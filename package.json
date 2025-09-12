@@ -1,0 +1,17 @@
+{
+  "name": "quickjs-typescript",
+  "version": "0.1.0",
+  "description": "TypeScript to QuickJS Bytecode Compiler",
+  "main": "dist/compiler.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/compiler.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "tsx": "^4.20.5"
+  }
+}
