@@ -5,7 +5,10 @@
   "main": "dist/compiler.js",
   "scripts": {
     "build": "tsc",
-    "start": "tsx src/cli.ts"
+    "start": "tsx src/cli.ts",
+    "align:qjs": "tsx scripts/auto-align-quickjs.ts",
+    "validate": "tsx scripts/validate-compile.ts",
+    "compare": "tsx scripts/compare-with-qjs.ts"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",

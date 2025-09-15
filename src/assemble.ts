@@ -1,5 +1,7 @@
 import { FunctionIR } from './ir'
-import { OP, HAS_GOTO16 } from './op'
+import { OP } from './op'
+import { HAS_GOTO16 } from './env'
+
 
 type LabelRefPatch = {
   instrIndex: number
@@ -25,6 +27,9 @@ export class Assembler {
   private patches: LabelRefPatch[] = []
   private nextLabelId = 1
 
+  // 新增：异常表（使用标签表示区间和目标）
+  private exceptionTriples: Array<{ startLabel: number; endLabel: number; targetLabel: number }> = []
+
   constructor(ir: FunctionIR) { 
     this.ir = ir
   }
@@ -35,6 +40,11 @@ export class Assembler {
 
   defineLabel(id: number) { 
     this.labels.set(id, this.instrs.length) 
+  }
+
+  // 基于标签添加异常表项（在 assemble 时解析为 PC）
+  addExceptionByLabels(startLabel: number, endLabel: number, targetLabel: number) {
+    this.exceptionTriples.push({ startLabel, endLabel, targetLabel })
   }
 
   emit(op: OP, operands: number[] = [], line?: number, col?: number) {
@@ -139,6 +149,18 @@ export class Assembler {
       const rel = targetPC - afterLabel
       writeI32LE(this.ir.bytecode, instrPC + p.operandOffset, rel)
     }
+
+    // 解析异常表（标签 -> PC）并写入 IR
+    for (const ex of this.exceptionTriples) {
+      const sIdx = this.labels.get(ex.startLabel)
+      const eIdx = this.labels.get(ex.endLabel)
+      const tIdx = this.labels.get(ex.targetLabel)
+      if (sIdx == null || eIdx == null || tIdx == null) continue
+      const start_pc = this.pcOffsets[sIdx]
+      const end_pc = this.pcOffsets[eIdx]
+      const target_pc = this.pcOffsets[tIdx]
+      this.ir.exceptions.push({ start_pc, end_pc, target_pc })
+    }
   }
 
   private computePC() {
@@ -159,7 +181,7 @@ function u32(v: number): number[] {
 
 function i32(v: number): number[] { 
   const b=Buffer.alloc(4)
-  b.writeInt32LE(v,0)
+  b.writeInt32LE(v,0) 
   return Array.from(b)
 }
 

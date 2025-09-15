@@ -1,4 +1,4 @@
-import { BufferWriter } from './utils'
+import { BufferWriter } from './buffer'
 
 const ATOM_KIND_STRING = 1
 
