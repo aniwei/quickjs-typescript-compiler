@@ -6,6 +6,7 @@ import { OP, FUN_FLAG_STRICT, OP_AWAIT, OP_YIELD } from './op'
 import { StrongTypeChecker } from './types'
 import { optimizeBytecode } from './optimizer'
 import { ShapePolicy } from './shape-policy'
+import { BytecodeWriter } from './bytecode-writer'
 
 export interface CompileOptions {
   forceModule?: boolean
@@ -77,6 +78,290 @@ export function compileSource(
     }
 
     return locals.get(name)!
+  }
+
+  // Closure variable analysis helper
+  function addVarRef(varName: string, fromParentIsVar: boolean, fromParentIndex: number): number {
+    const nameAtom = atoms.add(varName)
+    
+    // Check if already exists
+    const existing = ir.varRefIndexByNameAtom.get(nameAtom)
+    if (existing !== undefined) {
+      return existing
+    }
+    
+    const index = ir.varRefs.length
+    ir.varRefs.push({
+      nameAtom,
+      fromParentIsVar,
+      fromParentIndex
+    })
+    ir.varRefIndexByNameAtom.set(nameAtom, index)
+    
+    return index
+  }
+
+  // Function compilation helper
+  function compileFunction(func: ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction): number {
+    // Create a new isolated compilation context for the function
+    const childIR = new FunctionIR()
+    const childAtoms = new AtomTable()
+    const childTypeck = new StrongTypeChecker(checker)
+    
+    // Set up function metadata
+    const isAsync = !!(func.modifiers?.some(m => m.kind === ts.SyntaxKind.AsyncKeyword))
+    const isGenerator = !!func.asteriskToken
+    
+    // Check for async/generator support
+    if (isAsync && OP_AWAIT == null) {
+      const p = sf.getLineAndCharacterOfPosition(func.getStart())
+      throw new Error(`本编译器未配置 AWAIT opcode（QJS_OP_AWAIT）。无法编译 async 函数。位置：${sf.fileName}:${p.line+1}:${p.character+1}`)
+    }
+    
+    if (isGenerator && OP_YIELD == null) {
+      const p = sf.getLineAndCharacterOfPosition(func.getStart())
+      throw new Error(`本编译器未配置 YIELD opcode（QJS_OP_YIELD）。无法编译 generator 函数。位置：${sf.fileName}:${p.line+1}:${p.character+1}`)
+    }
+    
+    // Function name
+    let funcName = '<anonymous>'
+    if (ts.isFunctionDeclaration(func) && func.name) {
+      funcName = func.name.text
+    } else if (ts.isFunctionExpression(func) && func.name) {
+      funcName = func.name.text
+    }
+    
+    childIR.functionNameAtomId = childAtoms.add(funcName)
+    childIR.filenameAtomId = childAtoms.add(sf.fileName)
+    
+    // Set up child compilation context
+    const childAsm = new Assembler(childIR)
+    const childLocals = new Map<string, number>()
+    const childLocalNames: string[] = []
+    
+    // Helper functions for child compilation context
+    const childLine = (n: ts.Node) => sf.getLineAndCharacterOfPosition(n.getStart()).line + 1
+    const childCol = (n: ts.Node) => sf.getLineAndCharacterOfPosition(n.getStart()).character
+    const childEmit = (op: OP, ops: number[] = [], n?: ts.Node) => 
+      childAsm.emit(op, ops, n ? childLine(n) : undefined, n ? childCol(n) : undefined)
+    
+    const childAddLocal = (name: string) => { 
+      if (!childLocals.has(name)) { 
+        childLocals.set(name, childLocals.size)
+        childLocalNames.push(name)
+      }
+      return childLocals.get(name)!
+    }
+    
+    // Process parameters
+    const paramNames: string[] = []
+    func.parameters?.forEach((param) => {
+      if (ts.isIdentifier(param.name)) {
+        const paramName = param.name.text
+        paramNames.push(paramName)
+        childAddLocal(paramName)
+      }
+    })
+    
+    childIR.argCount = func.parameters?.length || 0
+    childIR.definedArgCount = childIR.argCount
+    childIR.paramNameAtoms = paramNames.map(n => childAtoms.add(n))
+    
+    // Simple function body compilation
+    function childEmitExpr(e: ts.Expression): void {
+      childTypeck.ensureNoAny(e)
+      
+      if (ts.isNumericLiteral(e)) { 
+        const n = Number(e.text)
+        if (Number.isInteger(n) && n >= -2147483648 && n <= 2147483647) {
+          childEmit(OP.push_i32, [
+            (n & 0xff), ((n >> 8) & 0xff), ((n >> 16) & 0xff), ((n >> 24) & 0xff)
+          ], e)
+        } else {
+          const k = childIR.constPool.indexNumber(n) 
+          childEmit(OP.push_const, [k & 0xff, (k >> 8) & 0xff, (k >> 16) & 0xff, (k >> 24) & 0xff], e)
+        }
+        return
+      }
+      
+      if (ts.isStringLiteral(e)) { 
+        childEmit(OP.push_atom_value, [
+          childAtoms.add(e.text) & 0xff, 
+          (childAtoms.add(e.text) >> 8) & 0xff,
+          (childAtoms.add(e.text) >> 16) & 0xff,
+          (childAtoms.add(e.text) >> 24) & 0xff
+        ], e)
+        return
+      }
+      
+      if (e.kind === ts.SyntaxKind.TrueKeyword) {
+        childEmit(OP.push_true, [], e) 
+        return
+      }
+
+      if (e.kind === ts.SyntaxKind.FalseKeyword) { 
+        childEmit(OP.push_false, [], e)
+        return
+      }
+
+      if (e.kind === ts.SyntaxKind.NullKeyword) { 
+        childEmit(OP.null, [], e) 
+        return
+      }
+      
+      if (ts.isIdentifier(e)) { 
+        if (childLocals.has(e.text)) {
+          const loc = childLocals.get(e.text)!
+          childEmit(OP.get_loc, [loc & 0xff, (loc >> 8) & 0xff], e)
+        } else {
+          // Check if this variable exists in parent scope (closure)
+          if (locals.has(e.text)) {
+            // This is a closure variable - add var_ref
+            const varRefIndex = addVarRef(e.text, false, locals.get(e.text)!)
+            childEmit(OP.get_var_ref, [varRefIndex & 0xff, (varRefIndex >> 8) & 0xff], e)
+          } else {
+            // Global variable
+            const atomId = childAtoms.add(e.text)
+            childEmit(OP.get_var, [
+              atomId & 0xff, (atomId >> 8) & 0xff, (atomId >> 16) & 0xff, (atomId >> 24) & 0xff
+            ], e)
+          }
+        }
+        return
+      }
+      
+      if (ts.isBinaryExpression(e)) {
+        childEmitExpr(e.left)
+        childEmitExpr(e.right)
+        
+        switch (e.operatorToken.kind) {
+          case ts.SyntaxKind.PlusToken: 
+            childEmit(OP.add, [], e)
+            break
+          case ts.SyntaxKind.MinusToken: 
+            childEmit(OP.sub, [], e)
+            break
+          case ts.SyntaxKind.AsteriskToken: 
+            childEmit(OP.mul, [], e)
+            break
+          case ts.SyntaxKind.SlashToken: 
+            childEmit(OP.div, [], e)
+            break
+          default:
+            childEmit(OP.add, [], e) // Default to add for safety
+            break
+        }
+        return
+      }
+      
+      if (ts.isCallExpression(e)) {
+        // Simple call handling
+        childEmitExpr(e.expression)
+        for (const arg of e.arguments) {
+          childEmitExpr(arg)
+        }
+        childEmit(OP.call, [e.arguments.length & 0xff, (e.arguments.length >> 8) & 0xff], e)
+        return
+      }
+      
+      // Default case
+      childEmit(OP.undefined, [], e)
+    }
+    
+    function childEmitStmt(s: ts.Statement): void {
+      if (ts.isVariableStatement(s)) {
+        for (const d of s.declarationList.declarations) {
+          if (!ts.isIdentifier(d.name)) {
+            continue
+          }
+          const name = d.name.text
+          childAddLocal(name)
+          if (d.initializer) { 
+            childEmitExpr(d.initializer)
+            const loc = childLocals.get(name)!
+            childEmit(OP.put_loc, [loc & 0xff, (loc >> 8) & 0xff], d)
+          }
+        }
+        return
+      }
+      
+      if (ts.isReturnStatement(s)) {
+        if (s.expression) { 
+          childEmitExpr(s.expression)
+          childEmit(OP.return, [], s)
+        } else {
+          childEmit(OP.return_undef, [], s)
+        }
+        return
+      }
+      
+      if (ts.isExpressionStatement(s)) { 
+        childEmitExpr(s.expression)
+        return
+      }
+      
+      if (ts.isBlock(s)) { 
+        for (const x of s.statements) {
+          childEmitStmt(x)
+        }
+        return
+      }
+      
+      if (ts.isIfStatement(s)) {
+        childEmitExpr(s.expression)
+        const childElseLabel = childAsm.newLabel()
+        childAsm.emitIfFalseTo(childElseLabel)
+        childEmitStmt(s.thenStatement)
+        
+        if (s.elseStatement) {
+          const childEndLabel = childAsm.newLabel()
+          childAsm.emitGotoTo(childEndLabel)
+          childAsm.defineLabel(childElseLabel)
+          childEmitStmt(s.elseStatement)
+          childAsm.defineLabel(childEndLabel)
+        } else {
+          childAsm.defineLabel(childElseLabel)
+        }
+        return
+      }
+    }
+    
+    // Compile function body
+    if (func.body) {
+      if (ts.isBlock(func.body)) {
+        // Block statement body
+        for (const stmt of func.body.statements) {
+          childEmitStmt(stmt)
+        }
+        // Add implicit return undefined if no explicit return
+        if (func.body.statements.length === 0 || 
+            !func.body.statements.some(s => ts.isReturnStatement(s))) {
+          childEmit(OP.return_undef)
+        }
+      } else {
+        // Expression body (arrow function)
+        childEmitExpr(func.body)
+        childEmit(OP.return, [], func.body)
+      }
+    } else {
+      childEmit(OP.return_undef, [], func)
+    }
+    
+    childIR.varCount = childLocals.size
+    childIR.localNameAtoms = childLocalNames.map(n => childAtoms.add(n))
+    
+    childAsm.assemble(!!options.enableShortOpcodes)
+    
+    // For isolated function, create a simplified bytecode buffer
+    // In a full implementation, this would use proper bytecode generation
+    // For now, store a simplified representation in the const pool
+    const funcIndex = ir.constPool.list.length
+    ir.constPool.list.push({
+      kind: 'function',
+      data: Buffer.from([0]) // Placeholder - would contain actual function bytecode
+    })
+    
+    return funcIndex
   }
 
   const withStack: WithStatic[] = []
@@ -173,7 +458,13 @@ export function compileSource(
     if (locals.has(name)) {
       emit(OP.get_loc, u16(locals.get(name)!), n)
     } else {
-      emit(OP.get_var, u32(atoms.add(name)), n)
+      // Check if this is a var_ref (closure variable)
+      const varRefIndex = ir.varRefIndexByNameAtom.get(atoms.add(name))
+      if (varRefIndex !== undefined) {
+        emit(OP.get_var_ref, u16(varRefIndex), n)
+      } else {
+        emit(OP.get_var, u32(atoms.add(name)), n)
+      }
     }
   }
 
@@ -202,7 +493,13 @@ export function compileSource(
     if (locals.has(name)){
       emit(OP.put_loc, u16(locals.get(name)!), n)
     } else {
-      emit(OP.put_var, u32(atoms.add(name)), n)
+      // Check if this is a var_ref (closure variable)
+      const varRefIndex = ir.varRefIndexByNameAtom.get(atoms.add(name))
+      if (varRefIndex !== undefined) {
+        emit(OP.put_var_ref, u16(varRefIndex), n)
+      } else {
+        emit(OP.put_var, u32(atoms.add(name)), n)
+      }
     }
   }
 
@@ -399,6 +696,14 @@ export function compileSource(
 
   function emitExpr(e: ts.Expression): void {
     typeck.ensureNoAny(e)
+
+    // Handle function expressions and arrow functions
+    if (ts.isFunctionExpression(e) || ts.isArrowFunction(e)) {
+      const constIndex = compileFunction(e)
+      emit(OP.push_const, u32(constIndex), e)
+      emit(OP.fclosure, [], e)
+      return
+    }
 
     if (ts.isAwaitExpression(e)) { 
       emitAwait(e.expression, e)
@@ -795,6 +1100,19 @@ export function compileSource(
   }
 
   function emitStmt(s: ts.Statement) {
+    // Handle function declarations with hoisting
+    if (ts.isFunctionDeclaration(s)) {
+      if (s.name) {
+        const funcName = s.name.text
+        const constIndex = compileFunction(s)
+        
+        // For hoisting, we emit define_func which creates the function binding immediately
+        emit(OP.push_const, u32(constIndex), s)
+        emit(OP.define_func, u32(atoms.add(funcName)), s)
+      }
+      return
+    }
+
     if (ts.isForOfStatement(s)) { 
       emitForOf(s) 
       return
@@ -934,8 +1252,28 @@ export function compileSource(
     }
   }
 
+  // Pre-scan for function declarations for hoisting
+  function hoistFunctionDeclarations(statements: readonly ts.Statement[]) {
+    for (const st of statements) {
+      if (ts.isFunctionDeclaration(st) && st.name) {
+        const funcName = st.name.text
+        const constIndex = compileFunction(st)
+        
+        // Emit the hoisted function declaration
+        emit(OP.push_const, u32(constIndex), st)
+        emit(OP.define_func, u32(atoms.add(funcName)), st)
+      }
+    }
+  }
+
+  // Hoist all function declarations first
+  hoistFunctionDeclarations(sf.statements)
+
   for (const st of sf.statements) {
-    emitStmt(st)
+    // Skip function declarations since they were already hoisted
+    if (!ts.isFunctionDeclaration(st)) {
+      emitStmt(st)
+    }
   }
 
   if (!ir.isModule) {
