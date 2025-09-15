@@ -80,12 +80,33 @@ export function compileSource(
     return locals.get(name)!
   }
 
+  // Closure variable analysis helper
+  function addVarRef(varName: string, fromParentIsVar: boolean, fromParentIndex: number): number {
+    const nameAtom = atoms.add(varName)
+    
+    // Check if already exists
+    const existing = ir.varRefIndexByNameAtom.get(nameAtom)
+    if (existing !== undefined) {
+      return existing
+    }
+    
+    const index = ir.varRefs.length
+    ir.varRefs.push({
+      nameAtom,
+      fromParentIsVar,
+      fromParentIndex
+    })
+    ir.varRefIndexByNameAtom.set(nameAtom, index)
+    
+    return index
+  }
+
   // Function compilation helper
   function compileFunction(func: ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction): number {
-    // For now, create a placeholder function that just returns undefined
-    // This is a simplified implementation that should be expanded for full function compilation
-    
+    // Create a new isolated compilation context for the function
     const childIR = new FunctionIR()
+    const childAtoms = new AtomTable()
+    const childTypeck = new StrongTypeChecker(checker)
     
     // Set up function metadata
     const isAsync = !!(func.modifiers?.some(m => m.kind === ts.SyntaxKind.AsyncKeyword))
@@ -110,36 +131,161 @@ export function compileSource(
       funcName = func.name.text
     }
     
-    childIR.functionNameAtomId = atoms.add(funcName)
-    childIR.filenameAtomId = atoms.add(sf.fileName)
+    childIR.functionNameAtomId = childAtoms.add(funcName)
+    childIR.filenameAtomId = childAtoms.add(sf.fileName)
     
-    // Parameters
+    // Set up child compilation context
+    const childAsm = new Assembler(childIR)
+    const childLocals = new Map<string, number>()
+    const childLocalNames: string[] = []
+    
+    // Helper functions for child compilation context
+    const childLine = (n: ts.Node) => sf.getLineAndCharacterOfPosition(n.getStart()).line + 1
+    const childCol = (n: ts.Node) => sf.getLineAndCharacterOfPosition(n.getStart()).character
+    const childEmit = (op: OP, ops: number[] = [], n?: ts.Node) => 
+      childAsm.emit(op, ops, n ? childLine(n) : undefined, n ? childCol(n) : undefined)
+    
+    const childAddLocal = (name: string) => { 
+      if (!childLocals.has(name)) { 
+        childLocals.set(name, childLocals.size)
+        childLocalNames.push(name)
+      }
+      return childLocals.get(name)!
+    }
+    
+    // Process parameters
     const paramNames: string[] = []
     func.parameters?.forEach((param) => {
       if (ts.isIdentifier(param.name)) {
-        paramNames.push(param.name.text)
+        const paramName = param.name.text
+        paramNames.push(paramName)
+        childAddLocal(paramName)
       }
     })
     
     childIR.argCount = func.parameters?.length || 0
     childIR.definedArgCount = childIR.argCount
-    childIR.paramNameAtoms = paramNames.map(n => atoms.add(n))
-    childIR.localNameAtoms = paramNames.map(n => atoms.add(n))
-    childIR.varCount = paramNames.length
+    childIR.paramNameAtoms = paramNames.map(n => childAtoms.add(n))
     
-    // For now, just create a minimal function that returns undefined
-    const childAsm = new Assembler(childIR)
-    childAsm.emit(OP.return_undef, [])
+    // Simple function body compilation
+    function childEmitExpr(e: ts.Expression): void {
+      childTypeck.ensureNoAny(e)
+      
+      if (ts.isNumericLiteral(e)) { 
+        const n = Number(e.text)
+        if (Number.isInteger(n) && n >= -2147483648 && n <= 2147483647) {
+          childEmit(OP.push_i32, [
+            (n & 0xff), ((n >> 8) & 0xff), ((n >> 16) & 0xff), ((n >> 24) & 0xff)
+          ], e)
+        } else {
+          const k = childIR.constPool.indexNumber(n) 
+          childEmit(OP.push_const, [k & 0xff, (k >> 8) & 0xff, (k >> 16) & 0xff, (k >> 24) & 0xff], e)
+        }
+        return
+      }
+      
+      if (ts.isStringLiteral(e)) { 
+        childEmit(OP.push_atom_value, [
+          childAtoms.add(e.text) & 0xff, 
+          (childAtoms.add(e.text) >> 8) & 0xff,
+          (childAtoms.add(e.text) >> 16) & 0xff,
+          (childAtoms.add(e.text) >> 24) & 0xff
+        ], e)
+        return
+      }
+      
+      if (ts.isIdentifier(e)) { 
+        if (childLocals.has(e.text)) {
+          const loc = childLocals.get(e.text)!
+          childEmit(OP.get_loc, [loc & 0xff, (loc >> 8) & 0xff], e)
+        } else {
+          // Check if this variable exists in parent scope (closure)
+          if (locals.has(e.text)) {
+            // This is a closure variable - add var_ref
+            const varRefIndex = addVarRef(e.text, false, locals.get(e.text)!)
+            childEmit(OP.get_var_ref, [varRefIndex & 0xff, (varRefIndex >> 8) & 0xff], e)
+          } else {
+            // Global variable
+            const atomId = childAtoms.add(e.text)
+            childEmit(OP.get_var, [
+              atomId & 0xff, (atomId >> 8) & 0xff, (atomId >> 16) & 0xff, (atomId >> 24) & 0xff
+            ], e)
+          }
+        }
+        return
+      }
+      
+      if (ts.isBinaryExpression(e) && e.operatorToken.kind === ts.SyntaxKind.PlusToken) {
+        childEmitExpr(e.left)
+        childEmitExpr(e.right)
+        childEmit(OP.add, [], e)
+        return
+      }
+      
+      // Default case
+      childEmit(OP.undefined, [], e)
+    }
+    
+    function childEmitStmt(s: ts.Statement): void {
+      if (ts.isReturnStatement(s)) {
+        if (s.expression) { 
+          childEmitExpr(s.expression)
+          childEmit(OP.return, [], s)
+        } else {
+          childEmit(OP.return_undef, [], s)
+        }
+        return
+      }
+      
+      if (ts.isExpressionStatement(s)) { 
+        childEmitExpr(s.expression)
+        return
+      }
+      
+      if (ts.isBlock(s)) { 
+        for (const x of s.statements) {
+          childEmitStmt(x)
+        }
+        return
+      }
+    }
+    
+    // Compile function body
+    if (func.body) {
+      if (ts.isBlock(func.body)) {
+        // Block statement body
+        for (const stmt of func.body.statements) {
+          childEmitStmt(stmt)
+        }
+        // Add implicit return undefined if no explicit return
+        if (func.body.statements.length === 0 || 
+            !func.body.statements.some(s => ts.isReturnStatement(s))) {
+          childEmit(OP.return_undef)
+        }
+      } else {
+        // Expression body (arrow function)
+        childEmitExpr(func.body)
+        childEmit(OP.return, [], func.body)
+      }
+    } else {
+      childEmit(OP.return_undef, [], func)
+    }
+    
+    childIR.varCount = childLocals.size
+    childIR.localNameAtoms = childLocalNames.map(n => childAtoms.add(n))
+    
     childAsm.assemble(!!options.enableShortOpcodes)
     
-    // Create a minimal bytecode representation
-    // This is a simplified approach - in a full implementation we'd need to 
-    // recursively compile the function body with proper scope handling
-    const writer = new BytecodeWriter(atoms)
-    const functionBundle = writer.writeTop(childIR)
+    // For isolated function, create a simplified bytecode buffer
+    // In a full implementation, this would use proper bytecode generation
+    // For now, store a simplified representation in the const pool
+    const funcIndex = ir.constPool.list.length
+    ir.constPool.list.push({
+      kind: 'function',
+      data: Buffer.from([0]) // Placeholder - would contain actual function bytecode
+    })
     
-    // Add function to constant pool as raw bytes
-    return ir.constPool.indexFunctionBytes(functionBundle.buffer)
+    return funcIndex
   }
 
   const withStack: WithStatic[] = []
@@ -236,7 +382,13 @@ export function compileSource(
     if (locals.has(name)) {
       emit(OP.get_loc, u16(locals.get(name)!), n)
     } else {
-      emit(OP.get_var, u32(atoms.add(name)), n)
+      // Check if this is a var_ref (closure variable)
+      const varRefIndex = ir.varRefIndexByNameAtom.get(atoms.add(name))
+      if (varRefIndex !== undefined) {
+        emit(OP.get_var_ref, u16(varRefIndex), n)
+      } else {
+        emit(OP.get_var, u32(atoms.add(name)), n)
+      }
     }
   }
 
@@ -265,7 +417,13 @@ export function compileSource(
     if (locals.has(name)){
       emit(OP.put_loc, u16(locals.get(name)!), n)
     } else {
-      emit(OP.put_var, u32(atoms.add(name)), n)
+      // Check if this is a var_ref (closure variable)
+      const varRefIndex = ir.varRefIndexByNameAtom.get(atoms.add(name))
+      if (varRefIndex !== undefined) {
+        emit(OP.put_var_ref, u16(varRefIndex), n)
+      } else {
+        emit(OP.put_var, u32(atoms.add(name)), n)
+      }
     }
   }
 
