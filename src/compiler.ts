@@ -6,6 +6,7 @@ import { OP, FUN_FLAG_STRICT, OP_AWAIT, OP_YIELD } from './op'
 import { StrongTypeChecker } from './types'
 import { optimizeBytecode } from './optimizer'
 import { ShapePolicy } from './shape-policy'
+import { BytecodeWriter } from './bytecode-writer'
 
 export interface CompileOptions {
   forceModule?: boolean
@@ -77,6 +78,68 @@ export function compileSource(
     }
 
     return locals.get(name)!
+  }
+
+  // Function compilation helper
+  function compileFunction(func: ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction): number {
+    // For now, create a placeholder function that just returns undefined
+    // This is a simplified implementation that should be expanded for full function compilation
+    
+    const childIR = new FunctionIR()
+    
+    // Set up function metadata
+    const isAsync = !!(func.modifiers?.some(m => m.kind === ts.SyntaxKind.AsyncKeyword))
+    const isGenerator = !!func.asteriskToken
+    
+    // Check for async/generator support
+    if (isAsync && OP_AWAIT == null) {
+      const p = sf.getLineAndCharacterOfPosition(func.getStart())
+      throw new Error(`本编译器未配置 AWAIT opcode（QJS_OP_AWAIT）。无法编译 async 函数。位置：${sf.fileName}:${p.line+1}:${p.character+1}`)
+    }
+    
+    if (isGenerator && OP_YIELD == null) {
+      const p = sf.getLineAndCharacterOfPosition(func.getStart())
+      throw new Error(`本编译器未配置 YIELD opcode（QJS_OP_YIELD）。无法编译 generator 函数。位置：${sf.fileName}:${p.line+1}:${p.character+1}`)
+    }
+    
+    // Function name
+    let funcName = '<anonymous>'
+    if (ts.isFunctionDeclaration(func) && func.name) {
+      funcName = func.name.text
+    } else if (ts.isFunctionExpression(func) && func.name) {
+      funcName = func.name.text
+    }
+    
+    childIR.functionNameAtomId = atoms.add(funcName)
+    childIR.filenameAtomId = atoms.add(sf.fileName)
+    
+    // Parameters
+    const paramNames: string[] = []
+    func.parameters?.forEach((param) => {
+      if (ts.isIdentifier(param.name)) {
+        paramNames.push(param.name.text)
+      }
+    })
+    
+    childIR.argCount = func.parameters?.length || 0
+    childIR.definedArgCount = childIR.argCount
+    childIR.paramNameAtoms = paramNames.map(n => atoms.add(n))
+    childIR.localNameAtoms = paramNames.map(n => atoms.add(n))
+    childIR.varCount = paramNames.length
+    
+    // For now, just create a minimal function that returns undefined
+    const childAsm = new Assembler(childIR)
+    childAsm.emit(OP.return_undef, [])
+    childAsm.assemble(!!options.enableShortOpcodes)
+    
+    // Create a minimal bytecode representation
+    // This is a simplified approach - in a full implementation we'd need to 
+    // recursively compile the function body with proper scope handling
+    const writer = new BytecodeWriter(atoms)
+    const functionBundle = writer.writeTop(childIR)
+    
+    // Add function to constant pool as raw bytes
+    return ir.constPool.indexFunctionBytes(functionBundle.buffer)
   }
 
   const withStack: WithStatic[] = []
@@ -399,6 +462,14 @@ export function compileSource(
 
   function emitExpr(e: ts.Expression): void {
     typeck.ensureNoAny(e)
+
+    // Handle function expressions and arrow functions
+    if (ts.isFunctionExpression(e) || ts.isArrowFunction(e)) {
+      const constIndex = compileFunction(e)
+      emit(OP.push_const, u32(constIndex), e)
+      emit(OP.fclosure, [], e)
+      return
+    }
 
     if (ts.isAwaitExpression(e)) { 
       emitAwait(e.expression, e)
@@ -795,6 +866,19 @@ export function compileSource(
   }
 
   function emitStmt(s: ts.Statement) {
+    // Handle function declarations with hoisting
+    if (ts.isFunctionDeclaration(s)) {
+      if (s.name) {
+        const funcName = s.name.text
+        const constIndex = compileFunction(s)
+        
+        // For hoisting, we emit define_func which creates the function binding immediately
+        emit(OP.push_const, u32(constIndex), s)
+        emit(OP.define_func, u32(atoms.add(funcName)), s)
+      }
+      return
+    }
+
     if (ts.isForOfStatement(s)) { 
       emitForOf(s) 
       return
@@ -934,8 +1018,28 @@ export function compileSource(
     }
   }
 
+  // Pre-scan for function declarations for hoisting
+  function hoistFunctionDeclarations(statements: readonly ts.Statement[]) {
+    for (const st of statements) {
+      if (ts.isFunctionDeclaration(st) && st.name) {
+        const funcName = st.name.text
+        const constIndex = compileFunction(st)
+        
+        // Emit the hoisted function declaration
+        emit(OP.push_const, u32(constIndex), st)
+        emit(OP.define_func, u32(atoms.add(funcName)), st)
+      }
+    }
+  }
+
+  // Hoist all function declarations first
+  hoistFunctionDeclarations(sf.statements)
+
   for (const st of sf.statements) {
-    emitStmt(st)
+    // Skip function declarations since they were already hoisted
+    if (!ts.isFunctionDeclaration(st)) {
+      emitStmt(st)
+    }
   }
 
   if (!ir.isModule) {
