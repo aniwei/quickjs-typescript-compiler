@@ -13,10 +13,6 @@ function looksLikeModule(text: string): boolean {
   return /\b(import|export)\b/.test(text)
 }
 
-function readU32LE(buf: Buffer, off: number) {
-  return (buf[off] | (buf[off+1]<<8) | (buf[off+2]<<16) | (buf[off+3]<<24)) >>> 0
-}
-
 function main() {
   const testsDir = path.resolve('__tests__')
   const outDir = path.resolve('dist-tests')
@@ -46,7 +42,12 @@ function main() {
     }
 
     try {
-      const program = ts.createProgram([fp], {
+      // 确保强类型别名可用：将 types.d.ts 一并注入 Program
+      const rootNames = [fp]
+      const typesDecl = path.resolve('types.d.ts')
+      if (fs.existsSync(typesDecl)) rootNames.push(typesDecl)
+
+      const program = ts.createProgram(rootNames, {
         target: ts.ScriptTarget.ES2020,
         module: ts.ModuleKind.ESNext,
         strict: true,
@@ -72,10 +73,8 @@ function main() {
       const outPath = path.join(outDir, outName)
       fs.writeFileSync(outPath, buffer)
 
-      const magic = readU32LE(buffer, 0)
-      const version = readU32LE(buffer, 4)
-
-      console.log(`[ok] ${f} -> ${outName} (${buffer.length} bytes) magic=0x${(magic>>>0).toString(16)} version=0x${(version>>>0).toString(16)}`)
+      const bcver = buffer[0] & 0xff
+      console.log(`[ok] ${f} -> ${outName} (${buffer.length} bytes) bc_version=0x${bcver.toString(16)}`)
       ok++
 
       const funcs = 1 // 顶层 1 个

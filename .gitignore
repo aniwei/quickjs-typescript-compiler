@@ -12,3 +12,4 @@ output/
 .idea/
 .joycode/
 dist-source
+dist-tests

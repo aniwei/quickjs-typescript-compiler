@@ -3,7 +3,7 @@ export type ConstKind = 'number' | 'string' | 'function' | 'atom'
 export interface ConstEntry {
   kind: ConstKind;
   num?: number;
-  data?: string|Buffer;
+  data?: string | Buffer;
   atomId?: number;
 }
 

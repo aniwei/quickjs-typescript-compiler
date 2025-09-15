@@ -8,30 +8,35 @@
 // 3) 验证：                         bash scripts/verify-with-qjs.sh out.qjbc
 
 // 简单的 i32/u32/i64 变量与运算
-function add_i32(a: any /* i32 */, b: any /* i32 */): any /* i32 */ {
-  return a + b;
+function add_i32(a: i32, b: i32): i32 {
+  return (a + b) as i32;
 }
-function to_u32(x: any /* u32 */): any /* u32 */ {
-  return x;
+function to_u32(x: u32): u32 {
+  return x as u32;
 }
-function add_i64(a: bigint /* i64 */, b: bigint /* i64 */): bigint /* i64 */ {
-  return a + b;
+function add_i64(a: i64, b: i64): i64 {
+  return (a + b) as i64;
 }
 
-export function main() {
-  const a /* i32 */ = 2147483647;       // 需要收窄为 i32
-  const b /* i32 */ = 1;
-  const c /* i32 */ = add_i32(a, b);    // 溢出后 |0
+// 窄化/品牌辅助：将 number/bigint 安全收窄为对应的品牌类型
+function as_i32(x: number): i32 { return (x | 0) as i32; }
+function as_u32(x: number): u32 { return (x >>> 0) as u32; }
+function as_i64(x: bigint): i64 { return x as i64; }
 
-  const x /* u32 */ = -1;               // >>>0 => 4294967295
-  const y /* u32 */ = to_u32(x);
+export function main(): i32 {
+  const a: i32 = as_i32(2147483647);       // 需要收窄为 i32
+  const b: i32 = as_i32(1);
+  const c: i32 = add_i32(a, b);            // 溢出后 |0
 
-  const m /* i64 */ = 9007199254740991n;  // BigInt 直接 i64
-  const n /* i64 */ = 2n;
-  const p /* i64 */ = add_i64(m, n);
+  const x: u32 = as_u32(-1);               // >>>0 => 4294967295
+  const y: u32 = to_u32(x);
+
+  const m: i64 = as_i64(9007199254740991n);  // BigInt 直接 i64
+  const n: i64 = as_i64(2n);
+  const p: i64 = add_i64(m, n);
 
   // 返回 i32
-  return (c as any);
+  return c as i32;
 }
 
 main();

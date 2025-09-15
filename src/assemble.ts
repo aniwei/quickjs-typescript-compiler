@@ -174,13 +174,13 @@ export class Assembler {
 }
 
 function u32(v: number): number[] { 
-  const b=Buffer.alloc(4)
+  const b = Buffer.alloc(4)
   b.writeUInt32LE(v,0)
   return Array.from(b) 
 }
 
 function i32(v: number): number[] { 
-  const b=Buffer.alloc(4)
+  const b = Buffer.alloc(4)
   b.writeInt32LE(v,0) 
   return Array.from(b)
 }
