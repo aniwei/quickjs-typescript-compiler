@@ -1,20 +1,20 @@
 import { FunctionIR } from './ir'
-import { OP, HAS_GOTO16 } from './op-codes'
+import { OP, HAS_GOTO16 } from './op'
 
 type LabelRefPatch = {
-  instrIndex: number;
-  operandOffset: number;  // from instruction start (incl opcode)
-  targetLabel: number;
+  instrIndex: number
+  operandOffset: number  // from instruction start (incl opcode)
+  targetLabel: number
 }
 
 type Instr = {
-  op: OP;
-  operands: number[];
-  srcLine?: number;
-  srcCol?: number;
+  op: OP
+  operands: number[]
+  srcLine?: number
+  srcCol?: number
 
-  targetLabel?: number;
-  size?: number;
+  targetLabel?: number
+  size?: number
 }
 
 export class Assembler {
@@ -124,6 +124,7 @@ export class Assembler {
         } else {
           this.ir.bytecode.push(ins.op, ...i32(rel))
         }
+
         continue
       }
 

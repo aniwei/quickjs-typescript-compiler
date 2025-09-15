@@ -1,4 +1,4 @@
-import { OP } from './op-codes';
+import { OP } from './op';
 
 /**
  * Optimizer:

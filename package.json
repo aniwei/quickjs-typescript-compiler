@@ -5,7 +5,7 @@
   "main": "dist/compiler.js",
   "scripts": {
     "build": "tsc",
-    "start": "tsx src/compiler.ts"
+    "start": "tsx src/cli.ts"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",

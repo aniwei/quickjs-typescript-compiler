@@ -1,9 +1,11 @@
 import { AtomTable } from './atoms'
 import { FunctionIR, ConstEntry } from './ir'
 import { BufferWriter } from './utils'
-import { BYTECODE_MAGIC, BYTECODE_VERSION, FUN_KIND_BYTECODE, FUN_KIND_MODULE } from './op-codes'
+import { BYTECODE_MAGIC, BYTECODE_VERSION, FUN_KIND_BYTECODE, FUN_KIND_MODULE } from './op'
 
-export interface BytecodeBundle { buf: Buffer; }
+export interface BytecodeBundle { 
+  buffer: Buffer 
+}
 
 export class BytecodeWriter {
   constructor(private atoms: AtomTable) {}
@@ -20,7 +22,7 @@ export class BytecodeWriter {
     w.raw(body)
 
     return { 
-      buf: w.concat() 
+      buffer: w.concat() 
     }
   }
 
@@ -29,7 +31,7 @@ export class BytecodeWriter {
 
     // Header (align with common bc_write_function layout)
     w.u8(ir.isModule ? FUN_KIND_MODULE : FUN_KIND_BYTECODE)
-    w.u32(ir.funFlags >>> 0)
+    w.u32(ir.flags >>> 0)
     w.u32(ir.argCount >>> 0)
     w.u32(ir.varCount >>> 0)
     w.u32(ir.definedArgCount >>> 0)
@@ -159,8 +161,14 @@ export class BytecodeWriter {
   }
 }
 
-function compressPC2Loc(ir: FunctionIR): { pc_delta: number; line_delta: number; column: number }[] {
-  const out: { pc_delta: number; line_delta: number; column: number }[] = []
+type Out = { 
+  pc_delta: number
+  line_delta: number
+  column: number 
+}
+
+function compressPC2Loc(ir: FunctionIR): Out[] {
+  const out: Out[] = []
   const sorted = [...ir.pc2loc].sort((a,b)=>a.pc-b.pc)
   let prevPC = 0, prevLine = 0
 
@@ -169,7 +177,8 @@ function compressPC2Loc(ir: FunctionIR): { pc_delta: number; line_delta: number;
     const pc_delta = (i === 0) ? e.pc : e.pc - prevPC
     const line_delta = (i === 0) ? e.line : e.line - prevLine
     out.push({ pc_delta, line_delta, column: e.column })
-    prevPC = e.pc; prevLine = e.line
+    prevPC = e.pc
+    prevLine = e.line
   }
 
   return out
