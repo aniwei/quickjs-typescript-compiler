@@ -194,6 +194,21 @@ export function compileSource(
         return
       }
       
+      if (e.kind === ts.SyntaxKind.TrueKeyword) {
+        childEmit(OP.push_true, [], e) 
+        return
+      }
+
+      if (e.kind === ts.SyntaxKind.FalseKeyword) { 
+        childEmit(OP.push_false, [], e)
+        return
+      }
+
+      if (e.kind === ts.SyntaxKind.NullKeyword) { 
+        childEmit(OP.null, [], e) 
+        return
+      }
+      
       if (ts.isIdentifier(e)) { 
         if (childLocals.has(e.text)) {
           const loc = childLocals.get(e.text)!
@@ -215,10 +230,37 @@ export function compileSource(
         return
       }
       
-      if (ts.isBinaryExpression(e) && e.operatorToken.kind === ts.SyntaxKind.PlusToken) {
+      if (ts.isBinaryExpression(e)) {
         childEmitExpr(e.left)
         childEmitExpr(e.right)
-        childEmit(OP.add, [], e)
+        
+        switch (e.operatorToken.kind) {
+          case ts.SyntaxKind.PlusToken: 
+            childEmit(OP.add, [], e)
+            break
+          case ts.SyntaxKind.MinusToken: 
+            childEmit(OP.sub, [], e)
+            break
+          case ts.SyntaxKind.AsteriskToken: 
+            childEmit(OP.mul, [], e)
+            break
+          case ts.SyntaxKind.SlashToken: 
+            childEmit(OP.div, [], e)
+            break
+          default:
+            childEmit(OP.add, [], e) // Default to add for safety
+            break
+        }
+        return
+      }
+      
+      if (ts.isCallExpression(e)) {
+        // Simple call handling
+        childEmitExpr(e.expression)
+        for (const arg of e.arguments) {
+          childEmitExpr(arg)
+        }
+        childEmit(OP.call, [e.arguments.length & 0xff, (e.arguments.length >> 8) & 0xff], e)
         return
       }
       
@@ -227,6 +269,22 @@ export function compileSource(
     }
     
     function childEmitStmt(s: ts.Statement): void {
+      if (ts.isVariableStatement(s)) {
+        for (const d of s.declarationList.declarations) {
+          if (!ts.isIdentifier(d.name)) {
+            continue
+          }
+          const name = d.name.text
+          childAddLocal(name)
+          if (d.initializer) { 
+            childEmitExpr(d.initializer)
+            const loc = childLocals.get(name)!
+            childEmit(OP.put_loc, [loc & 0xff, (loc >> 8) & 0xff], d)
+          }
+        }
+        return
+      }
+      
       if (ts.isReturnStatement(s)) {
         if (s.expression) { 
           childEmitExpr(s.expression)
@@ -245,6 +303,24 @@ export function compileSource(
       if (ts.isBlock(s)) { 
         for (const x of s.statements) {
           childEmitStmt(x)
+        }
+        return
+      }
+      
+      if (ts.isIfStatement(s)) {
+        childEmitExpr(s.expression)
+        const childElseLabel = childAsm.newLabel()
+        childAsm.emitIfFalseTo(childElseLabel)
+        childEmitStmt(s.thenStatement)
+        
+        if (s.elseStatement) {
+          const childEndLabel = childAsm.newLabel()
+          childAsm.emitGotoTo(childEndLabel)
+          childAsm.defineLabel(childElseLabel)
+          childEmitStmt(s.elseStatement)
+          childAsm.defineLabel(childEndLabel)
+        } else {
+          childAsm.defineLabel(childElseLabel)
         }
         return
       }
