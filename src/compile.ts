@@ -4,7 +4,7 @@ import { OP } from './op'
 import { AtomTable } from './atoms'
 import { FunctionIR } from './ir'
 import { Assembler } from './assemble'
-import { FUN_FLAG_STRICT, OP_AWAIT, OP_YIELD, FUN_FLAG_ARROW, FUN_FLAG_ASYNC, FUN_FLAG_GENERATOR } from './env'
+import { FUN_FLAG_STRICT, FUN_FLAG_ARROW, FUN_FLAG_ASYNC, FUN_FLAG_GENERATOR } from './env'
 import { StrongTypeChecker } from './types'
 import { optimize } from './optimize'
 import { ShapePolicy } from './shape'
@@ -690,28 +690,17 @@ export function compileSource(
 
   // Await
   function emitAwait(expr: ts.Expression, n?: ts.Node) {
-    if (OP_AWAIT == null) {
-      const p = sf.getLineAndCharacterOfPosition(expr.getStart())
-      throw new Error(`本编译器未配置 AWAIT opcode（QJS_OP_AWAIT）。无法编译 await。位置：${sf.fileName}:${p.line+1}:${p.character+1}`)
-    }
-
     emitExpr(expr)
-    // 直接写入 opcode 值（不是枚举）
-    asm.emit(OP_AWAIT as unknown as OP, [], n ? line(n) : undefined, n ? col(n) : undefined)
+    asm.emit(OP.await, [], n ? line(n) : undefined, n ? col(n) : undefined)
   }
 
   // Yield
   function emitYield(expr: ts.Expression | undefined, n?: ts.Node) {
-    if (OP_YIELD == null) {
-      const p = sf.getLineAndCharacterOfPosition(n ? n.getStart() : expr ? expr.getStart() : 0)
-      throw new Error(`本编译器未配置 YIELD opcode（QJS_OP_YIELD）。无法编译 yield。位置：${sf.fileName}:${p.line+1}:${p.character+1}`)
-    }
-
     if (expr) {
       emitExpr(expr)
     }
 
-    asm.emit(OP_YIELD as unknown as OP, [], n ? line(n) : undefined, n ? col(n) : undefined)
+    asm.emit(OP.yield, [], n ? line(n) : undefined, n ? col(n) : undefined)
   }
 
   // --- 函数相关：编译子函数 -> 常量 -> fclosure ---

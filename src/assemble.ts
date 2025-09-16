@@ -19,6 +19,12 @@ type Instr = {
   size?: number
 }
 
+type ExceptionTriples = {
+  startLabel: number
+  endLabel: number
+  targetLabel: number
+}
+
 export class Assembler {
   private ir: FunctionIR
   private instrs: Instr[] = []
@@ -28,7 +34,7 @@ export class Assembler {
   private nextLabelId = 1
 
   // 新增：异常表（使用标签表示区间和目标）
-  private exceptionTriples: Array<{ startLabel: number; endLabel: number; targetLabel: number }> = []
+  private exceptionTriples: Array<ExceptionTriples> = []
 
   constructor(ir: FunctionIR) { 
     this.ir = ir
@@ -72,7 +78,9 @@ export class Assembler {
   }
 
   assemble(enableShort = true) {
-    for (const ins of this.instrs) ins.size = 1 + ins.operands.length
+    for (const ins of this.instrs) {
+      ins.size = 1 + ins.operands.length
+    }
 
     let changed = true, rounds = 0
     while (changed && rounds < 8) {
@@ -117,7 +125,11 @@ export class Assembler {
         })
       }
 
-      if (ins.op === OP.if_false || ins.op === OP.if_true || ins.op === OP.goto) {
+      if (
+        ins.op === OP.if_false || 
+        ins.op === OP.if_true || 
+        ins.op === OP.goto
+      ) {
         const targetIdx = this.labels.get(ins.targetLabel!)!
         const after = pc + (ins.size ?? 5)
         const target = this.pcOffsets[targetIdx]
@@ -155,7 +167,10 @@ export class Assembler {
       const sIdx = this.labels.get(ex.startLabel)
       const eIdx = this.labels.get(ex.endLabel)
       const tIdx = this.labels.get(ex.targetLabel)
-      if (sIdx == null || eIdx == null || tIdx == null) continue
+      
+      if (sIdx == null || eIdx == null || tIdx == null) {
+        continue
+      }
       const start_pc = this.pcOffsets[sIdx]
       const end_pc = this.pcOffsets[eIdx]
       const target_pc = this.pcOffsets[tIdx]

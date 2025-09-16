@@ -2,16 +2,6 @@ import * as ts from 'typescript'
 import { AtomTable } from './atoms'
 import { FunctionIR, VarRefEntry, CaptureInfo } from './ir'
 
-/*
-  多层作用域与捕获分析（最小可用版）：
-  - 每个函数建立一个 Scope：记录参数与局部（let/const/var）符号到索引的映射。
-  - 解析标识符：自内向外查找，命中则返回绑定信息，否则返回未解析。
-  - addClosureCapture：当子函数需要捕获父函数的 param/local 时：
-    * 在父 IR.closures 增加 CaptureInfo（isVar: true=local, false=param；idx=对应索引）
-    * 在子 IR.varRefs 增加 VarRefEntry（nameAtom, fromParentIsVar, fromParentIndex）
-    * 返回子函数里的 var_ref 索引，便于后续发射 OP_get_var_ref/OP_put_var_ref
-*/
-
 export type Binding = {
   kind: 'param' | 'local'
   index: number
