@@ -27,6 +27,7 @@ type ExceptionTriples = {
 
 export class Assembler {
   private ir: FunctionIR
+  private preludes: Instr[] = []
   private instrs: Instr[] = []
   private labels = new Map<number, number>() // labelId -> instr index
   private pcOffsets: number[] = []
@@ -38,6 +39,11 @@ export class Assembler {
 
   constructor(ir: FunctionIR) { 
     this.ir = ir
+  }
+
+  // 前置指令：在 assemble 时排在最前（不参与跳转缩短逻辑，要求无分支/标签依赖）
+  emitPrelude(op: OP, operands: number[] = []) {
+    this.preludes.push({ op, operands })
   }
 
   newLabel(): number { 
@@ -78,7 +84,7 @@ export class Assembler {
   }
 
   assemble(enableShort = true) {
-    for (const ins of this.instrs) {
+    for (const ins of [...this.preludes, ...this.instrs]) {
       ins.size = 1 + ins.operands.length
     }
 
@@ -113,8 +119,9 @@ export class Assembler {
     this.computePC()
 
     this.ir.bytecode.length = 0
-    for (let i = 0; i < this.instrs.length; i++) {
-      const ins = this.instrs[i]
+    const allInstrs = [...this.preludes, ...this.instrs]
+    for (let i = 0; i < allInstrs.length; i++) {
+      const ins = allInstrs[i]
       const pc = this.pcOffsets[i]
 
       if (ins.srcLine !== undefined) {
@@ -130,7 +137,7 @@ export class Assembler {
         ins.op === OP.if_true || 
         ins.op === OP.goto
       ) {
-        const targetIdx = this.labels.get(ins.targetLabel!)!
+  const targetIdx = this.labels.get(ins.targetLabel!)!
         const after = pc + (ins.size ?? 5)
         const target = this.pcOffsets[targetIdx]
         const rel = target - after
@@ -181,9 +188,10 @@ export class Assembler {
   private computePC() {
     this.pcOffsets.length = 0
     let pc = 0
-    for (let i = 0; i < this.instrs.length; i++) {
+    const allInstrs = [...this.preludes, ...this.instrs]
+    for (let i = 0; i < allInstrs.length; i++) {
       this.pcOffsets[i] = pc
-      pc += (this.instrs[i].size ?? (1 + this.instrs[i].operands.length))
+      pc += (allInstrs[i].size ?? (1 + allInstrs[i].operands.length))
     }
   }
 }

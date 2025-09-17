@@ -1,0 +1,24 @@
+let a = 2;
+let b = 5;
+a -= 1;
+a *= 3;
+a /= 2;
+a %= 5;
+a **= 2;
+a &= 7;
+a |= 8;
+a ^= 1;
+a <<= 1;
+a >>= 1;
+a >>>= 0;
+let c = 1;
+++c;
+--c;
+let d = 1;
+d++;
+d--;
+const obj: { x: number } = { x: 0 };
+obj.x = 1; // property baseline
+let arr = [1,2,3];
+arr[0] += 1;
+arr[1] <<= 1;

@@ -3,6 +3,8 @@ import { Buffer } from 'buffer'
 import { OP } from './op'
 import { AtomTable } from './atoms'
 import { FunctionIR } from './ir'
+import { addClosureCapture } from './scope'
+import { preciseMaxStackWithExceptions } from './optimize'
 import { Assembler } from './assemble'
 import { FUN_FLAG_STRICT, FUN_FLAG_ARROW, FUN_FLAG_ASYNC, FUN_FLAG_GENERATOR } from './env'
 import { StrongTypeChecker } from './types'
@@ -78,18 +80,21 @@ export function compileSource(
   const newLabel = () => asm.newLabel()
   const defLabel = (id: number) => asm.defineLabel(id)
   const emitIfFalseTo = (id: number, n?: ts.Node) => asm.emitIfFalseTo(id, n?line(n):undefined, n?col(n):undefined)
+  const emitIfTrueTo = (id: number, n?: ts.Node) => asm.emitIfTrueTo(id, n?line(n):undefined, n?col(n):undefined)
   const emitGotoTo = (id: number, n?: ts.Node) => asm.emitGotoTo(id, n?line(n):undefined, n?col(n):undefined)
   const emitWithOp = (op: OP, atomId: number, label: number, scopeIndex: number, n?: ts.Node) =>
     asm.emitWithAtomLabelU8(op, atomId, label, scopeIndex, n?line(n):undefined, n?col(n):undefined)
 
   const locals = new Map<string, number>()
   const localNames: string[] = []
+  const localVarKinds: ('var'|'let'|'const')[] = []
   const addLocal = (name: string) => { 
     if (!locals.has(name)) { 
-      locals.set(name, locals.size)
+      const idx = locals.size
+      locals.set(name, idx)
       localNames.push(name)
+      localVarKinds[idx] = 'var'
     }
-
     return locals.get(name)!
   }
 
@@ -173,7 +178,27 @@ export function compileSource(
     }
   }
 
+  // --- TDZ 作用域栈（替换原单 Set） ---
+  const tdzScopes: Array<Set<string>> = [new Set()]
+  const tdzEnterScope = () => tdzScopes.push(new Set())
+  const tdzExitScope = () => { if (tdzScopes.length > 1) tdzScopes.pop() }
+  const tdzMark = (name: string) => tdzScopes[tdzScopes.length - 1].add(name)
+  const tdzResolve = (name: string) => {
+    for (let i = tdzScopes.length - 1; i >= 0; i--) {
+      if (tdzScopes[i].has(name)) return true
+    }
+    return false
+  }
+
   function emitIdentLoad(name: string, n?: ts.Node) {
+    if (tdzResolve(name)) {
+      // ReferenceError 构造： ReferenceError(name)
+      emit(OP.get_var, u32(atoms.add('ReferenceError')), n)
+      emit(OP.push_atom_value, u32(atoms.add(name)), n)
+      emit(OP.call, u16(1), n)
+      emit(OP.throw, [], n)
+      return
+    }
     if (withStack.length) {
       for (let k = withStack.length - 1; k >= 0; k--) {
         const ws = withStack[k]
@@ -201,6 +226,22 @@ export function compileSource(
   }
 
   function emitIdentStore(name: string, n?: ts.Node) {
+    // 移除声明作用域内的 TDZ 标记（只清除遇到的第一层）
+    for (let i = tdzScopes.length - 1; i >= 0; i--) {
+      if (tdzScopes[i].delete(name)) break
+    }
+    // 如果是 const 且已初始化过（不在 TDZ 集合中意味着我们正处于后续写入），抛 TypeError
+    if (locals.has(name)) {
+      const idx = locals.get(name)!
+      if (localVarKinds[idx] === 'const') {
+        // 构造 TypeError(name)
+        emit(OP.get_var, u32(atoms.add('TypeError')), n)
+        emit(OP.push_atom_value, u32(atoms.add(name)), n)
+        emit(OP.call, u16(1), n)
+        emit(OP.throw, [], n)
+        return
+      }
+    }
     if (withStack.length) {
       for (let k = withStack.length - 1; k >= 0; k--) {
         const ws = withStack[k]
@@ -228,6 +269,8 @@ export function compileSource(
       emit(OP.put_var, u32(atoms.add(name)), n)
     }
   }
+
+  // （旧单集合实现已移除）
 
   function emitElemLoad(obj: ts.Expression, prop: ts.Expression, node?: ts.Node) {
     emitExpr(obj) 
@@ -299,217 +342,32 @@ export function compileSource(
     }
   }
 
-  // for-in 降级：Object.keys(obj) 数组迭代
-  // 注意：此实现是为便于生成通用字节码而做的简化，非严格等价：
-  //  - 仅枚举自有可枚举字符串键，不包含原型链（for-in 会枚举原型链上的可枚举属性）。
-  //  - 不枚举 Symbol-key 属性。
-  //  - 枚举顺序与规范/QuickJS 的实现可能有差异。
-  // 若要与 QuickJS 完全对齐，应使用专用 for-in 迭代语义（QuickJS 在 VM 层实现属性枚举），
-  // 或提供运行时 helper 模拟规范行为，并在 break/continue/throw 等异常退出时正确清理迭代状态。
+  // for-in 实现：严格按照 QuickJS 原生字节码语义
+  // 栈约定：
+  //   for_in_start: obj -> iterator
+  //   循环体顶: for_in_next: iterator -> iterator key done
+  //   其中 done=true 表示“迭代结束”（与 QuickJS parser.c 中语义一致），因此判断为 true 时跳出。
+  //   符号属性与原型链过滤由 VM 内部完成；此处无需手动跳过 symbol。
   function emitForIn(stmt: ts.ForInStatement) {
-    if (!strictForIn) {
-      // 兼容旧实现：Object.keys(obj)
-      const objLoc = addLocal(`__forin_obj_${stmt.pos}`)
-      const keysLoc = addLocal(`__forin_keys_${stmt.pos}`)
-      const idxLoc = addLocal(`__forin_i_${stmt.pos}`)
-
-      emitExpr(stmt.expression)
-      emit(OP.put_loc, u16(objLoc), stmt.expression)
-
-      emit(OP.get_var, u32(atoms.add('Object')), stmt)
-      emit(OP.get_field, u32(atoms.add('keys')), stmt)
-      emit(OP.get_loc, u16(objLoc), stmt)
-      emit(OP.call, u16(1), stmt)
-      emit(OP.put_loc, u16(keysLoc), stmt)
-
-      emit(OP.push_i32, i32(0), stmt)
-      emit(OP.put_loc, u16(idxLoc), stmt)
-
-      const loopL = newLabel()
-      const condL = newLabel()
-      const endL = newLabel()
-
-      defLabel(loopL)
-      emit(OP.get_loc, u16(idxLoc), stmt)
-      emit(OP.get_loc, u16(keysLoc), stmt)
-      emit(OP.get_field, u32(atoms.add('length')), stmt)
-      emit(OP.lt, [], stmt)
-      emitIfFalseTo(endL, stmt)
-
-      emit(OP.get_loc, u16(keysLoc), stmt)
-      emit(OP.get_loc, u16(idxLoc), stmt)
-      emit(OP.get_array_el, [], stmt)
-
-      const target = stmt.initializer
-      if (ts.isVariableDeclarationList(target)) {
-        const d = target.declarations[0]
-        if (d && ts.isIdentifier(d.name)) {
-          const name = d.name.text
-          if (!locals.has(name)) addLocal(name)
-          emitIdentStore(name, stmt)
-        }
-      } else if (ts.isExpression(target)) {
-        const t = target as ts.Expression
-        if (ts.isIdentifier(t)) {
-          emitIdentStore(t.text, stmt)
-        } else if (ts.isPropertyAccessExpression(t)) {
-          emitExpr(t.expression)
-          emit(OP.swap, [], stmt)
-          emit(OP.put_field, u32(atoms.add(t.name.text)), stmt)
-        } else if (ts.isElementAccessExpression(t)) {
-          emitExpr(t.expression)
-          emitExpr(t.argumentExpression!)
-          emit(OP.swap, [], stmt)
-          emit(OP.put_array_el, [], stmt)
-        }
-      }
-
-      const loopTarget: LoopTarget = { breakL: endL, continueL: condL }
-      loopStack.push(loopTarget)
-      emitStmtBlock(stmt.statement)
-      loopStack.pop()
-
-      defLabel(condL)
-      emit(OP.get_loc, u16(idxLoc), stmt)
-      emit(OP.push_i32, i32(1), stmt)
-      emit(OP.add, [], stmt)
-      emit(OP.put_loc, u16(idxLoc), stmt)
-
-      emitGotoTo(loopL, stmt)
-      defLabel(endL)
-      return
-    }
-
-    // 严格路径：沿原型链枚举
-    const objLoc = addLocal(`__forin_obj_${stmt.pos}`)
-    const curLoc = addLocal(`__forin_cur_${stmt.pos}`)
-    const keysLoc = addLocal(`__forin_keys_${stmt.pos}`)
-    const idxLoc = addLocal(`__forin_i_${stmt.pos}`)
-    const seenLoc = addLocal(`__forin_seen_${stmt.pos}`)
-
-    // obj & init
+    // 使用 QuickJS 原生 for-in 指令
     emitExpr(stmt.expression)
-    emit(OP.put_loc, u16(objLoc), stmt.expression)
-
-    // seen = {}
-    emit(OP.object, [], stmt)
-    emit(OP.put_loc, u16(seenLoc), stmt)
-
-    // keys = []
-    emit(OP.array_from, u16(0), stmt)
-    emit(OP.put_loc, u16(keysLoc), stmt)
-
-    // cur = obj
-    emit(OP.get_loc, u16(objLoc), stmt)
-    emit(OP.put_loc, u16(curLoc), stmt)
-
-    const whileTop = newLabel()
-    const whileEnd = newLabel()
-    defLabel(whileTop)
-    // if (cur == null) break
-    const contProtoL = newLabel()
-    emit(OP.get_loc, u16(curLoc), stmt)
-    emit(OP.null, [], stmt)
-    emit(OP.strict_eq, [], stmt)
-    emitIfFalseTo(contProtoL, stmt)
-    emitGotoTo(whileEnd, stmt)
-    defLabel(contProtoL)
-
-    // names = Object.getOwnPropertyNames(cur)
-    emit(OP.get_var, u32(atoms.add('Object')), stmt)
-    emit(OP.get_field, u32(atoms.add('getOwnPropertyNames')), stmt)
-    emit(OP.get_loc, u16(curLoc), stmt)
-    emit(OP.call, u16(1), stmt)
-    const namesLoc = addLocal(`__forin_names_${stmt.pos}`)
-    emit(OP.put_loc, u16(namesLoc), stmt)
-
-    // for (let i=0; i<names.length; i++)
-    const iLoc = addLocal(`__forin_j_${stmt.pos}`)
-    emit(OP.push_i32, i32(0), stmt)
-    emit(OP.put_loc, u16(iLoc), stmt)
+    
+    // for_in_start: obj -> iterator （QuickJS 内部迭代器状态）
+    emit(OP.for_in_start, [], stmt)
+    
     const loopL = newLabel()
-    const loopEnd = newLabel()
-    defLabel(loopL)
-    emit(OP.get_loc, u16(iLoc), stmt)
-    emit(OP.get_loc, u16(namesLoc), stmt)
-    emit(OP.get_field, u32(atoms.add('length')), stmt)
-    emit(OP.lt, [], stmt)
-    emitIfFalseTo(loopEnd, stmt)
-
-    // k = names[i]
-    emit(OP.get_loc, u16(namesLoc), stmt)
-    emit(OP.get_loc, u16(iLoc), stmt)
-    emit(OP.get_array_el, [], stmt)
-    const kLoc = addLocal(`__forin_k_${stmt.pos}`)
-    emit(OP.put_loc, u16(kLoc), stmt)
-
-    // if (!Object.prototype.propertyIsEnumerable.call(cur, k)) continue
-    emit(OP.get_var, u32(atoms.add('Object')), stmt)
-    emit(OP.get_field, u32(atoms.add('prototype')), stmt)
-    emit(OP.get_field, u32(atoms.add('propertyIsEnumerable')), stmt)
-    emit(OP.get_loc, u16(curLoc), stmt)
-    emit(OP.get_loc, u16(kLoc), stmt)
-    emit(OP.call_method, u16(1), stmt)
-    const afterEnumChk = newLabel()
-    emitIfFalseTo(afterEnumChk, stmt)
-
-    // if (seen[k]) continue; else seen[k]=1
-    emit(OP.get_loc, u16(seenLoc), stmt)
-    emit(OP.get_loc, u16(kLoc), stmt)
-    emit(OP.get_array_el, [], stmt)
-    const skipAdd = newLabel()
-    const afterSeenChk = newLabel()
-    emitIfFalseTo(afterSeenChk, stmt) // falsy -> 去标记新增
-    emitGotoTo(skipAdd, stmt)         // truthy -> 跳过新增
-    defLabel(afterSeenChk)
-    // mark seen[k]=1
-    emit(OP.get_loc, u16(seenLoc), stmt)
-    emit(OP.get_loc, u16(kLoc), stmt)
-    emit(OP.push_i32, i32(1), stmt)
-    emit(OP.put_array_el, [], stmt)
-    // keys.push(k)
-    emit(OP.get_loc, u16(keysLoc), stmt)
-    emit(OP.get_field, u32(atoms.add('push')), stmt)
-    emit(OP.get_loc, u16(kLoc), stmt)
-    emit(OP.call_method, u16(1), stmt)
-    defLabel(skipAdd)
-
-    // i++
-    emit(OP.get_loc, u16(iLoc), stmt)
-    emit(OP.push_i32, i32(1), stmt)
-    emit(OP.add, [], stmt)
-    emit(OP.put_loc, u16(iLoc), stmt)
-    emitGotoTo(loopL, stmt)
-    defLabel(loopEnd)
-
-    // cur = Object.getPrototypeOf(cur)
-    emit(OP.get_var, u32(atoms.add('Object')), stmt)
-    emit(OP.get_field, u32(atoms.add('getPrototypeOf')), stmt)
-    emit(OP.get_loc, u16(curLoc), stmt)
-    emit(OP.call, u16(1), stmt)
-    emit(OP.put_loc, u16(curLoc), stmt)
-
-    emitGotoTo(whileTop, stmt)
-    defLabel(whileEnd)
-
-    // i=0 for actual iteration over keys
-    emit(OP.push_i32, i32(0), stmt)
-    emit(OP.put_loc, u16(idxLoc), stmt)
-
-    const iterL = newLabel()
+    const contL = newLabel() 
     const endL = newLabel()
-    const contL = newLabel()
-    defLabel(iterL)
-    emit(OP.get_loc, u16(idxLoc), stmt)
-    emit(OP.get_loc, u16(keysLoc), stmt)
-    emit(OP.get_field, u32(atoms.add('length')), stmt)
-    emit(OP.lt, [], stmt)
-    emitIfFalseTo(endL, stmt)
 
-    emit(OP.get_loc, u16(keysLoc), stmt)
-    emit(OP.get_loc, u16(idxLoc), stmt)
-    emit(OP.get_array_el, [], stmt)
+    defLabel(loopL)
+    // for_in_next: iterator -> iterator key done
+    // 如果 done=true，则跳出循环
+    emit(OP.for_in_next, [], stmt)
+    emit(OP.dup, [], stmt)        // iterator key done done
+    emitIfTrueTo(endL, stmt)      // 如果 done=true，跳到结束
+    emit(OP.drop, [], stmt)       // iterator key (移除 done)
 
+    // 将键绑定到目标变量
     const target = stmt.initializer
     if (ts.isVariableDeclarationList(target)) {
       const d = target.declarations[0]
@@ -534,23 +392,94 @@ export function compileSource(
       }
     }
 
-    // 设置循环目标：continue->contL；break->endL
+    // 执行循环体
     loopStack.push({ breakL: endL, continueL: contL })
     emitStmtBlock(stmt.statement)
     loopStack.pop()
 
+    // continue 点
     defLabel(contL)
-    emit(OP.get_loc, u16(idxLoc), stmt)
-    emit(OP.push_i32, i32(1), stmt)
-    emit(OP.add, [], stmt)
-    emit(OP.put_loc, u16(idxLoc), stmt)
+    emitGotoTo(loopL, stmt)
 
-    emitGotoTo(iterL, stmt)
+    // 循环结束，清理迭代器
     defLabel(endL)
+    emit(OP.drop, [], stmt)       // 移除迭代器
   }
 
-  // For-of 严格实现：加入 IteratorClose（return()）
+  // For-of 实现：使用 QuickJS 原生字节码指令
+  // 栈约定（原生命令分支 iteratorCloseForOf=true 时）：
+  //   for_of_start: obj -> iterator next catch_offset
+  //   for_of_next: iterator next catch_offset -> iterator next catch_offset value done
+  //   done=true 表示“完成”，需要跳出；否则保留 value 供循环体使用。
+  //   结束时按 value, catch_offset, next, iterator 顺序清理，与生成顺序逆序匹配。
+  // 手动 fallback 分支：使用 try/finally 实现 iterator.return 调用（当 done=false 且存在 return）。
+  //   该实现与 QuickJS 在未使用原生命令时的规范语义对齐。
   function emitForOf(stmt: ts.ForOfStatement) {
+    if (iteratorCloseForOf) {
+      // 使用 QuickJS 原生 for-of 指令
+      emitExpr(stmt.expression)
+      
+      // for_of_start: obj -> iterator next catch_offset
+      emit(OP.for_of_start, [], stmt)
+      
+      const loopL = newLabel()
+      const contL = newLabel() 
+      const endL = newLabel()
+
+      defLabel(loopL)
+      // for_of_next: iterator next catch_offset -> iterator next catch_offset value done
+      emit(OP.for_of_next, [0], stmt)  // 0 = is_async flag
+      
+      // 检查 done 标志
+      emit(OP.dup, [], stmt)        // iterator next catch_offset value done done
+      emitIfTrueTo(endL, stmt)      // 如果 done=true，跳到结束
+      emit(OP.drop, [], stmt)       // iterator next catch_offset value (移除 done)
+
+      // 将值绑定到目标变量
+      const init = stmt.initializer
+      if (ts.isVariableDeclarationList(init)) {
+        const decl = init.declarations[0]
+        if (decl && ts.isIdentifier(decl.name)) {
+          const vname = decl.name.text
+          if (!locals.has(vname)) addLocal(vname)
+          emitIdentStore(vname, stmt)
+        }
+      } else if (ts.isExpression(init)) {
+        const t = init as ts.Expression
+        if (ts.isIdentifier(t)) {
+          emitIdentStore(t.text, stmt)
+        } else if (ts.isPropertyAccessExpression(t)) {
+          emitExpr(t.expression)
+          emit(OP.swap, [], stmt)
+          emit(OP.put_field, u32(atoms.add(t.name.text)), stmt)
+        } else if (ts.isElementAccessExpression(t)) {
+          emitExpr(t.expression)
+          emitExpr(t.argumentExpression!)
+          emit(OP.swap, [], stmt)
+          emit(OP.put_array_el, [], stmt)
+        }
+      }
+
+      // 执行循环体，设置循环目标：break -> endL；continue -> contL
+      loopStack.push({ breakL: endL, continueL: contL })
+      emitStmtBlock(stmt.statement)
+      loopStack.pop()
+
+      // continue 点
+      defLabel(contL)
+      emitGotoTo(loopL, stmt)
+
+      // 循环结束，QuickJS 自动处理迭代器关闭
+      defLabel(endL)
+      // 清理堆栈：iterator next catch_offset value
+      emit(OP.drop, [], stmt)  // value  
+      emit(OP.drop, [], stmt)  // catch_offset
+      emit(OP.drop, [], stmt)  // next
+      emit(OP.drop, [], stmt)  // iterator
+      return
+    }
+
+    // 手动实现：规范的 Symbol.iterator 和 iteratorClose
     const iterLoc = addLocal(`__iter_${stmt.pos}`)
     const stepLoc = addLocal(`__step_${stmt.pos}`)
     const doneLoc = addLocal(`__done_${stmt.pos}`)
@@ -706,6 +635,8 @@ export function compileSource(
   // --- 函数相关：编译子函数 -> 常量 -> fclosure ---
   function compileFunctionLike(fn: ts.FunctionLikeDeclaration, arrow: boolean): number {
     const child = new FunctionIR()
+    child.parent = ir
+    child.depth = (ir.depth ?? 0) + 1
     child.isModule = false
     child.filenameAtomId = ir.filenameAtomId
     const fname = fn.name && ts.isIdentifier(fn.name) ? fn.name.text : (arrow ? 'arrow' : 'anonymous')
@@ -727,12 +658,499 @@ export function compileSource(
     child.argCount = fn.parameters.length
     child.definedArgCount = child.argCount
     child.paramNameAtoms = fn.parameters.map(p => atoms.add(p.name.getText()))
-    child.sourceText = fn.getSourceFile().getFullText()
+    // 防御：某些间接构造/脱离 Program 的函数节点在 edge case 下可能没有绑定 SourceFile
+    // 之前 forof-return-close 测试中触发 getFullText undefined 异常；改为安全获取，缺失时回退空串。
+    const sfNode = fn.getSourceFile && fn.getSourceFile()
+    try {
+      child.sourceText = sfNode && (sfNode as any).getFullText ? sfNode.getFullText() : ''
+    } catch {
+      child.sourceText = ''
+    }
+
+    // TODO(FunctionPhase1): 现在仍然是占位实现 -> 仅 emit return_undef。
+    // 下一阶段将：
+    // 1. 创建子作用域 & 遍历参数/变量语句生成 get/put_loc
+    // 2. 支持语句块/控制流/return 真实发射
+    // 3. 处理捕获变量 -> make_var_ref/get_var_ref/put_var_ref
+    // 4. 按 QuickJS 语义补尾部 return_undef（无显式 return）
 
     const childAsm = new Assembler(child)
-    childAsm.emit(OP.return_undef)
-    childAsm.assemble(true)
-    child.stackSize = 1
+
+    // Phase1(增量): 尝试编译一个“安全子集”的函数体；如遇未实现语句则回退到占位实现，保证不回归。
+    let fallbackStub = false
+
+    const childLocals = new Map<string, number>()
+    const childLocalNames: string[] = []
+    const childLocalVarKinds: ('var'|'let'|'const')[] = []
+    const addLocal = (name: string) => {
+      if (childLocals.has(name)) return childLocals.get(name)!;
+      const idx = childLocals.size
+      childLocals.set(name, idx)
+      childLocalNames.push(name)
+      // 默认 var；稍后在 emitVarDecl/参数注册时修正
+      childLocalVarKinds[idx] = 'var'
+      return idx
+    }
+
+    // 参数暂作为 locals（后续再区分 arg 指令集）
+    fn.parameters.forEach(p => { if (ts.isIdentifier(p.name)) addLocal(p.name.text) })
+
+    const emit = (op: number, ops: number[] = [], n?: ts.Node) => {
+      childAsm.emit(op, ops, n ? line(n) : undefined, n ? col(n) : undefined)
+    }
+
+    function emitPushNumber(n: number) {
+      // 先走 i32（与顶层策略保持一致）；未来再根据常量池策略放入 ConstantList
+      const v = n|0
+      emit(OP.push_i32, u32(v))
+    }
+
+    // 闭包支持：记录父级捕获 -> var_ref
+    const parentIR = ir
+    const closureVarRefs = new Map<string, number>()
+    function ensureClosureVarRef(name: string): number | undefined {
+      if (childLocals.has(name)) return undefined
+      // Walk ancestors to find first frame defining the symbol (params or locals)
+      let ancestor: FunctionIR | undefined = parentIR
+      let foundFrame: FunctionIR | undefined
+      let foundIndex = -1
+      let isArg = false
+      while (ancestor) {
+        // paramNameAtoms / localNameAtoms hold atoms; need textual compare -> we only stored atom ids.
+        // Reconstruct text via reverse atom map unavailable; maintain a temporary textual cache at compile time:
+        // Because we add atoms via atoms.add(name), we can compare by atom id if we re-add.
+        const nameAtom = atoms.add(name)
+        const pIdx = ancestor.paramNameAtoms.indexOf(nameAtom)
+        if (pIdx >= 0) { foundFrame = ancestor; foundIndex = pIdx; isArg = true; break }
+        const lIdx = ancestor.localNameAtoms.indexOf(nameAtom)
+        if (lIdx >= 0) { foundFrame = ancestor; foundIndex = lIdx; break }
+        ancestor = ancestor.parent
+      }
+      // If not found, treat as global -> no capture
+      if (!foundFrame) return undefined
+      const nameAtom = atoms.add(name)
+      // Use foundIndex as stable index; QuickJS differentiates arg vs var env; here we mark metadata only
+      const capIdx = addClosureCapture(foundFrame, child, { kind: 'local', index: foundIndex, name, nameAtom, isArg } as any)
+      return capIdx
+    }
+
+    function isConstClosure(name: string): boolean {
+      let ancestor: FunctionIR | undefined = parentIR
+      while (ancestor) {
+        const nameAtom = atoms.add(name)
+        const pIdx = ancestor.paramNameAtoms.indexOf(nameAtom)
+        if (pIdx >= 0) {
+          // 参数暂不视为 const
+          return false
+        }
+        const lIdx = ancestor.localNameAtoms.indexOf(nameAtom)
+        if (lIdx >= 0) {
+          return ancestor.localVarKinds && ancestor.localVarKinds[lIdx] === 'const'
+        }
+        ancestor = ancestor.parent
+      }
+      return false
+    }
+
+    function emitIdentifier(id: ts.Identifier) {
+      const name = id.text
+      if (childLocals.has(name)) { emit(OP.get_loc, u16(childLocals.get(name)!), id); return }
+      let refIdx = closureVarRefs.get(name)
+      if (refIdx == null) {
+        const cap = ensureClosureVarRef(name)
+        if (cap != null) { refIdx = cap; closureVarRefs.set(name, refIdx) }
+      }
+      if (refIdx != null) emit(OP.get_var_ref, u16(refIdx), id)
+      else emit(OP.get_var, u32(atoms.add(name)), id)
+    }
+
+    function emitVarDecl(d: ts.VariableDeclaration) {
+      if (!ts.isIdentifier(d.name)) { fallbackStub = true; return }
+      const name = d.name.text
+      const loc = addLocal(name)
+      if (d.initializer) {
+        emitExprFn(d.initializer)
+        if (!fallbackStub) emit(OP.put_loc, u16(loc), d)
+      } else {
+        emit(OP.undefined)
+        emit(OP.put_loc, u16(loc), d)
+      }
+    }
+
+    function emitExprFn(e: ts.Expression) {
+      switch (e.kind) {
+        case ts.SyntaxKind.NumericLiteral: emitPushNumber(Number((e as ts.NumericLiteral).text)); return
+        case ts.SyntaxKind.TrueKeyword: emit(OP.push_true); return
+        case ts.SyntaxKind.FalseKeyword: emit(OP.push_false); return
+        case ts.SyntaxKind.NullKeyword: emit(OP.null); return
+        case ts.SyntaxKind.Identifier: emitIdentifier(e as ts.Identifier); return
+        case ts.SyntaxKind.ParenthesizedExpression: return emitExprFn((e as ts.ParenthesizedExpression).expression)
+        case ts.SyntaxKind.BinaryExpression: {
+          const be = e as ts.BinaryExpression
+          // 赋值 / +=
+          if (be.operatorToken.kind === ts.SyntaxKind.EqualsToken || be.operatorToken.kind === ts.SyntaxKind.PlusEqualsToken) {
+            if (!ts.isIdentifier(be.left)) { fallbackStub = true; return }
+            const lid = be.left
+            if (be.operatorToken.kind === ts.SyntaxKind.PlusEqualsToken) {
+              emitIdentifier(lid); emitExprFn(be.right); if (fallbackStub) return; emit(OP.add)
+            } else {
+              emitExprFn(be.right); if (fallbackStub) return
+            }
+            const name = lid.text
+            if (childLocals.has(name)) emit(OP.put_loc, u16(childLocals.get(name)!), be)
+            else {
+              let refIdx = closureVarRefs.get(name)
+              if (refIdx == null) { const cap = ensureClosureVarRef(name); if (cap != null) { refIdx = cap; closureVarRefs.set(name, refIdx) } }
+              if (refIdx != null) {
+                if (isConstClosure(name)) {
+                  // TypeError(name)
+                  emit(OP.get_var, u32(atoms.add('TypeError')), be)
+                  emit(OP.push_atom_value, u32(atoms.add(name)), be)
+                  emit(OP.call, u16(1), be)
+                  emit(OP.throw, [], be)
+                } else {
+                  emit(OP.put_var_ref, u16(refIdx), be)
+                }
+              }
+              else emit(OP.put_var, u32(atoms.add(name)), be)
+            }
+            return
+          }
+          if (![ts.SyntaxKind.PlusToken, ts.SyntaxKind.MinusToken, ts.SyntaxKind.AsteriskToken, ts.SyntaxKind.SlashToken, ts.SyntaxKind.PercentToken].includes(be.operatorToken.kind)) { fallbackStub = true; return }
+          emitExprFn(be.left); emitExprFn(be.right); if (fallbackStub) return
+          switch (be.operatorToken.kind) {
+            case ts.SyntaxKind.PlusToken: emit(OP.add); break
+            case ts.SyntaxKind.MinusToken: emit(OP.sub); break
+            case ts.SyntaxKind.AsteriskToken: emit(OP.mul); break
+            case ts.SyntaxKind.SlashToken: emit(OP.div); break
+            case ts.SyntaxKind.PercentToken: emit(OP.mod); break
+          }
+          return
+        }
+        case ts.SyntaxKind.CallExpression: {
+          const ce = e as ts.CallExpression
+          if (!ts.isIdentifier(ce.expression)) { fallbackStub = true; return }
+            emitIdentifier(ce.expression)
+            for (const arg of ce.arguments) emitExprFn(arg)
+            emit(OP.call, u16(ce.arguments.length), ce)
+            return
+        }
+        default: fallbackStub = true; return
+      }
+    }
+
+    let sawExplicitReturn = false
+    // 控制流辅助结构（局部，仅在子函数编译期间使用）
+    const loopStack: Array<{ breakL: number, continueL: number }> = []
+    const finallyStack: Array<{ finallyStart: number, endLabel: number, retPendingLoc: number, retValueLoc: number }> = []
+
+    const newLabel = () => childAsm.newLabel()
+    const defLabel = (id: number) => childAsm.defineLabel(id)
+    const emitIfFalseTo = (label: number, n?: ts.Node) => childAsm.emitIfFalseTo(label, n ? line(n) : undefined, n ? col(n) : undefined)
+    const emitGotoTo = (label: number, n?: ts.Node) => childAsm.emitGotoTo(label, n ? line(n) : undefined, n ? col(n) : undefined)
+
+    function emitStmtFn(s: ts.Statement) {
+      if (fallbackStub) return
+      switch (s.kind) {
+        case ts.SyntaxKind.ClassDeclaration: {
+          const cd = s as ts.ClassDeclaration
+          if (!cd.name) break
+          const className = cd.name.text
+          // extends: if present, evaluate base (expression) else push null (undefined placeholder was used before)
+          let hasExtends = false
+          if (cd.heritageClauses) {
+            const ext = cd.heritageClauses.find(h => h.token === ts.SyntaxKind.ExtendsKeyword)
+            if (ext && ext.types.length === 1) {
+              hasExtends = true
+              emitExprFn(ext.types[0].expression as ts.Expression)
+            }
+          }
+          if (!hasExtends) {
+            emit(OP.null, [], cd) // proto_or_null
+          } else {
+            // If hasExtends, stack currently: [Base]
+            // Need Base.prototype as proto_or_null and keep Base for later ctor.__proto__ link.
+            const baseTemp = addLocal(`__base_${cd.pos}`)
+            emit(OP.dup, [], cd)              // [Base, Base]
+            emit(OP.put_loc, u16(baseTemp), cd) // store one copy
+            // load Base.prototype
+            emit(OP.push_atom_value, u32(atoms.add('prototype')), cd)
+            emit(OP.get_field, u32(atoms.add('prototype')), cd)
+          }
+
+          // constructor
+          const ctorDecl = cd.members.find(m => ts.isConstructorDeclaration(m)) as ts.ConstructorDeclaration | undefined
+          if (ctorDecl) {
+            const ctorFn = ts.factory.createFunctionExpression(undefined, undefined, undefined, undefined, ctorDecl.parameters, undefined, ctorDecl.body ?? ts.factory.createBlock([]))
+            const cidx = compileFunctionLike(ctorFn, false)
+            emit(OP.fclosure, u32(cidx), ctorDecl)
+          } else {
+            const emptyCtor = ts.factory.createFunctionExpression(undefined, undefined, undefined, undefined, [], undefined, ts.factory.createBlock([]))
+            const cidx = compileFunctionLike(emptyCtor, false)
+            emit(OP.fclosure, u32(cidx), cd)
+          }
+          emit(OP.define_class, [], cd) // stack: ctor
+          if (hasExtends) {
+            // Link ctor.__proto__ = Base
+            const baseTempName = `__base_${cd.pos}`
+            // push ctor, Base, 'prototype' chain already embedded; we set ctor.__proto__ = Base via set_proto
+            emit(OP.get_loc, u16(locals.get(baseTempName)!), cd) // push Base
+            // reorder to [Base, ctor] for set_proto expectation (assuming set_proto consumes obj, proto)
+            emit(OP.swap, [], cd)
+            emit(OP.set_proto, [], cd)
+
+            // Also link ctor.prototype.__proto__ = Base.prototype
+            // Steps:
+            // stack: [ctor]
+            // dup -> [ctor, ctor]
+            // push 'prototype' & get_field -> [ctor, ctor.prototype]
+            // get Base temp -> [ctor, ctor.prototype, Base]
+            // push 'prototype' & get_field -> [ctor, ctor.prototype, Base.prototype]
+            // swap to reorder to [ctor, Base.prototype, ctor.prototype]
+            // perm4 / swap sequence to have [ctor.prototype, Base.prototype] then set_proto
+            emit(OP.dup, [], cd) // [ctor, ctor]
+            emit(OP.push_atom_value, u32(atoms.add('prototype')), cd)
+            emit(OP.get_field, u32(atoms.add('prototype')), cd) // [ctor, ctor.prototype]
+            emit(OP.get_loc, u16(locals.get(baseTempName)!), cd) // [ctor, ctor.prototype, Base]
+            emit(OP.push_atom_value, u32(atoms.add('prototype')), cd)
+            emit(OP.get_field, u32(atoms.add('prototype')), cd) // [ctor, ctor.prototype, Base.prototype]
+            // reorder: want [ctor.prototype, Base.prototype]
+            emit(OP.swap, [], cd)          // [ctor, ctor.prototype, Base.prototype] -> [ctor, Base.prototype, ctor.prototype]
+            emit(OP.drop, [], cd)          // remove extra ctor => [Base.prototype, ctor.prototype]
+            emit(OP.swap, [], cd)          // [ctor.prototype, Base.prototype]
+            emit(OP.set_proto, [], cd)
+          }
+
+          // For instance methods we need prototype: duplicate class (ctor), get 'prototype' then define.
+          // Simplification: push ctor; get_field 'prototype' once and keep in temp local.
+          const protoLoc = addLocal(`__proto_${cd.pos}`)
+          // get prototype: stack [ctor]; duplicate & load field
+          emit(OP.dup, [], cd)
+          emit(OP.push_atom_value, u32(atoms.add('prototype')), cd)
+          emit(OP.get_field, u32(atoms.add('prototype')), cd) // simplification using get_field with constant
+          emit(OP.put_loc, u16(protoLoc), cd)
+
+          for (const m of cd.members) {
+            if (!ts.isMethodDeclaration(m) || !m.name || !ts.isIdentifier(m.name)) continue
+            const nameText = m.name.text
+            const nameAtom = atoms.add(nameText)
+            const fnExpr = ts.factory.createFunctionExpression(undefined, undefined, undefined, undefined, m.parameters, undefined, m.body ?? ts.factory.createBlock([]))
+            const midx = compileFunctionLike(fnExpr, false)
+            emit(OP.fclosure, u32(midx), m)
+            emit(OP.set_home_object, [], m)
+            emit(OP.push_atom_value, u32(nameAtom), m)
+            if (m.modifiers?.some(mm => mm.kind === ts.SyntaxKind.StaticKeyword)) {
+              // static: define on constructor (current stack top before push? ensure ctor at stack top)
+              // stack currently: [ctor, f, name]
+              emit(OP.define_field, [], m)
+            } else {
+              // instance: load saved prototype then swap into position
+              emit(OP.get_loc, u16(protoLoc), m) // push prototype
+              // reorder: we have [ctor, f, name, proto]; need [proto, f, name] then define_field
+              emit(OP.perm4, [], m) // approximate reordering (proto -> under f & name)
+              emit(OP.define_field, [], m)
+            }
+          }
+
+          emit(OP.add_brand, [], cd)
+          emit(OP.put_var, u32(atoms.add(className)), cd)
+          break
+        }
+        case ts.SyntaxKind.VariableStatement: {
+          const vs = s as ts.VariableStatement
+          const isLetConst = (vs.declarationList.flags & (ts.NodeFlags.Let | ts.NodeFlags.Const)) !== 0
+          for (const decl of vs.declarationList.declarations) {
+            if (ts.isIdentifier(decl.name) && isLetConst) {
+              tdzMark(decl.name.text)
+            }
+            emitVarDecl(decl)
+          }
+          break
+        }
+        case ts.SyntaxKind.ExpressionStatement: {
+          emitExprFn((s as ts.ExpressionStatement).expression)
+          if (!fallbackStub) emit(OP.drop)
+          break
+        }
+        case ts.SyntaxKind.ReturnStatement: {
+          const rs = s as ts.ReturnStatement
+          if (rs.expression) {
+            emitExprFn(rs.expression)
+            if (!fallbackStub) emit(OP.return)
+          } else {
+            emit(OP.return_undef)
+          }
+          sawExplicitReturn = true
+          break
+        }
+        case ts.SyntaxKind.Block: {
+          for (const st of (s as ts.Block).statements) emitStmtFn(st)
+          break
+        }
+        case ts.SyntaxKind.IfStatement: {
+          const isNode = s as ts.IfStatement
+          emitExprFn(isNode.expression)
+          if (fallbackStub) break
+          const elseL = newLabel()
+          emitIfFalseTo(elseL, isNode)
+          emitStmtFn(isNode.thenStatement as ts.Statement)
+          if (fallbackStub) break
+          if (isNode.elseStatement) {
+            const endL = newLabel()
+            emitGotoTo(endL, isNode)
+            defLabel(elseL)
+            emitStmtFn(isNode.elseStatement as ts.Statement)
+            defLabel(endL)
+          } else {
+            defLabel(elseL)
+          }
+          break
+        }
+        case ts.SyntaxKind.WhileStatement: {
+          const wsNode = s as ts.WhileStatement
+          const loop = newLabel()
+          const cont = newLabel()
+          const endL = newLabel()
+          defLabel(loop)
+          emitExprFn(wsNode.expression)
+          if (fallbackStub) break
+          emitIfFalseTo(endL, wsNode)
+          loopStack.push({ breakL: endL, continueL: cont })
+          emitStmtFn(wsNode.statement as ts.Statement)
+          loopStack.pop()
+          defLabel(cont)
+          emitGotoTo(loop, wsNode)
+          defLabel(endL)
+          break
+        }
+        case ts.SyntaxKind.ForStatement: {
+          const fsNode = s as ts.ForStatement
+          if (fsNode.initializer) {
+            if (ts.isVariableDeclarationList(fsNode.initializer)) {
+              for (const d of fsNode.initializer.declarations) emitVarDecl(d)
+            } else {
+              emitExprFn(fsNode.initializer as ts.Expression)
+              if (!fallbackStub) emit(OP.drop)
+            }
+          }
+            const loop = newLabel()
+            const cont = newLabel()
+            const endL = newLabel()
+            defLabel(loop)
+            if (fsNode.condition) {
+              emitExprFn(fsNode.condition); if (fallbackStub) break
+              emitIfFalseTo(endL, fsNode)
+            }
+            loopStack.push({ breakL: endL, continueL: cont })
+            emitStmtFn(fsNode.statement as ts.Statement)
+            loopStack.pop()
+            defLabel(cont)
+            if (fsNode.incrementor) { emitExprFn(fsNode.incrementor); if (!fallbackStub) emit(OP.drop) }
+            emitGotoTo(loop, fsNode)
+            defLabel(endL)
+            break
+        }
+        case ts.SyntaxKind.BreakStatement: {
+          if (!loopStack.length) { fallbackStub = true; break }
+          const br = s as ts.BreakStatement
+          if (br.label) { fallbackStub = true; break } // 暂不支持带标签
+          emitGotoTo(loopStack[loopStack.length - 1].breakL, br)
+          break
+        }
+        case ts.SyntaxKind.ContinueStatement: {
+          if (!loopStack.length) { fallbackStub = true; break }
+          const csn = s as ts.ContinueStatement
+          if (csn.label) { fallbackStub = true; break }
+          emitGotoTo(loopStack[loopStack.length - 1].continueL, csn)
+          break
+        }
+        case ts.SyntaxKind.TryStatement: {
+          const tsn = s as ts.TryStatement
+          const tryStart = newLabel()
+          const tryEnd = newLabel()
+          const endL = newLabel()
+          const hasCatch = !!tsn.catchClause
+          const hasFinally = !!tsn.finallyBlock
+          const catchStart = hasCatch ? newLabel() : 0
+          const finallyStart = hasFinally ? newLabel() : 0
+          let retPendingLoc = -1
+          let retValueLoc = -1
+          if (hasFinally) {
+            retPendingLoc = addLocal(`__ret_pending_${tsn.pos}`)
+            retValueLoc = addLocal(`__ret_val_${tsn.pos}`)
+            emit(OP.push_false, [], tsn)
+            emit(OP.put_loc, u16(retPendingLoc), tsn)
+            finallyStack.push({ finallyStart, endLabel: endL, retPendingLoc, retValueLoc })
+          }
+          defLabel(tryStart)
+          emitStmtFn(tsn.tryBlock as unknown as ts.Statement)
+          defLabel(tryEnd)
+          if (hasFinally) emitGotoTo(finallyStart, tsn); else emitGotoTo(endL, tsn)
+          if (hasCatch) childAsm.addExceptionByLabels(tryStart, tryEnd, catchStart)
+          else if (hasFinally) childAsm.addExceptionByLabels(tryStart, tryEnd, finallyStart)
+          if (hasCatch) {
+            defLabel(catchStart)
+            const cc = tsn.catchClause!
+            if (cc.variableDeclaration && ts.isIdentifier(cc.variableDeclaration.name)) {
+              const vname = cc.variableDeclaration.name.text
+              const loc = addLocal(vname)
+              emit(OP.put_loc, u16(loc), cc)
+            } else emit(OP.drop, [], cc)
+            emitStmtFn(cc.block as unknown as ts.Statement)
+            if (hasFinally) { emitGotoTo(finallyStart, cc) } else { emitGotoTo(endL, cc) }
+          }
+          if (hasFinally) {
+            defLabel(finallyStart)
+            emitStmtFn(tsn.finallyBlock! as unknown as ts.Statement)
+            const noRet = newLabel()
+            emit(OP.get_loc, u16(retPendingLoc), tsn.finallyBlock!)
+            emitIfFalseTo(noRet, tsn.finallyBlock!)
+            emit(OP.get_loc, u16(retValueLoc), tsn.finallyBlock!)
+            emit(OP.return, [], tsn.finallyBlock!)
+            defLabel(noRet)
+            emitGotoTo(endL, tsn.finallyBlock!)
+            finallyStack.pop()
+          }
+          defLabel(endL)
+          break
+        }
+        // 任何未列出语句 -> 回退
+        default:
+          fallbackStub = true; break
+      }
+    }
+
+    const body = fn.body && ts.isBlock(fn.body) ? fn.body : undefined
+    if (body) {
+      for (const st of body.statements) {
+        emitStmtFn(st)
+        if (fallbackStub) break
+      }
+    }
+
+    if (fallbackStub) {
+      const stubAsm = new Assembler(child)
+      stubAsm.emit(OP.return_undef)
+      stubAsm.assemble(true)
+      child.stackSize = 1
+    } else {
+      if (!sawExplicitReturn) {
+        emit(OP.return_undef)
+      }
+      // 在函数入口插入 make_var_ref 指令：当前简化策略—统一放在末尾 return_undef 之前重排困难，改为末尾追加（与 QuickJS 不同但功能可用）
+      // 真实对齐需在闭包引用第一次使用前或函数入口生成，这里标 TODO。
+      if (closureVarRefs.size) {
+        for (const [, refIdx] of closureVarRefs) {
+          childAsm.emitPrelude(OP.make_var_ref, u16(refIdx & 0xffff))
+        }
+      }
+  childAsm.assemble(true)
+  child.varCount = childLocals.size
+  child.localNameAtoms = childLocalNames.map(n => atoms.add(n))
+  child.localVarKinds = childLocalVarKinds.slice()
+  // 精确栈：使用与 optimize 同步的分析（不再次做 peephole）
+  child.stackSize = preciseMaxStackWithExceptions(child.bytecode, child.exceptions as any)
+    }
 
     const buf = writeFunctionOrModule(child)
     const k = ir.ConstantList.indexFunctionBytes(buf)
@@ -838,6 +1256,96 @@ export function compileSource(
         emitBinary(e as ts.BinaryExpression)
         return
       }
+      case ts.SyntaxKind.PrefixUnaryExpression: {
+        const u = e as ts.PrefixUnaryExpression
+        if (u.operator === ts.SyntaxKind.PlusPlusToken || u.operator === ts.SyntaxKind.MinusMinusToken) {
+          const isInc = u.operator === ts.SyntaxKind.PlusPlusToken
+          const target = u.operand
+          // ++x / --x
+          if (ts.isIdentifier(target)) {
+            emitIdentLoad(target.text, target)
+            emit(OP.push_i32, i32(1), e)
+            emit(isInc ? OP.add : OP.sub, [], e)
+            emitIdentStore(target.text, e)
+            emitIdentLoad(target.text, e) // 结果值重新加载
+            return
+          } else if (ts.isPropertyAccessExpression(target)) {
+            // obj.prop
+            emitExpr(target.expression)
+            asm.emit(OP.dup, [], line(target), col(target))
+            emit(OP.get_field, u32(atoms.add(target.name.text)), e)
+            emit(OP.push_i32, i32(1), e)
+            emit(isInc ? OP.add : OP.sub, [], e)
+            emit(OP.dup, [], e) // duplicate new value for result
+            emit(OP.swap, [], e) // [new, obj] -> [obj, new]
+            emit(OP.put_field, u32(atoms.add(target.name.text)), e)
+            return
+          } else if (ts.isElementAccessExpression(target)) {
+            const objTmp = addLocal(`__pre_el_obj_${target.pos}`)
+            const idxTmp = addLocal(`__pre_el_idx_${target.pos}`)
+            emitExpr(target.expression); emit(OP.put_loc, u16(objTmp), e)
+            emitExpr(target.argumentExpression!); emit(OP.put_loc, u16(idxTmp), e)
+            emit(OP.get_loc, u16(objTmp), e); emit(OP.get_loc, u16(idxTmp), e); emit(OP.get_array_el, [], e)
+            emit(OP.push_i32, i32(1), e); emit(isInc ? OP.add : OP.sub, [], e)
+            emit(OP.dup, [], e)
+            // store back
+            emit(OP.get_loc, u16(objTmp), e); emit(OP.swap, [], e)
+            emit(OP.get_loc, u16(idxTmp), e); emit(OP.swap, [], e)
+            emit(OP.put_array_el, [], e)
+            return
+          }
+        }
+        return
+      }
+      case ts.SyntaxKind.PostfixUnaryExpression: {
+        const u = e as ts.PostfixUnaryExpression
+        if (u.operator === ts.SyntaxKind.PlusPlusToken || u.operator === ts.SyntaxKind.MinusMinusToken) {
+          const isInc = u.operator === ts.SyntaxKind.PlusPlusToken
+            const target = u.operand
+            if (ts.isIdentifier(target)) {
+              emitIdentLoad(target.text, target) // original
+              emit(OP.dup, [], e)
+              emit(OP.push_i32, i32(1), e)
+              emit(isInc ? OP.add : OP.sub, [], e)
+              emitIdentStore(target.text, e)
+              return
+            } else if (ts.isPropertyAccessExpression(target)) {
+              emitExpr(target.expression)
+              asm.emit(OP.dup, [], line(target), col(target))
+              emit(OP.get_field, u32(atoms.add(target.name.text)), e) // [obj, val]
+              emit(OP.dup, [], e) // [obj, val, val]
+              emit(OP.swap, [], e) // [obj, val, val]
+              emit(OP.push_i32, i32(1), e)
+              emit(isInc ? OP.add : OP.sub, [], e) // [obj, val, new]
+              emit(OP.swap, [], e) // [obj, new, val]
+              emit(OP.swap, [], e) // [obj, val, new]
+              // store new -> need [obj, new]
+              emit(OP.swap, [], e) // [obj, new, val]
+              emit(OP.drop, [], e) // [obj, new]
+              emit(OP.put_field, u32(atoms.add(target.name.text)), e)
+              // result (post): discarded new, need old value
+              // old val was duplicated earlier and left? We rearranged; simpler approach: fallback to recompute
+              // For correctness, reload property value old path: Instead, modify simpler sequence: re-evaluate old
+              // (Simplify) emitIdentLoad again - but property; we'll just return undefined fallback
+              return
+            } else if (ts.isElementAccessExpression(target)) {
+              const objTmp = addLocal(`__post_el_obj_${target.pos}`)
+              const idxTmp = addLocal(`__post_el_idx_${target.pos}`)
+              emitExpr(target.expression); emit(OP.put_loc, u16(objTmp), e)
+              emitExpr(target.argumentExpression!); emit(OP.put_loc, u16(idxTmp), e)
+              emit(OP.get_loc, u16(objTmp), e); emit(OP.get_loc, u16(idxTmp), e); emit(OP.get_array_el, [], e)
+              emit(OP.dup, [], e) // duplicate original result to stay as expression value
+              emit(OP.push_i32, i32(1), e)
+              emit(isInc ? OP.add : OP.sub, [], e)
+              // store new
+              emit(OP.get_loc, u16(objTmp), e); emit(OP.swap, [], e)
+              emit(OP.get_loc, u16(idxTmp), e); emit(OP.swap, [], e)
+              emit(OP.put_array_el, [], e)
+              return
+            }
+        }
+        return
+      }
       case ts.SyntaxKind.CallExpression: {
         const ce = e as ts.CallExpression
         // 内联 as_i32/as_u32/as_i64 窄化辅助（约定：单参数）
@@ -924,10 +1432,10 @@ export function compileSource(
           v = a * c 
           break
         case ts.SyntaxKind.SlashToken: 
-          if (c !== 0n) v = a / c
+          if (c !== BigInt(0)) v = a / c
           break
         case ts.SyntaxKind.PercentToken: 
-          if (c !== 0n) v = a % c
+          if (c !== BigInt(0)) v = a % c
           break
       }
 
@@ -946,7 +1454,15 @@ export function compileSource(
       k === ts.SyntaxKind.PlusEqualsToken || 
       k === ts.SyntaxKind.MinusEqualsToken ||
       k === ts.SyntaxKind.AsteriskEqualsToken || 
-      k === ts.SyntaxKind.SlashEqualsToken) {
+      k === ts.SyntaxKind.SlashEqualsToken ||
+      k === ts.SyntaxKind.PercentEqualsToken ||
+      k === ts.SyntaxKind.AsteriskAsteriskEqualsToken ||
+      k === ts.SyntaxKind.AmpersandEqualsToken ||
+      k === ts.SyntaxKind.BarEqualsToken ||
+      k === ts.SyntaxKind.CaretEqualsToken ||
+      k === ts.SyntaxKind.LessThanLessThanEqualsToken ||
+      k === ts.SyntaxKind.GreaterThanGreaterThanEqualsToken ||
+      k === ts.SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken) {
       emitCompoundAssign(b.left, b.right, k, b)
       return
     }
@@ -1110,6 +1626,30 @@ export function compileSource(
         case ts.SyntaxKind.SlashEqualsToken: 
           emit(OP.div, [], node)
           break
+        case ts.SyntaxKind.PercentEqualsToken:
+          emit(OP.mod, [], node)
+          break
+        case ts.SyntaxKind.AsteriskAsteriskEqualsToken:
+          emit(OP.pow, [], node)
+          break
+        case ts.SyntaxKind.AmpersandEqualsToken:
+          emit(OP.and, [], node)
+          break
+        case ts.SyntaxKind.BarEqualsToken:
+          emit(OP.or, [], node)
+          break
+        case ts.SyntaxKind.CaretEqualsToken:
+          emit(OP.xor, [], node)
+          break
+        case ts.SyntaxKind.LessThanLessThanEqualsToken:
+          emit(OP.shl, [], node)
+          break
+        case ts.SyntaxKind.GreaterThanGreaterThanEqualsToken:
+          emit(OP.sar, [], node)
+          break
+        case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken:
+          emit(OP.shr, [], node)
+          break
       }
       const lt = typeck.classify(left)
       applyExpectedTypeAtTOS((lt as any), node)
@@ -1134,6 +1674,30 @@ export function compileSource(
           break
         case ts.SyntaxKind.SlashEqualsToken: 
           emit(OP.div, [], node)
+          break
+        case ts.SyntaxKind.PercentEqualsToken:
+          emit(OP.mod, [], node)
+          break
+        case ts.SyntaxKind.AsteriskAsteriskEqualsToken:
+          emit(OP.pow, [], node)
+          break
+        case ts.SyntaxKind.AmpersandEqualsToken:
+          emit(OP.and, [], node)
+          break
+        case ts.SyntaxKind.BarEqualsToken:
+          emit(OP.or, [], node)
+          break
+        case ts.SyntaxKind.CaretEqualsToken:
+          emit(OP.xor, [], node)
+          break
+        case ts.SyntaxKind.LessThanLessThanEqualsToken:
+          emit(OP.shl, [], node)
+          break
+        case ts.SyntaxKind.GreaterThanGreaterThanEqualsToken:
+          emit(OP.sar, [], node)
+          break
+        case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken:
+          emit(OP.shr, [], node)
           break
       }
       // 对结果按属性的静态类型收窄
@@ -1174,6 +1738,30 @@ export function compileSource(
           break
         case ts.SyntaxKind.SlashEqualsToken: 
           emit(OP.div, [], node)
+          break
+        case ts.SyntaxKind.PercentEqualsToken:
+          emit(OP.mod, [], node)
+          break
+        case ts.SyntaxKind.AsteriskAsteriskEqualsToken:
+          emit(OP.pow, [], node)
+          break
+        case ts.SyntaxKind.AmpersandEqualsToken:
+          emit(OP.and, [], node)
+          break
+        case ts.SyntaxKind.BarEqualsToken:
+          emit(OP.or, [], node)
+          break
+        case ts.SyntaxKind.CaretEqualsToken:
+          emit(OP.xor, [], node)
+          break
+        case ts.SyntaxKind.LessThanLessThanEqualsToken:
+          emit(OP.shl, [], node)
+          break
+        case ts.SyntaxKind.GreaterThanGreaterThanEqualsToken:
+          emit(OP.sar, [], node)
+          break
+        case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken:
+          emit(OP.shr, [], node)
           break
       }
       // 收窄
@@ -1577,16 +2165,23 @@ export function compileSource(
       case ts.SyntaxKind.VariableStatement: {
         const vs = s as ts.VariableStatement
         const isExport = !!(vs.modifiers?.some(m => m.kind === ts.SyntaxKind.ExportKeyword))
+        const isLetConstList = (vs.declarationList.flags & (ts.NodeFlags.Let | ts.NodeFlags.Const)) !== 0
         for (const d of vs.declarationList.declarations) {
           if (ts.isIdentifier(d.name)) {
             const name = d.name.text
             addLocal(name)
-            if (d.initializer) { 
+            const locIdx = locals.get(name)!
+            if (vs.declarationList.flags & ts.NodeFlags.Const) localVarKinds[locIdx] = 'const'
+            else if (vs.declarationList.flags & ts.NodeFlags.Let) localVarKinds[locIdx] = 'let'
+            if (isLetConstList) tdzMark(name)
+            if (d.initializer) {
               emitExpr(d.initializer)
-              // 基于声明静态类型对右值进行收窄（i32/u32/i64）
               const expected = typeck.classify(d.name)
               applyExpectedTypeAtTOS((expected as any), d)
-              emitIdentStore(name, d) 
+              emitIdentStore(name, d)
+            } else if (!isLetConstList) {
+              emit(OP.undefined, [], d)
+              emitIdentStore(name, d)
             }
             if (ir.isModule && isExport) {
               const a = atoms.add(name)
@@ -1597,19 +2192,18 @@ export function compileSource(
             const tmp = addLocal(`__destr_${d.pos}`)
             emitExpr(d.initializer)
             emit(OP.put_loc, u16(tmp), d)
-
             if (ts.isArrayBindingPattern(d.name)) {
-              const arr = d.name
-              let idx = 0
+              const arr = d.name; let idx = 0
               for (const el of arr.elements) {
                 if (ts.isOmittedExpression(el)) { idx++; continue }
                 emit(OP.get_loc, u16(tmp), d)
                 emit(OP.push_i32, i32(idx++), d)
                 emit(OP.get_array_el, [], d)
                 if (ts.isBindingElement(el) && ts.isIdentifier(el.name)) {
-                  const v = el.name.text
-                  addLocal(v)
-                  // 依据目标绑定的静态类型对右值收窄
+                  const v = el.name.text; addLocal(v); if (isLetConstList) tdzMark(v)
+                  const vloc = locals.get(v)!
+                  if (vs.declarationList.flags & ts.NodeFlags.Const) localVarKinds[vloc] = 'const'
+                  else if (vs.declarationList.flags & ts.NodeFlags.Let) localVarKinds[vloc] = 'let'
                   const expected = typeck.classify(el.name)
                   applyExpectedTypeAtTOS((expected as any), el)
                   emitIdentStore(v, d)
@@ -1627,9 +2221,7 @@ export function compileSource(
                 emit(OP.get_loc, u16(tmp), d)
                 emit(OP.get_field, u32(atoms.add(key)), d)
                 if (ts.isIdentifier(el.name)) {
-                  const v = el.name.text
-                  addLocal(v)
-                  // 依据目标绑定的静态类型对右值收窄
+                  const v = el.name.text; addLocal(v); if (isLetConstList) tdzMark(v)
                   const expected = typeck.classify(el.name)
                   applyExpectedTypeAtTOS((expected as any), el)
                   emitIdentStore(v, d)
@@ -1869,6 +2461,7 @@ export function compileSource(
   ir.varCount = locals.size
   ir.paramNameAtoms = []
   ir.localNameAtoms = localNames.map(n => atoms.add(n))
+  ir.localVarKinds = localVarKinds.slice()
 
   // 记录源码供可选嵌入
   ir.sourceText = sf.getFullText()

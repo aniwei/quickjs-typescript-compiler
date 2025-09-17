@@ -85,12 +85,25 @@ export function addClosureCapture(
   // 1) 在父 IR.closures 确保登记该捕获（去重）
   const wantIsVar = source.kind === 'local'
   const wantIdx = source.index
-
   let foundCaptureIdx = parentIR.closures.findIndex(c => c.isVar === wantIsVar && c.idx === wantIdx)
   if (foundCaptureIdx < 0) {
-    const cap: CaptureInfo = { isVar: wantIsVar, idx: wantIdx }
+    const cap: CaptureInfo = {
+      isVar: wantIsVar,
+      idx: wantIdx,
+      nameAtom: source.nameAtom,
+      isLocal: source.kind === 'local',
+      isArg: source.kind === 'param',
+      // 读取父函数 localVarKinds（若存在）来判断变量种类；参数暂不区分 -> undefined
+      varKind: source.kind === 'local' ? parentIR.localVarKinds[wantIdx] || 'let' : undefined,
+      isConst: source.kind === 'local' ? parentIR.localVarKinds[wantIdx] === 'const' : false,
+      isLexical: source.kind === 'local' ? parentIR.localVarKinds[wantIdx] !== 'var' : false
+    }
     parentIR.closures.push(cap)
     foundCaptureIdx = parentIR.closures.length - 1
+  } else {
+    // 若已存在但缺少 nameAtom，补齐（第一次捕获可能没有写）
+    const existing = parentIR.closures[foundCaptureIdx]
+    if (existing.nameAtom == null) existing.nameAtom = source.nameAtom
   }
 
   // 2) 在子 IR.varRefs 登记引用（按 nameAtom 去重）

@@ -130,7 +130,13 @@ export class FunctionIR {
   filenameAtomId = 0;
   paramNameAtoms: number[] = [];
   localNameAtoms: number[] = [];
+  // 与 localNameAtoms 对应的变量种类信息（var/let/const），用于捕获元数据扩展与写保护
+  localVarKinds: ('var' | 'let' | 'const')[] = [];
 
   imports: ImportEntry[] = [];
   exports: ExportEntry[] = [];
+
+  // Multi-layer closure support (not in original QuickJS IR but aids mapping)
+  parent?: FunctionIR;
+  depth: number = 0; // 0 = top-level/module, increases per nested function
 }
