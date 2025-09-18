@@ -1,0 +1,6 @@
+{
+  "features": {
+    "bigInt": false,
+    "shortOpcodes": true
+  }
+}

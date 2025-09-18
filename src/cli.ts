@@ -1,72 +1,76 @@
-import * as ts from 'typescript'
-import * as fs from 'fs'
-import { compileSource } from './compile'
-import { BytecodeWriter } from './bytecode'
+#!/usr/bin/env node
+import { readFileSync, existsSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { compileToIR } from './compile'
+import { emitBytecode } from './bytecode'
+import { serializeQuickJS, writeModule } from './assembler'
+import { disassemble } from './disasm'
 
-function loadEnvQuickJS() {
-  try {
-    if (fs.existsSync('.env.quickjs')) {
-      const txt = fs.readFileSync('.env.quickjs', 'utf8')
 
-      for (const line of txt.split(/\r?\n/)) {
-        const m = line.match(/^(\w+)\s*=\s*(.+)$/)
-        if (m) process.env[m[1]] = m[2]
-      }
 
-      console.log('已加载 .env.quickjs（QJS_BC_MAGIC/QJS_BC_VERSION）')
-    }
-  } catch {}
-}
+function main () {
+  const input = process.argv[2] || '__tests__/compute.ts'
+  const abs = resolve(process.cwd(), input)
 
-function main() {
-  const args = process.argv.slice(2)
-  if (args.length < 2) {
-    console.error('用法: src/cli.ts input.ts output.bin [--module] [--short] [--bigint=error|coerce] [--no-pc2loc] [--no-columns] [--embed-source] [--strip-debug]')
+  if (!existsSync(abs)) {
+    console.error('Input not found:', abs)
     process.exit(1)
   }
-  const input = args[0], output = args[1];
-  const forceModule = args.includes('--module');
-  const enableShort = args.includes('--short');
-  const bigArg = (args.find(a => a.startsWith('--bigint=')) || '--bigint=error').split('=')[1] as 'error'|'coerce'
 
-  const optNoPC2 = args.includes('--no-pc2loc')
-  const optNoCols = args.includes('--no-columns')
-  const optEmbedSrc = args.includes('--embed-source')
-  const optStripDbg = args.includes('--strip-debug')
+  // 使用预生成 build-opcodes.ts 的 opcodes，不再调用旧 gen-opcodes
+  const src = readFileSync(abs, 'utf8')
+  const ir = compileToIR(src, abs)
 
-  loadEnvQuickJS()
+  const { 
+    code, 
+    constants, 
+    atoms, 
+    localCount, 
+    stackSize, 
+    locals 
+  } = emitBytecode(ir)
 
-  const program = ts.createProgram([input], {
-    target: ts.ScriptTarget.ES2020,
-    module: ts.ModuleKind.ESNext,
-    strict: true,
-    noEmit: true,
-    sourceMap: true,
-    skipLibCheck: true
+  const debug = process.argv.includes('--debug')
+  const capturedLocals = Array.from(locals.keys()).filter(k => /outer/i.test(k))
+  const localsMapObj: Record<string, number> = Object.fromEntries(locals.entries())
+
+  const mod = serializeQuickJS({ 
+    code, 
+    constants, 
+    atoms, 
+    localCount, 
+    stackSize, 
+    debug: debug ? { filename: abs } : undefined, 
+    localsMap: localsMapObj, 
+    capturedLocals 
   })
-  const checker = program.getTypeChecker()
-  const sf = program.getSourceFile(input)
 
-  if (!sf) {
-    throw new Error('Source not found: '+input)
+  const outPath = resolve(process.cwd(), 'output.bin')
+  writeModule(mod, outPath)
+  if (process.env.DUMP_ASM) {
+  console.log('=== LOCALS ===')
+  console.log('localCount', localCount)
+  console.log('localsMap', localsMapObj)
+  if (capturedLocals) console.log('capturedLocals', capturedLocals)
+  console.log('stackSize', stackSize)
+  console.log('debug', debug)
+  console.log('=== ATOMS ===')
+  atoms.forEach((a, i) => console.log(i, a))
+  console.log('=== CONST POOL ===')
+  constants.forEach((c, i) => console.log(i, c))
+  console.log('=== CODE ===')
+  console.log(code.map(b => b.toString(16).padStart(2, '0')).join(' '))
   }
+  console.log('Wrote', outPath, 'size=', mod.buffer.length, 'format=quickjs')
+  const wantDisasm = process.argv.includes('--disasm')
+  const wantCFG = process.argv.includes('--showCFG')
+  const wantDOT = process.argv.includes('--dot')
+  if (wantDisasm || wantCFG || wantDOT) {
+    const text = disassemble(mod.buffer, { showCFG: wantCFG, dot: wantDOT })
+    console.log(text)
+  }
+}
 
-  const { atoms, ir } = compileSource(sf, checker, {
-    forceModule,
-    enableShortOpcodes: enableShort,
-    bigintMixPolicy: bigArg
-  })
-
-  // 应用调试/源码选项
-  if (optStripDbg) ir.debug.stripDebug = true
-  if (optNoPC2) ir.debug.emitPC2Loc = false
-  if (optNoCols) ir.debug.emitColumns = false
-  if (optEmbedSrc) ir.debug.embedSource = true
-
-  const writer = new BytecodeWriter(atoms)
-  const { buffer } = writer.writeTop(ir)
-  fs.writeFileSync(output, buffer)
-
-  console.log(`已输出字节码: ${output} (${buffer.length} bytes)`)}
-
-if (require.main === module) main()
+if (require.main === module) {
+  main()
+}

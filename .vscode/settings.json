@@ -5,6 +5,20 @@
     "*.wxss": "css",
     "*.wxs": "javascript",
     "*. codediagram": "codediagram",
-    "complex": "cpp"
+    "complex": "cpp",
+    "__bit_reference": "cpp",
+    "__node_handle": "cpp",
+    "array": "cpp",
+    "memory": "cpp",
+    "ios": "cpp",
+    "istream": "cpp",
+    "optional": "cpp",
+    "ostream": "cpp",
+    "sstream": "cpp",
+    "streambuf": "cpp",
+    "string_view": "cpp",
+    "tuple": "cpp",
+    "variant": "cpp",
+    "vector": "cpp"
   }
 }
