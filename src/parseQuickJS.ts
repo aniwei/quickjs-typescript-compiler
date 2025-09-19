@@ -1,7 +1,6 @@
 // Minimal QuickJS bytecode container parser focused on extracting the first function bytecode
 import { readUlebFrom, readSlebFrom } from './leb128'
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { FIRST_ATOM } from './env'
 
 export interface ParsedQuickJSFunction {
   version: number
@@ -32,16 +31,7 @@ interface ClosureVar {
 
 type ConstValue = number | string | boolean | null | undefined
 
-function computeFirstAtom(): number {
-  try {
-    const p = resolve(process.cwd(), 'cpp/QuickJS/include/QuickJS/quickjs-atom.h')
-    const txt = readFileSync(p, 'utf8')
-    const count = (txt.match(/\bDEF\s*\(/g) || []).length
-    return (count + 1) >>> 0
-  } catch {
-    return 512
-  }
-}
+// FIRST_ATOM is generated at build time in src/env.ts
 
 export function parseQuickJS(buf: Buffer): ParsedQuickJSFunction {
   // QuickJS bytecode container layout:
@@ -58,6 +48,7 @@ export function parseQuickJS(buf: Buffer): ParsedQuickJSFunction {
     const encLen = readUleb0()
     const isWide = (encLen & 1) !== 0
     const len = encLen >>> 1
+
     if (isWide) {
       const byteLen = len * 2
       const s = buf.toString('utf16le', offRef0.off, offRef0.off + byteLen)
@@ -70,7 +61,7 @@ export function parseQuickJS(buf: Buffer): ParsedQuickJSFunction {
     }
   }
 
-  const firstAtom = computeFirstAtom()
+  const firstAtom = FIRST_ATOM >>> 0
   const res = readObjectStream(buf, offRef0, atoms, version, firstAtom)
   if (!res) throw new Error('No FunctionBytecode found in object stream')
   return res
@@ -104,6 +95,7 @@ function parseFunctionFrom(
     // 兼容我们早期的 SIM 偏移（已废弃，保留以提升健壮性）
     const SIM = 1 << 24
     if (idx >= SIM) idx -= SIM
+    if (idx === 0) return undefined as any // JS_ATOM_NULL
     return atoms[idx]
   }
 
@@ -148,12 +140,20 @@ function parseFunctionFrom(
   if (hasDebug) {
     debugFilename = readAtomRef()
     const pc2len = readUleb()
-    if (pc2len < 0 || offRef.off + pc2len > buf.length) throw new Error('Invalid pc2line length')
+    
+    if (pc2len < 0 || offRef.off + pc2len > buf.length) {
+      throw new Error('Invalid pc2line length')
+    }
+
     pc2line = buf.slice(offRef.off, offRef.off + pc2len)
     offRef.off += pc2len
+
     const sourceLen = readUleb()
-    if (sourceLen < 0 || offRef.off + sourceLen > buf.length) throw new Error('Invalid source length')
-    offRef.off += sourceLen
+    if (sourceLen < 0 || offRef.off + sourceLen > buf.length) {
+      throw new Error('Invalid source length')
+    }
+    
+      offRef.off += sourceLen
   }
 
   // const pool: in QuickJS, constants are generic objects serialized by the same writer.

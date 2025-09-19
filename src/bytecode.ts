@@ -13,6 +13,18 @@ export interface EmitResult {
   stackSize: number
   labels: Map<string, number>
   sourceMarks: Array<{ pc: number; line: number; col: number }>
+  subFunctions?: Array<SubFunction>
+}
+
+export interface SubFunction {
+  name: string
+  atoms: string[]
+  code: number[]
+  constants: ConstValue[]
+  localCount: number
+  stackSize: number
+  argCount?: number
+  argNames?: string[]
 }
 
 export class BytecodeEmitter {
@@ -26,6 +38,7 @@ export class BytecodeEmitter {
   private currentLoc?: { line: number; col: number }
   private lastLoc?: { line: number; col: number }
   private sourceMarks: Array<{ pc: number; line: number; col: number }> = []
+  private subFunctions: Array<SubFunction> = []
 
   emit (ir: IRProgram): EmitResult {
     for (const node of ir) {
@@ -45,7 +58,8 @@ export class BytecodeEmitter {
       localKinds: this.localKinds,
       stackSize: this.computeStackSize(),
       labels: this.labels,
-      sourceMarks: this.sourceMarks
+      sourceMarks: this.sourceMarks,
+      subFunctions: this.subFunctions
     }
   }
 
@@ -91,12 +105,27 @@ export class BytecodeEmitter {
       case 'Jump': return this.emitJump(OpCode.OP_goto, node.label)
       case 'JumpIfFalse': return this.emitJump(OpCode.OP_if_false, node.label)
       case 'ReturnUndef': return this.pushOp(OpCode.OP_return_undef)
+      case 'Return': return this.pushOp(OpCode.OP_return)
       case 'Equal': return this.pushOp(OpCode.OP_eq)
       case 'StrictEqual': return this.pushOp(OpCode.OP_strict_eq)
       case 'MethodCall': return this.pushOp(OpCode.OP_call_method, node.argc)
+      case 'Call': return this.pushOp(OpCode.OP_call, node.argc)
+      case 'GetArg': return this.pushOp(OpCode.OP_get_arg, node.index)
+      case 'PutArg': return this.pushOp(OpCode.OP_put_arg, node.index)
       case 'SetEnvVar': return this.processSetEnvVar(node)
       case 'GetEnvVar': return this.processGetEnvVar(node)
       case 'CheckDefineVar': return this.processCheckDefineVar(node)
+      case 'DefineFunc': {
+        const atom = this.internAtom(node.name)
+        return this.pushOp(OpCode.OP_define_func, { atom, flags: (node.flags ?? 0) & 0xff } as any)
+      }
+      case 'FunctionObject': {
+        return this.processFunctionObject(node as any)
+      }
+      // NOTE: FunctionDecl lowering is currently handled at compile stage as
+      // LoadConst placeholder + local alias + env store. Future: emit OP_define_func
+      // (atom_u8) paired with OP_fclosure/OP_fclosure8 once multi-function serialization
+      // is supported in assembler.
       default: { 
         const exhaust: never = node as never
         throw new Error('Unhandled IR node '+ JSON.stringify(exhaust)) 
@@ -108,8 +137,13 @@ export class BytecodeEmitter {
     const idx = this.ensureLocal(node.name)
     if (node.declKind) this.localKinds.set(node.name, node.declKind)
   }
+
   private processLoadConst (node: { value: any }) {
     const v = (node as any).value
+    if (v === undefined) {
+      this.pushOp(OpCode.OP_undefined)
+      return
+    }
     if (typeof v === 'number' && Number.isFinite(v) && Number.isInteger(v) && v >= -0x80000000 && v <= 0x7fffffff) {
       // 优先使用 OP_push_i32 与 qjsc 对齐（qjsc 会尽量用立即数推入小整数）
       this.pushOp(OpCode.OP_push_i32, v | 0)
@@ -119,6 +153,7 @@ export class BytecodeEmitter {
       this.pushOp(OpCode.OP_push_const, idx)
     }
   }
+
   private processSetLocal (node: { name: string }) {
     const idx = this.ensureLocal(node.name)
     // 根据变量种类选择 put 指令：对 let/const 采用 *_check（运行时 TDZ 检查）
@@ -129,6 +164,7 @@ export class BytecodeEmitter {
       this.pushOp(OpCode.OP_put_loc, idx)
     }
   }
+
   private processInitLocal (node: { name: string }) {
     const idx = this.ensureLocal(node.name)
     const kind = this.localKinds.get(node.name)
@@ -139,6 +175,7 @@ export class BytecodeEmitter {
       this.pushOp(OpCode.OP_put_loc, idx)
     }
   }
+
   private processGetLocal (node: { name: string }) {
     const idx = this.ensureLocal(node.name)
     // 读取 let/const 使用 TDZ 检查变体
@@ -149,6 +186,7 @@ export class BytecodeEmitter {
       this.pushOp(OpCode.OP_get_loc, idx)
     }
   }
+
   // array literal: handled via OP_array_from with argc emitted directly
   // no-op: real OP_lt used
   private processIncLocal (node: { name: string }) {
@@ -244,16 +282,43 @@ export class BytecodeEmitter {
     }
   }
 
+  // Compile a nested function body into its own bytecode and constants, insert into const pool as FunctionBytecode object,
+  // then emit OP_fclosure(/8) referencing that constant index.
+  private processFunctionObject (node: { name: string; argCount: number; argNames?: string[]; body: IRProgram }) {
+    // Compile child using a new emitter but sharing the atom table for cross-atom consistency
+    const child = new BytecodeEmitter()
+    // reuse atom table by assigning instance (Atoms are interned by name)
+    ;(child as any).atomTable = this.atomTable
+    const childResult = child.emit(node.body)
+    const sub: SubFunction = {
+      name: node.name,
+      atoms: childResult.atoms,
+      code: childResult.code,
+      constants: childResult.constants,
+      localCount: childResult.localCount,
+      stackSize: childResult.stackSize,
+      argCount: node.argCount,
+      argNames: node.argNames,
+    }
+    const constIndex = this.constants.add({ __function__: sub } as any)
+    this.subFunctions.push(sub)
+    // emit fclosure referencing constIndex; short form when possible
+    if (constIndex >= 0 && constIndex <= 0xff) this.pushOp(OpCode.OP_fclosure8, constIndex)
+    else this.pushOp(OpCode.OP_fclosure, constIndex)
+  }
+
   private processSetEnvVar (node: { name: string; strict?: boolean }) {
     const atom = this.internAtom(node.name)
     this.pushOp(node.strict 
       ? OpCode.OP_put_var_strict 
       : OpCode.OP_put_var, atom)
   }
+
   private processGetEnvVar (node: { name: string; strict?: boolean }) {
     const atom = this.internAtom(node.name)
     this.pushOp(node.strict ? OpCode.OP_get_var : OpCode.OP_get_var_undef, atom)
   }
+
   private processCheckDefineVar (node: { name: string; flags?: number }) {
     const atom = this.internAtom(node.name)
     const flags = (node.flags ?? 0) & 0xff
@@ -349,6 +414,9 @@ export class BytecodeEmitter {
       } else if (op === OpCode.OP_push_const) {
         const idx = src[it.pc + 1] | (src[it.pc + 2] << 8)
         if (idx >= 0 && idx <= 0xff) setOp(i, OpCode.OP_push_const8, 2)
+      } else if (op === OpCode.OP_fclosure) {
+        const idx = src[it.pc + 1] | (src[it.pc + 2] << 8)
+        if (idx >= 0 && idx <= 0xff) setOp(i, OpCode.OP_fclosure8, 2)
       }
     }
 
@@ -451,6 +519,13 @@ export class BytecodeEmitter {
         } else {
           out[dst + 1] = src[it.pc + 1]; out[dst + 2] = src[it.pc + 2]
         }
+      } else if (was === OpCode.OP_fclosure) {
+        if (op === OpCode.OP_fclosure8) {
+          const v = src[it.pc + 1] | (src[it.pc + 2] << 8)
+          out[dst + 1] = (v & 0xff)
+        } else {
+          out[dst + 1] = src[it.pc + 1]; out[dst + 2] = src[it.pc + 2]
+        }
       } else {
         // 其它指令：直接复制原始 payload（如果有）
         for (let k = 1; k < size; k++) {
@@ -504,16 +579,29 @@ export class BytecodeEmitter {
         case OpCode.OP_push_const8:
         case OpCode.OP_push_0:
         case OpCode.OP_push_i8:
+        case OpCode.OP_undefined:
+        case OpCode.OP_fclosure:
+        case OpCode.OP_fclosure8:
           sp += 1
           break
         case OpCode.OP_dup:
           if (sp > 0) sp += 1
           break
         case OpCode.OP_dup1:
+        case OpCode.OP_return:
+          // Return consumes the value and ends the function. Reset stack depth.
+          sp = 0
+          break
           if (sp > 1) sp += 1
           break
         // no swap opcode in current set
         case OpCode.OP_get_loc:
+        case OpCode.OP_get_arg:
+          sp += 1
+          break
+        case OpCode.OP_put_arg:
+          sp -= 1
+          break
         case OpCode.OP_get_loc8:
         case OpCode.OP_get_loc_check:
         case OpCode.OP_get_loc0:
@@ -608,6 +696,15 @@ export class BytecodeEmitter {
           sp -= (1 + argc)
           break
         }
+        case OpCode.OP_call: {
+          const argc = readImm(pc, meta.imm?.[0]?.size ?? 2)
+          // expects [func, this, ...args]; consumes (2+argc), pushes result => net -(2+argc) + 1
+          sp -= (1 + argc)
+          break
+        }
+        case OpCode.OP_define_func:
+          // treat as metadata operation (naming), assume no net stack change in our subset
+          break
         case OpCode.OP_return_undef:
           // pop? (这里我们返回 undefined 不消耗已有) 设为不变
           break

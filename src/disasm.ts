@@ -2,7 +2,7 @@ import { parseQuickJS } from './parseQuickJS'
 import { OPCODE_META, OpCode } from './opcodes'
 import { QJS_OPCODE_META } from './qjs_opcodes'
 import { readFileSync } from 'node:fs'
-import { readFileSync as readFileSyncFs } from 'node:fs'
+import { FIRST_ATOM } from './env'
 
 function hex(b: number) { 
   return b.toString(16).padStart(2, '0') 
@@ -249,7 +249,7 @@ export function disassemble(buf: Buffer, opts?: { showCFG?: boolean, dot?: boole
         immStr = ` off=${val} -> pc=${target}${lab?` (${lab})`:''}${annByName || annByPc}`
       } else if (op === OpCode.OP_define_field || op === OpCode.OP_get_field2) {
         // 现在字节码中的立即数是 first_atom + idx（无符号32位）
-        const firstAtom =  computeFirstAtomSafe()
+  const firstAtom = FIRST_ATOM >>> 0
         const raw = (val >>> 0)
         const idx = raw - firstAtom
         const name = (idx >= 0 && idx < fn.atoms.length) ? (fn.atoms[idx] ?? `atom#${idx}`) : `atom#${idx}`
@@ -306,13 +306,4 @@ export function generateCFGDOT(blocks: Array<{ start: number; end: number; succ:
   return lines.join('\n')
 }
 
-function computeFirstAtomSafe(): number {
-  try {
-    const path = require('node:path').resolve(process.cwd(), 'cpp/QuickJS/include/QuickJS/quickjs-atom.h')
-    const text = readFileSyncFs(path, 'utf8')
-    const count = (text.match(/\bDEF\s*\(/g) || []).length
-    return (count + 1) >>> 0
-  } catch {
-    return 512
-  }
-}
+// FIRST_ATOM is generated at build time in src/env.ts

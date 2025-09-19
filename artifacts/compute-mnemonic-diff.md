@@ -29,13 +29,11 @@
 |   | OP_add | OP_add |
 |   | OP_call_method | OP_call_method |
 | - | OP_drop |  |
-| - | OP_get_loc |  |
-| - | OP_dup |  |
 | + |  | OP_put_loc |
 | + |  | OP_put_loc |
 |   | OP_inc | OP_inc |
-|   | OP_put_loc | OP_put_loc |
-|   | OP_drop | OP_drop |
+| + |  | OP_put_loc |
+| + |  | OP_drop |
 |   | OP_goto | OP_goto |
 | + |  | OP_get_loc |
 |   | OP_return_undef | OP_return_undef |

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync, existsSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { resolve, relative } from 'node:path'
 import { compileToIR } from './compile'
 import { emitBytecode } from './bytecode'
 import { serialize, writeModule } from './assembler'
@@ -10,7 +10,8 @@ import { disassemble } from './disasm'
 
 function main () {
   const input = process.argv[2] || '__tests__/compute.ts'
-  const abs = resolve(process.cwd(), input)
+  const cwd = process.cwd()
+  const abs = resolve(cwd, input)
 
   if (!existsSync(abs)) {
     console.error('Input not found:', abs)
@@ -50,6 +51,9 @@ function main () {
 
   const debug = process.argv.includes('--debug')
   const strict = process.argv.includes('--strict') || detectStrictPrologue(src)
+  // 规范化 debug 文件名：使用相对路径，并将 .ts 扩展转换为 .js（对齐 qjsc）
+  const relPath = relative(cwd, abs).replace(/\\/g, '/')
+  const debugFilename = relPath.replace(/\.ts$/i, '.js')
   const capturedLocals = Array.from(locals.keys()).filter(k => /outer/i.test(k))
   const localsMapObj: Record<string, number> = Object.fromEntries(locals.entries())
   const localKindsObj: Record<string, 'var' | 'let' | 'const'> = localKinds ? Object.fromEntries(localKinds.entries()) as any : {}
@@ -61,7 +65,8 @@ function main () {
     localCount, 
     stackSize, 
     sourceMarks,
-    debug: debug ? { filename: abs, strict } : (strict ? { strict } as any : undefined), 
+    // 当存在严格模式或启用 --debug 时，总是携带规范化的 debug 文件名，确保 has_debug 与文件名原子对齐
+    debug: (debug || strict) ? { filename: debugFilename, strict } : undefined as any, 
     localsMap: localsMapObj, 
     localKindsMap: localKindsObj,
     capturedLocals 

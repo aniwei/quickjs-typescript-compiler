@@ -57,6 +57,14 @@ export enum OpCode {
   OP_get_loc8 = 47,
   OP_put_loc8 = 48,
   OP_push_const8 = 49,
+  OP_define_func = 50,
+  OP_fclosure = 51,
+  OP_fclosure8 = 52,
+  OP_call = 53,
+  OP_undefined = 54,
+  OP_return = 55,
+  OP_get_arg = 56,
+  OP_put_arg = 57,
 }
 
 export interface OpMeta { name: string; size: number; imm?: Array<{ name: string; size: number }>; doc?: string }
@@ -113,6 +121,14 @@ export const OPCODE_META: OpMeta[] = [
   { name: 'OP_get_loc8', size: 1 + 1, imm: [{"name":"index","size":1}], doc: `Load local (8-bit index)` },
   { name: 'OP_put_loc8', size: 1 + 1, imm: [{"name":"index","size":1}], doc: `Store local (8-bit index)` },
   { name: 'OP_push_const8', size: 1 + 1, imm: [{"name":"index","size":1}], doc: `Push const pool entry (8-bit index)` },
+  { name: 'OP_define_func', size: 1 + 5, imm: [{"name":"atom","size":4},{"name":"flags","size":1}], doc: `Define function binding (atom + flags u8), consumes function object on TOS` },
+  { name: 'OP_fclosure', size: 1 + 2, imm: [{"name":"index","size":2}], doc: `Create function object from constant function bytecode (u16 index)` },
+  { name: 'OP_fclosure8', size: 1 + 1, imm: [{"name":"index","size":1}], doc: `Create function object from constant function bytecode (u8 index)` },
+  { name: 'OP_call', size: 1 + 2, imm: [{"name":"argc","size":2}], doc: `Call function (expects [func, this, ...args])` },
+  { name: 'OP_undefined', size: 1 + 0, imm: undefined, doc: `Push undefined` },
+  { name: 'OP_return', size: 1 + 0, imm: undefined, doc: `Return with TOS as value` },
+  { name: 'OP_get_arg', size: 1 + 2, imm: [{"name":"index","size":2}], doc: `Load argument (u16 index)` },
+  { name: 'OP_put_arg', size: 1 + 2, imm: [{"name":"index","size":2}], doc: `Store argument (u16 index)` },
 ] as const
 
 export const OPCODE_INDEX: Record<string, number> = Object.fromEntries(OPCODE_META.map((m,i)=>[m.name,i]))
@@ -122,14 +138,15 @@ export const OPCODE_LOOKUP: Record<number, OpMeta & { code: number; fmt?: string
   OPCODE_META.map((m, i) => {
     let fmt: string | undefined
   if (m.name === 'OP_push_i32') fmt = 'i32'
-  else if (m.name === 'OP_push_const' || m.name === 'OP_push_const8') fmt = 'const'
+  else if (m.name === 'OP_push_const' || m.name === 'OP_push_const8' || m.name === 'OP_fclosure' || m.name === 'OP_fclosure8') fmt = 'const'
   else if (m.name === 'OP_get_loc' || m.name === 'OP_put_loc' || m.name === 'OP_get_loc_check' || m.name === 'OP_put_loc_check' || m.name === 'OP_put_loc_check_init') fmt = 'loc'
   else if (m.name === 'OP_inc_loc' || m.name === 'OP_get_loc8' || m.name === 'OP_put_loc8') fmt = 'loc8'
+    else if (m.name === 'OP_get_arg' || m.name === 'OP_put_arg') fmt = 'arg'
     else if (m.name === 'OP_goto' || m.name === 'OP_if_false') fmt = 'label'
     else if (m.name === 'OP_goto8' || m.name === 'OP_if_false8') fmt = 'label8'
     else if (m.name === 'OP_array_from') fmt = 'u16'
     else if (m.name === 'OP_define_field' || m.name === 'OP_get_field2') fmt = 'atom'
-    else if (m.name === 'OP_put_field' || m.name === 'OP_put_var' || m.name === 'OP_put_var_strict' || m.name === 'OP_get_var' || m.name === 'OP_get_var_undef' || m.name === 'OP_check_define_var') fmt = 'atom'
+    else if (m.name === 'OP_put_field' || m.name === 'OP_put_var' || m.name === 'OP_put_var_strict' || m.name === 'OP_get_var' || m.name === 'OP_get_var_undef' || m.name === 'OP_check_define_var' || m.name === 'OP_define_func') fmt = 'atom'
     return [i, { ...m, code: i, fmt }]
   })
 ) as any

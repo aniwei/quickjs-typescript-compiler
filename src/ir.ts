@@ -19,6 +19,7 @@ export type IRNode =
   | IRPutField
   | IRDefineField
   | IRMethodCall
+  | IRCall
   | IRDrop
   | IRDup
   | IRDup1
@@ -29,11 +30,17 @@ export type IRNode =
   | IRJumpIfFalse
   | IRLabel
   | IRReturnUndef
+  | IRReturn
   | IREqual
   | IRStrictEqual
   | IRSetEnvVar
   | IRGetEnvVar
   | IRCheckDefineVar
+  | IRFunctionDecl
+  | IRDefineFunc
+  | IRFunctionObject
+  | IRGetArg
+  | IRPutArg
 
 export interface IRLoadConst { kind: 'LoadConst'; value: any }
 export interface IRDeclareLocal { kind: 'DeclareLocal'; name: string; declKind?: 'var' | 'let' | 'const' }
@@ -53,6 +60,7 @@ export interface IRObjectNew { kind: 'ObjectNew' }
 export interface IRPutField { kind: 'PutField'; name: string }
 export interface IRDefineField { kind: 'DefineField'; name: string }
 export interface IRMethodCall { kind: 'MethodCall'; argc: number }
+export interface IRCall { kind: 'Call'; argc: number }
 export interface IRDrop { kind: 'Drop' }
 export interface IRDup { kind: 'Dup' }
 export interface IRDup1 { kind: 'Dup1' }
@@ -63,10 +71,16 @@ export interface IRJump { kind: 'Jump'; label: string }
 export interface IRJumpIfFalse { kind: 'JumpIfFalse'; label: string }
 export interface IRLabel { kind: 'Label'; name: string }
 export interface IRReturnUndef { kind: 'ReturnUndef' }
+export interface IRReturn { kind: 'Return' }
 export interface IREqual { kind: 'Equal' }
 export interface IRStrictEqual { kind: 'StrictEqual' }
 export interface IRSetEnvVar { kind: 'SetEnvVar'; name: string; strict?: boolean }
 export interface IRGetEnvVar { kind: 'GetEnvVar'; name: string; strict?: boolean }
 export interface IRCheckDefineVar { kind: 'CheckDefineVar'; name: string; flags?: number }
+export interface IRFunctionDecl { kind: 'FunctionDecl'; name: string; argCount: number }
+export interface IRDefineFunc { kind: 'DefineFunc'; name: string; flags?: number }
+export interface IRFunctionObject { kind: 'FunctionObject'; name: string; argCount: number; argNames?: string[]; body: IRProgram }
+export interface IRGetArg { kind: 'GetArg'; index: number }
+export interface IRPutArg { kind: 'PutArg'; index: number }
 
 export type IRProgram = IRNode[]

@@ -155,10 +155,96 @@ export class Compiler {
   // ---------- dispatch ----------
   private processTopLevel (node: ts.Node) {
     if (ts.isVariableStatement(node)) return this.processVariableStatement(node)
+    if (ts.isFunctionDeclaration(node)) return this.processFunctionDeclaration(node)
     if (ts.isForStatement(node)) return this.processForStatement(node)
     if (ts.isIfStatement(node)) return this.processIfStatement(node)
     if (ts.isWhileStatement(node)) return this.processWhileStatement(node)
     if (ts.isLabeledStatement(node)) return this.processLabeledStatement(node)
+    if (ts.isExpressionStatement(node) && ts.isCallExpression(node.expression)) return this.processCallExpression(node.expression)
+  }
+
+  private processFunctionDeclaration (fn: ts.FunctionDeclaration) {
+    if (!fn.name) return
+    const name = fn.name.text
+    const topLevel = ts.isSourceFile(fn.parent)
+    if (!topLevel) return // 暂不处理非顶层
+    // 顶层函数：check_define_var + fclosure + define_func
+    const DEFINE_GLOBAL_LEX_VAR = 1 << 7
+    const DEFINE_GLOBAL_FUNC_VAR = 1 << 6
+    // 函数声明在语义上是 var_kind=function（非 lexical）
+    // 仍然需要标记 FUNC 标志，便于比较
+    let flags = DEFINE_GLOBAL_FUNC_VAR
+    // 登记本地槽，便于后续读取直接用本地
+    if (!this.locals.has(name)) {
+      const fakeDecl = ts.factory.createVariableDeclaration(fn.name, undefined, undefined, undefined)
+      this.declare(fakeDecl)
+    }
+    // 1) 预定义到 env（带 FUNC 标志）
+    this.push(<any>{ kind: 'CheckDefineVar', name, flags }, fn.name)
+    // 2) 生成真实函数对象：lower 函数体为一个子 IRProgram，并通过 FunctionObject + fclosure 发射
+    // 处理参数与 return 语句（简单版）
+    const body: IRProgram = []
+    const pushToBody = (n: any, src?: ts.Node) => {
+      if (src) (n as any).loc = this.locOf(src)
+      body.push(n)
+    }
+    // 收集参数名（当前不降级参数语义，仅用于 header/varDefs 占位）
+    const argNames: string[] = []
+    if (fn.parameters) {
+      for (const p of fn.parameters) {
+        if (p.name && (ts.isIdentifier(p.name))) argNames.push(p.name.text)
+      }
+    }
+    // 简单 body 降级：仅支持 "return expr;"，以及使用标识符引用参数名时从参数槽取值
+    if (fn.body && ts.isBlock(fn.body)) {
+      for (const st of fn.body.statements) {
+        if (ts.isReturnStatement(st)) {
+          if (st.expression) {
+            // lower expression with a tiny helper that treats identifiers matching params as GetArg
+            const lowerExprInto = (e: ts.Expression) => {
+              if (ts.isIdentifier(e)) {
+                const name = e.text
+                const idx = argNames.indexOf(name)
+                if (idx >= 0) {
+                  pushToBody(<any>{ kind: 'GetArg', index: idx } as any, e)
+                  return
+                }
+              }
+              // fallback: constant numbers/strings
+              if (ts.isNumericLiteral(e)) {
+                pushToBody(<any>{ kind: 'LoadConst', value: Number(e.text) } as any, e)
+                return
+              }
+              if (ts.isStringLiteral(e)) {
+                pushToBody(<any>{ kind: 'LoadConst', value: e.text } as any, e)
+                return
+              }
+              // minimal support: binary a+b where a/b can be identifiers/number literals
+              if (ts.isBinaryExpression(e) && e.operatorToken.kind === ts.SyntaxKind.PlusToken) {
+                lowerExprInto(e.left)
+                lowerExprInto(e.right)
+                pushToBody(<any>{ kind: 'Add' } as any, e.operatorToken)
+                return
+              }
+            }
+            lowerExprInto(st.expression)
+            pushToBody(<any>{ kind: 'Return' } as any, st)
+          } else {
+            pushToBody(<IRReturnUndef>{ kind: 'ReturnUndef' }, st)
+          }
+        }
+      }
+    }
+    if (body.length === 0) body.push(<IRReturnUndef>{ kind: 'ReturnUndef' })
+    this.push(<any>{ kind: 'FunctionObject', name, argCount: argNames.length, argNames, body }, fn)
+    // 2.1) 对应 define_func(atom+u8)
+    this.push(<any>{ kind: 'DefineFunc', name, flags: 0 }, fn.name)
+    // 3) 本地别名（dup + set_local/init_local）
+    this.push(<IRDup>{ kind: 'Dup' }, fn)
+    // 函数声明是 var-kind：用 SetLocal，不走 TDZ
+    this.push(<IRSetLocal>{ kind: 'SetLocal', name }, fn)
+    // 4) 写回 env（严格）
+    this.push(<any>{ kind: 'SetEnvVar', name, strict: this.strictMode }, fn)
   }
 
   private processLabeledStatement (node: ts.LabeledStatement) {
@@ -646,14 +732,9 @@ export class Compiler {
   }
 
   private processCallExpression (call: ts.CallExpression) {
-    if (!ts.isPropertyAccessExpression(call.expression)) return
-    
-    const objExpr = call.expression.expression
-    const prop = call.expression.name.text
-
-    if (prop === 'push' && call.arguments.length === 1) {
-      return this.lowerArrayPush(objExpr, call.arguments[0])
-    }
+    // 语句位置：统一用表达式降级 + 丢弃返回值
+    this.lowerExpression(call)
+    this.push(<IRDrop>{ kind: 'Drop' }, call)
   }
 
   // Lower results.push(a + i) pattern (current constraints)
@@ -686,6 +767,27 @@ export class Compiler {
         this.lowerExpression(pa.expression)
         // get_field2 by atom(name)
         this.push(<IRGetField2>{ kind: 'GetField2', field: name }, pa.name)
+        return
+      }
+      case ts.SyntaxKind.CallExpression: {
+        const ce = expr as ts.CallExpression
+        // 方法调用：obj.method(...args)
+        if (ts.isPropertyAccessExpression(ce.expression)) {
+          const obj = ce.expression.expression
+          const name = ce.expression.name.text
+          // [obj, func, ...args]
+          this.lowerExpression(obj)
+          this.push(<IRDup>{ kind: 'Dup' }, ce.expression)
+          this.push(<IRGetField2>{ kind: 'GetField2', field: name }, ce.expression)
+          for (const a of ce.arguments) this.lowerExpression(a)
+          this.push(<IRMethodCall>{ kind: 'MethodCall', argc: ce.arguments.length }, ce)
+          return
+        }
+        // 简单调用：func(...args) 严格模式下 this=undefined
+        this.lowerExpression(ce.expression)
+        this.push(<IRLoadConst>{ kind: 'LoadConst', value: undefined }, ce.expression)
+        for (const a of ce.arguments) this.lowerExpression(a)
+        this.push(<any>{ kind: 'Call', argc: ce.arguments.length } as any, ce)
         return
       }
       case ts.SyntaxKind.Identifier:

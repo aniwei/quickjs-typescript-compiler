@@ -1,6 +1,7 @@
-import { writeFileSync, readFileSync } from 'node:fs'
+import { writeFileSync } from 'node:fs'
 import { writeUleb, writeSleb } from './leb128'
 import { ConstValue } from './const'
+import { FIRST_ATOM } from './env'
 
 /**
  * QuickJS-like 字节码序列化（quickjs-only）：
@@ -67,12 +68,16 @@ interface ContextOptions {
   localKindsMap?: Record<string, 'var' | 'let' | 'const'>
   capturedLocals?: string[]
   closureVars?: ClosureVar[]
+  functionName?: string
+  argCount?: number
+  definedArgCount?: number
 }
 
 interface Context {
   code: number[]
   constants: ConstValue[]
   atoms: string[]
+  oldAtoms: string[]
   atomIndexMap: Map<string, number>
   localCount: number
   stackSize: number
@@ -89,6 +94,18 @@ interface Context {
   // BC_VERSION,
   // JS_ATOM_END_SIM,
   debugFilename: string
+  funcName?: string
+  argCount: number
+  definedArgCount: number
+}
+
+interface SerializedFunction {
+  name: string
+  code: number[]
+  constants: ConstValue[]
+  atoms: string[]
+  localCount: number
+  stackSize: number
 }
 
 export interface SerializedModule {
@@ -136,19 +153,47 @@ export class Assembler {
     const useBigNum = !!process.env.ENABLE_BIGNUM || (debug as DebugOptions)?.bignum
     const BC_VERSION = useBigNum ? 0x45 : 5
     const debugFilename = debug?.filename || 'input.ts'
-    const atomList = atoms.slice()
+    const oldAtoms = atoms.slice()
 
-    if (debug && !atomList.includes(debugFilename)) {
-      atomList.push(debugFilename)
+    // 构建 qjsc 风格的原子顺序：locals -> 'use strict' (若严格) -> 其它原子 -> debug 文件名
+    const merged: string[] = []
+    const seen = new Set<string>()
+
+    // 1) 按 localsMap 索引顺序加入局部变量名（参数优先，其后本地）
+    if (p.localsMap) {
+      const indexToName: string[] = []
+      for (const [name, idx] of Object.entries(p.localsMap)) {
+        indexToName[idx] = name
+      }
+      for (let i = 0; i < indexToName.length; i++) {
+        const n = indexToName[i]
+        if (n && !seen.has(n)) { seen.add(n); merged.push(n) }
+      }
     }
-    
+
+    // 2) 严格模式时加入 'use strict'
+    if (debug?.strict) {
+      const us = 'use strict'
+      if (!seen.has(us)) { seen.add(us); merged.push(us) }
+    }
+
+    // 3) 合并发射阶段产生的其它原子（保持出现顺序）
+    for (const a of oldAtoms) {
+      if (!seen.has(a)) { seen.add(a); merged.push(a) }
+    }
+
+    // 4) 最后追加 debug 文件名（一般位于末尾）
+    if (!seen.has(debugFilename)) { seen.add(debugFilename); merged.push(debugFilename) }
+
+    const atomList = merged
     const atomIndexMap = new Map<string, number>()
     atomList.forEach((a: string, i: number) => atomIndexMap.set(a, i))
-    const firstAtom = computeFirstAtom()
+  const firstAtom = FIRST_ATOM >>> 0
     
     // 如果未显式提供 closureVars 但给出了 capturedLocals + localsMap，则自动合成
     if (!closureVars.length && p.capturedLocals && p.capturedLocals.length && p.localsMap) {
-      closureVars = p.capturedLocals.filter((n: string) => n in p.localsMap!)
+      closureVars = p.capturedLocals
+        .filter((n: string) => n in p.localsMap!)
         .map((n: string) => ({
           name: n,
           varIdx: p.localsMap![n],
@@ -163,22 +208,26 @@ export class Assembler {
       code: [...code],
       constants,
       atoms: atomList,
+      oldAtoms,
       atomIndexMap,
       localCount,
       stackSize,
       debug,
       closureVars,
-    localsMap: p.localsMap,
-    localKindsMap: p.localKindsMap,
+      localsMap: p.localsMap,
+      localKindsMap: p.localKindsMap,
       capturedLocals: p.capturedLocals,
       remappedCode: [...code],
       vardefsCount: 0,
-  version: BC_VERSION,
-  firstAtom,
+      version: BC_VERSION,
+      firstAtom,
       sourceMarks: sourceMarks ?? [],
       // BC_VERSION,
       // JS_ATOM_END_SIM,
-      debugFilename
+      debugFilename,
+      funcName: p.functionName,
+      argCount: (p.argCount ?? 0) >>> 0,
+      definedArgCount: (p.definedArgCount ?? 0) >>> 0,
     }
   }
 
@@ -194,21 +243,23 @@ export class Assembler {
 
     const idx = ctx.atomIndexMap.get(name)
     if (idx === undefined) {
-      throw new Error('missing atom: '+name)
+      throw new Error('Missing atom: ' + name)
     }
 
     writeUleb(dst, ((ctx.firstAtom + idx) >>> 0) << 1)
   }
 
-  private buildFlags(ctx: any) {
+  private buildFlags(ctx: Context): number {
     const d = ctx.debug
     let flags = 0
     // 与 qjsc 默认脚本函数保持一致：仅 arguments_allowed 与 has_debug 置位
     // bit 9: arguments_allowed, bit 10: has_debug
     const ARGUMENTS_ALLOWED_BIT = 1 << 9
     const HAS_DEBUG_BIT = 1 << 10
+
     if (true) flags |= ARGUMENTS_ALLOWED_BIT
     if (d) flags |= HAS_DEBUG_BIT
+
     return flags
   }
 
@@ -222,21 +273,15 @@ export class Assembler {
     const jsMode = ctx.debug?.strict ? 0x01 : 0x00
     out.push(jsMode)
     
-    // func name
-    let funcName = ctx.atoms[0] || ''
-    if (ctx.debugFilename) {
-      const base = ctx.debugFilename.replace(/\\/g,'/').split('/').pop()!
-      const dot = base.lastIndexOf('.')
-      const stem = dot>=0?base.slice(0,dot):base
-      
-      if (stem) funcName = stem
-      if (!ctx.atomIndexMap.has(funcName)) { 
-        ctx.atoms.push(funcName)
-        ctx.atomIndexMap.set(funcName, ctx.atoms.length-1) 
-      }
+    // 顶层函数名在 qjsc 中通常为空（<eval>），此处对齐为写入 0（tagged-int 0）代表 JS_ATOM_NULL
+    if (ctx.funcName && ctx.funcName.length > 0) {
+      const name = ctx.funcName
+      if (!ctx.atomIndexMap.has(name)) { ctx.atoms.push(name); ctx.atomIndexMap.set(name, ctx.atoms.length - 1) }
+      this.putAtomRef(out, name, ctx)
+    } else {
+      // 写入 JS_ATOM_NULL 的引用：0（偶数，表示 atom 引用，索引 0 落在内建原子表范围）
+      writeUleb(out, 0)
     }
-
-    this.putAtomRef(out, funcName, ctx)
   }
 
   private remapBytecodeAtoms(ctx: Context){
@@ -253,7 +298,10 @@ export class Assembler {
         if (meta.fmt === 'atom') {
           const off = pc + 1
           const v = remap[off] | (remap[off+1] << 8) | (remap[off+2] << 16) | (remap[off+3]<<24)
-          const mapped = (ctx.firstAtom + v) >>>0
+          // v 是旧原子索引（发射期 AtomTable 序号）。需要经由名字映射到新的原子索引
+          const name = ctx.oldAtoms[v]
+          const newIdx = (name !== undefined) ? ctx.atomIndexMap.get(name)! : v
+          const mapped = (ctx.firstAtom + (newIdx >>> 0)) >>> 0
           remap[off]=mapped &0xff; remap[off+1]=(mapped>>8)&0xff; remap[off+2]=(mapped>>16)&0xff; remap[off+3]=(mapped>>24)&0xff
         }
         pc += meta.size
@@ -264,7 +312,7 @@ export class Assembler {
 
   private writeHeaderCounts(out: number[], ctx: Context){
     this.remapBytecodeAtoms(ctx)
-    const argCount=0, varCount=ctx.localCount, definedArgCount=0
+    const argCount=ctx.argCount, varCount=ctx.localCount, definedArgCount=ctx.definedArgCount
     const closureVarCount = ctx.closureVars.length
     const cpoolCount = ctx.constants.length
     const byteCodeLen = ctx.remappedCode.length
@@ -463,6 +511,41 @@ export class Assembler {
       // QuickJS: JS_WriteString -> (len << 1) | is_wide
       writeUleb(out, (utf8.length << 1) | 0)
       for (const b of utf8) out.push(b)
+    } else if (typeof v === 'object' && v && (v as any).__function__) {
+      // Serialize nested function bytecode object (as constant)
+      const sub = (v as any).__function__ as SerializedFunction
+      // Build a temporary assembler context for function
+      // 构造参数相关元信息：将参数名放入 localsMap 开头位置仅用于 vardefs 呈现（QuickJS 会区分 args/locals；此处近似）
+  const maybeArgs: unknown = (sub as any).argNames
+  const argNames = Array.isArray(maybeArgs) ? (maybeArgs as string[]) : []
+      const localsMap: Record<string, number> = {}
+      const localKindsMap: Record<string, 'var' | 'let' | 'const'> = {}
+      for (let i = 0; i < argNames.length; i++) { localsMap[argNames[i]] = i; localKindsMap[argNames[i]] = 'var' }
+      const childCtx = this.createContext({
+        code: sub.code,
+        constants: sub.constants,
+        atoms: sub.atoms,
+        localCount: sub.localCount,
+        stackSize: sub.stackSize,
+        debug: undefined,
+        functionName: sub.name,
+        argCount: (sub as any).argCount ?? 0,
+        definedArgCount: (sub as any).argCount ?? 0,
+        localsMap,
+        localKindsMap,
+      })
+      const fnBody: number[] = []
+      this.writeFunctionTag(fnBody, childCtx)
+      this.writeHeaderCounts(fnBody, childCtx)
+      this.writeVarDefs(fnBody, childCtx)
+      this.writeClosureVars(fnBody, childCtx)
+      this.writeBytecode(fnBody, childCtx)
+      // no debug/source for nested for now
+      this.writeConstants(fnBody, childCtx)
+      // Now wrap as BC_TAG_FUNCTION_BYTECODE object in constants
+      const BC_TAG_FUNCTION_BYTECODE = 0x0c
+      out.push(BC_TAG_FUNCTION_BYTECODE)
+      for (const b of fnBody) out.push(b)
     } else {
       throw new Error('unsupported constant type: ' + String(v))
     }
@@ -503,15 +586,4 @@ export function serialize (p: {
   closureVars?: ClosureVar[]
 }) {
   return new Assembler().serialize(p)
-}
-
-function computeFirstAtom(): number {
-  try {
-    const path = require('node:path').resolve(process.cwd(), 'cpp/QuickJS/include/QuickJS/quickjs-atom.h')
-    const text = readFileSync(path, 'utf8')
-    const count = (text.match(/\bDEF\s*\(/g) || []).length
-    return (count + 1) >>> 0
-  } catch {
-    return 512
-  }
 }

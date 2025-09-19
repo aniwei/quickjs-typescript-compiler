@@ -4,11 +4,13 @@
   "description": "TypeScript to QuickJS Bytecode Compiler",
   "main": "dist/compiler.js",
   "scripts": {
-    "build": "tsc",
+    "gen:env": "tsx scripts/gen-env.ts",
+    "build": "npm run gen:env && tsc",
+    "build:wasm": "tsx scripts/build-bytecode-wasm.ts",
     "start": "tsx src/cli.ts",
     "align:qjs": "tsx scripts/auto-align-quickjs.ts",
     "validate": "tsx scripts/validate-compile.ts",
-    "compare": "tsx scripts/compare-with-qjs.ts",
+    "compare": "tsx scripts/compare-with-wasm.ts",
     "compare:batch": "tsx scripts/batch-compare.ts"
   },
   "devDependencies": {
