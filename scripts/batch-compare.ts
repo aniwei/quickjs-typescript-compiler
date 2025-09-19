@@ -8,10 +8,12 @@ interface CaseResult {
   note?: string
 }
 
-function runCompare(tsPath: string, jsPath: string, passDisasm: boolean, sideBySide: boolean): CaseResult {
+function runCompare(tsPath: string, jsPath: string, passDisasm: boolean, sideBySide: boolean, passDot: boolean, artifactsDir?: string): CaseResult {
   const args = ['-s', 'exec', 'tsx', 'scripts/compare-with-qjs.ts', tsPath, '--input-js', jsPath]
   if (passDisasm) args.push('--disasm')
   if (sideBySide) args.push('--side-by-side')
+  if (passDot) args.push('--dot')
+  if (artifactsDir) args.push('--artifacts-dir', artifactsDir)
   const r = spawnSync('pnpm', args, { encoding: 'utf8' })
   if (r.status === 0) {
     return { name: basename(tsPath), ok: true }
@@ -40,9 +42,12 @@ function main() {
   const results: CaseResult[] = []
   const passDisasm = process.argv.includes('--disasm-all')
   const sideBySide = process.argv.includes('--side-by-side')
+  const passDot = process.argv.includes('--dot')
+  const artIdx = process.argv.indexOf('--artifacts-dir')
+  const artifactsDir = artIdx >= 0 ? process.argv[artIdx + 1] : undefined
   for (const c of cases) {
     console.log(`\n=== Comparing ${basename(c.ts)} vs ${basename(c.js)} ===`)
-    results.push(runCompare(c.ts, c.js, passDisasm, sideBySide))
+    results.push(runCompare(c.ts, c.js, passDisasm, sideBySide, passDot, artifactsDir))
   }
   const ok = results.filter(r => r.ok).length
   const fail = results.length - ok

@@ -5,6 +5,7 @@ export function uleb128(n: number): Uint8Array {
   if (n < 0) {
     throw new Error('uleb128: negative input')
   }
+  
   const bytes: number[] = []
 
   do {
@@ -13,6 +14,7 @@ export function uleb128(n: number): Uint8Array {
     if (n !== 0) b |= 0x80
     bytes.push(b)
   } while (n !== 0)
+
   return Uint8Array.from(bytes)
 }
 
@@ -26,13 +28,16 @@ export function leb128(n: number): Uint8Array {
     let b = n & 0x7f
     n >>= 7
     const signBit = (b & 0x40) !== 0
+
     if ((n === 0 && !signBit) || (n === -1 && signBit)) {
       more = false
     } else {
       b |= 0x80
     }
+
     bytes.push(b & 0xff)
   }
+
   return Uint8Array.from(bytes)
 }
 
@@ -54,12 +59,14 @@ export const encodeSleb128 = leb128
 export function readUlebFrom(buf: Buffer, offRef: { off: number }): number {
   let res = 0
   let shift = 0
+
   for (;;) {
     const b = buf[offRef.off++]
     res |= (b & 0x7f) << shift
     if ((b & 0x80) === 0) break
     shift += 7
   }
+
   return res >>> 0
 }
 
@@ -68,15 +75,18 @@ export function readSlebFrom(buf: Buffer, offRef: { off: number }): number {
   let result = 0
   let shift = 0
   let byte = 0
+
   do {
     byte = buf[offRef.off++]
     result |= (byte & 0x7f) << shift
     shift += 7
   } while (byte & 0x80)
+
   // If sign bit of last byte is set, sign-extend
   if (shift < 32 && (byte & 0x40)) {
     result |= (~0 << shift)
   }
+
   // Force into 32-bit signed range
   result |= 0
   return result

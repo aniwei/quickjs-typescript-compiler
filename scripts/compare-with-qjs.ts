@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { readFileSync, existsSync, mkdtempSync } from 'node:fs'
+import { readFileSync, existsSync, mkdtempSync, mkdirSync, writeFileSync, accessSync, constants } from 'node:fs'
 import { resolve, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { parseQuickJS } from '../src/parseQuickJS'
@@ -8,6 +8,17 @@ import { disassemble } from '../src/disasm'
 function which(cmd: string): string | null {
   const r = spawnSync('which', [cmd], { encoding: 'utf8' })
   if (r.status === 0) return r.stdout.trim() || null
+  // Environment override
+  const envPath = process.env.QJSC
+  if (envPath) return envPath
+  // Fallbacks for common Homebrew locations
+  const fallbacks = ['/opt/homebrew/bin/qjsc', '/usr/local/bin/qjsc']
+  for (const p of fallbacks) {
+    try {
+      accessSync(p, constants.X_OK)
+      return p
+    } catch {}
+  }
   return null
 }
 
@@ -24,15 +35,10 @@ function compileSelf(input: string, opts: { debug: boolean; format: 'quickjs' | 
 function compileWithQjsc(input: string) {
   const qjscPath = which('qjsc')
   if (!qjscPath) return null
-  // 优先直接生成字节码；失败则回退生成 C 并解析数组
-  const out = resolve(tmpdir(), 'ref.bin')
-  let r = spawnSync(qjscPath, ['-c', '-o', out, input], { encoding: 'utf8' })
-  if (r.status === 0 && existsSync(out)) {
-    return readFileSync(out)
-  }
+  // 生成 C 并解析其中的字节数组更稳定（不同版本的 qjsc 标志不一致）
   const tmp = mkdtempSync(join(tmpdir(), 'qjsc-'))
   const cOut = join(tmp, 'out.c')
-  r = spawnSync(qjscPath, ['-o', cOut, input], { encoding: 'utf8' })
+  const r = spawnSync(qjscPath, ['-c', '-o', cOut, input], { encoding: 'utf8' })
   if (r.status !== 0) throw new Error('qjsc C emit failed:\n' + r.stdout + '\n' + r.stderr)
   const c = readFileSync(cOut, 'utf8')
   const arr = extractByteArrayFromC(c)
@@ -41,18 +47,26 @@ function compileWithQjsc(input: string) {
 }
 
 function extractByteArrayFromC(c: string): number[] | null {
-  const m = c.match(/static\s+const\s+uint8_t\s+\w+\s*\[\s*\]\s*=\s*\{([\s\S]*?)\};/)
-  if (!m) return null
-  const body = m[1]
-  const bytes: number[] = []
-  const regex = /(0x[0-9a-fA-F]+|\d+)/g
-  let t: RegExpExecArray | null
-  while ((t = regex.exec(body)) !== null) {
-    const lit = t[1]
-    const v = lit.startsWith('0x') ? parseInt(lit, 16) : parseInt(lit, 10)
-    if (!Number.isNaN(v)) bytes.push(v & 0xff)
+  // 支持以下几种形式：
+  //   const uint8_t name[SIZE] = { ... };
+  //   static const uint8_t name[] = { ... };
+  //   const unsigned char name[SIZE] = { ... };
+  const re = /(?:static\s+)?(?:const\s+)?(?:uint8_t|unsigned\s+char)\s+\w+\s*\[\s*(?:\d+)?\s*\]\s*=\s*\{([\s\S]*?)\};/g
+  let best: number[] | null = null
+  let m: RegExpExecArray | null
+  while ((m = re.exec(c)) !== null) {
+    const body = m[1]
+    const bytes: number[] = []
+    const regex = /(0x[0-9a-fA-F]+|\d+)/g
+    let t: RegExpExecArray | null
+    while ((t = regex.exec(body)) !== null) {
+      const lit = t[1]
+      const v = lit.startsWith('0x') ? parseInt(lit, 16) : parseInt(lit, 10)
+      if (!Number.isNaN(v)) bytes.push(v & 0xff)
+    }
+    if (!best || bytes.length > best.length) best = bytes
   }
-  return bytes
+  return best
 }
 
 function parseAtoms(buf: Buffer) {
@@ -73,7 +87,16 @@ function parseAtoms(buf: Buffer) {
   const atomCount = readUleb()
   const atoms: string[] = []
   for (let i = 0; i < atomCount; i++) {
-    const len = readUleb()
+    const encLen = readUleb()
+    const isWide = (encLen & 1) !== 0
+    const len = encLen >>> 1
+    if (isWide) {
+      const byteLen = len * 2
+      const s = buf.toString('utf16le', off, off + byteLen)
+      off += byteLen
+      atoms.push(s)
+      continue
+    }
     const s = buf.slice(off, off + len).toString('utf8')
     off += len
     atoms.push(s)
@@ -95,6 +118,10 @@ function main() {
   const debug = process.argv.includes('--debug')
   const wantDisasm = process.argv.includes('--disasm')
   const sideBySide = process.argv.includes('--side-by-side')
+  const wantDot = process.argv.includes('--dot')
+  const normalize = process.argv.includes('--normalize') || process.argv.includes('--normalize-short')
+  const artIdx = process.argv.indexOf('--artifacts-dir')
+  const artifactsDir = artIdx >= 0 ? process.argv[artIdx + 1] : 'artifacts'
   const self = compileSelf(input, { debug, format: 'quickjs' })
   const jsArgIdx = process.argv.indexOf('--input-js')
   const qjsInput = jsArgIdx >= 0 ? process.argv[jsArgIdx + 1] : input.replace(/\.ts$/, '.js')
@@ -111,6 +138,21 @@ function main() {
     const qTags = scanTags(qjscBin, qAtoms.offsetAfterAtoms)
     console.log('Tag frequency (raw byte heuristic) SELF:', selfTags)
     console.log('Tag frequency (raw byte heuristic) QJSC:', qTags)
+    // 调试：在 qjscBuf 中从原子表末尾起扫描函数标签 0x0C/0x13 并打印邻域
+    const TAGS = [0x0c, 0x13]
+    const view = new Uint8Array(qjscBin)
+    const hits: number[] = []
+    for (let i = qAtoms.offsetAfterAtoms; i < view.length; i++) {
+      if (TAGS.includes(view[i])) hits.push(i)
+    }
+    console.log('QJSC candidate function tag positions:', hits)
+    if (hits.length > 0) {
+      const i = hits[0]
+      const start = Math.max(qAtoms.offsetAfterAtoms, i - 16)
+      const end = Math.min(view.length, i + 64)
+      const hex = Array.from(view.slice(start, end)).map(b => b.toString(16).padStart(2, '0')).join(' ')
+      console.log(`Hexdump around first tag @${i}:`, hex)
+    }
     try {
       // 字段级对比（我方格式）
       const S = parseQuickJS(self)
@@ -138,7 +180,7 @@ function main() {
         }
         console.log('Header diff:', headerDiff)
         // Atom/Const 表逐项对比
-        const maxAtoms = Math.max(S.atoms.length, Q.atoms.length)
+    const maxAtoms = Math.max(S.atoms.length, Q.atoms.length)
         const atomDiff: Array<{ i: number, self?: string, qjsc?: string }> = []
         for (let i = 0; i < maxAtoms; i++) if (S.atoms[i] !== Q.atoms[i]) atomDiff.push({ i, self: S.atoms[i], qjsc: Q.atoms[i] })
         if (atomDiff.length) console.log('Atom table diffs:', atomDiff)
@@ -146,20 +188,27 @@ function main() {
         const constDiff: Array<{ i: number, self?: any, qjsc?: any }> = []
         for (let i = 0; i < maxConsts; i++) { const sv = S.constants[i]; const qv = Q.constants[i]; if (JSON.stringify(sv) !== JSON.stringify(qv)) constDiff.push({ i, self: sv, qjsc: qv }) }
         if (constDiff.length) console.log('Const pool diffs:', constDiff)
-        // 助记符序列（忽略立即数）
-        function mnems(buf: Buffer): string[] {
-          const f = parseQuickJS(buf)
-          const bc = f.bytecode ?? new Uint8Array()
-          const r: string[] = []
-          const { OPCODE_META } = require('../src/opcodes') as typeof import('../src/opcodes')
-          for (let pc = 0; pc < bc.length;) { const op = bc[pc]; const meta = OPCODE_META[op]; if (!meta) break; r.push(meta.name); pc += meta.size }
-          return r
-        }
-        const selfMn = mnems(self); const qjsMn = mnems(qjscBin)
+  let selfMn = getMnemonics(self)
+  let qjsMn = getMnemonics(qjscBin, /*useQjsMeta*/ true)
+    if (normalize) {
+      selfMn = normalizeMnemonics(selfMn)
+      qjsMn = normalizeMnemonics(qjsMn)
+    }
         console.log('Mnemonic lengths: self=', selfMn.length, ' qjsc=', qjsMn.length)
         if (sideBySide) {
           console.log('\n-- SIDE-BY-SIDE (LCS) --')
           printSideBySide(selfMn, qjsMn)
+          // 保存为 markdown
+          try {
+            mkdirSync(artifactsDir, { recursive: true })
+            const base = (input.split(/[\\/]/).pop() || 'input').replace(/\.[^.]+$/, '')
+            const mdPath = join(artifactsDir, `${base}-mnemonic-diff.md`)
+            const md = generateSideBySideMarkdown(selfMn, qjsMn)
+            writeFileSync(mdPath, md, 'utf8')
+            console.log('Saved mnemonic side-by-side to', mdPath)
+          } catch (e) {
+            console.log('Warn: failed to write side-by-side markdown:', e instanceof Error ? e.message : String(e))
+          }
         } else if (selfMn.join(',') !== qjsMn.join(',')) {
           const maxM = Math.max(selfMn.length, qjsMn.length)
           const list: Array<{ i: number, self?: string, qjsc?: string }> = []
@@ -169,14 +218,68 @@ function main() {
         if (wantDisasm) {
           console.log('\n-- SELF DISASM --')
           console.log(disassemble(self, { showCFG: false }))
-          console.log('\n-- QJSC DISASM --')
-          console.log(disassemble(qjscBin, { showCFG: false }))
+          // 我们的结构化解析可能无法读取 qjsc 的布局。尝试启发式反汇编（只提取助记符序列）。
+          let qJsMnems = getMnemonics(qjscBin, /*useQjsMeta*/ true)
+          if (normalize) qJsMnems = normalizeMnemonics(qJsMnems)
+          if (qJsMnems) {
+            console.log('\n-- QJSC (heuristic mnemonics) --')
+            console.log(qJsMnems.join('\n'))
+          } else {
+            console.log('\n-- QJSC DISASM --')
+            console.log(disassemble(qjscBin, { showCFG: false }))
+          }
+        }
+        if (wantDot) {
+          try {
+            mkdirSync(artifactsDir, { recursive: true })
+            const base = (input.split(/[\\/]/).pop() || 'input').replace(/\.[^.]+$/, '')
+            const selfAsm = disassemble(self, { dot: true }) as string
+            const qAsm = disassemble(qjscBin, { dot: true, useQjsMeta: true }) as string
+            const selfDot = extractDot(selfAsm)
+            const qDot = extractDot(qAsm)
+            if (selfDot) {
+              writeFileSync(join(artifactsDir, `${base}-self.cfg.dot`), selfDot, 'utf8')
+              console.log('Saved self DOT to', join(artifactsDir, `${base}-self.cfg.dot`))
+            }
+            if (qDot) {
+              writeFileSync(join(artifactsDir, `${base}-qjsc.cfg.dot`), qDot, 'utf8')
+              console.log('Saved qjsc DOT to', join(artifactsDir, `${base}-qjsc.cfg.dot`))
+            } else {
+              console.log('Note: qjsc DOT unavailable (parse/disasm may have failed).')
+            }
+          } catch (e) {
+            console.log('Warn: failed to write DOT artifacts:', e instanceof Error ? e.message : String(e))
+          }
         }
       } catch (e) {
-        console.log('Note: qjsc binary layout not recognized by our minimal parser; skipping field-level/detailed diff for qjsc.')
+        const msg = e instanceof Error ? e.message : String(e)
+        console.log('Note: qjsc binary layout not recognized by our minimal parser; skipping field-level/detailed diff for qjsc. Details:', msg)
         if (wantDisasm) {
           console.log('\n-- SELF DISASM --')
           console.log(disassemble(self, { showCFG: false }))
+          const qJsMnems = tryHeuristicMnemonics(qjscBin)
+          if (qJsMnems) {
+            console.log('\n-- QJSC (heuristic mnemonics) --')
+            console.log(qJsMnems.join('\n'))
+          }
+        }
+        // 仍然尝试按助记符进行 side-by-side 对比
+  let selfMn = getMnemonics(self)
+  let qjsMn = getMnemonics(qjscBin)
+  if (normalize) { selfMn = normalizeMnemonics(selfMn); qjsMn = normalizeMnemonics(qjsMn) }
+        if (sideBySide) {
+          console.log('\n-- SIDE-BY-SIDE (LCS) --')
+          printSideBySide(selfMn, qjsMn)
+          try {
+            mkdirSync(artifactsDir, { recursive: true })
+            const base = (input.split(/[\\\/]/).pop() || 'input').replace(/\.[^.]+$/, '')
+            const mdPath = join(artifactsDir, `${base}-mnemonic-diff.md`)
+            const md = generateSideBySideMarkdown(selfMn, qjsMn)
+            writeFileSync(mdPath, md, 'utf8')
+            console.log('Saved mnemonic side-by-side to', mdPath)
+          } catch (e) {
+            console.log('Warn: failed to write side-by-side markdown:', e instanceof Error ? e.message : String(e))
+          }
         }
       }
     } catch (e) {
@@ -230,4 +333,197 @@ function buildLCS(a: string[], b: string[]): Array<[number, number]> {
     else j++
   }
   return path
+}
+
+function generateSideBySideMarkdown(a: string[], b: string[]): string {
+  const lcs = buildLCS(a, b)
+  const rows: Array<{ left?: string; right?: string; tag: ' ' | '-' | '+' }> = []
+  let i = 0, j = 0
+  for (const [ai, bi] of lcs) {
+    while (i < ai) rows.push({ left: a[i++], tag: '-' })
+    while (j < bi) rows.push({ right: b[j++], tag: '+' })
+    if (ai < a.length) rows.push({ left: a[i++], right: b[j++], tag: ' ' })
+  }
+  while (i < a.length) rows.push({ left: a[i++], tag: '-' })
+  while (j < b.length) rows.push({ right: b[j++], tag: '+' })
+  const header = '| Tag | Self | QJSC |\n|---|---|---|\n'
+  const body = rows.map(r => `| ${r.tag} | ${r.left ?? ''} | ${r.right ?? ''} |`).join('\n')
+  return header + body + '\n'
+}
+
+function extractDot(disasmText: string): string | null {
+  const marker = 'DOT (CFG):\n'
+  const i = disasmText.indexOf(marker)
+  if (i < 0) return null
+  const dot = disasmText.slice(i + marker.length).trim()
+  return dot || null
+}
+
+function readUlebFromBufNode(buf: Buffer, ref: { off: number }): number {
+  let res = 0, shift = 0
+  for (;;) {
+    const b = buf[ref.off++]
+    res |= (b & 0x7f) << shift
+    if (!(b & 0x80)) break
+    shift += 7
+  }
+  return res >>> 0
+}
+
+// 尝试直接从 qjsc 原始缓冲中抽取第一个 FunctionBytecode 的指令区
+function tryExtractQjscBytecode(buf: Buffer): Uint8Array | null {
+  const TAGS = [0x13, 0x0c]
+  for (let i = 0; i < buf.length - 16; i++) {
+    if (!TAGS.includes(buf[i])) continue
+    const r = { off: i + 1 }
+    if (r.off + 3 >= buf.length) continue
+    // flags u16, jsMode u8
+    const flags = buf[r.off] | (buf[r.off + 1] << 8); r.off += 2
+    const jsMode = buf[r.off++]
+    // funcName atomref (uleb)
+    readUlebFromBufNode(buf, r)
+    // counts
+    const argCount = readUlebFromBufNode(buf, r)
+    const varCount = readUlebFromBufNode(buf, r)
+    const definedArgCount = readUlebFromBufNode(buf, r)
+    const stackSize = readUlebFromBufNode(buf, r)
+    const closureVarCount = readUlebFromBufNode(buf, r)
+    const cpoolCount = readUlebFromBufNode(buf, r)
+    const byteCodeLen = readUlebFromBufNode(buf, r)
+    const vardefsCount = readUlebFromBufNode(buf, r)
+    // skip vardefs
+    for (let k = 0; k < vardefsCount; k++) {
+      readUlebFromBufNode(buf, r) // atom ref
+      readUlebFromBufNode(buf, r) // scope_level
+      readUlebFromBufNode(buf, r) // scope_next+1
+      r.off += 1 // flags
+    }
+    // skip closure vars
+    for (let k = 0; k < closureVarCount; k++) {
+      readUlebFromBufNode(buf, r) // name atomref
+      readUlebFromBufNode(buf, r) // varIdx
+      r.off += 1 // flags
+    }
+    if (r.off + byteCodeLen <= buf.length && byteCodeLen > 0 && byteCodeLen < 65536) {
+      const bc = buf.slice(r.off, r.off + byteCodeLen)
+      // 粗验：能否解码出一定数量的指令
+      const { OPCODE_META } = require('../src/opcodes') as typeof import('../src/opcodes')
+      let cnt = 0
+      for (let pc = 0; pc < bc.length;) {
+        const op = bc[pc]
+        const meta = OPCODE_META[op]
+        if (!meta || !meta.size) break
+        if (meta.size <= 0) break
+        pc += meta.size
+        cnt++
+        if (cnt >= 16) break
+      }
+      if (cnt >= 8) return bc
+    }
+  }
+  return null
+}
+
+function getMnemonics(buf: Buffer, useQjsMeta = false): string[] {
+  try {
+    const f = parseQuickJS(buf)
+    const bc = f.bytecode ?? new Uint8Array()
+    const r: string[] = []
+    if (useQjsMeta) {
+      const { QJS_OPCODE_META } = require('../src/qjs_opcodes') as typeof import('../src/qjs_opcodes')
+      for (let pc = 0; pc < bc.length;) { const op = bc[pc]; const meta = QJS_OPCODE_META[op]; if (!meta) break; r.push(meta.name); pc += meta.size }
+    } else {
+      const { OPCODE_META } = require('../src/opcodes') as typeof import('../src/opcodes')
+      for (let pc = 0; pc < bc.length;) { const op = bc[pc]; const meta = OPCODE_META[op]; if (!meta) break; r.push(meta.name); pc += meta.size }
+    }
+    return r
+  } catch {}
+  const bc = tryExtractQjscBytecode(buf)
+  if (bc) {
+    const r: string[] = []
+    if (useQjsMeta) {
+      const { QJS_OPCODE_META } = require('../src/qjs_opcodes') as typeof import('../src/qjs_opcodes')
+      for (let pc = 0; pc < bc.length;) { const op = bc[pc]; const meta = QJS_OPCODE_META[op]; if (!meta) break; r.push(meta.name); pc += meta.size }
+    } else {
+      const { OPCODE_META } = require('../src/opcodes') as typeof import('../src/opcodes')
+      for (let pc = 0; pc < bc.length;) { const op = bc[pc]; const meta = OPCODE_META[op]; if (!meta) break; r.push(meta.name); pc += meta.size }
+    }
+    return r
+  }
+  const h = tryHeuristicMnemonics(buf)
+  return h ?? []
+}
+
+// 尝试在未知外层封装的缓冲中，启发式提取一段可能的字节码流并返回助记符序列
+function tryHeuristicMnemonics(buf: Buffer): string[] | null {
+  try {
+    const { OPCODE_META } = require('../src/opcodes') as typeof import('../src/opcodes')
+    // 简单策略：在缓冲区内滑动，寻找以合法 opcode 开头且能持续解码 >= 8 条指令的窗口
+    const bytes = new Uint8Array(buf)
+    const minInstr = 8
+    const maxScan = Math.min(bytes.length, 4096)
+    scan:
+    for (let start = 0; start < maxScan; start++) {
+      const first = bytes[start]
+      const meta0 = OPCODE_META[first]
+      if (!meta0 || !meta0.size) continue
+      const mn: string[] = []
+      for (let pc = start; pc < bytes.length;) {
+        const op = bytes[pc]
+        const meta = OPCODE_META[op]
+        if (!meta || !meta.size) break
+        mn.push(meta.name)
+        pc += meta.size
+        if (mn.length >= 64) break // 足够长，认为找到了
+      }
+      if (mn.length >= minInstr) return mn
+    }
+  } catch {}
+  return null
+}
+
+// 将 QuickJS 短指令/带检查变体规范化为“长名”，便于逐条对比
+function normalizeMnemonics(m: string[]): string[] {
+  const map: Record<string, string> = {
+    // 短跳转/比较
+    OP_goto8: 'OP_goto',
+    OP_if_false8: 'OP_if_false',
+    // 局部变量短形式
+    OP_put_loc0: 'OP_put_loc',
+    OP_put_loc1: 'OP_put_loc',
+    OP_put_loc2: 'OP_put_loc',
+    OP_get_loc0: 'OP_get_loc',
+    OP_get_loc1: 'OP_get_loc',
+    OP_get_loc2: 'OP_get_loc',
+    // tdz/初始化检查
+    OP_put_loc_check: 'OP_put_loc',
+    OP_put_loc_check_init: 'OP_put_loc',
+    OP_get_loc_check: 'OP_get_loc',
+    // 其它近似
+    OP_post_inc: 'OP_inc',
+    OP_tail_call_method: 'OP_call_method',
+    OP_apply: 'OP_call_method',
+    OP_nip: 'OP_drop',
+    OP_nip1: 'OP_drop',
+    // 统一立即数推入类别
+    OP_push_0: 'OP_push_const',
+    OP_push_i8: 'OP_push_const',
+    OP_push_i32: 'OP_push_const',
+    // 全局/严格赋值归一到本地写入（仅用于比较对齐，不改变真实语义）
+    OP_put_var: 'OP_put_loc',
+    OP_put_var_strict: 'OP_put_loc',
+  }
+  const drop = new Set<string>([
+    // 模块/顶层样板，非主体算法逻辑
+    'OP_define_func',
+    'OP_check_define_var',
+    'OP_private_symbol',
+    'OP_null',
+  ])
+  const out: string[] = []
+  for (const x of m) {
+    if (drop.has(x)) continue
+    out.push(map[x] ?? x)
+  }
+  return out
 }

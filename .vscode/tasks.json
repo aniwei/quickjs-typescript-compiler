@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run CLI quick validation",
+			"type": "shell",
+			"command": "pnpm -s start __tests__/compute.ts --disasm --showCFG --pc2line --debug",
+			"args": [],
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}
