@@ -27,15 +27,32 @@ async function main() {
   const src = readFileSync(binPath)
   const wasm = await import(modPath)
   const mod = await wasm.default()
-  const qjs = new mod.QuickJSBytecode()
   const vec = new mod.Uint8Array()
   for (let i = 0; i < src.length; i++) vec.push_back(src[i])
-  const msg = qjs.validate(vec)
-  if (msg && String(msg).trim().length > 0) {
-    console.error('[VALIDATE] error:', String(msg))
-    process.exit(1)
+  // Prefer static validate if exported; otherwise try run() and catch errors
+  const Cls = mod.QuickJSBytecode as any
+  if (Cls && typeof Cls.validate === 'function') {
+    const msg = Cls.validate(vec)
+    if (msg && String(msg).trim().length > 0) {
+      console.error('[VALIDATE] error:', String(msg))
+      process.exit(1)
+    } else {
+      console.log('[VALIDATE] ok')
+    }
   } else {
-    console.log('[VALIDATE] ok')
+    const qjs = new (mod as any).QuickJSBytecode()
+    try {
+      const out = qjs.run(vec, new (mod as any).StringArray())
+      if (String(out || '').startsWith('ERROR:')) {
+        console.error('[VALIDATE] error:', String(out))
+        process.exit(1)
+      } else {
+        console.log('[VALIDATE] ok (run)')
+      }
+    } catch (e: any) {
+      console.error('[VALIDATE] exception:', e?.stack || String(e))
+      process.exit(1)
+    }
   }
 }
 
