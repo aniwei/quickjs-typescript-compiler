@@ -147,7 +147,10 @@ static void taro_dump_opcodes(JSContext* ctx, JSFunctionBytecode* b, std::ostrin
       case OP_FMT_atom: {
         if (pc + 4 < len) {
           uint32_t a = bc[pc+1] | (bc[pc+2] << 8) | (bc[pc+3] << 16) | (bc[pc+4] << 24);
+          char atom_buf[ATOM_GET_STR_BUF_SIZE];
+          const char* aname = JS_AtomGetStr(ctx, atom_buf, sizeof(atom_buf), (JSAtom)a);
           ss << "  atom=" << a;
+          if (aname) ss << " (" << aname << ")";
         }
         break;
       }
@@ -155,7 +158,11 @@ static void taro_dump_opcodes(JSContext* ctx, JSFunctionBytecode* b, std::ostrin
         if (pc + 5 < len) {
           uint32_t a = bc[pc+1] | (bc[pc+2] << 8) | (bc[pc+3] << 16) | (bc[pc+4] << 24);
           uint8_t f = bc[pc+5];
-          ss << "  atom=" << a << " flags=" << int(f);
+          char atom_buf[ATOM_GET_STR_BUF_SIZE];
+          const char* aname = JS_AtomGetStr(ctx, atom_buf, sizeof(atom_buf), (JSAtom)a);
+          ss << "  atom=" << a;
+          if (aname) ss << " (" << aname << ")";
+          ss << " flags=" << int(f);
         }
         break;
       }
@@ -186,6 +193,7 @@ static void taro_dump_value(JSContext* ctx, JSValueConst obj, std::ostringstream
   if (tag == JS_TAG_FUNCTION_BYTECODE) {
     JSFunctionBytecode* b = (JSFunctionBytecode*)JS_VALUE_GET_PTR(obj);
     if (b) taro_dump_function_bytecode(ctx, b, ss);
+    ss << "TTT";
     return;
   }
   if (tag == JS_TAG_MODULE) {

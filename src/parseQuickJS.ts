@@ -220,11 +220,13 @@ function readObjectStream(
   // Read the next tag and dispatch; return the first function encountered.
   if (offRef.off >= buf.length) return null
   const tag = buf[offRef.off++]
+  
   if (tag === BCTag.FUNCTION_BYTECODE || tag === 0x13 /* legacy tag in our early code */) {
     // rewind by 1 to let parseFunctionFrom consume the tag
     offRef.off -= 1
     return parseFunctionFrom(buf, offRef, atoms, version, firstAtom)
   }
+
   switch (tag) {
     case BCTag.NULL:
     case BCTag.UNDEFINED:

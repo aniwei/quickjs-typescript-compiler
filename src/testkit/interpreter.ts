@@ -15,7 +15,8 @@ export function run(
     let mul = 1
     
     for (let i = 0; i < bytes; i++) { 
-      v += code[pc + 1 + i] * mul; mul *= 256 
+      v += code[pc + 1 + i] * mul
+      mul *= 256 
     }
 
     if (bytes === 2 && v >= 0x8000) v -= 0x10000
@@ -29,7 +30,7 @@ export function run(
     const meta = (OPCODE_META as any[])[op]
 
     if (!meta) {
-      throw new Error('Interpreter unsupported opcode value '+op+' at pc='+pc)
+      throw new Error('Interpreter unsupported opcode value ' + op + ' at pc=' + pc)
     }
 
     const size = meta.size
@@ -41,7 +42,8 @@ export function run(
         continue
       }
 
-      case OpCode.OP_if_false: {
+      case OpCode.OP_if_false:
+      case OpCode.OP_if_false8: {
         const off = readImm(pc, meta.imm[0].size)
         const cond = stack.pop()
         const next = pc + size
@@ -55,13 +57,19 @@ export function run(
         stack.push(constants[idx])
         break
       }
+      case OpCode.OP_push_const8: {
+        const idx = readImm(pc, meta.imm[0].size)
+        stack.push(constants[idx])
+        break
+      }
       case OpCode.OP_push_i32: {
         const v = readImm(pc, meta.imm[0].size)
         stack.push(v | 0)
         break
       }
 
-      case OpCode.OP_get_loc: {
+      case OpCode.OP_get_loc:
+      case OpCode.OP_get_loc8: {
         const i = readImm(pc, meta.imm[0].size)
         stack.push(locals[i])
         break
@@ -73,10 +81,99 @@ export function run(
         break
       }
 
-      case OpCode.OP_put_loc: {
+      case OpCode.OP_put_loc:
+      case OpCode.OP_put_loc8: {
         const i = readImm(pc, meta.imm[0].size)
         const v = stack.pop()
         locals[i] = v
+        break
+      }
+      case OpCode.OP_get_loc0: { stack.push(locals[0]); break }
+      case OpCode.OP_get_loc1: { stack.push(locals[1]); break }
+      case OpCode.OP_get_loc2: { stack.push(locals[2]); break }
+      case OpCode.OP_put_loc0: { locals[0] = stack.pop(); break }
+      case OpCode.OP_put_loc1: { locals[1] = stack.pop(); break }
+      case OpCode.OP_put_loc2: { locals[2] = stack.pop(); break }
+
+      case OpCode.OP_push_0: { stack.push(0); break }
+      case OpCode.OP_push_i8: { const v = readImm(pc, meta.imm[0].size); stack.push((v<<24)>>24); break }
+
+      case OpCode.OP_goto8: {
+        const off = readImm(pc, meta.imm[0].size)
+        const next = pc + size
+        pc = next + off
+        continue
+      }
+      case OpCode.OP_call: {
+        const argc = readImm(pc, meta.imm[0].size)
+        const args: any[] = []
+        for (let i = 0; i < argc; i++) args.unshift(stack.pop())
+        const thisArg = stack.pop()
+        const func = stack.pop()
+        const ret = (typeof func === 'function') ? func.apply(thisArg, args) : undefined
+        stack.push(ret)
+        break
+      }
+
+      case OpCode.OP_fclosure:
+      case OpCode.OP_fclosure8: {
+        // For tests, we store function bytecode objects in constants via emitter; interpreter won't execute them.
+        // Push a stub callable that returns undefined to let call sites proceed.
+        const idx = readImm(pc, meta.imm[0].size)
+        const fnObj = constants[idx]
+        const stub = function() { return undefined }
+        ;(stub as any).__qjs = fnObj
+        stack.push(stub)
+        break
+      }
+
+      case OpCode.OP_define_func: {
+        // Consumes function object on TOS; in tests we simply drop it.
+        stack.pop()
+        break
+      }
+
+      case OpCode.OP_put_var:
+      case OpCode.OP_put_var_strict: {
+        // Ignore env; consume value
+        const _atom = readImm(pc, meta.imm[0].size)
+        const v = stack.pop()
+        // emulate env by writing into a hidden globals object if needed in future
+        break
+      }
+      case OpCode.OP_get_var:
+      case OpCode.OP_get_var_undef: {
+        // return undefined for now (no env)
+        const _atom = readImm(pc, meta.imm[0].size)
+        stack.push(undefined)
+        break
+      }
+
+      case OpCode.OP_check_define_var: {
+        // atom + flags (ignored in test interpreter)
+        // no stack effects
+        break
+      }
+
+      // TDZ variants: treat as plain get/put in test interpreter
+      case OpCode.OP_get_loc_check: {
+        const i = readImm(pc, meta.imm[0].size)
+        stack.push(locals[i])
+        break
+      }
+      case OpCode.OP_put_loc_check:
+      case OpCode.OP_put_loc_check_init: {
+        const i = readImm(pc, meta.imm[0].size)
+        const v = stack.pop()
+        locals[i] = v
+        break
+      }
+
+      case OpCode.OP_nip: {
+        // a b -> b ; remove second from top
+        const a = stack.pop()
+        stack.pop()
+        stack.push(a)
         break
       }
 
@@ -97,6 +194,13 @@ export function run(
         const b = stack.pop()
         const a = stack.pop()
         stack.push(Number(a) + Number(b))
+        break
+      }
+      case OpCode.OP_inc_loc: {
+        const i = readImm(pc, meta.imm[0].size)
+        const v = locals[i]
+        const n = typeof v === 'number' ? v + 1 : Number(v) + 1
+        locals[i] = n
         break
       }
       case OpCode.OP_inc: {
@@ -233,6 +337,54 @@ export function run(
         const obj = stack.pop()
         const v = obj[atomName]
         stack.push(v)
+        break
+      }
+
+      case OpCode.OP_get_array_el: {
+        const index = stack.pop()
+        const arr = stack.pop()
+        const v = (arr as any)[index]
+        stack.push(v)
+        break
+      }
+
+      case OpCode.OP_put_array_el: {
+        const value = stack.pop()
+        const index = stack.pop()
+        const arr = stack.pop()
+        ;(arr as any)[index] = value
+        break
+      }
+
+      case OpCode.OP_swap: {
+        const a = stack.pop()
+        const b = stack.pop()
+        stack.push(a)
+        stack.push(b)
+        break
+      }
+
+      case OpCode.OP_rot3r: {
+        const c = stack.pop()
+        const b = stack.pop()
+        const a = stack.pop()
+        // a b c -> c a b
+        stack.push(c)
+        stack.push(a)
+        stack.push(b)
+        break
+      }
+
+      case OpCode.OP_rot4l: {
+        const d = stack.pop()
+        const c = stack.pop()
+        const b = stack.pop()
+        const a = stack.pop()
+        // a b c d -> b c d a
+        stack.push(b)
+        stack.push(c)
+        stack.push(d)
+        stack.push(a)
         break
       }
 

@@ -123,8 +123,8 @@ console.log('semantics tests passed')
   const bc = serialize({ code, constants: constants as any[], atoms: [], localCount, stackSize: 4 })
   const text = disassemble(bc.buffer)
   const hasCmp = /(OP_lt|OP_lte|OP_gt|OP_gte|OP_eq|OP_strict_eq)/.test(text)
-  // 允许存在用于其它路径的比较，这里只要求至少有布尔 push_const 可见
-  assert(/\(true\)|\(false\)/.test(text), 'disasm shows folded boolean constants')
+  // 允许存在用于其它路径的比较，这里只要求至少有布尔 push_const 可见（含 push_const8）
+  assert(/OP_push_const(?:8)?\s+.*\((true|false)\)/.test(text), 'disasm shows folded boolean constants')
 }
 
 // 8) Type-directed conversions: annotated number triggers ToNumber; annotated string triggers ToString

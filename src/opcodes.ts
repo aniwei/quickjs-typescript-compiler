@@ -65,6 +65,13 @@ export enum OpCode {
   OP_return = 55,
   OP_get_arg = 56,
   OP_put_arg = 57,
+  // element access helpers (appended)
+  OP_get_array_el = 58,
+  OP_put_array_el = 59,
+  // stack manipulation helpers for pure-stack ++/-- lowering
+  OP_swap = 60,
+  OP_rot3r = 61,
+  OP_rot4l = 62,
 }
 
 export interface OpMeta { name: string; size: number; imm?: Array<{ name: string; size: number }>; doc?: string }
@@ -129,6 +136,11 @@ export const OPCODE_META: OpMeta[] = [
   { name: 'OP_return', size: 1 + 0, imm: undefined, doc: `Return with TOS as value` },
   { name: 'OP_get_arg', size: 1 + 2, imm: [{"name":"index","size":2}], doc: `Load argument (u16 index)` },
   { name: 'OP_put_arg', size: 1 + 2, imm: [{"name":"index","size":2}], doc: `Store argument (u16 index)` },
+  { name: 'OP_get_array_el', size: 1 + 0, imm: undefined, doc: `Get array element: [arr, index] -> [value]` },
+  { name: 'OP_put_array_el', size: 1 + 0, imm: undefined, doc: `Put array element: [arr, index, value] -> []` },
+  { name: 'OP_swap', size: 1 + 0, imm: undefined, doc: `Swap top two stack values: a b -> b a` },
+  { name: 'OP_rot3r', size: 1 + 0, imm: undefined, doc: `Rotate right 3: a b c -> c a b` },
+  { name: 'OP_rot4l', size: 1 + 0, imm: undefined, doc: `Rotate left 4: a b c d -> b c d a` },
 ] as const
 
 export const OPCODE_INDEX: Record<string, number> = Object.fromEntries(OPCODE_META.map((m,i)=>[m.name,i]))
@@ -137,10 +149,10 @@ export const OPCODE_INDEX: Record<string, number> = Object.fromEntries(OPCODE_ME
 export const OPCODE_LOOKUP: Record<number, OpMeta & { code: number; fmt?: string }> = Object.fromEntries(
   OPCODE_META.map((m, i) => {
     let fmt: string | undefined
-  if (m.name === 'OP_push_i32') fmt = 'i32'
-  else if (m.name === 'OP_push_const' || m.name === 'OP_push_const8' || m.name === 'OP_fclosure' || m.name === 'OP_fclosure8') fmt = 'const'
-  else if (m.name === 'OP_get_loc' || m.name === 'OP_put_loc' || m.name === 'OP_get_loc_check' || m.name === 'OP_put_loc_check' || m.name === 'OP_put_loc_check_init') fmt = 'loc'
-  else if (m.name === 'OP_inc_loc' || m.name === 'OP_get_loc8' || m.name === 'OP_put_loc8') fmt = 'loc8'
+    if (m.name === 'OP_push_i32') fmt = 'i32'
+    else if (m.name === 'OP_push_const' || m.name === 'OP_push_const8' || m.name === 'OP_fclosure' || m.name === 'OP_fclosure8') fmt = 'const'
+    else if (m.name === 'OP_get_loc' || m.name === 'OP_put_loc' || m.name === 'OP_get_loc_check' || m.name === 'OP_put_loc_check' || m.name === 'OP_put_loc_check_init') fmt = 'loc'
+    else if (m.name === 'OP_inc_loc' || m.name === 'OP_get_loc8' || m.name === 'OP_put_loc8') fmt = 'loc8'
     else if (m.name === 'OP_get_arg' || m.name === 'OP_put_arg') fmt = 'arg'
     else if (m.name === 'OP_goto' || m.name === 'OP_if_false') fmt = 'label'
     else if (m.name === 'OP_goto8' || m.name === 'OP_if_false8') fmt = 'label8'

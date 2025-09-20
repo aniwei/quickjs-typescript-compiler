@@ -14,6 +14,7 @@ export interface EmitResult {
   labels: Map<string, number>
   sourceMarks: Array<{ pc: number; line: number; col: number }>
   subFunctions?: Array<SubFunction>
+  labelKinds?: Map<string, string>
 }
 
 export interface SubFunction {
@@ -39,8 +40,12 @@ export class BytecodeEmitter {
   private lastLoc?: { line: number; col: number }
   private sourceMarks: Array<{ pc: number; line: number; col: number }> = []
   private subFunctions: Array<SubFunction> = []
+  private labelKinds?: Map<string, string>
 
   emit (ir: IRProgram): EmitResult {
+    // 透传编译阶段导出的标签语义（用于 disasm 注解）
+    const lk = (ir as any).__labelKinds as Map<string, string> | undefined
+    if (lk) this.labelKinds = lk
     for (const node of ir) {
       this.process(node)
     }
@@ -60,6 +65,7 @@ export class BytecodeEmitter {
       labels: this.labels,
       sourceMarks: this.sourceMarks,
       subFunctions: this.subFunctions
+      , labelKinds: this.labelKinds
     }
   }
 
@@ -87,6 +93,9 @@ export class BytecodeEmitter {
       case 'Dup': return this.pushOp(OpCode.OP_dup)
       case 'Dup1': return this.pushOp(OpCode.OP_dup1)
       case 'Inc': return this.pushOp(OpCode.OP_inc)
+      case 'Swap': return this.pushOp(OpCode.OP_swap)
+      case 'Rot3R': return this.pushOp(OpCode.OP_rot3r)
+      case 'Rot4L': return this.pushOp(OpCode.OP_rot4l)
       case 'PutField': {
         const atom = this.internAtom(node.name)
         return this.pushOp(OpCode.OP_put_field, atom)
@@ -108,8 +117,17 @@ export class BytecodeEmitter {
       case 'Return': return this.pushOp(OpCode.OP_return)
       case 'Equal': return this.pushOp(OpCode.OP_eq)
       case 'StrictEqual': return this.pushOp(OpCode.OP_strict_eq)
-      case 'MethodCall': return this.pushOp(OpCode.OP_call_method, node.argc)
-      case 'Call': return this.pushOp(OpCode.OP_call, node.argc)
+      case 'MethodCall':
+        // For method calls, the expected stack shape before OP_call_method is [obj, func, ...args].
+        // Upstream QuickJS uses get_field2 to produce [obj, func] directly; we rely on IR to have prepared that.
+        return this.pushOp(OpCode.OP_call_method, node.argc)
+      case 'GetArrayEl':
+        return this.pushOp(OpCode.OP_get_array_el)
+      case 'PutArrayEl':
+        return this.pushOp(OpCode.OP_put_array_el)
+      case 'Call':
+        // Caller must prepare [func, this, ...args] in IR lowering.
+        return this.pushOp(OpCode.OP_call, node.argc)
       case 'GetArg': return this.pushOp(OpCode.OP_get_arg, node.index)
       case 'PutArg': return this.pushOp(OpCode.OP_put_arg, node.index)
       case 'SetEnvVar': return this.processSetEnvVar(node)
@@ -588,11 +606,12 @@ export class BytecodeEmitter {
           if (sp > 0) sp += 1
           break
         case OpCode.OP_dup1:
+          // Duplicate stack[-2]: a b -> a a b ; net +1 when at least 2 items
+          if (sp > 1) sp += 1
+          break
         case OpCode.OP_return:
           // Return consumes the value and ends the function. Reset stack depth.
           sp = 0
-          break
-          if (sp > 1) sp += 1
           break
         // no swap opcode in current set
         case OpCode.OP_get_loc:
@@ -625,6 +644,9 @@ export class BytecodeEmitter {
           break
         case OpCode.OP_inc:
           // unary ++ on TOS: net 0
+          break
+        case OpCode.OP_inc_loc:
+          // local ++ (short form) updates in-place, no net stack change
           break
         case OpCode.OP_lte:
         case OpCode.OP_gt:
@@ -677,6 +699,10 @@ export class BytecodeEmitter {
           }
           break
         }
+        // For expression-level post-inc lowering pattern: get_loc; dup; inc; put_loc -> leaves old value
+        // 我们不在此做序列识别，但单指令栈效应组合本就实现 net 0：
+        // get_loc(+1); dup(+1); inc(0); put_loc(-1) => +1 overall, old value remains on stack; 但 put_loc 还会额外消费一个值？
+        // 注意：我们的 put_loc 消费 1（新值），dup 复制旧值，序列执行后，栈上只剩旧值，净 +0 相对初始。
         case OpCode.OP_drop:
         case OpCode.OP_nip:
           sp -= 1
@@ -702,8 +728,25 @@ export class BytecodeEmitter {
           sp -= (1 + argc)
           break
         }
+        case OpCode.OP_swap:
+          // swap does not change stack depth
+          break
+        case OpCode.OP_rot3r:
+          // rotation does not change stack depth
+          break
+        case OpCode.OP_rot4l:
+          // rotation does not change stack depth
+          break
         case OpCode.OP_define_func:
           // treat as metadata operation (naming), assume no net stack change in our subset
+          break
+        case OpCode.OP_get_array_el:
+          // [arr, index] -> [value] : pop 2 push 1 => -1
+          sp -= 1
+          break
+        case OpCode.OP_put_array_el:
+          // [arr, index, value] -> [] : pop 3 => -3
+          sp -= 3
           break
         case OpCode.OP_return_undef:
           // pop? (这里我们返回 undefined 不消耗已有) 设为不变

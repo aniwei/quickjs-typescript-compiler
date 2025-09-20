@@ -6,7 +6,11 @@ function main() {
   const verHeader = resolve(process.cwd(), 'third_party/QuickJS/include/QuickJS/extension/taro_js_bytecode.h')
   let firstAtom = 512
   try {
-    const txt = readFileSync(atomHeader, 'utf8')
+    let txt = readFileSync(atomHeader, 'utf8')
+    // 移除 CONFIG_BIGNUM 相关的条件块，避免把 BigInt64Array/BigUint64Array 计入
+    // 同时处理两种写法：#ifdef CONFIG_BIGNUM 与 #if CONFIG_BIGNUM
+    txt = txt.replace(/#ifdef\s+CONFIG_BIGNUM[\s\S]*?#endif/g, '')
+             .replace(/#if\s+CONFIG_BIGNUM[\s\S]*?#endif/g, '')
     const count = (txt.match(/\bDEF\s*\(/g) || []).length
     firstAtom = (count + 1) >>> 0
   } catch (e) {

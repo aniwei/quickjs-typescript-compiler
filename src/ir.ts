@@ -18,6 +18,8 @@ export type IRNode =
   | IRObjectNew
   | IRPutField
   | IRDefineField
+  | IRGetArrayEl
+  | IRPutArrayEl
   | IRMethodCall
   | IRCall
   | IRDrop
@@ -26,6 +28,9 @@ export type IRNode =
   | IRInc
   | IRPushI32
   | IRIncLocal
+  | IRSwap
+  | IRRot3R
+  | IRRot4L
   | IRJump
   | IRJumpIfFalse
   | IRLabel
@@ -59,6 +64,8 @@ export interface IRGetField2 { kind: 'GetField2'; field: string }
 export interface IRObjectNew { kind: 'ObjectNew' }
 export interface IRPutField { kind: 'PutField'; name: string }
 export interface IRDefineField { kind: 'DefineField'; name: string }
+export interface IRGetArrayEl { kind: 'GetArrayEl' }
+export interface IRPutArrayEl { kind: 'PutArrayEl' }
 export interface IRMethodCall { kind: 'MethodCall'; argc: number }
 export interface IRCall { kind: 'Call'; argc: number }
 export interface IRDrop { kind: 'Drop' }
@@ -67,6 +74,9 @@ export interface IRDup1 { kind: 'Dup1' }
 export interface IRInc { kind: 'Inc' }
 export interface IRPushI32 { kind: 'PushI32'; value: number }
 export interface IRIncLocal { kind: 'IncLocal'; name: string }
+export interface IRSwap { kind: 'Swap' }
+export interface IRRot3R { kind: 'Rot3R' }
+export interface IRRot4L { kind: 'Rot4L' }
 export interface IRJump { kind: 'Jump'; label: string }
 export interface IRJumpIfFalse { kind: 'JumpIfFalse'; label: string }
 export interface IRLabel { kind: 'Label'; name: string }

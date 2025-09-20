@@ -104,6 +104,18 @@ namespace quickjs {
     return out;
   }
 
+  std::string QuickJSBytecodeBinding::dumpWithBin(
+    std::vector<uint8_t> bytes,
+    std::vector<std::string> modules
+  ) {
+    std::string out;
+    
+#ifdef DUMP_BYTECODE
+    out = taro_js_dump_function_bytecode_bin(bytes.data(), bytes.size());
+#endif
+    return out;
+  }
+
   std::string QuickJSBytecodeBinding::dump(
     std::string input,
     std::string sourceURL,
@@ -145,5 +157,117 @@ namespace quickjs {
     JS_FreeContext(ctx);
     JS_FreeRuntime(rt);
     return out;
+  }
+
+  std::string QuickJSBytecodeBinding::run(std::vector<uint8_t> bytes, std::vector<std::string> modules) {
+    JSContext* ctx = prepare(modules);
+    JSRuntime* rt = JS_GetRuntime(ctx);
+
+    // Read the serialized object (module/function bytecode)
+    JSValue obj = JS_ReadObject(ctx, bytes.data(), bytes.size(), JS_READ_OBJ_BYTECODE);
+    if (taro_is_exception(obj)) {
+      std::string err = getEvalException(ctx, obj);
+      JS_FreeContext(ctx);
+      JS_FreeRuntime(rt);
+      return std::string("ERROR: Failed to read bytecode: ") + err;
+    }
+
+    // Evaluate module or function
+    if (JS_VALUE_GET_TAG(obj) == JS_TAG_MODULE) {
+      // For modules, JS_EvalFunction loads the module and returns the evaluation result
+      JSValue evalRes = JS_EvalFunction(ctx, obj);
+      if (taro_is_exception(evalRes)) {
+        std::string err = getEvalException(ctx, evalRes);
+        JS_FreeValue(ctx, evalRes);
+        JS_FreeContext(ctx);
+        JS_FreeRuntime(rt);
+        return std::string("ERROR: Failed to eval module: ") + err;
+      }
+      // Convert result to string (often undefined for modules)
+      const char* s = JS_ToCString(ctx, evalRes);
+      std::string out = s ? std::string(s) : std::string();
+      if (s) JS_FreeCString(ctx, s);
+      JS_FreeValue(ctx, evalRes);
+      JS_FreeContext(ctx);
+      JS_FreeRuntime(rt);
+      return out;
+    }
+
+    // If function bytecode, create function object and call it
+    if (JS_VALUE_GET_TAG(obj) == JS_TAG_FUNCTION_BYTECODE) {
+      JSValue funcObj = JS_EvalFunction(ctx, obj);
+      if (taro_is_exception(funcObj)) {
+        std::string err = getEvalException(ctx, funcObj);
+        JS_FreeValue(ctx, funcObj);
+        JS_FreeContext(ctx);
+        JS_FreeRuntime(rt);
+        return std::string("ERROR: Failed to create function from bytecode: ") + err;
+      }
+      JSValue thisVal = JS_UNDEFINED;
+      JSValue ret = JS_Call(ctx, funcObj, thisVal, 0, nullptr);
+      if (taro_is_exception(ret)) {
+        std::string err = getEvalException(ctx, ret);
+        JS_FreeValue(ctx, funcObj);
+        JS_FreeValue(ctx, ret);
+        JS_FreeContext(ctx);
+        JS_FreeRuntime(rt);
+        return std::string("ERROR: Runtime exception: ") + err;
+      }
+      const char* s = JS_ToCString(ctx, ret);
+      std::string out = s ? std::string(s) : std::string();
+      if (s) JS_FreeCString(ctx, s);
+      JS_FreeValue(ctx, funcObj);
+      JS_FreeValue(ctx, ret);
+      JS_FreeContext(ctx);
+      JS_FreeRuntime(rt);
+      return out;
+    }
+
+    // Fallback: try to eval as general object
+    JSValue evalRes = JS_EvalFunction(ctx, obj);
+    if (taro_is_exception(evalRes)) {
+      std::string err = getEvalException(ctx, evalRes);
+      JS_FreeValue(ctx, evalRes);
+      JS_FreeContext(ctx);
+      JS_FreeRuntime(rt);
+      return std::string("ERROR: Failed to eval object: ") + err;
+    }
+    const char* s = JS_ToCString(ctx, evalRes);
+    std::string out = s ? std::string(s) : std::string();
+    if (s) JS_FreeCString(ctx, s);
+    JS_FreeValue(ctx, evalRes);
+    JS_FreeContext(ctx);
+    JS_FreeRuntime(rt);
+    return out;
+  }
+}
+
+// ---- Debug helpers ----
+namespace quickjs {
+  uint32_t QuickJSBytecodeBinding::getFirstAtom() {
+    // Create a minimal context to read JS_ATOM_END
+    JSRuntime* rt = JS_NewRuntime();
+    JSContext* ctx = JS_NewContext(rt);
+    uint32_t first = JS_ATOM_END; // quick way to expose header constant
+    JS_FreeContext(ctx);
+    JS_FreeRuntime(rt);
+    return first;
+  }
+
+  std::string QuickJSBytecodeBinding::validate(std::vector<uint8_t> bytes) {
+    JSRuntime* rt = JS_NewRuntime();
+    JSContext* ctx = JS_NewContext(rt);
+    // Attempt to read the object with allow_bytecode
+    JSValue obj = JS_ReadObject(ctx, bytes.data(), bytes.size(), JS_READ_OBJ_BYTECODE);
+    if (taro_is_exception(obj)) {
+      std::string err = getEvalException(ctx, obj);
+      JS_FreeContext(ctx);
+      JS_FreeRuntime(rt);
+      return err;
+    }
+    JS_FreeValue(ctx, obj);
+    JS_FreeContext(ctx);
+    JS_FreeRuntime(rt);
+    return std::string();
   }
 }

@@ -116,7 +116,7 @@ export function disassemble(buf: Buffer, opts?: { showCFG?: boolean, dot?: boole
     })
   }
 
-  // first pass: collect jump targets
+  // first pass: collect jump targets（含短形式）
   const META = (opts?.useQjsMeta ? (QJS_OPCODE_META as any[]) : (OPCODE_META as any[]))
   const targets = new Set<number>()
   for (let pc = 0; pc < bc.length;) {
@@ -128,7 +128,7 @@ export function disassemble(buf: Buffer, opts?: { showCFG?: boolean, dot?: boole
     if (meta.imm && meta.imm.length > 0) {
       const sz = meta.imm[0].size
 
-      if ((op === OpCode.OP_goto || op === OpCode.OP_if_false) && sz > 0) {
+      if ((op === OpCode.OP_goto || op === OpCode.OP_if_false || op === OpCode.OP_goto8 || op === OpCode.OP_if_false8) && sz > 0) {
         const val = readImmLE(bc, pc + 1, sz, true)
         const target = pc + meta.size + val
 
@@ -152,14 +152,14 @@ export function disassemble(buf: Buffer, opts?: { showCFG?: boolean, dot?: boole
   const meta = META[op]
       
       if (!meta) break
-      if (op === OpCode.OP_goto || op === OpCode.OP_if_false) {
+      if (op === OpCode.OP_goto || op === OpCode.OP_if_false || op === OpCode.OP_goto8 || op === OpCode.OP_if_false8) {
         const sz = meta.imm?.[0]?.size ?? 0
         const val = readImmLE(bc, pc + 1, sz, true)
         const target = pc + meta.size + val
 
         leaders.add(target)
         // 条件跳转有 fallthrough，非条件跳转无
-        if (op === OpCode.OP_if_false) leaders.add(pc + meta.size)
+  if (op === OpCode.OP_if_false || op === OpCode.OP_if_false8) leaders.add(pc + meta.size)
       }
       pc += meta.size
     }
@@ -176,22 +176,22 @@ export function disassemble(buf: Buffer, opts?: { showCFG?: boolean, dot?: boole
       for (let pc = start; pc < end;) {
         lastPc = pc
         const op = bc[pc]
-  const meta = META[op]
+        const meta = META[op]
         if (!meta) break
         pc += meta.size
       }
 
       const lastOp = bc[lastPc]
-  const lastMeta = META[lastOp]
+      const lastMeta = META[lastOp]
 
       if (lastMeta) {
-        if (lastOp === OpCode.OP_goto || lastOp === OpCode.OP_if_false) {
+        if (lastOp === OpCode.OP_goto || lastOp === OpCode.OP_if_false || lastOp === OpCode.OP_goto8 || lastOp === OpCode.OP_if_false8) {
           const sz = lastMeta.imm?.[0]?.size ?? 0
           const val = readImmLE(bc, lastPc + 1, sz, true)
           const target = lastPc + lastMeta.size + val
 
           if (target >= 0 && target <= bc.length) succ.push(target)
-            if (lastOp === OpCode.OP_if_false) {
+            if (lastOp === OpCode.OP_if_false || lastOp === OpCode.OP_if_false8) {
             const fall = lastPc + lastMeta.size
             
             if (fall < bc.length) succ.push(fall)
@@ -210,7 +210,7 @@ export function disassemble(buf: Buffer, opts?: { showCFG?: boolean, dot?: boole
 
   for (let pc = 0; pc < bc.length;) {
     const op = bc[pc]
-  const meta = META[op]
+    const meta = META[op]
 
     if (!meta) { 
       out.push(pc.toString().padStart(4)+' ??')
@@ -234,13 +234,13 @@ export function disassemble(buf: Buffer, opts?: { showCFG?: boolean, dot?: boole
          bytes.push(bc[pc + 1 + i])
       }
 
-      const signed = (op === OpCode.OP_goto || op === OpCode.OP_if_false)
+  const signed = (op === OpCode.OP_goto || op === OpCode.OP_if_false || op === OpCode.OP_goto8 || op === OpCode.OP_if_false8)
       let val = readImmLE(bc, pc + 1, sz, signed)
 
-      if (op === OpCode.OP_push_const) {
+      if (op === OpCode.OP_push_const || op === OpCode.OP_push_const8) {
         const c = fn.constants[val]
         immStr = ` index=${val} (${JSON.stringify(c)})`
-      } else if (op === OpCode.OP_goto || op === OpCode.OP_if_false) {
+      } else if (op === OpCode.OP_goto || op === OpCode.OP_if_false || op === OpCode.OP_goto8 || op === OpCode.OP_if_false8) {
         const target = pc + meta.size + val
         const lab = labels.get(target)
         const annByName = lab && opts?.labelComments?.[lab] ? ` ; ${opts?.labelComments?.[lab]}` : ''
@@ -249,7 +249,7 @@ export function disassemble(buf: Buffer, opts?: { showCFG?: boolean, dot?: boole
         immStr = ` off=${val} -> pc=${target}${lab?` (${lab})`:''}${annByName || annByPc}`
       } else if (op === OpCode.OP_define_field || op === OpCode.OP_get_field2) {
         // 现在字节码中的立即数是 first_atom + idx（无符号32位）
-  const firstAtom = FIRST_ATOM >>> 0
+        const firstAtom = FIRST_ATOM >>> 0
         const raw = (val >>> 0)
         const idx = raw - firstAtom
         const name = (idx >= 0 && idx < fn.atoms.length) ? (fn.atoms[idx] ?? `atom#${idx}`) : `atom#${idx}`

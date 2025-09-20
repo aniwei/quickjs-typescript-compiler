@@ -6,7 +6,13 @@
   "scripts": {
     "gen:env": "tsx scripts/gen-env.ts",
     "build": "npm run gen:env && tsc",
+    "dump:wasm": "tsx scripts/dump-with-wasm.ts",
+    "validate:bin": "tsx scripts/validate-bin-with-wasm.ts",
+    "dump:both": "tsx scripts/dump-both.ts",
     "build:wasm": "tsx scripts/build-bytecode-wasm.ts",
+    "compile:wasm": "tsx scripts/compile-with-wasm.ts",
+    "compile:ts": "tsx scripts/compile-with-ts.ts",
+    "run:wasm": "tsx scripts/run-with-wasm.ts",
     "start": "tsx src/cli.ts",
     "align:qjs": "tsx scripts/auto-align-quickjs.ts",
     "validate": "tsx scripts/validate-compile.ts",

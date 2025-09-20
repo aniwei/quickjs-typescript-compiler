@@ -14,6 +14,10 @@ EMSCRIPTEN_BINDINGS(quickjs_bytecode_wasm) {
     .constructor<>()
     .function("compile", &QuickJSBytecodeBinding::compile)
     .function("dump", &QuickJSBytecodeBinding::dump)
+    .function("dumpWithBin", &QuickJSBytecodeBinding::dumpWithBin)
+    .function("run", &QuickJSBytecodeBinding::run)
+    .class_function("getFirstAtom", &QuickJSBytecodeBinding::getFirstAtom)
+    .class_function("validate", &QuickJSBytecodeBinding::validate)
     .smart_ptr<std::shared_ptr<QuickJSBytecodeBinding>>("shared_ptr<QuickJSBytecodeBinding>");
 
   emscripten::function(

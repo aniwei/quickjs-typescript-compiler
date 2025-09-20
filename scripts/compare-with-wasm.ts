@@ -294,6 +294,11 @@ function main() {
         }
 
         console.log('Header diff:', headerDiff)
+        if ((Q as any).closureVars && (Q as any).closureVars.length) {
+          try {
+            console.log('QJSC closureVars:', (Q as any).closureVars)
+          } catch {}
+        }
         // Atom/Const 表逐项对比
         const maxAtoms = Math.max(S.atoms.length, Q.atoms.length)
         const atomDiff: Array<{ i: number, self?: string, qjsc?: string }> = []
@@ -324,8 +329,10 @@ function main() {
           console.log('Const pool diffs:', constDiff)
         }
         
-        let selfMn = getMnemonics(self)
-        let qjsMn = getMnemonics(qjscBin, /*useQjsMeta*/ true)
+        let selfMnRaw = getMnemonics(self)
+        let qjsMnRaw = getMnemonics(qjscBin, /*useQjsMeta*/ true)
+        let selfMn = selfMnRaw.slice()
+        let qjsMn = qjsMnRaw.slice()
 
         if (normalize) {
           selfMn = normalizeMnemonics(selfMn)
@@ -333,9 +340,19 @@ function main() {
         }
 
         console.log('Mnemonic lengths: self=', selfMn.length, ' qjsc=', qjsMn.length)
+        if (normalize) {
+          const foldDeltaSelf = selfMnRaw.length - selfMn.length
+          const foldDeltaQ = qjsMnRaw.length - qjsMn.length
+          console.log('Normalization summary:')
+          console.log('  Self:  before=', selfMnRaw.length, ' after=', selfMn.length, ' folded=', foldDeltaSelf)
+          console.log('  QJSC:  before=', qjsMnRaw.length, ' after=', qjsMn.length, ' folded=', foldDeltaQ)
+        }
         
         if (sideBySide) {
           console.log('\n-- SIDE-BY-SIDE (LCS) --')
+          if (normalize) {
+            console.log('(Note) Displaying normalized/"folded" mnemonics side-by-side. Use --no-normalize to inspect raw sequences.')
+          }
           printSideBySide(selfMn, qjsMn)
 
           // 保存为 markdown
@@ -344,7 +361,8 @@ function main() {
 
             const base = (input.split(/[\\/]/).pop() || 'input').replace(/\.[^.]+$/, '')
             const mdPath = join(artifactsDir, `${base}-mnemonic-diff.md`)
-            const md = generateSideBySideMarkdown(selfMn, qjsMn)
+            const headerNote = normalize ? '\n\nNote: Mnemonics shown are normalized (folded). Use --no-normalize to see raw sequences.\n' : ''
+            const md = generateSideBySideMarkdown(selfMn, qjsMn) + headerNote
             
             writeFileSync(mdPath, md, 'utf8')
             console.log('Saved mnemonic side-by-side to', mdPath)
@@ -382,7 +400,7 @@ function main() {
           }
         }
 
-        if (wantDot) {
+          if (wantDot) {
           try {
             mkdirSync(artifactsDir, { recursive: true })
 
@@ -744,9 +762,13 @@ function tryHeuristicMnemonics(buf: Buffer): string[] | null {
 // 将 QuickJS 短指令/带检查变体规范化为“长名”，便于逐条对比
 function normalizeMnemonics(m: string[]): string[] {
   const map: Record<string, string> = {
+  // 统一 inc_loc 到通用 inc（便于与组合序列对齐）
+  OP_inc_loc: 'OP_inc',
     // 短跳转/比较
     OP_goto8: 'OP_goto',
     OP_if_false8: 'OP_if_false',
+    OP_goto16: 'OP_goto',
+    OP_if_true8: 'OP_if_false', // 将 if_true 统一到 if_false 方向，在折叠阶段处理
     // 局部变量短形式
     OP_put_loc0: 'OP_put_loc',
     OP_put_loc1: 'OP_put_loc',
@@ -754,6 +776,8 @@ function normalizeMnemonics(m: string[]): string[] {
     OP_get_loc0: 'OP_get_loc',
     OP_get_loc1: 'OP_get_loc',
     OP_get_loc2: 'OP_get_loc',
+    OP_get_loc8: 'OP_get_loc',
+    OP_put_loc8: 'OP_put_loc',
     // tdz/初始化检查
     OP_put_loc_check: 'OP_put_loc',
     OP_put_loc_check_init: 'OP_put_loc',
@@ -783,6 +807,8 @@ function normalizeMnemonics(m: string[]): string[] {
     // 全局/严格赋值归一到本地写入（仅用于比较对齐，不改变真实语义）
     OP_put_var: 'OP_put_loc',
     OP_put_var_strict: 'OP_put_loc',
+    OP_put_var_ref0: 'OP_put_loc',
+    OP_put_var_ref_check: 'OP_put_loc',
   }
   const drop = new Set<string>([
     // 模块/顶层样板，非主体算法逻辑
@@ -791,6 +817,12 @@ function normalizeMnemonics(m: string[]): string[] {
     'OP_fclosure',
     'OP_private_symbol',
     'OP_null',
+    // 函数/构造器模板样板
+    'OP_check_ctor_return',
+    'OP_throw',
+    'OP_push_false',
+    'OP_push_true',
+    'OP_push_null',
   ])
   // First pass: simple rename & drop
   const stage: string[] = []
@@ -818,8 +850,44 @@ function normalizeMnemonics(m: string[]): string[] {
       continue
     }
 
+    // put_loc; inc; put_loc; drop => inc （某些场景下 quickjs 优化前的等价序列）
+    if (stage[i] === 'OP_put_loc' && stage[i+1] === 'OP_inc' && stage[i+2] === 'OP_put_loc' && stage[i+3] === 'OP_drop') {
+      out.push('OP_inc')
+      i += 4
+      continue
+    }
+
+    // 模板：if (cond) { A } else { B }
+    // 常见编码： [cond-eval] if_false Lelse ; [A...] ; goto Lend ; Lelse: [B...] ; Lend:
+    // 将 if_false/goto/Lelse/Lend 结构性的模式折叠为 OP_if_else，以减少跳转噪声
+    if (stage[i] === 'OP_if_false' && stage[i+2] === 'OP_goto') {
+      out.push('OP_if_else')
+      i += 3
+      continue
+    }
+
+    // 模板：if (cond) { A }，无 else
+    if (stage[i] === 'OP_if_false') {
+      out.push('OP_if')
+      i += 1
+      continue
+    }
+
+    // continue 模板经常出现在循环体：... -> OP_goto 到 loop-continue；对比时可弱化为一条 OP_continue
+    if (stage[i] === 'OP_goto') {
+      out.push('OP_jump')
+      i += 1
+      continue
+    }
+
     out.push(stage[i])
     i++
+  }
+
+  // 第三步：尾部清理
+  // - 若末尾为单独一条 OP_return_undef，默认折叠掉（qjsc 常无显式该指令，或布局不同）
+  if (out.length > 0 && out[out.length - 1] === 'OP_return_undef') {
+    out.pop()
   }
 
   return out

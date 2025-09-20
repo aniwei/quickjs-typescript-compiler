@@ -1,12 +1,10 @@
 #!/usr/bin/env node
 import { readFileSync, existsSync } from 'node:fs'
-import { resolve, relative } from 'node:path'
+import { resolve, relative, basename } from 'node:path'
 import { compileToIR } from './compile'
 import { emitBytecode } from './bytecode'
 import { serialize, writeModule } from './assembler'
 import { disassemble } from './disasm'
-
-
 
 function main () {
   const input = process.argv[2] || '__tests__/compute.ts'
@@ -20,21 +18,25 @@ function main () {
 
   // 使用预生成 build-opcodes.ts 的 opcodes，不再调用旧 gen-opcodes
   const src = readFileSync(abs, 'utf8')
+
   // 简易指令序言检测：源码开头是否包含 'use strict' 或 "use strict"
   function detectStrictPrologue(text: string): boolean {
     // 允许前导 BOM/空白/换行；匹配首个非空行是 'use strict' 或 "use strict"
     const trimmed = text.replace(/^\uFEFF?/, '')
     // 取前几行检查指令语句
     const lines = trimmed.split(/\r?\n/)
+
     for (const raw of lines) {
       const line = raw.trim()
       if (!line) continue
+      
       // 只检查第一条非空行；若是字符串字面量则视为指令
       if (line === '\'use strict\'' || line === '"use strict"' || line.startsWith('\'use strict\';') || line.startsWith('"use strict";')) return true
       break
     }
     return false
   }
+  
   const ir = compileToIR(src, abs)
 
   const { 
@@ -51,10 +53,12 @@ function main () {
 
   const debug = process.argv.includes('--debug')
   const strict = process.argv.includes('--strict') || detectStrictPrologue(src)
-  // 规范化 debug 文件名：使用相对路径，并将 .ts 扩展转换为 .js（对齐 qjsc）
-  const relPath = relative(cwd, abs).replace(/\\/g, '/')
-  const debugFilename = relPath.replace(/\.ts$/i, '.js')
-  const capturedLocals = Array.from(locals.keys()).filter(k => /outer/i.test(k))
+  
+  // 规范化 debug 文件名：使用基名，并将 .ts 扩展转换为 .js（对齐 qjsc）
+  const base = basename(abs)
+  const debugFilename = base.replace(/\.ts$/i, '.js')
+  // 编译阶段导出的闭包捕获列表（例如 for(let i...) 的 i）
+  const capturedLocals = (ir as any).__capturedLocals as string[] | undefined
   const localsMapObj: Record<string, number> = Object.fromEntries(locals.entries())
   const localKindsObj: Record<string, 'var' | 'let' | 'const'> = localKinds ? Object.fromEntries(localKinds.entries()) as any : {}
 
@@ -89,6 +93,7 @@ function main () {
     console.log('=== CODE ===')
     console.log(code.map(b => b.toString(16).padStart(2, '0')).join(' '))
   }
+
   console.log('Wrote', outPath, 'size=', mod.buffer.length, 'format=quickjs')
   const wantDisasm = process.argv.includes('--disasm')
   const wantCFG = process.argv.includes('--showCFG')
@@ -96,10 +101,14 @@ function main () {
   const wantPC2 = process.argv.includes('--pc2line')
   
   if (wantDisasm || wantCFG || wantDOT) {
-    // 通过发射阶段的 label -> pc 映射构建 pc 注释
+    // 通过发射阶段的 label -> pc 映射构建 pc 注释；优先使用编译阶段导出的 labelKinds
     const pcAnnotations: Record<number, string> = {}
+    // labelKinds 由编译阶段导出，并在发射结果中透传
+    const labelKinds: Map<string, string> | undefined = (ir as any).__labelKinds
     for (const [name, pc] of labels) {
-      if (/(_for_start|_while_start)/.test(name)) pcAnnotations[pc] = 'loop-start'
+      const kind = labelKinds?.get(name)
+      if (kind) pcAnnotations[pc] = kind
+      else if (/(_for_start|_while_start)/.test(name)) pcAnnotations[pc] = 'loop-start'
       else if (/(_for_end|_while_end)/.test(name)) pcAnnotations[pc] = 'loop-end'
       else if (/(_for_continue|_while_start)/.test(name)) pcAnnotations[pc] = 'loop-continue'
     }

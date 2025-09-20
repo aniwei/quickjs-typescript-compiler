@@ -14,6 +14,8 @@ import {
   IRDefineArrayEl,
   IRGetField2,
   IRDefineField,
+  IRGetArrayEl,
+  IRPutArrayEl,
   IRMethodCall,
   IRDrop,
   IRIncLocal,
@@ -27,9 +29,13 @@ import {
   IRObjectNew,
   IRAppend,
   IRDup,
-  IRInitLocal
+  IRDup1,
+  IRInitLocal,
+  IRPushI32,
+  IRSwap,
+  IRRot3R,
+  IRRot4L
 } from './ir'
-// removed IRToNumber/IRToString: runtime semantics handle conversions
 
 interface LoopStack { 
   breakLabel: string
@@ -42,13 +48,15 @@ interface NamedLoopStack {
   continueLabel: string
 }
 
+type LabelKind = 'loop-start' | 'loop-end' | 'loop-continue'
+
 export class Compiler {
   private ir: IRProgram = []
   private locals = new Set<string>()
   // 简单类型跟踪：仅标注本地变量是否可静态认为是 number
   private localType = new Map<string, 'number' | 'string' | 'unknown'>()
+  private sf!: ts.SourceFile
   private checker?: ts.TypeChecker
-  private sf?: ts.SourceFile
   private strictMode = false
   // 循环标签栈：用于 break/continue 降级
   private loopStack: Array<LoopStack> = []
@@ -56,7 +64,9 @@ export class Compiler {
   // 支持带标签的循环：label -> 最近匹配的 loop 索引
   private namedLoopStack: Array<NamedLoopStack> = []
   // 供反汇编注释使用：特殊标签语义
-  private labelKinds = new Map<string, 'loop-start' | 'loop-end' | 'loop-continue'>()
+  private labelKinds = new Map<string, LabelKind>()
+  // 顶层函数的“需要作为闭包捕获”的本地名（用于对齐 qjsc 的 closure_var 列表）
+  private capturedLocals = new Set<string>()
 
   private newLabel(prefix: string) { 
     return `${prefix}_${this.labelId++}` 
@@ -96,6 +106,10 @@ export class Compiler {
 
     sf.forEachChild(node => this.processTopLevel(node))
     this.ir.push(<IRReturnUndef>{ kind: 'ReturnUndef' })
+    // 将循环标签语义导出给后续发射阶段：name -> kind
+    ;(this.ir as any).__labelKinds = new Map(this.labelKinds)
+    // 导出需要作为闭包变量的本地名（例如 for(let i...) 的 i）
+    ;(this.ir as any).__capturedLocals = Array.from(this.capturedLocals)
     return this.ir
   }
 
@@ -160,13 +174,41 @@ export class Compiler {
     if (ts.isIfStatement(node)) return this.processIfStatement(node)
     if (ts.isWhileStatement(node)) return this.processWhileStatement(node)
     if (ts.isLabeledStatement(node)) return this.processLabeledStatement(node)
-    if (ts.isExpressionStatement(node) && ts.isCallExpression(node.expression)) return this.processCallExpression(node.expression)
+    if (ts.isExpressionStatement(node)) return this.processExpressionStatement(node)
+  }
+
+  // 统一的表达式语句处理（顶层与循环体共用）
+  private processExpressionStatement (node: ts.ExpressionStatement) {
+    if (ts.isCallExpression(node.expression)) return this.processCallExpression(node.expression)
+    if (ts.isBinaryExpression(node.expression)) {
+      this.processBinaryExpression(node.expression)
+      return
+    }
+    if (ts.isStringLiteral(node.expression)) {
+      const s = node.expression.text
+      if (s === 'use strict') return
+    }
+    if (!ts.isCallExpression(node.expression) && !ts.isPostfixUnaryExpression(node.expression)) {
+      this.lowerExpression(node.expression)
+      this.push(<IRDrop>{ kind: 'Drop' }, node.expression)
+      return
+    }
+    if (ts.isPostfixUnaryExpression(node.expression)) {
+      const pe = node.expression
+      if (pe.operator === ts.SyntaxKind.PlusPlusToken || pe.operator === ts.SyntaxKind.MinusMinusToken) {
+        this.lowerExpression(pe)
+        this.push(<IRDrop>{ kind: 'Drop' }, pe)
+        return
+      }
+    }
   }
 
   private processFunctionDeclaration (fn: ts.FunctionDeclaration) {
     if (!fn.name) return
+
     const name = fn.name.text
     const topLevel = ts.isSourceFile(fn.parent)
+
     if (!topLevel) return // 暂不处理非顶层
     // 顶层函数：check_define_var + fclosure + define_func
     const DEFINE_GLOBAL_LEX_VAR = 1 << 7
@@ -179,6 +221,7 @@ export class Compiler {
       const fakeDecl = ts.factory.createVariableDeclaration(fn.name, undefined, undefined, undefined)
       this.declare(fakeDecl)
     }
+    
     // 1) 预定义到 env（带 FUNC 标志）
     this.push(<any>{ kind: 'CheckDefineVar', name, flags }, fn.name)
     // 2) 生成真实函数对象：lower 函数体为一个子 IRProgram，并通过 FunctionObject + fclosure 发射
@@ -195,6 +238,7 @@ export class Compiler {
         if (p.name && (ts.isIdentifier(p.name))) argNames.push(p.name.text)
       }
     }
+
     // 简单 body 降级：仅支持 "return expr;"，以及使用标识符引用参数名时从参数槽取值
     if (fn.body && ts.isBlock(fn.body)) {
       for (const st of fn.body.statements) {
@@ -239,11 +283,7 @@ export class Compiler {
     this.push(<any>{ kind: 'FunctionObject', name, argCount: argNames.length, argNames, body }, fn)
     // 2.1) 对应 define_func(atom+u8)
     this.push(<any>{ kind: 'DefineFunc', name, flags: 0 }, fn.name)
-    // 3) 本地别名（dup + set_local/init_local）
-    this.push(<IRDup>{ kind: 'Dup' }, fn)
-    // 函数声明是 var-kind：用 SetLocal，不走 TDZ
-    this.push(<IRSetLocal>{ kind: 'SetLocal', name }, fn)
-    // 4) 写回 env（严格）
+    // 3) 直接写回 env（严格），不建立本地别名
     this.push(<any>{ kind: 'SetEnvVar', name, strict: this.strictMode }, fn)
   }
 
@@ -282,22 +322,16 @@ export class Compiler {
     const topLevel = ts.isSourceFile(node.parent)
     node.declarationList.declarations.forEach(decl => {
       if (!ts.isIdentifier(decl.name)) return
+     
       const name = decl.name.text
       const isLex = (decl.parent.flags & (ts.NodeFlags.Const | ts.NodeFlags.Let)) !== 0
 
       if (topLevel) {
-        // 顶层：qjsc 会同时维护一个本地槽来缓存该全局，且仍通过 check_define_var 宣告到 env
-        // 我们对齐为：DeclareLocal + check_define_var + 初始化 + (dup -> Init/SetLocal) + put_var/put_var_strict
-        // 之后在本编译单元内对该标识符的读写均走本地槽，最终效果与 qjsc 更接近
-        // 先登记本地槽（用于后续 identifier 解析走 local 路径）
-        if (!this.locals.has(name)) {
-          // 保留原始声明种类以维持 TDZ 读/写变体
-          const fakeDecl = decl as ts.VariableDeclaration
-          this.declare(fakeDecl)
-        }
+        // 顶层：与 qjsc 对齐，避免为 env 变量创建本地别名与本地写入，直接声明到 env 并写回 env
         // flags: QuickJS runtime.h -> DEFINE_GLOBAL_LEX_VAR(1<<7), DEFINE_GLOBAL_FUNC_VAR(1<<6)
         const DEFINE_GLOBAL_LEX_VAR = 1 << 7
         const DEFINE_GLOBAL_FUNC_VAR = 1 << 6
+
         let flags = 0
         if (isLex) flags |= DEFINE_GLOBAL_LEX_VAR
         // 变量语句不包含函数声明，这里仅依据字面量初始化，不置 FUNC_VAR
@@ -311,37 +345,40 @@ export class Compiler {
             this.push(<IRLoadConst>{ kind: 'LoadConst', value: Number(decl.initializer.text) }, decl.initializer)
           } else if (ts.isStringLiteral(decl.initializer)) {
             this.push(<IRLoadConst>{ kind: 'LoadConst', value: decl.initializer.text }, decl.initializer)
-          }
-          // 复制一份给本地槽
-          this.push(<IRDup>{ kind: 'Dup' }, decl.initializer)
-          if (isLex) {
-            this.push(<IRInitLocal>{ kind: 'InitLocal', name }, decl.name)
           } else {
-            this.push(<IRSetLocal>{ kind: 'SetLocal', name }, decl.name)
+            // 通用表达式初始化（包括 ++/--、调用、属性访问等）
+            this.lowerExpression(decl.initializer)
           }
-          // 写回 env（严格模式）
+          // 直接写回 env（严格模式）；不建立本地别名，后续读取统一走 env
           this.push(<any>{ kind: 'SetEnvVar', name, strict: this.strictMode }, decl.name)
         }
         // 顶层 env 不登记为本地
       } else {
         // 局部：登记为本地并使用本地初始化
         this.declare(decl)
-        if (decl.initializer && ts.isArrayLiteralExpression(decl.initializer)) {
-          this.lowerArrayLiteral(decl.initializer)
-          this.push(isLex ? (<IRInitLocal>{ kind: 'InitLocal', name }) : (<IRSetLocal>{ kind: 'SetLocal', name }), decl.name)
-          this.localType.set(name, 'unknown')
-        } else if (decl.initializer && ts.isObjectLiteralExpression(decl.initializer)) {
-          this.lowerObjectLiteral(decl.initializer)
-          this.push(isLex ? (<IRInitLocal>{ kind: 'InitLocal', name }) : (<IRSetLocal>{ kind: 'SetLocal', name }), decl.name)
-          this.localType.set(name, 'unknown')
-        } else if (decl.initializer && ts.isNumericLiteral(decl.initializer)) {
-          this.push(<IRLoadConst>{ kind: 'LoadConst', value: Number(decl.initializer.text) }, decl.initializer)
-          this.push(isLex ? (<IRInitLocal>{ kind: 'InitLocal', name }) : (<IRSetLocal>{ kind: 'SetLocal', name }), decl.name)
-          this.localType.set(name, 'number')
-        } else if (decl.initializer && ts.isStringLiteral(decl.initializer)) {
-          this.push(<IRLoadConst>{ kind: 'LoadConst', value: decl.initializer.text }, decl.initializer)
-          this.push(isLex ? (<IRInitLocal>{ kind: 'InitLocal', name }) : (<IRSetLocal>{ kind: 'SetLocal', name }), decl.name)
-          this.localType.set(name, 'string')
+        if (decl.initializer) {
+          if (ts.isArrayLiteralExpression(decl.initializer)) {
+            this.lowerArrayLiteral(decl.initializer)
+            this.push(isLex ? (<IRInitLocal>{ kind: 'InitLocal', name }) : (<IRSetLocal>{ kind: 'SetLocal', name }), decl.name)
+            this.localType.set(name, 'unknown')
+          } else if (ts.isObjectLiteralExpression(decl.initializer)) {
+            this.lowerObjectLiteral(decl.initializer)
+            this.push(isLex ? (<IRInitLocal>{ kind: 'InitLocal', name }) : (<IRSetLocal>{ kind: 'SetLocal', name }), decl.name)
+            this.localType.set(name, 'unknown')
+          } else if (ts.isNumericLiteral(decl.initializer)) {
+            this.push(<IRLoadConst>{ kind: 'LoadConst', value: Number(decl.initializer.text) }, decl.initializer)
+            this.push(isLex ? (<IRInitLocal>{ kind: 'InitLocal', name }) : (<IRSetLocal>{ kind: 'SetLocal', name }), decl.name)
+            this.localType.set(name, 'number')
+          } else if (ts.isStringLiteral(decl.initializer)) {
+            this.push(<IRLoadConst>{ kind: 'LoadConst', value: decl.initializer.text }, decl.initializer)
+            this.push(isLex ? (<IRInitLocal>{ kind: 'InitLocal', name }) : (<IRSetLocal>{ kind: 'SetLocal', name }), decl.name)
+            this.localType.set(name, 'string')
+          } else {
+            // 通用表达式初始化（包括 ++/--、调用、属性访问等）
+            this.lowerExpression(decl.initializer)
+            this.push(isLex ? (<IRInitLocal>{ kind: 'InitLocal', name }) : (<IRSetLocal>{ kind: 'SetLocal', name }), decl.name)
+            this.localType.set(name, 'unknown')
+          }
         }
       }
     })
@@ -359,9 +396,12 @@ export class Compiler {
           this.push(<IRLoadConst>{ kind: 'LoadConst', value: Number(decl.initializer.text) })
           const isLex = (decl.parent.flags & (ts.NodeFlags.Const | ts.NodeFlags.Let)) !== 0
           this.push(isLex ? (<IRInitLocal>{ kind: 'InitLocal', name }) : (<IRSetLocal>{ kind: 'SetLocal', name }))
+          // 对齐 quickjs：for (let i=...) 的循环变量通常记为 closure var
+          if (isLex) this.capturedLocals.add(name)
         }
       })
     }
+
     // 生成唯一标签，避免嵌套/多循环冲突
     const labels = (node as any).__labels as { start: string; end: string; cont: string; name?: string } | undefined
     const loopStart = labels?.start ?? this.newLabel('L_for_start')
@@ -396,19 +436,19 @@ export class Compiler {
     // continue 目标落点
     this.push(<IRLabel>{ kind: 'Label', name: loopContinue }, node.incrementor ?? node)
     
-    // incrementor (i++)
-    if (node.incrementor && ts.isPostfixUnaryExpression(node.incrementor) && node.incrementor.operator === ts.SyntaxKind.PlusPlusToken && ts.isIdentifier(node.incrementor.operand)) {
-      const vname = node.incrementor.operand.text
-      // Lower to: get_loc v ; dup ; inc ; put_loc v ; drop   (equivalent to post_inc + nip)
-      if (this.locals.has(vname)) {
-        this.push(<IRGetLocal>{ kind: 'GetLocal', name: vname }, node.incrementor)
-        this.push(<IRDup>{ kind: 'Dup' }, node.incrementor)
-        this.push(<any>{ kind: 'Inc' } as any, node.incrementor)
-        this.push(<IRSetLocal>{ kind: 'SetLocal', name: vname }, node.incrementor)
-        this.push(<IRDrop>{ kind: 'Drop' }, node.incrementor)
-      } else {
-        // env var ++ not supported in current subset; keep old inc_loc lowering fallback
+    // incrementor：优先优化本地 i++ 为 OP_inc_loc，否则通用降级并丢弃结果
+    if (node.incrementor) {
+      if (
+        ts.isPostfixUnaryExpression(node.incrementor) &&
+        node.incrementor.operator === ts.SyntaxKind.PlusPlusToken &&
+        ts.isIdentifier(node.incrementor.operand) &&
+        this.locals.has(node.incrementor.operand.text)
+      ) {
+        const vname = node.incrementor.operand.text
         this.push(<IRIncLocal>{ kind: 'IncLocal', name: vname }, node.incrementor)
+      } else {
+        this.lowerExpression(node.incrementor)
+        this.push(<IRDrop>{ kind: 'Drop' }, node.incrementor)
       }
     }
     
@@ -448,7 +488,8 @@ export class Compiler {
     return undefined
   }
 
-  private lowerConditionBoolean (expr: ts.Expression, falseLabel: string) {
+  private lowerConditionBoolean (expr: ts.Expression, _falseLabel: string) {
+    // 对比较与逻辑运算进行降级，最终“在栈顶留下一个可被 if_false 使用的值”
     const lowerCompare = (left: ts.Expression, op: ts.SyntaxKind, right: ts.Expression) => {
       // 常量折叠：两侧均为字面量时在编译期直接计算
       if (this.isLiteral(left) && this.isLiteral(right)) {
@@ -471,9 +512,7 @@ export class Compiler {
         }
       }
       this.lowerExpression(left)
-      // 不再插入显式 ToNumber/ToString，保留 JS 运行时语义
       this.lowerExpression(right)
-      // same as above: no explicit conversions
       switch (op) {
         case ts.SyntaxKind.LessThanToken: 
           this.push(<IRLessThan>{ kind: 'LessThan' }, (left.parent ?? left))
@@ -501,60 +540,30 @@ export class Compiler {
 
       if (ts.isBinaryExpression(e)) {
         const op = e.operatorToken.kind
-
         if (op === ts.SyntaxKind.AmpersandAmpersandToken) {
-          // 常量短路：两侧字面量时整体折叠
-          const lt = this.literalTruthiness(e.left)
-          const rt = this.literalTruthiness(e.right)
-
-          if (lt !== undefined && rt !== undefined) {
-            this.push(<IRLoadConst>{ kind: 'LoadConst', value: Boolean(lt && rt) }, e)
-            return
-          }
-          // 左侧可判定时直接决定
-          const t = lt
-          if (t === false) {
-            this.push(<IRLoadConst>{ kind: 'LoadConst', value: false }, e.left)
-            return
-          } else if (t === true) {
-            lowerAsBooleanOnStack(e.right)
-            return
-          }
-
+          // a && b ：若 a 为假，结果为 false；否则取 b
+          const L_false = this.newLabel('L_and_false')
+          const L_after = this.newLabel('L_and_after')
           lowerAsBooleanOnStack(e.left)
-          this.push(<IRJumpIfFalse>{ kind: 'JumpIfFalse', label: falseLabel }, e.operatorToken)
-          
+          this.push(<IRJumpIfFalse>{ kind: 'JumpIfFalse', label: L_false }, e.operatorToken)
           lowerAsBooleanOnStack(e.right)
+          this.push(<IRJumpIfFalse>{ kind: 'JumpIfFalse', label: L_false }, e.operatorToken)
+          this.push(<IRLoadConst>{ kind: 'LoadConst', value: true }, e)
+          this.push(<IRJump>{ kind: 'Jump', label: L_after }, e)
+          this.push(<IRLabel>{ kind: 'Label', name: L_false }, e)
+          this.push(<IRLoadConst>{ kind: 'LoadConst', value: false }, e)
+          this.push(<IRLabel>{ kind: 'Label', name: L_after }, e)
           return
         }
         if (op === ts.SyntaxKind.BarBarToken) {
-          const L_eval_right = 'L_or_eval_right'
-          const L_after = 'L_or_after'
-          const lt = this.literalTruthiness(e.left)
-          const rt = this.literalTruthiness(e.right)
-          
-          if (lt !== undefined && rt !== undefined) { 
-            this.push(<IRLoadConst>{ kind: 'LoadConst', value: Boolean(lt || rt) }, e)
-            return 
-          }
-
-          const t = lt
-
-          if (t === true) {
-            this.push(<IRLoadConst>{ kind: 'LoadConst', value: true }, e.left)
-            return
-          } else if (t === false) {
-            lowerAsBooleanOnStack(e.right)
-            return
-          }
-
+          // a || b ：若 a 为真，结果为 true；否则计算 b
+          const L_eval_right = this.newLabel('L_or_eval_right')
+          const L_after = this.newLabel('L_or_after')
           lowerAsBooleanOnStack(e.left)
-
           this.push(<IRJumpIfFalse>{ kind: 'JumpIfFalse', label: L_eval_right }, e.operatorToken)
           this.push(<IRLoadConst>{ kind: 'LoadConst', value: true }, e)
           this.push(<IRJump>{ kind: 'Jump', label: L_after }, e)
           this.push(<IRLabel>{ kind: 'Label', name: L_eval_right }, e)
-          
           lowerAsBooleanOnStack(e.right)
           this.push(<IRLabel>{ kind: 'Label', name: L_after }, e)
           return
@@ -570,6 +579,7 @@ export class Compiler {
         }
       }
 
+      // 其它表达式：直接按普通表达式降级，依赖 if_false 的 truthy 语义
       this.lowerExpression(e)
     }
 
@@ -688,7 +698,7 @@ export class Compiler {
 
   private processLoopBodyStatement (stmt: ts.Statement) {
     if (ts.isVariableStatement(stmt)) return this.processVariableStatement(stmt)
-    if (ts.isExpressionStatement(stmt) && ts.isCallExpression(stmt.expression)) return this.processCallExpression(stmt.expression)
+    if (ts.isExpressionStatement(stmt)) return this.processExpressionStatement(stmt)
     if (ts.isIfStatement(stmt)) return this.processIfStatement(stmt)
     if (ts.isForStatement(stmt)) return this.processForStatement(stmt)
     if (ts.isWhileStatement(stmt)) return this.processWhileStatement(stmt)
@@ -741,11 +751,11 @@ export class Compiler {
   private lowerArrayPush (objExpr: ts.Expression, arg: ts.Expression) {
     if (!ts.isIdentifier(objExpr)) return
     
-  // QuickJS 期望 [obj, func, ...args]
-  // 压入 obj（作为 this），再 dup 以便从副本上取出方法函数
-  this.lowerExpression(objExpr)
-  this.push(<IRDup>{ kind: 'Dup' }, objExpr)
-  this.push(<IRGetField2>{ kind: 'GetField2', field: 'push' }, objExpr)
+    // QuickJS 期望 [obj, func, ...args]
+    // 压入 obj（作为 this），再 dup 以便从副本上取出方法函数
+    this.lowerExpression(objExpr)
+    this.push(<IRDup>{ kind: 'Dup' }, objExpr)
+    this.push(<IRGetField2>{ kind: 'GetField2', field: 'push' }, objExpr)
     // 4) 压入参数表达式
     this.lowerExpression(arg)
     // 5) 调用方法，argc=1，返回新长度
@@ -756,6 +766,170 @@ export class Compiler {
 
   private lowerExpression (expr: ts.Expression) {
     switch (expr.kind) {
+      case ts.SyntaxKind.PrefixUnaryExpression: {
+        const pe = expr as ts.PrefixUnaryExpression
+        const opnd = pe.operand
+
+        if (pe.operator === ts.SyntaxKind.PlusPlusToken || pe.operator === ts.SyntaxKind.MinusMinusToken) {
+          if (ts.isIdentifier(opnd)) {
+            const name = opnd.text
+            const delta = pe.operator === ts.SyntaxKind.PlusPlusToken ? 1 : -1
+
+            if (this.locals.has(name)) {
+              // ++x/--x for local: get x; push delta; add; dup; set x => leaves new value
+              this.push(<IRGetLocal>{ kind: 'GetLocal', name }, opnd)
+              this.push(<IRPushI32>{ kind: 'PushI32', value: delta }, opnd)
+              this.push(<IRAdd>{ kind: 'Add' }, opnd)
+              this.push(<IRDup>{ kind: 'Dup' }, opnd)
+              this.push(<IRSetLocal>{ kind: 'SetLocal', name }, opnd)
+            } else {
+              // env/global ++x/--x
+              this.push(<any>{ kind: 'GetEnvVar', name, strict: this.strictMode } as any, opnd)
+              this.push(<IRPushI32>{ kind: 'PushI32', value: delta }, opnd)
+              this.push(<IRAdd>{ kind: 'Add' }, opnd)
+              this.push(<IRDup>{ kind: 'Dup' }, opnd)
+              this.push(<any>{ kind: 'SetEnvVar', name, strict: this.strictMode } as any, opnd)
+            }
+            return
+          } else if (ts.isPropertyAccessExpression(opnd)) {
+            // 前缀属性 ++/--：纯栈，新值作为表达式结果
+            const pa = opnd
+            const field = pa.name.text
+            // obj ; dup ; get_field2 ; inc/dec ; dup ; rot3r ; put_field -> leaves new
+            this.lowerExpression(pa.expression) // obj
+            this.push(<IRDup>{ kind: 'Dup' }, opnd)
+            this.push(<IRGetField2>{ kind: 'GetField2', field }, pa.name)
+            if (pe.operator === ts.SyntaxKind.PlusPlusToken) {
+              this.push(<any>{ kind: 'Inc' } as any, opnd)
+            } else {
+              this.push(<IRPushI32>{ kind: 'PushI32', value: -1 }, opnd)
+              this.push(<IRAdd>{ kind: 'Add' }, opnd)
+            }
+            this.push(<IRDup>{ kind: 'Dup' }, opnd)
+            this.push(<IRRot3R>{ kind: 'Rot3R' }, opnd)
+            this.push(<IRPutField>{ kind: 'PutField', name: field }, pa.name)
+            return
+          } else if (ts.isElementAccessExpression(opnd)) {
+            // 前缀元素 ++/--：纯栈，结果为新值（arr 与 index 仅求值一次）
+            const ea = opnd
+            // 压入 arr, index
+            this.lowerExpression(ea.expression)
+            if (ea.argumentExpression) this.lowerExpression(ea.argumentExpression)
+            // 复制一对 [arr, index]：Dup1; Dup; Rot4L; Swap -> [arr, index, arr, index]
+            this.push(<IRDup1>{ kind: 'Dup1' }, opnd)
+            this.push(<IRDup>{ kind: 'Dup' }, opnd)
+            this.push(<IRRot4L>{ kind: 'Rot4L' }, opnd)
+            this.push(<IRSwap>{ kind: 'Swap' }, opnd)
+            // 读取 arr[index]
+            this.push(<IRGetArrayEl>{ kind: 'GetArrayEl' }, opnd)
+            // 计算新值
+            if (pe.operator === ts.SyntaxKind.PlusPlusToken) {
+              this.push(<any>{ kind: 'Inc' } as any, opnd)
+            } else {
+              this.push(<IRPushI32>{ kind: 'PushI32', value: -1 }, opnd)
+              this.push(<IRAdd>{ kind: 'Add' }, opnd)
+            }
+            // 复制新值，重排并写回，保留新值作为表达式结果
+            this.push(<IRDup>{ kind: 'Dup' }, opnd)
+            this.push(<IRRot4L>{ kind: 'Rot4L' }, opnd)
+            this.push(<IRRot4L>{ kind: 'Rot4L' }, opnd)
+            this.push(<IRRot3R>{ kind: 'Rot3R' }, opnd)
+            this.push(<IRRot3R>{ kind: 'Rot3R' }, opnd)
+            this.push(<IRPutArrayEl>{ kind: 'PutArrayEl' }, opnd)
+            return
+          }
+        }
+        return
+      }
+      case ts.SyntaxKind.PostfixUnaryExpression: {
+        const pe = expr as ts.PostfixUnaryExpression
+
+        if (pe.operator === ts.SyntaxKind.PlusPlusToken || pe.operator === ts.SyntaxKind.MinusMinusToken) {
+          const opnd = pe.operand
+          if (ts.isIdentifier(opnd)) {
+            const name = opnd.text
+
+            if (this.locals.has(name)) {
+              // x++/x-- in expression context (local)
+              // ++: get x; dup; inc; put x      --: get x; dup; push -1; add; put x
+              this.push(<IRGetLocal>{ kind: 'GetLocal', name }, opnd)
+              this.push(<IRDup>{ kind: 'Dup' }, opnd)
+
+              if (pe.operator === ts.SyntaxKind.PlusPlusToken) {
+                this.push(<any>{ kind: 'Inc' } as any, opnd)
+              } else {
+                this.push(<IRPushI32>{ kind: 'PushI32', value: -1 }, opnd)
+                this.push(<IRAdd>{ kind: 'Add' }, opnd)
+              }
+
+              this.push(<IRSetLocal>{ kind: 'SetLocal', name }, opnd)
+            } else {
+              // env/global x++/x--
+              this.push(<any>{ kind: 'GetEnvVar', name, strict: this.strictMode } as any, opnd)
+              this.push(<IRDup>{ kind: 'Dup' }, opnd)
+
+              if (pe.operator === ts.SyntaxKind.PlusPlusToken) {
+                this.push(<any>{ kind: 'Inc' } as any, opnd)
+              } else {
+                this.push(<IRPushI32>{ kind: 'PushI32', value: -1 }, opnd)
+                this.push(<IRAdd>{ kind: 'Add' }, opnd)
+              }
+
+              this.push(<any>{ kind: 'SetEnvVar', name, strict: this.strictMode } as any, opnd)
+            }
+            return
+          } else if (ts.isPropertyAccessExpression(opnd)) {
+            // 后缀属性 ++/--：纯栈，结果为旧值
+            const pa = opnd
+            const field = pa.name.text
+            // obj ; dup ; get_field2 ; dup(old) ; rot3r ; inc/dec ; put_field -> leaves old
+            this.lowerExpression(pa.expression) // obj
+            this.push(<IRDup>{ kind: 'Dup' }, opnd)
+            this.push(<IRGetField2>{ kind: 'GetField2', field }, pa.name)
+            this.push(<IRDup>{ kind: 'Dup' }, opnd)
+            this.push(<IRRot3R>{ kind: 'Rot3R' }, opnd)
+            if (pe.operator === ts.SyntaxKind.PlusPlusToken) {
+              this.push(<any>{ kind: 'Inc' } as any, opnd)
+            } else {
+              this.push(<IRPushI32>{ kind: 'PushI32', value: -1 }, opnd)
+              this.push(<IRAdd>{ kind: 'Add' }, opnd)
+            }
+            this.push(<IRPutField>{ kind: 'PutField', name: field }, pa.name)
+            return
+          } else if (ts.isElementAccessExpression(opnd)) {
+            // 后缀元素 ++/--：纯栈，结果为旧值（arr 与 index 仅求值一次）
+            const ea = opnd
+            // 压入 arr, index
+            this.lowerExpression(ea.expression)
+            if (ea.argumentExpression) this.lowerExpression(ea.argumentExpression)
+            // 复制一对：[arr, index, arr, index]
+            this.push(<IRDup1>{ kind: 'Dup1' }, opnd)
+            this.push(<IRDup>{ kind: 'Dup' }, opnd)
+            this.push(<IRRot4L>{ kind: 'Rot4L' }, opnd)
+            this.push(<IRSwap>{ kind: 'Swap' }, opnd)
+            // 读取旧值
+            this.push(<IRGetArrayEl>{ kind: 'GetArrayEl' }, opnd)
+            // 复制旧值作为表达式结果
+            this.push(<IRDup>{ kind: 'Dup' }, opnd)
+            // 计算新值（作用于栈顶副本）
+            if (pe.operator === ts.SyntaxKind.PlusPlusToken) {
+              this.push(<any>{ kind: 'Inc' } as any, opnd)
+            } else {
+              this.push(<IRPushI32>{ kind: 'PushI32', value: -1 }, opnd)
+              this.push(<IRAdd>{ kind: 'Add' }, opnd)
+            }
+            // 重排为 [old, arr, index, new] 并写回
+            this.push(<IRRot4L>{ kind: 'Rot4L' }, opnd)
+            this.push(<IRRot4L>{ kind: 'Rot4L' }, opnd)
+            this.push(<IRRot3R>{ kind: 'Rot3R' }, opnd)
+            this.push(<IRRot3R>{ kind: 'Rot3R' }, opnd)
+            this.push(<IRPutArrayEl>{ kind: 'PutArrayEl' }, opnd)
+            return
+          }
+        }
+        // fallback: not handled here
+        return
+      }
       case ts.SyntaxKind.ArrayLiteralExpression:
         return this.lowerArrayLiteral(expr as ts.ArrayLiteralExpression)
       case ts.SyntaxKind.BinaryExpression:
@@ -920,6 +1094,7 @@ export class Compiler {
         this.push(<IRPutField>{ kind: 'PutField', name: pa.name.text }, pa.name)
         return
       }
+
       // local/env = value
       if (ts.isIdentifier(bin.left)) {
         const name = bin.left.text

@@ -1,0 +1,16 @@
+BC_VERSION=5 atoms=6 name=undefined
+   0 OP_check_define_var  2b e7 00 00 00 atom=231
+   6 OP_fclosure8  34 00 index=0
+   8 OP_define_func  32 e7 00 00 00 atom=231
+  14 OP_put_var_strict  28 e7 00 00 00 atom=231
+  19 OP_check_define_var  2b e8 00 00 00 atom=232
+  25 OP_fclosure8  34 00 index=0
+  27 OP_define_func  32 e8 00 00 00 atom=232
+  33 OP_put_var_strict  28 e8 00 00 00 atom=232
+  38 OP_check_define_var  2b e9 00 00 00 atom=233
+  44 OP_add  05
+  45 OP_put_var_strict  28 e9 00 00 00 atom=233
+  50 OP_return_undef  0c
+
+CFG:
+B0 -> 
