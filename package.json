@@ -10,13 +10,15 @@
     "start": "tsx src/cli.ts",
     "compile": "tsx scripts/compile.ts",
     "eval": "tsx scripts/eval.ts",
-    "test:advanced": "pnpm -s start __tests__/advanced.ts --disasm --pc2line --debug && pnpm -s exec qjs dist/advanced.bin",
     "dump": "tsx scripts/dump.ts",
-    "qjsc": "docker run --rm -v $(pwd):/app aniwei/quickjs qjsc",
-    "compare": "tsx scripts/compare-with-wasm.ts"
+    "compare": "tsx scripts/compare-with-wasm.ts",
+    "test": "jest"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.19.13",
+    "jest": "^30.1.3",
+    "ts-jest": "^29.4.4",
     "typescript": "^5.9.2"
   },
   "dependencies": {

@@ -52,6 +52,14 @@ export class QuickJSBinding {
     console.log(String(text || ''))
   }
 
+  static async dumpBytesToString(bytes: Uint8Array | Buffer): Promise<string> {
+    const QuickJSModule = await QuickJSBinding.getQuickJSModule()
+    const input = new QuickJSModule.Uint8Array()
+    for (let i = 0; i < bytes.length; i++) input.push_back(bytes[i])
+    const text = QuickJSModule.QuickJSBinding.dumpWithBinary(input, new QuickJSModule.StringArray())
+    return String(text || '')
+  }
+
   static async getOpcodes() {
     const QuickJSModule = await QuickJSBinding.getQuickJSModule()
     const opcodesMap = QuickJSModule.QuickJSBinding.getAllOpCodes()

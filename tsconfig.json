@@ -7,7 +7,7 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["./types.d.ts", "node"]
+    "types": ["./types.d.ts", "node", "jest"]
   },
   "include": [
     "types.d.ts", 
