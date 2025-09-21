@@ -6,22 +6,18 @@
   "scripts": {
     "gen:env": "tsx scripts/gen-env.ts",
     "build": "npm run gen:env && tsc",
-    "dump:wasm": "tsx scripts/dump-with-wasm.ts",
-    "validate:bin": "tsx scripts/validate-bin-with-wasm.ts",
-    "dump:both": "tsx scripts/dump-both.ts",
-    "build:wasm": "tsx scripts/build-bytecode-wasm.ts",
-    "compile:wasm": "tsx scripts/compile-with-wasm.ts",
-    "compile:ts": "tsx scripts/compile-with-ts.ts",
-    "run:wasm": "tsx scripts/run-with-wasm.ts",
+    "build:wasm": "tsx scripts/buildWasm.ts",
     "start": "tsx src/cli.ts",
-    "align:qjs": "tsx scripts/auto-align-quickjs.ts",
-    "validate": "tsx scripts/validate-compile.ts",
-    "compare": "tsx scripts/compare-with-wasm.ts",
-    "compare:batch": "tsx scripts/batch-compare.ts"
+    "compile": "tsx scripts/compile.ts",
+    "eval": "tsx scripts/eval.ts",
+    "test:advanced": "pnpm -s start __tests__/advanced.ts --disasm --pc2line --debug && pnpm -s exec qjs dist/advanced.bin",
+    "dump": "tsx scripts/dump.ts",
+    "qjsc": "docker run --rm -v $(pwd):/app aniwei/quickjs qjsc",
+    "compare": "tsx scripts/compare-with-wasm.ts"
   },
   "devDependencies": {
     "@types/node": "^20.19.13",
-    "typescript": "^5.3.3"
+    "typescript": "^5.9.2"
   },
   "dependencies": {
     "tsx": "^4.20.5"

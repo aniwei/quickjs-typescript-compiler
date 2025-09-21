@@ -1,8 +1,0 @@
-digraph CFG {
-  rankdir=TB;
-  "B0" [label="B0\n[0, 33)"];
-  "B33" [label="B33\n[33, 68)"];
-  "B68" [label="B68\n[68, 278)"];
-  "B278" [label="B278\n[278, 63)"];
-  "B0" -> "B33";
-}

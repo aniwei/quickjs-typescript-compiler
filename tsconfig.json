@@ -9,9 +9,13 @@
     "skipLibCheck": true,
     "types": ["./types.d.ts", "node"]
   },
-  "include": ["src/**/*", "scripts/**/*.ts", "__tests__", "types.d.ts", "__tests__/decl.js"],
+  "include": [
+    "types.d.ts", 
+    "example/**/*.ts", 
+    "scripts/**/*.ts", 
+    "src/**/*.ts"
+  ],
   "exclude": [
-    // 临时排除未完成的自动生成文件，避免语法错误干扰当前编译
-    "src/Op.ts"
+    
   ]
 }
