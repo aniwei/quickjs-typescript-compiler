@@ -17,7 +17,7 @@ async function main() {
   }
 
   const outPath = absIn.replace(/\.ts$/, '.bin')
-  const bytecode = await QuickJSLib.compileSourcePath(absIn)
+  const bytecode = await QuickJSLib.compileSourceWithPath(absIn)
   await fs.writeFile(outPath, bytecode)
 
   await QuickJSLib.dumpWithBinaryPath(outPath) 

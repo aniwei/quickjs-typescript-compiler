@@ -20,7 +20,7 @@ async function main() {
   const absOut = path.resolve(outFile)
 
   await ensureDir(absOut)
-  const bytecode = await QuickJSLib.compileSourcePath(absIn) 
+  const bytecode = await QuickJSLib.compileSourceWithPath(absIn) 
   await fs.writeFile(absOut, Buffer.from(bytecode))
 
   console.log(

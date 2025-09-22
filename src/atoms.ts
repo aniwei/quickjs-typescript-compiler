@@ -124,11 +124,13 @@ export enum JSAtom {
   JS_ATOM_clear,
   JS_ATOM_dir,
   JS_ATOM_dirxml,
-  JS_ATOM_trace
+  JS_ATOM_trace,
+  // End marker - this should match QuickJS quickjs-atom.h
+  JS_ATOM_END
 }
 
-// Atom string mapping
-export const ATOM_STRINGS: Record<JSAtom, string> = {
+// Atom string mapping (excludes JS_ATOM_END which is just a marker)
+export const ATOM_STRINGS: Partial<Record<JSAtom, string>> = {
   [JSAtom.JS_ATOM_null]: 'null',
   [JSAtom.JS_ATOM_false]: 'false',
   [JSAtom.JS_ATOM_true]: 'true',
@@ -243,17 +245,20 @@ export const ATOM_STRINGS: Record<JSAtom, string> = {
   [JSAtom.JS_ATOM_dir]: 'dir',
   [JSAtom.JS_ATOM_dirxml]: 'dirxml',
   [JSAtom.JS_ATOM_trace]: 'trace'
+  // Note: JS_ATOM_END is not included as it's just a marker
 }
 
 // Atom table management
 export class AtomTable {
   private atoms = new Map<string, number>()
-  private nextAtomId = Object.keys(JSAtom).length / 2 // Start after predefined atoms
+  private nextAtomId = JSAtom.JS_ATOM_END // Start after predefined atoms
   
   constructor() {
-    // Initialize with predefined atoms
+    // Initialize with predefined atoms (excluding JS_ATOM_END)
     for (const [atomId, atomStr] of Object.entries(ATOM_STRINGS)) {
-      this.atoms.set(atomStr, parseInt(atomId))
+      if (atomStr) { // Only add if atomStr is defined
+        this.atoms.set(atomStr, parseInt(atomId))
+      }
     }
   }
 
@@ -282,11 +287,38 @@ export class AtomTable {
   // Check if string is a predefined atom
   isPredefinedAtom(str: string): boolean {
     const id = this.atoms.get(str)
-    return id !== undefined && id < Object.keys(JSAtom).length / 2
+    return id !== undefined && id < JSAtom.JS_ATOM_END
   }
 
   // Get all atoms for bytecode generation
   getAllAtoms(): Map<string, number> {
     return new Map(this.atoms)
+  }
+  
+  // Get total atom count
+  getAtomCount(): number {
+    return this.atoms.size
+  }
+  
+  // Get user-defined atoms (for bytecode generation)
+  getUserAtoms(): Map<string, number> {
+    const userAtoms = new Map<string, number>()
+    for (const [str, id] of this.atoms) {
+      if (id >= JSAtom.JS_ATOM_END) {
+        userAtoms.set(str, id)
+      }
+    }
+    return userAtoms
+  }
+  
+  // Get user atom count (only atoms >= JS_ATOM_END)
+  getUserAtomCount(): number {
+    let count = 0
+    for (const [, id] of this.atoms) {
+      if (id >= JSAtom.JS_ATOM_END) {
+        count++
+      }
+    }
+    return count
   }
 }

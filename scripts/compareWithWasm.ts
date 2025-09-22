@@ -9,6 +9,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { TypeScriptCompiler } from '../src/index'
+import { QuickJSLib } from './QuickJSLib'
 
 interface ComparisonOptions {
   inputTs: string
@@ -75,9 +76,9 @@ class BytecodeComparator {
       debug: false,
       strictMode: false
     })
-    
-    const bytecode = compiler.compile(sourceCode)
-    
+
+    const bytecode = compiler.compile(sourceCode, path.relative(process.cwd(), this.options.inputTs))
+
     let disassembly: string | undefined
     if (this.options.disasm) {
       disassembly = await this.disassembleBytecode(bytecode, 'ts')
@@ -94,7 +95,7 @@ class BytecodeComparator {
   private async compileWithWasm(): Promise<CompilationResult> {
     try {
       // Check if QuickJS WASM is available
-      const wasmPath = path.join('third_party', 'QuickJS', 'wasm', 'quickjs.wasm')
+      const wasmPath = path.join('third_party', 'QuickJS', 'wasm', 'output', 'quickjs_wasm.wasm')
       
       try {
         await fs.access(wasmPath)
@@ -106,15 +107,17 @@ class BytecodeComparator {
       // Use JavaScript input if provided, otherwise convert TypeScript
       let jsCode: string
       if (this.options.inputJs) {
+        // Read the JavaScript file directly
         jsCode = await fs.readFile(this.options.inputJs, 'utf-8')
       } else {
-        // Simple TypeScript to JavaScript conversion (remove types)
+        // Convert TypeScript to JavaScript by stripping types
         const tsCode = await fs.readFile(this.options.inputTs, 'utf-8')
         jsCode = this.stripTypeScript(tsCode)
       }
       
       // Compile with QuickJS WASM (placeholder - would need actual WASM binding)
-      const bytecode = await this.compileJavaScriptWithWasm(jsCode)
+      const inputFileName = this.options.inputJs || this.options.inputTs
+      const bytecode = await this.compileJavaScriptWithWasm(jsCode, inputFileName)
       
       let disassembly: string | undefined
       if (this.options.disasm) {
@@ -152,20 +155,8 @@ class BytecodeComparator {
       .replace(/:\s*\w+\s*$/g, '')
   }
 
-  private async compileJavaScriptWithWasm(jsCode: string): Promise<Uint8Array> {
-    // Placeholder for actual WASM compilation
-    // This would use the QuickJS WASM module to compile JavaScript
-    
-    // For now, return a simple bytecode representation
-    const encoder = new TextEncoder()
-    const encoded = encoder.encode(jsCode)
-    
-    // Add some mock bytecode header
-    const header = new Uint8Array([0x51, 0x4A, 0x53, 0x01]) // "QJS" + version
-    const result = new Uint8Array(header.length + encoded.length)
-    result.set(header)
-    result.set(encoded, header.length)
-    
+  private async compileJavaScriptWithWasm(jsCode: string, jsPath?: string): Promise<Uint8Array> {
+    const result = await QuickJSLib.compileSource(jsCode, jsPath);
     return result
   }
 
@@ -321,7 +312,8 @@ async function main() {
   if (args.length === 0) {
     console.log('Usage: compareWithWasm.ts <input.ts> [options]')
     console.log('Options:')
-    console.log('  --input-js <file>      JavaScript input file for WASM compilation')
+    console.log('  --input-js <file>      JavaScript input file for TypeScript compilation')
+    console.log('  --input-ts <file>      TypeScript input file (required)')
     console.log('  --disasm               Generate disassembly')
     console.log('  --normalize-short      Disable short opcode optimization')
     console.log('  --side-by-side         Show side-by-side disassembly')
@@ -339,6 +331,9 @@ async function main() {
     switch (args[i]) {
       case '--input-js':
         options.inputJs = args[++i]
+        break
+      case '--input-ts':
+        options.inputTs = args[++i]
         break
       case '--disasm':
         options.disasm = true

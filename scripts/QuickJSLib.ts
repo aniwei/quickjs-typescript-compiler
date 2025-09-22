@@ -85,11 +85,10 @@ export class QuickJSLib {
     }
   }
 
-  static async compileSourcePath(sourcePath: string, cwd?: string): Promise<Buffer> {
+  static async compileSource(source: string, sourcePath: string = '<eval>', cwd?: string): Promise<Buffer> {
     const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    const source = readFileSync(sourcePath, 'utf-8')
 
-    const result = QuickJSModule.QuickJSLib.compile(
+    const result = await QuickJSModule.QuickJSBinding.compile(
       source, 
       relative(cwd || process.cwd(), sourcePath), 
       new QuickJSModule.StringArray())
@@ -98,6 +97,13 @@ export class QuickJSLib {
     for (let i = 0; i < result.size(); i++) {
       output[i] = result.get(i)
     }
+    
     return output
+  }
+
+  static async compileSourceWithPath(sourcePath: string, cwd?: string): Promise<Buffer> {
+    const QuickJSModule = await QuickJSLib.getQuickJSModule()
+    const source = readFileSync(sourcePath, 'utf-8')
+    return this.compileSource(source, sourcePath, cwd)
   }
 }

@@ -364,9 +364,9 @@ export class BytecodeWriter {
     this.buffer[position + 3] = (address >> 24) & 0xFF
   }
   
-  // Finalize and get bytecode
+  // Finalize and get bytecode in QuickJS JS_WriteObject format
   finalize(): Uint8Array {
-    // Resolve all label patches
+    // Resolve all label patches first
     for (const [label, patches] of this.labelManager.getPatches()) {
       const address = this.labelManager.getAddress(label)
       if (address !== undefined) {
@@ -376,7 +376,158 @@ export class BytecodeWriter {
       }
     }
     
-    return new Uint8Array(this.buffer)
+    // Generate QuickJS-compatible bytecode format
+    return this.generateQuickJSBytecode()
+  }
+  
+  // Generate bytecode in QuickJS JS_WriteObject format
+  private generateQuickJSBytecode(): Uint8Array {
+    const chunks: Uint8Array[] = []
+    
+    // 1. Write BC_VERSION (1 byte)
+    const bcVersion = this.config.bigInt ? 0x45 : 0x05
+    chunks.push(new Uint8Array([bcVersion]))
+    
+    // 2. Write user atom count (LEB128) - only atoms >= JS_ATOM_END
+    const userAtomCount = this.atomTable.getUserAtomCount()
+    chunks.push(LEB128.encode(userAtomCount))
+    
+    // 3. Write all user atom strings (only >= JS_ATOM_END)
+    const userAtoms = this.atomTable.getUserAtoms()
+    const sortedUserAtoms = Array.from(userAtoms.entries()).sort((a, b) => a[1] - b[1])
+    
+    for (const [atomString, ] of sortedUserAtoms) {
+      const atomData = this.encodeString(atomString)
+      chunks.push(atomData)
+    }
+    
+    // 4. Write function bytecode tag
+    chunks.push(new Uint8Array([0x0C])) // BC_TAG_FUNCTION_BYTECODE
+    
+    // 5. Write function flags (minimal for simple function)
+    chunks.push(new Uint8Array([0x00, 0x00])) // flags: 16 bits
+    chunks.push(new Uint8Array([0x00])) // js_mode: strict mode
+    
+    // 6. Write function name atom (use first atom or create anonymous)
+    chunks.push(LEB128.encode(0)) // Anonymous function uses atom 0
+    
+    // 7. Write function parameters
+    chunks.push(LEB128.encode(0)) // arg_count
+    chunks.push(LEB128.encode(0)) // var_count
+    chunks.push(LEB128.encode(0)) // defined_arg_count
+    chunks.push(LEB128.encode(8)) // stack_size (default)
+    chunks.push(LEB128.encode(0)) // closure_var_count
+    chunks.push(LEB128.encode(this.constants.size())) // cpool_count
+    chunks.push(LEB128.encode(this.buffer.length)) // byte_code_len
+    
+    // 8. Write vardefs (empty for now)
+    chunks.push(LEB128.encode(0)) // vardefs count
+    
+    // 9. Write actual bytecode
+    chunks.push(new Uint8Array(this.buffer))
+    
+    // 10. Write constant pool
+    for (let i = 0; i < this.constants.size(); i++) {
+      const constant = this.constants.get(i)
+      const constantData = this.encodeConstant(constant)
+      chunks.push(constantData)
+    }
+    
+    // Combine all chunks
+    const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0)
+    const result = new Uint8Array(totalLength)
+    let offset = 0
+    
+    for (const chunk of chunks) {
+      result.set(chunk, offset)
+      offset += chunk.length
+    }
+    
+    return result
+  }
+  
+  // Encode string in QuickJS format
+  private encodeString(str: string): Uint8Array {
+    const utf8 = new TextEncoder().encode(str)
+    const chunks: Uint8Array[] = []
+    
+    // String length (LEB128)
+    chunks.push(LEB128.encode(utf8.length))
+    
+    // String data
+    chunks.push(utf8)
+    
+    const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0)
+    const result = new Uint8Array(totalLength)
+    let offset = 0
+    
+    for (const chunk of chunks) {
+      result.set(chunk, offset)
+      offset += chunk.length
+    }
+    
+    return result
+  }
+  
+  // Encode constant value
+  private encodeConstant(value: any): Uint8Array {
+    if (typeof value === 'number') {
+      if (Number.isInteger(value) && value >= -2147483648 && value <= 2147483647) {
+        // BC_TAG_INT32
+        const chunks: Uint8Array[] = []
+        chunks.push(new Uint8Array([0x05])) // BC_TAG_INT32
+        chunks.push(LEB128.encodeSigned(value))
+        
+        const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0)
+        const result = new Uint8Array(totalLength)
+        let offset = 0
+        
+        for (const chunk of chunks) {
+          result.set(chunk, offset)
+          offset += chunk.length
+        }
+        
+        return result
+      } else {
+        // BC_TAG_FLOAT64
+        const chunks: Uint8Array[] = []
+        chunks.push(new Uint8Array([0x06])) // BC_TAG_FLOAT64
+        
+        const float64Array = new Float64Array([value])
+        const uint8Array = new Uint8Array(float64Array.buffer)
+        chunks.push(uint8Array)
+        
+        const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0)
+        const result = new Uint8Array(totalLength)
+        let offset = 0
+        
+        for (const chunk of chunks) {
+          result.set(chunk, offset)
+          offset += chunk.length
+        }
+        
+        return result
+      }
+    } else if (typeof value === 'string') {
+      // BC_TAG_STRING
+      const chunks: Uint8Array[] = []
+      chunks.push(new Uint8Array([0x07])) // BC_TAG_STRING
+      chunks.push(this.encodeString(value))
+      
+      const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0)
+      const result = new Uint8Array(totalLength)
+      let offset = 0
+      
+      for (const chunk of chunks) {
+        result.set(chunk, offset)
+        offset += chunk.length
+      }
+      
+      return result
+    }
+    
+    // Default: null
+    return new Uint8Array([0x01]) // BC_TAG_NULL
   }
   
   // Get instructions for debugging
