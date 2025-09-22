@@ -6,8 +6,10 @@
 import ts from 'typescript'
 import { CompilerFlags, OPCODES, getAllOpcodes } from './opcodes'
 import { AtomTable, JSAtom } from './atoms'
-import { BytecodeWriter, Constants, LabelManager } from './bytecode'
+import { BytecodeWriter } from './bytecode'
 import { createOpcodeGenerator, OpcodeGenerator } from './opcodeGenerator'
+import { Constants } from './constant'
+import { LabelManager } from './label'
 
 export interface CompilerContext {
   sourceFile: ts.SourceFile

@@ -34,9 +34,9 @@ class QuickJSBinding {
 
   static uint32_t getFirstAtomId();
 
-  static std::map<std::string, uint32_t> getAllAtomIds();
+  static std::map<std::string, uint32_t> getAtomMap();
 
-  static std::map<std::string, uint32_t> getAllOpcodeIds();
+  static std::map<std::string, uint32_t> getOpcodeMap();
 
   static std::string dumpWithBinary(
     std::vector<uint8_t> bytes,

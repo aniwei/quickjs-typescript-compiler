@@ -1,6 +1,6 @@
 import { existsSync, promises as fs } from 'node:fs'
 import * as path from 'node:path'
-import { QuickJSLib } from './QuickJSLib.js'
+import { QuickJSLib } from './QuickJSLib'
 
 async function main() {
   const [ , , inFile] = process.argv

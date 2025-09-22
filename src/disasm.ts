@@ -3,7 +3,7 @@
  * Generates detailed assembly output similar to QuickJS WASM output
  */
 
-import { LEB128 } from './bytecode'
+import { LEB128 } from './leb128'
 import { OPCODES } from './opcodes'
 
 export interface DisassemblyResult {

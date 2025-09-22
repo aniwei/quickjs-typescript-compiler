@@ -2,6 +2,11 @@ import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve, relative, basename } from 'node:path'
 
+interface Atom {
+  id: number
+  key: string
+}
+
 export class QuickJSLib {
   static QuickJSModule: unknown = null
 
@@ -82,12 +87,25 @@ export class QuickJSLib {
     return QuickJSModule.QuickJSLib.getFirstAtomId()
   }
 
-  static async getConfig() {
+  static async getAllAtoms() {
     const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    const config = QuickJSModule.QuickJSLib.getConfig()
-    return {
-      bignum: config.get('bignum')
+    const atomMap = QuickJSModule.QuickJSBinding.getAtomMap()
+
+    const atoms: Atom[] = []
+    const keys = atomMap.keys()
+    
+    for (let i = 0; i < keys.size(); i++) {
+      const key = keys.get(i)
+      atoms.push({ id: atomMap.get(key), key })
     }
+
+    return atoms
+  }
+
+  static async getCompileOptions() {
+    const QuickJSModule = await QuickJSLib.getQuickJSModule()
+    const options = QuickJSModule.QuickJSLib.getCompileOptions()
+    return options
   }
 
   static async compileSource(source: string, sourcePath: string = '<eval>', cwd?: string): Promise<Buffer> {
