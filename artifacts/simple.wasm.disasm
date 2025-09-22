@@ -1,0 +1,6 @@
+--- WASM Disassembly ---
+Bytecode size: 20 bytes
+
+00000000: 51 4a 53 01 63 6f 6e 73 74 20 61 20 3d 20 31 20 |QJS.const a = 1 |
+00000010: 2b 20 32 0a                                     |+ 2.|
+--- End Disassembly ---

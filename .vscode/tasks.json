@@ -12,7 +12,7 @@
 		{
 			"label": "compare-compute",
 			"type": "shell",
-			"command": "pnpm -s exec tsx scripts/compare-with-wasm.ts __tests__/compute.ts --input-js __tests__/compute.js --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compute.ts --input-js __tests__/compute.js --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
 			"problemMatcher": [
 				"$tsc"
 			],

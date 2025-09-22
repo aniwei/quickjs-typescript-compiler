@@ -1,6 +1,6 @@
 import { promises as fs } from 'node:fs'
 import * as path from 'node:path'
-import { QuickJSBinding } from './QuickJSBinding.js'
+import { QuickJSLib } from './QuickJSLib'
 
 
 async function ensureDir(filePath: string) {
@@ -20,7 +20,7 @@ async function main() {
   const absOut = path.resolve(outFile)
 
   await ensureDir(absOut)
-  const bytecode = await QuickJSBinding.compileSourcePath(absIn) 
+  const bytecode = await QuickJSLib.compileSourcePath(absIn) 
   await fs.writeFile(absOut, Buffer.from(bytecode))
 
   console.log(

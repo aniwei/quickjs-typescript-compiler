@@ -1,7 +1,7 @@
-import { QuickJSBinding } from './QuickJSBinding'
+import { QuickJSLib } from './QuickJSLib'
 
 async function main() {
-  const version = await QuickJSBinding.getBytecodeVersion()
+  const version = await QuickJSLib.getBytecodeVersion()
   console.log('QuickJS Bytecode Version:', version)
 }
 

@@ -1,0 +1,9 @@
+--- WASM Disassembly ---
+Bytecode size: 76 bytes
+
+00000000: 51 4a 53 01 63 6f 6e 73 74 20 61 72 72 20 3d 20 |QJS.const arr = |
+00000010: 5b 31 2c 20 32 2c 20 33 5d 3b 0a 66 6f 72 20 28 |[1, 2, 3];.for (|
+00000020: 63 6f 6e 73 74 20 69 74 65 6d 20 6f 66 20 61 72 |const item of ar|
+00000030: 72 29 20 7b 0a 20 20 63 6f 6e 73 6f 6c 65 2e 6c |r) {.  console.l|
+00000040: 6f 67 28 69 74 65 6d 29 3b 0a 7d 0a             |og(item);.}.|
+--- End Disassembly ---

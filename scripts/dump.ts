@@ -1,6 +1,6 @@
 import { existsSync, promises as fs } from 'node:fs'
 import * as path from 'node:path'
-import { QuickJSBinding } from './QuickJSBinding.js'
+import { QuickJSLib } from './QuickJSLib'
 
 async function main() {
   const [ , , inFile] = process.argv
@@ -17,10 +17,10 @@ async function main() {
   }
 
   const outPath = absIn.replace(/\.ts$/, '.bin')
-  const bytecode = await QuickJSBinding.compileSourcePath(absIn)
+  const bytecode = await QuickJSLib.compileSourcePath(absIn)
   await fs.writeFile(outPath, bytecode)
 
-  await QuickJSBinding.dumpWithBinaryPath(outPath) 
+  await QuickJSLib.dumpWithBinaryPath(outPath) 
   
   console.log(
     `✅ 运行成功: ${path.relative(process.cwd(), absIn)}`)

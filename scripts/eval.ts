@@ -1,6 +1,6 @@
 import { existsSync, promises as fs } from 'node:fs'
 import * as path from 'node:path'
-import { QuickJSBinding } from './QuickJSBinding.js'
+import { QuickJSLib } from './QuickJSLib.js'
 
 async function main() {
   const [ , , inFile] = process.argv
@@ -16,7 +16,7 @@ async function main() {
     process.exit(1)
   }
 
-  const result = await QuickJSBinding.runWithBinaryPath(absIn) 
+  const result = await QuickJSLib.runWithBinaryPath(absIn) 
   
   console.log(
     `✅ 运行成功: ${path.relative(process.cwd(), absIn)}`)

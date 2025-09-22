@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve, relative, basename } from 'node:path'
 
-export class QuickJSBinding {
+export class QuickJSLib {
   static QuickJSModule: unknown = null
 
   static ensureWasmBuilt () {
@@ -17,18 +17,18 @@ export class QuickJSBinding {
   }
 
   static getQuickJSModule = async () => {
-    if (QuickJSBinding.QuickJSModule) return QuickJSBinding.QuickJSModule
+    if (QuickJSLib.QuickJSModule) return QuickJSLib.QuickJSModule
 
-    const path = QuickJSBinding.ensureWasmBuilt()
+    const path = QuickJSLib.ensureWasmBuilt()
     if (!path) throw new Error('QuickJS wasm binding not available')
 
     const WasmModule = await import(path)
-    QuickJSBinding.QuickJSModule = await WasmModule.default()
-    return QuickJSBinding.QuickJSModule as any
+    QuickJSLib.QuickJSModule = await WasmModule.default()
+    return QuickJSLib.QuickJSModule as any
   }
 
   static async runWithBinaryPath(binaryPath: string) {
-    const QuickJSModule = await QuickJSBinding.getQuickJSModule()
+    const QuickJSModule = await QuickJSLib.getQuickJSModule()
     const source = readFileSync(binaryPath)
 
     const input = new QuickJSModule.Uint8Array()
@@ -36,11 +36,11 @@ export class QuickJSBinding {
       input.push_back(source[i])
     }
 
-    QuickJSModule.QuickJSBinding.runWithBinary(input, new QuickJSModule.StringArray())
+    QuickJSModule.QuickJSLib.runWithBinary(input, new QuickJSModule.StringArray())
   }
 
   static async dumpWithBinaryPath(binaryPath: string) {
-    const QuickJSModule = await QuickJSBinding.getQuickJSModule()
+    const QuickJSModule = await QuickJSLib.getQuickJSModule()
     const source = readFileSync(binaryPath)
 
     const input = new QuickJSModule.Uint8Array()
@@ -48,21 +48,21 @@ export class QuickJSBinding {
       input.push_back(source[i])
     }
 
-    const text = QuickJSModule.QuickJSBinding.dumpWithBinary(input, new QuickJSModule.StringArray())
+    const text = QuickJSModule.QuickJSLib.dumpWithBinary(input, new QuickJSModule.StringArray())
     console.log(String(text || ''))
   }
 
   static async dumpBytesToString(bytes: Uint8Array | Buffer): Promise<string> {
-    const QuickJSModule = await QuickJSBinding.getQuickJSModule()
+    const QuickJSModule = await QuickJSLib.getQuickJSModule()
     const input = new QuickJSModule.Uint8Array()
     for (let i = 0; i < bytes.length; i++) input.push_back(bytes[i])
-    const text = QuickJSModule.QuickJSBinding.dumpWithBinary(input, new QuickJSModule.StringArray())
+    const text = QuickJSModule.QuickJSLib.dumpWithBinary(input, new QuickJSModule.StringArray())
     return String(text || '')
   }
 
   static async getOpcodes() {
-    const QuickJSModule = await QuickJSBinding.getQuickJSModule()
-    const opcodesMap = QuickJSModule.QuickJSBinding.getAllOpCodes()
+    const QuickJSModule = await QuickJSLib.getQuickJSModule()
+    const opcodesMap = QuickJSModule.QuickJSLib.getAllOpCodes()
     const opcodes: Record<string, number> = {}
     const keys = opcodesMap.keys()
     for (let i = 0; i < keys.size(); i++) {
@@ -73,23 +73,23 @@ export class QuickJSBinding {
   }
 
   static async getBytecodeVersion() {
-    const QuickJSModule = await QuickJSBinding.getQuickJSModule()
-    return QuickJSModule.QuickJSBinding.getBytecodeVersion()
+    const QuickJSModule = await QuickJSLib.getQuickJSModule()
+    return QuickJSModule.QuickJSLib.getBytecodeVersion()
   }
 
   static async getConfig() {
-    const QuickJSModule = await QuickJSBinding.getQuickJSModule()
-    const config = QuickJSModule.QuickJSBinding.getConfig()
+    const QuickJSModule = await QuickJSLib.getQuickJSModule()
+    const config = QuickJSModule.QuickJSLib.getConfig()
     return {
       bignum: config.get('bignum')
     }
   }
 
   static async compileSourcePath(sourcePath: string, cwd?: string): Promise<Buffer> {
-    const QuickJSModule = await QuickJSBinding.getQuickJSModule()
+    const QuickJSModule = await QuickJSLib.getQuickJSModule()
     const source = readFileSync(sourcePath, 'utf-8')
 
-    const result = QuickJSModule.QuickJSBinding.compile(
+    const result = QuickJSModule.QuickJSLib.compile(
       source, 
       relative(cwd || process.cwd(), sourcePath), 
       new QuickJSModule.StringArray())
