@@ -104,8 +104,9 @@ export enum JSAtom {
   JS_ATOM_EvalError,
   JS_ATOM_URIError,
   JS_ATOM_InternalError,
-  JS_ATOM_console,
-  JS_ATOM_log,
+  // Console related atoms are removed temporarily to test if they should be user atoms
+  // JS_ATOM_console,
+  // JS_ATOM_log,
   JS_ATOM_debug,
   JS_ATOM_info,
   JS_ATOM_warn,
@@ -224,8 +225,9 @@ export const ATOM_STRINGS: Partial<Record<JSAtom, string>> = {
   [JSAtom.JS_ATOM_EvalError]: 'EvalError',
   [JSAtom.JS_ATOM_URIError]: 'URIError',
   [JSAtom.JS_ATOM_InternalError]: 'InternalError',
-  [JSAtom.JS_ATOM_console]: 'console',
-  [JSAtom.JS_ATOM_log]: 'log',
+  // Console atoms removed temporarily  
+  // [JSAtom.JS_ATOM_console]: 'console',
+  // [JSAtom.JS_ATOM_log]: 'log',
   [JSAtom.JS_ATOM_debug]: 'debug',
   [JSAtom.JS_ATOM_info]: 'info',
   [JSAtom.JS_ATOM_warn]: 'warn',
@@ -251,9 +253,12 @@ export const ATOM_STRINGS: Partial<Record<JSAtom, string>> = {
 // Atom table management
 export class AtomTable {
   private atoms = new Map<string, number>()
-  private nextAtomId = JSAtom.JS_ATOM_END // Start after predefined atoms
+  private nextAtomId: number
+  private firstAtomId: number
   
-  constructor() {
+  constructor(firstAtomId: number = JSAtom.JS_ATOM_END) {
+    this.firstAtomId = firstAtomId
+    this.nextAtomId = firstAtomId // Start after predefined atoms or provided threshold
     // Initialize with predefined atoms (excluding JS_ATOM_END)
     for (const [atomId, atomStr] of Object.entries(ATOM_STRINGS)) {
       if (atomStr) { // Only add if atomStr is defined
@@ -287,7 +292,7 @@ export class AtomTable {
   // Check if string is a predefined atom
   isPredefinedAtom(str: string): boolean {
     const id = this.atoms.get(str)
-    return id !== undefined && id < JSAtom.JS_ATOM_END
+    return id !== undefined && id < this.firstAtomId
   }
 
   // Get all atoms for bytecode generation
@@ -304,7 +309,7 @@ export class AtomTable {
   getUserAtoms(): Map<string, number> {
     const userAtoms = new Map<string, number>()
     for (const [str, id] of this.atoms) {
-      if (id >= JSAtom.JS_ATOM_END) {
+      if (id >= this.firstAtomId) {
         userAtoms.set(str, id)
       }
     }
@@ -315,7 +320,7 @@ export class AtomTable {
   getUserAtomCount(): number {
     let count = 0
     for (const [, id] of this.atoms) {
-      if (id >= JSAtom.JS_ATOM_END) {
+      if (id >= this.firstAtomId) {
         count++
       }
     }

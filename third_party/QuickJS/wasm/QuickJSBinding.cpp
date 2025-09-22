@@ -24,6 +24,9 @@ namespace quickjs {
     return ss;
   }
 
+  /// @brief
+  QuickJSBinding::QuickJSBinding() {}
+
   JSModuleDef *QuickJSBinding::resolve(
     JSContext *jsContext,
     const char *moduleName,
@@ -36,9 +39,6 @@ namespace quickjs {
     JSModuleDef *m = taro_js_new_c_module(jsContext, moduleName, defaultExport);
     return m;
   }
-
-  /// @brief
-  QuickJSBinding::QuickJSBinding() {}
 
   JSContext *QuickJSBinding::prepare(std::vector<std::string> modules) {
     JSRuntime *runtime = JS_NewRuntime();
@@ -227,5 +227,48 @@ namespace quickjs {
     JS_FreeContext(ctx);
     JS_FreeRuntime(rt);
     return out;
+  }
+
+  uint32_t QuickJSBinding::getBytecodeVersion() {
+    return static_cast<uint32_t>(taro_bc_get_version());
+  }
+
+  std::map<std::string, bool> QuickJSBinding::getCompileOptions() {
+    std::map<std::string, bool> options;
+#ifdef DUMP_BYTECODE
+    options["dump"] = true;
+#else
+    options["dump"] = false;
+#endif
+
+#ifdef CONFIG_BIGNUM
+    options["bignum"] = true;
+#else
+    options["bignum"] = false;
+#endif
+    
+    return options;
+  }
+
+  std::map<std::string, uint32_t> QuickJSBinding::getAllAtomIds() {
+    std::map<std::string, uint32_t> atomIds;
+
+    // TODO
+    
+    return atomIds;
+  }
+
+  uint32_t QuickJSBinding::getFirstAtomId() {
+    // QuickJS 写对象时，允许字节码情况下 first_atom = JS_ATOM_END
+    // 这里返回编译期的值供前端校验
+    return static_cast<uint32_t>(JS_ATOM_END);
+  }
+
+  std::map<std::string, uint32_t> QuickJSBinding::getAllOpcodeIds() {
+    std::map<std::string, uint32_t> opcodeIds;
+
+    // TODO
+
+    return opcodeIds;
   }
 }

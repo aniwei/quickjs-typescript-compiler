@@ -28,7 +28,15 @@ class QuickJSBinding {
     std::string sourceURL, 
     std::vector<std::string> modules);
 
-  static uint8_t getBytecodeVersion();
+  static uint32_t getBytecodeVersion();
+
+  static std::map<std::string, bool> getCompileOptions();
+
+  static uint32_t getFirstAtomId();
+
+  static std::map<std::string, uint32_t> getAllAtomIds();
+
+  static std::map<std::string, uint32_t> getAllOpcodeIds();
 
   static std::string dumpWithBinary(
     std::vector<uint8_t> bytes,

@@ -77,6 +77,11 @@ export class QuickJSLib {
     return QuickJSModule.QuickJSLib.getBytecodeVersion()
   }
 
+  static async getFirstAtomId() {
+    const QuickJSModule = await QuickJSLib.getQuickJSModule()
+    return QuickJSModule.QuickJSLib.getFirstAtomId()
+  }
+
   static async getConfig() {
     const QuickJSModule = await QuickJSLib.getQuickJSModule()
     const config = QuickJSModule.QuickJSLib.getConfig()

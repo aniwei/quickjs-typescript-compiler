@@ -69,12 +69,19 @@ class BytecodeComparator {
   private async compileWithTypeScript(): Promise<CompilationResult> {
     const sourceCode = await fs.readFile(this.options.inputTs, 'utf-8')
     
+    // 从 WASM 查询 firstAtomId（JS_ATOM_END），用于对齐用户原子阈值
+    let firstAtomId: number | undefined
+    try {
+      firstAtomId = await QuickJSLib.getFirstAtomId()
+    } catch {}
+    
     const compiler = new TypeScriptCompiler({
       bigInt: false,
       dump: false,
       shortCode: !this.options.normalizeShort,
       debug: false,
-      strictMode: false
+      strictMode: false,
+      firstAtomId
     })
 
     const bytecode = compiler.compile(sourceCode, path.relative(process.cwd(), this.options.inputTs))
@@ -106,18 +113,24 @@ class BytecodeComparator {
       
       // Use JavaScript input if provided, otherwise convert TypeScript
       let jsCode: string
+      let jsPath: string
       if (this.options.inputJs) {
-        // Read the JavaScript file directly
+        // Read the provided file; if it's TypeScript, strip types
         jsCode = await fs.readFile(this.options.inputJs, 'utf-8')
+        jsPath = this.options.inputJs
+        if (/\.ts$/i.test(jsPath)) {
+          jsCode = this.stripTypeScript(jsCode)
+          jsPath = jsPath.replace(/\.ts$/i, '.js')
+        }
       } else {
-        // Convert TypeScript to JavaScript by stripping types
+        // Convert TypeScript to JavaScript
         const tsCode = await fs.readFile(this.options.inputTs, 'utf-8')
         jsCode = this.stripTypeScript(tsCode)
+        jsPath = this.options.inputTs.replace(/\.ts$/, '.js')
       }
       
       // Compile with QuickJS WASM (placeholder - would need actual WASM binding)
-      const inputFileName = this.options.inputJs || this.options.inputTs
-      const bytecode = await this.compileJavaScriptWithWasm(jsCode, inputFileName)
+      const bytecode = await this.compileJavaScriptWithWasm(jsCode, jsPath)
       
       let disassembly: string | undefined
       if (this.options.disasm) {
@@ -146,13 +159,16 @@ class BytecodeComparator {
   }
 
   private stripTypeScript(tsCode: string): string {
-    // Simple TypeScript stripping - remove type annotations
+    // Simple TypeScript stripping - remove common type annotations and interfaces
     return tsCode
-      .replace(/:\s*\w+\s*=/g, ' =')
-      .replace(/:\s*\w+\s*\)/g, ')')
-      .replace(/:\s*\w+\s*;/g, ';')
-      .replace(/:\s*\w+\s*,/g, ',')
-      .replace(/:\s*\w+\s*$/g, '')
+      // Remove basic type annotations after colons (e.g., const x: number = ...)
+      .replace(/:\s*[^=;,)]+(?=[=;,)])/g, '')
+      // Remove generic type parameters in simple cases (e.g., Array<number>)
+      .replace(/<\s*[^>]+\s*>/g, '')
+      // Remove interface and type declarations (very naive)
+      .replace(/\b(interface|type)\s+\w+\s*=\s*[^;]+;?/g, '')
+      // Remove TS-only assertion syntax as const, satisfies, etc. (naive)
+      .replace(/\s+as\s+const\b/g, '')
   }
 
   private async compileJavaScriptWithWasm(jsCode: string, jsPath?: string): Promise<Uint8Array> {
@@ -216,7 +232,215 @@ class BytecodeComparator {
       )
     }
     
+    // Save detailed analysis dumps
+    await this.saveDumpAnalysis(baseName, tsResult, wasmResult)
+    
     console.log(`💾 Artifacts saved to ${this.artifactsDir}/`)
+  }
+  
+  private async saveDumpAnalysis(baseName: string, tsResult: CompilationResult, wasmResult: CompilationResult): Promise<void> {
+    const analysis = {
+      timestamp: new Date().toISOString(),
+      inputFile: this.options.inputTs,
+      compilation: {
+        typescript: {
+          size: tsResult.size,
+          bytecode: Array.from(tsResult.bytecode).map(b => `0x${b.toString(16).padStart(2, '0')}`),
+          hexDump: this.generateHexDump(tsResult.bytecode),
+          structure: this.analyzeBytecodeStructure(tsResult.bytecode, 'TypeScript')
+        },
+        wasm: {
+          size: wasmResult.size,
+          bytecode: Array.from(wasmResult.bytecode).map(b => `0x${b.toString(16).padStart(2, '0')}`),
+          hexDump: this.generateHexDump(wasmResult.bytecode),
+          structure: this.analyzeBytecodeStructure(wasmResult.bytecode, 'WASM')
+        }
+      },
+      differences: this.analyzeDetailedDifferences(tsResult.bytecode, wasmResult.bytecode),
+      sizeDifference: {
+        absolute: tsResult.size - wasmResult.size,
+        percentage: wasmResult.size > 0 ? ((tsResult.size - wasmResult.size) / wasmResult.size * 100).toFixed(2) : 'N/A'
+      }
+    }
+    
+    // Save JSON analysis
+    await fs.writeFile(
+      path.join(this.artifactsDir, `${baseName}.analysis.json`),
+      JSON.stringify(analysis, null, 2)
+    )
+    
+    // Save human-readable report
+    const report = this.generateAnalysisReport(analysis)
+    await fs.writeFile(
+      path.join(this.artifactsDir, `${baseName}.report.md`),
+      report
+    )
+  }
+  
+  private generateHexDump(bytecode: Uint8Array): string[] {
+    const lines = []
+    for (let i = 0; i < bytecode.length; i += 16) {
+      const chunk = bytecode.slice(i, i + 16)
+      const hex = Array.from(chunk).map(b => b.toString(16).padStart(2, '0')).join(' ')
+      const ascii = Array.from(chunk).map(b => b >= 32 && b <= 126 ? String.fromCharCode(b) : '.').join('')
+      lines.push(`${i.toString(16).padStart(8, '0')}: ${hex.padEnd(47)} |${ascii}|`)
+    }
+    return lines
+  }
+  
+  private analyzeBytecodeStructure(bytecode: Uint8Array, source: string): any {
+    if (bytecode.length < 10) {
+      return { error: 'Bytecode too short for analysis' }
+    }
+    
+    try {
+      let offset = 0
+      const structure: any = { source }
+      
+      // BC_VERSION
+      structure.bcVersion = `0x${bytecode[offset].toString(16)}`
+      offset++
+      
+      // User atom count (LEB128)
+      const { value: atomCount, bytesRead } = this.readLEB128(bytecode, offset)
+      structure.userAtomCount = atomCount
+      offset += bytesRead
+      
+      // Analyze atoms
+      const atoms = []
+      for (let i = 0; i < atomCount && offset < bytecode.length; i++) {
+        const atomStart = offset
+        
+        // String length (LEB128, potentially encoded with QuickJS format)
+        const { value: stringLen, bytesRead: lenBytes } = this.readLEB128(bytecode, offset)
+        offset += lenBytes
+        
+        // Actual string length (QuickJS format: length >> 1)
+        const actualLen = stringLen >> 1
+        const isWideChar = stringLen & 1
+        
+        if (offset + actualLen <= bytecode.length) {
+          const atomString = new TextDecoder().decode(bytecode.slice(offset, offset + actualLen))
+          atoms.push({
+            index: i,
+            rawLength: stringLen,
+            actualLength: actualLen,
+            isWideChar,
+            string: atomString,
+            offset: atomStart
+          })
+          offset += actualLen
+        } else {
+          atoms.push({ index: i, error: 'String extends beyond bytecode' })
+          break
+        }
+      }
+      structure.atoms = atoms
+      
+      // Function header analysis
+      if (offset < bytecode.length) {
+        structure.functionHeader = {
+          offset,
+          tag: `0x${bytecode[offset].toString(16)}`,
+          remaining: bytecode.length - offset
+        }
+      }
+      
+      return structure
+    } catch (error: any) {
+      return { error: `Analysis failed: ${error.message}` }
+    }
+  }
+  
+  private readLEB128(buffer: Uint8Array, offset: number): { value: number, bytesRead: number } {
+    let result = 0
+    let shift = 0
+    let bytesRead = 0
+    
+    while (offset + bytesRead < buffer.length) {
+      const byte = buffer[offset + bytesRead]
+      result |= (byte & 0x7F) << shift
+      bytesRead++
+      
+      if ((byte & 0x80) === 0) break
+      shift += 7
+    }
+    
+    return { value: result, bytesRead }
+  }
+  
+  private analyzeDetailedDifferences(tsBytes: Uint8Array, wasmBytes: Uint8Array): any[] {
+    const differences = []
+    const maxLen = Math.max(tsBytes.length, wasmBytes.length)
+    
+    for (let i = 0; i < maxLen; i++) {
+      const tsVal = i < tsBytes.length ? tsBytes[i] : undefined
+      const wasmVal = i < wasmBytes.length ? wasmBytes[i] : undefined
+      
+      if (tsVal !== wasmVal) {
+        differences.push({
+          offset: i,
+          offsetHex: `0x${i.toString(16)}`,
+          typescript: tsVal !== undefined ? `0x${tsVal.toString(16).padStart(2, '0')}` : 'EOF',
+          wasm: wasmVal !== undefined ? `0x${wasmVal.toString(16).padStart(2, '0')}` : 'EOF',
+          typescriptDecimal: tsVal,
+          wasmDecimal: wasmVal
+        })
+      }
+    }
+    
+    return differences
+  }
+  
+  private generateAnalysisReport(analysis: any): string {
+    const lines = [
+      '# 字节码分析报告',
+      '',
+      `**输入文件**: ${analysis.inputFile}`,
+      `**生成时间**: ${analysis.timestamp}`,
+      '',
+      '## 大小对比',
+      '',
+      `- TypeScript编译器: ${analysis.compilation.typescript.size} 字节`,
+      `- WASM编译器: ${analysis.compilation.wasm.size} 字节`,
+      `- 差异: ${analysis.sizeDifference.absolute} 字节 (${analysis.sizeDifference.percentage}%)`,
+      '',
+      '## 结构分析',
+      '',
+      '### TypeScript编译器输出',
+      '```json',
+      JSON.stringify(analysis.compilation.typescript.structure, null, 2),
+      '```',
+      '',
+      '### WASM编译器输出',
+      '```json',
+      JSON.stringify(analysis.compilation.wasm.structure, null, 2),
+      '```',
+      '',
+      '## 字节级差异',
+      '',
+      `共发现 ${analysis.differences.length} 个字节差异:`,
+      ''
+    ]
+    
+    analysis.differences.slice(0, 20).forEach((diff: any) => {
+      lines.push(`- 偏移量 ${diff.offsetHex}: TS=${diff.typescript} vs WASM=${diff.wasm}`)
+    })
+    
+    if (analysis.differences.length > 20) {
+      lines.push(`- ... (显示前20个差异，总共${analysis.differences.length}个)`)
+    }
+    
+    lines.push('', '## 十六进制转储对比', '', '### TypeScript')
+    lines.push('```')
+    lines.push(...analysis.compilation.typescript.hexDump)
+    lines.push('```')
+    lines.push('', '### WASM')
+    lines.push('```')
+    lines.push(...analysis.compilation.wasm.hexDump)
+    lines.push('```')
+    
+    return lines.join('\n')
   }
 
   private compareResults(tsResult: CompilationResult, wasmResult: CompilationResult): void {

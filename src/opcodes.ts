@@ -54,6 +54,7 @@ export interface CompilerFlags {
   shortCode: boolean
   debug: boolean
   strictMode: boolean
+  firstAtomId?: number
 }
 
 // QuickJS Opcodes - 基于头文件定义

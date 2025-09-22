@@ -26,6 +26,7 @@ target_link_options(quickjs_wasm PRIVATE
     -sALLOW_MEMORY_GROWTH=1
     -sINITIAL_MEMORY=268435456
     -sASSERTIONS=1
+    -sNO_DISABLE_EXCEPTION_CATCHING
     -sMALLOC=emmalloc
     --bind
     --no-entry

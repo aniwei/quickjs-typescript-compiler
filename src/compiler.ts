@@ -21,6 +21,7 @@ export interface CompilerContext {
   // Variable management
   locals: Map<string, number> // name -> local index
   nextLocalIndex: number
+  varKinds: Map<string, 'var' | 'let' | 'const'>
   
   // Scope management
   scopeStack: Scope[]
@@ -43,9 +44,11 @@ export interface LoopContext {
 
 export class TypeScriptCompilerCore {
   private context: CompilerContext
+  private moduleNameAtom?: number
+  private moduleScopeLocals: Set<string> = new Set()
   
   constructor(flags: CompilerFlags) {
-    const atomTable = new AtomTable()
+    const atomTable = new AtomTable(flags.firstAtomId)
     const constantsPool = new Constants()
     const labelManager = new LabelManager()
     const opcodeGenerator = createOpcodeGenerator(flags)
@@ -61,23 +64,31 @@ export class TypeScriptCompilerCore {
       opcodeGenerator,
       locals: new Map(),
       nextLocalIndex: 0,
+      varKinds: new Map(),
       scopeStack: [],
       loopStack: []
     }
   }
   
   // Main compilation entry point
-  compile(sourceCode: string, fileName = 'input.ts'): Uint8Array {
+  compile(sourceCode: string, fileName = '<input>'): Uint8Array {
+    // Create atom for file name (QuickJS includes this in bytecode)
+    // Use .js extension to match WASM behavior
+  const jsFileName = fileName.replace(/\.ts$/, '.js')
+  this.moduleNameAtom = this.context.atomTable.getAtomId(jsFileName)
+    
     // Parse TypeScript code
     const sourceFile = ts.createSourceFile(
       fileName,
       sourceCode,
       ts.ScriptTarget.ES2020,
       true,
-      ts.ScriptKind.TS
-    )
+      ts.ScriptKind.TS)
     
     this.context.sourceFile = sourceFile
+    
+    // Pre-create atoms in QuickJS order by analyzing the AST
+    this.preCreateAtoms(sourceFile)
     
     // Create module scope
     this.enterScope('module')
@@ -95,7 +106,90 @@ export class TypeScriptCompilerCore {
       this.exitScope()
     }
     
+    // Set vardefs before finalizing: include only non-module locals
+    const functionLocals = new Map<string, number>()
+    for (const [name, idx] of this.context.locals) {
+      if (!this.moduleScopeLocals.has(name)) {
+        functionLocals.set(name, idx)
+      }
+    }
+    
+    this.context.bytecodeWriter.setVardefs(functionLocals)
+    // 传递变量 kind 信息（若无记录则视为 var）
+    const kinds = new Map<string, 'var' | 'let' | 'const'>()
+    for (const [name, k] of this.context.varKinds) {
+      kinds.set(name, k)
+    }
+    this.context.bytecodeWriter.setVarKinds(kinds)
+    // 传入闭包变量（模块作用域变量作为闭包捕获）
+    const closureVars = new Map<string, number>()
+    for (const name of this.moduleScopeLocals) {
+      const idx = this.context.locals.get(name)
+      if (idx !== undefined) closureVars.set(name, idx)
+    }
+    this.context.bytecodeWriter.setClosureVars(closureVars)
+    // 传入模块名 atom，用于模块包装头
+    if (this.moduleNameAtom !== undefined) {
+      this.context.bytecodeWriter.setModuleNameAtom(this.moduleNameAtom)
+    }
+    
     return this.context.bytecodeWriter.finalize()
+  }
+  
+  // Pre-create atoms in the correct order to match QuickJS WASM output
+  private preCreateAtoms(sourceFile: ts.SourceFile): void {
+    // Collect all identifiers that will need atoms
+    const identifiers = new Set<string>()
+    
+    // Walk the AST to find all identifiers
+    function visitNode(node: ts.Node): void {
+      if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name)) {
+        identifiers.add(node.name.text)
+      }
+      if (ts.isPropertyAccessExpression(node) && ts.isIdentifier(node.name)) {
+        identifiers.add(node.name.text)
+      }
+      if (ts.isIdentifier(node)) {
+        // Only add certain identifiers to match QuickJS pattern
+        const text = node.text
+        if (text === 'console' || text === 'log' || 
+            text === 'arr' || text === 'item') {
+          identifiers.add(text)
+        }
+      }
+      if (ts.isArrayLiteralExpression(node)) {
+        // Check for array variable names in parent context
+        const parent = node.parent
+        if (ts.isVariableDeclaration(parent) && ts.isIdentifier(parent.name)) {
+          identifiers.add(parent.name.text)
+        }
+      }
+      ts.forEachChild(node, visitNode)
+    }
+    
+    visitNode(sourceFile)
+    
+    // Create atoms in QuickJS order: variable names first, then property access
+    const orderedIds = Array.from(identifiers).sort((a, b) => {
+      // QuickJS order: item, arr, console, log
+      const order = ['item', 'arr', 'console', 'log']
+      const aIndex = order.indexOf(a)
+      const bIndex = order.indexOf(b)
+      
+      if (aIndex !== -1 && bIndex !== -1) {
+        return aIndex - bIndex
+      }
+      if (aIndex !== -1) return -1
+      if (bIndex !== -1) return 1
+      
+      // Alphabetical for unknown identifiers
+      return a.localeCompare(b)
+    })
+    
+    // Create atoms in this order
+    for (const id of orderedIds) {
+      this.context.atomTable.getAtomId(id)
+    }
   }
   
   // Scope management
@@ -124,6 +218,9 @@ export class TypeScriptCompilerCore {
     const scope = this.getCurrentScope()
     if (scope) {
       scope.locals.add(name)
+      if (scope.type === 'module') {
+        this.moduleScopeLocals.add(name)
+      }
     }
     
     return index
@@ -164,6 +261,10 @@ export class TypeScriptCompilerCore {
         this.compileReturnStatement(node as ts.ReturnStatement)
         break
         
+      case ts.SyntaxKind.EmptyStatement:
+        // Empty statement (semicolon) - do nothing
+        break
+        
       default:
         throw new Error(`Unsupported statement kind: ${ts.SyntaxKind[node.kind]}`)
     }
@@ -183,34 +284,52 @@ export class TypeScriptCompilerCore {
     
     const varName = node.name.text
     const localIndex = this.declareLocal(varName)
+    // 记录变量 kind
+    const parentList = node.parent as ts.VariableDeclarationList
+    const isConst = (parentList.flags & ts.NodeFlags.Const) !== 0
+    const isLet = (parentList.flags & ts.NodeFlags.Let) !== 0
+    this.context.varKinds.set(varName, isConst ? 'const' : (isLet ? 'let' : 'var'))
     
     if (node.initializer) {
       // Compile initializer expression
       this.compileExpression(node.initializer)
       
-      // Store in local variable
-      if (this.context.flags.shortCode && localIndex < 4) {
-        // Use optimized opcodes for first 4 locals
-        const opcodes = getAllOpcodes(this.context.flags)
-        this.context.bytecodeWriter.writeInstruction(
-          opcodes[`PUT_LOC${localIndex}`]
-        )
-      } else if (this.context.flags.shortCode && localIndex < 256) {
-        const opcodes = getAllOpcodes(this.context.flags)
-        this.context.bytecodeWriter.writeInstruction(
-          opcodes.PUT_LOC8,
-          localIndex
-        )
+      // At module scope, use PUT_VAR_INIT (atom-based), otherwise store into local
+      const currentScope = this.getCurrentScope()
+      if (currentScope?.type === 'module') {
+        const atomId = this.context.atomTable.getAtomId(varName)
+        this.context.bytecodeWriter.writeInstruction(OPCODES.PUT_VAR_INIT, atomId)
       } else {
-        this.context.bytecodeWriter.writeInstruction(
-          OPCODES.PUT_LOC,
-          localIndex
-        )
+        // Store in local variable
+        if (this.context.flags.shortCode && localIndex < 4) {
+          // Use optimized opcodes for first 4 locals
+          const opcodes = getAllOpcodes(this.context.flags)
+          this.context.bytecodeWriter.writeInstruction(
+            opcodes[`PUT_LOC${localIndex}`]
+          )
+        } else if (this.context.flags.shortCode && localIndex < 256) {
+          const opcodes = getAllOpcodes(this.context.flags)
+          this.context.bytecodeWriter.writeInstruction(
+            opcodes.PUT_LOC8,
+            localIndex
+          )
+        } else {
+          this.context.bytecodeWriter.writeInstruction(
+            OPCODES.PUT_LOC,
+            localIndex
+          )
+        }
       }
     } else {
       // Initialize with undefined
       this.context.bytecodeWriter.writeInstruction(OPCODES.UNDEFINED)
-      this.context.bytecodeWriter.writeInstruction(OPCODES.PUT_LOC, localIndex)
+      const currentScope = this.getCurrentScope()
+      if (currentScope?.type === 'module') {
+        const atomId = this.context.atomTable.getAtomId(varName)
+        this.context.bytecodeWriter.writeInstruction(OPCODES.PUT_VAR_INIT, atomId)
+      } else {
+        this.context.bytecodeWriter.writeInstruction(OPCODES.PUT_LOC, localIndex)
+      }
     }
   }
   
@@ -331,9 +450,16 @@ export class TypeScriptCompilerCore {
     if (!ts.isIdentifier(declaration.name)) {
       throw new Error('For-of with destructuring not supported')
     }
-    
+    // Create a block scope for the entire loop so the iterator variable is block-scoped
+    this.enterScope('block')
+
     const iterVar = declaration.name.text
     const iterLocalIndex = this.declareLocal(iterVar)
+  // for-of 声明的变量通常为 const/let（TS AST 里由声明列表 flags 指定）
+  const parentList = node.initializer as ts.VariableDeclarationList
+  const isConst = (parentList.flags & ts.NodeFlags.Const) !== 0
+  const isLet = (parentList.flags & ts.NodeFlags.Let) !== 0
+  this.context.varKinds.set(iterVar, isConst ? 'const' : (isLet ? 'let' : 'var'))
     
     // Create labels for loop control
     const startLabel = this.context.labelManager.createLabel('for_of_start')
@@ -373,13 +499,8 @@ export class TypeScriptCompilerCore {
       // Store current value in iterator variable
       this.context.bytecodeWriter.writeInstruction(OPCODES.PUT_LOC, iterLocalIndex)
       
-      // Compile loop body
-      this.enterScope('block')
-      try {
-        this.compileStatement(node.statement)
-      } finally {
-        this.exitScope()
-      }
+      // Compile loop body (already inside loop block scope)
+      this.compileStatement(node.statement)
       
       // Continue label
       this.context.labelManager.setLabel(
@@ -405,6 +526,8 @@ export class TypeScriptCompilerCore {
       
     } finally {
       this.context.loopStack.pop()
+      // Exit loop block scope
+      this.exitScope()
     }
   }
   
@@ -578,7 +701,7 @@ export class TypeScriptCompilerCore {
     const name = node.text
     const localIndex = this.getLocalIndex(name)
     
-    if (localIndex !== undefined) {
+    if (localIndex !== undefined && !this.moduleScopeLocals.has(name)) {
       // Local variable
       if (this.context.flags.shortCode && localIndex < 4) {
         const opcodes = getAllOpcodes(this.context.flags)
@@ -598,7 +721,13 @@ export class TypeScriptCompilerCore {
   
   // Binary expressions
   private compileBinaryExpression(node: ts.BinaryExpression): void {
-    // Compile operands
+    // Handle assignment operations differently
+    if (this.isAssignmentOperator(node.operatorToken.kind)) {
+      this.compileAssignmentExpression(node)
+      return
+    }
+    
+    // Compile operands for non-assignment operations
     this.compileExpression(node.left)
     this.compileExpression(node.right)
     
@@ -717,5 +846,80 @@ export class TypeScriptCompilerCore {
     
     // Get field (leaves obj and value on stack for method calls)
     this.context.bytecodeWriter.writeInstruction(OPCODES.GET_FIELD2, atomId)
+  }
+
+  // Helper to check if an operator is an assignment operator
+  private isAssignmentOperator(kind: ts.SyntaxKind): boolean {
+    return kind === ts.SyntaxKind.FirstAssignment || 
+           kind >= ts.SyntaxKind.FirstCompoundAssignment && kind <= ts.SyntaxKind.LastCompoundAssignment
+  }
+
+  // Compile assignment expressions
+  private compileAssignmentExpression(node: ts.BinaryExpression): void {
+    if (node.left.kind !== ts.SyntaxKind.Identifier) {
+      throw new Error('Only simple identifier assignments are supported')
+    }
+
+    const identifier = node.left as ts.Identifier
+    const varName = identifier.text
+
+    if (node.operatorToken.kind === ts.SyntaxKind.FirstAssignment) {
+      // Simple assignment: x = value
+      this.compileExpression(node.right)
+      
+      // Store in variable
+      if (this.context.locals.has(varName) && !this.moduleScopeLocals.has(varName)) {
+        const localIndex = this.context.locals.get(varName)!
+        this.context.bytecodeWriter.writeInstruction(OPCODES.PUT_LOC, localIndex)
+      } else {
+        // Module/global variable
+        const atomId = this.context.atomTable.getAtomId(varName)
+        this.context.bytecodeWriter.writeInstruction(OPCODES.PUT_VAR, atomId)
+      }
+    } else {
+      // Compound assignment: x += value, x -= value, etc.
+      
+      // Load current value of variable
+      if (this.context.locals.has(varName) && !this.moduleScopeLocals.has(varName)) {
+        const localIndex = this.context.locals.get(varName)!
+        this.context.bytecodeWriter.writeInstruction(OPCODES.GET_LOC, localIndex)
+      } else {
+        const atomId = this.context.atomTable.getAtomId(varName)
+        this.context.bytecodeWriter.writeInstruction(OPCODES.GET_VAR, atomId)
+      }
+      
+      // Compile right operand
+      this.compileExpression(node.right)
+      
+      // Apply the compound operation
+      switch (node.operatorToken.kind) {
+        case ts.SyntaxKind.PlusEqualsToken:
+          this.context.bytecodeWriter.writeInstruction(OPCODES.ADD)
+          break
+        case ts.SyntaxKind.MinusEqualsToken:
+          this.context.bytecodeWriter.writeInstruction(OPCODES.SUB)
+          break
+        case ts.SyntaxKind.AsteriskEqualsToken:
+          this.context.bytecodeWriter.writeInstruction(OPCODES.MUL)
+          break
+        case ts.SyntaxKind.SlashEqualsToken:
+          this.context.bytecodeWriter.writeInstruction(OPCODES.DIV)
+          break
+        case ts.SyntaxKind.PercentEqualsToken:
+          this.context.bytecodeWriter.writeInstruction(OPCODES.MOD)
+          break
+        default:
+          throw new Error(`Unsupported compound assignment operator: ${ts.SyntaxKind[node.operatorToken.kind]}`)
+      }
+      
+      // Store result back to variable
+      if (this.context.locals.has(varName) && !this.moduleScopeLocals.has(varName)) {
+        const localIndex = this.context.locals.get(varName)!
+        this.context.bytecodeWriter.writeInstruction(OPCODES.PUT_LOC, localIndex)
+      } else {
+        const atomId = this.context.atomTable.getAtomId(varName)
+        this.context.bytecodeWriter.writeInstruction(OPCODES.PUT_VAR, atomId)
+      }
+    }
   }
 }

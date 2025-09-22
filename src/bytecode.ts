@@ -4,7 +4,7 @@
  */
 
 import { OpcodeDefinition, OpcodeFormat, CompilerFlags } from './opcodes'
-import { AtomTable } from './atoms'
+import { AtomTable, JSAtom } from './atoms'
 import { OpcodeGenerator } from './opcodeGenerator'
 
 // LEB128 encoding/decoding utilities
@@ -156,6 +156,18 @@ export class BytecodeWriter {
   private constants: Constants
   private labelManager: LabelManager
   private opcodeGenerator?: OpcodeGenerator
+  private vardefs: Map<string, number> = new Map()
+  // 变量元信息：用于在 vardefs 中区分 var/let/const
+  private varKinds: Map<string, 'var' | 'let' | 'const'> = new Map()
+  private closureVars: Array<{ name: string, idx: number }> = []
+  // 栈深度估算
+  private currentStack = 0
+  private maxStack = 0
+  private moduleNameAtom: number = 0
+  private firstAtomId: number = JSAtom.JS_ATOM_END
+  private atomMap = new Map<number, number>()
+  private idxToAtom: number[] = []
+  private atomPatches: Array<{ pos: number, atomId: number }> = []
   
   constructor(
     config: CompilerFlags,
@@ -169,6 +181,12 @@ export class BytecodeWriter {
     this.constants = constants
     this.labelManager = labelManager
     this.opcodeGenerator = opcodeGenerator
+    this.firstAtomId = (config.firstAtomId ?? JSAtom.JS_ATOM_END) >>> 0
+  }
+  
+  // 设置模块名 atom（通常为源文件 .js 名称）
+  setModuleNameAtom(atom: number) {
+    this.moduleNameAtom = atom >>> 0
   }
   
   // Write instruction with arguments
@@ -181,6 +199,12 @@ export class BytecodeWriter {
     
     // Write arguments based on format
     this.writeInstructionArgs(opcode, args)
+
+    // 更新栈深度估算
+    const delta = this.getStackDelta(opcode, args)
+    this.currentStack += delta
+    if (this.currentStack > this.maxStack) this.maxStack = this.currentStack
+    if (this.currentStack < 0) this.currentStack = 0 // 保护，避免负值导致后续异常
   }
   
   private writeInstructionArgs(opcode: OpcodeDefinition, args: number[]): void {
@@ -222,7 +246,8 @@ export class BytecodeWriter {
         break
         
       case OpcodeFormat.ATOM:
-        this.writeUint32(args[0] || 0) // Atom ID
+        this.atomPatches.push({ pos: this.buffer.length, atomId: args[0] || 0 })
+        this.writeUint32(args[0] || 0) // Atom ID (占位，稍后映射)
         break
         
       case OpcodeFormat.CONST:
@@ -249,23 +274,27 @@ export class BytecodeWriter {
         break
         
       case OpcodeFormat.ATOM_U8:
-        this.writeUint32(args[0] || 0) // Atom ID
+        this.atomPatches.push({ pos: this.buffer.length, atomId: args[0] || 0 })
+        this.writeUint32(args[0] || 0) // Atom ID (占位)
         this.writeUint8(args[1] || 0)
         break
         
       case OpcodeFormat.ATOM_U16:
-        this.writeUint32(args[0] || 0) // Atom ID
+        this.atomPatches.push({ pos: this.buffer.length, atomId: args[0] || 0 })
+        this.writeUint32(args[0] || 0) // Atom ID (占位)
         this.writeUint16(args[1] || 0)
         break
         
       case OpcodeFormat.ATOM_LABEL_U8:
-        this.writeUint32(args[0] || 0) // Atom ID
+        this.atomPatches.push({ pos: this.buffer.length, atomId: args[0] || 0 })
+        this.writeUint32(args[0] || 0) // Atom ID (占位)
         this.writeUint32(args[1] || 0) // Label address
         this.writeUint8(args[2] || 0)
         break
         
       case OpcodeFormat.ATOM_LABEL_U16:
-        this.writeUint32(args[0] || 0) // Atom ID
+        this.atomPatches.push({ pos: this.buffer.length, atomId: args[0] || 0 })
+        this.writeUint32(args[0] || 0) // Atom ID (占位)
         this.writeUint32(args[1] || 0) // Label address
         this.writeUint16(args[2] || 0)
         break
@@ -365,6 +394,21 @@ export class BytecodeWriter {
   }
   
   // Finalize and get bytecode in QuickJS JS_WriteObject format
+  setVardefs(locals: Map<string, number>): void {
+    this.vardefs = new Map(locals)
+  }
+
+  // 记录变量的 kind 信息（var/let/const）供 vardefs 使用
+  setVarKinds(varKinds: Map<string, 'var' | 'let' | 'const'>): void {
+    this.varKinds = new Map(varKinds)
+  }
+  // 记录闭包变量（模块作用域变量）
+  setClosureVars(vars: Map<string, number>): void {
+    this.closureVars = Array.from(vars.entries())
+      .map(([name, idx]) => ({ name, idx }))
+      .sort((a, b) => a.idx - b.idx)
+  }
+
   finalize(): Uint8Array {
     // Resolve all label patches first
     for (const [label, patches] of this.labelManager.getPatches()) {
@@ -384,66 +428,188 @@ export class BytecodeWriter {
   private generateQuickJSBytecode(): Uint8Array {
     const chunks: Uint8Array[] = []
     
-    // 1. Write BC_VERSION (1 byte)
-    const bcVersion = this.config.bigInt ? 0x45 : 0x05
-    chunks.push(new Uint8Array([bcVersion]))
+    // 改为先写内容区块：模块 -> 函数 -> 常量池
+    const content: Uint8Array[] = []
+    // 模块头
+    content.push(new Uint8Array([0x0D]))
+    content.push(this.bcPutAtom(this.moduleNameAtom))
+    content.push(LEB128.encode(0)) // req
+    content.push(LEB128.encode(0)) // export
+    content.push(LEB128.encode(0)) // star export
+    content.push(LEB128.encode(0)) // import
+    content.push(new Uint8Array([0])) // has_tla
+    // 函数对象
+    content.push(new Uint8Array([0x0C]))
     
-    // 2. Write user atom count (LEB128) - only atoms >= JS_ATOM_END
-    const userAtomCount = this.atomTable.getUserAtomCount()
-    chunks.push(LEB128.encode(userAtomCount))
+  // 5. Write function flags - based on QuickJS JS_WriteFunctionTag logic
+    // Calculate flags based on our function characteristics
+    let flags = 0
+    let flagIdx = 0
     
-    // 3. Write all user atom strings (only >= JS_ATOM_END)
-    const userAtoms = this.atomTable.getUserAtoms()
-    const sortedUserAtoms = Array.from(userAtoms.entries()).sort((a, b) => a[1] - b[1])
+    // Based on QuickJS bc_set_flags calls:
+    // bc_set_flags(&flags, &idx, b->has_prototype, 1);           // bit 0
+    // bc_set_flags(&flags, &idx, b->has_simple_parameter_list, 1); // bit 1  
+    // bc_set_flags(&flags, &idx, b->is_derived_class_constructor, 1); // bit 2
+    // bc_set_flags(&flags, &idx, b->need_home_object, 1);        // bit 3
+    // bc_set_flags(&flags, &idx, b->func_kind, 2);              // bits 4-5
+    // bc_set_flags(&flags, &idx, b->new_target_allowed, 1);     // bit 6
+    // bc_set_flags(&flags, &idx, b->super_call_allowed, 1);     // bit 7
+    // bc_set_flags(&flags, &idx, b->super_allowed, 1);          // bit 8
+    // bc_set_flags(&flags, &idx, b->arguments_allowed, 1);      // bit 9
+    // bc_set_flags(&flags, &idx, b->has_debug, 1);              // bit 10
+    // bc_set_flags(&flags, &idx, b->is_direct_or_indirect_eval, 1); // bit 11
     
-    for (const [atomString, ] of sortedUserAtoms) {
-      const atomData = this.encodeString(atomString)
-      chunks.push(atomData)
+    const setFlags = (value: number, bitCount: number) => {
+      flags |= (value << flagIdx)
+      flagIdx += bitCount
     }
     
-    // 4. Write function bytecode tag
-    chunks.push(new Uint8Array([0x0C])) // BC_TAG_FUNCTION_BYTECODE
+  setFlags(0, 1) // has_prototype = false
+  setFlags(1, 1) // has_simple_parameter_list = true
+  setFlags(0, 1) // is_derived_class_constructor = false
+  setFlags(0, 1) // need_home_object = false
+  setFlags(0, 2) // func_kind = JS_FUNC_NORMAL (0)
+  setFlags(0, 1) // new_target_allowed = false
+  setFlags(0, 1) // super_call_allowed = false
+  setFlags(0, 1) // super_allowed = false
+  setFlags(0, 1) // arguments_allowed = false（模块/顶层函数不允许）
+  setFlags(0, 1) // has_debug = false（默认关闭）
+  setFlags(0, 1) // is_direct_or_indirect_eval = false
     
-    // 5. Write function flags (minimal for simple function)
-    chunks.push(new Uint8Array([0x00, 0x00])) // flags: 16 bits
-    chunks.push(new Uint8Array([0x00])) // js_mode: strict mode
+  content.push(new Uint8Array([flags & 0xFF, (flags >> 8) & 0xFF])) // u16 little endian
+  // js_mode: 模块/顶层默认为严格模式
+  const JS_MODE_STRICT = 1
+  content.push(new Uint8Array([this.config.strictMode ? JS_MODE_STRICT : 0]))
     
-    // 6. Write function name atom (use first atom or create anonymous)
-    chunks.push(LEB128.encode(0)) // Anonymous function uses atom 0
+    // 6. Write function name atom - based on QuickJS bc_put_atom logic
+  // func_name: anonymous (atom 0)
+  content.push(this.bcPutAtom(0))
     
-    // 7. Write function parameters
-    chunks.push(LEB128.encode(0)) // arg_count
-    chunks.push(LEB128.encode(0)) // var_count
-    chunks.push(LEB128.encode(0)) // defined_arg_count
-    chunks.push(LEB128.encode(8)) // stack_size (default)
-    chunks.push(LEB128.encode(0)) // closure_var_count
-    chunks.push(LEB128.encode(this.constants.size())) // cpool_count
-    chunks.push(LEB128.encode(this.buffer.length)) // byte_code_len
+    // 7. Write function parameters - based on QuickJS JS_WriteFunctionTag exact order
+  content.push(LEB128.encode(0)) // arg_count = 0 (no function parameters)
+    const varCount = this.vardefs.size
+  content.push(LEB128.encode(varCount)) // var_count = number of locals
+  content.push(LEB128.encode(0)) // defined_arg_count = 0 (no default parameters)
+    // 使用估算得到的最大栈深度
+    const stackSize = Math.max(this.maxStack, 0)
+  content.push(LEB128.encode(stackSize)) // stack_size
+  content.push(LEB128.encode(this.closureVars.length)) // closure_var_count
+  content.push(LEB128.encode(this.constants.size())) // cpool_count
+  content.push(LEB128.encode(this.buffer.length)) // byte_code_len
     
-    // 8. Write vardefs (empty for now)
-    chunks.push(LEB128.encode(0)) // vardefs count
+    // 8. Write vardefs - based on QuickJS logic: arg_count + var_count variables
+  const totalVarCount = varCount // arg_count + var_count (arg_count=0)
+  content.push(LEB128.encode(totalVarCount))
+
+    // 在写 vardefs 之前，先扫描指令流中的 atom 操作数，建立与 QuickJS 更接近的原子顺序
+    this.patchInstructionAtomOperands()
+
+    // Write variable definitions for local variables
+    const localEntries = Array.from(this.vardefs.entries()).sort((a, b) => a[1] - b[1])
+    for (const [varName, varIndex] of localEntries) {
+      const atomId = this.atomTable.getAtomId(varName)
+  content.push(this.bcPutAtom(atomId))
+  content.push(LEB128.encode(0)) // scope_level
+  content.push(LEB128.encode(0)) // scope_next+1
+      
+      // Calculate variable flags based on QuickJS JSVarDef
+      let varFlags = 0
+      let varFlagIdx = 0
+      const setVarFlags = (value: number, bitCount: number) => {
+        varFlags |= (value << varFlagIdx)
+        varFlagIdx += bitCount  
+      }
+      
+      setVarFlags(0, 4) // var_kind = JS_VAR_NORMAL (0)
+      // 根据记录的 kind 设置 is_const/is_lexical
+      const kind = this.varKinds.get(varName) || 'var'
+      const isConst = kind === 'const' ? 1 : 0
+      const isLexical = kind !== 'var' ? 1 : 0
+      setVarFlags(isConst, 1) // is_const
+      setVarFlags(isLexical, 1) // is_lexical
+      setVarFlags(0, 1) // is_captured = false (not used in closure)
+      
+      content.push(new Uint8Array([varFlags]))
+    }
+
+    // 9. 闭包变量
+    for (const cv of this.closureVars) {
+      const atomId = this.atomTable.getAtomId(cv.name)
+      content.push(this.bcPutAtom(atomId))
+      content.push(LEB128.encode(cv.idx))
+      let cvFlags = 0
+      let idxBits = 0
+      const set = (v: number, n: number) => { cvFlags |= (v << idxBits); idxBits += n }
+      set(1, 1) // is_local
+      set(0, 1) // is_arg
+      const kind = this.varKinds.get(cv.name) || 'var'
+      set(kind === 'const' ? 1 : 0, 1) // is_const
+      set(kind !== 'var' ? 1 : 0, 1) // is_lexical
+      set(0, 4) // var_kind = NORMAL
+      content.push(new Uint8Array([cvFlags]))
+    }
+
+    // 10. Write actual bytecode - use our generated bytecode
+  content.push(new Uint8Array(this.buffer))
     
-    // 9. Write actual bytecode
-    chunks.push(new Uint8Array(this.buffer))
+    // 11. Write debug info if has_debug flag is set  
+    // Since we set has_debug = false, we don't need debug section
     
-    // 10. Write constant pool
+    // 12. Write constant pool
     for (let i = 0; i < this.constants.size(); i++) {
       const constant = this.constants.get(i)
       const constantData = this.encodeConstant(constant)
-      chunks.push(constantData)
+      content.push(constantData)
     }
     
-    // Combine all chunks
-    const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0)
+    // 现在生成原子表并前置
+    const header: Uint8Array[] = []
+    const bcVersion = this.config.bigInt ? 0x45 : 0x05
+    header.push(new Uint8Array([bcVersion]))
+    header.push(LEB128.encode(this.idxToAtom.length))
+    for (const atomId of this.idxToAtom) {
+      const str = this.atomTable.getAtomString(atomId) ?? ''
+      header.push(this.encodeString(str))
+    }
+    const all = [...header, ...content]
+    const totalLength = all.reduce((sum, c) => sum + c.length, 0)
     const result = new Uint8Array(totalLength)
     let offset = 0
-    
-    for (const chunk of chunks) {
-      result.set(chunk, offset)
-      offset += chunk.length
+    for (const c of all) {
+      result.set(c, offset)
+      offset += c.length
     }
-    
     return result
+  }
+
+  // 计算单条指令的栈变化量
+  private getStackDelta(op: OpcodeDefinition, args: number[]): number {
+    let delta = op.nPush - op.nPop
+    // 对于带有“额外弹栈计数”的指令进行修正
+    switch (op.format) {
+      case OpcodeFormat.NPOP: {
+        const extra = args[0] ?? 0
+        delta -= extra
+        break
+      }
+      case OpcodeFormat.NPOP_U16: {
+        const extra = args[0] ?? 0
+        delta -= extra
+        break
+      }
+      case OpcodeFormat.NPOPX: {
+        // CALL0..CALL3 等隐含参数个数
+        const id = op.id.toLowerCase()
+        if (id === 'call0') delta -= 0
+        else if (id === 'call1') delta -= 1
+        else if (id === 'call2') delta -= 2
+        else if (id === 'call3') delta -= 3
+        break
+      }
+      default:
+        break
+    }
+    return delta
   }
   
   // Encode string in QuickJS format
@@ -451,8 +617,10 @@ export class BytecodeWriter {
     const utf8 = new TextEncoder().encode(str)
     const chunks: Uint8Array[] = []
     
-    // String length (LEB128)
-    chunks.push(LEB128.encode(utf8.length))
+    // QuickJS string format: ((length << 1) | is_wide_char)
+    // For UTF-8 strings, is_wide_char = 0
+    const lengthEncoded = utf8.length << 1
+    chunks.push(LEB128.encode(lengthEncoded))
     
     // String data
     chunks.push(utf8)
@@ -528,6 +696,37 @@ export class BytecodeWriter {
     
     // Default: null
     return new Uint8Array([0x01]) // BC_TAG_NULL
+  }
+
+  private patchInstructionAtomOperands() {
+    for (const { pos, atomId } of this.atomPatches) {
+      const mapped = this.mapAtom(atomId)
+      this.buffer[pos] = mapped & 0xff
+      this.buffer[pos + 1] = (mapped >>> 8) & 0xff
+      this.buffer[pos + 2] = (mapped >>> 16) & 0xff
+      this.buffer[pos + 3] = (mapped >>> 24) & 0xff
+    }
+  }
+
+  private mapAtom(atomId: number): number {
+    if (atomId < this.firstAtomId) return atomId >>> 0
+    const cached = this.atomMap.get(atomId)
+    if (cached !== undefined) return cached
+    const idx = this.idxToAtom.length
+    this.idxToAtom.push(atomId)
+    const mapped = (this.firstAtomId + idx) >>> 0
+    this.atomMap.set(atomId, mapped)
+    return mapped
+  }
+
+  private bcPutAtom(atomId: number): Uint8Array {
+    // QuickJS bc_put_atom writes either tagged small int (v<<1)|1 for predefined atoms
+    // or mapped atom index (v<<1) for user atoms.
+    // mapAtom returns original id for predefined (< firstAtomId) and remapped id for user atoms.
+    const v = this.mapAtom(atomId) >>> 0
+    const isPredef = v < this.firstAtomId
+    const tagged = isPredef ? ((v << 1) | 1) >>> 0 : (v << 1) >>> 0
+    return LEB128.encode(tagged)
   }
   
   // Get instructions for debugging

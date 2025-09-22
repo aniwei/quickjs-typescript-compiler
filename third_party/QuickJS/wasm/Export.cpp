@@ -13,10 +13,10 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
   class_<QuickJSBinding>("QuickJSBinding")
     .constructor<>()
     .class_function("compile", &QuickJSBinding::compile)
-    .class_function("dump", &QuickJSBinding::dump)
     .class_function("dumpWithBinary", &QuickJSBinding::dumpWithBinary)
     .class_function("runWithBinary", &QuickJSBinding::runWithBinary)
     .class_function("getBytecodeVersion", &QuickJSBinding::getBytecodeVersion)
     .class_function("getCompileOptions", &QuickJSBinding::getCompileOptions)
+    .class_function("getFirstAtomId", &QuickJSBinding::getFirstAtomId)
     .smart_ptr<std::shared_ptr<QuickJSBinding>>("shared_ptr<QuickJSBinding>");
 }

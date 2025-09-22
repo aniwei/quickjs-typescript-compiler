@@ -11,6 +11,7 @@ export interface CompileFlags {
   shortCode?: boolean
   debug?: boolean
   strictMode?: boolean
+  firstAtomId?: number
 }
 
 export class TypeScriptCompiler {
@@ -22,7 +23,8 @@ export class TypeScriptCompiler {
       dump: options.dump ?? false,
       shortCode: options.shortCode ?? true, // Default to true for optimization
       debug: options.debug ?? false,
-      strictMode: options.strictMode ?? true
+      strictMode: options.strictMode ?? true,
+      firstAtomId: options.firstAtomId
     }
   }
   
