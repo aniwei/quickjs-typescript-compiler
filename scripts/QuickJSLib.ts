@@ -7,6 +7,11 @@ interface Atom {
   key: string
 }
 
+interface Opcode {
+  name: string
+  code: number
+}
+
 export class QuickJSLib {
   static QuickJSModule: unknown = null
 
@@ -41,7 +46,7 @@ export class QuickJSLib {
       input.push_back(source[i])
     }
 
-    QuickJSModule.QuickJSLib.runWithBinary(input, new QuickJSModule.StringArray())
+    QuickJSModule.QuickJSBinding.runWithBinary(input, new QuickJSModule.StringArray())
   }
 
   static async dumpWithBinaryPath(binaryPath: string) {
@@ -53,7 +58,7 @@ export class QuickJSLib {
       input.push_back(source[i])
     }
 
-    const text = QuickJSModule.QuickJSLib.dumpWithBinary(input, new QuickJSModule.StringArray())
+    const text = QuickJSModule.QuickJSBinding.dumpWithBinary(input, new QuickJSModule.StringArray())
     console.log(String(text || ''))
   }
 
@@ -61,13 +66,13 @@ export class QuickJSLib {
     const QuickJSModule = await QuickJSLib.getQuickJSModule()
     const input = new QuickJSModule.Uint8Array()
     for (let i = 0; i < bytes.length; i++) input.push_back(bytes[i])
-    const text = QuickJSModule.QuickJSLib.dumpWithBinary(input, new QuickJSModule.StringArray())
+    const text = QuickJSModule.QuickJSBinding.dumpWithBinary(input, new QuickJSModule.StringArray())
     return String(text || '')
   }
 
   static async getOpcodes() {
     const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    const opcodesMap = QuickJSModule.QuickJSLib.getAllOpCodes()
+    const opcodesMap = QuickJSModule.QuickJSBinding.getAllOpCodes()
     const opcodes: Record<string, number> = {}
     const keys = opcodesMap.keys()
     for (let i = 0; i < keys.size(); i++) {
@@ -79,12 +84,12 @@ export class QuickJSLib {
 
   static async getBytecodeVersion() {
     const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    return QuickJSModule.QuickJSLib.getBytecodeVersion()
+    return QuickJSModule.QuickJSBinding.getBytecodeVersion()
   }
 
   static async getFirstAtomId() {
     const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    return QuickJSModule.QuickJSLib.getFirstAtomId()
+    return QuickJSModule.QuickJSBinding.getFirstAtomId()
   }
 
   static async getAllAtoms() {
@@ -100,6 +105,21 @@ export class QuickJSLib {
     }
 
     return atoms
+  }
+
+  static async getAllOpcodes() {
+    const QuickJSModule = await QuickJSLib.getQuickJSModule()
+    const opcodeMap = QuickJSModule.QuickJSBinding.getOpcodeMap()
+
+    const opcodes: Opcode[] = []
+    const keys = opcodeMap.keys()
+
+    for (let i = 0; i < keys.size(); i++) {
+      const key = keys.get(i)
+      opcodes.push({ code: opcodeMap.get(key), name: key })
+    }
+
+    return opcodes
   }
 
   static async getCompileOptions() {

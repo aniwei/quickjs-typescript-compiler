@@ -377,7 +377,10 @@ export class BytecodeWriter {
     for (const [varName, varIndex] of localEntries) {
       const atomId = this.atomTable.getAtomId(varName)
   content.push(this.bcPutAtom(atomId))
-  content.push(LEB128.encode(0)) // scope_level
+  // 近似：var -> 0；let/const -> 2（QuickJS 顶层 for-of 的块作用域）
+  const kind0 = this.varKinds.get(varName) || 'var'
+  const scopeLevel = (kind0 === 'var') ? 0 : 2
+  content.push(LEB128.encode(scopeLevel)) // scope_level
   content.push(LEB128.encode(0)) // scope_next+1
       
       // Calculate variable flags based on QuickJS JSVarDef
@@ -390,9 +393,9 @@ export class BytecodeWriter {
       
       setVarFlags(0, 4) // var_kind = JS_VAR_NORMAL (0)
       // 根据记录的 kind 设置 is_const/is_lexical
-      const kind = this.varKinds.get(varName) || 'var'
-      const isConst = kind === 'const' ? 1 : 0
-      const isLexical = kind !== 'var' ? 1 : 0
+  const kind = this.varKinds.get(varName) || 'var'
+  const isConst = kind === 'const' ? 1 : 0
+  const isLexical = kind !== 'var' ? 1 : 0
       setVarFlags(isConst, 1) // is_const
       setVarFlags(isLexical, 1) // is_lexical
       setVarFlags(0, 1) // is_captured = false (not used in closure)
@@ -595,11 +598,18 @@ export class BytecodeWriter {
   private bcPutAtom(atomId: number): Uint8Array {
     // QuickJS bc_put_atom writes either tagged small int (v<<1)|1 for predefined atoms
     // or mapped atom index (v<<1) for user atoms.
-    // mapAtom returns original id for predefined (< firstAtomId) and remapped id for user atoms.
+    // mapAtom returns original id for predefined (< firstAtomId) and remapped id (firstAtomId + idx) for user atoms.
     const v = this.mapAtom(atomId) >>> 0
-    const isPredef = v < this.firstAtomId
-    const tagged = isPredef ? ((v << 1) | 1) >>> 0 : (v << 1) >>> 0
-    return LEB128.encode(tagged)
+    if (v < this.firstAtomId) {
+      // Predefined atom: encode as tagged small int (id<<1)|1
+      const tagged = ((v << 1) | 1) >>> 0
+      return LEB128.encode(tagged)
+    } else {
+      // User atom: encode its index in idxToAtom (NOT the remapped id)
+      const idx = (v - this.firstAtomId) >>> 0
+      const tagged = (idx << 1) >>> 0
+      return LEB128.encode(tagged)
+    }
   }
   
   // Get instructions for debugging

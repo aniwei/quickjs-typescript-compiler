@@ -15,6 +15,7 @@ interface ComparisonOptions {
   inputTs: string
   inputJs?: string
   disasm?: boolean
+  asm?: boolean
   normalizeShort?: boolean
   sideBySide?: boolean
   artifactsDir?: string
@@ -24,6 +25,7 @@ interface ComparisonOptions {
 interface CompilationResult {
   bytecode: Uint8Array
   disassembly?: string
+  assembly?: string
   size: number
   opcodes?: string[]
 }
@@ -90,9 +92,15 @@ class BytecodeComparator {
     if (this.options.disasm) {
       disassembly = await this.disassembleBytecode(bytecode, 'ts')
     }
+
+    let assembly: string | undefined 
+    if (this.options.asm) {
+      assembly = await QuickJSLib.dumpBytesToString(bytecode)
+    }
     
     return {
       bytecode,
+      assembly: assembly ? assembly : '<invalid>',
       disassembly,
       size: bytecode.length,
       opcodes: this.extractOpcodes(bytecode)
@@ -136,9 +144,15 @@ class BytecodeComparator {
       if (this.options.disasm) {
         disassembly = await this.disassembleBytecode(bytecode, 'wasm')
       }
-      
+
+      let assembly: string | undefined
+      if (this.options.asm) {
+        assembly = await QuickJSLib.dumpBytesToString(bytecode)
+      }
+
       return {
         bytecode,
+        assembly,
         disassembly,
         size: bytecode.length,
         opcodes: this.extractOpcodes(bytecode)
@@ -231,7 +245,19 @@ class BytecodeComparator {
         wasmResult.disassembly
       )
     }
-    
+
+    if (this.options.asm && tsResult.assembly && wasmResult.assembly) {
+      await fs.writeFile(
+        path.join(this.artifactsDir, `${baseName}.ts.asm`),
+        tsResult.assembly
+      )
+
+      await fs.writeFile(
+        path.join(this.artifactsDir, `${baseName}.wasm.asm`),
+        wasmResult.assembly
+      )
+    }
+
     // Save detailed analysis dumps
     await this.saveDumpAnalysis(baseName, tsResult, wasmResult)
     
@@ -539,6 +565,7 @@ async function main() {
     console.log('  --input-js <file>      JavaScript input file for TypeScript compilation')
     console.log('  --input-ts <file>      TypeScript input file (required)')
     console.log('  --disasm               Generate disassembly')
+    console.log('  --sasm                 Generate assembly')
     console.log('  --normalize-short      Disable short opcode optimization')
     console.log('  --side-by-side         Show side-by-side disassembly')
     console.log('  --artifacts-dir <dir>  Output directory for artifacts (default: artifacts)')
@@ -561,6 +588,9 @@ async function main() {
         break
       case '--disasm':
         options.disasm = true
+        break
+      case '--asm':
+        options.asm = true
         break
       case '--normalize-short':
         options.normalizeShort = true
