@@ -7,7 +7,7 @@ export class Compiler {
 
   compile(node: ts.Node): FunctionDef {
     const fd = new FunctionDef(null);
-    // TODO
+    
     return fd;
   }
 }
