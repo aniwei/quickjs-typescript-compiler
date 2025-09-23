@@ -23,10 +23,11 @@ function toEnumKey(raw: string, prefix: string): string {
 }
 
 async function main() {
-  const [compileOptions, bytecodeVersion, firstAtomId] = await Promise.all([
+  const [compileOptions, bytecodeVersion, firstAtomId, supportsShortOpcodes] = await Promise.all([
     QuickJSLib.getCompileOptions(),
     QuickJSLib.getBytecodeVersion(),
     QuickJSLib.getFirstAtomId(),
+    QuickJSLib.hasShortOpcodes(),
   ])
 
   const [atomsList, opcodeList] = await Promise.all([
@@ -108,17 +109,20 @@ ${uniqueAtoms.map(a => `  ${a.id}: ${JSON.stringify(a.key)},`).join('\n')}
   bytecodeVersion: number
   compileOptions: number
   firstAtomId: number
+  supportsShortOpcodes: boolean
 }
 
 export const env = {
   bytecodeVersion: ${bytecodeVersion},
   compileOptions: ${compileOptions},
   firstAtomId: ${firstAtomId},
+  supportsShortOpcodes: ${supportsShortOpcodes},
 } as const
 `
 
   // Base opcode metadata (id/size/nPop/nPush/format) centralized in env
-  // Note: short opcodes are produced conditionally in TS by getShortOpcodes()
+  // Short opcodes: we also export a subset SHORT_OPCODE_DEFS derived from wasm opcode metadata,
+  // guarded by supportsShortOpcodes so that consumers don't need to re-encode details.
   const idToFormatName = new Map<number, string>(opformats.map(f => [f.id, f.name]))
   const sizeByFormat: Record<string, number> = {
     NONE: 1,
@@ -161,7 +165,39 @@ ${opcodes
 }
 `
 
-  const content = header + '\n' + compiledFlagsEnum + '\n' + opformatEnum + '\n' + opcodeEnum + '\n' + opcodeNameToCode + '\n' + atomEnum + '\n' + atomStrings + '\n' + opcodeDefs + '\n' + envBlock
+  // Define the set of short opcode names as per quickjs-opcode.h #if SHORT_OPCODES block.
+  // We intentionally keep this list small and explicit to avoid ambiguity with similar opcodes.
+  const SHORT_OPCODE_NAME_SET = new Set<string>([
+    'push_minus1', 'push_0', 'push_1', 'push_2', 'push_3', 'push_4', 'push_5', 'push_6', 'push_7',
+    'push_i8', 'push_i16', 'push_const8', 'fclosure8', 'push_empty_string',
+    'get_loc8', 'put_loc8', 'set_loc8',
+    'get_loc0', 'get_loc1', 'get_loc2', 'get_loc3',
+    'put_loc0', 'put_loc1', 'put_loc2', 'put_loc3',
+    'set_loc0', 'set_loc1', 'set_loc2', 'set_loc3',
+    'get_arg0', 'get_arg1', 'get_arg2', 'get_arg3',
+    'put_arg0', 'put_arg1', 'put_arg2', 'put_arg3',
+    'set_arg0', 'set_arg1', 'set_arg2', 'set_arg3',
+    'get_var_ref0', 'get_var_ref1', 'get_var_ref2', 'get_var_ref3',
+    'put_var_ref0', 'put_var_ref1', 'put_var_ref2', 'put_var_ref3',
+    'set_var_ref0', 'set_var_ref1', 'set_var_ref2', 'set_var_ref3',
+    'get_length',
+    'if_false8', 'if_true8', 'goto8', 'goto16',
+    'call0', 'call1', 'call2', 'call3',
+    'is_undefined', 'is_null', 'typeof_is_undefined', 'typeof_is_function',
+  ])
+
+  const shortOpcodeDefs = `export const SHORT_OPCODE_DEFS: Record<string, OpcodeDefinition> = ${supportsShortOpcodes ? '{\n' + opcodes
+    .filter(o => SHORT_OPCODE_NAME_SET.has(o.name))
+    .map(o => {
+      const key = toEnumKey(o.name, 'OP')
+      const fmtName = idToFormatName.get(o.fmt) || 'NONE'
+      const sz = o.size ?? sizeByFormat[fmtName] ?? 1
+      return `  ${key}: { id: ${JSON.stringify(o.name)}, size: ${sz}, nPop: ${o.nPop}, nPush: ${o.nPush}, format: OpFormat.${toEnumKey(fmtName, 'OPFMT')} },`
+    })
+    .join('\n') + '\n}' : '{}'}
+`
+
+  const content = header + '\n' + compiledFlagsEnum + '\n' + opformatEnum + '\n' + opcodeEnum + '\n' + opcodeNameToCode + '\n' + atomEnum + '\n' + atomStrings + '\n' + opcodeDefs + '\n' + shortOpcodeDefs + '\n' + envBlock
 
   fs.writeFileSync('src/env.ts', content, 'utf-8')
   console.log('✓ Environment file src/env.ts generated successfully')

@@ -1,5 +1,7 @@
 import { TypeScriptCompilerCore } from '../src/compiler'
 import { CompilerFlags } from '../src/opcodes'
+import { AtomTable } from '../src/atoms'
+import { BytecodeSerializer } from '../src/serializer'
 
 describe('Bytecode Generation Tests', () => {
   const config: CompilerFlags = {
@@ -9,12 +11,18 @@ describe('Bytecode Generation Tests', () => {
     debug: false,
     strictMode: false
   }
+  const atomTable = new AtomTable(config.firstAtomId)
+  const compiler = new TypeScriptCompilerCore(config, atomTable)
 
-  const compiler = new TypeScriptCompilerCore(config)
+  function compileCode(code: string): Uint8Array {
+    const funcDef = compiler.compile(code)
+    const serializer = new BytecodeSerializer(funcDef, atomTable, config)
+    return serializer.serialize()
+  }
 
   test('should compile simple variable declaration', () => {
     const code = 'let x = 42'
-    const bytecode = compiler.compile(code)
+    const bytecode = compileCode(code)
     
     expect(bytecode).toBeDefined()
     expect(bytecode.length).toBeGreaterThan(0)
@@ -23,7 +31,7 @@ describe('Bytecode Generation Tests', () => {
 
   test('should compile simple assignment', () => {
     const code = 'let x = 5; x = 10;'
-    const bytecode = compiler.compile(code)
+    const bytecode = compileCode(code)
     
     expect(bytecode).toBeDefined()
     expect(bytecode.length).toBeGreaterThan(0)
@@ -31,7 +39,7 @@ describe('Bytecode Generation Tests', () => {
 
   test('should compile arithmetic assignment', () => {
     const code = 'let sum = 0; sum = sum + 5;'
-    const bytecode = compiler.compile(code)
+    const bytecode = compileCode(code)
     
     expect(bytecode).toBeDefined()
     expect(bytecode.length).toBeGreaterThan(0)
@@ -44,7 +52,7 @@ describe('Bytecode Generation Tests', () => {
         console.log(item)
       }
     `
-    const bytecode = compiler.compile(code)
+    const bytecode = compileCode(code)
     
     expect(bytecode).toBeDefined()
     expect(bytecode.length).toBeGreaterThan(0)
@@ -57,7 +65,7 @@ describe('Bytecode Generation Tests', () => {
       }
       let result = add(5, 10)
     `
-    const bytecode = compiler.compile(code)
+    const bytecode = compileCode(code)
     
     expect(bytecode).toBeDefined()
     expect(bytecode.length).toBeGreaterThan(0)
@@ -69,7 +77,7 @@ describe('Bytecode Generation Tests', () => {
       let name = "World"
       let message = greeting + " " + name
     `
-    const bytecode = compiler.compile(code)
+    const bytecode = compileCode(code)
     
     expect(bytecode).toBeDefined()
     expect(bytecode.length).toBeGreaterThan(0)
@@ -83,7 +91,7 @@ describe('Bytecode Generation Tests', () => {
         console.log(item);
       }
     `
-    const bytecode = compiler.compile(code)
+    const bytecode = compileCode(code)
     
     expect(bytecode).toBeDefined()
     expect(bytecode.length).toBeGreaterThan(0)
@@ -91,7 +99,7 @@ describe('Bytecode Generation Tests', () => {
 
   test('should generate valid QuickJS bytecode header', () => {
     const code = 'let x = 42'
-    const bytecode = compiler.compile(code)
+    const bytecode = compileCode(code)
     
     // Check QuickJS bytecode header
     expect(bytecode[0]).toBe(0x05) // BC_VERSION
@@ -102,7 +110,7 @@ describe('Bytecode Generation Tests', () => {
 
   test('should include proper atom table', () => {
     const code = 'let myVariable = "hello"'
-    const bytecode = compiler.compile(code)
+    const bytecode = compileCode(code)
     
     expect(bytecode).toBeDefined()
     expect(bytecode.length).toBeGreaterThan(10) // Should be substantial with atoms
@@ -129,8 +137,8 @@ describe('Bytecode Generation Tests', () => {
     const code1 = 'let x = 1'
     const code2 = 'let y = 2'
     
-    const bytecode1 = compiler.compile(code1)
-    const bytecode2 = compiler.compile(code2)
+    const bytecode1 = compileCode(code1)
+    const bytecode2 = compileCode(code2)
     
     expect(bytecode1).not.toEqual(bytecode2)
   })

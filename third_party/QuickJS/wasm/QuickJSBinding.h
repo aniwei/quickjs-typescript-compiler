@@ -61,6 +61,7 @@ class QuickJSBinding {
   static std::vector<Atom> getAtoms();
   static std::vector<OpFormat> getOpcodeFormats();
   static std::vector<Op> getOpcodes();
+  static bool hasShortOpcodes();
 
   static std::string dumpWithBinary(
     std::vector<uint8_t> bytes,

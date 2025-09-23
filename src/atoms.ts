@@ -29,6 +29,8 @@ if (!("JS_ATOM_trace" in JSAtomObj)) {
 
 export const JSAtom = JSAtomObj as Readonly<typeof JSAtomObj>
 
+export type Atom = number;
+
 // Atom table management
 export class AtomTable {
   private atoms = new Map<string, number>()

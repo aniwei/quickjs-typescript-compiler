@@ -14,8 +14,13 @@ export interface CompileFlags {
   firstAtomId?: number
 }
 
+import { JSFunctionBytecode } from './functionBytecode'
+import { BytecodeSerializer } from './serializer'
+import { AtomTable } from './atoms'
+
 export class TypeScriptCompiler {
   private config: CompilerFlags
+  private atomTable: AtomTable
   
   constructor(options: CompileFlags = {}) {
     this.config = {
@@ -26,12 +31,15 @@ export class TypeScriptCompiler {
       strictMode: options.strictMode ?? true,
       firstAtomId: options.firstAtomId
     }
+    this.atomTable = new AtomTable(this.config.firstAtomId)
   }
   
   // Compile TypeScript source code to QuickJS bytecode
   compile(sourceCode: string, fileName?: string): Uint8Array {
-    const compiler = new TypeScriptCompilerCore(this.config)
-    return compiler.compile(sourceCode, fileName)
+    const compiler = new TypeScriptCompilerCore(this.config, this.atomTable)
+    const funcDef = compiler.compile(sourceCode, fileName)
+    const serializer = new BytecodeSerializer(funcDef, this.atomTable, this.config)
+    return serializer.serialize()
   }
   
   // Compile from file

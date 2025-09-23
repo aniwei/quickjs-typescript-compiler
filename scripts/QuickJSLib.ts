@@ -157,6 +157,11 @@ export class QuickJSLib {
     return options
   }
 
+  static async hasShortOpcodes(): Promise<boolean> {
+    const QuickJSModule = await QuickJSLib.getQuickJSModule()
+    return !!QuickJSModule.QuickJSBinding.hasShortOpcodes()
+  }
+
   static async compileSource(source: string, sourcePath: string = '<eval>', cwd?: string): Promise<Buffer> {
     const QuickJSModule = await QuickJSLib.getQuickJSModule()
 

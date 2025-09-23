@@ -53,12 +53,13 @@ export class BytecodeWriter {
     this.constants = constants
     this.labelManager = labelManager
     this.opcodeGenerator = opcodeGenerator
-  this.firstAtomId = (config.firstAtomId ?? env.firstAtomId) >>> 0
+    this.firstAtomId = env.firstAtomId >>> 0
   }
   
   // 设置模块名 atom（通常为源文件 .js 名称）
   setModuleNameAtom(atom: number) {
     this.moduleNameAtom = atom >>> 0
+    this.mapAtom(this.moduleNameAtom)
   }
   
   // Write instruction with arguments
@@ -265,6 +266,14 @@ export class BytecodeWriter {
     this.buffer[position + 3] = (address >> 24) & 0xFF
   }
   
+  putVar(varName: string): void {
+    const index = this.vardefs.get(varName)
+    if (index === undefined) {
+      throw new Error(`Variable ${varName} not defined`)
+    }
+    this.writeInstruction(this.opcodeGenerator!.getOpcode('put_var'), index)
+  }
+
   // Finalize and get bytecode in QuickJS JS_WriteObject format
   setVardefs(locals: Map<string, number>): void {
     this.vardefs = new Map(locals)
@@ -281,7 +290,11 @@ export class BytecodeWriter {
       .sort((a, b) => a.idx - b.idx)
   }
 
-  finalize(): Uint8Array {
+  getClosureVars(): ReadonlyArray<{ name: string, idx: number }> {
+    return this.closureVars
+  }
+
+  resolveLabels(): void {
     // Resolve all label patches first
     for (const [label, patches] of this.labelManager.getPatches()) {
       const address = this.labelManager.getAddress(label)
@@ -291,9 +304,25 @@ export class BytecodeWriter {
         }
       }
     }
+  }
+
+  finalize(): Uint8Array {
+    this.resolveLabels()
     
     // Generate QuickJS-compatible bytecode format
     return this.generateQuickJSBytecode()
+  }
+
+  getBuffer(): number[] {
+    return this.buffer
+  }
+
+  getAtomPatches(): Array<{ pos: number, atomId: number }> {
+    return this.atomPatches
+  }
+
+  getMaxStackSize(): number {
+    return this.maxStack
   }
   
   // Generate bytecode in QuickJS JS_WriteObject format
@@ -337,7 +366,7 @@ export class BytecodeWriter {
   setFlags(0, 1) // super_call_allowed = false
   setFlags(0, 1) // super_allowed = false
   setFlags(0, 1) // arguments_allowed = false（模块/顶层函数不允许）
-  setFlags(0, 1) // has_debug = false（默认关闭）
+  setFlags(1, 1) // has_debug = true (for line numbers)
   setFlags(0, 1) // is_direct_or_indirect_eval = false
     
   content.push(new Uint8Array([flags & 0xFF, (flags >> 8) & 0xFF])) // u16 little endian
@@ -362,16 +391,18 @@ export class BytecodeWriter {
     
     // 8. Write vardefs - based on QuickJS logic: arg_count + var_count variables
   const totalVarCount = varCount // arg_count + var_count (arg_count=0)
-  content.push(this.encodeHeaderLEB(totalVarCount))
+  // QuickJS's JS_WriteFunctionTag does not write totalVarCount here.
+  // It's implicitly known from arg_count and var_count.
+  // content.push(this.encodeHeaderLEB(totalVarCount))
 
   // Write variable definitions for local variables (按索引顺序)
     const localEntries = Array.from(this.vardefs.entries()).sort((a, b) => a[1] - b[1])
     for (const [varName, varIndex] of localEntries) {
       const atomId = this.atomTable.getAtomId(varName)
   content.push(this.bcPutAtom(atomId))
-  // 近似：var -> 0；let/const -> 2（QuickJS 顶层 for-of 的块作用域）
+  // 近似：var -> 0；let/const -> 1（QuickJS 顶层 for-of 的块作用域）
   const kind0 = this.varKinds.get(varName) || 'var'
-  const scopeLevel = (kind0 === 'var') ? 0 : 2
+  const scopeLevel = (kind0 === 'var') ? 0 : 1
   content.push(LEB128.encode(scopeLevel)) // scope_level
   content.push(LEB128.encode(0)) // scope_next+1
       
@@ -403,8 +434,8 @@ export class BytecodeWriter {
       let cvFlags = 0
       let idxBits = 0
       const set = (v: number, n: number) => { cvFlags |= (v << idxBits); idxBits += n }
-      set(1, 1) // is_local
-      set(0, 1) // is_arg
+      set(1, 1) // is_local = 1
+      set(0, 1) // is_arg = 0
       const kind = this.varKinds.get(cv.name) || 'var'
       set(kind === 'const' ? 1 : 0, 1) // is_const
       set(kind !== 'var' ? 1 : 0, 1) // is_lexical
@@ -416,8 +447,16 @@ export class BytecodeWriter {
     this.patchInstructionAtomOperands()
     content.push(new Uint8Array(this.buffer))
     
-    // 11. Write debug info if has_debug flag is set  
-    // Since we set has_debug = false, we don't need debug section
+    // 11. Write debug info if has_debug flag is set
+    // QuickJS uses this section for line number information
+    content.push(this.encodeHeaderLEB(this.buffer.length)) // pc2line_len
+    // For now, we write a minimal pc2line table. A more sophisticated implementation
+    // would map bytecode offsets to source line numbers.
+    // Format: LEB128(line_num), LEB128(pc_offset) pairs, terminated by a 0 byte.
+    // Let's assume line 1 for the whole function for simplicity.
+    content.push(LEB128.encode(1)) // line_num
+    content.push(LEB128.encode(this.buffer.length)) // pc_offset
+    content.push(new Uint8Array([0])) // End of pc2line table
     
     // 12. Write constant pool
     for (let i = 0; i < this.constants.size(); i++) {
@@ -454,8 +493,10 @@ export class BytecodeWriter {
   private encodeHeaderLEB(value: number): Uint8Array {
     const raw = LEB128.encode(value)
 
-    if (raw.length === 1 && (raw[0] === 0x05 || raw[0] === 0x07)) {
-      return new Uint8Array([0x80 | raw[0], 0x00]) // 0x85/0x87 + 0x00 仍表示同一数值
+    // This logic is based on QuickJS's bc_put_leb128_flags
+    // It avoids single-byte encodings that match a BC_TAG
+    if (raw.length === 1 && raw[0] <= 0x0E) { // BC_TAG_LAST_ATOM is 0x0E
+      return new Uint8Array([0x80 | raw[0], 0x00]) // e.g., 0x05 -> 0x85 0x00
     }
     
     return raw

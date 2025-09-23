@@ -351,4 +351,12 @@ namespace quickjs {
 
     return opcodes;
   }
+
+    bool QuickJSBinding::hasShortOpcodes() {
+      #ifdef SHORT_OPCODES
+      return SHORT_OPCODES != 0;
+      #else
+      return false;
+      #endif
+    }
 }

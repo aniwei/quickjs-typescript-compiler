@@ -52,5 +52,6 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .class_function("getAtoms", &QuickJSBinding::getAtoms)
     .class_function("getOpcodeFormats", &QuickJSBinding::getOpcodeFormats)
     .class_function("getOpcodes", &QuickJSBinding::getOpcodes)
+  .class_function("hasShortOpcodes", &QuickJSBinding::hasShortOpcodes)
     .smart_ptr<std::shared_ptr<QuickJSBinding>>("shared_ptr<QuickJSBinding>");
 }
