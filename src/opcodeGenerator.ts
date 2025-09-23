@@ -5,186 +5,7 @@
 
 import { ConfigManager, CompileFlags } from './config'
 import { CompilerFlags, OpcodeDefinition, OpcodeFormat } from './opcodes'
-
-// Opcode 值映射 - 根据 QuickJS 源码定义
-export enum OpcodeValue {
-  // 基础 opcodes (0-127)
-  OP_INVALID = 0,
-  OP_PUSH_I32 = 1,
-  OP_PUSH_CONST = 2,
-  OP_FCLOSURE = 3,
-  OP_PUSH_ATOM_VALUE = 4,
-  OP_PRIVATE_SYMBOL = 5,
-  OP_UNDEFINED = 6,
-  OP_NULL = 7,
-  OP_PUSH_THIS = 8,
-  OP_PUSH_FALSE = 9,
-  OP_PUSH_TRUE = 10,
-  OP_OBJECT = 11,
-  OP_SPECIAL_OBJECT = 12,
-  OP_REST = 13,
-  OP_DROP = 14,
-  OP_NIP = 15,
-  OP_NIP1 = 16,
-  OP_DUP = 17,
-  OP_DUP1 = 18,
-  OP_DUP2 = 19,
-  OP_DUP3 = 20,
-  OP_INSERT2 = 21,
-  OP_INSERT3 = 22,
-  OP_INSERT4 = 23,
-  OP_PERM3 = 24,
-  OP_PERM4 = 25,
-  OP_PERM5 = 26,
-  OP_SWAP = 27,
-  OP_SWAP2 = 28,
-  OP_ROT3L = 29,
-  OP_ROT3R = 30,
-  OP_ROT4L = 31,
-  OP_ROT5L = 32,
-  
-  // Function calls
-  OP_CALL_CONSTRUCTOR = 33,
-  OP_CALL = 34,
-  OP_TAIL_CALL = 35,
-  OP_CALL_METHOD = 36,
-  OP_TAIL_CALL_METHOD = 37,
-  OP_ARRAY_FROM = 38,
-  OP_APPLY = 39,
-  OP_RETURN = 40,
-  OP_RETURN_UNDEF = 41,
-  
-  // Variables
-  OP_GET_VAR = 42,
-  OP_PUT_VAR = 43,
-  OP_PUT_VAR_INIT = 44,
-  OP_PUT_VAR_STRICT = 45,
-  
-  // Locals
-  OP_GET_LOC = 46,
-  OP_PUT_LOC = 47,
-  OP_SET_LOC = 48,
-  
-  // Arguments
-  OP_GET_ARG = 49,
-  OP_PUT_ARG = 50,
-  OP_SET_ARG = 51,
-  
-  // Object/Array operations
-  OP_GET_FIELD = 52,
-  OP_GET_FIELD2 = 53,
-  OP_PUT_FIELD = 54,
-  OP_GET_ARRAY_EL = 55,
-  OP_PUT_ARRAY_EL = 56,
-  OP_DEFINE_FIELD = 57,
-  OP_DEFINE_ARRAY_EL = 58,
-  OP_APPEND = 59,
-  
-  // Control flow
-  OP_IF_FALSE = 60,
-  OP_IF_TRUE = 61,
-  OP_GOTO = 62,
-  
-  // Arithmetic operations
-  OP_NEG = 63,
-  OP_PLUS = 64,
-  OP_DEC = 65,
-  OP_INC = 66,
-  OP_NOT = 67,
-  OP_LNOT = 68,
-  OP_MUL = 69,
-  OP_DIV = 70,
-  OP_MOD = 71,
-  OP_ADD = 72,
-  OP_SUB = 73,
-  OP_POW = 74,
-  OP_SHL = 75,
-  OP_SAR = 76,
-  OP_SHR = 77,
-  
-  // Comparison operations
-  OP_LT = 78,
-  OP_LTE = 79,
-  OP_GT = 80,
-  OP_GTE = 81,
-  OP_EQ = 82,
-  OP_NEQ = 83,
-  OP_STRICT_EQ = 84,
-  OP_STRICT_NEQ = 85,
-  
-  // Logical operations
-  OP_AND = 86,
-  OP_XOR = 87,
-  OP_OR = 88,
-  
-  // For loops
-  OP_FOR_IN_START = 89,
-  OP_FOR_OF_START = 90,
-  OP_FOR_IN_NEXT = 91,
-  OP_FOR_OF_NEXT = 92,
-  
-  // BigInt support (conditional)
-  OP_PUSH_BIGINT_I32 = 93,
-  
-  // Special opcode
-  OP_NOP = 94,
-  
-  // Short opcodes start (when SHORT_OPCODES enabled)
-  OP_PUSH_MINUS1 = 128,
-  OP_PUSH_0 = 129,
-  OP_PUSH_1 = 130,
-  OP_PUSH_2 = 131,
-  OP_PUSH_3 = 132,
-  OP_PUSH_4 = 133,
-  OP_PUSH_5 = 134,
-  OP_PUSH_6 = 135,
-  OP_PUSH_7 = 136,
-  OP_PUSH_I8 = 137,
-  OP_PUSH_I16 = 138,
-  OP_PUSH_CONST8 = 139,
-  OP_FCLOSURE8 = 140,
-  OP_PUSH_EMPTY_STRING = 141,
-  
-  // Short local operations
-  OP_GET_LOC8 = 142,
-  OP_PUT_LOC8 = 143,
-  OP_SET_LOC8 = 144,
-  
-  // Optimized local access for first 4 locals
-  OP_GET_LOC0 = 145,
-  OP_GET_LOC1 = 146,
-  OP_GET_LOC2 = 147,
-  OP_GET_LOC3 = 148,
-  OP_PUT_LOC0 = 149,
-  OP_PUT_LOC1 = 150,
-  OP_PUT_LOC2 = 151,
-  OP_PUT_LOC3 = 152,
-  OP_SET_LOC0 = 153,
-  OP_SET_LOC1 = 154,
-  OP_SET_LOC2 = 155,
-  OP_SET_LOC3 = 156,
-  
-  // Short jump operations
-  OP_IF_FALSE8 = 157,
-  OP_IF_TRUE8 = 158,
-  OP_GOTO8 = 159,
-  OP_GOTO16 = 160,
-  
-  // Short call operations
-  OP_CALL0 = 161,
-  OP_CALL1 = 162,
-  OP_CALL2 = 163,
-  OP_CALL3 = 164,
-  
-  // Type checks
-  OP_IS_UNDEFINED = 165,
-  OP_IS_NULL = 166,
-  OP_TYPEOF_IS_UNDEFINED = 167,
-  OP_TYPEOF_IS_FUNCTION = 168,
-  
-  // 其他优化的 opcodes...
-  OP_COUNT = 256  // 总数限制
-}
+import { OPCODE_NAME_TO_CODE } from './env'
 
 export class OpcodeGenerator {
   private configManager: ConfigManager
@@ -236,185 +57,188 @@ export class OpcodeGenerator {
   
   // 添加基础 opcodes
   private addBaseOpcodes(): void {
-    this.opcodeMap.set('invalid', OpcodeValue.OP_INVALID)
-    this.opcodeMap.set('push_i32', OpcodeValue.OP_PUSH_I32)
-    this.opcodeMap.set('push_const', OpcodeValue.OP_PUSH_CONST)
-    this.opcodeMap.set('fclosure', OpcodeValue.OP_FCLOSURE)
-    this.opcodeMap.set('push_atom_value', OpcodeValue.OP_PUSH_ATOM_VALUE)
-    this.opcodeMap.set('private_symbol', OpcodeValue.OP_PRIVATE_SYMBOL)
-    this.opcodeMap.set('undefined', OpcodeValue.OP_UNDEFINED)
-    this.opcodeMap.set('null', OpcodeValue.OP_NULL)
-    this.opcodeMap.set('push_this', OpcodeValue.OP_PUSH_THIS)
-    this.opcodeMap.set('push_false', OpcodeValue.OP_PUSH_FALSE)
-    this.opcodeMap.set('push_true', OpcodeValue.OP_PUSH_TRUE)
-    this.opcodeMap.set('object', OpcodeValue.OP_OBJECT)
-    this.opcodeMap.set('special_object', OpcodeValue.OP_SPECIAL_OBJECT)
-    this.opcodeMap.set('rest', OpcodeValue.OP_REST)
+    const code = (name: string) => OPCODE_NAME_TO_CODE[name]
+    this.opcodeMap.set('invalid', code('invalid'))
+    this.opcodeMap.set('push_i32', code('push_i32'))
+    this.opcodeMap.set('push_const', code('push_const'))
+    this.opcodeMap.set('fclosure', code('fclosure'))
+    this.opcodeMap.set('push_atom_value', code('push_atom_value'))
+    this.opcodeMap.set('private_symbol', code('private_symbol'))
+    this.opcodeMap.set('undefined', code('undefined'))
+    this.opcodeMap.set('null', code('null'))
+    this.opcodeMap.set('push_this', code('push_this'))
+    this.opcodeMap.set('push_false', code('push_false'))
+    this.opcodeMap.set('push_true', code('push_true'))
+    this.opcodeMap.set('object', code('object'))
+    this.opcodeMap.set('special_object', code('special_object'))
+    this.opcodeMap.set('rest', code('rest'))
     
     // Stack operations
-    this.opcodeMap.set('drop', OpcodeValue.OP_DROP)
-    this.opcodeMap.set('nip', OpcodeValue.OP_NIP)
-    this.opcodeMap.set('nip1', OpcodeValue.OP_NIP1)
-    this.opcodeMap.set('dup', OpcodeValue.OP_DUP)
-    this.opcodeMap.set('dup1', OpcodeValue.OP_DUP1)
-    this.opcodeMap.set('dup2', OpcodeValue.OP_DUP2)
-    this.opcodeMap.set('dup3', OpcodeValue.OP_DUP3)
-    this.opcodeMap.set('insert2', OpcodeValue.OP_INSERT2)
-    this.opcodeMap.set('insert3', OpcodeValue.OP_INSERT3)
-    this.opcodeMap.set('insert4', OpcodeValue.OP_INSERT4)
-    this.opcodeMap.set('perm3', OpcodeValue.OP_PERM3)
-    this.opcodeMap.set('perm4', OpcodeValue.OP_PERM4)
-    this.opcodeMap.set('perm5', OpcodeValue.OP_PERM5)
-    this.opcodeMap.set('swap', OpcodeValue.OP_SWAP)
-    this.opcodeMap.set('swap2', OpcodeValue.OP_SWAP2)
-    this.opcodeMap.set('rot3l', OpcodeValue.OP_ROT3L)
-    this.opcodeMap.set('rot3r', OpcodeValue.OP_ROT3R)
-    this.opcodeMap.set('rot4l', OpcodeValue.OP_ROT4L)
-    this.opcodeMap.set('rot5l', OpcodeValue.OP_ROT5L)
+  this.opcodeMap.set('drop', code('drop'))
+  this.opcodeMap.set('nip', code('nip'))
+  this.opcodeMap.set('nip1', code('nip1'))
+  this.opcodeMap.set('dup', code('dup'))
+  this.opcodeMap.set('dup1', code('dup1'))
+  this.opcodeMap.set('dup2', code('dup2'))
+  this.opcodeMap.set('dup3', code('dup3'))
+  this.opcodeMap.set('insert2', code('insert2'))
+  this.opcodeMap.set('insert3', code('insert3'))
+  this.opcodeMap.set('insert4', code('insert4'))
+  this.opcodeMap.set('perm3', code('perm3'))
+  this.opcodeMap.set('perm4', code('perm4'))
+  this.opcodeMap.set('perm5', code('perm5'))
+  this.opcodeMap.set('swap', code('swap'))
+  this.opcodeMap.set('swap2', code('swap2'))
+  this.opcodeMap.set('rot3l', code('rot3l'))
+  this.opcodeMap.set('rot3r', code('rot3r'))
+  this.opcodeMap.set('rot4l', code('rot4l'))
+  this.opcodeMap.set('rot5l', code('rot5l'))
     
     // Function calls
-    this.opcodeMap.set('call_constructor', OpcodeValue.OP_CALL_CONSTRUCTOR)
-    this.opcodeMap.set('call', OpcodeValue.OP_CALL)
-    this.opcodeMap.set('tail_call', OpcodeValue.OP_TAIL_CALL)
-    this.opcodeMap.set('call_method', OpcodeValue.OP_CALL_METHOD)
-    this.opcodeMap.set('tail_call_method', OpcodeValue.OP_TAIL_CALL_METHOD)
-    this.opcodeMap.set('array_from', OpcodeValue.OP_ARRAY_FROM)
-    this.opcodeMap.set('apply', OpcodeValue.OP_APPLY)
-    this.opcodeMap.set('return', OpcodeValue.OP_RETURN)
-    this.opcodeMap.set('return_undef', OpcodeValue.OP_RETURN_UNDEF)
+  this.opcodeMap.set('call_constructor', code('call_constructor'))
+  this.opcodeMap.set('call', code('call'))
+  this.opcodeMap.set('tail_call', code('tail_call'))
+  this.opcodeMap.set('call_method', code('call_method'))
+  this.opcodeMap.set('tail_call_method', code('tail_call_method'))
+  this.opcodeMap.set('array_from', code('array_from'))
+  this.opcodeMap.set('apply', code('apply'))
+  this.opcodeMap.set('return', code('return'))
+  this.opcodeMap.set('return_undef', code('return_undef'))
     
     // Variables
-    this.opcodeMap.set('get_var', OpcodeValue.OP_GET_VAR)
-    this.opcodeMap.set('put_var', OpcodeValue.OP_PUT_VAR)
-    this.opcodeMap.set('put_var_init', OpcodeValue.OP_PUT_VAR_INIT)
-    this.opcodeMap.set('put_var_strict', OpcodeValue.OP_PUT_VAR_STRICT)
+  this.opcodeMap.set('get_var', code('get_var'))
+  this.opcodeMap.set('put_var', code('put_var'))
+  this.opcodeMap.set('put_var_init', code('put_var_init'))
+  this.opcodeMap.set('put_var_strict', code('put_var_strict'))
     
     // Locals
-    this.opcodeMap.set('get_loc', OpcodeValue.OP_GET_LOC)
-    this.opcodeMap.set('put_loc', OpcodeValue.OP_PUT_LOC)
-    this.opcodeMap.set('set_loc', OpcodeValue.OP_SET_LOC)
+  this.opcodeMap.set('get_loc', code('get_loc'))
+  this.opcodeMap.set('put_loc', code('put_loc'))
+  this.opcodeMap.set('set_loc', code('set_loc'))
     
     // Arguments
-    this.opcodeMap.set('get_arg', OpcodeValue.OP_GET_ARG)
-    this.opcodeMap.set('put_arg', OpcodeValue.OP_PUT_ARG)
-    this.opcodeMap.set('set_arg', OpcodeValue.OP_SET_ARG)
+  this.opcodeMap.set('get_arg', code('get_arg'))
+  this.opcodeMap.set('put_arg', code('put_arg'))
+  this.opcodeMap.set('set_arg', code('set_arg'))
     
     // Object/Array operations
-    this.opcodeMap.set('get_field', OpcodeValue.OP_GET_FIELD)
-    this.opcodeMap.set('get_field2', OpcodeValue.OP_GET_FIELD2)
-    this.opcodeMap.set('put_field', OpcodeValue.OP_PUT_FIELD)
-    this.opcodeMap.set('get_array_el', OpcodeValue.OP_GET_ARRAY_EL)
-    this.opcodeMap.set('put_array_el', OpcodeValue.OP_PUT_ARRAY_EL)
-    this.opcodeMap.set('define_field', OpcodeValue.OP_DEFINE_FIELD)
-    this.opcodeMap.set('define_array_el', OpcodeValue.OP_DEFINE_ARRAY_EL)
-    this.opcodeMap.set('append', OpcodeValue.OP_APPEND)
+  this.opcodeMap.set('get_field', code('get_field'))
+  this.opcodeMap.set('get_field2', code('get_field2'))
+  this.opcodeMap.set('put_field', code('put_field'))
+  this.opcodeMap.set('get_array_el', code('get_array_el'))
+  this.opcodeMap.set('put_array_el', code('put_array_el'))
+  this.opcodeMap.set('define_field', code('define_field'))
+  this.opcodeMap.set('define_array_el', code('define_array_el'))
+  this.opcodeMap.set('append', code('append'))
     
     // Control flow
-    this.opcodeMap.set('if_false', OpcodeValue.OP_IF_FALSE)
-    this.opcodeMap.set('if_true', OpcodeValue.OP_IF_TRUE)
-    this.opcodeMap.set('goto', OpcodeValue.OP_GOTO)
+  this.opcodeMap.set('if_false', code('if_false'))
+  this.opcodeMap.set('if_true', code('if_true'))
+  this.opcodeMap.set('goto', code('goto'))
     
     // Arithmetic operations
-    this.opcodeMap.set('neg', OpcodeValue.OP_NEG)
-    this.opcodeMap.set('plus', OpcodeValue.OP_PLUS)
-    this.opcodeMap.set('dec', OpcodeValue.OP_DEC)
-    this.opcodeMap.set('inc', OpcodeValue.OP_INC)
-    this.opcodeMap.set('not', OpcodeValue.OP_NOT)
-    this.opcodeMap.set('lnot', OpcodeValue.OP_LNOT)
-    this.opcodeMap.set('mul', OpcodeValue.OP_MUL)
-    this.opcodeMap.set('div', OpcodeValue.OP_DIV)
-    this.opcodeMap.set('mod', OpcodeValue.OP_MOD)
-    this.opcodeMap.set('add', OpcodeValue.OP_ADD)
-    this.opcodeMap.set('sub', OpcodeValue.OP_SUB)
-    this.opcodeMap.set('pow', OpcodeValue.OP_POW)
-    this.opcodeMap.set('shl', OpcodeValue.OP_SHL)
-    this.opcodeMap.set('sar', OpcodeValue.OP_SAR)
-    this.opcodeMap.set('shr', OpcodeValue.OP_SHR)
+  this.opcodeMap.set('neg', code('neg'))
+  this.opcodeMap.set('plus', code('plus'))
+  this.opcodeMap.set('dec', code('dec'))
+  this.opcodeMap.set('inc', code('inc'))
+  this.opcodeMap.set('not', code('not'))
+  this.opcodeMap.set('lnot', code('lnot'))
+  this.opcodeMap.set('mul', code('mul'))
+  this.opcodeMap.set('div', code('div'))
+  this.opcodeMap.set('mod', code('mod'))
+  this.opcodeMap.set('add', code('add'))
+  this.opcodeMap.set('sub', code('sub'))
+  this.opcodeMap.set('pow', code('pow'))
+  this.opcodeMap.set('shl', code('shl'))
+  this.opcodeMap.set('sar', code('sar'))
+  this.opcodeMap.set('shr', code('shr'))
     
     // Comparison operations
-    this.opcodeMap.set('lt', OpcodeValue.OP_LT)
-    this.opcodeMap.set('lte', OpcodeValue.OP_LTE)
-    this.opcodeMap.set('gt', OpcodeValue.OP_GT)
-    this.opcodeMap.set('gte', OpcodeValue.OP_GTE)
-    this.opcodeMap.set('eq', OpcodeValue.OP_EQ)
-    this.opcodeMap.set('neq', OpcodeValue.OP_NEQ)
-    this.opcodeMap.set('strict_eq', OpcodeValue.OP_STRICT_EQ)
-    this.opcodeMap.set('strict_neq', OpcodeValue.OP_STRICT_NEQ)
+  this.opcodeMap.set('lt', code('lt'))
+  this.opcodeMap.set('lte', code('lte'))
+  this.opcodeMap.set('gt', code('gt'))
+  this.opcodeMap.set('gte', code('gte'))
+  this.opcodeMap.set('eq', code('eq'))
+  this.opcodeMap.set('neq', code('neq'))
+  this.opcodeMap.set('strict_eq', code('strict_eq'))
+  this.opcodeMap.set('strict_neq', code('strict_neq'))
     
     // Logical operations
-    this.opcodeMap.set('and', OpcodeValue.OP_AND)
-    this.opcodeMap.set('xor', OpcodeValue.OP_XOR)
-    this.opcodeMap.set('or', OpcodeValue.OP_OR)
+  this.opcodeMap.set('and', code('and'))
+  this.opcodeMap.set('xor', code('xor'))
+  this.opcodeMap.set('or', code('or'))
     
     // For loops
-    this.opcodeMap.set('for_in_start', OpcodeValue.OP_FOR_IN_START)
-    this.opcodeMap.set('for_of_start', OpcodeValue.OP_FOR_OF_START)
-    this.opcodeMap.set('for_in_next', OpcodeValue.OP_FOR_IN_NEXT)
-    this.opcodeMap.set('for_of_next', OpcodeValue.OP_FOR_OF_NEXT)
+  this.opcodeMap.set('for_in_start', code('for_in_start'))
+  this.opcodeMap.set('for_of_start', code('for_of_start'))
+  this.opcodeMap.set('for_in_next', code('for_in_next'))
+  this.opcodeMap.set('for_of_next', code('for_of_next'))
     
     // Special opcode
-    this.opcodeMap.set('nop', OpcodeValue.OP_NOP)
+    this.opcodeMap.set('nop', code('nop'))
   }
   
   // 添加 BigInt opcodes
   private addBigIntOpcodes(): void {
-    this.opcodeMap.set('push_bigint_i32', OpcodeValue.OP_PUSH_BIGINT_I32)
+    const code = (name: string) => OPCODE_NAME_TO_CODE[name]
+    this.opcodeMap.set('push_bigint_i32', code('push_bigint_i32'))
   }
   
   // 添加 Short opcodes
   private addShortOpcodes(): void {
+    const code = (name: string) => OPCODE_NAME_TO_CODE[name]
     // Push small integers
-    this.opcodeMap.set('push_minus1', OpcodeValue.OP_PUSH_MINUS1)
-    this.opcodeMap.set('push_0', OpcodeValue.OP_PUSH_0)
-    this.opcodeMap.set('push_1', OpcodeValue.OP_PUSH_1)
-    this.opcodeMap.set('push_2', OpcodeValue.OP_PUSH_2)
-    this.opcodeMap.set('push_3', OpcodeValue.OP_PUSH_3)
-    this.opcodeMap.set('push_4', OpcodeValue.OP_PUSH_4)
-    this.opcodeMap.set('push_5', OpcodeValue.OP_PUSH_5)
-    this.opcodeMap.set('push_6', OpcodeValue.OP_PUSH_6)
-    this.opcodeMap.set('push_7', OpcodeValue.OP_PUSH_7)
-    this.opcodeMap.set('push_i8', OpcodeValue.OP_PUSH_I8)
-    this.opcodeMap.set('push_i16', OpcodeValue.OP_PUSH_I16)
-    this.opcodeMap.set('push_const8', OpcodeValue.OP_PUSH_CONST8)
-    this.opcodeMap.set('fclosure8', OpcodeValue.OP_FCLOSURE8)
-    this.opcodeMap.set('push_empty_string', OpcodeValue.OP_PUSH_EMPTY_STRING)
+    this.opcodeMap.set('push_minus1', code('push_minus1'))
+    this.opcodeMap.set('push_0', code('push_0'))
+    this.opcodeMap.set('push_1', code('push_1'))
+    this.opcodeMap.set('push_2', code('push_2'))
+    this.opcodeMap.set('push_3', code('push_3'))
+    this.opcodeMap.set('push_4', code('push_4'))
+    this.opcodeMap.set('push_5', code('push_5'))
+    this.opcodeMap.set('push_6', code('push_6'))
+    this.opcodeMap.set('push_7', code('push_7'))
+    this.opcodeMap.set('push_i8', code('push_i8'))
+    this.opcodeMap.set('push_i16', code('push_i16'))
+    this.opcodeMap.set('push_const8', code('push_const8'))
+    this.opcodeMap.set('fclosure8', code('fclosure8'))
+    this.opcodeMap.set('push_empty_string', code('push_empty_string'))
     
     // Short local operations
-    this.opcodeMap.set('get_loc8', OpcodeValue.OP_GET_LOC8)
-    this.opcodeMap.set('put_loc8', OpcodeValue.OP_PUT_LOC8)
-    this.opcodeMap.set('set_loc8', OpcodeValue.OP_SET_LOC8)
+  this.opcodeMap.set('get_loc8', code('get_loc8'))
+  this.opcodeMap.set('put_loc8', code('put_loc8'))
+  this.opcodeMap.set('set_loc8', code('set_loc8'))
     
     // Optimized local access for first 4 locals
-    this.opcodeMap.set('get_loc0', OpcodeValue.OP_GET_LOC0)
-    this.opcodeMap.set('get_loc1', OpcodeValue.OP_GET_LOC1)
-    this.opcodeMap.set('get_loc2', OpcodeValue.OP_GET_LOC2)
-    this.opcodeMap.set('get_loc3', OpcodeValue.OP_GET_LOC3)
-    this.opcodeMap.set('put_loc0', OpcodeValue.OP_PUT_LOC0)
-    this.opcodeMap.set('put_loc1', OpcodeValue.OP_PUT_LOC1)
-    this.opcodeMap.set('put_loc2', OpcodeValue.OP_PUT_LOC2)
-    this.opcodeMap.set('put_loc3', OpcodeValue.OP_PUT_LOC3)
-    this.opcodeMap.set('set_loc0', OpcodeValue.OP_SET_LOC0)
-    this.opcodeMap.set('set_loc1', OpcodeValue.OP_SET_LOC1)
-    this.opcodeMap.set('set_loc2', OpcodeValue.OP_SET_LOC2)
-    this.opcodeMap.set('set_loc3', OpcodeValue.OP_SET_LOC3)
+  this.opcodeMap.set('get_loc0', code('get_loc0'))
+  this.opcodeMap.set('get_loc1', code('get_loc1'))
+  this.opcodeMap.set('get_loc2', code('get_loc2'))
+  this.opcodeMap.set('get_loc3', code('get_loc3'))
+  this.opcodeMap.set('put_loc0', code('put_loc0'))
+  this.opcodeMap.set('put_loc1', code('put_loc1'))
+  this.opcodeMap.set('put_loc2', code('put_loc2'))
+  this.opcodeMap.set('put_loc3', code('put_loc3'))
+  this.opcodeMap.set('set_loc0', code('set_loc0'))
+  this.opcodeMap.set('set_loc1', code('set_loc1'))
+  this.opcodeMap.set('set_loc2', code('set_loc2'))
+  this.opcodeMap.set('set_loc3', code('set_loc3'))
     
     // Short jump operations
-    this.opcodeMap.set('if_false8', OpcodeValue.OP_IF_FALSE8)
-    this.opcodeMap.set('if_true8', OpcodeValue.OP_IF_TRUE8)
-    this.opcodeMap.set('goto8', OpcodeValue.OP_GOTO8)
-    this.opcodeMap.set('goto16', OpcodeValue.OP_GOTO16)
+  this.opcodeMap.set('if_false8', code('if_false8'))
+  this.opcodeMap.set('if_true8', code('if_true8'))
+  this.opcodeMap.set('goto8', code('goto8'))
+  this.opcodeMap.set('goto16', code('goto16'))
     
     // Short call operations
-    this.opcodeMap.set('call0', OpcodeValue.OP_CALL0)
-    this.opcodeMap.set('call1', OpcodeValue.OP_CALL1)
-    this.opcodeMap.set('call2', OpcodeValue.OP_CALL2)
-    this.opcodeMap.set('call3', OpcodeValue.OP_CALL3)
+  this.opcodeMap.set('call0', code('call0'))
+  this.opcodeMap.set('call1', code('call1'))
+  this.opcodeMap.set('call2', code('call2'))
+  this.opcodeMap.set('call3', code('call3'))
     
     // Type checks
-    this.opcodeMap.set('is_undefined', OpcodeValue.OP_IS_UNDEFINED)
-    this.opcodeMap.set('is_null', OpcodeValue.OP_IS_NULL)
-    this.opcodeMap.set('typeof_is_undefined', OpcodeValue.OP_TYPEOF_IS_UNDEFINED)
-    this.opcodeMap.set('typeof_is_function', OpcodeValue.OP_TYPEOF_IS_FUNCTION)
+    this.opcodeMap.set('is_undefined', code('is_undefined'))
+    this.opcodeMap.set('is_null', code('is_null'))
+    this.opcodeMap.set('typeof_is_undefined', code('typeof_is_undefined'))
+    this.opcodeMap.set('typeof_is_function', code('typeof_is_function'))
   }
   
   // 添加调试 opcodes (placeholder)

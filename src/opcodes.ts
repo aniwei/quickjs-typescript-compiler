@@ -5,38 +5,9 @@
  * 根据 QuickJS 编译配置逻辑生成 opcode，不依赖分析 QuickJS 文件
  */
 
-// Opcode format types
-export enum OpcodeFormat {
-  NONE = 'none',
-  NONE_INT = 'none_int',
-  NONE_LOC = 'none_loc',
-  NONE_ARG = 'none_arg',
-  NONE_VAR_REF = 'none_var_ref',
-  U8 = 'u8',
-  I8 = 'i8',
-  LOC8 = 'loc8',
-  CONST8 = 'const8',
-  LABEL8 = 'label8',
-  U16 = 'u16',
-  I16 = 'i16',
-  LABEL16 = 'label16',
-  NPOP = 'npop',
-  NPOPX = 'npopx',
-  NPOP_U16 = 'npop_u16',
-  LOC = 'loc',
-  ARG = 'arg',
-  VAR_REF = 'var_ref',
-  U32 = 'u32',
-  I32 = 'i32',
-  CONST = 'const',
-  LABEL = 'label',
-  ATOM = 'atom',
-  ATOM_U8 = 'atom_u8',
-  ATOM_U16 = 'atom_u16',
-  ATOM_LABEL_U8 = 'atom_label_u8',
-  ATOM_LABEL_U16 = 'atom_label_u16',
-  LABEL_U16 = 'label_u16'
-}
+import { OpFormat as OpcodeFormat } from './env'
+// Re-export for existing imports
+export { OpFormat as OpcodeFormat } from './env'
 
 // Opcode definition structure
 export interface OpcodeDefinition {

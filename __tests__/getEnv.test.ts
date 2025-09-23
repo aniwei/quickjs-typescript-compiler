@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import vm from 'node:vm'
 
 // 通过子进程执行 getEnv.ts，验证生成文件与基础结构
 describe('scripts/getEnv', () => {
@@ -23,12 +24,12 @@ describe('scripts/getEnv', () => {
     expect(content).toContain('export enum JSAtom')
     expect(content).toMatch(/export const env = /)
 
-    // 解析出 env 常量（用一种安全而宽松的方式）
-    // 使用函数包裹 eval，避免污染全局；仅提取 env 定义
+  // 解析出 env 常量（用一种安全而宽松的方式）
+  // 在独立沙箱中对对象字面量求值，避免污染全局
     const envMatch = content.match(/export const env = ([\s\S]*?) as const/)
     expect(envMatch).toBeTruthy()
     const jsonText = envMatch![1]
-    const envObj = JSON.parse(jsonText)
+  const envObj = vm.runInNewContext(`(${jsonText})`, {}, { timeout: 1000 }) as any
 
     // 字段存在与类型检查
     expect(typeof envObj.bytecodeVersion).toBe('number')

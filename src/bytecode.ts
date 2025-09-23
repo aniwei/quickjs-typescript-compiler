@@ -413,8 +413,8 @@ export class BytecodeWriter {
     }
 
     // 10. Write actual bytecode - 按 QuickJS 顺序在 vardefs/closures 之后重写指令里的 atom 并写入
-  this.patchInstructionAtomOperands()
-  content.push(new Uint8Array(this.buffer))
+    this.patchInstructionAtomOperands()
+    content.push(new Uint8Array(this.buffer))
     
     // 11. Write debug info if has_debug flag is set  
     // Since we set has_debug = false, we don't need debug section
@@ -431,27 +431,33 @@ export class BytecodeWriter {
     const bcVersion = this.config.bigInt ? 0x45 : 0x05
     header.push(new Uint8Array([bcVersion]))
     header.push(LEB128.encode(this.idxToAtom.length))
+    
     for (const atomId of this.idxToAtom) {
       const str = this.atomTable.getAtomString(atomId) ?? ''
       header.push(this.encodeString(str))
     }
+
     const all = [...header, ...content]
     const totalLength = all.reduce((sum, c) => sum + c.length, 0)
     const result = new Uint8Array(totalLength)
     let offset = 0
+
     for (const c of all) {
       result.set(c, offset)
       offset += c.length
     }
+
     return result
   }
 
   // 避免在函数头 LEB 特定位置出现 0x05/0x07（测试采用简化扫描常量池的方法）
   private encodeHeaderLEB(value: number): Uint8Array {
     const raw = LEB128.encode(value)
+
     if (raw.length === 1 && (raw[0] === 0x05 || raw[0] === 0x07)) {
       return new Uint8Array([0x80 | raw[0], 0x00]) // 0x85/0x87 + 0x00 仍表示同一数值
     }
+    
     return raw
   }
 

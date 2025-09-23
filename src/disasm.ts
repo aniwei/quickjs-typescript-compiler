@@ -4,7 +4,6 @@
  */
 
 import { LEB128 } from './leb128'
-import { OPCODES } from './opcodes'
 
 export interface DisassemblyResult {
   functionInfo: FunctionInfo
