@@ -24,7 +24,8 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .property("name", &Op::name)
     .property("nPop", &Op::nPop)
     .property("nPush", &Op::nPush)
-    .property("fmt", &Op::fmt);
+    .property("fmt", &Op::fmt)
+    .property("size", &Op::size);
   
 
   class_<Atom>("Atom")

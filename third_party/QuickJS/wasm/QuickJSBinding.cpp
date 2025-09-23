@@ -340,7 +340,8 @@ namespace quickjs {
       #id, \
       static_cast<uint8_t>(n_pop), \
       static_cast<uint8_t>(n_push), \
-      static_cast<uint8_t>(OPFMT_##f) \
+      static_cast<uint8_t>(OPFMT_##f), \
+      static_cast<uint8_t>(size) \
     });
     #define def(id, size, n_pop, n_push, f)
     #include "QuickJS/quickjs-opcode.h"

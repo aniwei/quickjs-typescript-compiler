@@ -3,7 +3,6 @@
 import { BytecodeGenerator, Constants, LabelManager } from '../src/bytecode'
 import { AtomTable, JSAtom } from '../src/atoms'
 import { CompilerFlags, OPCODES } from '../src/opcodes'
-import { LEB128 } from '../src/encoding'
 
 describe('Bytecode Alignment with QuickJS', () => {
   let generator: BytecodeGenerator

@@ -7,9 +7,13 @@ interface Atom {
   key: string
 }
 
-interface Opcode {
+interface OpcodeMeta {
   name: string
   code: number
+  nPop: number
+  nPush: number
+  fmt: number
+  size: number
 }
 
 interface StringArray {
@@ -134,10 +138,10 @@ export class QuickJSLib {
   static async getAllOpcodes() {
     const QuickJSModule = await QuickJSLib.getQuickJSModule()
     const vec = QuickJSModule.QuickJSBinding.getOpcodes()
-    const out: Opcode[] = []
+    const out: OpcodeMeta[] = []
     for (let i = 0; i < vec.size(); i++) {
       const o = vec.get(i)
-      out.push({ name: o.name, code: o.id })
+      out.push({ name: o.name, code: o.id, nPop: o.nPop, nPush: o.nPush, fmt: o.fmt, size: o.size })
     }
     return out
   }

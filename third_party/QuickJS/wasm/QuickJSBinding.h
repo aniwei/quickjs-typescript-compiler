@@ -20,6 +20,7 @@ struct Op {
   uint8_t nPop;
   uint8_t nPush;
   uint8_t fmt;
+  uint8_t size;
 };
 
 struct Atom {
