@@ -23,7 +23,7 @@ function toEnumKey(raw: string, prefix: string): string {
 }
 
 async function main() {
-  const [compileFlags, bytecodeVersion, firstAtomId] = await Promise.all([
+  const [compileOptions, bytecodeVersion, firstAtomId] = await Promise.all([
     QuickJSLib.getCompileOptions(),
     QuickJSLib.getBytecodeVersion(),
     QuickJSLib.getFirstAtomId(),
@@ -83,8 +83,24 @@ ${opcodes.map(o => `  ${toEnumKey(o.name, 'OP')} = ${o.code},`).join('\n')}
 }
 `
 
+  // 直接导出从 QuickJS 名称（如 'add','push_i32'）到数值 code 的映射，便于 TS 侧使用
+  const opcodeNameToCode = `export const OPCODE_NAME_TO_CODE: Record<string, number> = {
+${opcodes.map(o => `  ${JSON.stringify(o.name)}: ${o.code},`).join('\n')}
+}
+`
+
   const atomEnum = `export enum JSAtom {
 ${atomEntries.map(a => `  ${a.key} = ${a.id},`).join('\n')}
+}
+`
+
+  // 额外导出一个从 id 到原始字符串名称的映射，供编译器原子表初始化使用
+  const uniqueAtoms = (atomsList as Atom[])
+    .filter((a, idx, arr) => arr.findIndex(x => x.id === a.id) === idx)
+    .sort((a, b) => a.id - b.id)
+
+  const atomStrings = `export const ATOM_STRINGS: Record<number, string> = {
+${uniqueAtoms.map(a => `  ${a.id}: ${JSON.stringify(a.key)},`).join('\n')}
 }
 `
 
@@ -96,12 +112,12 @@ ${atomEntries.map(a => `  ${a.key} = ${a.id},`).join('\n')}
 
 export const env = ${JSON.stringify({
     bytecodeVersion,
-    compileFlags,
+    compileOptions,
     firstAtomId,
   }, null, 2)} as const
 `
 
-  const content = header + '\n' + compiledFlagsEnum + '\n' + opformatEnum + '\n' + opcodeEnum + '\n' + atomEnum + '\n' + envBlock
+  const content = header + '\n' + compiledFlagsEnum + '\n' + opformatEnum + '\n' + opcodeEnum + '\n' + opcodeNameToCode + '\n' + atomEnum + '\n' + atomStrings + '\n' + envBlock
 
   fs.writeFileSync('src/env.ts', content, 'utf-8')
   console.log('✓ Environment file src/env.ts generated successfully')

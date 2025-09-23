@@ -5,7 +5,7 @@
 
 import ts from 'typescript'
 import { CompilerFlags, OPCODES, getAllOpcodes } from './opcodes'
-import { AtomTable, JSAtom } from './atoms'
+import { AtomTable } from './atoms'
 import { BytecodeWriter } from './bytecode'
 import { createOpcodeGenerator, OpcodeGenerator } from './opcodeGenerator'
 import { Constants } from './constant'
@@ -76,8 +76,8 @@ export class TypeScriptCompilerCore {
   compile(sourceCode: string, fileName = '<input>'): Uint8Array {
     // Create atom for file name (QuickJS includes this in bytecode)
     // Use .js extension to match WASM behavior
-  const jsFileName = fileName.replace(/\.ts$/, '.js')
-  this.moduleNameAtom = this.context.atomTable.getAtomId(jsFileName)
+    const jsFileName = fileName.replace(/\.ts$/, '.js')
+    this.moduleNameAtom = this.context.atomTable.getAtomId(jsFileName)
     
     // Parse TypeScript code
     const sourceFile = ts.createSourceFile(
@@ -457,11 +457,11 @@ export class TypeScriptCompilerCore {
 
     const iterVar = declaration.name.text
     const iterLocalIndex = this.declareLocal(iterVar)
-  // for-of 声明的变量通常为 const/let（TS AST 里由声明列表 flags 指定）
-  const parentList = node.initializer as ts.VariableDeclarationList
-  const isConst = (parentList.flags & ts.NodeFlags.Const) !== 0
-  const isLet = (parentList.flags & ts.NodeFlags.Let) !== 0
-  this.context.varKinds.set(iterVar, isConst ? 'const' : (isLet ? 'let' : 'var'))
+    // for-of 声明的变量通常为 const/let（TS AST 里由声明列表 flags 指定）
+    const parentList = node.initializer as ts.VariableDeclarationList
+    const isConst = (parentList.flags & ts.NodeFlags.Const) !== 0
+    const isLet = (parentList.flags & ts.NodeFlags.Let) !== 0
+    this.context.varKinds.set(iterVar, isConst ? 'const' : (isLet ? 'let' : 'var'))
     
     // Create labels for loop control
     const startLabel = this.context.labelManager.createLabel('for_of_start')

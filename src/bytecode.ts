@@ -4,7 +4,8 @@
  */
 
 import { OpcodeDefinition, OpcodeFormat, CompilerFlags } from './opcodes'
-import { AtomTable, JSAtom } from './atoms'
+import { AtomTable } from './atoms'
+import { env } from './env'
 import { OpcodeGenerator } from './opcodeGenerator'
 import { LEB128 } from './leb128'
 import { LabelManager } from './label'
@@ -35,7 +36,7 @@ export class BytecodeWriter {
   private currentStack = 0
   private maxStack = 0
   private moduleNameAtom: number = 0
-  private firstAtomId: number = JSAtom.JS_ATOM_END
+  private firstAtomId: number = env.firstAtomId
   private atomMap = new Map<number, number>()
   private idxToAtom: number[] = []
   private atomPatches: Array<{ pos: number, atomId: number }> = []
@@ -52,7 +53,7 @@ export class BytecodeWriter {
     this.constants = constants
     this.labelManager = labelManager
     this.opcodeGenerator = opcodeGenerator
-    this.firstAtomId = (config.firstAtomId ?? JSAtom.JS_ATOM_END) >>> 0
+  this.firstAtomId = (config.firstAtomId ?? env.firstAtomId) >>> 0
   }
   
   // 设置模块名 atom（通常为源文件 .js 名称）
