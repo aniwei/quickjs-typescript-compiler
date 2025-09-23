@@ -200,6 +200,10 @@ export class TypeScriptCompilerCore {
     if (node.initializer) {
       this.compileExpression(node.initializer);
       this.context.currentFunction.bytecodeWriter.putVar(varName);
+    } else if (kind !== 'var') {
+      // let/const must have initializers, but for robustness, if not, push undefined
+      this.context.currentFunction.bytecodeWriter.writeInstruction(OPCODES.PUSH_UNDEFINED)
+      this.context.currentFunction.bytecodeWriter.putVar(varName)
     }
   }
   

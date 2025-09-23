@@ -1,8 +1,3 @@
-/**
- * QuickJS Bytecode Generation
- * Based on third_party/QuickJS/src/core/bytecode.h and bytecode.cpp
- */
-
 import { OpcodeDefinition, OpcodeFormat, CompilerFlags } from './opcodes'
 import { AtomTable } from './atoms'
 import { env } from './env'
@@ -272,6 +267,12 @@ export class BytecodeWriter {
       throw new Error(`Variable ${varName} not defined`)
     }
     this.writeInstruction(this.opcodeGenerator!.getOpcode('put_var'), index)
+  }
+
+  addVarDef(name: string, kind: 'var' | 'let' | 'const') {
+    const idx = this.vardefs.size
+    this.vardefs.set(name, idx)
+    this.varKinds.set(name, kind)
   }
 
   // Finalize and get bytecode in QuickJS JS_WriteObject format
@@ -663,40 +664,6 @@ export class BytecodeWriter {
   // Get instructions for debugging
   getInstructions(): Instruction[] {
     return [...this.instructions]
-  }
-}
-
-// 为测试提供向后兼容的包装类：BytecodeGenerator
-// 该类复用 BytecodeWriter 能力，并暴露与测试中使用的方法名一致的 API
-export class BytecodeGenerator extends BytecodeWriter {
-  private _defs = new Map<string, number>()
-  private _kinds = new Map<string, 'var' | 'let' | 'const'>()
-  constructor(
-    config: CompilerFlags,
-    atomTable: AtomTable,
-    constants: Constants,
-    labelManager: LabelManager,
-    opcodeGenerator?: OpcodeGenerator
-  ) {
-    super(config, atomTable, constants, labelManager, opcodeGenerator)
-  }
-
-  // 适配旧测试用例 API
-  addVarDef(name: string, kind: 'var' | 'let' | 'const') {
-    const idx = this._defs.size
-    this._defs.set(name, idx)
-    this._kinds.set(name, kind)
-  }
-
-  writeInstruction(opcode: OpcodeDefinition, ...args: number[]): void {
-    super.writeInstruction(opcode, ...args)
-  }
-
-  finalize(): Uint8Array {
-    // 在生成前同步子类收集到的 var 定义与种类
-    this.setVardefs(this._defs)
-    this.setVarKinds(this._kinds)
-    return super.finalize()
   }
 }
 
