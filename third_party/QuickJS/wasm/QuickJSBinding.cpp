@@ -233,65 +233,75 @@ namespace quickjs {
     return static_cast<uint32_t>(taro_bc_get_version());
   }
 
-  std::map<std::string, bool> QuickJSBinding::getCompileOptions() {
-    std::map<std::string, bool> options;
+  uint32_t QuickJSBinding::getCompileOptions() {
+    uint32_t flags = COMPILED_FLAG_NONE;
 #ifdef DUMP_BYTECODE
-    options["dump"] = true;
-#else
-    options["dump"] = false;
+    flags |= COMPILED_FLAG_DUMP;
 #endif
 
 #ifdef CONFIG_BIGNUM
-    options["bignum"] = true;
-#else
-    options["bignum"] = false;
+    flags |= COMPILED_FLAG_BIGNUM;
 #endif
     
-    return options;
+    return flags;
   }
 
-  std::map<std::string, uint32_t> QuickJSBinding::getAtomMap() {
-    std::map<std::string, uint32_t> atomIds;
+  std::vector<Atom> QuickJSBinding::getAtoms() {
+    std::vector<Atom> atoms;
 
-    // 与 getOpcodeMap 一致：通过展开 quickjs-atom.h 自动生成映射
-    // - 为每个原子添加两种键：标识符名称（#name）与其字符串值（str）
-    // - 其中 empty_string 既添加 "" 键，也补充一个易读别名 "empty_string"
-    // - 额外补充历史兼容别名（如 "<private_brand>")
-
-    #define DEF(name, str)                                                     \
-      atomIds[#name] = static_cast<uint32_t>(JS_ATOM_##name);                  \
-      atomIds[str]    = static_cast<uint32_t>(JS_ATOM_##name);
+    // 同时输出标识符形式(#name)和字符串字面量形式(str)
+    #define DEF(name, str) \
+      atoms.push_back(Atom{ static_cast<uint32_t>(JS_ATOM_##name), #name }); \
+      atoms.push_back(Atom{ static_cast<uint32_t>(JS_ATOM_##name), str });
     #include "QuickJS/quickjs-atom.h"
     #undef DEF
 
     // 友好别名：空字符串
-    atomIds["empty_string"] = static_cast<uint32_t>(JS_ATOM_empty_string);
+    atoms.push_back(Atom{ static_cast<uint32_t>(JS_ATOM_empty_string), "empty_string" });
     // 兼容别名：历史映射中使用过的私有品牌占位
-    atomIds["<private_brand>"] = static_cast<uint32_t>(JS_ATOM_Private_brand);
-    
-    return atomIds;
+    atoms.push_back(Atom{ static_cast<uint32_t>(JS_ATOM_Private_brand), "<private_brand>" });
+
+    return atoms;
   }
 
   uint32_t QuickJSBinding::getFirstAtomId() {
-    // QuickJS 写对象时，允许字节码情况下 first_atom = JS_ATOM_END
-    // 这里返回编译期的值供前端校验
     return static_cast<uint32_t>(JS_ATOM_END);
   }
 
-  std::map<std::string, uint32_t> QuickJSBinding::getOpcodeMap() {
-    std::map<std::string, uint32_t> opcodeIds;
+  std::vector<OpFormat> QuickJSBinding::getOpcodeFormats() {
+    std::vector<OpFormat> formats;
 
-    // 参照 getAtomMap 的思路：通过 quickjs-opcode.h 列表，构建 name -> opcode 数值的映射。
-    // 由于 OP_* 枚举定义在私有头 types.h 中，这里本地重建一个等价的枚举，
-    // 保证与引擎一致（包含 SHORT_OPCODES）。然后基于该枚举生成映射。
-    // 注意：跳过临时指令（def 宏），仅导出正式与短指令（DEF 宏）。
+    // 先构造本地格式枚举，确保 f 有确定的数值
+    enum {
+      #define FMT(f) OPFMT_##f,
+      #define DEF(id, size, n_pop, n_push, f)
+      #define def(id, size, n_pop, n_push, f)
+      #include "QuickJS/quickjs-opcode.h"
+      #undef def
+      #undef DEF
+      #undef FMT
+      OPFMT__COUNT
+    };
 
-    // 确保包含短指令（与引擎默认一致）
+    // 然后填充格式数组
+  #define FMT(f) formats.push_back(OpFormat{ static_cast<uint8_t>(OPFMT_##f), #f });
+    #define DEF(id, size, n_pop, n_push, f)
+    #define def(id, size, n_pop, n_push, f)
+    #include "QuickJS/quickjs-opcode.h"
+    #undef def
+    #undef DEF
+    #undef FMT
+
+    return formats;
+  }
+
+  std::vector<Op> QuickJSBinding::getOpcodes() {
+    std::vector<Op> opcodes;
     #ifndef SHORT_OPCODES
     #define SHORT_OPCODES 1
     #endif
 
-    // 本地重建与 OPCodeEnum 一致的枚举，前半段生成 OP_LOCAL_*，随后追加临时指令范围。
+    // 本地 opcode 枚举，包含普通与短指令，顺序与 QuickJS 一致
     enum {
       #define FMT(f)
       #define DEF(id, size, n_pop, n_push, f) OP_LOCAL_##id,
@@ -312,15 +322,32 @@ namespace quickjs {
       OP_LOCAL_TEMP_END,
     };
 
-    // 生成 name -> id 的映射（只包含“正式/短”指令，不含临时指令）
+    // 同步构造格式枚举以获得格式码
+    enum {
+      #define FMT(f) OPFMT_##f,
+      #define DEF(id, size, n_pop, n_push, f)
+      #define def(id, size, n_pop, n_push, f)
+      #include "QuickJS/quickjs-opcode.h"
+      #undef def
+      #undef DEF
+      #undef FMT
+      OPFMT__COUNT
+    };
+
     #define FMT(f)
-    #define DEF(id, size, n_pop, n_push, f) opcodeIds[#id] = static_cast<uint32_t>(OP_LOCAL_##id);
+    #define DEF(id, size, n_pop, n_push, f) opcodes.push_back(Op{ \
+      static_cast<uint32_t>(OP_LOCAL_##id), \
+      #id, \
+      static_cast<uint8_t>(n_pop), \
+      static_cast<uint8_t>(n_push), \
+      static_cast<uint8_t>(OPFMT_##f) \
+    });
     #define def(id, size, n_pop, n_push, f)
     #include "QuickJS/quickjs-opcode.h"
     #undef def
     #undef DEF
     #undef FMT
 
-    return opcodeIds;
+    return opcodes;
   }
 }

@@ -4,7 +4,7 @@
   "description": "TypeScript to QuickJS Bytecode Compiler",
   "main": "dist/compiler.js",
   "scripts": {
-    "gen:env": "tsx scripts/gen-env.ts",
+    "gen:env": "tsx scripts/getEnv.ts",
     "build": "npm run gen:env && tsc",
     "build:wasm": "tsx scripts/buildWasm.ts",
     "start": "tsx src/cli.ts",

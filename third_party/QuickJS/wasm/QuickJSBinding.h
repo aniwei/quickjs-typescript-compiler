@@ -7,6 +7,31 @@
 using namespace emscripten;
 
 namespace quickjs {
+
+enum CompiledFlags {
+  COMPILED_FLAG_NONE = 0,
+  COMPILED_FLAG_DUMP = 1 << 0,
+  COMPILED_FLAG_BIGNUM = 1 << 1,
+};
+
+struct Op {
+  uint32_t id;
+  std::string name;
+  uint8_t nPop;
+  uint8_t nPush;
+  uint8_t fmt;
+};
+
+struct Atom {
+  uint32_t id;
+  std::string name;
+};
+
+struct OpFormat {
+  uint8_t id;
+  std::string name;
+};
+
 class QuickJSBinding {
   using Ptr = std::shared_ptr<QuickJSBinding>;
 
@@ -29,14 +54,12 @@ class QuickJSBinding {
     std::vector<std::string> modules);
 
   static uint32_t getBytecodeVersion();
-
-  static std::map<std::string, bool> getCompileOptions();
-
+  static uint32_t getCompileOptions();
   static uint32_t getFirstAtomId();
 
-  static std::map<std::string, uint32_t> getAtomMap();
-
-  static std::map<std::string, uint32_t> getOpcodeMap();
+  static std::vector<Atom> getAtoms();
+  static std::vector<OpFormat> getOpcodeFormats();
+  static std::vector<Op> getOpcodes();
 
   static std::string dumpWithBinary(
     std::vector<uint8_t> bytes,

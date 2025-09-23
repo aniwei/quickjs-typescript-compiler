@@ -49,11 +49,11 @@ export class TypeScriptCompilerCore {
   private moduleNameAtom?: number
   private moduleScopeLocals: Set<string> = new Set()
   
-  constructor(flags: CompilerFlags) {
+  constructor(flags: CompilerFlags, opcodeOverride?: Map<string, number>) {
     const atomTable = new AtomTable(flags.firstAtomId)
     const constantsPool = new Constants()
     const labelManager = new LabelManager()
-    const opcodeGenerator = createOpcodeGenerator(flags)
+    const opcodeGenerator = createOpcodeGenerator(flags, opcodeOverride)
     const bytecodeWriter = new BytecodeWriter(flags, atomTable, constantsPool, labelManager, opcodeGenerator)
     
     this.context = {

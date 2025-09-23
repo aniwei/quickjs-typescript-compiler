@@ -89,7 +89,7 @@ class BytecodeAlignmentVerifier {
   }
   
   private extractAtomOrder(output: string): { ts: string[], wasm: string[] } {
-    const atomOrder = { ts: [], wasm: [] }
+    const atomOrder: { ts: string[]; wasm: string[] } = { ts: [], wasm: [] }
     
     // Extract TypeScript atoms
     const tsAtomsMatch = output.match(/TypeScript atoms: \[(.*?)\]/)

@@ -12,8 +12,25 @@ interface Opcode {
   code: number
 }
 
+interface StringArray {
+  size: () => number
+  get: (index: number) => string
+  push_back: (str: string) => void
+}
+
+interface QuickJSBinding {
+  runWithBinary: (input: Uint8Array, args: StringArray) => void
+  dumpWithBinary: (input: Uint8Array, args: StringArray) => string
+  compile: (source: string, sourcePath: string, args: StringArray) => Uint8Array
+  getBytecodeVersion: () => number
+  getFirstAtomId: () => number
+  getAtoms: () => Map<string, number>
+  getOpcodes: () => Map<string, number>
+}
+
 export class QuickJSLib {
-  static QuickJSModule: unknown = null
+  // 使用 any 以避免对 Emscripten 模块结构的过度约束
+  static Module: any = null
 
   static ensureWasmBuilt () {
     const path = resolve(process.cwd(), 'third_party/QuickJS/wasm/output/quickjs_wasm.js')
@@ -26,27 +43,28 @@ export class QuickJSLib {
     return existsSync(path) ? path : null
   }
 
-  static getQuickJSModule = async () => {
-    if (QuickJSLib.QuickJSModule) return QuickJSLib.QuickJSModule
+  static getQuickJSModule = async (): Promise<any> => {
+    if (QuickJSLib.Module) return QuickJSLib.Module
 
     const path = QuickJSLib.ensureWasmBuilt()
     if (!path) throw new Error('QuickJS wasm binding not available')
 
-    const WasmModule = await import(path)
-    QuickJSLib.QuickJSModule = await WasmModule.default()
-    return QuickJSLib.QuickJSModule as any
+    const WasmModule: any = await import(path)
+    QuickJSLib.Module = await WasmModule.default()
+    // 返回 Emscripten 模块本体，包含 QuickJSBinding/Uint8Array/StringArray 等类型
+    return QuickJSLib.Module
   }
 
   static async runWithBinaryPath(binaryPath: string) {
-    const QuickJSModule = await QuickJSLib.getQuickJSModule()
+    const Module = await QuickJSLib.getQuickJSModule()
     const source = readFileSync(binaryPath)
 
-    const input = new QuickJSModule.Uint8Array()
+    const input = new Module.Uint8Array()
     for (let i = 0; i < source.length; i++) {
       input.push_back(source[i])
     }
 
-    QuickJSModule.QuickJSBinding.runWithBinary(input, new QuickJSModule.StringArray())
+    Module.QuickJSBinding.runWithBinary(input, new Module.StringArray())
   }
 
   static async dumpWithBinaryPath(binaryPath: string) {
@@ -72,14 +90,13 @@ export class QuickJSLib {
 
   static async getOpcodes() {
     const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    const opcodesMap = QuickJSModule.QuickJSBinding.getAllOpCodes()
-    const opcodes: Record<string, number> = {}
-    const keys = opcodesMap.keys()
-    for (let i = 0; i < keys.size(); i++) {
-      const key = keys.get(i)
-      opcodes[key] = opcodesMap.get(key)
+    const vec = QuickJSModule.QuickJSBinding.getOpcodes()
+    const map: Record<string, number> = {}
+    for (let i = 0; i < vec.size(); i++) {
+      const o = vec.get(i)
+      map[o.name] = o.id
     }
-    return opcodes
+    return map
   }
 
   static async getBytecodeVersion() {
@@ -94,37 +111,45 @@ export class QuickJSLib {
 
   static async getAllAtoms() {
     const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    const atomMap = QuickJSModule.QuickJSBinding.getAtomMap()
-
+    const vec = QuickJSModule.QuickJSBinding.getAtoms()
     const atoms: Atom[] = []
-    const keys = atomMap.keys()
-    
-    for (let i = 0; i < keys.size(); i++) {
-      const key = keys.get(i)
-      atoms.push({ id: atomMap.get(key), key })
+    for (let i = 0; i < vec.size(); i++) {
+      const a = vec.get(i)
+      atoms.push({ id: a.id, key: a.name })
     }
-
     return atoms
+  }
+
+  static async getAllOpcodeFormats() {
+    const QuickJSModule = await QuickJSLib.getQuickJSModule()
+    const vec = QuickJSModule.QuickJSBinding.getOpcodeFormats()
+    const formats: Record<string, number> = {}
+    for (let i = 0; i < vec.size(); i++) {
+      const f = vec.get(i)
+      formats[f.name] = f.id
+    }
+    return formats
   }
 
   static async getAllOpcodes() {
     const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    const opcodeMap = QuickJSModule.QuickJSBinding.getOpcodeMap()
-
-    const opcodes: Opcode[] = []
-    const keys = opcodeMap.keys()
-
-    for (let i = 0; i < keys.size(); i++) {
-      const key = keys.get(i)
-      opcodes.push({ code: opcodeMap.get(key), name: key })
+    const vec = QuickJSModule.QuickJSBinding.getOpcodes()
+    const out: Opcode[] = []
+    for (let i = 0; i < vec.size(); i++) {
+      const o = vec.get(i)
+      out.push({ name: o.name, code: o.id })
     }
+    return out
+  }
 
-    return opcodes
+  static async getOpcodeOverrideMap(): Promise<Map<string, number>> {
+    const list = await QuickJSLib.getAllOpcodes()
+    return new Map(list.map(o => [o.name, o.code]))
   }
 
   static async getCompileOptions() {
     const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    const options = QuickJSModule.QuickJSLib.getCompileOptions()
+    const options = QuickJSModule.QuickJSBinding.getCompileOptions()
     return options
   }
 

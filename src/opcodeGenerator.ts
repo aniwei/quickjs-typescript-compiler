@@ -189,9 +189,11 @@ export enum OpcodeValue {
 export class OpcodeGenerator {
   private configManager: ConfigManager
   private opcodeMap = new Map<string, number>()
+  private overrideMap?: Map<string, number>
   
-  constructor(configManager: ConfigManager) {
+  constructor(configManager: ConfigManager, overrideMap?: Map<string, number>) {
     this.configManager = configManager
+    this.overrideMap = overrideMap
     this.generateOpcodeMap()
   }
   
@@ -443,6 +445,9 @@ export class OpcodeGenerator {
   
   // 获取 opcode 数值
   getOpcodeValue(opcodeId: string): number | undefined {
+    // 优先使用 QuickJS 提供的权威映射
+    const v = this.overrideMap?.get(opcodeId)
+    if (v !== undefined) return v
     return this.opcodeMap.get(opcodeId)
   }
   
@@ -490,7 +495,7 @@ export class OpcodeGenerator {
 }
 
 // 根据编译器配置创建 opcode 生成器
-export function createOpcodeGenerator(config: CompilerFlags): OpcodeGenerator {
+export function createOpcodeGenerator(config: CompilerFlags, overrideMap?: Map<string, number>): OpcodeGenerator {
   const configManager = ConfigManager.fromCompilerFlags(config)
-  return new OpcodeGenerator(configManager)
+  return new OpcodeGenerator(configManager, overrideMap)
 }

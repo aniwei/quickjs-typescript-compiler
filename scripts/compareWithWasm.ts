@@ -8,7 +8,8 @@
 
 import fs from 'fs/promises'
 import path from 'path'
-import { TypeScriptCompiler } from '../src/index'
+import { TypeScriptCompilerCore } from '../src/index'
+import { createAdvancedDisassembly } from '../src/disasm'
 import { QuickJSLib } from './QuickJSLib'
 
 interface ComparisonOptions {
@@ -76,16 +77,22 @@ class BytecodeComparator {
     try {
       firstAtomId = await QuickJSLib.getFirstAtomId()
     } catch {}
-    
-    const compiler = new TypeScriptCompiler({
+    // 获取 QuickJS 的 opcode 映射，确保我们生成的数值与引擎一致
+    let opcodeOverride: Map<string, number> | undefined
+    try {
+      opcodeOverride = await QuickJSLib.getOpcodeOverrideMap()
+    } catch {}
+
+    const flags = {
       bigInt: false,
       dump: false,
       shortCode: !this.options.normalizeShort,
       debug: false,
       strictMode: false,
       firstAtomId
-    })
+    } as const
 
+    const compiler = new TypeScriptCompilerCore(flags as any, opcodeOverride)
     const bytecode = compiler.compile(sourceCode, path.relative(process.cwd(), this.options.inputTs))
 
     let disassembly: string | undefined
@@ -95,7 +102,8 @@ class BytecodeComparator {
 
     let assembly: string | undefined 
     if (this.options.asm) {
-      assembly = await QuickJSLib.dumpBytesToString(bytecode)
+      // 使用我们自己的反汇编器渲染 TS 侧字节码，避免被 QuickJS 误解析
+      assembly = createAdvancedDisassembly(bytecode)
     }
     
     return {
