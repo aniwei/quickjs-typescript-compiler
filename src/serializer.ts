@@ -69,8 +69,8 @@ export class BytecodeSerializer {
     setFlags(this.funcDef.super_call_allowed ? 1 : 0, 1)
     setFlags(this.funcDef.super_allowed ? 1 : 0, 1)
     setFlags(this.funcDef.arguments_allowed ? 1 : 0, 1)
-    setFlags(this.funcDef.has_debug ? 1 : 0, 1)
-    setFlags(this.funcDef.is_direct_or_indirect_eval ? 1 : 0, 1)
+    setFlags(this.funcDef.strip_debug ? 0 : 1, 1)
+    setFlags(this.funcDef.is_eval ? 1 : 0, 1)
 
     content.push(new Uint8Array([flags & 0xff, (flags >> 8) & 0xff])) // u16 little endian
     // js_mode: 由 config.strictMode 控制（测试读取该字段）
