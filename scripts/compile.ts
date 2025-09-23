@@ -1,6 +1,9 @@
 import { promises as fs } from 'node:fs'
 import * as path from 'node:path'
 import { QuickJSLib } from './QuickJSLib'
+import { Compiler } from '../src/compiler';
+import { serialize } from '../src/serializer';
+import * as ts from 'typescript';
 
 
 async function ensureDir(filePath: string) {
@@ -20,8 +23,17 @@ async function main() {
   const absOut = path.resolve(outFile)
 
   await ensureDir(absOut)
-  const bytecode = await QuickJSLib.compileSourceWithPath(absIn) 
-  await fs.writeFile(absOut, Buffer.from(bytecode))
+  const code = await fs.readFile(absIn, 'utf-8');
+  const sourceFile = ts.createSourceFile(
+    absIn,
+    code,
+    ts.ScriptTarget.ESNext,
+    true
+  );
+  const compiler = new Compiler();
+  const func = compiler.compile(sourceFile);
+  const bytecode = serialize(func);
+  await fs.writeFile(absOut, Buffer.from(bytecode));
 
   console.log(
     `✅ 编译成功: ${path.relative(process.cwd(), absIn)} -> ${path.relative(

@@ -1,27 +1,29 @@
-/**
- * Represents the definition of a function during compilation, analogous to
- * `JSFunctionDef` in QuickJS's `parser.h`. This class serves as a workspace
- * for collecting all information needed to compile a single function.
- */
 
-import { AtomTable, Atom } from './atoms';
-import { Constants } from './constant';
-import { LabelManager } from './label';
-import { OpcodeGenerator } from './opcodeGenerator';
-import { BytecodeWriter, Instruction } from './bytecode';
-import { CompilerFlags } from './opcodes';
-import { ConfigManager } from './config';
-import { LoopContext, Scope } from './types';
+import { Atom } from './atoms';
+import { FunctionBytecode } from './functionBytecode';
+import { JSVarScope } from './scope';
+import { ClosureVar, VarDef } from './var';
 
-type JSFunctionKind = 0 | 1 | 2 | 3; // JS_FUNC_NORMAL, JS_FUNC_GENERATOR, JS_FUNC_ASYNC, JS_FUNC_ASYNC_GENERATOR
+export type JSFunctionKind = 0 | 1 | 2 | 3; // JS_FUNC_NORMAL, JS_FUNC_GENERATOR, JS_FUNC_ASYNC, JS_FUNC_ASYNC_GENERATOR
 
-export class JSFunctionDef {
-  ctx: any; // JSContext
-  parent?: JSFunctionDef;
-  parent_cpool_idx: number = -1;
+export enum JSParseFunctionEnum {
+  JS_PARSE_FUNC_STATEMENT,
+  JS_PARSE_FUNC_VAR,
+  JS_PARSE_FUNC_EXPR,
+  JS_PARSE_FUNC_ARROW,
+
+  JS_PARSE_FUNC_GETTER,
+  JS_PARSE_FUNC_SETTER,
+  JS_PARSE_FUNC_METHOD,
+  JS_PARSE_FUNC_CLASS_STATIC_INIT,
+  JS_PARSE_FUNC_CLASS_CONSTRUCTOR,
+  JS_PARSE_FUNC_DERIVED_CLASS_CONSTRUCTOR,
+}
+
+export class FunctionDef {
+  parent: FunctionDef | null = null;
+  parent_cpool_idx: number = 0;
   parent_scope_level: number = 0;
-  child_list: JSFunctionDef[] = [];
-  link: any; // list_head
 
   is_eval: boolean = false;
   eval_type: number = 0;
@@ -38,19 +40,16 @@ export class JSFunctionDef {
   new_target_allowed: boolean = false;
   super_call_allowed: boolean = false;
   super_allowed: boolean = false;
-  arguments_allowed: boolean = true;
+  arguments_allowed: boolean = false;
   is_derived_class_constructor: boolean = false;
   in_function_body: boolean = false;
-  func_kind: JSFunctionKind = 0; // JSFunctionKindEnum
-  func_type: number = 0; // JSParseFunctionEnum
+  func_kind: JSFunctionKind = 0;
+  func_type: JSParseFunctionEnum = JSParseFunctionEnum.JS_PARSE_FUNC_STATEMENT;
   js_mode: number = 0;
   func_name: Atom = 0;
 
-  vars: any[] = []; // JSVarDef
-  var_size: number = 0;
-  var_count: number = 0;
-  args: any[] = []; // JSVarDef
-  arg_size: number = 0;
+  vars: VarDef[] = [];
+  args: VarDef[] = [];
   arg_count: number = 0;
   defined_arg_count: number = 0;
   var_object_idx: number = -1;
@@ -67,47 +66,29 @@ export class JSFunctionDef {
 
   scope_level: number = 0;
   scope_first: number = 0;
-  scope_size: number = 0;
-  scope_count: number = 0;
-  scopes: any[] = []; // JSVarScope
-  def_scope_array: any[] = []; // JSVarScope[4]
+  scopes: JSVarScope[] = [];
   body_scope: number = 0;
 
-  global_var_count: number = 0;
-  global_var_size: number = 0;
   global_vars: any[] = []; // JSGlobalVar
 
-  byte_code: any; // DynBuf
+  byte_code: number[] = [];
   last_opcode_pos: number = -1;
-  last_opcode_source_ptr: any; // uint8_t*
+  last_opcode_source_ptr: any = null;
   use_short_opcodes: boolean = false;
 
   label_slots: any[] = []; // LabelSlot
-  label_size: number = 0;
-  label_count: number = 0;
-  top_break: any; // BlockEnv*
+  top_break: any = null; // BlockEnv
 
-  cpool: any[] = []; // JSValue
-  cpool_count: number = 0;
-  cpool_size: number = 0;
+  cpool: any[] = [];
 
-  closure_var_count: number = 0;
-  closure_var_size: number = 0;
-  closure_var: any[] = []; // JSClosureVar
+  closure_var: ClosureVar[] = [];
 
   jump_slots: any[] = []; // JumpSlot
-  jump_size: number = 0;
-  jump_count: number = 0;
-
   line_number_slots: any[] = []; // LineNumberSlot
-  line_number_size: number = 0;
-  line_number_count: number = 0;
+  column_number_slots: any[] = []; // ColumnNumberSlot
+
   line_number_last: number = 0;
   line_number_last_pc: number = 0;
-
-  column_number_slots: any[] = []; // ColumnNumberSlot
-  column_number_size: number = 0;
-  column_number_count: number = 0;
   column_number_last: number = 0;
   column_number_last_pc: number = 0;
 
@@ -115,76 +96,19 @@ export class JSFunctionDef {
   strip_source: boolean = false;
   filename: Atom = 0;
   source_pos: number = 0;
-  get_line_col_cache: any; // GetLineColCache*
-  pc2line: any; // DynBuf
-  pc2column: any; // DynBuf
 
   source: string = '';
-  source_len: number = 0;
 
-  module: any; // JSModuleDef*
+  module: any = null; // JSModuleDef
   has_await: boolean = false;
 
-  ic: any; // InlineCache*
-
-  // TypeScript specific fields
-  bytecodeWriter: BytecodeWriter;
-  opcodeGenerator: OpcodeGenerator;
-  constantsPool: Constants;
-  labelManager: LabelManager;
-  locals: Map<string, number> = new Map()
-  nextLocalIndex: number = 0
-  varKinds: Map<string, 'var' | 'let' | 'const'> = new Map()
-  moduleScopeLocals: Set<string> = new Set()
-  loopStack: LoopContext[] = []
-
-  constructor(atomTable: AtomTable, opcodeGenerator: OpcodeGenerator, flags: CompilerFlags, parent?: JSFunctionDef) {
-    this.parent = parent;
-    this.opcodeGenerator = opcodeGenerator;
-    this.constantsPool = new Constants();
-    this.labelManager = new LabelManager();
-    this.bytecodeWriter = new BytecodeWriter(flags, atomTable, this.constantsPool, this.labelManager, opcodeGenerator);
+  constructor(public parent_fd: FunctionDef | null) {
+    this.parent = parent_fd;
   }
 
-  // Scope management methods
-  enterScope(type: Scope['type']): void {
-    const scope: Scope = {
-      type,
-      locals: new Set(),
-      parent: this.scopes[this.scopes.length - 1],
-    };
-    this.scopes.push(scope);
-  }
-
-  exitScope(): void {
-    this.scopes.pop();
-  }
-
-  getCurrentScope(): Scope | undefined {
-    return this.scopes[this.scopes.length - 1];
-  }
-
-  // Local variable management methods
-  declareLocal(name: string): number {
-    const index = this.var_count++;
-    this.locals.set(name, index);
-
-    const scope = this.getCurrentScope();
-    if (scope) {
-      scope.locals.add(name);
-      if (scope.type === 'module') {
-        this.moduleScopeLocals.add(name);
-      }
-    }
-
-    return index;
-  }
-
-  getLocalIndex(name: string): number | undefined {
-    return this.locals.get(name);
-  }
-
-  isModuleVar(name: string): boolean {
-    return this.moduleScopeLocals.has(name);
+  toBytecode(): FunctionBytecode {
+    const bc = new FunctionBytecode();
+    // TODO: fill bytecode
+    return bc;
   }
 }

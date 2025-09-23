@@ -1,66 +1,30 @@
+
 import { Atom } from './atoms';
-import { Instruction } from './bytecode';
-import { Constants } from './constant';
+import { FunctionDef } from './functionDef';
 
-export type VarKind = 'var' | 'let' | 'const';
-
-export interface JSVarDef {
-  name: Atom;
-  scopeLevel: number;
-  scopeNext: number;
-  kind: VarKind;
-  isCaptured: boolean;
-}
-
-export interface JSClosureVar {
-  name: Atom;
-  isLocal: boolean;
-  isArg: boolean;
-  kind: VarKind;
-  varKind: 'normal' | 'function_name' | 'this' | 'new.target' | 'home_object';
-  idx: number;
-}
-
-export class JSFunctionBytecode {
-  // Function properties
-  funcName: Atom = 0;
-  source?: string;
-  sourceLen?: number;
-  
-  // Flags
-  jsMode: 'strict' | 'sloppy' = 'strict';
-  hasPrototype: boolean = false;
-  hasSimpleParameterList: boolean = true;
-  isDerivedClassConstructor: boolean = false;
-  needHomeObject: boolean = false;
-  funcKind: 'normal' | 'generator' | 'async' | 'async_generator' = 'normal';
-  newTargetAllowed: boolean = false;
-  superCallAllowed: boolean = false;
-  superAllowed: boolean = false;
-  argumentsAllowed: boolean = false;
-  hasDebug: boolean = true; // Default to true for line numbers
-  isDirectOrIndirectEval: boolean = false;
-
-  // Counts and sizes
-  argCount: number = 0;
-  varCount: number = 0;
-  definedArgCount: number = 0;
-  stackSize: number = 0;
-  closureVarCount: number = 0;
-  cpoolCount: number = 0;
-  bytecodeLen: number = 0;
-
-  // Data buffers
-  vardefs: JSVarDef[] = [];
-  closureVars: JSClosureVar[] = [];
-  cpool: Constants[] = [];
-  instructions: Instruction[] = [];
-  pc2line: { pc: number; line: number }[] = [];
-
-  // Module info
-  moduleNameAtom: Atom = 0;
-
-  constructor(name: Atom = 0) {
-    this.funcName = name;
-  }
+export class FunctionBytecode {
+  header_size: number = 0;
+  function_name: Atom = 0;
+  line_num: number = 0;
+  pc2line_len: number = 0;
+  pc2line_buf: number[] = [];
+  stack_size: number = 0;
+  arg_count: number = 0;
+  var_count: number = 0;
+  defined_arg_count: number = 0;
+  js_mode: number = 0;
+  has_prototype: boolean = false;
+  has_parameter_expressions: boolean = false;
+  has_use_strict: boolean = false;
+  is_derived_class_constructor: boolean = false;
+  need_home_object: boolean = false;
+  func_kind: number = 0;
+  closure_var_count: number = 0;
+  closure_var: any[] = []; // JSClosureVar
+  cpool_count: number = 0;
+  cpool: any[] = [];
+  bytecode_len: number = 0;
+  bytecode_buf: number[] = [];
+  vardefs_len: number = 0;
+  vardefs: any[] = []; // JSVarDef
 }
