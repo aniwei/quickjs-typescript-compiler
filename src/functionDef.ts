@@ -1,12 +1,25 @@
-export class FunctionDef {}
+import { Atom } from './atoms';
+import { FunctionBytecode } from './functionBytecode';
+import { Scope } from './scopes';
+import { Var } from './vars';
 
-export function createNewEmptyFunctionDef(filename: string) {
-  return createNewFunctionDef(null, filename)
-}
 
-export function createNewFunctionDef(
-  parent: FunctionDef | null,
-  filename: string
-) {
-  return new FunctionDef()
+
+// ...existing code...
+export class FunctionDef {
+  parent: FunctionDef | null = null;
+  childs: FunctionDef[] = [];
+
+  funcBytecode: FunctionBytecode;
+  funcName: Atom;
+  vars: Var[] = [];
+  scopes: Scope[] = [];
+
+  constructor(name: Atom, source: string, sourceFile: string) {
+    this.funcName = name;
+    this.funcBytecode = new FunctionBytecode(name, {
+      source,
+      sourceFile,
+    });
+  }
 }

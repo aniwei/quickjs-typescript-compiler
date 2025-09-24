@@ -1,6 +1,34 @@
-export class FunctionBytecode {}
+import { Atom } from './atoms';
+import { ConstantTag } from './constant';
+import { Opcode } from './env';
+
+export class FunctionBytecode {
+  name: Atom;
+  stackSize = 0;
+  argCount = 0;
+  varCount = 0;
+  definedArgCount = 0;
+  // TODO
+  cpool: [ConstantTag, any][] = [];
+  opcodes: Opcode[] = [];
+  source: string;
+  sourceFile: string;
+  lineNum = 1;
+
+  constructor(
+    name: Atom,
+    options: {
+      source: string;
+      sourceFile: string;
+    }
+  ) {
+    this.name = name;
+    this.source = options.source;
+    this.sourceFile = options.sourceFile;
+  }
+}
 
 
 export function createNewFunctionBytecode() {
-  
+
 }

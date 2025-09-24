@@ -1,1 +1,3 @@
-export class VarScope {}
+export class Scope {
+  // TODO
+}
