@@ -18,7 +18,7 @@ describe('scripts/getEnv', () => {
     const content = fs.readFileSync(envPath, 'utf-8')
 
     // 基本的片段检查，避免对具体数值强耦合
-    expect(content).toContain('export enum CompiledFlags')
+  expect(content).toContain('export enum CompileFlags')
     expect(content).toContain('export enum OpFormat')
     expect(content).toContain('export enum Opcode')
     expect(content).toContain('export enum JSAtom')

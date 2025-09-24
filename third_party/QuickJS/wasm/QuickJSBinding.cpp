@@ -2,6 +2,7 @@
 #include <string>
 #include <stdexcept>
 #include "QuickJS/extension/taro_js_bytecode.h"
+#include "QuickJS/extension/taro_js_types.h"
 #include "QuickJSBinding.h"
 
 namespace quickjs {
@@ -244,7 +245,7 @@ namespace quickjs {
 #endif
 
 #ifdef SHORT_OPCODES
-    flags |= COMPILE_FLAT_SHORT_OPCODES;
+    flags |= COMPILE_FLAG_SHORT_OPCODES;
 #endif
     
     return flags;
@@ -270,6 +271,17 @@ namespace quickjs {
 
   uint32_t QuickJSBinding::getFirstAtomId() {
     return static_cast<uint32_t>(JS_ATOM_END);
+  }
+
+  std::vector<FunctionKind> QuickJSBinding::getFunctionKinds() {
+    std::vector<FunctionKind> kinds;
+
+    kinds.push_back(FunctionKind{ id: JS_FUNC_NORMAL, name: "JS_FUNC_NORMAL" });
+    kinds.push_back(FunctionKind{ id: JS_FUNC_GENERATOR, name: "JS_FUNC_GENERATOR" });
+    kinds.push_back(FunctionKind{ id: JS_FUNC_ASYNC, name: "JS_FUNC_ASYNC" });
+    kinds.push_back(FunctionKind{ id: JS_FUNC_ASYNC_GENERATOR, name: "JS_FUNC_ASYNC_GENERATOR" });
+
+    return kinds;
   }
 
   std::vector<BytecodeTag> QuickJSBinding::getBytecodeTags() {

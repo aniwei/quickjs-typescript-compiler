@@ -2,7 +2,7 @@ import * as ts from 'typescript'
 import { Atom, AtomTable } from './atoms'
 import { FunctionDef } from './functionDef'
 import { ScopeManager } from './scopeManager'
-import { Var, VarKind } from './vars'
+import { Var, VarKind, ClosureVar } from './vars'
 import { Opcode, OPCODE_DEFS, type OpcodeDefinition } from './env'
 
 export interface CompilerOptions {
@@ -18,6 +18,8 @@ export class Compiler {
   private currentFunction!: FunctionDef
   private scopeManager!: ScopeManager
   private readonly opcodeInfoByCode = new Map<number, OpcodeDefinition>()
+  private readonly closureVarIndices = new Map<Atom, number>()
+  private moduleAtom!: Atom
 
   private stackDepth = 0
   private maxStackDepth = 0
@@ -57,17 +59,34 @@ export class Compiler {
   }
 
   compile(): FunctionDef {
-    const mainAtom = this.atomTable.getAtomId('<main>')
-    const rootFunction = new FunctionDef(mainAtom, this.sourceCode, this.fileName)
+    this.closureVarIndices.clear()
+  this.stackDepth = 0
+  this.maxStackDepth = 0
+    const evalAtom = this.atomTable.getAtomId('_eval_')
+    const rootFunction = new FunctionDef(evalAtom, this.sourceCode, this.fileName)
     this.currentFunction = rootFunction
     this.scopeManager = new ScopeManager(rootFunction)
+    this.moduleAtom = this.atomTable.getAtomId(this.fileName)
+
+    rootFunction.bytecode.jsMode = 1
+    rootFunction.bytecode.funcKind = 2 // JS_FUNC_ASYNC
+    rootFunction.bytecode.argumentsAllowed = true
+    rootFunction.bytecode.hasSimpleParameterList = false
+    rootFunction.bytecode.hasDebug = true
+    rootFunction.bytecode.filename = this.moduleAtom
 
     this.pushScope()
+    this.emitModulePrologue()
     ts.forEachChild(this.sourceFile, (node) => this.visitNode(node))
-    this.emitOpcode(Opcode.OP_return_undef)
+    this.emitOpcode(Opcode.OP_undefined)
+    this.emitOpcode(Opcode.OP_return_async)
     this.popScope()
 
     rootFunction.bytecode.stackSize = this.maxStackDepth
+    rootFunction.bytecode.argCount = 0
+    rootFunction.bytecode.definedArgCount = 0
+    rootFunction.bytecode.varCount = 0
+    rootFunction.bytecode.pc2line = [0, 0]
     return rootFunction
   }
 
@@ -116,7 +135,7 @@ export class Compiler {
       }
 
       if (isConst || isLet) {
-        this.emitPutVarInit(atom)
+        this.emitStoreToClosure(atom)
       } else {
         // var declarations: TODO
         throw new Error('var declarations are not implemented yet')
@@ -126,7 +145,23 @@ export class Compiler {
 
   private compileNumericLiteral(node: ts.NumericLiteral) {
     const value = Number(node.text)
-    this.emitOpcode(Opcode.OP_push_i32, [value | 0])
+    if (Number.isInteger(value) && value >= -1 && value <= 7) {
+      const shortOpcodes = [
+        Opcode.OP_push_minus1,
+        Opcode.OP_push_0,
+        Opcode.OP_push_1,
+        Opcode.OP_push_2,
+        Opcode.OP_push_3,
+        Opcode.OP_push_4,
+        Opcode.OP_push_5,
+        Opcode.OP_push_6,
+        Opcode.OP_push_7,
+      ]
+      const opcode = shortOpcodes[value + 1]
+      this.emitOpcode(opcode)
+    } else {
+      this.emitOpcode(Opcode.OP_push_i32, [value | 0])
+    }
   }
 
   private declareLexicalVariable(atom: Atom, options: { isConst: boolean; isLet: boolean }): number {
@@ -136,15 +171,51 @@ export class Compiler {
       kind: VarKind.NORMAL,
       scopeLevel: this.scopeManager.currentScope(),
     })
-    return this.currentFunction.addVar(variable)
+    const varIndex = this.currentFunction.addVar(variable)
+    this.registerClosureVar(atom, varIndex, options)
+    return varIndex
   }
 
   private bindCurrentScope(index: number) {
     this.scopeManager.bindVarToCurrentScope(index)
   }
 
-  private emitPutVarInit(atom: Atom) {
-    this.emitOpcode(Opcode.OP_put_var_init, [atom])
+  private registerClosureVar(atom: Atom, varIndex: number, options: { isConst: boolean; isLet: boolean }) {
+    if (this.closureVarIndices.has(atom)) return
+    const closureVar = new ClosureVar(atom, {
+      isLocal: true,
+      isArgument: false,
+      isConst: options.isConst,
+      isLexical: true,
+      kind: VarKind.NORMAL,
+      varIndex,
+    })
+    const closureIndex = this.currentFunction.bytecode.addClosureVar(closureVar)
+    this.closureVarIndices.set(atom, closureIndex)
+  }
+
+  private emitStoreToClosure(atom: Atom) {
+    const index = this.closureVarIndices.get(atom)
+    if (index === undefined) {
+      throw new Error('Unknown closure variable')
+    }
+    const shortOpcodes = [
+      Opcode.OP_put_var_ref0,
+      Opcode.OP_put_var_ref1,
+      Opcode.OP_put_var_ref2,
+      Opcode.OP_put_var_ref3,
+    ]
+    if (index < shortOpcodes.length) {
+      this.emitOpcode(shortOpcodes[index])
+    } else {
+      this.emitOpcode(Opcode.OP_put_var_ref, [index])
+    }
+  }
+
+  private emitModulePrologue() {
+    this.emitOpcode(Opcode.OP_push_this)
+    this.emitOpcode(Opcode.OP_if_false8, [2])
+    this.emitOpcode(Opcode.OP_return_undef)
   }
 
   private emitOpcode(opcode: Opcode, operands: number[] = []) {

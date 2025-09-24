@@ -1,4 +1,5 @@
 import { AtomTable, JSAtom } from '../src/atoms'
+import { env } from '../src/env'
 
 describe('AtomTable', () => {
   let atomTable: AtomTable
@@ -16,8 +17,8 @@ describe('AtomTable', () => {
   test('should add new atom and return unique id', () => {
     const atomId1 = atomTable.getAtomId('customAtom')
     const atomId2 = atomTable.getAtomId('anotherAtom')
-    
-    expect(atomId1).toBeGreaterThan(JSAtom.JS_ATOM_trace) // After predefined atoms
+
+    expect(atomId1).toBeGreaterThanOrEqual(env.firstAtomId)
     expect(atomId2).toBeGreaterThan(atomId1)
     expect(atomId1).not.toBe(atomId2)
   })

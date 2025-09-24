@@ -66,6 +66,10 @@ export class QuickJSLib {
     return QuickJSLib.WasmInstance as WasmInstance
   }
 
+  static async getQuickJSModule(): Promise<any> {
+    return this.getWasmInstance()
+  }
+
   static getCompileFlags = async (): Promise<number> => {
     const WasmInstance = await QuickJSLib.getWasmInstance()
     return WasmInstance.QuickJSBinding.getCompileOptions()
@@ -135,6 +139,17 @@ export class QuickJSLib {
     for (let i = 0; i < vec.size(); i++) {
       const o = vec.get(i)
       map[o.name] = o.id
+    }
+    return map
+  }
+
+  static async getFunctionKinds() {
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const vec = WasmInstance.QuickJSBinding.getFunctionKinds()
+    const map: Record<string, number> = {}
+    for (let i = 0; i < vec.size(); i++) {
+      const t = vec.get(i)
+      map[t.name] = t.id
     }
     return map
   }

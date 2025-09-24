@@ -29,6 +29,7 @@ async function main() {
   ])
   const opformatRecord = await QuickJSLib.getAllOpcodeFormats()
   const bytecodeTagRecord = await QuickJSLib.getAllBytecodeTags()
+  const functionKindRecord = await QuickJSLib.getFunctionKinds()
 
   // 去重与清洗 atoms（按 id 去重，优先保留首次出现的名称）
   const seenAtomIds = new Set<number>()
@@ -61,6 +62,9 @@ async function main() {
   const compileFlags = Object.entries(compileFlagEnums as Record<string, number>)
     .map(([name, id]) => ({ name, id }))
     .sort((a, b) => a.id - b.id)
+  const functionKinds = Object.entries(functionKindRecord as Record<string, number>)
+    .map(([name, id]) => ({ name, id }))
+    .sort((a, b) => a.id - b.id)
   
   
 
@@ -81,6 +85,11 @@ ${opformats.map(f => `  ${f.name} = ${f.id},`).join('\n')}
 
   const bytecodeTagsEnum = `export enum BytecodeTag {
 ${bytecodeTags.map(f => `  ${f.name} = ${f.id},`).join('\n')}
+}
+`
+
+  const functionKindEnum = `export enum FunctionKind {
+${functionKinds.map(f => `  ${f.name} = ${f.id},`).join('\n')}
 }
 `
 

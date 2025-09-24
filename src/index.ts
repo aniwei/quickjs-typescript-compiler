@@ -1,6 +1,8 @@
 import { promises as fs } from 'node:fs'
+import path from 'node:path'
 import { Compiler, CompilerOptions } from './compiler'
 import { AtomTable } from './atoms'
+import { BytecodeWriter } from './bytecodeWriter'
 
 export interface CompileFlags {
   bigInt?: boolean
@@ -27,14 +29,15 @@ export class TypeScriptCompiler {
 
   async compileFile(filePath: string): Promise<Uint8Array> {
     const source = await fs.readFile(filePath, 'utf-8')
-    return this.compileSource(source, filePath)
+    const relativePath = path.relative(process.cwd(), filePath) || filePath
+    return this.compileSource(source, relativePath)
   }
 
   async compileSource(source: string, fileName = '<stdin>'): Promise<Uint8Array> {
     const compiler = new Compiler(fileName, source, this.compilerOptions)
-    compiler.compile()
-    // TODO: Implement bytecode serialization
-    return new Uint8Array()
+    const functionDef = compiler.compile()
+    const writer = new BytecodeWriter(this.atomTable)
+    return writer.writeModule(functionDef)
   }
 }
 

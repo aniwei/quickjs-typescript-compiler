@@ -43,6 +43,7 @@
 #include "QuickJS/extension/taro_js_type.h"
 #include "QuickJS/extension/taro_js_function.h"
 #include "QuickJS/extension/taro_js_runtime.h"
+#include "QuickJS/extension/taro_js_types.h"
 
 #ifdef __cplusplus
 extern "C" {

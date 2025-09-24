@@ -13,6 +13,7 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
   register_vector<Atom>("AtomArray");
   register_vector<OpFmt>("OpFormatArray");
   register_vector<BytecodeTag>("BytecodeTagArray");
+  register_vector<FunctionKind>("FunctionKindArray");
 
   enum_<CompileFlags>("CompileFlags")
     .value("COMPILE_FLAG_NONE", COMPILE_FLAG_NONE)
@@ -46,6 +47,11 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .property("id", &BytecodeTag::id)
     .property("name", &BytecodeTag::name);
 
+  class_<FunctionKind>("FunctionKind")
+    .constructor<>()
+    .property("id", &FunctionKind::id)
+    .property("name", &FunctionKind::name);
+
   class_<QuickJSBinding>("QuickJSBinding")
     .constructor<>()
     .class_function("compile", &QuickJSBinding::compile)
@@ -58,5 +64,6 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .class_function("getOpcodeFormats", &QuickJSBinding::getOpcodeFormats)
     .class_function("getOpcodes", &QuickJSBinding::getOpcodes)
     .class_function("getBytecodeTags", &QuickJSBinding::getBytecodeTags)
+    .class_function("getFunctionKinds", &QuickJSBinding::getFunctionKinds)
     .smart_ptr<std::shared_ptr<QuickJSBinding>>("shared_ptr<QuickJSBinding>");
 }

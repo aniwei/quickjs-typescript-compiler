@@ -425,13 +425,6 @@ typedef struct JSVarDef {
 #define PC2LINE_DIFF_PC_MAX ((255 - PC2LINE_OP_FIRST) / PC2LINE_RANGE)
 #define IC_CACHE_ITEM_CAPACITY 4
 
-typedef enum JSFunctionKindEnum {
-  JS_FUNC_NORMAL = 0,
-  JS_FUNC_GENERATOR = (1 << 0),
-  JS_FUNC_ASYNC = (1 << 1),
-  JS_FUNC_ASYNC_GENERATOR = (JS_FUNC_GENERATOR | JS_FUNC_ASYNC),
-} JSFunctionKindEnum;
-
 typedef int watchpoint_delete_callback(
     JSRuntime* rt,
     intptr_t ref,

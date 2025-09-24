@@ -39,6 +39,11 @@ struct BytecodeTag {
   std::string name;
 };
 
+struct FunctionKind {
+  uint32_t id;
+  std::string name;
+};
+
 class QuickJSBinding {
   using Ptr = std::shared_ptr<QuickJSBinding>;
 
@@ -65,6 +70,7 @@ class QuickJSBinding {
   static uint32_t getFirstAtomId();
 
   static std::vector<BytecodeTag> getBytecodeTags();
+  static std::vector<FunctionKind> getFunctionKinds();
 
   static std::vector<Atom> getAtoms();
   static std::vector<OpFmt> getOpcodeFormats();

@@ -61,6 +61,9 @@
     "unordered_map": "cpp",
     "algorithm": "cpp",
     "valarray": "cpp",
-    "*.inc": "cpp"
+    "*.inc": "cpp",
+    "quickjs-opcode.h": "c",
+    "taro_js_function.h": "c",
+    "taro_js_types.h": "c"
   }
 }
