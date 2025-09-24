@@ -268,8 +268,34 @@ namespace quickjs {
     return static_cast<uint32_t>(JS_ATOM_END);
   }
 
-  std::vector<OpFormat> QuickJSBinding::getOpcodeFormats() {
-    std::vector<OpFormat> formats;
+  std::vector<BytecodeTag> QuickJSBinding::getBytecodeTags() {
+    std::vector<BytecodeTag> tags;
+
+    tags.push_back(BytecodeTag{ id: BC_TAG_NULL, name: "TC_TAG_NULL" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_UNDEFINED, name: "TC_TAG_UNDEFINED" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_BOOL_FALSE, name: "TC_TAG_BOOL_FALSE" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_BOOL_TRUE, name: "TC_TAG_BOOL_TRUE" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_INT32, name: "TC_TAG_INT32" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_FLOAT64, name: "TC_TAG_FLOAT64" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_STRING, name: "TC_TAG_STRING" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_OBJECT, name: "TC_TAG_OBJECT" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_ARRAY, name: "TC_TAG_ARRAY" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_BIG_INT, name: "TC_TAG_BIG_INT" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_TEMPLATE_OBJECT, name: "TC_TAG_TEMPLATE_OBJECT" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_FUNCTION_BYTECODE, name: "TC_TAG_FUNCTION_BYTECODE" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_MODULE, name: "TC_TAG_MODULE" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_TYPED_ARRAY, name: "TC_TAG_TYPED_ARRAY" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_ARRAY_BUFFER, name: "TC_TAG_ARRAY_BUFFER" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_SHARED_ARRAY_BUFFER, name: "TC_TAG_SHARED_ARRAY_BUFFER" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_DATE, name: "TC_TAG_DATE" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_OBJECT_VALUE, name: "TC_TAG_OBJECT_VALUE" });
+    tags.push_back(BytecodeTag{ id: BC_TAG_OBJECT_REFERENCE, name: "TC_TAG_OBJECT_REFERENCE" });
+    
+    return tags;
+  }
+
+  std::vector<OpFmt> QuickJSBinding::getOpcodeFormats() {
+    std::vector<OpFmt> formats;
 
     // 先构造本地格式枚举，确保 f 有确定的数值
     enum {
@@ -284,7 +310,7 @@ namespace quickjs {
     };
 
     // 然后填充格式数组
-  #define FMT(f) formats.push_back(OpFormat{ static_cast<uint8_t>(OPFMT_##f), #f });
+  #define FMT(f) formats.push_back(OpFmt{ static_cast<uint8_t>(OPFMT_##f), #f });
     #define DEF(id, size, n_pop, n_push, f)
     #define def(id, size, n_pop, n_push, f)
     #include "QuickJS/quickjs-opcode.h"
@@ -351,12 +377,4 @@ namespace quickjs {
 
     return opcodes;
   }
-
-    bool QuickJSBinding::hasShortOpcodes() {
-      #ifdef SHORT_OPCODES
-      return SHORT_OPCODES != 0;
-      #else
-      return false;
-      #endif
-    }
 }

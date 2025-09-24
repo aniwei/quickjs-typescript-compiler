@@ -33,80 +33,99 @@ export type Atom = number;
 
 // Atom table management
 export class AtomTable {
-  private atoms = new Map<string, number>()
-  private nextAtomId: number
-  private firstAtomId: number
-  
+  private atoms: (string | undefined)[] = [];
+  private atomMap: Map<string, number> = new Map();
+  private nextAtomId: number;
+  private readonly firstAtomId: number;
+
   constructor(firstAtomId: number = env.firstAtomId) {
-    this.firstAtomId = firstAtomId >>> 0
-    this.nextAtomId = this.firstAtomId // Start after predefined atoms or provided threshold
+    this.firstAtomId = firstAtomId >>> 0;
+    this.nextAtomId = 0; // Will be updated after adding predefined atoms
+
     // Initialize with predefined atoms (id -> string) from generated env
     for (const [idStr, nameAny] of Object.entries(ATOM_STRINGS)) {
-      const id = parseInt(idStr, 10)
-      if (!Number.isFinite(id)) continue
-      const name = String(nameAny)
-      // 仅注册预定义原子（id < firstAtomId）
-      if (id < this.firstAtomId) this.atoms.set(name, id)
+      const id = parseInt(idStr, 10);
+      if (!Number.isFinite(id)) continue;
+      const name = String(nameAny);
+      
+      if (id < this.firstAtomId) {
+        if (this.atoms[id] === undefined) {
+          this.atoms[id] = name;
+        }
+        this.atomMap.set(name, id);
+        if (id >= this.nextAtomId) {
+          this.nextAtomId = id + 1;
+        }
+      }
+    }
+
+    if (this.nextAtomId < this.firstAtomId) {
+      this.nextAtomId = this.firstAtomId;
     }
   }
 
-  // Get or create atom ID for a string
-  getAtomId(str: string): number {
-    const existing = this.atoms.get(str)
+  addAtom(str: string): number {
+    const existing = this.atomMap.get(str);
     if (existing !== undefined) {
-      return existing
+      return existing;
     }
     
-    const newId = this.nextAtomId++
-    this.atoms.set(str, newId)
-    return newId
+    const newId = this.nextAtomId++;
+    this.atoms[newId] = str;
+    this.atomMap.set(str, newId);
+    return newId;
   }
 
-  // Get atom string by ID
+  getAtom(str: string): number {
+    let id = this.atomMap.get(str);
+    if (id === undefined) {
+      id = this.addAtom(str);
+    }
+    return id;
+  }
+
+  getAtomId(str: string): number | undefined {
+    return this.atomMap.get(str);
+  }
+
   getAtomString(id: number): string | undefined {
-    for (const [str, atomId] of this.atoms) {
-      if (atomId === id) {
-        return str
-      }
-    }
-    return undefined
+    return this.atoms[id];
   }
 
-  // Check if string is a predefined atom
+  getAtomName(id: number): string | undefined {
+    return this.getAtomString(id);
+  }
+
   isPredefinedAtom(str: string): boolean {
-    const id = this.atoms.get(str)
-    return id !== undefined && id < this.firstAtomId
+    const id = this.atomMap.get(str);
+    return id !== undefined && id < this.firstAtomId;
   }
 
-  // Get all atoms for bytecode generation
   getAllAtoms(): Map<string, number> {
-    return new Map(this.atoms)
+    return new Map(this.atomMap);
   }
   
-  // Get total atom count
   getAtomCount(): number {
-    return this.atoms.size
+    return this.atomMap.size;
   }
   
-  // Get user-defined atoms (for bytecode generation)
   getUserAtoms(): Map<string, number> {
-    const userAtoms = new Map<string, number>()
-    for (const [str, id] of this.atoms) {
+    const userAtoms = new Map<string, number>();
+    for (const [str, id] of this.atomMap) {
       if (id >= this.firstAtomId) {
-        userAtoms.set(str, id)
+        userAtoms.set(str, id);
       }
     }
-    return userAtoms
+    return userAtoms;
   }
   
-  // Get user atom count (only atoms >= JS_ATOM_END)
   getUserAtomCount(): number {
-    let count = 0
-    for (const [, id] of this.atoms) {
+    let count = 0;
+    for (const [, id] of this.atomMap) {
       if (id >= this.firstAtomId) {
-        count++
+        count++;
       }
     }
-    return count
+    return count;
   }
 }

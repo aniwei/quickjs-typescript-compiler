@@ -1,8 +1,14 @@
-
-import { Atom } from './atoms';
+import { Atom, AtomTable } from './atoms';
+import { BytecodeWriter } from './bytecodeWriter';
 import { FunctionBytecode } from './functionBytecode';
-import { JSVarScope } from './scope';
+import { Opcode } from './opcodes';
+import { VarScope } from './scopes';
 import { ClosureVar, VarDef } from './var';
+
+interface Relocation {
+  offset: number; // position in bytecode of the jump offset to patch
+  label: number;  // the label id to jump to
+}
 
 export type JSFunctionKind = 0 | 1 | 2 | 3; // JS_FUNC_NORMAL, JS_FUNC_GENERATOR, JS_FUNC_ASYNC, JS_FUNC_ASYNC_GENERATOR
 
@@ -22,93 +28,142 @@ export enum JSParseFunctionEnum {
 
 export class FunctionDef {
   parent: FunctionDef | null = null;
-  parent_cpool_idx: number = 0;
-  parent_scope_level: number = 0;
+  parentCpoolIdx = 0;
+  parentScopeLevel = 0;
 
-  is_eval: boolean = false;
-  eval_type: number = 0;
-  is_global_var: boolean = false;
-  is_func_expr: boolean = false;
-  has_home_object: boolean = false;
-  has_prototype: boolean = false;
-  has_simple_parameter_list: boolean = true;
-  has_parameter_expressions: boolean = false;
-  has_use_strict: boolean = false;
-  has_eval_call: boolean = false;
-  has_arguments_binding: boolean = false;
-  has_this_binding: boolean = false;
-  new_target_allowed: boolean = false;
-  super_call_allowed: boolean = false;
-  super_allowed: boolean = false;
-  arguments_allowed: boolean = false;
-  is_derived_class_constructor: boolean = false;
-  in_function_body: boolean = false;
-  func_kind: JSFunctionKind = 0;
-  func_type: JSParseFunctionEnum = JSParseFunctionEnum.JS_PARSE_FUNC_STATEMENT;
-  js_mode: number = 0;
-  func_name: Atom = 0;
+  isEval = false;
+  evalType = 0;
+  isGlobalVar = false;
+  isFuncExpr = false;
+  hasHomeObject = false;
+  hasPrototype = false;
+  hasSimpleParameterList = true;
+  hasParameterExpressions = false;
+  hasUseStrict = false;
+  hasEvalCall = false;
+  hasArgumentsBinding = false;
+  hasThisBinding = false;
+  newTargetAllowed = false;
+  superCallAllowed = false;
+  superAllowed = false;
+  argumentsAllowed = false;
+  isDerivedClassConstructor = false;
+  inFunctionBody = false;
+  funcKind: JSFunctionKind = 0;
+  funcType: JSParseFunctionEnum = JSParseFunctionEnum.JS_PARSE_FUNC_STATEMENT;
+  jsMode = 0;
+  funcName: Atom = 0;
 
+  constants: (string | number | boolean | null | undefined)[] = [];
   vars: VarDef[] = [];
   args: VarDef[] = [];
-  arg_count: number = 0;
-  defined_arg_count: number = 0;
-  var_object_idx: number = -1;
-  arg_var_object_idx: number = -1;
-  arguments_var_idx: number = -1;
-  arguments_arg_idx: number = -1;
-  func_var_idx: number = -1;
-  eval_ret_idx: number = -1;
-  this_var_idx: number = -1;
-  new_target_var_idx: number = -1;
-  this_active_func_var_idx: number = -1;
-  home_object_var_idx: number = -1;
-  need_home_object: boolean = false;
+  argCount = 0;
+  definedArgCount = 0;
+  varObjectIdx = -1;
+  argVarObjectIdx = -1;
+  argumentsVarIdx = -1;
+  argumentsArgIdx = -1;
+  funcVarIdx = -1;
+  evalRetIdx = -1;
+  thisVarIdx = -1;
+  newTargetVarIdx = -1;
+  thisActiveFuncVarIdx = -1;
+  homeObjectVarIdx = -1;
+  needHomeObject = false;
 
-  scope_level: number = 0;
-  scope_first: number = 0;
-  scopes: JSVarScope[] = [];
-  body_scope: number = 0;
+  scopeLevel = 0;
+  scopeFirst = 0;
+  scopes: VarScope[] = [];
+  bodyScope = 0;
 
-  global_vars: any[] = []; // JSGlobalVar
+  globalVars: any[] = [];
 
-  byte_code: number[] = [];
-  last_opcode_pos: number = -1;
-  last_opcode_source_ptr: any = null;
-  use_short_opcodes: boolean = false;
+  private writer = new BytecodeWriter();
+  private labels: number[] = [];
+  private relocations: Relocation[] = [];
 
-  label_slots: any[] = []; // LabelSlot
-  top_break: any = null; // BlockEnv
+  constructor(public parentFd: FunctionDef | null, public atomTable: AtomTable) {
+    this.parent = parentFd;
+  }
 
-  cpool: any[] = [];
+  emitOp(op: number) {
+    this.writer.putU8(op);
+  }
 
-  closure_var: ClosureVar[] = [];
+  emitU8(val: number) {
+    this.writer.putU8(val & 0xff);
+  }
 
-  jump_slots: any[] = []; // JumpSlot
-  line_number_slots: any[] = []; // LineNumberSlot
-  column_number_slots: any[] = []; // ColumnNumberSlot
+  emitU16(val: number) {
+    this.writer.putU16(val);
+  }
 
-  line_number_last: number = 0;
-  line_number_last_pc: number = 0;
-  column_number_last: number = 0;
-  column_number_last_pc: number = 0;
+  emitU32(val: number) {
+    this.writer.putU32(val);
+  }
 
-  strip_debug: boolean = false;
-  strip_source: boolean = false;
-  filename: Atom = 0;
-  source_pos: number = 0;
+  createNewLabel(): number {
+    // -1 indicates the label is not yet bound to an address.
+    return this.labels.push(-1) - 1;
+  }
 
-  source: string = '';
+  bindLabel(label: number) {
+    const currentOffset = this.writer.length;
+    if (this.labels[label] !== -1) {
+      throw new Error(`Label ${label} is already bound`);
+    }
+    this.labels[label] = currentOffset;
 
-  module: any = null; // JSModuleDef
-  has_await: boolean = false;
+    // Patch all relocations that were waiting for this label.
+    this.relocations = this.relocations.filter(reloc => {
+      if (reloc.label === label) {
+        // offset of the jump instruction from the byte after the jump opcode
+        const jumpOffset = currentOffset - (reloc.offset - 1);
+        this.writer.patchU16(reloc.offset, jumpOffset);
+        return false; // Remove this relocation from the list
+      }
+      return true; // Keep this relocation
+    });
+  }
 
-  constructor(public parent_fd: FunctionDef | null) {
-    this.parent = parent_fd;
+  emitJump(opcode: Opcode, label: number): number {
+    this.emitOp(opcode);
+    const offset = this.writer.length;
+    this.writer.putU16(0); // placeholder
+    this.relocations.push({ offset, label });
+    return offset;
+  }
+
+  patchJump(offset: number, targetLabel: number) {
+    const targetOffset = this.labels[targetLabel];
+    if (targetOffset === -1) {
+      // If the target label is not yet bound, add a relocation.
+      this.relocations.push({ offset: offset + 1, label: targetLabel });
+    } else {
+      const jumpOffset = targetOffset - offset;
+      this.writer.patchU16(offset + 1, jumpOffset);
+    }
+  }
+
+  addConst(value: string | number | boolean | null | undefined): number {
+    const existingIndex = this.constants.indexOf(value);
+    if (existingIndex !== -1) {
+      return existingIndex;
+    }
+    this.constants.push(value);
+    return this.constants.length - 1;
   }
 
   toBytecode(): FunctionBytecode {
     const bc = new FunctionBytecode();
-    // TODO: fill bytecode
+    bc.buffer = Array.from(this.writer.toUint8Array());
+    bc.cpool = this.constants;
+    bc.vardefs = this.vars;
+    bc.argCount = this.argCount;
+    bc.varCount = this.vars.length;
+    bc.definedArgCount = this.definedArgCount;
+    bc.stackSize = 0; // TODO: calculate stack size
+    bc.functionName = this.funcName;
     return bc;
   }
 }

@@ -1,22 +1,28 @@
-
 import { Atom } from './atoms';
 
+export enum JSVarKindEnum {
+  VAR,     /* var */
+  LET,     /* let */
+  CONST,   /* const */
+  PRIVATE, /* private field */
+};
+
 export class VarDef {
-  var_name: Atom = 0;
-  scope_level: number = 0;
-  scope_next: number = 0;
-  var_kind: number = 0; // JSVarKindEnum
-  is_const: boolean = false;
-  is_lexical: boolean = false;
-  is_captured: boolean = false;
+  varName: Atom = 0;
+  scopeLevel: number = 0;
+  scopeNext: number = 0;
+  isLexical: boolean = false;
+  isConst: boolean = false;
+  isFuncDecl: boolean = false;
+  isNewField: boolean = false;
+  isCaptured: boolean = false;
+  isParam: boolean = false;
 }
 
 export class ClosureVar {
-  var_name: Atom = 0;
-  var_idx: number = 0;
-  is_local: boolean = false;
-  is_arg: boolean = false;
-  is_const: boolean = false;
-  is_lexical: boolean = false;
-  var_kind: number = 0; // JSVarKindEnum
+  varName: Atom = 0;
+  varIdx: number = 0;
+  isLocal: boolean = false;
+  isArg: boolean = false;
 }
+

@@ -30,8 +30,11 @@ async function main() {
     ts.ScriptTarget.ESNext,
     true
   );
-  const compiler = new Compiler();
-  const func = compiler.compile(sourceFile);
+  const compiler = new Compiler([absIn]);
+  const func = compiler.compile(absIn);
+  if (!func) {
+    throw new Error('Compilation failed');
+  }
   const bytecode = serialize(func);
   await fs.writeFile(absOut, Buffer.from(bytecode));
 

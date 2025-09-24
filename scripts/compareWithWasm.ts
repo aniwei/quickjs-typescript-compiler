@@ -8,7 +8,7 @@
 
 import fs from 'fs/promises'
 import path from 'path'
-import { TypeScriptCompilerCore } from '../src/index'
+import { TypeScriptCompiler } from '../src/index'
 import { createAdvancedDisassembly } from '../src/disasm'
 import { QuickJSLib } from './QuickJSLib'
 
@@ -92,8 +92,8 @@ class BytecodeComparator {
       firstAtomId
     } as const
 
-    const compiler = new TypeScriptCompilerCore(flags as any, opcodeOverride)
-    const bytecode = compiler.compile(sourceCode, path.relative(process.cwd(), this.options.inputTs))
+    const compiler = new TypeScriptCompiler(flags as any)
+    const bytecode = await compiler.compileFile(this.options.inputTs);
 
     let disassembly: string | undefined
     if (this.options.disasm) {

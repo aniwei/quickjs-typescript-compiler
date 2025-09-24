@@ -28,8 +28,13 @@ struct Atom {
   std::string name;
 };
 
-struct OpFormat {
+struct OpFmt {
   uint8_t id;
+  std::string name;
+};
+
+struct BytecodeTag {
+  uint32_t id;
   std::string name;
 };
 
@@ -58,10 +63,11 @@ class QuickJSBinding {
   static uint32_t getCompileOptions();
   static uint32_t getFirstAtomId();
 
+  static std::vector<BytecodeTag> getBytecodeTags();
+
   static std::vector<Atom> getAtoms();
-  static std::vector<OpFormat> getOpcodeFormats();
+  static std::vector<OpFmt> getOpcodeFormats();
   static std::vector<Op> getOpcodes();
-  static bool hasShortOpcodes();
 
   static std::string dumpWithBinary(
     std::vector<uint8_t> bytes,

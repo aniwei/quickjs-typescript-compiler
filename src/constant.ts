@@ -30,3 +30,22 @@ export class Constants {
     return this.values.length
   }
 }
+
+export enum BCTag {
+  NULL = 0,
+  UNDEFINED = 1,
+  FALSE = 2,
+  TRUE = 3,
+  INT32 = 4,
+  FLOAT64 = 5,
+  STRING = 6,
+  OBJECT = 7,
+  ARRAY = 8,
+  BIG_INT = 9,
+  BIG_FLOAT = 10,
+  BIG_DECIMAL = 11,
+  TEMPLATE = 12,
+  FUNCTION_BYTECODE = 13,
+  MODULE = 14,
+  // ... add other tags as needed
+}

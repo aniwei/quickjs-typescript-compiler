@@ -27,7 +27,7 @@ async function main() {
     QuickJSLib.getCompileOptions(),
     QuickJSLib.getBytecodeVersion(),
     QuickJSLib.getFirstAtomId(),
-    QuickJSLib.hasShortOpcodes(),
+    true, // TODO
   ])
 
   const [atomsList, opcodeList] = await Promise.all([

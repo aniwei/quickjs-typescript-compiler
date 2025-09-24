@@ -22,19 +22,25 @@ interface StringArray {
   push_back: (str: string) => void
 }
 
+interface BytecodeTag {
+  id: number
+  name: string
+}
+
 interface QuickJSBinding {
   runWithBinary: (input: Uint8Array, args: StringArray) => void
   dumpWithBinary: (input: Uint8Array, args: StringArray) => string
   compile: (source: string, sourcePath: string, args: StringArray) => Uint8Array
   getBytecodeVersion: () => number
   getFirstAtomId: () => number
-  getAtoms: () => Map<string, number>
-  getOpcodes: () => Map<string, number>
+  getAtoms: () => Atom[]
+  getOpcodes: () => OpcodeMeta[]
+  getBytecodeTags: () => BytecodeTag[]
 }
 
 export class QuickJSLib {
   // 使用 any 以避免对 Emscripten 模块结构的过度约束
-  static Module: any = null
+  static WasmInstance: any | null = null
 
   static ensureWasmBuilt () {
     const path = resolve(process.cwd(), 'third_party/QuickJS/wasm/output/quickjs_wasm.js')
@@ -47,54 +53,53 @@ export class QuickJSLib {
     return existsSync(path) ? path : null
   }
 
-  static getQuickJSModule = async (): Promise<any> => {
-    if (QuickJSLib.Module) return QuickJSLib.Module
+  static getWasmInstance = async (): Promise<any> => {
+    if (QuickJSLib.WasmInstance) return QuickJSLib.WasmInstance
 
     const path = QuickJSLib.ensureWasmBuilt()
     if (!path) throw new Error('QuickJS wasm binding not available')
 
     const WasmModule: any = await import(path)
-    QuickJSLib.Module = await WasmModule.default()
-    // 返回 Emscripten 模块本体，包含 QuickJSBinding/Uint8Array/StringArray 等类型
-    return QuickJSLib.Module
+    QuickJSLib.WasmInstance = await WasmModule.default()
+    return QuickJSLib.WasmInstance
   }
 
   static async runWithBinaryPath(binaryPath: string) {
-    const Module = await QuickJSLib.getQuickJSModule()
+    const WasmInstance = await QuickJSLib.getWasmInstance()
     const source = readFileSync(binaryPath)
 
-    const input = new Module.Uint8Array()
+    const input = new WasmInstance.Uint8Array()
     for (let i = 0; i < source.length; i++) {
       input.push_back(source[i])
     }
 
-    Module.QuickJSBinding.runWithBinary(input, new Module.StringArray())
+    WasmInstance.QuickJSBinding.runWithBinary(input, new WasmInstance.StringArray())
   }
 
   static async dumpWithBinaryPath(binaryPath: string) {
-    const QuickJSModule = await QuickJSLib.getQuickJSModule()
+    const WasmInstance = await QuickJSLib.getWasmInstance()
     const source = readFileSync(binaryPath)
 
-    const input = new QuickJSModule.Uint8Array()
+    const input = new WasmInstance.Uint8Array()
     for (let i = 0; i < source.length; i++) {
       input.push_back(source[i])
     }
 
-    const text = QuickJSModule.QuickJSBinding.dumpWithBinary(input, new QuickJSModule.StringArray())
+    const text = WasmInstance.QuickJSBinding.dumpWithBinary(input, new WasmInstance.StringArray())
     console.log(String(text || ''))
   }
 
   static async dumpBytesToString(bytes: Uint8Array | Buffer): Promise<string> {
-    const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    const input = new QuickJSModule.Uint8Array()
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const input = new WasmInstance.Uint8Array()
     for (let i = 0; i < bytes.length; i++) input.push_back(bytes[i])
-    const text = QuickJSModule.QuickJSBinding.dumpWithBinary(input, new QuickJSModule.StringArray())
+    const text = WasmInstance.QuickJSBinding.dumpWithBinary(input, new WasmInstance.StringArray())
     return String(text || '')
   }
 
   static async getOpcodes() {
-    const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    const vec = QuickJSModule.QuickJSBinding.getOpcodes()
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const vec = WasmInstance.QuickJSBinding.getOpcodes()
     const map: Record<string, number> = {}
     for (let i = 0; i < vec.size(); i++) {
       const o = vec.get(i)
@@ -103,19 +108,40 @@ export class QuickJSLib {
     return map
   }
 
-  static async getBytecodeVersion() {
-    const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    return QuickJSModule.QuickJSBinding.getBytecodeVersion()
+  static async getBytecodeTags() {
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const vec = WasmInstance.QuickJSBinding.getBytecodeTags()
+    const map: Record<string, number> = {}
+    for (let i = 0; i < vec.size(); i++) {
+      const t = vec.get(i)
+      map[t.name] = t.id
+    }
+    return map
   }
 
-  static async getFirstAtomId() {
-    const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    return QuickJSModule.QuickJSBinding.getFirstAtomId()
+  static async getBytecodeVersion() {
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    return WasmInstance.QuickJSBinding.getBytecodeVersion()
+  }
+
+  static async getFirstAtomId(): Promise<number> {
+    const WasmInstance = await this.getWasmInstance();
+    return WasmInstance.QuickJSBinding.getFirstAtomId();
+  }
+
+  static async hasShortOpcodes(): Promise<boolean> {
+    const WasmInstance = await this.getWasmInstance();
+    return WasmInstance.QuickJSBinding.hasShortOpcodes();
+  }
+
+  static async getOpcodeName(opcode: number): Promise<string> {
+    const WasmInstance = await this.getWasmInstance();
+    return WasmInstance.QuickJSBinding.getOpcodeName(opcode);
   }
 
   static async getAllAtoms() {
-    const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    const vec = QuickJSModule.QuickJSBinding.getAtoms()
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const vec = WasmInstance.QuickJSBinding.getAtoms()
     const atoms: Atom[] = []
     for (let i = 0; i < vec.size(); i++) {
       const a = vec.get(i)
@@ -125,8 +151,8 @@ export class QuickJSLib {
   }
 
   static async getAllOpcodeFormats() {
-    const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    const vec = QuickJSModule.QuickJSBinding.getOpcodeFormats()
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const vec = WasmInstance.QuickJSBinding.getOpcodeFormats()
     const formats: Record<string, number> = {}
     for (let i = 0; i < vec.size(); i++) {
       const f = vec.get(i)
@@ -136,8 +162,8 @@ export class QuickJSLib {
   }
 
   static async getAllOpcodes() {
-    const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    const vec = QuickJSModule.QuickJSBinding.getOpcodes()
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const vec = WasmInstance.QuickJSBinding.getOpcodes()
     const out: OpcodeMeta[] = []
     for (let i = 0; i < vec.size(); i++) {
       const o = vec.get(i)
@@ -152,23 +178,18 @@ export class QuickJSLib {
   }
 
   static async getCompileOptions() {
-    const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    const options = QuickJSModule.QuickJSBinding.getCompileOptions()
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const options = WasmInstance.QuickJSBinding.getCompileOptions()
     return options
   }
 
-  static async hasShortOpcodes(): Promise<boolean> {
-    const QuickJSModule = await QuickJSLib.getQuickJSModule()
-    return !!QuickJSModule.QuickJSBinding.hasShortOpcodes()
-  }
-
   static async compileSource(source: string, sourcePath: string = '<eval>', cwd?: string): Promise<Buffer> {
-    const QuickJSModule = await QuickJSLib.getQuickJSModule()
+    const WasmInstance = await QuickJSLib.getWasmInstance()
 
-    const result = await QuickJSModule.QuickJSBinding.compile(
+    const result = await WasmInstance.QuickJSBinding.compile(
       source, 
       relative(cwd || process.cwd(), sourcePath), 
-      new QuickJSModule.StringArray())
+      new WasmInstance.StringArray())
 
     const output: Buffer = Buffer.alloc(result.size())
     for (let i = 0; i < result.size(); i++) {
@@ -179,7 +200,6 @@ export class QuickJSLib {
   }
 
   static async compileSourceWithPath(sourcePath: string, cwd?: string): Promise<Buffer> {
-    const QuickJSModule = await QuickJSLib.getQuickJSModule()
     const source = readFileSync(sourcePath, 'utf-8')
     return this.compileSource(source, sourcePath, cwd)
   }

@@ -5,9 +5,9 @@
  * 根据 QuickJS 编译配置逻辑生成 opcode，不依赖分析 QuickJS 文件
  */
 
-import { OpFormat as OpcodeFormat, OPCODE_DEFS, SHORT_OPCODE_DEFS, type OpcodeDefinition, env as QJSEnv } from './env'
+import { OpFormat as OpcodeFormat, OPCODE_DEFS, SHORT_OPCODE_DEFS, type OpcodeDefinition, env as QJSEnv, Opcode } from './env'
 // Re-export for existing imports and types
-export { OpFormat as OpcodeFormat } from './env'
+export { OpFormat as OpcodeFormat, Opcode } from './env'
 export type { OpcodeDefinition } from './env'
 
 // 编译配置

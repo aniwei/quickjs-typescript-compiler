@@ -11,7 +11,7 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
   register_vector<std::string>("StringArray");
   register_vector<Op>("OpArray");
   register_vector<Atom>("AtomArray");
-  register_vector<OpFormat>("OpFormatArray");
+  register_vector<OpFmt>("OpFormatArray");
 
   enum_<CompiledFlags>("CompiledFlags")
     .value("COMPILED_FLAG_NONE", COMPILED_FLAG_NONE)
@@ -33,13 +33,16 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .property("id", &Atom::id)
     .property("name", &Atom::name);
   
-  class_<OpFormat>("OpFormat")
+  class_<OpFmt>("OpFmt")
     .constructor<>()
-    .property("id", &OpFormat::id)
-    .property("name", &OpFormat::name);
+    .property("id", &OpFmt::id)
+    .property("name", &OpFmt::name);
 
 
-
+  class_<BytecodeTag>("BytecodeTag")
+    .constructor<>()
+    .property("id", &BytecodeTag::id)
+    .property("name", &BytecodeTag::name);
 
   class_<QuickJSBinding>("QuickJSBinding")
     .constructor<>()
@@ -52,6 +55,5 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .class_function("getAtoms", &QuickJSBinding::getAtoms)
     .class_function("getOpcodeFormats", &QuickJSBinding::getOpcodeFormats)
     .class_function("getOpcodes", &QuickJSBinding::getOpcodes)
-  .class_function("hasShortOpcodes", &QuickJSBinding::hasShortOpcodes)
     .smart_ptr<std::shared_ptr<QuickJSBinding>>("shared_ptr<QuickJSBinding>");
 }
