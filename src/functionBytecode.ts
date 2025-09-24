@@ -1,6 +1,16 @@
 import { Atom } from './atoms';
 import { BytecodeTag } from './env';
-import { ClosureVar } from './vars';
+import { ClosureVar, Var, VarKind } from './vars';
+
+export interface VarDefEntry {
+  name: Atom;
+  scopeLevel: number;
+  scopeNext: number;
+  isConst: boolean;
+  isLexical: boolean;
+  isCaptured: boolean;
+  kind: VarKind;
+}
 
 export type ConstantEntry =
   | { tag: BytecodeTag.TC_TAG_NULL }
@@ -48,6 +58,7 @@ export class FunctionBytecode {
   definedArgCount = 0;
   constantPool: ConstantEntry[] = [];
   closureVars: ClosureVar[] = [];
+  varDefs: VarDefEntry[] = [];
 
   lineInfo: LineInfoEntry[] = [];
   columnInfo: LineInfoEntry[] = [];
@@ -78,6 +89,25 @@ export class FunctionBytecode {
   addClosureVar(entry: ClosureVar): number {
     this.closureVars.push(entry);
     return this.closureVars.length - 1;
+  }
+
+  setVarDefs(vars: Array<Var | VarDefEntry>) {
+    this.varDefs = vars.map((entry) => {
+      if ('name' in entry && 'scopeLevel' in entry && 'scopeNext' in entry) {
+        const source = entry as Var & VarDefEntry;
+        return {
+          name: source.name,
+          scopeLevel: source.scopeLevel,
+          scopeNext: source.scopeNext,
+          isConst: source.isConst,
+          isLexical: source.isLexical,
+          isCaptured: source.isCaptured,
+          kind: source.kind,
+        } as VarDefEntry;
+      }
+      return entry as VarDefEntry;
+    });
+    this.varCount = this.varDefs.length;
   }
 
   addLineInfo(info: LineInfoEntry) {

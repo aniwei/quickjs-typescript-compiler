@@ -278,10 +278,6 @@ typedef struct JSClassShortDef {
   JSClassGCMark* gc_mark;
 } JSClassShortDef;
 
-#define JS_MODE_STRICT (1 << 0)
-#define JS_MODE_ASYNC  (1 << 2) /* async function */
-#define JS_MODE_BACKTRACE_BARRIER (1 << 3) /* stop backtrace before this frame */
-
 typedef enum {
   JS_AUTOINIT_ID_PROTOTYPE,
   JS_AUTOINIT_ID_MODULE_NS,

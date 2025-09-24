@@ -1,9 +1,10 @@
+import path from 'node:path'
 import * as ts from 'typescript'
 import { Atom, AtomTable } from './atoms'
 import { FunctionDef } from './functionDef'
 import { ScopeManager } from './scopeManager'
 import { Var, VarKind, ClosureVar } from './vars'
-import { Opcode, OPCODE_DEFS, type OpcodeDefinition } from './env'
+import { Opcode, OPCODE_DEFS, OpFormat, type OpcodeDefinition } from './env'
 
 export interface CompilerOptions {
   atomTable?: AtomTable
@@ -19,10 +20,17 @@ export class Compiler {
   private scopeManager!: ScopeManager
   private readonly opcodeInfoByCode = new Map<number, OpcodeDefinition>()
   private readonly closureVarIndices = new Map<Atom, number>()
+  private readonly localVarIndices = new Map<Atom, number>()
   private moduleAtom!: Atom
 
   private stackDepth = 0
   private maxStackDepth = 0
+
+  private currentOffset = 0
+  private readonly instructionOffsets: number[] = []
+  private labelCounter = 0
+  private readonly labelPositions = new Map<string, number>()
+  private readonly pendingJumps: Array<{ index: number; label: string; opcode: Opcode }> = []
 
   constructor(private readonly fileName: string, private readonly sourceCode: string, options: CompilerOptions = {}) {
     this.atomTable = options.atomTable ?? new AtomTable()
@@ -59,14 +67,14 @@ export class Compiler {
   }
 
   compile(): FunctionDef {
-    this.closureVarIndices.clear()
-    this.stackDepth = 0
-    this.maxStackDepth = 0
+    this.resetCodegenState()
     const evalAtom = this.atomTable.getAtomId('_eval_')
     const rootFunction = new FunctionDef(evalAtom, this.sourceCode, this.fileName)
     this.currentFunction = rootFunction
     this.scopeManager = new ScopeManager(rootFunction)
-    this.moduleAtom = this.atomTable.getAtomId(this.fileName)
+  const relativePath = path.relative(process.cwd(), this.fileName) || this.fileName
+  const moduleFileName = relativePath.replace(/\.ts$/i, '.js')
+  this.moduleAtom = this.atomTable.getAtomId(moduleFileName)
 
     rootFunction.bytecode.jsMode = 1
     rootFunction.bytecode.funcKind = 2 // JS_FUNC_ASYNC
@@ -82,25 +90,48 @@ export class Compiler {
     this.emitOpcode(Opcode.OP_return_async)
     this.popScope()
 
+    this.resolvePendingJumps()
+
+    const lexicalVars = rootFunction.vars.filter((variable) => !variable.isCaptured)
+    rootFunction.bytecode.setVarDefs(lexicalVars)
+
     rootFunction.bytecode.stackSize = this.maxStackDepth
-    rootFunction.bytecode.argCount = 0
-    rootFunction.bytecode.definedArgCount = 0
-    rootFunction.bytecode.varCount = 0
+    rootFunction.bytecode.argCount = rootFunction.args.length
+    rootFunction.bytecode.definedArgCount = rootFunction.definedArgCount
     rootFunction.bytecode.pc2line = [0, 0]
     return rootFunction
   }
 
+  private resetCodegenState() {
+    this.closureVarIndices.clear()
+    this.localVarIndices.clear()
+    this.stackDepth = 0
+    this.maxStackDepth = 0
+    this.currentOffset = 0
+    this.instructionOffsets.length = 0
+    this.labelCounter = 0
+    this.labelPositions.clear()
+    this.pendingJumps.length = 0
+  }
+
   private visitNode(node: ts.Node): void {
-    switch (node.kind) {
-      case ts.SyntaxKind.VariableStatement:
-        this.compileVariableStatement(node as ts.VariableStatement)
-        return
-      case ts.SyntaxKind.NumericLiteral:
-        this.compileNumericLiteral(node as ts.NumericLiteral)
-        return
-      default:
-        ts.forEachChild(node, (child) => this.visitNode(child))
+    if (ts.isVariableStatement(node)) {
+      this.compileVariableStatement(node)
+      return
     }
+    if (ts.isForOfStatement(node)) {
+      this.compileForOfStatement(node)
+      return
+    }
+    if (ts.isBlock(node)) {
+      this.compileBlock(node)
+      return
+    }
+    if (ts.isExpressionStatement(node)) {
+      this.compileExpressionStatement(node)
+      return
+    }
+    ts.forEachChild(node, (child) => this.visitNode(child))
   }
 
   private compileVariableStatement(node: ts.VariableStatement) {
@@ -128,7 +159,7 @@ export class Compiler {
       this.bindCurrentScope(varIndex)
 
       if (declaration.initializer) {
-        this.visitNode(declaration.initializer)
+        this.compileExpression(declaration.initializer)
       } else if (isConst || isLet) {
         // Lexical declarations without initializer are initialized to undefined
         this.emitOpcode(Opcode.OP_undefined)
@@ -164,15 +195,234 @@ export class Compiler {
     }
   }
 
-  private declareLexicalVariable(atom: Atom, options: { isConst: boolean; isLet: boolean }): number {
+  private compileBlock(node: ts.Block) {
+    for (const statement of node.statements) {
+      this.visitNode(statement)
+    }
+  }
+
+  private compileExpressionStatement(node: ts.ExpressionStatement) {
+    this.compileExpression(node.expression)
+    this.emitOpcode(Opcode.OP_drop)
+  }
+
+  private compileForOfStatement(node: ts.ForOfStatement) {
+    if (node.awaitModifier) {
+      throw new Error('for await is not supported yet')
+    }
+
+  this.pushScope()
+
+    if (!ts.isVariableDeclarationList(node.initializer)) {
+      throw new Error('for-of initializer must be a variable declaration')
+    }
+    if (node.initializer.declarations.length !== 1) {
+      throw new Error('Only single variable declarations are supported in for-of')
+    }
+
+    const declaration = node.initializer.declarations[0]
+    if (!ts.isIdentifier(declaration.name)) {
+      throw new Error('Destructuring in for-of is not supported yet')
+    }
+    if (declaration.initializer) {
+      throw new Error('for-of loop variable cannot have an initializer')
+    }
+
+    const nameText = declaration.name.text
+    const atom = this.atomTable.getAtomId(nameText)
+    if (this.scopeManager.hasBindingInCurrentScope(atom)) {
+      throw new Error(`Identifier '${nameText}' has already been declared in this scope`)
+    }
+
+    const flags = node.initializer.flags
+    const isConst = (flags & ts.NodeFlags.Const) !== 0
+    const isLet = (flags & ts.NodeFlags.Let) !== 0
+
+    const loopVarIndex = this.declareLexicalVariable(atom, { isConst, isLet, capture: false })
+    this.bindCurrentScope(loopVarIndex)
+    this.emitSetLocalUninitialized(loopVarIndex)
+
+    this.compileExpression(node.expression)
+    this.emitOpcode(Opcode.OP_for_of_start)
+
+    const labelBody = this.createLabel()
+    const labelCheck = this.createLabel()
+
+    this.emitJump(Opcode.OP_goto8, labelCheck)
+
+    this.markLabel(labelBody)
+    this.emitStoreToLocal(loopVarIndex)
+
+    if (ts.isBlock(node.statement)) {
+      this.compileBlock(node.statement)
+    } else {
+      this.visitNode(node.statement)
+    }
+
+    this.popScope()
+
+    this.markLabel(labelCheck)
+    this.emitOpcode(Opcode.OP_for_of_next, [0])
+    this.emitJump(Opcode.OP_if_false8, labelBody)
+    this.emitOpcode(Opcode.OP_drop)
+    this.emitOpcode(Opcode.OP_iterator_close)
+  }
+
+  private compileExpression(expression: ts.Expression): void {
+    if (ts.isParenthesizedExpression(expression)) {
+      this.compileExpression(expression.expression)
+      return
+    }
+
+    if (ts.isNumericLiteral(expression)) {
+      this.compileNumericLiteral(expression)
+      return
+    }
+
+    if (ts.isArrayLiteralExpression(expression)) {
+      this.compileArrayLiteral(expression)
+      return
+    }
+
+    if (ts.isIdentifier(expression)) {
+      this.emitLoadIdentifier(expression)
+      return
+    }
+
+    if (ts.isCallExpression(expression)) {
+      this.compileCallExpression(expression)
+      return
+    }
+
+    throw new Error(`Unsupported expression kind: ${ts.SyntaxKind[expression.kind]}`)
+  }
+
+  private compileArrayLiteral(expression: ts.ArrayLiteralExpression) {
+    const elements = expression.elements
+    const values = elements.filter((el) => !ts.isOmittedExpression(el))
+    if (values.length !== elements.length) {
+      throw new Error('Array holes are not supported yet')
+    }
+    for (const element of values) {
+      this.compileExpression(element as ts.Expression)
+    }
+    this.emitOpcode(Opcode.OP_array_from, [values.length])
+  }
+
+  private compileCallExpression(expression: ts.CallExpression) {
+    if (!ts.isPropertyAccessExpression(expression.expression)) {
+      throw new Error('Only property access calls are supported for now')
+    }
+
+    const propertyAccess = expression.expression
+    this.compileExpression(propertyAccess.expression)
+    const propertyAtom = this.atomTable.getAtomId(propertyAccess.name.text)
+    this.emitOpcode(Opcode.OP_get_field2, [propertyAtom])
+
+    for (const arg of expression.arguments) {
+      this.compileExpression(arg)
+    }
+
+    this.emitOpcode(Opcode.OP_call_method, [expression.arguments.length])
+  }
+
+  private emitLoadIdentifier(identifier: ts.Identifier) {
+    const atom = this.atomTable.getAtomId(identifier.text)
+    if (this.localVarIndices.has(atom)) {
+      this.emitLoadLocalCheck(this.localVarIndices.get(atom)!)
+      return
+    }
+    if (this.closureVarIndices.has(atom)) {
+      const index = this.closureVarIndices.get(atom)!
+      this.emitOpcode(Opcode.OP_get_var_ref_check, [index])
+      return
+    }
+    this.emitOpcode(Opcode.OP_get_var, [atom])
+  }
+
+  private emitSetLocalUninitialized(index: number) {
+    this.emitOpcode(Opcode.OP_set_loc_uninitialized, [index])
+  }
+
+  private emitStoreToLocal(index: number) {
+    switch (index) {
+      case 0:
+        this.emitOpcode(Opcode.OP_put_loc0)
+        break
+      case 1:
+        this.emitOpcode(Opcode.OP_put_loc1)
+        break
+      case 2:
+        this.emitOpcode(Opcode.OP_put_loc2)
+        break
+      case 3:
+        this.emitOpcode(Opcode.OP_put_loc3)
+        break
+      default:
+        this.emitOpcode(Opcode.OP_put_loc, [index])
+        break
+    }
+  }
+
+  private emitLoadLocalCheck(index: number) {
+    this.emitOpcode(Opcode.OP_get_loc_check, [index])
+  }
+
+  private createLabel(): string {
+    return `L${this.labelCounter++}`
+  }
+
+  private markLabel(label: string) {
+    this.labelPositions.set(label, this.currentOffset)
+  }
+
+  private emitJump(opcode: Opcode, label: string) {
+    const index = this.emitOpcode(opcode, [0])
+    this.pendingJumps.push({ index, label, opcode })
+  }
+
+  private resolvePendingJumps() {
+    const instructions = this.currentFunction.bytecode.instructions
+    for (const pending of this.pendingJumps) {
+      const target = this.labelPositions.get(pending.label)
+      if (target === undefined) {
+        throw new Error(`Unresolved label ${pending.label}`)
+      }
+      const def = this.opcodeInfoByCode.get(pending.opcode)
+      if (!def) {
+        throw new Error(`Unknown opcode ${pending.opcode}`)
+      }
+      const start = this.instructionOffsets[pending.index]
+      const offset = target - (start + def.size)
+      if (def.format === OpFormat.label8) {
+        if (offset < -128 || offset > 127) {
+          throw new Error('Jump offset out of range for label8')
+        }
+      }
+      const instruction = instructions[pending.index]
+      if (instruction.operands.length === 0) {
+        instruction.operands.push(offset)
+      } else {
+        instruction.operands[0] = offset
+      }
+    }
+  }
+
+  private declareLexicalVariable(atom: Atom, options: { isConst: boolean; isLet: boolean; capture?: boolean }): number {
+    const isCaptured = options.capture !== false
     const variable = new Var(atom, {
       isConst: options.isConst,
       isLexical: true,
+      isCaptured,
       kind: VarKind.NORMAL,
       scopeLevel: this.scopeManager.currentScope(),
     })
     const varIndex = this.currentFunction.addVar(variable)
-    this.registerClosureVar(atom, varIndex, options)
+    if (isCaptured) {
+      this.registerClosureVar(atom, varIndex, options)
+    } else {
+      this.localVarIndices.set(atom, varIndex)
+    }
     return varIndex
   }
 
@@ -180,7 +430,7 @@ export class Compiler {
     this.scopeManager.bindVarToCurrentScope(index)
   }
 
-  private registerClosureVar(atom: Atom, varIndex: number, options: { isConst: boolean; isLet: boolean }) {
+  private registerClosureVar(atom: Atom, varIndex: number, options: { isConst: boolean; isLet: boolean; capture?: boolean }) {
     if (this.closureVarIndices.has(atom)) return
     const closureVar = new ClosureVar(atom, {
       isLocal: true,
@@ -218,7 +468,7 @@ export class Compiler {
     this.emitOpcode(Opcode.OP_return_undef)
   }
 
-  private emitOpcode(opcode: Opcode, operands: number[] = []) {
+  private emitOpcode(opcode: Opcode, operands: number[] = []): number {
     const def = this.opcodeInfoByCode.get(opcode)
     if (!def) {
       throw new Error(`Unknown opcode: ${opcode}`)
@@ -233,8 +483,12 @@ export class Compiler {
       this.maxStackDepth = this.stackDepth
     }
 
+    const instructionIndex = this.currentFunction.bytecode.instructions.length
     this.currentFunction.bytecode.pushOpcode(opcode, operands)
     this.currentFunction.bytecode.stackSize = this.maxStackDepth
+    this.instructionOffsets[instructionIndex] = this.currentOffset
+    this.currentOffset += def.size
+    return instructionIndex
   }
 
   private pushScope() {

@@ -6,7 +6,19 @@ export class ScopeManager {
   private readonly scopeStack: number[] = []
   private readonly bindings = new Map<number, Map<Atom, number>>()
 
-  constructor(private readonly func: FunctionDef) {}
+  constructor(private readonly func: FunctionDef) {
+    if (func.scopes.length === 0) {
+      const rootScope = new Scope({ parent: -1 })
+      const rootIndex = func.addScope(rootScope)
+      this.scopeStack.push(rootIndex)
+      this.bindings.set(rootIndex, new Map())
+      func.scopeLevel = rootIndex
+      func.scopeFirst = rootScope.first
+    } else if (func.scopeLevel >= 0) {
+      this.scopeStack.push(func.scopeLevel)
+      this.bindings.set(func.scopeLevel, new Map())
+    }
+  }
 
   enterScope(): number {
     const parent = this.currentScope()
@@ -22,6 +34,9 @@ export class ScopeManager {
   }
 
   leaveScope(): number | undefined {
+    if (this.scopeStack.length <= 1) {
+      return undefined
+    }
     const popped = this.scopeStack.pop()
     if (popped !== undefined) {
       this.bindings.delete(popped)

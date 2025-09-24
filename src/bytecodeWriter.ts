@@ -152,7 +152,19 @@ export class BytecodeWriter {
 		this.body.writeLEB128(bytecode.constantPool.length)
 		this.body.writeLEB128(instructions.length)
 
-		this.body.writeLEB128(0) // vardef count
+		const varDefs = bytecode.varDefs ?? []
+		this.body.writeLEB128(varDefs.length)
+		for (const vd of varDefs) {
+			this.writeAtom(this.body, vd.name)
+			this.body.writeLEB128(vd.scopeLevel)
+			this.body.writeLEB128(vd.scopeNext + 1)
+			let flags = 0
+			flags |= (vd.kind & 0x0f)
+			if (vd.isConst) flags |= 1 << 4
+			if (vd.isLexical) flags |= 1 << 5
+			if (vd.isCaptured) flags |= 1 << 6
+			this.body.writeU8(flags)
+		}
 
 		for (const closureVar of bytecode.closureVars) {
 			this.writeClosureVar(closureVar)
