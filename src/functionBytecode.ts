@@ -1,36 +1,82 @@
 import { Atom } from './atoms';
-import { ConstantTag } from './constant';
-import { Opcode } from './env';
+import { BytecodeTag } from './env';
+import { ClosureVar } from './vars';
+
+export interface ConstantEntry {
+  tag: BytecodeTag;
+  value: unknown;
+}
+
+export interface LineInfoEntry {
+  pc: number;
+  sourcePos: number;
+}
+
+export interface Instruction {
+  opcode: number;
+  operands: number[];
+}
 
 export class FunctionBytecode {
-  name: Atom;
+  readonly name: Atom;
+  jsMode = 0;
+  hasPrototype = false;
+  hasSimpleParameterList = true;
+  isDerivedClassConstructor = false;
+  needHomeObject = false;
+  funcKind = 0;
+  newTargetAllowed = false;
+  superCallAllowed = false;
+  superAllowed = false;
+  argumentsAllowed = true;
+  hasDebug = false;
+  readOnlyBytecode = false;
+  isDirectOrIndirectEval = false;
+
+  instructions: Instruction[] = [];
   stackSize = 0;
   argCount = 0;
   varCount = 0;
   definedArgCount = 0;
-  // TODO
-  // ...existing code...
-  cpool: [ConstantTag, any][] = [];
-  opcodes: (Opcode | number)[] = [];
-  source: string;
-// ...existing code...
-  sourceFile: string;
-  lineNum = 1;
+  constantPool: ConstantEntry[] = [];
+  closureVars: ClosureVar[] = [];
 
-  constructor(
-    name: Atom,
-    options: {
-      source: string;
-      sourceFile: string;
-    }
-  ) {
+  lineInfo: LineInfoEntry[] = [];
+  columnInfo: LineInfoEntry[] = [];
+  pc2line: number[] = [];
+  pc2column: number[] = [];
+
+  filename: Atom | null = null;
+  source: string;
+  sourceFile: string;
+  sourceLength: number;
+
+  constructor(name: Atom, options: { source: string; sourceFile: string }) {
     this.name = name;
     this.source = options.source;
     this.sourceFile = options.sourceFile;
+    this.sourceLength = options.source.length;
   }
-}
 
+  pushOpcode(opcode: number, operands: number[] = []) {
+    this.instructions.push({ opcode, operands });
+  }
 
-export function createNewFunctionBytecode() {
+  addConstant(entry: ConstantEntry): number {
+    this.constantPool.push(entry);
+    return this.constantPool.length - 1;
+  }
 
+  addClosureVar(entry: ClosureVar): number {
+    this.closureVars.push(entry);
+    return this.closureVars.length - 1;
+  }
+
+  addLineInfo(info: LineInfoEntry) {
+    this.lineInfo.push(info);
+  }
+
+  addColumnInfo(info: LineInfoEntry) {
+    this.columnInfo.push(info);
+  }
 }
