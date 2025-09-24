@@ -11,7 +11,7 @@ import { TypeScriptCompiler, CompileFlags } from './index'
 interface CLIOptions extends CompileFlags {
   output?: string
   disasm?: boolean
-  showCFG?: boolean
+  cfg?: boolean
   pc2line?: boolean
   verbose?: boolean
 }
@@ -29,7 +29,7 @@ async function main() {
     console.log('  --debug               Enable debug mode')
     console.log('  --no-strict           Disable strict mode')
     console.log('  --disasm              Disassemble bytecode (for debugging)')
-    console.log('  --showCFG             Show control flow graph')
+    console.log('  --cfg             Show control flow graph')
     console.log('  --pc2line             Show PC to line mapping')
     console.log('  -v, --verbose         Verbose output')
     return
@@ -64,8 +64,8 @@ async function main() {
       case '--disasm':
         options.disasm = true
         break
-      case '--showCFG':
-        options.showCFG = true
+      case '--cfg':
+        options.cfg = true
         break
       case '--pc2line':
         options.pc2line = true
@@ -152,7 +152,7 @@ async function compileTsFile(inputFile: string, options: CLIOptions) {
     await disassembleBytecode(bytecode, inputPath)
   }
   
-  if (options.showCFG) {
+  if (options.cfg) {
     console.log('Control Flow Graph generation not implemented yet')
   }
   

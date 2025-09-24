@@ -4,7 +4,7 @@
 		{
 			"label": "Run CLI quick validation",
 			"type": "shell",
-			"command": "pnpm -s start __tests__/compiler/fixtures/compute.ts --disasm --showCFG --pc2line --debug",
+			"command": "pnpm -s start __tests__/compiler/fixtures/compute.ts --disasm --cfg --pc2line --debug",
 			"args": [],
 			"problemMatcher": [],
 			"group": "build"
@@ -39,7 +39,7 @@
 		{
 			"label": "Generate env and quick-validate CLI",
 			"type": "shell",
-			"command": "pnpm -s gen:env && pnpm -s start __tests__/compiler/fixtures/compute.ts --disasm --showCFG --pc2line --debug",
+			"command": "pnpm -s gen:env && pnpm -s start __tests__/compiler/fixtures/compute.ts --disasm --cfg --pc2line --debug",
 			"isBackground": false,
 			"group": "build"
 		}

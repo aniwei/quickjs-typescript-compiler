@@ -136,6 +136,17 @@ export class BytecodeWriter {
 	}
 
 	private writeFunction(bytecode: FunctionBytecode, moduleAtom: Atom) {
+		const varDefs = bytecode.varDefs ?? []
+		for (const vd of varDefs) {
+			this.ensureAtom(vd.name)
+		}
+		for (const closureVar of bytecode.closureVars) {
+			this.ensureAtom(closureVar.name)
+		}
+		if (bytecode.hasDebug) {
+			this.ensureAtom(bytecode.filename ?? moduleAtom)
+		}
+
 		const instructions = this.encodeInstructions(bytecode.instructions)
 		const flags = this.computeFunctionFlags(bytecode)
 
@@ -152,7 +163,6 @@ export class BytecodeWriter {
 		this.body.writeLEB128(bytecode.constantPool.length)
 		this.body.writeLEB128(instructions.length)
 
-		const varDefs = bytecode.varDefs ?? []
 		this.body.writeLEB128(varDefs.length)
 		for (const vd of varDefs) {
 			this.writeAtom(this.body, vd.name)
@@ -366,6 +376,21 @@ export class BytecodeWriter {
 	private writeAtomValue(buffer: ByteBuffer, atom: Atom) {
 		const encoded = this.encodeAtom(atom)
 		buffer.writeLEB128(encoded)
+	}
+
+	private ensureAtom(atom: Atom) {
+		if (atom < env.firstAtomId) {
+			return
+		}
+		if (this.customAtomIndex.has(atom)) {
+			return
+		}
+		const str = this.atomTable.getAtomString(atom)
+		if (str === undefined) {
+			throw new Error(`Unknown atom ${atom}`)
+		}
+		this.customAtomIndex.set(atom, this.customAtomStrings.length)
+		this.customAtomStrings.push(str)
 	}
 
 	private encodeAtom(atom: Atom): number {
