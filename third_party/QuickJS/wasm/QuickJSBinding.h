@@ -8,10 +8,11 @@ using namespace emscripten;
 
 namespace quickjs {
 
-enum CompiledFlags {
-  COMPILED_FLAG_NONE = 0,
-  COMPILED_FLAG_DUMP = 1 << 0,
-  COMPILED_FLAG_BIGNUM = 1 << 1,
+enum CompileFlags {
+  COMPILE_FLAG_NONE = 0,
+  COMPILE_FLAG_DUMP = 1 << 0,
+  COMPILE_FLAG_BIGNUM = 1 << 1,
+  COMPILE_FLAG_SHORT_OPCODES = 1 << 2,
 };
 
 struct Op {

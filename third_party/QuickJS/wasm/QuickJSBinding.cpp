@@ -234,13 +234,17 @@ namespace quickjs {
   }
 
   uint32_t QuickJSBinding::getCompileOptions() {
-    uint32_t flags = COMPILED_FLAG_NONE;
+    uint32_t flags = COMPILE_FLAG_NONE;
 #ifdef DUMP_BYTECODE
-    flags |= COMPILED_FLAG_DUMP;
+    flags |= COMPILE_FLAG_DUMP;
 #endif
 
 #ifdef CONFIG_BIGNUM
-    flags |= COMPILED_FLAG_BIGNUM;
+    flags |= COMPILE_FLAG_BIGNUM;
+#endif
+
+#ifdef SHORT_OPCODES
+    flags |= COMPILE_FLAT_SHORT_OPCODES;
 #endif
     
     return flags;

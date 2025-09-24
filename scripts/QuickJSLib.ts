@@ -27,7 +27,7 @@ interface BytecodeTag {
   name: string
 }
 
-interface QuickJSBinding {
+interface WasmInstance {
   runWithBinary: (input: Uint8Array, args: StringArray) => void
   dumpWithBinary: (input: Uint8Array, args: StringArray) => string
   compile: (source: string, sourcePath: string, args: StringArray) => Uint8Array
@@ -36,6 +36,8 @@ interface QuickJSBinding {
   getAtoms: () => Atom[]
   getOpcodes: () => OpcodeMeta[]
   getBytecodeTags: () => BytecodeTag[]
+  getCompileFlags: () => number
+  getCompileEnums: () => Record<string, number>
 }
 
 export class QuickJSLib {
@@ -61,7 +63,24 @@ export class QuickJSLib {
 
     const WasmModule: any = await import(path)
     QuickJSLib.WasmInstance = await WasmModule.default()
-    return QuickJSLib.WasmInstance
+    return QuickJSLib.WasmInstance as WasmInstance
+  }
+
+  static getCompileFlags = async (): Promise<number> => {
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    return WasmInstance.QuickJSBinding.getCompileOptions()
+  }
+
+  static getCompileFlagEnums = async (): Promise<Record<string, number>> => {
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const enums: Record<string, number> = {}
+
+    enums['COMPILE_FLAG_NONE'] = WasmInstance.CompileFlags.COMPILE_FLAG_NONE.value
+    enums['COMPILE_FLAG_DUMP'] = WasmInstance.CompileFlags.COMPILE_FLAG_DUMP.value
+    enums['COMPILE_FLAG_BIGNUM'] = WasmInstance.CompileFlags.COMPILE_FLAG_BIGNUM.value
+    enums['COMPILE_SHORT_OPCODES'] = WasmInstance.CompileFlags.COMPILE_FLAG_SHORT_OPCODES.value
+
+    return enums
   }
 
   static async runWithBinaryPath(binaryPath: string) {
@@ -97,6 +116,18 @@ export class QuickJSLib {
     return String(text || '')
   }
 
+  static async getCompileEnums(): Promise<Record<string, number>> {
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const enums: Record<string, number> = {}
+
+    enums['COMPILE_FLAG_NONE'] = WasmInstance.QuickJSBinding.CompileFlags.COMPILE_FLAG_NONE
+    enums['COMPILE_FLAG_DUMP'] = WasmInstance.QuickJSBinding.CompileFlags.COMPILE_FLAG_DUMP
+    enums['COMPILE_FLAG_BIGNUM'] = WasmInstance.QuickJSBinding.CompileFlags.COMPILE_FLAG_BIGNUM
+    enums['COMPILE_FLAG_SHORT_OPCODES'] = WasmInstance.QuickJSBinding.CompileFlags.COMPILE_FLAG_SHORT_OPCODES
+
+    return enums
+  }
+
   static async getOpcodes() {
     const WasmInstance = await QuickJSLib.getWasmInstance()
     const vec = WasmInstance.QuickJSBinding.getOpcodes()
@@ -127,11 +158,6 @@ export class QuickJSLib {
   static async getFirstAtomId(): Promise<number> {
     const WasmInstance = await this.getWasmInstance();
     return WasmInstance.QuickJSBinding.getFirstAtomId();
-  }
-
-  static async hasShortOpcodes(): Promise<boolean> {
-    const WasmInstance = await this.getWasmInstance();
-    return WasmInstance.QuickJSBinding.hasShortOpcodes();
   }
 
   static async getOpcodeName(opcode: number): Promise<string> {

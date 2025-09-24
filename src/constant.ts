@@ -1,24 +1,29 @@
 /*
  * @see https://github.com/bellard/quickjs/blob/master/quickjs.h#L322
  */
-export enum ConstantTag {
-  UNDEFINED = 0,
-  NULL = 1,
-  BOOL_FALSE = 2,
-  BOOL_TRUE = 3,
-  INT32 = 4,
-  FLOAT64 = 5,
-  STRING = 6,
-  OBJECT = 7,
-  ARRAY = 8,
-  BIG_INT = 9,
-  BIG_FLOAT = 10,
-  BIG_DECIMAL = 11,
-  TEMPLATE = 12,
-  FUNCTION_BYTECODE = 13,
-  MODULE = 14,
-  REGEXP = 15,
-  // custom
-  ATOM = 200,
-  ATOM_NULL = 201,
+
+import { BytecodeTag } from './env'
+
+export class ConstantTable {
+  private constants: Map<string, { tag: BytecodeTag; value: unknown; index: number }> = new Map()
+  private nextIndex = 0
+
+  addConstant(tag: BytecodeTag, value: unknown): number {
+    const key = `${tag}:${String(value)}`
+    if (this.constants.has(key)) {
+      return this.constants.get(key)!.index
+    }
+    const index = this.nextIndex++
+    this.constants.set(key, { tag, value, index })
+    return index
+  }
+
+  getConstants(): { tag: BytecodeTag; value: unknown }[] {
+    const sorted = Array.from(this.constants.values()).sort((a, b) => a.index - b.index)
+    return sorted.map(({ tag, value }) => ({ tag, value }))
+  }
+
+  size(): number {
+    return this.constants.size
+  }
 }

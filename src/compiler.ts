@@ -97,12 +97,16 @@ export class Compiler {
       const nameText = declaration.name.text
       const atom = this.atomTable.getAtomId(nameText)
 
-      if (this.scopeManager.hasBindingInCurrentScope(atom)) {
+      if ((isConst || isLet) && this.scopeManager.hasBindingInCurrentScope(atom)) {
         throw new Error(`Identifier '${nameText}' has already been declared in this scope`)
       }
 
-  const varIndex = this.declareLexicalVariable(atom, { isConst, isLet })
-  this.bindCurrentScope(varIndex)
+      if (isConst && !declaration.initializer) {
+        throw new Error(`Missing initializer in const declaration for '${nameText}'`)
+      }
+
+      const varIndex = this.declareLexicalVariable(atom, { isConst, isLet })
+      this.bindCurrentScope(varIndex)
 
       if (declaration.initializer) {
         this.visitNode(declaration.initializer)

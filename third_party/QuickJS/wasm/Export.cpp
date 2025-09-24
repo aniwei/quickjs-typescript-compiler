@@ -14,10 +14,11 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
   register_vector<OpFmt>("OpFormatArray");
   register_vector<BytecodeTag>("BytecodeTagArray");
 
-  enum_<CompiledFlags>("CompiledFlags")
-    .value("COMPILED_FLAG_NONE", COMPILED_FLAG_NONE)
-    .value("COMPILED_FLAG_DUMP", COMPILED_FLAG_DUMP)
-    .value("COMPILED_FLAG_BIGNUM", COMPILED_FLAG_BIGNUM);
+  enum_<CompileFlags>("CompileFlags")
+    .value("COMPILE_FLAG_NONE", COMPILE_FLAG_NONE)
+    .value("COMPILE_FLAG_DUMP", COMPILE_FLAG_DUMP)
+    .value("COMPILE_FLAG_BIGNUM", COMPILE_FLAG_BIGNUM)
+    .value("COMPILE_FLAG_SHORT_OPCODES", COMPILE_FLAG_SHORT_OPCODES);
 
   class_<Op>("Op")
     .constructor<>()
