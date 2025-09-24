@@ -1,8 +1,10 @@
+import { Atom } from './atoms'
 import { FunctionDef } from './functionDef'
 import { Scope } from './scopes'
 
 export class ScopeManager {
   private readonly scopeStack: number[] = []
+  private readonly bindings = new Map<number, Map<Atom, number>>()
 
   constructor(private readonly func: FunctionDef) {}
 
@@ -15,11 +17,15 @@ export class ScopeManager {
     if (this.func.bodyScope === -1) {
       this.func.bodyScope = index
     }
+    this.bindings.set(index, new Map())
     return index
   }
 
   leaveScope(): number | undefined {
     const popped = this.scopeStack.pop()
+    if (popped !== undefined) {
+      this.bindings.delete(popped)
+    }
     const parent = this.currentScope()
     this.func.scopeLevel = parent
     this.func.scopeFirst = parent >= 0 ? this.func.scopes[parent].first : -1
@@ -42,5 +48,24 @@ export class ScopeManager {
     variable.scopeLevel = current
     scope.first = varIndex
     this.func.scopeFirst = scope.first
+  this.bindings.get(current)?.set(variable.name, varIndex)
+  }
+
+  hasBindingInCurrentScope(atom: Atom): boolean {
+    const current = this.currentScope()
+    if (current < 0) return false
+    return this.bindings.get(current)?.has(atom) ?? false
+  }
+
+  lookup(atom: Atom): { scopeIndex: number; varIndex: number } | null {
+    for (let i = this.scopeStack.length - 1; i >= 0; i--) {
+      const scopeIndex = this.scopeStack[i]
+      const map = this.bindings.get(scopeIndex)
+      const varIndex = map?.get(atom)
+      if (varIndex !== undefined) {
+        return { scopeIndex, varIndex }
+      }
+    }
+    return null
   }
 }

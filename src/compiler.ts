@@ -17,7 +17,6 @@ export class Compiler {
   private readonly atomTable: AtomTable
   private currentFunction!: FunctionDef
   private scopeManager!: ScopeManager
-  private readonly bindingStack: Map<Atom, number>[] = []
   private readonly opcodeInfoByCode = new Map<number, OpcodeDefinition>()
 
   private stackDepth = 0
@@ -98,8 +97,12 @@ export class Compiler {
       const nameText = declaration.name.text
       const atom = this.atomTable.getAtomId(nameText)
 
-      const varIndex = this.declareLexicalVariable(atom, { isConst, isLet })
-      this.bindCurrentScope(atom, varIndex)
+      if (this.scopeManager.hasBindingInCurrentScope(atom)) {
+        throw new Error(`Identifier '${nameText}' has already been declared in this scope`)
+      }
+
+  const varIndex = this.declareLexicalVariable(atom, { isConst, isLet })
+  this.bindCurrentScope(varIndex)
 
       if (declaration.initializer) {
         this.visitNode(declaration.initializer)
@@ -132,10 +135,8 @@ export class Compiler {
     return this.currentFunction.addVar(variable)
   }
 
-  private bindCurrentScope(atom: Atom, index: number) {
+  private bindCurrentScope(index: number) {
     this.scopeManager.bindVarToCurrentScope(index)
-    const bindings = this.bindingStack[this.bindingStack.length - 1]
-    bindings.set(atom, index)
   }
 
   private emitPutVarInit(atom: Atom) {
@@ -163,12 +164,10 @@ export class Compiler {
 
   private pushScope() {
     this.scopeManager.enterScope()
-    this.bindingStack.push(new Map())
   }
 
   private popScope() {
     this.scopeManager.leaveScope()
-    this.bindingStack.pop()
   }
 }
 
