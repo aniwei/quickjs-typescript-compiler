@@ -12,11 +12,12 @@
     "eval": "tsx scripts/eval.ts",
     "dump": "tsx scripts/dump.ts",
     "compare": "tsx scripts/compareWithWasm.ts",
-  "test": "npm run gen:env && jest"
+    "test": "npm run gen:env && jest"
   },
   "devDependencies": {
     "@babel/parser": "^7.28.4",
     "@babel/traverse": "^7.28.4",
+    "@types/babel__core": "^7.20.5",
     "@types/jest": "^30.0.0",
     "@types/node": "^20.19.13",
     "jest": "^30.1.3",
@@ -24,6 +25,8 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "@babel/core": "^7.28.4",
+    "@babel/preset-typescript": "^7.27.1",
     "tsx": "^4.20.5"
   }
 }

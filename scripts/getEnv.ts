@@ -5,21 +5,13 @@ type Atom = { id: number; key: string }
 type Opcode = { name: string; code: number, nPop: number, nPush: number, size?: number, fmt: number }
 
 function toEnumKey(raw: string, prefix: string): string {
-  // 1) 将字符串转为大写
-  let key = String(raw).toUpperCase()
-  // 2) 非字母数字与 $ 替换为下划线
-  key = key.replace(/[^A-Z0-9$]/g, '_')
-  // 3) 避免以数字开头
-  if (/^[0-9]/.test(key)) key = `${prefix}_${key}`
-  // 4) 避免空键
-  if (!key.length) key = `${prefix}_EMPTY`
-  // 5) 避免重复下划线的冗余
-  key = key.replace(/_+/g, '_')
-  // 6) 去除首尾下划线
-  key = key.replace(/^_+|_+$/g, '')
-  // 再次兜底
-  if (!key.length) key = `${prefix}_EMPTY`
-  return key
+  if (prefix === 'ATOM') {
+    return `JSAtom_${raw}`;
+  }
+  if (prefix === 'OP') {
+    return `OP_${raw}`;
+  }
+  return raw;
 }
 
 async function main() {
@@ -75,7 +67,7 @@ async function main() {
 `
 
   const opformatEnum = `export enum OpFormat {
-${opformats.map(f => `  ${toEnumKey(f.name, 'OPFMT')} = ${f.id},`).join('\n')}
+${opformats.map(f => `  ${f.name} = ${f.id},`).join('\n')}
 }
 `
 
@@ -159,7 +151,7 @@ ${opcodes
     const key = toEnumKey(o.name, 'OP')
     const fmtName = idToFormatName.get(o.fmt) || 'NONE'
     const sz = o.size ?? sizeByFormat[fmtName] ?? 1
-    return `  ${key}: { id: ${JSON.stringify(o.name)}, size: ${sz}, nPop: ${o.nPop}, nPush: ${o.nPush}, format: OpFormat.${toEnumKey(fmtName, 'OPFMT')} },`
+    return `  ${key}: { id: ${JSON.stringify(o.name)}, size: ${sz}, nPop: ${o.nPop}, nPush: ${o.nPush}, format: OpFormat.${fmtName} },`
   })
   .join('\n')}
 }
@@ -192,7 +184,7 @@ ${opcodes
       const key = toEnumKey(o.name, 'OP')
       const fmtName = idToFormatName.get(o.fmt) || 'NONE'
       const sz = o.size ?? sizeByFormat[fmtName] ?? 1
-      return `  ${key}: { id: ${JSON.stringify(o.name)}, size: ${sz}, nPop: ${o.nPop}, nPush: ${o.nPush}, format: OpFormat.${toEnumKey(fmtName, 'OPFMT')} },`
+      return `  ${key}: { id: ${JSON.stringify(o.name)}, size: ${sz}, nPop: ${o.nPop}, nPush: ${o.nPush}, format: OpFormat.${fmtName} },`
     })
     .join('\n') + '\n}' : '{}'}
 `

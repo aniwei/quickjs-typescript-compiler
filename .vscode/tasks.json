@@ -35,6 +35,13 @@
 			"type": "shell",
 			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/compute.ts --input-js __tests__/compiler/fixtures/compute.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts --show-diff",
 			"group": "build"
+		},
+		{
+			"label": "Generate env and quick-validate CLI",
+			"type": "shell",
+			"command": "pnpm -s gen:env && pnpm -s start __tests__/compiler/fixtures/compute.ts --disasm --showCFG --pc2line --debug",
+			"isBackground": false,
+			"group": "build"
 		}
 	]
 }
