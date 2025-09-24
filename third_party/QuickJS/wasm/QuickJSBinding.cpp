@@ -273,6 +273,16 @@ namespace quickjs {
     return static_cast<uint32_t>(JS_ATOM_END);
   }
 
+  std::vector<JSMode> QuickJSBinding::getJSModes() {
+    std::vector<JSMode> modes;
+
+    modes.push_back(JSMode{ id: JS_MODE_STRICT, name: "JS_MODE_STRICT" });
+    modes.push_back(JSMode{ id: JS_MODE_ASYNC, name: "JS_MODE_ASYNC" });
+    modes.push_back(JSMode{ id: JS_MODE_BACKTRACE_BARRIER, name: "JS_MODE_BACKTRACE_BARRIER" });
+
+    return modes;
+  }
+
   std::vector<FunctionKind> QuickJSBinding::getFunctionKinds() {
     std::vector<FunctionKind> kinds;
 

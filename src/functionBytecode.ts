@@ -2,10 +2,18 @@ import { Atom } from './atoms';
 import { BytecodeTag } from './env';
 import { ClosureVar } from './vars';
 
-export interface ConstantEntry {
-  tag: BytecodeTag;
-  value: unknown;
-}
+export type ConstantEntry =
+  | { tag: BytecodeTag.TC_TAG_NULL }
+  | { tag: BytecodeTag.TC_TAG_UNDEFINED }
+  | { tag: BytecodeTag.TC_TAG_BOOL_FALSE }
+  | { tag: BytecodeTag.TC_TAG_BOOL_TRUE }
+  | { tag: BytecodeTag.TC_TAG_INT32; value: number }
+  | { tag: BytecodeTag.TC_TAG_FLOAT64; value: number }
+  | { tag: BytecodeTag.TC_TAG_STRING; value: string }
+  | { tag: BytecodeTag.TC_TAG_ARRAY; elements: ConstantEntry[] }
+  | { tag: BytecodeTag.TC_TAG_TEMPLATE_OBJECT; elements: ConstantEntry[]; raw: ConstantEntry }
+  | { tag: BytecodeTag.TC_TAG_OBJECT; properties: Array<{ name: Atom; value: ConstantEntry }> }
+  | { tag: BytecodeTag.TC_TAG_FUNCTION_BYTECODE; value: FunctionBytecode };
 
 export interface LineInfoEntry {
   pc: number;

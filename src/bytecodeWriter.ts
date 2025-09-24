@@ -40,6 +40,28 @@ class ByteBuffer {
 		} while (v !== 0)
 	}
 
+	writeSLEB128(value: number) {
+		let v = value | 0
+		let more = true
+		while (more) {
+			let byte = v & 0x7f
+			v >>= 7
+			const signBitSet = (byte & 0x40) !== 0
+			if ((v === 0 && !signBitSet) || (v === -1 && signBitSet)) {
+				more = false
+			} else {
+				byte |= 0x80
+			}
+			this.writeU8(byte)
+		}
+	}
+
+	writeFloat64(value: number) {
+		const buffer = new ArrayBuffer(8)
+		new DataView(buffer).setFloat64(0, value, true)
+		this.writeBytes(new Uint8Array(buffer))
+	}
+
 	writeBytes(bytes: Iterable<number> | Uint8Array) {
 		for (const b of bytes) {
 			this.writeU8(b)
@@ -148,7 +170,7 @@ export class BytecodeWriter {
 		}
 
 			for (const entry of bytecode.constantPool) {
-				this.writeConstant(entry)
+				this.writeConstant(entry, moduleAtom)
 			}
 	}
 
@@ -180,8 +202,77 @@ export class BytecodeWriter {
 		this.body.writeU8(flags)
 	}
 
-	private writeConstant(_entry: ConstantEntry): void {
-		throw new Error('Constant pool serialization is not implemented yet')
+	private writeConstant(entry: ConstantEntry, moduleAtom: Atom): void {
+		switch (entry.tag) {
+			case BytecodeTag.TC_TAG_NULL:
+			case BytecodeTag.TC_TAG_UNDEFINED:
+			case BytecodeTag.TC_TAG_BOOL_FALSE:
+			case BytecodeTag.TC_TAG_BOOL_TRUE:
+				this.body.writeU8(entry.tag)
+				return
+			case BytecodeTag.TC_TAG_INT32:
+				this.body.writeU8(BytecodeTag.TC_TAG_INT32)
+				this.body.writeSLEB128(entry.value | 0)
+				return
+			case BytecodeTag.TC_TAG_FLOAT64:
+				this.body.writeU8(BytecodeTag.TC_TAG_FLOAT64)
+				this.body.writeFloat64(entry.value)
+				return
+			case BytecodeTag.TC_TAG_STRING:
+				this.body.writeU8(BytecodeTag.TC_TAG_STRING)
+				this.writeString(entry.value)
+				return
+			case BytecodeTag.TC_TAG_ARRAY:
+				this.body.writeU8(BytecodeTag.TC_TAG_ARRAY)
+				this.body.writeLEB128(entry.elements.length)
+				for (const element of entry.elements) {
+					this.writeConstant(element, moduleAtom)
+				}
+				return
+			case BytecodeTag.TC_TAG_TEMPLATE_OBJECT:
+				this.body.writeU8(BytecodeTag.TC_TAG_TEMPLATE_OBJECT)
+				this.body.writeLEB128(entry.elements.length)
+				for (const element of entry.elements) {
+					this.writeConstant(element, moduleAtom)
+				}
+				this.writeConstant(entry.raw, moduleAtom)
+				return
+			case BytecodeTag.TC_TAG_OBJECT:
+				this.body.writeU8(BytecodeTag.TC_TAG_OBJECT)
+				this.body.writeLEB128(entry.properties.length)
+				for (const property of entry.properties) {
+					this.writeAtom(this.body, property.name)
+					this.writeConstant(property.value, moduleAtom)
+				}
+				return
+			case BytecodeTag.TC_TAG_FUNCTION_BYTECODE:
+				this.writeFunction(entry.value, moduleAtom)
+				return
+			default: {
+				const unreachable: never = entry
+				throw new Error('Unsupported constant tag in constant pool')
+			}
+		}
+	}
+
+	private writeString(value: string) {
+		let isWide = false
+		for (let i = 0; i < value.length; i++) {
+			if (value.charCodeAt(i) > 0xff) {
+				isWide = true
+				break
+			}
+		}
+		this.body.writeLEB128((value.length << 1) | (isWide ? 1 : 0))
+		if (isWide) {
+			for (let i = 0; i < value.length; i++) {
+				this.body.writeU16(value.charCodeAt(i))
+			}
+		} else {
+			for (let i = 0; i < value.length; i++) {
+				this.body.writeU8(value.charCodeAt(i))
+			}
+		}
 	}
 
 	private encodeInstructions(instructions: Instruction[]): Uint8Array {

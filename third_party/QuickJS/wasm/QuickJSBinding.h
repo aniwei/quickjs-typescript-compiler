@@ -44,6 +44,11 @@ struct FunctionKind {
   std::string name;
 };
 
+struct JSMode {
+  uint32_t id;
+  std::string name;
+};
+
 class QuickJSBinding {
   using Ptr = std::shared_ptr<QuickJSBinding>;
 
@@ -71,6 +76,7 @@ class QuickJSBinding {
 
   static std::vector<BytecodeTag> getBytecodeTags();
   static std::vector<FunctionKind> getFunctionKinds();
+  static std::vector<JSMode> getJSModes();
 
   static std::vector<Atom> getAtoms();
   static std::vector<OpFmt> getOpcodeFormats();

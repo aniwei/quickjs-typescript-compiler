@@ -30,6 +30,7 @@ async function main() {
   const opformatRecord = await QuickJSLib.getAllOpcodeFormats()
   const bytecodeTagRecord = await QuickJSLib.getAllBytecodeTags()
   const functionKindRecord = await QuickJSLib.getFunctionKinds()
+  const jsModeRecord = await QuickJSLib.getJSModes()
 
   // 去重与清洗 atoms（按 id 去重，优先保留首次出现的名称）
   const seenAtomIds = new Set<number>()
@@ -65,6 +66,9 @@ async function main() {
   const functionKinds = Object.entries(functionKindRecord as Record<string, number>)
     .map(([name, id]) => ({ name, id }))
     .sort((a, b) => a.id - b.id)
+  const jsModes = Object.entries(jsModeRecord as Record<string, number>)
+    .map(([name, id]) => ({ name, id }))
+    .sort((a, b) => a.id - b.id)
   
   
 
@@ -90,6 +94,11 @@ ${bytecodeTags.map(f => `  ${f.name} = ${f.id},`).join('\n')}
 
   const functionKindEnum = `export enum FunctionKind {
 ${functionKinds.map(f => `  ${f.name} = ${f.id},`).join('\n')}
+}
+`
+
+  const jsModeEnum = `export enum JSMode {
+${jsModes.map(m => `  ${m.name} = ${m.id},`).join('\n')}
 }
 `
 
@@ -211,7 +220,7 @@ ${opcodes
     .join('\n') + '\n}' : '{}'}
 `
 
-  const content = header + '\n' + compileFlagsEnum + '\n' + bytecodeTagsEnum + '\n' + opformatEnum + '\n' + opcodeEnum + '\n' + opcodeNameToCode + '\n' + atomEnum + '\n' + atomStrings + '\n' + opcodeDefs + '\n' + shortOpcodeDefs + '\n' + envBlock
+  const content = header + '\n' + compileFlagsEnum + '\n' + bytecodeTagsEnum + '\n' + functionKindEnum + '\n' + jsModeEnum + '\n' + opformatEnum + '\n' + opcodeEnum + '\n' + opcodeNameToCode + '\n' + atomEnum + '\n' + atomStrings + '\n' + opcodeDefs + '\n' + shortOpcodeDefs + '\n' + envBlock
 
   fs.writeFileSync('src/env.ts', content, 'utf-8')
   console.log('✓ Environment file src/env.ts generated successfully')

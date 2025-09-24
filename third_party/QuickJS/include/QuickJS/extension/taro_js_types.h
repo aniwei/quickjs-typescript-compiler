@@ -31,3 +31,7 @@ typedef enum JSFunctionKindEnum {
   JS_FUNC_ASYNC = (1 << 1),
   JS_FUNC_ASYNC_GENERATOR = (JS_FUNC_GENERATOR | JS_FUNC_ASYNC),
 } JSFunctionKindEnum;
+
+#define JS_MODE_STRICT (1 << 0)
+#define JS_MODE_ASYNC  (1 << 2) /* async function */
+#define JS_MODE_BACKTRACE_BARRIER (1 << 3) /* stop backtrace before this frame */

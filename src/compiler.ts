@@ -60,8 +60,8 @@ export class Compiler {
 
   compile(): FunctionDef {
     this.closureVarIndices.clear()
-  this.stackDepth = 0
-  this.maxStackDepth = 0
+    this.stackDepth = 0
+    this.maxStackDepth = 0
     const evalAtom = this.atomTable.getAtomId('_eval_')
     const rootFunction = new FunctionDef(evalAtom, this.sourceCode, this.fileName)
     this.currentFunction = rootFunction

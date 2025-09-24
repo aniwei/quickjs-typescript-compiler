@@ -143,6 +143,17 @@ export class QuickJSLib {
     return map
   }
 
+  static async getJSModes() {
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const vec = WasmInstance.QuickJSBinding.getJSModes()
+    const map: Record<string, number> = {}
+    for (let i = 0; i < vec.size(); i++) {
+      const m = vec.get(i)
+      map[m.name] = m.id
+    }
+    return map
+  }
+
   static async getFunctionKinds() {
     const WasmInstance = await QuickJSLib.getWasmInstance()
     const vec = WasmInstance.QuickJSBinding.getFunctionKinds()
