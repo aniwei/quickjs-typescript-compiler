@@ -10,14 +10,14 @@ export class FunctionDef {
   parent: FunctionDef | null = null;
   childs: FunctionDef[] = [];
 
-  funcBytecode: FunctionBytecode;
-  funcName: Atom;
+  bytecode: FunctionBytecode;
+  name: Atom;
   vars: Var[] = [];
   scopes: Scope[] = [];
 
   constructor(name: Atom, source: string, sourceFile: string) {
-    this.funcName = name;
-    this.funcBytecode = new FunctionBytecode(name, {
+    this.name = name;
+    this.bytecode = new FunctionBytecode(name, {
       source,
       sourceFile,
     });

@@ -9,9 +9,11 @@ export class FunctionBytecode {
   varCount = 0;
   definedArgCount = 0;
   // TODO
+  // ...existing code...
   cpool: [ConstantTag, any][] = [];
-  opcodes: Opcode[] = [];
+  opcodes: (Opcode | number)[] = [];
   source: string;
+// ...existing code...
   sourceFile: string;
   lineNum = 1;
 

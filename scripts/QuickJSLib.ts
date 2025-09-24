@@ -150,6 +150,17 @@ export class QuickJSLib {
     return atoms
   }
 
+  static async getAllBytecodeTags() {
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const vec = WasmInstance.QuickJSBinding.getBytecodeTags()
+    const tags: Record<string, number> = {}
+    for (let i = 0; i < vec.size(); i++) {
+      const t = vec.get(i)
+      tags[t.name] = t.id
+    }
+    return tags
+  }
+
   static async getAllOpcodeFormats() {
     const WasmInstance = await QuickJSLib.getWasmInstance()
     const vec = WasmInstance.QuickJSBinding.getOpcodeFormats()

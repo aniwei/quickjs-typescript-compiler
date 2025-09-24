@@ -1,15 +1,17 @@
 import * as ts from 'typescript';
 import { FunctionDef } from './functionDef';
 import { Atom } from './atoms';
+import { Var } from './vars';
+import { OPCODES } from './opcodes';
 
 export class Compiler {
-  private sourceFile: ts.SourceFile;
+  private sf: ts.SourceFile;
   private program: ts.Program;
   private checker: ts.TypeChecker;
-  private currentFunc: FunctionDef | null = null;
+  private currentFunctionDef: FunctionDef | null = null;
 
   constructor(private fileName: string, private sourceCode: string) {
-    this.sourceFile = ts.createSourceFile(
+    this.sf = ts.createSourceFile(
       this.fileName,
       this.sourceCode,
       ts.ScriptTarget.ES2020,
@@ -23,7 +25,7 @@ export class Compiler {
     const host = ts.createCompilerHost(options);
     host.getSourceFile = (fileName, languageVersion) => {
       if (fileName === this.fileName) {
-        return this.sourceFile;
+        return this.sf;
       }
       return undefined;
     };
@@ -33,9 +35,9 @@ export class Compiler {
 
   compile(): FunctionDef {
     const rootFuncDef = new FunctionDef('<main>', this.sourceCode, this.fileName);
-    this.currentFunc = rootFuncDef;
+    this.currentFunctionDef = rootFuncDef;
 
-    ts.forEachChild(this.sourceFile, this.visitNode.bind(this));
+    ts.forEachChild(this.sf, this.visitNode.bind(this));
 
     return rootFuncDef;
   }
@@ -46,6 +48,10 @@ export class Compiler {
         this.compileFunctionDeclaration(node as ts.FunctionDeclaration);
         break;
       
+      case ts.SyntaxKind.NumericLiteral:
+        this.compileNumericLiteral(node as ts.NumericLiteral);
+        break;
+
       case ts.SyntaxKind.VariableStatement:
         this.compileVariableStatement(node as ts.VariableStatement);
         break;
@@ -64,7 +70,38 @@ export class Compiler {
   }
 
   private compileVariableStatement(node: ts.VariableStatement) {
-    // TODO: Implement variable statement compilation
+    for (const decl of node.declarationList.declarations) {
+      if (ts.isIdentifier(decl.name)) {
+        const varName = decl.name.text;
+        const isConst = (node.declarationList.flags & ts.NodeFlags.Const) !== 0;
+        
+        if (this.currentFunctionDef) {
+          this.currentFunctionDef.vars.push(new Var(varName, isConst));
+          this.currentFunctionDef.bytecode.varCount++;
+
+          if (decl.initializer) {
+            this.visitNode(decl.initializer);
+            this.emitOp('set_var', this.currentFunctionDef.vars.length - 1);
+          }
+        }
+      }
+    }
+  }
+
+  private compileNumericLiteral(node: ts.NumericLiteral) {
+    const value = Number(node.text);
+    this.emitOp('push_i32', value);
+  }
+
+  private emitOp(name: string, ...args: number[]) {
+    if (this.currentFunctionDef) {
+      const opcode = OPCODES[name];
+      if (opcode) {
+        this.currentFunctionDef.bytecode.opcodes.push(opcode.op, ...args);
+      } else {
+        throw new Error(`Unknown opcode: ${name}`);
+      }
+    }
   }
 }
 

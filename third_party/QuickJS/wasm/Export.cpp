@@ -12,6 +12,7 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
   register_vector<Op>("OpArray");
   register_vector<Atom>("AtomArray");
   register_vector<OpFmt>("OpFormatArray");
+  register_vector<BytecodeTag>("BytecodeTagArray");
 
   enum_<CompiledFlags>("CompiledFlags")
     .value("COMPILED_FLAG_NONE", COMPILED_FLAG_NONE)
@@ -55,5 +56,6 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .class_function("getAtoms", &QuickJSBinding::getAtoms)
     .class_function("getOpcodeFormats", &QuickJSBinding::getOpcodeFormats)
     .class_function("getOpcodes", &QuickJSBinding::getOpcodes)
+    .class_function("getBytecodeTags", &QuickJSBinding::getBytecodeTags)
     .smart_ptr<std::shared_ptr<QuickJSBinding>>("shared_ptr<QuickJSBinding>");
 }
