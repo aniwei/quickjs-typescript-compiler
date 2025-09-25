@@ -7,6 +7,11 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { TypeScriptCompiler, CompileFlags } from './index'
+import { PC2Line } from './env'
+
+const PC2LINE_BASE = PC2Line.PC2LINE_BASE
+const PC2LINE_RANGE = PC2Line.PC2LINE_RANGE
+const PC2LINE_OP_FIRST = PC2Line.PC2LINE_OP_FIRST
 
 interface CLIOptions extends CompileFlags {
   output?: string
@@ -123,7 +128,7 @@ async function compileTsFile(inputFile: string, options: CLIOptions) {
   
   // Compile file
   const startTime = Date.now()
-  const bytecode = await compiler.compileFile(inputPath)
+  const { bytecode, functionDef } = await compiler.compileFileWithArtifacts(inputPath)
   const compileTime = Date.now() - startTime
   
   if (options.verbose) {
@@ -157,10 +162,92 @@ async function compileTsFile(inputFile: string, options: CLIOptions) {
   }
   
   if (options.pc2line) {
-    console.log('PC to line mapping not implemented yet')
+    const table = functionDef.bytecode.pc2line
+    if (!table || table.length === 0) {
+      console.log('⚠️  pc2line 表为空')
+    } else {
+      printPc2LineTable(table)
+    }
   }
   
   console.log('✓ Compilation successful')
+}
+
+function printPc2LineTable(buffer: number[]) {
+  const hexBytes = buffer.map((byte) => `0x${byte.toString(16).padStart(2, '0')}`)
+  console.log('📦 pc2line 原始字节:', hexBytes.join(' '))
+
+  const entries = decodePc2line(buffer)
+  console.log('┏━━╸PC ╺━━╸行 ╺━━╸列 ╺━━╸ΔPC ╺━━╸Δ行 ╺━━╸Δ列')
+  for (const entry of entries) {
+    const pcText = entry.pc.toString().padStart(4, ' ')
+    const lineText = (entry.line + 1).toString().padStart(3, ' ')
+    const colText = (entry.column + 1).toString().padStart(3, ' ')
+    const deltaPc = entry.deltaPc.toString().padStart(3, ' ')
+    const deltaLine = entry.deltaLine.toString().padStart(3, ' ')
+    const deltaColumn = entry.deltaColumn.toString().padStart(3, ' ')
+    console.log(`┃ ${pcText} → ${lineText} : ${colText}  [Δpc=${deltaPc} Δ行=${deltaLine} Δ列=${deltaColumn}]`)
+  }
+}
+
+function decodePc2line(buffer: number[]) {
+  const data = buffer.slice()
+  let offset = 0
+  const readULEB = (): number => {
+    let result = 0
+    let shift = 0
+    while (true) {
+      const byte = data[offset++]
+      result |= (byte & 0x7f) << shift
+      if ((byte & 0x80) === 0) break
+      shift += 7
+    }
+    return result >>> 0
+  }
+  const readSLEB = (): number => {
+    let result = 0
+    let shift = 0
+    let byte: number
+    do {
+      byte = data[offset++]
+      result |= (byte & 0x7f) << shift
+      shift += 7
+    } while (byte & 0x80)
+    if (shift < 32 && (byte & 0x40)) {
+      result |= (~0 << shift)
+    }
+    return result | 0
+  }
+
+  const entries: Array<{ pc: number; line: number; column: number; deltaPc: number; deltaLine: number; deltaColumn: number }> = []
+  let pc = 0
+  let line = readULEB()
+  let column = readULEB()
+  entries.push({ pc, line, column, deltaPc: 0, deltaLine: 0, deltaColumn: 0 })
+
+  while (offset < data.length) {
+    const op = data[offset++]
+    let diffPc: number
+    let diffLine: number
+
+    if (op === 0) {
+      diffPc = readULEB()
+      diffLine = readSLEB()
+    } else {
+      const encoded = op - PC2LINE_OP_FIRST
+      diffPc = Math.floor(encoded / PC2LINE_RANGE)
+      diffLine = (encoded % PC2LINE_RANGE) + PC2LINE_BASE
+    }
+    const diffColumn = readSLEB()
+
+    pc += diffPc
+    line += diffLine
+    column += diffColumn
+
+    entries.push({ pc, line, column, deltaPc: diffPc, deltaLine: diffLine, deltaColumn: diffColumn })
+  }
+
+  return entries
 }
 
 async function disassembleBytecode(bytecode: Uint8Array, sourceFile: string) {

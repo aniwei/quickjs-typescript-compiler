@@ -1,0 +1,317 @@
+{
+  "version": 5,
+  "atoms": [
+    {
+      "id": 228,
+      "value": "__tests__/compiler/fixtures/compute.js"
+    },
+    {
+      "id": 229,
+      "value": "item"
+    },
+    {
+      "id": 230,
+      "value": "arr"
+    },
+    {
+      "id": 231,
+      "value": "console"
+    },
+    {
+      "id": 232,
+      "value": "log"
+    }
+  ],
+  "root": {
+    "type": "module",
+    "moduleName": {
+      "type": "atom",
+      "id": 228,
+      "name": "__tests__/compiler/fixtures/compute.js"
+    },
+    "requireEntries": [],
+    "exportEntries": [],
+    "starExportEntries": [],
+    "importEntries": [],
+    "hasTopLevelAwait": false,
+    "function": {
+      "type": "function",
+      "flags": {
+        "raw": 1568,
+        "hasPrototype": false,
+        "hasSimpleParameterList": false,
+        "isDerivedClassConstructor": false,
+        "needHomeObject": false,
+        "funcKind": {
+          "value": 2,
+          "name": "JS_FUNC_ASYNC"
+        },
+        "newTargetAllowed": false,
+        "superCallAllowed": false,
+        "superAllowed": false,
+        "argumentsAllowed": true,
+        "hasDebug": true,
+        "isDirectOrIndirectEval": false
+      },
+      "jsMode": 1,
+      "jsModeFlags": [
+        "JS_MODE_STRICT"
+      ],
+      "name": {
+        "type": "atom",
+        "id": 82,
+        "name": "_eval_"
+      },
+      "argCount": 0,
+      "varCount": 1,
+      "definedArgCount": 0,
+      "stackSize": 6,
+      "closureVarCount": 1,
+      "constantPoolCount": 0,
+      "instructionLength": 42,
+      "varDefs": [
+        {
+          "name": {
+            "type": "atom",
+            "id": 229,
+            "name": "item"
+          },
+          "scopeLevel": 2,
+          "scopeNext": -1,
+          "isConst": true,
+          "isLexical": true,
+          "isCaptured": false,
+          "kind": {
+            "value": 0,
+            "name": "NORMAL"
+          }
+        }
+      ],
+      "closureVars": [
+        {
+          "name": {
+            "type": "atom",
+            "id": 230,
+            "name": "arr"
+          },
+          "varIndex": 0,
+          "isLocal": true,
+          "isArgument": false,
+          "isConst": true,
+          "isLexical": true,
+          "kind": {
+            "value": 0,
+            "name": "NORMAL"
+          }
+        }
+      ],
+      "instructions": [
+        {
+          "offset": 0,
+          "size": 1,
+          "opcode": 8,
+          "opcodeName": "OP_push_this"
+        },
+        {
+          "offset": 1,
+          "size": 2,
+          "opcode": 236,
+          "opcodeName": "OP_if_false8",
+          "operand": 2
+        },
+        {
+          "offset": 3,
+          "size": 1,
+          "opcode": 41,
+          "opcodeName": "OP_return_undef"
+        },
+        {
+          "offset": 4,
+          "size": 1,
+          "opcode": 184,
+          "opcodeName": "OP_push_1"
+        },
+        {
+          "offset": 5,
+          "size": 1,
+          "opcode": 185,
+          "opcodeName": "OP_push_2"
+        },
+        {
+          "offset": 6,
+          "size": 1,
+          "opcode": 186,
+          "opcodeName": "OP_push_3"
+        },
+        {
+          "offset": 7,
+          "size": 3,
+          "opcode": 38,
+          "opcodeName": "OP_array_from",
+          "operand": 3
+        },
+        {
+          "offset": 10,
+          "size": 1,
+          "opcode": 227,
+          "opcodeName": "OP_put_var_ref0"
+        },
+        {
+          "offset": 11,
+          "size": 3,
+          "opcode": 99,
+          "opcodeName": "OP_set_loc_uninitialized",
+          "operand": 0
+        },
+        {
+          "offset": 14,
+          "size": 3,
+          "opcode": 104,
+          "opcodeName": "OP_get_var_ref_check",
+          "operand": 0
+        },
+        {
+          "offset": 17,
+          "size": 1,
+          "opcode": 127,
+          "opcodeName": "OP_for_of_start"
+        },
+        {
+          "offset": 18,
+          "size": 2,
+          "opcode": 238,
+          "opcodeName": "OP_goto8",
+          "operand": 19
+        },
+        {
+          "offset": 20,
+          "size": 1,
+          "opcode": 203,
+          "opcodeName": "OP_put_loc0"
+        },
+        {
+          "offset": 21,
+          "size": 5,
+          "opcode": 57,
+          "opcodeName": "OP_get_var",
+          "operand": {
+            "type": "atom",
+            "id": 231,
+            "name": "console"
+          }
+        },
+        {
+          "offset": 24,
+          "size": 5,
+          "opcode": 67,
+          "opcodeName": "OP_get_field2",
+          "operand": {
+            "type": "atom",
+            "id": 232,
+            "name": "log"
+          }
+        },
+        {
+          "offset": 27,
+          "size": 3,
+          "opcode": 100,
+          "opcodeName": "OP_get_loc_check",
+          "operand": 0
+        },
+        {
+          "offset": 30,
+          "size": 3,
+          "opcode": 36,
+          "opcodeName": "OP_call_method",
+          "operand": 1
+        },
+        {
+          "offset": 33,
+          "size": 1,
+          "opcode": 14,
+          "opcodeName": "OP_drop"
+        },
+        {
+          "offset": 34,
+          "size": 2,
+          "opcode": 130,
+          "opcodeName": "OP_for_of_next",
+          "operand": 0
+        },
+        {
+          "offset": 36,
+          "size": 2,
+          "opcode": 236,
+          "opcodeName": "OP_if_false8",
+          "operand": -21
+        },
+        {
+          "offset": 38,
+          "size": 1,
+          "opcode": 14,
+          "opcodeName": "OP_drop"
+        },
+        {
+          "offset": 39,
+          "size": 1,
+          "opcode": 134,
+          "opcodeName": "OP_iterator_close"
+        },
+        {
+          "offset": 40,
+          "size": 1,
+          "opcode": 6,
+          "opcodeName": "OP_undefined"
+        },
+        {
+          "offset": 41,
+          "size": 1,
+          "opcode": 47,
+          "opcodeName": "OP_return_async"
+        }
+      ],
+      "debug": {
+        "filename": {
+          "type": "atom",
+          "id": 228,
+          "name": "__tests__/compiler/fixtures/compute.js"
+        },
+        "pc2line": [
+          0,
+          0,
+          22,
+          13,
+          7,
+          3,
+          7,
+          3,
+          7,
+          121,
+          17,
+          122,
+          8,
+          122,
+          17,
+          19,
+          17,
+          109,
+          23,
+          2,
+          27,
+          8,
+          27,
+          4,
+          17,
+          116,
+          21,
+          126,
+          31,
+          0
+        ],
+        "sourceLength": 0,
+        "source": null
+      },
+      "constantPool": []
+    }
+  }
+}

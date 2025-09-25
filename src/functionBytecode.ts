@@ -12,6 +12,11 @@ export interface VarDefEntry {
   kind: VarKind;
 }
 
+export interface LineInfoEntry {
+  pc: number;
+  sourcePos: number;
+}
+
 export type ConstantEntry =
   | { tag: BytecodeTag.TC_TAG_NULL }
   | { tag: BytecodeTag.TC_TAG_UNDEFINED }
@@ -24,11 +29,6 @@ export type ConstantEntry =
   | { tag: BytecodeTag.TC_TAG_TEMPLATE_OBJECT; elements: ConstantEntry[]; raw: ConstantEntry }
   | { tag: BytecodeTag.TC_TAG_OBJECT; properties: Array<{ name: Atom; value: ConstantEntry }> }
   | { tag: BytecodeTag.TC_TAG_FUNCTION_BYTECODE; value: FunctionBytecode };
-
-export interface LineInfoEntry {
-  pc: number;
-  sourcePos: number;
-}
 
 export interface Instruction {
   opcode: number;
@@ -64,7 +64,7 @@ export class FunctionBytecode {
   columnInfo: LineInfoEntry[] = [];
   pc2line: number[] = [];
   pc2column: number[] = [];
-  lineNumberTable: Array<{ pc: number; sourcePos: number }> = [];
+  lineNumberTable: Array<{ pc: number; line: number; column: number; sourcePos: number }> = [];
 
   filename: Atom | null = null;
   source: string;
@@ -119,20 +119,25 @@ export class FunctionBytecode {
     this.columnInfo.push(info);
   }
 
-  recordLineNumber(pc: number, sourcePos: number) {
-    if (sourcePos < 0) {
+  recordLineNumber(pc: number, line: number, column: number, sourcePos: number) {
+    if (line < 0 || column < 0) {
       return;
     }
     const last = this.lineNumberTable[this.lineNumberTable.length - 1];
     if (last) {
       if (last.pc === pc) {
+        last.line = line;
+        last.column = column;
         last.sourcePos = sourcePos;
+        return;
+      }
+      if (last.line === line && last.column === column) {
         return;
       }
       if (last.sourcePos === sourcePos) {
         return;
       }
     }
-    this.lineNumberTable.push({ pc, sourcePos });
+    this.lineNumberTable.push({ pc, line, column, sourcePos });
   }
 }

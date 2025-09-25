@@ -3,6 +3,7 @@ import path from 'node:path'
 import { Compiler, CompilerOptions } from './compiler'
 import { AtomTable } from './atoms'
 import { BytecodeWriter } from './bytecodeWriter'
+import { FunctionDef } from './functionDef'
 
 export interface CompileFlags {
   bigInt?: boolean
@@ -28,16 +29,27 @@ export class TypeScriptCompiler {
   }
 
   async compileFile(filePath: string): Promise<Uint8Array> {
+    const { bytecode } = await this.compileFileWithArtifacts(filePath)
+    return bytecode
+  }
+
+  async compileFileWithArtifacts(filePath: string): Promise<{ functionDef: FunctionDef; bytecode: Uint8Array }> {
     const source = await fs.readFile(filePath, 'utf-8')
     const relativePath = path.relative(process.cwd(), filePath) || filePath
-    return this.compileSource(source, relativePath)
+    return this.compileSourceWithArtifacts(source, relativePath)
   }
 
   async compileSource(source: string, fileName = '<stdin>'): Promise<Uint8Array> {
+    const { bytecode } = await this.compileSourceWithArtifacts(source, fileName)
+    return bytecode
+  }
+
+  async compileSourceWithArtifacts(source: string, fileName = '<stdin>'): Promise<{ functionDef: FunctionDef; bytecode: Uint8Array }> {
     const compiler = new Compiler(fileName, source, this.compilerOptions)
     const functionDef = compiler.compile()
     const writer = new BytecodeWriter(this.atomTable)
-    return writer.writeModule(functionDef)
+    const bytecode = writer.writeModule(functionDef)
+    return { functionDef, bytecode }
   }
 }
 

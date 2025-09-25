@@ -6,7 +6,7 @@ async function main() {
   const [ , , inFile] = process.argv
 
   if (!inFile) {
-    console.error('用法：tsx scripts/dump.ts <input.bin>')
+    console.error('Usage: tsx scripts/dump.ts <input.bin>')
     process.exit(1)
   }
 

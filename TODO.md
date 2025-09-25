@@ -5,9 +5,11 @@
 ## 📌 阶段 1：序列化基础设施
 - [x] 重构 `BytecodeWriter` 常量池写出逻辑，覆盖基础标量、数组、对象、子函数常量。
 - [ ] 补齐模块/函数头、闭包、pc2line、子函数等字段的完整写出逻辑，严格依据 `env.ts` 定义。
-- [ ] 编写辅助脚本，将 QuickJS wasm 生成的 `.qbc` 解析成 JSON，便于比对字段差异。
+- [x] 编写辅助脚本，将 QuickJS wasm 生成的 `.qbc` 解析成 JSON，便于比对字段差异。
 - [ ] 调整模块函数前言（`push_this`/`if_false8`/`return_undef`）的插入逻辑，与 QuickJS `instantiate_hoisted_definitions` 条件保持一致。
 - [ ] 在编译阶段实现 `for...of`、数组字面量、属性访问/方法调用的指令序列，先以 `__tests__/compiler/fixtures/compute.ts` 为基准，输出与 QuickJS 字节码逐字节对齐。
+- [ ] 提炼复用的枚举值→名称映射工具，避免在 `bytecodeReader` 等模块重复实现。
+- [ ] 将 TypeScript 编译器产出的字节码交给 QuickJS wasm 运行，验证运行时行为一致。
 
 ## 📌 阶段 2：作用域与符号系统
 - [ ] 扩展 `ScopeManager`/`Var`/`ClosureVar`，支持 `var/let/const`、函数声明/表达式、块级作用域、捕获变量、参数列表等。

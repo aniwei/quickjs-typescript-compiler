@@ -1,5 +1,5 @@
 import { Atom } from './atoms';
-import { FunctionBytecode } from './functionBytecode';
+import { FunctionBytecode, type ConstantEntry } from './functionBytecode';
 import { Scope } from './scopes';
 import { ClosureVar, Var } from './vars';
 
@@ -8,6 +8,63 @@ export interface FunctionDefOptions {
   sourcePos?: number;
   isEval?: boolean;
   isFuncExpr?: boolean;
+  moduleRecord?: ModuleRecord;
+}
+
+export enum ModuleExportType {
+  Local = 0,
+  Indirect = 1,
+}
+
+export interface ModuleRequireEntry {
+  moduleName: Atom;
+  attributes?: ConstantEntry;
+}
+
+export interface ModuleExportEntryLocal {
+  type: ModuleExportType.Local;
+  exportedName: Atom;
+  localVarIndex: number;
+}
+
+export interface ModuleExportEntryIndirect {
+  type: ModuleExportType.Indirect;
+  exportedName: Atom;
+  reqModuleIndex: number;
+  localName: Atom;
+}
+
+export type ModuleExportEntry = ModuleExportEntryLocal | ModuleExportEntryIndirect;
+
+export interface ModuleStarExportEntry {
+  reqModuleIndex: number;
+}
+
+export interface ModuleImportEntry {
+  varIndex: number;
+  isStar: boolean;
+  importName: Atom;
+  reqModuleIndex: number;
+}
+
+export interface ModuleRecord {
+  moduleName?: Atom;
+  requireEntries: ModuleRequireEntry[];
+  exportEntries: ModuleExportEntry[];
+  starExportEntries: ModuleStarExportEntry[];
+  importEntries: ModuleImportEntry[];
+  hasTopLevelAwait: boolean;
+}
+
+export function createEmptyModuleRecord(): ModuleRecord {
+  return {
+    moduleName: undefined,
+    requireEntries: [],
+    exportEntries: [],
+    starExportEntries: [],
+    importEntries: [],
+    hasTopLevelAwait: false,
+  };
 }
 
 export class FunctionDef {
@@ -36,6 +93,7 @@ export class FunctionDef {
   bytecode: FunctionBytecode;
 
   sourcePos: number;
+  module: ModuleRecord | null;
 
   constructor(name: Atom, source: string, sourceFile: string, options: FunctionDefOptions = {}) {
     this.parent = options.parent ?? null;
@@ -44,6 +102,13 @@ export class FunctionDef {
     this.funcName = name;
     this.bytecode = new FunctionBytecode(name, { source, sourceFile });
     this.sourcePos = options.sourcePos ?? 0;
+    if (options.moduleRecord) {
+      this.module = options.moduleRecord;
+    } else if (!this.parent) {
+      this.module = createEmptyModuleRecord();
+    } else {
+      this.module = null;
+    }
   }
 
   addVar(variable: Var) {

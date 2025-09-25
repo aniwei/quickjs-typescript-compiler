@@ -1,5 +1,10 @@
 import { Atom, AtomTable } from './atoms'
-import { FunctionDef } from './functionDef'
+import {
+	FunctionDef,
+	createEmptyModuleRecord,
+	ModuleExportType,
+	type ModuleRecord,
+} from './functionDef'
 import { FunctionBytecode, Instruction, ConstantEntry } from './functionBytecode'
 import { BytecodeTag, env, OpFormat, Opcode, OPCODE_DEFS, type OpcodeDefinition } from './env'
 import { ClosureVar } from './vars'
@@ -94,10 +99,14 @@ export class BytecodeWriter {
 		}
 	}
 
-	writeModule(mainFunction: FunctionDef): Uint8Array {
+		writeModule(mainFunction: FunctionDef): Uint8Array {
 		this.reset()
-		const moduleAtom = mainFunction.bytecode.filename ?? this.atomTable.getAtomId(mainFunction.bytecode.sourceFile)
-		this.writeModuleObject(mainFunction.bytecode, moduleAtom)
+			const moduleRecord = mainFunction.module ?? createEmptyModuleRecord()
+			const resolvedModuleAtom =
+				moduleRecord.moduleName ??
+				mainFunction.bytecode.filename ??
+				this.atomTable.getAtomId(mainFunction.bytecode.sourceFile)
+			this.writeModuleObject(mainFunction.bytecode, moduleRecord, resolvedModuleAtom)
 		const atomsSection = this.buildAtomsSection()
 		const bodyBytes = this.body.toUint8Array()
 		const result = new Uint8Array(atomsSection.length + bodyBytes.length)
@@ -124,15 +133,56 @@ export class BytecodeWriter {
 		return header.toUint8Array()
 	}
 
-	private writeModuleObject(bytecode: FunctionBytecode, moduleAtom: Atom) {
+		private writeModuleObject(bytecode: FunctionBytecode, moduleRecord: ModuleRecord, moduleAtom: Atom) {
 		this.body.writeU8(BytecodeTag.TC_TAG_MODULE)
 		this.writeAtom(this.body, moduleAtom)
-		this.body.writeLEB128(0) // req_module_entries_count
-		this.body.writeLEB128(0) // export_entries_count
-		this.body.writeLEB128(0) // star_export_entries_count
-		this.body.writeLEB128(0) // import_entries_count
-		this.body.writeU8(0) // has_tla
-		this.writeFunction(bytecode, moduleAtom)
+			this.writeModuleRequireEntries(moduleRecord, moduleAtom)
+			this.writeModuleExportEntries(moduleRecord)
+			this.writeModuleStarExportEntries(moduleRecord)
+			this.writeModuleImportEntries(moduleRecord)
+			this.body.writeU8(moduleRecord.hasTopLevelAwait ? 1 : 0)
+			this.writeFunction(bytecode, moduleAtom)
+		}
+
+		private writeModuleRequireEntries(moduleRecord: ModuleRecord, moduleAtom: Atom) {
+			const undefinedEntry: ConstantEntry = { tag: BytecodeTag.TC_TAG_UNDEFINED }
+			this.body.writeLEB128(moduleRecord.requireEntries.length)
+			for (const entry of moduleRecord.requireEntries) {
+				this.writeAtom(this.body, entry.moduleName)
+				const attributes = entry.attributes ?? undefinedEntry
+				this.writeConstant(attributes, moduleAtom)
+			}
+		}
+
+		private writeModuleExportEntries(moduleRecord: ModuleRecord) {
+			this.body.writeLEB128(moduleRecord.exportEntries.length)
+			for (const entry of moduleRecord.exportEntries) {
+				this.body.writeU8(entry.type)
+				if (entry.type === ModuleExportType.Local) {
+					this.body.writeLEB128(entry.localVarIndex)
+				} else {
+					this.body.writeLEB128(entry.reqModuleIndex)
+					this.writeAtom(this.body, entry.localName)
+				}
+				this.writeAtom(this.body, entry.exportedName)
+			}
+		}
+
+		private writeModuleStarExportEntries(moduleRecord: ModuleRecord) {
+			this.body.writeLEB128(moduleRecord.starExportEntries.length)
+			for (const entry of moduleRecord.starExportEntries) {
+				this.body.writeLEB128(entry.reqModuleIndex)
+			}
+		}
+
+		private writeModuleImportEntries(moduleRecord: ModuleRecord) {
+			this.body.writeLEB128(moduleRecord.importEntries.length)
+			for (const entry of moduleRecord.importEntries) {
+				this.body.writeLEB128(entry.varIndex)
+				this.body.writeU8(entry.isStar ? 1 : 0)
+				this.writeAtom(this.body, entry.importName)
+				this.body.writeLEB128(entry.reqModuleIndex)
+			}
 	}
 
 	private writeFunction(bytecode: FunctionBytecode, moduleAtom: Atom) {
@@ -188,7 +238,14 @@ export class BytecodeWriter {
 			const pc2line = bytecode.pc2line.length > 0 ? bytecode.pc2line : [0, 0]
 			this.body.writeLEB128(pc2line.length)
 			this.body.writeBytes(pc2line)
-			this.body.writeLEB128(0) // source length
+			const sourceText = bytecode.source ?? ''
+			if (sourceText.length > 0) {
+				const sourceBytes = this.textEncoder.encode(sourceText)
+				this.body.writeLEB128(sourceBytes.length)
+				this.body.writeBytes(sourceBytes)
+			} else {
+				this.body.writeLEB128(0)
+			}
 		}
 
 			for (const entry of bytecode.constantPool) {
@@ -331,14 +388,17 @@ export class BytecodeWriter {
 				case OpFormat.var_ref:
 					buf.writeU16(operands[0] ?? 0)
 					break
+				case OpFormat.npop:
+					buf.writeU16(operands[0] ?? 0)
+					break
 				case OpFormat.u32:
 				case OpFormat.i32:
-				case OpFormat.npop:
-				case OpFormat.npopx:
 				case OpFormat.label:
 				case OpFormat.label_u16:
 				case OpFormat.const:
 					buf.writeU32(operands[0] ?? 0)
+					break
+				case OpFormat.npopx:
 					break
 				case OpFormat.atom:
 					this.writeAtomValue(buf, operands[0] as Atom)
