@@ -35,3 +35,9 @@ typedef enum JSFunctionKindEnum {
 #define JS_MODE_STRICT (1 << 0)
 #define JS_MODE_ASYNC  (1 << 2) /* async function */
 #define JS_MODE_BACKTRACE_BARRIER (1 << 3) /* stop backtrace before this frame */
+
+/* for the encoding of the pc2line table */
+#define PC2LINE_BASE (-1)
+#define PC2LINE_RANGE 5
+#define PC2LINE_OP_FIRST 1
+#define PC2LINE_DIFF_PC_MAX ((255 - PC2LINE_OP_FIRST) / PC2LINE_RANGE)

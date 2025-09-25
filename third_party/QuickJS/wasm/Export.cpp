@@ -15,6 +15,7 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
   register_vector<BytecodeTag>("BytecodeTagArray");
   register_vector<FunctionKind>("FunctionKindArray");
   register_vector<JSMode>("JSModeArray");
+  register_vector<PC2Line>("PC2LineArray");
 
   enum_<CompileFlags>("CompileFlags")
     .value("COMPILE_FLAG_NONE", COMPILE_FLAG_NONE)
@@ -53,6 +54,11 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .property("id", &FunctionKind::id)
     .property("name", &FunctionKind::name);
 
+  class_<PC2Line>("PC2Line")
+    .constructor<>()
+    .property("id", &PC2Line::id)
+    .property("name", &PC2Line::name);
+
   class_<JSMode>("JSMode")
     .constructor<>()
     .property("id", &JSMode::id)
@@ -72,5 +78,6 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .class_function("getBytecodeTags", &QuickJSBinding::getBytecodeTags)
     .class_function("getFunctionKinds", &QuickJSBinding::getFunctionKinds)
     .class_function("getJSModes", &QuickJSBinding::getJSModes)
+    .class_function("getPC2LineCodes", &QuickJSBinding::getPC2LineCodes)
     .smart_ptr<std::shared_ptr<QuickJSBinding>>("shared_ptr<QuickJSBinding>");
 }

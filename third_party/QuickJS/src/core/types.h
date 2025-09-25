@@ -414,11 +414,6 @@ typedef struct JSVarDef {
                              definition */
 } JSVarDef;
 
-/* for the encoding of the pc2line table */
-#define PC2LINE_BASE (-1)
-#define PC2LINE_RANGE 5
-#define PC2LINE_OP_FIRST 1
-#define PC2LINE_DIFF_PC_MAX ((255 - PC2LINE_OP_FIRST) / PC2LINE_RANGE)
 #define IC_CACHE_ITEM_CAPACITY 4
 
 typedef int watchpoint_delete_callback(

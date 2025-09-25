@@ -64,6 +64,7 @@ export class FunctionBytecode {
   columnInfo: LineInfoEntry[] = [];
   pc2line: number[] = [];
   pc2column: number[] = [];
+  lineNumberTable: Array<{ pc: number; sourcePos: number }> = [];
 
   filename: Atom | null = null;
   source: string;
@@ -116,5 +117,22 @@ export class FunctionBytecode {
 
   addColumnInfo(info: LineInfoEntry) {
     this.columnInfo.push(info);
+  }
+
+  recordLineNumber(pc: number, sourcePos: number) {
+    if (sourcePos < 0) {
+      return;
+    }
+    const last = this.lineNumberTable[this.lineNumberTable.length - 1];
+    if (last) {
+      if (last.pc === pc) {
+        last.sourcePos = sourcePos;
+        return;
+      }
+      if (last.sourcePos === sourcePos) {
+        return;
+      }
+    }
+    this.lineNumberTable.push({ pc, sourcePos });
   }
 }

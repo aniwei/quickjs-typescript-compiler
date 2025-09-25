@@ -143,6 +143,17 @@ export class QuickJSLib {
     return map
   }
 
+  static async getPC2LineCodes() {
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const vec = WasmInstance.QuickJSBinding.getPC2LineCodes()
+    const map: Record<string, number> = {}
+    for (let i = 0; i < vec.size(); i++) {
+      const o = vec.get(i)
+      map[o.name] = o.id
+    }
+    return map
+  }
+
   static async getJSModes() {
     const WasmInstance = await QuickJSLib.getWasmInstance()
     const vec = WasmInstance.QuickJSBinding.getJSModes()

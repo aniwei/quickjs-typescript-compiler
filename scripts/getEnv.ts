@@ -6,11 +6,13 @@ type Opcode = { name: string; code: number, nPop: number, nPush: number, size?: 
 
 function toEnumKey(raw: string, prefix: string): string {
   if (prefix === 'ATOM') {
-    return `JSAtom_${raw}`;
+    return `JS_ATOM_${raw}`;
   }
+
   if (prefix === 'OP') {
     return `OP_${raw}`;
   }
+  
   return raw;
 }
 
@@ -31,6 +33,7 @@ async function main() {
   const bytecodeTagRecord = await QuickJSLib.getAllBytecodeTags()
   const functionKindRecord = await QuickJSLib.getFunctionKinds()
   const jsModeRecord = await QuickJSLib.getJSModes()
+  const pc2LineRecord = await QuickJSLib.getPC2LineCodes()
 
   // 去重与清洗 atoms（按 id 去重，优先保留首次出现的名称）
   const seenAtomIds = new Set<number>()
@@ -69,6 +72,9 @@ async function main() {
   const jsModes = Object.entries(jsModeRecord as Record<string, number>)
     .map(([name, id]) => ({ name, id }))
     .sort((a, b) => a.id - b.id)
+  const pc2Lines = Object.entries(pc2LineRecord as Record<string, number>)
+    .map(([name, id]) => ({ name, id }))
+    .sort((a, b) => a.id - b.id)
   
   
 
@@ -94,6 +100,11 @@ ${bytecodeTags.map(f => `  ${f.name} = ${f.id},`).join('\n')}
 
   const functionKindEnum = `export enum FunctionKind {
 ${functionKinds.map(f => `  ${f.name} = ${f.id},`).join('\n')}
+}
+`
+
+  const pc2LineEnum = `export enum PC2Line {
+${pc2Lines.map(m => `  ${m.name} = ${m.id},`).join('\n')}
 }
 `
 
@@ -220,7 +231,7 @@ ${opcodes
     .join('\n') + '\n}' : '{}'}
 `
 
-  const content = header + '\n' + compileFlagsEnum + '\n' + bytecodeTagsEnum + '\n' + functionKindEnum + '\n' + jsModeEnum + '\n' + opformatEnum + '\n' + opcodeEnum + '\n' + opcodeNameToCode + '\n' + atomEnum + '\n' + atomStrings + '\n' + opcodeDefs + '\n' + shortOpcodeDefs + '\n' + envBlock
+  const content = header + '\n' + compileFlagsEnum + '\n' + bytecodeTagsEnum + '\n' + functionKindEnum + '\n' + jsModeEnum + '\n' + pc2LineEnum + '\n' + opformatEnum + '\n' + opcodeEnum + '\n' + opcodeNameToCode + '\n' + atomEnum + '\n' + atomStrings + '\n' + opcodeDefs + '\n' + shortOpcodeDefs + '\n' + envBlock
 
   fs.writeFileSync('src/env.ts', content, 'utf-8')
   console.log('✓ Environment file src/env.ts generated successfully')

@@ -5,10 +5,22 @@ import { FunctionDef } from './functionDef'
 import { FunctionBytecode, type Instruction } from './functionBytecode'
 import { ScopeManager } from './scopeManager'
 import { Var, VarKind, ClosureVar } from './vars'
-import { Opcode, OPCODE_DEFS, OpFormat, type OpcodeDefinition } from './env'
+import { Opcode, OPCODE_DEFS, OpFormat, PC2Line, type OpcodeDefinition } from './env'
+
+const PC2LINE_BASE = PC2Line.PC2LINE_BASE
+const PC2LINE_RANGE = PC2Line.PC2LINE_RANGE
+const PC2LINE_OP_FIRST = PC2Line.PC2LINE_OP_FIRST
+const PC2LINE_DIFF_PC_MAX = PC2Line.PC2LINE_DIFF_PC_MAX
 
 export interface CompilerOptions {
   atomTable?: AtomTable
+}
+
+interface SourceMapMapping {
+  generatedLine: number
+  generatedColumn: number
+  sourceLine: number
+  sourceColumn: number
 }
 
 export class Compiler {
@@ -24,8 +36,14 @@ export class Compiler {
   private readonly localVarIndices = new Map<Atom, number>()
   private moduleAtom!: Atom
 
+  private jsSourceCode = ''
+  private jsLineStarts: number[] = []
+  private sourceMapMappings: SourceMapMapping[] = []
+  private readonly base64CharToInt = this.createBase64Lookup()
+
   private stackDepth = 0
   private maxStackDepth = 0
+  private currentSourceNode: ts.Node | null = null
 
   private currentOffset = 0
   private readonly instructionOffsets: number[] = []
@@ -65,17 +83,18 @@ export class Compiler {
         this.opcodeInfoByCode.set(opcodeValue, def)
       }
     }
+
+    this.prepareTranspiledSource()
   }
 
   compile(): FunctionDef {
     this.resetCodegenState()
     const evalAtom = this.atomTable.getAtomId('_eval_')
-    const rootFunction = new FunctionDef(evalAtom, this.sourceCode, this.fileName)
+    const moduleFileName = this.getModuleFileName()
+    const rootFunction = new FunctionDef(evalAtom, this.jsSourceCode, moduleFileName)
     this.currentFunction = rootFunction
     this.scopeManager = new ScopeManager(rootFunction)
-  const relativePath = path.relative(process.cwd(), this.fileName) || this.fileName
-  const moduleFileName = relativePath.replace(/\.ts$/i, '.js')
-  this.moduleAtom = this.atomTable.getAtomId(moduleFileName)
+    this.moduleAtom = this.atomTable.getAtomId(moduleFileName)
 
     rootFunction.bytecode.jsMode = 1
     rootFunction.bytecode.funcKind = 2 // JS_FUNC_ASYNC
@@ -85,10 +104,14 @@ export class Compiler {
     rootFunction.bytecode.filename = this.moduleAtom
 
     this.pushScope()
-    this.emitModulePrologue()
+    this.withSourceNode(this.sourceFile, () => {
+      this.emitModulePrologue()
+    })
     ts.forEachChild(this.sourceFile, (node) => this.visitNode(node))
-    this.emitOpcode(Opcode.OP_undefined)
-    this.emitOpcode(Opcode.OP_return_async)
+    this.withSourceNode(this.sourceFile, () => {
+      this.emitOpcode(Opcode.OP_undefined)
+      this.emitOpcode(Opcode.OP_return_async)
+    })
     this.popScope()
 
     this.resolvePendingJumps()
@@ -96,10 +119,10 @@ export class Compiler {
     const lexicalVars = rootFunction.vars.filter((variable) => !variable.isCaptured)
     rootFunction.bytecode.setVarDefs(lexicalVars)
 
-  rootFunction.bytecode.stackSize = this.computeStackSize(rootFunction.bytecode)
+    rootFunction.bytecode.stackSize = this.computeStackSize(rootFunction.bytecode)
+    this.buildDebugInfo(rootFunction)
     rootFunction.bytecode.argCount = rootFunction.args.length
     rootFunction.bytecode.definedArgCount = rootFunction.definedArgCount
-    rootFunction.bytecode.pc2line = [0, 0]
     return rootFunction
   }
 
@@ -113,23 +136,34 @@ export class Compiler {
     this.labelCounter = 0
     this.labelPositions.clear()
     this.pendingJumps.length = 0
+    this.currentSourceNode = null
+  }
+
+  private withSourceNode<T>(node: ts.Node, fn: () => T): T {
+    const previous = this.currentSourceNode
+    this.currentSourceNode = node
+    try {
+      return fn()
+    } finally {
+      this.currentSourceNode = previous
+    }
   }
 
   private visitNode(node: ts.Node): void {
     if (ts.isVariableStatement(node)) {
-      this.compileVariableStatement(node)
+      this.withSourceNode(node, () => this.compileVariableStatement(node))
       return
     }
     if (ts.isForOfStatement(node)) {
-      this.compileForOfStatement(node)
+      this.withSourceNode(node, () => this.compileForOfStatement(node))
       return
     }
     if (ts.isBlock(node)) {
-      this.compileBlock(node)
+      this.withSourceNode(node, () => this.compileBlock(node))
       return
     }
     if (ts.isExpressionStatement(node)) {
-      this.compileExpressionStatement(node)
+      this.withSourceNode(node, () => this.compileExpressionStatement(node))
       return
     }
     ts.forEachChild(node, (child) => this.visitNode(child))
@@ -316,15 +350,17 @@ export class Compiler {
     }
 
     const propertyAccess = expression.expression
-    this.compileExpression(propertyAccess.expression)
+    this.withSourceNode(propertyAccess.expression, () => {
+      this.compileExpression(propertyAccess.expression)
+    })
     const propertyAtom = this.atomTable.getAtomId(propertyAccess.name.text)
-    this.emitOpcode(Opcode.OP_get_field2, [propertyAtom])
+    this.emitOpcode(Opcode.OP_get_field2, [propertyAtom], propertyAccess.name)
 
     for (const arg of expression.arguments) {
-      this.compileExpression(arg)
+      this.withSourceNode(arg, () => this.compileExpression(arg))
     }
 
-    this.emitOpcode(Opcode.OP_call_method, [expression.arguments.length])
+    this.emitOpcode(Opcode.OP_call_method, [expression.arguments.length], expression)
   }
 
   private emitLoadIdentifier(identifier: ts.Identifier) {
@@ -470,10 +506,17 @@ export class Compiler {
     this.emitOpcode(Opcode.OP_return_undef)
   }
 
-  private emitOpcode(opcode: Opcode, operands: number[] = []): number {
+  private emitOpcode(opcode: Opcode, operands: number[] = [], node?: ts.Node): number {
     const def = this.opcodeInfoByCode.get(opcode)
     if (!def) {
       throw new Error(`Unknown opcode: ${opcode}`)
+    }
+
+    const recordNode = node ?? this.currentSourceNode
+    if (recordNode) {
+      const sourcePos = recordNode.getStart(this.sourceFile, false)
+      const mappedPos = this.mapTsPositionToJs(sourcePos)
+      this.currentFunction.bytecode.recordLineNumber(this.currentOffset, mappedPos)
     }
 
     const { nPop, nPush } = this.getStackEffect(opcode, operands)
@@ -749,12 +792,321 @@ export class Compiler {
     return stackLenMax
   }
 
+  private buildDebugInfo(func: FunctionDef) {
+    const bytecode = func.bytecode
+    const entries = [...bytecode.lineNumberTable].sort((a, b) => a.pc - b.pc)
+    if (process.env.DEBUG_PC2LINE === '1') {
+      console.log('pc2line:lineNumberTable', entries.map((entry) => ({ ...entry })))
+    }
+    const pc2line: number[] = []
+
+    const source = bytecode.source
+    const initialSourcePos = Math.max(0, func.sourcePos | 0)
+  const positionState = { line: 0, column: initialSourcePos }
+  this.advancePosition(source, 0, initialSourcePos, positionState)
+
+    pc2line.push(...this.encodeULEB128(positionState.line))
+    pc2line.push(...this.encodeULEB128(positionState.column))
+
+    let lastPc = 0
+    let lastLine = positionState.line
+    let lastCol = positionState.column
+    let lastSourcePos = initialSourcePos
+
+    for (const entry of entries) {
+      if (entry.pc < lastPc) {
+        continue
+      }
+      if (entry.sourcePos <= lastSourcePos) {
+        continue
+      }
+
+      this.advancePosition(source, lastSourcePos, entry.sourcePos, positionState)
+
+      const diffPc = entry.pc - lastPc
+      const diffLine = positionState.line - lastLine
+      const diffCol = positionState.column - lastCol
+
+      if (diffLine === 0 && diffCol === 0) {
+        lastPc = entry.pc
+        lastSourcePos = entry.sourcePos
+        continue
+      }
+
+      if (
+        diffLine >= PC2LINE_BASE &&
+        diffLine < PC2LINE_BASE + PC2LINE_RANGE &&
+        diffPc <= PC2LINE_DIFF_PC_MAX
+      ) {
+        pc2line.push((diffLine - PC2LINE_BASE) + diffPc * PC2LINE_RANGE + PC2LINE_OP_FIRST)
+      } else {
+        pc2line.push(0)
+        pc2line.push(...this.encodeULEB128(diffPc))
+        pc2line.push(...this.encodeSLEB128(diffLine))
+      }
+
+      pc2line.push(...this.encodeSLEB128(diffCol))
+
+      lastPc = entry.pc
+      lastLine = positionState.line
+      lastCol = positionState.column
+      lastSourcePos = entry.sourcePos
+    }
+
+    bytecode.pc2line = pc2line
+  }
+
+  private advancePosition(source: string, from: number, to: number, state: { line: number; column: number }) {
+    if (to <= from) {
+      return
+    }
+    for (let index = from; index < to; index++) {
+      const code = source.charCodeAt(index)
+      if (code === 0x0a /* \n */) {
+        state.line += 1
+      }
+    }
+    state.column = to
+  }
+
+  private encodeULEB128(value: number): number[] {
+    const result: number[] = []
+    let v = value >>> 0
+    do {
+      let byte = v & 0x7f
+      v >>>= 7
+      if (v !== 0) {
+        byte |= 0x80
+      }
+      result.push(byte)
+    } while (v !== 0)
+    return result
+  }
+
+  private encodeSLEB128(value: number): number[] {
+    const result: number[] = []
+    let v = value | 0
+    let more = true
+    while (more) {
+      let byte = v & 0x7f
+      v >>= 7
+      const signBit = byte & 0x40
+      if ((v === 0 && signBit === 0) || (v === -1 && signBit !== 0)) {
+        more = false
+      } else {
+        byte |= 0x80
+      }
+      result.push(byte & 0xff)
+    }
+    return result
+  }
+
   private pushScope() {
     this.scopeManager.enterScope()
   }
 
   private popScope() {
     this.scopeManager.leaveScope()
+  }
+
+  private getModuleFileName(): string {
+    const relative = path.relative(process.cwd(), this.fileName) || this.fileName
+    const ext = path.extname(relative)
+    if (!ext) {
+      return `${relative}.js`
+    }
+    return relative.slice(0, -ext.length) + '.js'
+  }
+
+  private prepareTranspiledSource() {
+    const transpileResult = ts.transpileModule(this.sourceCode, {
+      compilerOptions: {
+        target: ts.ScriptTarget.ES2020,
+        module: ts.ModuleKind.ES2020,
+        sourceMap: true,
+        removeComments: false,
+      },
+      fileName: this.fileName,
+    })
+
+    this.jsSourceCode = this.normalizeJsOutput(transpileResult.outputText)
+    this.jsLineStarts = this.computeLineStarts(this.jsSourceCode)
+
+    if (transpileResult.sourceMapText) {
+      try {
+        const rawMap = JSON.parse(transpileResult.sourceMapText) as { mappings: string }
+        this.sourceMapMappings = this.decodeSourceMapMappings(rawMap.mappings)
+      } catch (error) {
+        this.sourceMapMappings = []
+      }
+    } else {
+      this.sourceMapMappings = []
+    }
+  }
+
+  private normalizeJsOutput(output: string): string {
+    let result = output.replace(/\r\n?/g, '\n')
+    result = result.replace(/\/\/#[^\n]*sourceMappingURL[^\n]*$/m, '')
+    if (!result.endsWith('\n')) {
+      result += '\n'
+    }
+    return result
+  }
+
+  private computeLineStarts(text: string): number[] {
+    const starts = [0]
+    for (let index = 0; index < text.length; index++) {
+      const code = text.charCodeAt(index)
+      if (code === 0x0d /* \r */) {
+        if (text.charCodeAt(index + 1) === 0x0a) {
+          index += 1
+        }
+        starts.push(index + 1)
+      } else if (code === 0x0a /* \n */) {
+        starts.push(index + 1)
+      }
+    }
+    return starts
+  }
+
+  private decodeSourceMapMappings(mappings: string): SourceMapMapping[] {
+    const result: SourceMapMapping[] = []
+    let generatedLine = 0
+    let generatedColumn = 0
+    let sourceIndex = 0
+    let sourceLine = 0
+    let sourceColumn = 0
+
+    const lines = mappings.split(';')
+    for (const line of lines) {
+      if (line.length === 0) {
+        generatedLine += 1
+        generatedColumn = 0
+        continue
+      }
+
+      generatedColumn = 0
+      const segments = line.split(',')
+      for (const segment of segments) {
+        if (!segment) {
+          continue
+        }
+        const values = this.decodeVlqSegment(segment)
+        if (values.length === 0) {
+          continue
+        }
+
+        generatedColumn += values[0]
+        if (values.length >= 4) {
+          sourceIndex += values[1]
+          sourceLine += values[2]
+          sourceColumn += values[3]
+
+          if (sourceIndex === 0) {
+            result.push({
+              generatedLine,
+              generatedColumn,
+              sourceLine,
+              sourceColumn,
+            })
+          }
+        }
+      }
+      generatedLine += 1
+    }
+
+    result.sort((a, b) => {
+      if (a.sourceLine !== b.sourceLine) {
+        return a.sourceLine - b.sourceLine
+      }
+      if (a.sourceColumn !== b.sourceColumn) {
+        return a.sourceColumn - b.sourceColumn
+      }
+      if (a.generatedLine !== b.generatedLine) {
+        return a.generatedLine - b.generatedLine
+      }
+      return a.generatedColumn - b.generatedColumn
+    })
+
+    return result
+  }
+
+  private decodeVlqSegment(segment: string): number[] {
+    const values: number[] = []
+    let value = 0
+    let shift = 0
+
+    for (let i = 0; i < segment.length; i++) {
+      const digit = this.base64CharToInt.get(segment[i])
+      if (digit === undefined) {
+        continue
+      }
+      const continuation = (digit & 32) !== 0
+      const digitValue = digit & 31
+      value += digitValue << shift
+      shift += 5
+
+      if (!continuation) {
+        const shouldNegate = (value & 1) === 1
+        value >>= 1
+        values.push(shouldNegate ? -value : value)
+        value = 0
+        shift = 0
+      }
+    }
+
+    return values
+  }
+
+  private createBase64Lookup(): Map<string, number> {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+    const map = new Map<string, number>()
+    for (let index = 0; index < chars.length; index++) {
+      map.set(chars[index], index)
+    }
+    return map
+  }
+
+  private mapTsPositionToJs(tsPos: number): number {
+    if (this.sourceMapMappings.length === 0) {
+      return tsPos
+    }
+    const { line: tsLine, character: tsColumn } = this.sourceFile.getLineAndCharacterOfPosition(tsPos)
+
+    let candidate: SourceMapMapping | null = null
+    for (const mapping of this.sourceMapMappings) {
+      if (mapping.sourceLine > tsLine) {
+        break
+      }
+      if (mapping.sourceLine === tsLine && mapping.sourceColumn <= tsColumn) {
+        if (
+          !candidate ||
+          mapping.sourceColumn > candidate.sourceColumn ||
+          (mapping.sourceColumn === candidate.sourceColumn && mapping.generatedColumn > candidate.generatedColumn)
+        ) {
+          candidate = mapping
+        }
+      }
+    }
+
+    if (!candidate) {
+      for (let i = this.sourceMapMappings.length - 1; i >= 0; i--) {
+        const mapping = this.sourceMapMappings[i]
+        if (mapping.sourceLine < tsLine) {
+          candidate = mapping
+          break
+        }
+      }
+    }
+
+    if (!candidate) {
+      candidate = this.sourceMapMappings[0]
+    }
+
+    const lineStart = this.jsLineStarts[candidate.generatedLine] ?? 0
+    const columnDelta = Math.max(0, tsColumn - candidate.sourceColumn)
+    const jsColumn = candidate.generatedColumn + columnDelta
+    return lineStart + jsColumn
   }
 }
 

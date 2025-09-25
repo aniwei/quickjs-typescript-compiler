@@ -49,6 +49,11 @@ struct JSMode {
   std::string name;
 };
 
+struct PC2Line {
+  int32_t id;
+  std::string name;
+};
+
 class QuickJSBinding {
   using Ptr = std::shared_ptr<QuickJSBinding>;
 
@@ -77,6 +82,7 @@ class QuickJSBinding {
   static std::vector<BytecodeTag> getBytecodeTags();
   static std::vector<FunctionKind> getFunctionKinds();
   static std::vector<JSMode> getJSModes();
+  static std::vector<PC2Line> getPC2LineCodes();
 
   static std::vector<Atom> getAtoms();
   static std::vector<OpFmt> getOpcodeFormats();

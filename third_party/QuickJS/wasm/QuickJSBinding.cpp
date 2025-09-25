@@ -283,6 +283,17 @@ namespace quickjs {
     return modes;
   }
 
+  std::vector<PC2Line> QuickJSBinding::getPC2LineCodes() {
+    std::vector<PC2Line> codes;
+
+    codes.push_back(PC2Line{ id: PC2LINE_BASE, name: "PC2LINE_BASE" });
+    codes.push_back(PC2Line{ id: PC2LINE_RANGE, name: "PC2LINE_RANGE" });
+    codes.push_back(PC2Line{ id: PC2LINE_OP_FIRST, name: "PC2LINE_OP_FIRST" });
+    codes.push_back(PC2Line{ id: PC2LINE_DIFF_PC_MAX, name: "PC2LINE_DIFF_PC_MAX" });
+
+    return codes;
+  }
+
   std::vector<FunctionKind> QuickJSBinding::getFunctionKinds() {
     std::vector<FunctionKind> kinds;
 
