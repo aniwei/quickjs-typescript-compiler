@@ -59,6 +59,7 @@ export class FunctionBytecode {
   constantPool: ConstantEntry[] = [];
   closureVars: ClosureVar[] = [];
   varDefs: VarDefEntry[] = [];
+  argDefs: VarDefEntry[] = [];
 
   lineInfo: LineInfoEntry[] = [];
   columnInfo: LineInfoEntry[] = [];
@@ -93,22 +94,20 @@ export class FunctionBytecode {
   }
 
   setVarDefs(vars: Array<Var | VarDefEntry>) {
-    this.varDefs = vars.map((entry) => {
-      if ('name' in entry && 'scopeLevel' in entry && 'scopeNext' in entry) {
-        const source = entry as Var & VarDefEntry;
-        return {
-          name: source.name,
-          scopeLevel: source.scopeLevel,
-          scopeNext: source.scopeNext,
-          isConst: source.isConst,
-          isLexical: source.isLexical,
-          isCaptured: source.isCaptured,
-          kind: source.kind,
-        } as VarDefEntry;
-      }
-      return entry as VarDefEntry;
-    });
+    this.varDefs = vars.map((entry) => this.normalizeVarEntry(entry));
     this.varCount = this.varDefs.length;
+  }
+
+  setArgDefs(args: Array<Var | VarDefEntry>) {
+    this.argDefs = args.map((entry) => this.normalizeVarEntry(entry));
+    this.argCount = this.argDefs.length;
+  }
+
+  getAllVarDefs(): VarDefEntry[] {
+    if (this.argDefs.length === 0) {
+      return [...this.varDefs];
+    }
+    return [...this.argDefs, ...this.varDefs];
   }
 
   addLineInfo(info: LineInfoEntry) {
@@ -139,5 +138,18 @@ export class FunctionBytecode {
       }
     }
     this.lineNumberTable.push({ pc, line, column, sourcePos });
+  }
+
+  private normalizeVarEntry(entry: Var | VarDefEntry): VarDefEntry {
+    const source = entry as Var & VarDefEntry;
+    return {
+      name: source.name,
+      scopeLevel: source.scopeLevel ?? 0,
+      scopeNext: source.scopeNext ?? -1,
+      isConst: source.isConst ?? false,
+      isLexical: source.isLexical ?? false,
+      isCaptured: source.isCaptured ?? false,
+      kind: source.kind ?? VarKind.NORMAL,
+    };
   }
 }

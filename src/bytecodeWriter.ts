@@ -186,7 +186,7 @@ export class BytecodeWriter {
 	}
 
 	private writeFunction(bytecode: FunctionBytecode, moduleAtom: Atom) {
-		const varDefs = bytecode.varDefs ?? []
+		const varDefs = bytecode.getAllVarDefs()
 		for (const vd of varDefs) {
 			this.ensureAtom(vd.name)
 		}
@@ -235,7 +235,7 @@ export class BytecodeWriter {
 		if (bytecode.hasDebug) {
 			const filenameAtom = bytecode.filename ?? moduleAtom
 			this.writeAtom(this.body, filenameAtom)
-			const pc2line = bytecode.pc2line.length > 0 ? bytecode.pc2line : [0, 0]
+			const pc2line = bytecode.pc2line
 			this.body.writeLEB128(pc2line.length)
 			this.body.writeBytes(pc2line)
 			const sourceText = bytecode.source ?? ''

@@ -11,6 +11,7 @@ import {
   type OpcodeDefinition,
 } from './env'
 import { VarKind } from './vars'
+import { enumFlagNames, enumName, enumNameOrFallback } from './utils/enum'
 
 const BUILTIN_ATOMS = new Map<number, string>(
   Object.entries(ATOM_STRINGS).map(([id, value]) => [Number(id), value])
@@ -306,15 +307,7 @@ function readFlags(value: number, bit: number): boolean {
 }
 
 function decodeJsModeFlags(jsMode: number): string[] {
-  const names: string[] = []
-  for (const key of Object.keys(JSMode)) {
-    if (!Number.isNaN(Number(key))) continue
-    const bit = (JSMode as unknown as Record<string, number>)[key]
-    if ((jsMode & bit) !== 0) {
-      names.push(key)
-    }
-  }
-  return names
+  return enumFlagNames(JSMode, jsMode)
 }
 
 function parseModuleObjectBody(reader: ByteReader, customAtoms: Map<number, string>): ParsedModuleObject {
@@ -405,9 +398,7 @@ function parseVarDefs(reader: ByteReader, count: number, customAtoms: Map<number
     const isLexical = readFlags(flags, 5)
     const isCaptured = readFlags(flags, 6)
 
-    const kindName = typeof (VarKind as unknown as Record<number, string>)[kind] === 'string'
-      ? (VarKind as unknown as Record<number, string>)[kind]
-      : null
+    const kindName = enumName(VarKind, kind)
 
     varDefs.push({
       name,
@@ -437,9 +428,7 @@ function parseClosureVars(reader: ByteReader, count: number, customAtoms: Map<nu
     const isLexical = readFlags(flags, 3)
     const kind = (flags >> 4) & 0x0f
 
-    const kindName = typeof (VarKind as unknown as Record<number, string>)[kind] === 'string'
-      ? (VarKind as unknown as Record<number, string>)[kind]
-      : null
+    const kindName = enumName(VarKind, kind)
 
     closureVars.push({
       name,
@@ -517,9 +506,7 @@ function parseFunctionBytecode(
   }
 
   const funcKindValue = (flagsValue >> 4) & 0x3
-    const funcKindName = typeof (FunctionKind as unknown as Record<number, string>)[funcKindValue] === 'string'
-      ? (FunctionKind as unknown as Record<number, string>)[funcKindValue]
-      : null
+  const funcKindName = enumName(FunctionKind, funcKindValue)
   return {
     type: 'function',
     flags: {
@@ -530,7 +517,7 @@ function parseFunctionBytecode(
       needHomeObject: readFlags(flagsValue, 3),
       funcKind: {
         value: funcKindValue,
-          name: funcKindName,
+        name: funcKindName,
       },
       newTargetAllowed: readFlags(flagsValue, 6),
       superCallAllowed: readFlags(flagsValue, 7),
@@ -563,7 +550,7 @@ function parseFunction(reader: ByteReader, customAtoms: Map<number, string>): Pa
 
 function parseTaggedValue(reader: ByteReader, customAtoms: Map<number, string>): ParsedTaggedValue {
   const tag = reader.readU8()
-  const tagName = (BytecodeTag as unknown as Record<number, string>)[tag] ?? `UNKNOWN_${tag}`
+  const tagName = enumNameOrFallback(BytecodeTag, tag, `UNKNOWN_${tag}`)
 
   switch (tag) {
     case BytecodeTag.TC_TAG_NULL:
@@ -640,8 +627,8 @@ function parseInstructions(bytes: Uint8Array, customAtoms: Map<number, string>):
       throw new Error(`Unknown opcode encountered: ${opcode}`)
     }
 
-    const operand = readOperandByFormat(reader, def.format, customAtoms)
-    const opcodeName = (Opcode as unknown as Record<number, string>)[opcode] ?? def.id ?? `OP_${opcode}`
+  const operand = readOperandByFormat(reader, def.format, customAtoms)
+  const opcodeName = enumNameOrFallback(Opcode, opcode, def.id ?? `OP_${opcode}`)
     const instruction: ParsedInstruction = {
       offset,
       size: def.size,

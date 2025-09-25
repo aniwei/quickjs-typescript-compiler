@@ -41,10 +41,10 @@ export class Compiler {
   private labelCounter = 0
   private readonly labelPositions = new Map<string, number>()
   private readonly pendingJumps: Array<{ index: number; label: string; opcode: Opcode }> = []
-  private readonly recordedStatementPositions = new Set<number>()
   private readonly sourceUtf8: Uint8Array
   private readonly utf8OffsetByPos: Uint32Array
   private lineColCache = { offset: 0, line: 0, column: 0 }
+  private readonly recordedStatementPositions = new Set<number>()
 
   constructor(private readonly fileName: string, private readonly sourceCode: string, options: CompilerOptions = {}) {
     this.atomTable = options.atomTable ?? new AtomTable()
@@ -136,6 +136,7 @@ export class Compiler {
 
     const lexicalVars = rootFunction.vars.filter((variable) => !variable.isCaptured)
     rootFunction.bytecode.setVarDefs(lexicalVars)
+    rootFunction.bytecode.setArgDefs(rootFunction.args)
     rootFunction.bytecode.stackSize = this.computeStackSize(rootFunction.bytecode)
     this.buildDebugInfo(rootFunction)
     rootFunction.bytecode.argCount = rootFunction.args.length
@@ -156,14 +157,15 @@ export class Compiler {
     this.pendingJumps.length = 0
     this.currentSourceNode = null
     this.currentStatementNode = null
-    this.recordedStatementPositions.clear()
     this.lineColCache = { offset: 0, line: 0, column: 0 }
+    this.recordedStatementPositions.clear()
   }
 
   private withStatementNode<T>(node: ts.Node, fn: () => T): T {
     const previousStatement = this.currentStatementNode
     this.currentStatementNode = node
     try {
+      this.markStatementStart(node)
       return this.withSourceNode(node, fn)
     } finally {
       this.currentStatementNode = previousStatement
@@ -178,6 +180,18 @@ export class Compiler {
     } finally {
       this.currentSourceNode = previous
     }
+  }
+
+  private markStatementStart(node: ts.Node) {
+    if (node === this.sourceFile) return
+    if (this.suppressDebugRecording) return
+    const tsSourcePos = node.getStart(this.sourceFile, false)
+    if (tsSourcePos < 0) return
+    const sourcePos = this.toUtf8Offset(tsSourcePos)
+    if (this.recordedStatementPositions.has(sourcePos)) return
+    const { line, column } = this.getLineColumnFromUtf8Offset(sourcePos)
+    this.currentFunction.bytecode.recordLineNumber(this.currentOffset, line, column, sourcePos)
+    this.recordedStatementPositions.add(sourcePos)
   }
 
   private visitNode(node: ts.Node): void {
@@ -559,7 +573,7 @@ export class Compiler {
       throw new Error(`Unknown opcode: ${opcode}`)
     }
 
-    const recordNode = node === null ? null : node ?? this.currentStatementNode ?? this.currentSourceNode
+  const recordNode = node === null ? null : node ?? this.currentStatementNode ?? this.currentSourceNode
     if (!this.suppressDebugRecording && recordNode) {
       const tsSourcePos = recordNode.getStart(this.sourceFile, false)
       if (tsSourcePos >= 0) {
