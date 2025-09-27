@@ -12,7 +12,7 @@ function toEnumKey(raw: string, prefix: string): string {
   if (prefix === 'OP') {
     return `OP_${raw}`;
   }
-  
+
   return raw;
 }
 
@@ -23,7 +23,7 @@ async function main() {
     QuickJSLib.getFirstAtomId(),
     QuickJSLib.getCompileFlagEnums()
   ])
-  const supportsShortOpcodes = compileOptions & compileFlagEnums.COMPILE_FLAG_SHORT_OPCODES ? true : false
+  let supportsShortOpcodes = (compileOptions & compileFlagEnums.COMPILE_FLAG_SHORT_OPCODES) !== 0
 
   const [atomsList, opcodeList] = await Promise.all([
     QuickJSLib.getAllAtoms(),
@@ -139,21 +139,6 @@ ${uniqueAtoms.map(a => `  ${a.id}: ${JSON.stringify(a.key)},`).join('\n')}
 }
 `
 
-  const envBlock = `export interface Env {
-  bytecodeVersion: number
-  compileOptions: number
-  firstAtomId: number
-  supportsShortOpcodes: boolean
-}
-
-export const env = {
-  bytecodeVersion: ${bytecodeVersion},
-  compileOptions: ${compileOptions},
-  firstAtomId: ${firstAtomId},
-  supportsShortOpcodes: ${supportsShortOpcodes},
-} as const
-`
-
   // Base opcode metadata (id/size/nPop/nPush/format) centralized in env
   // Short opcodes: we also export a subset SHORT_OPCODE_DEFS derived from wasm opcode metadata,
   // guarded by supportsShortOpcodes so that consumers don't need to re-encode details.
@@ -220,6 +205,13 @@ ${opcodes
     'is_undefined', 'is_null', 'typeof_is_undefined', 'typeof_is_function',
   ])
 
+  if (!supportsShortOpcodes) {
+    const opcodeNameSet = new Set(opcodes.map((o) => o.name))
+    if (Array.from(SHORT_OPCODE_NAME_SET).some((name) => opcodeNameSet.has(name))) {
+      supportsShortOpcodes = true
+    }
+  }
+
   const shortOpcodeDefs = `export const SHORT_OPCODE_DEFS: Record<string, OpcodeDefinition> = ${supportsShortOpcodes ? '{\n' + opcodes
     .filter(o => SHORT_OPCODE_NAME_SET.has(o.name))
     .map(o => {
@@ -229,6 +221,21 @@ ${opcodes
       return `  ${key}: { id: ${JSON.stringify(o.name)}, size: ${sz}, nPop: ${o.nPop}, nPush: ${o.nPush}, format: OpFormat.${fmtName} },`
     })
     .join('\n') + '\n}' : '{}'}
+`
+
+  const envBlock = `export interface Env {
+  bytecodeVersion: number
+  compileOptions: number
+  firstAtomId: number
+  supportsShortOpcodes: boolean
+}
+
+export const env = {
+  bytecodeVersion: ${bytecodeVersion},
+  compileOptions: ${compileOptions},
+  firstAtomId: ${firstAtomId},
+  supportsShortOpcodes: ${supportsShortOpcodes},
+} as const
 `
 
   const content = header + '\n' + compileFlagsEnum + '\n' + bytecodeTagsEnum + '\n' + functionKindEnum + '\n' + jsModeEnum + '\n' + pc2LineEnum + '\n' + opformatEnum + '\n' + opcodeEnum + '\n' + opcodeNameToCode + '\n' + atomEnum + '\n' + atomStrings + '\n' + opcodeDefs + '\n' + shortOpcodeDefs + '\n' + envBlock

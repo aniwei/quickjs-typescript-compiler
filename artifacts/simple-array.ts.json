@@ -1,0 +1,142 @@
+{
+  "version": 5,
+  "atoms": [
+    {
+      "id": 228,
+      "value": "__tests__/compiler/fixtures/simple-array.js"
+    }
+  ],
+  "root": {
+    "type": "module",
+    "moduleName": {
+      "type": "atom",
+      "id": 228,
+      "name": "__tests__/compiler/fixtures/simple-array.js"
+    },
+    "requireEntries": [],
+    "exportEntries": [],
+    "starExportEntries": [],
+    "importEntries": [],
+    "hasTopLevelAwait": false,
+    "function": {
+      "type": "function",
+      "flags": {
+        "raw": 1568,
+        "hasPrototype": false,
+        "hasSimpleParameterList": false,
+        "isDerivedClassConstructor": false,
+        "needHomeObject": false,
+        "funcKind": {
+          "value": 2,
+          "name": "JS_FUNC_ASYNC"
+        },
+        "newTargetAllowed": false,
+        "superCallAllowed": false,
+        "superAllowed": false,
+        "argumentsAllowed": true,
+        "hasDebug": true,
+        "isDirectOrIndirectEval": false
+      },
+      "jsMode": 1,
+      "jsModeFlags": [
+        "JS_MODE_STRICT"
+      ],
+      "name": {
+        "type": "atom",
+        "id": 82,
+        "name": "_eval_"
+      },
+      "argCount": 0,
+      "varCount": 0,
+      "definedArgCount": 0,
+      "stackSize": 3,
+      "closureVarCount": 0,
+      "constantPoolCount": 0,
+      "instructionLength": 13,
+      "varDefs": [],
+      "closureVars": [],
+      "instructions": [
+        {
+          "offset": 0,
+          "size": 1,
+          "opcode": 8,
+          "opcodeName": "OP_push_this"
+        },
+        {
+          "offset": 1,
+          "size": 2,
+          "opcode": 236,
+          "opcodeName": "OP_if_false8",
+          "operand": 2
+        },
+        {
+          "offset": 3,
+          "size": 1,
+          "opcode": 41,
+          "opcodeName": "OP_return_undef"
+        },
+        {
+          "offset": 4,
+          "size": 1,
+          "opcode": 184,
+          "opcodeName": "OP_push_1"
+        },
+        {
+          "offset": 5,
+          "size": 1,
+          "opcode": 185,
+          "opcodeName": "OP_push_2"
+        },
+        {
+          "offset": 6,
+          "size": 1,
+          "opcode": 186,
+          "opcodeName": "OP_push_3"
+        },
+        {
+          "offset": 7,
+          "size": 3,
+          "opcode": 38,
+          "opcodeName": "OP_array_from",
+          "operand": 3
+        },
+        {
+          "offset": 10,
+          "size": 1,
+          "opcode": 14,
+          "opcodeName": "OP_drop"
+        },
+        {
+          "offset": 11,
+          "size": 1,
+          "opcode": 6,
+          "opcodeName": "OP_undefined"
+        },
+        {
+          "offset": 12,
+          "size": 1,
+          "opcode": 47,
+          "opcodeName": "OP_return_async"
+        }
+      ],
+      "debug": {
+        "filename": {
+          "type": "atom",
+          "id": 228,
+          "name": "__tests__/compiler/fixtures/simple-array.js"
+        },
+        "pc2line": [
+          0,
+          0,
+          22,
+          2,
+          37,
+          1
+        ],
+        "sourceLength": 0,
+        "source": null
+      },
+      "constantPool": []
+    }
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "version": 5,
+  "atoms": [
+    {
+      "id": 228,
+      "value": "__tests__/compiler/fixtures/simple-decl-init.js"
+    },
+    {
+      "id": 229,
+      "value": "a"
+    }
+  ],
+  "root": {
+    "type": "module",
+    "moduleName": {
+      "type": "atom",
+      "id": 228,
+      "name": "__tests__/compiler/fixtures/simple-decl-init.js"
+    },
+    "requireEntries": [],
+    "exportEntries": [],
+    "starExportEntries": [],
+    "importEntries": [],
+    "hasTopLevelAwait": false,
+    "function": {
+      "type": "function",
+      "flags": {
+        "raw": 1568,
+        "hasPrototype": false,
+        "hasSimpleParameterList": false,
+        "isDerivedClassConstructor": false,
+        "needHomeObject": false,
+        "funcKind": {
+          "value": 2,
+          "name": "JS_FUNC_ASYNC"
+        },
+        "newTargetAllowed": false,
+        "superCallAllowed": false,
+        "superAllowed": false,
+        "argumentsAllowed": true,
+        "hasDebug": true,
+        "isDirectOrIndirectEval": false
+      },
+      "jsMode": 1,
+      "jsModeFlags": [
+        "JS_MODE_STRICT"
+      ],
+      "name": {
+        "type": "atom",
+        "id": 82,
+        "name": "_eval_"
+      },
+      "argCount": 0,
+      "varCount": 0,
+      "definedArgCount": 0,
+      "stackSize": 2,
+      "closureVarCount": 1,
+      "constantPoolCount": 0,
+      "instructionLength": 10,
+      "varDefs": [],
+      "closureVars": [
+        {
+          "name": {
+            "type": "atom",
+            "id": 229,
+            "name": "a"
+          },
+          "varIndex": 0,
+          "isLocal": true,
+          "isArgument": false,
+          "isConst": true,
+          "isLexical": true,
+          "kind": {
+            "value": 0,
+            "name": "NORMAL"
+          }
+        }
+      ],
+      "instructions": [
+        {
+          "offset": 0,
+          "size": 1,
+          "opcode": 8,
+          "opcodeName": "OP_push_this"
+        },
+        {
+          "offset": 1,
+          "size": 2,
+          "opcode": 236,
+          "opcodeName": "OP_if_false8",
+          "operand": 2
+        },
+        {
+          "offset": 3,
+          "size": 1,
+          "opcode": 41,
+          "opcodeName": "OP_return_undef"
+        },
+        {
+          "offset": 4,
+          "size": 1,
+          "opcode": 184,
+          "opcodeName": "OP_push_1"
+        },
+        {
+          "offset": 5,
+          "size": 1,
+          "opcode": 185,
+          "opcodeName": "OP_push_2"
+        },
+        {
+          "offset": 6,
+          "size": 1,
+          "opcode": 159,
+          "opcodeName": "OP_add"
+        },
+        {
+          "offset": 7,
+          "size": 1,
+          "opcode": 227,
+          "opcodeName": "OP_put_var_ref0"
+        },
+        {
+          "offset": 8,
+          "size": 1,
+          "opcode": 6,
+          "opcodeName": "OP_undefined"
+        },
+        {
+          "offset": 9,
+          "size": 1,
+          "opcode": 47,
+          "opcodeName": "OP_return_async"
+        }
+      ],
+      "debug": {
+        "filename": {
+          "type": "atom",
+          "id": 228,
+          "name": "__tests__/compiler/fixtures/simple-decl-init.js"
+        },
+        "pc2line": [
+          0,
+          0,
+          32,
+          22
+        ],
+        "sourceLength": 0,
+        "source": null
+      },
+      "constantPool": []
+    }
+  }
+}

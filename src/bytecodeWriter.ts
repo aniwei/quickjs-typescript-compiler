@@ -6,7 +6,8 @@ import {
 	type ModuleRecord,
 } from './functionDef'
 import { FunctionBytecode, Instruction, ConstantEntry } from './functionBytecode'
-import { BytecodeTag, env, OpFormat, Opcode, OPCODE_DEFS, type OpcodeDefinition } from './env'
+import { BytecodeTag, env, OpFormat, Opcode } from './env'
+import { getOpcodeDefinition } from './utils/opcode'
 import { ClosureVar } from './vars'
 
 class ByteBuffer {
@@ -83,21 +84,12 @@ class ByteBuffer {
 }
 
 export class BytecodeWriter {
-	private readonly opcodeInfoByCode = new Map<number, OpcodeDefinition>()
 	private body = new ByteBuffer()
 	private readonly customAtomIndex = new Map<Atom, number>()
 	private customAtomStrings: string[] = []
 	private readonly textEncoder = new TextEncoder()
 
-	constructor(private readonly atomTable: AtomTable) {
-		const opcodeEnum = Opcode as unknown as Record<string, number>
-		for (const [key, def] of Object.entries(OPCODE_DEFS)) {
-			const opcodeValue = opcodeEnum[key]
-			if (typeof opcodeValue === 'number') {
-				this.opcodeInfoByCode.set(opcodeValue, def)
-			}
-		}
-	}
+	constructor(private readonly atomTable: AtomTable) {}
 
 		writeModule(mainFunction: FunctionDef): Uint8Array {
 		this.reset()
@@ -358,7 +350,7 @@ export class BytecodeWriter {
 		const buf = new ByteBuffer()
 		for (const instruction of instructions) {
 			buf.writeU8(instruction.opcode)
-			const def = this.opcodeInfoByCode.get(instruction.opcode)
+			const def = getOpcodeDefinition(instruction.opcode)
 			if (!def) {
 				throw new Error(`Unknown opcode: ${instruction.opcode}`)
 			}
@@ -401,23 +393,23 @@ export class BytecodeWriter {
 				case OpFormat.npopx:
 					break
 				case OpFormat.atom:
-					this.writeAtomValue(buf, operands[0] as Atom)
+					this.writeAtomOperand(buf, operands[0] as Atom)
 					break
 				case OpFormat.atom_u8:
-					this.writeAtomValue(buf, operands[0] as Atom)
+					this.writeAtomOperand(buf, operands[0] as Atom)
 					buf.writeU8(operands[1] ?? 0)
 					break
 				case OpFormat.atom_u16:
-					this.writeAtomValue(buf, operands[0] as Atom)
+					this.writeAtomOperand(buf, operands[0] as Atom)
 					buf.writeU16(operands[1] ?? 0)
 					break
 				case OpFormat.atom_label_u8:
-					this.writeAtomValue(buf, operands[0] as Atom)
+					this.writeAtomOperand(buf, operands[0] as Atom)
 					buf.writeU32(operands[1] ?? 0)
 					buf.writeInt8(operands[2] ?? 0)
 					break
 				case OpFormat.atom_label_u16:
-					this.writeAtomValue(buf, operands[0] as Atom)
+					this.writeAtomOperand(buf, operands[0] as Atom)
 					buf.writeU32(operands[1] ?? 0)
 					buf.writeU16(operands[2] ?? 0)
 					break
@@ -433,6 +425,11 @@ export class BytecodeWriter {
 		buffer.writeLEB128(encoded)
 	}
 
+	private writeAtomOperand(buffer: ByteBuffer, atom: Atom) {
+		const index = this.getAtomIndexValue(atom)
+		buffer.writeU32(index >>> 0)
+	}
+
 	private writeAtomValue(buffer: ByteBuffer, atom: Atom) {
 		const encoded = this.encodeAtom(atom)
 		buffer.writeLEB128(encoded)
@@ -442,34 +439,34 @@ export class BytecodeWriter {
 		if (atom < env.firstAtomId) {
 			return
 		}
-		if (this.customAtomIndex.has(atom)) {
-			return
+		this.getOrAddCustomAtomIndex(atom)
+	}
+
+	private encodeAtom(atom: Atom): number {
+		const indexValue = this.getAtomIndexValue(atom)
+		return indexValue << 1
+	}
+
+	private getAtomIndexValue(atom: Atom): number {
+		if (atom < env.firstAtomId) {
+			return atom
+		}
+		const index = this.getOrAddCustomAtomIndex(atom)
+		return env.firstAtomId + index
+	}
+
+	private getOrAddCustomAtomIndex(atom: Atom): number {
+		let index = this.customAtomIndex.get(atom)
+		if (index !== undefined) {
+			return index
 		}
 		const str = this.atomTable.getAtomString(atom)
 		if (str === undefined) {
 			throw new Error(`Unknown atom ${atom}`)
 		}
-		this.customAtomIndex.set(atom, this.customAtomStrings.length)
+		index = this.customAtomStrings.length
 		this.customAtomStrings.push(str)
-	}
-
-	private encodeAtom(atom: Atom): number {
-		const firstAtomId = env.firstAtomId
-		if (atom < firstAtomId) {
-			return atom << 1
-		}
-
-		let index = this.customAtomIndex.get(atom)
-		if (index === undefined) {
-			const str = this.atomTable.getAtomString(atom)
-			if (str === undefined) {
-				throw new Error(`Unknown atom ${atom}`)
-			}
-			index = this.customAtomStrings.length
-			this.customAtomStrings.push(str)
-			this.customAtomIndex.set(atom, index)
-		}
-		const value = firstAtomId + index
-		return value << 1
+		this.customAtomIndex.set(atom, index)
+		return index
 	}
 }

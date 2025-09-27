@@ -4,8 +4,10 @@ import { Atom, AtomTable } from './atoms'
 import { FunctionDef, createEmptyModuleRecord } from './functionDef'
 import { FunctionBytecode, type Instruction } from './functionBytecode'
 import { ScopeManager } from './scopeManager'
-import { Var, VarKind, ClosureVar } from './vars'
-import { Opcode, OPCODE_DEFS, OpFormat, PC2Line, type OpcodeDefinition } from './env'
+import { ScopeKind } from './scopes'
+import { Var, VarKind, ClosureVar, VarDeclarationKind } from './vars'
+import { Opcode, OpFormat, PC2Line, BytecodeTag, FunctionKind, JSMode, env, type OpcodeDefinition } from './env'
+import { getOpcodeDefinition, getOpcodeName } from './utils/opcode'
 
 const PC2LINE_BASE = PC2Line.PC2LINE_BASE
 const PC2LINE_OP_FIRST = PC2Line.PC2LINE_OP_FIRST
@@ -16,6 +18,32 @@ export interface CompilerOptions {
   atomTable?: AtomTable
 }
 
+interface FunctionContextSnapshot {
+  functionDef: FunctionDef
+  scopeManager: ScopeManager
+  closureVarIndices: Map<Atom, number>
+  localVarIndices: Map<Atom, number>
+  argumentIndices: Map<Atom, number>
+  nextLocalSlot: number
+  stackDepth: number
+  maxStackDepth: number
+  currentSourceNode: ts.Node | null
+  currentStatementNode: ts.Node | null
+  suppressDebugRecording: boolean
+  currentOffset: number
+  instructionOffsets: number[]
+  labelCounter: number
+  labelPositions: Map<string, number>
+  pendingJumps: Array<{ index: number; label: string; opcode: Opcode }>
+  lineColCache: { offset: number; line: number; column: number }
+  recordedStatementPositions: Set<number>
+  hasExplicitReturn: boolean
+}
+
+interface EmitDebugInfoOptions {
+  tsSourcePos?: number
+}
+
 export class Compiler {
   private readonly sourceFile: ts.SourceFile
   private readonly program: ts.Program
@@ -24,9 +52,9 @@ export class Compiler {
   private readonly atomTable: AtomTable
   private currentFunction!: FunctionDef
   private scopeManager!: ScopeManager
-  private readonly opcodeInfoByCode = new Map<number, OpcodeDefinition>()
   private readonly closureVarIndices = new Map<Atom, number>()
   private readonly localVarIndices = new Map<Atom, number>()
+  private readonly argumentIndices = new Map<Atom, number>()
   private nextLocalSlot = 0
   private moduleAtom!: Atom
 
@@ -43,8 +71,11 @@ export class Compiler {
   private readonly pendingJumps: Array<{ index: number; label: string; opcode: Opcode }> = []
   private readonly sourceUtf8: Uint8Array
   private readonly utf8OffsetByPos: Uint32Array
+  private readonly normalizedPosByPos: Uint32Array
   private lineColCache = { offset: 0, line: 0, column: 0 }
   private readonly recordedStatementPositions = new Set<number>()
+  private hasExplicitReturn = false
+  private moduleHoistInsertionIndex: number | null = null
 
   constructor(private readonly fileName: string, private readonly sourceCode: string, options: CompilerOptions = {}) {
     this.atomTable = options.atomTable ?? new AtomTable()
@@ -71,27 +102,22 @@ export class Compiler {
     this.program = ts.createProgram([this.fileName], compilerOptions, host)
     this.checker = this.program.getTypeChecker()
 
-    const opcodeEnum = Opcode as unknown as Record<string, number>
-    for (const [key, def] of Object.entries(OPCODE_DEFS)) {
-      const opcodeValue = opcodeEnum[key]
-      if (typeof opcodeValue === 'number') {
-        this.opcodeInfoByCode.set(opcodeValue, def)
-      }
-    }
+    const { strippedSource, normalizedPosByPos } = this.computeDebugSourceMapping(this.sourceCode)
+    this.normalizedPosByPos = normalizedPosByPos
 
     const encoder = new TextEncoder()
-    this.sourceUtf8 = encoder.encode(this.sourceCode)
-    this.utf8OffsetByPos = new Uint32Array(this.sourceCode.length + 1)
+    this.sourceUtf8 = encoder.encode(strippedSource)
+    this.utf8OffsetByPos = new Uint32Array(strippedSource.length + 1)
     let utf8Offset = 0
     let index = 0
     this.utf8OffsetByPos[0] = 0
-    while (index < this.sourceCode.length) {
-      const codePoint = this.sourceCode.codePointAt(index) ?? 0
+    while (index < strippedSource.length) {
+      const codePoint = strippedSource.codePointAt(index) ?? 0
       const step = codePoint > 0xffff ? 2 : 1
       utf8Offset += this.getUtf8ByteLength(codePoint)
       for (let j = 1; j <= step; j++) {
         const target = index + j
-        if (target <= this.sourceCode.length) {
+        if (target <= strippedSource.length) {
           this.utf8OffsetByPos[target] = utf8Offset
         }
       }
@@ -106,47 +132,45 @@ export class Compiler {
     this.currentFunction = rootFunction
     this.scopeManager = new ScopeManager(rootFunction)
 
-    const relativePath = path.relative(process.cwd(), this.fileName) || this.fileName
-    const moduleFileName = relativePath.replace(/\.ts$/i, '.js')
+    const moduleFileName = this.toModuleFileName(path.relative(process.cwd(), this.fileName) || this.fileName)
     this.moduleAtom = this.atomTable.getAtomId(moduleFileName)
     if (!rootFunction.module) {
       rootFunction.module = createEmptyModuleRecord()
     }
     rootFunction.module.moduleName = this.moduleAtom
 
-    rootFunction.bytecode.jsMode = 1
-    rootFunction.bytecode.funcKind = 2 // JS_FUNC_ASYNC
+  rootFunction.bytecode.jsMode = JSMode.JS_MODE_STRICT
+  rootFunction.bytecode.funcKind = FunctionKind.JS_FUNC_ASYNC
     rootFunction.bytecode.argumentsAllowed = true
     rootFunction.bytecode.hasSimpleParameterList = false
     rootFunction.bytecode.hasDebug = true
     rootFunction.bytecode.filename = this.moduleAtom
 
-    this.pushScope()
+  this.pushScope(ScopeKind.Function)
     this.withStatementNode(this.sourceFile, () => {
       this.emitModulePrologue()
     })
     ts.forEachChild(this.sourceFile, (node) => this.visitNode(node))
-    this.withStatementNode(this.sourceFile, () => {
-      this.emitOpcode(Opcode.OP_undefined)
-      this.emitOpcode(Opcode.OP_return_async)
+    this.withoutDebugRecording(() => {
+      this.withStatementNode(this.sourceFile, () => {
+        this.emitOpcode(Opcode.OP_undefined)
+        this.emitReturnOpcode()
+      })
     })
     this.popScope()
 
+    this.injectModuleHoistedDefinitions(rootFunction)
+
     this.resolvePendingJumps()
 
-    const lexicalVars = rootFunction.vars.filter((variable) => !variable.isCaptured)
-    rootFunction.bytecode.setVarDefs(lexicalVars)
-    rootFunction.bytecode.setArgDefs(rootFunction.args)
-    rootFunction.bytecode.stackSize = this.computeStackSize(rootFunction.bytecode)
-    this.buildDebugInfo(rootFunction)
-    rootFunction.bytecode.argCount = rootFunction.args.length
-    rootFunction.bytecode.definedArgCount = rootFunction.definedArgCount
+    this.finalizeFunction(rootFunction)
     return rootFunction
   }
 
   private resetCodegenState() {
     this.closureVarIndices.clear()
     this.localVarIndices.clear()
+    this.argumentIndices.clear()
     this.nextLocalSlot = 0
     this.stackDepth = 0
     this.maxStackDepth = 0
@@ -159,6 +183,86 @@ export class Compiler {
     this.currentStatementNode = null
     this.lineColCache = { offset: 0, line: 0, column: 0 }
     this.recordedStatementPositions.clear()
+    this.hasExplicitReturn = false
+  }
+
+  private toModuleFileName(filePath: string): string {
+    const ext = path.extname(filePath)
+    const base = filePath.slice(0, filePath.length - ext.length)
+    switch (ext) {
+      case '.ts':
+      case '.tsx':
+        return `${base}.js`
+      case '.mts':
+        return `${base}.mjs`
+      case '.cts':
+        return `${base}.cjs`
+      default:
+        return filePath
+    }
+  }
+
+  private saveCurrentFunctionContext(): FunctionContextSnapshot {
+    return {
+      functionDef: this.currentFunction,
+      scopeManager: this.scopeManager,
+      closureVarIndices: new Map(this.closureVarIndices),
+      localVarIndices: new Map(this.localVarIndices),
+      argumentIndices: new Map(this.argumentIndices),
+      nextLocalSlot: this.nextLocalSlot,
+      stackDepth: this.stackDepth,
+      maxStackDepth: this.maxStackDepth,
+      currentSourceNode: this.currentSourceNode,
+      currentStatementNode: this.currentStatementNode,
+      suppressDebugRecording: this.suppressDebugRecording,
+      currentOffset: this.currentOffset,
+      instructionOffsets: [...this.instructionOffsets],
+      labelCounter: this.labelCounter,
+      labelPositions: new Map(this.labelPositions),
+      pendingJumps: this.pendingJumps.map((entry) => ({ ...entry })),
+      lineColCache: { ...this.lineColCache },
+      recordedStatementPositions: new Set(this.recordedStatementPositions),
+      hasExplicitReturn: this.hasExplicitReturn,
+    }
+  }
+
+  private restoreFunctionContext(snapshot: FunctionContextSnapshot) {
+    this.currentFunction = snapshot.functionDef
+    this.scopeManager = snapshot.scopeManager
+    this.restoreMap(this.closureVarIndices, snapshot.closureVarIndices)
+    this.restoreMap(this.localVarIndices, snapshot.localVarIndices)
+    this.restoreMap(this.argumentIndices, snapshot.argumentIndices)
+    this.nextLocalSlot = snapshot.nextLocalSlot
+    this.stackDepth = snapshot.stackDepth
+    this.maxStackDepth = snapshot.maxStackDepth
+    this.currentSourceNode = snapshot.currentSourceNode
+    this.currentStatementNode = snapshot.currentStatementNode
+    this.suppressDebugRecording = snapshot.suppressDebugRecording
+    this.currentOffset = snapshot.currentOffset
+    this.instructionOffsets.length = 0
+    this.instructionOffsets.push(...snapshot.instructionOffsets)
+    this.labelCounter = snapshot.labelCounter
+    this.labelPositions.clear()
+    for (const [key, value] of snapshot.labelPositions) {
+      this.labelPositions.set(key, value)
+    }
+    this.pendingJumps.length = 0
+    for (const entry of snapshot.pendingJumps) {
+      this.pendingJumps.push({ ...entry })
+    }
+    this.lineColCache = { ...snapshot.lineColCache }
+    this.recordedStatementPositions.clear()
+    for (const value of snapshot.recordedStatementPositions) {
+      this.recordedStatementPositions.add(value)
+    }
+    this.hasExplicitReturn = snapshot.hasExplicitReturn
+  }
+
+  private restoreMap<K, V>(target: Map<K, V>, source: Map<K, V>) {
+    target.clear()
+    for (const [key, value] of source) {
+      target.set(key, value)
+    }
   }
 
   private withStatementNode<T>(node: ts.Node, fn: () => T): T {
@@ -187,14 +291,14 @@ export class Compiler {
     if (this.suppressDebugRecording) return
     const tsSourcePos = node.getStart(this.sourceFile, false)
     if (tsSourcePos < 0) return
-    const sourcePos = this.toUtf8Offset(tsSourcePos)
-    if (this.recordedStatementPositions.has(sourcePos)) return
-    const { line, column } = this.getLineColumnFromUtf8Offset(sourcePos)
-    this.currentFunction.bytecode.recordLineNumber(this.currentOffset, line, column, sourcePos)
-    this.recordedStatementPositions.add(sourcePos)
+    // 延迟到首次相关 opcode 发射时再记录调试信息，避免重复
   }
 
   private visitNode(node: ts.Node): void {
+    if (ts.isFunctionDeclaration(node)) {
+      this.withStatementNode(node, () => this.compileFunctionDeclaration(node))
+      return
+    }
     if (ts.isVariableStatement(node)) {
       this.withStatementNode(node, () => this.compileVariableStatement(node))
       return
@@ -209,6 +313,10 @@ export class Compiler {
     }
     if (ts.isExpressionStatement(node)) {
       this.withStatementNode(node, () => this.compileExpressionStatement(node))
+      return
+    }
+    if (ts.isReturnStatement(node)) {
+      this.withStatementNode(node, () => this.compileReturnStatement(node))
       return
     }
     ts.forEachChild(node, (child) => this.visitNode(child))
@@ -236,23 +344,241 @@ export class Compiler {
           throw new Error(`Missing initializer in const declaration for '${nameText}'`)
         }
 
-        const varIndex = this.declareLexicalVariable(atom, { isConst, isLet })
-        this.bindCurrentScope(varIndex)
+        this.declareLexicalVariable(atom, { isConst, isLet })
 
         if (declaration.initializer) {
           this.compileExpression(declaration.initializer)
-        } else if (isConst || isLet) {
-          // Lexical declarations without initializer are initialized to undefined
-          this.emitOpcode(Opcode.OP_undefined)
+          this.emitStoreToLexical(atom)
+          return
         }
 
         if (isConst || isLet) {
-          this.emitStoreToClosure(atom)
-        } else {
-          // var declarations: TODO
-          throw new Error('var declarations are not implemented yet')
+          // Lexical declarations without initializer are initialized to undefined
+          this.emitOpcode(Opcode.OP_undefined)
+          this.emitStoreToLexical(atom)
         }
       })
+    }
+  }
+
+  private compileFunctionDeclaration(node: ts.FunctionDeclaration) {
+    if (!node.name) {
+      throw new Error('Function declaration must have a name')
+    }
+    if (!node.body) {
+      throw new Error(`Function '${node.name.text}' is missing a body`)
+    }
+
+    const atom = this.atomTable.getAtomId(node.name.text)
+    if (this.scopeManager.hasBindingInCurrentScope(atom)) {
+      throw new Error(`Identifier '${node.name.text}' has already been declared in this scope`)
+    }
+
+    const varIndex = this.declareLexicalVariable(atom, {
+      isConst: false,
+      isLet: false,
+      kind: VarKind.FUNCTION_DECL,
+    })
+    const variable = this.currentFunction.vars[varIndex]
+
+    const childFunction = this.compileChildFunction(node, atom, { isExpression: false })
+    const constantIndex = this.currentFunction.bytecode.addConstant({
+      tag: BytecodeTag.TC_TAG_FUNCTION_BYTECODE,
+      value: childFunction.bytecode,
+    })
+    variable.funcPoolIndex = constantIndex
+
+    const isModuleTopLevel =
+      this.currentFunction.parent === null &&
+      this.currentFunction.module !== null &&
+      this.scopeManager.currentScope() === this.currentFunction.bodyScope
+
+    if (isModuleTopLevel) {
+      return
+    }
+
+    if (constantIndex <= 0xff) {
+      this.emitOpcode(Opcode.OP_fclosure8, [constantIndex], node)
+    } else {
+      this.emitOpcode(Opcode.OP_fclosure, [constantIndex], node)
+    }
+  this.emitStoreToLexical(atom)
+  }
+
+  private compileChildFunction(
+    node: ts.FunctionDeclaration | ts.FunctionExpression,
+    nameAtom: Atom,
+    options: { isExpression: boolean }
+  ): FunctionDef {
+    const parentFunction = this.currentFunction
+    const sourcePos = this.toUtf8Offset(node.getStart(this.sourceFile, false))
+    const childFunction = new FunctionDef(nameAtom, this.sourceCode, this.fileName, {
+      parent: parentFunction,
+      isFuncExpr: options.isExpression,
+      sourcePos,
+    })
+
+    const isAsync = node.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.AsyncKeyword) ?? false
+    const isGenerator = Boolean(node.asteriskToken)
+
+    let funcKind = FunctionKind.JS_FUNC_NORMAL
+    if (isAsync && isGenerator) {
+      funcKind = FunctionKind.JS_FUNC_ASYNC_GENERATOR
+    } else if (isAsync) {
+      funcKind = FunctionKind.JS_FUNC_ASYNC
+    } else if (isGenerator) {
+      funcKind = FunctionKind.JS_FUNC_GENERATOR
+    }
+
+    childFunction.bytecode.jsMode = JSMode.JS_MODE_STRICT
+    if (isAsync) {
+      childFunction.bytecode.jsMode |= JSMode.JS_MODE_ASYNC
+    }
+    childFunction.bytecode.funcKind = funcKind
+    childFunction.bytecode.hasDebug = true
+    childFunction.bytecode.filename = this.moduleAtom
+    childFunction.bytecode.argumentsAllowed = true
+    childFunction.bytecode.hasSimpleParameterList = true
+    childFunction.bytecode.hasPrototype = funcKind === FunctionKind.JS_FUNC_NORMAL
+    childFunction.bytecode.newTargetAllowed = true
+
+    parentFunction.appendChild(childFunction)
+
+    const snapshot = this.saveCurrentFunctionContext()
+    this.resetCodegenState()
+    this.currentFunction = childFunction
+    this.scopeManager = new ScopeManager(childFunction)
+
+  this.pushScope(ScopeKind.Function)
+
+    childFunction.definedArgCount = node.parameters.length
+    for (let index = 0; index < node.parameters.length; index++) {
+      this.compileFunctionParameter(node.parameters[index], index, node.parameters.length)
+    }
+
+    if (!node.body || !ts.isBlock(node.body)) {
+      throw new Error('Only block bodies are supported for function declarations')
+    }
+
+    for (const statement of node.body.statements) {
+      this.visitNode(statement)
+    }
+
+    if (!this.hasExplicitReturn) {
+      this.emitOpcode(Opcode.OP_undefined)
+      this.emitReturnOpcode()
+    }
+
+    this.popScope()
+    this.resolvePendingJumps()
+    this.finalizeFunction(childFunction)
+    this.restoreFunctionContext(snapshot)
+
+    return childFunction
+  }
+
+  private compileFunctionParameter(parameter: ts.ParameterDeclaration, index: number, totalParams: number) {
+    if (!ts.isIdentifier(parameter.name)) {
+      this.currentFunction.bytecode.hasSimpleParameterList = false
+      throw new Error('Only simple identifier parameters are supported')
+    }
+
+    if (parameter.dotDotDotToken && parameter.initializer) {
+      throw new Error('Rest parameters cannot have initializers')
+    }
+
+    if (parameter.dotDotDotToken && index !== totalParams - 1) {
+      throw new Error('Rest parameter must be in the last position')
+    }
+
+    if (parameter.initializer || parameter.dotDotDotToken) {
+      this.currentFunction.bytecode.hasSimpleParameterList = false
+    }
+
+    const atom = this.atomTable.getAtomId(parameter.name.text)
+    if (this.scopeManager.hasBindingInCurrentScope(atom)) {
+      throw new Error(`Duplicate parameter name '${parameter.name.text}'`)
+    }
+
+    const variable = new Var(atom, {
+      isConst: false,
+      isLexical: false,
+      isCaptured: false,
+      kind: VarKind.NORMAL,
+      declarationKind: VarDeclarationKind.Parameter,
+    })
+
+    this.currentFunction.addArg(variable)
+    this.scopeManager.bindArgumentToCurrentScope(atom, index)
+    this.argumentIndices.set(atom, index)
+
+    if (parameter.dotDotDotToken) {
+      this.withSourceNode(parameter, () => {
+        this.emitOpcode(Opcode.OP_rest, [index], parameter)
+        this.emitStoreArgument(index, parameter)
+      })
+      return
+    }
+
+    const initializer = parameter.initializer ?? null
+
+    if (initializer) {
+      this.withSourceNode(initializer, () => {
+        const skipDefaultLabel = this.createLabel()
+        const endLabel = this.createLabel()
+
+        this.emitLoadArgument(index, initializer)
+        this.emitOpcode(Opcode.OP_dup, [], initializer)
+        this.emitOpcode(Opcode.OP_is_undefined, [], initializer)
+        this.emitJump(Opcode.OP_if_false8, skipDefaultLabel)
+        this.emitOpcode(Opcode.OP_drop)
+        this.compileExpression(initializer)
+        this.emitStoreArgument(index, initializer)
+        this.emitJump(Opcode.OP_goto8, endLabel)
+
+        this.markLabel(skipDefaultLabel)
+        this.emitOpcode(Opcode.OP_drop)
+        this.markLabel(endLabel)
+      })
+    }
+  }
+
+  private compileReturnStatement(node: ts.ReturnStatement) {
+    if (node.expression) {
+      this.compileExpression(node.expression)
+    } else {
+      this.emitOpcode(Opcode.OP_undefined)
+    }
+    this.emitReturnOpcode(node)
+    this.hasExplicitReturn = true
+  }
+
+  private emitReturnOpcode(node?: ts.Node) {
+    const opcode = this.getReturnOpcodeForFunction(this.currentFunction.bytecode.funcKind)
+    this.emitOpcode(opcode, [], node)
+  }
+
+  private getReturnOpcodeForFunction(funcKind: FunctionKind): Opcode {
+    switch (funcKind) {
+      case FunctionKind.JS_FUNC_ASYNC:
+      case FunctionKind.JS_FUNC_ASYNC_GENERATOR:
+        return Opcode.OP_return_async
+      default:
+        return Opcode.OP_return
+    }
+  }
+
+  private compileBinaryExpression(expression: ts.BinaryExpression) {
+    const operator = expression.operatorToken.kind
+    switch (operator) {
+      case ts.SyntaxKind.PlusToken: {
+        this.compileExpression(expression.left)
+        this.compileExpression(expression.right)
+        this.emitOpcode(Opcode.OP_add, [], expression.operatorToken)
+        return
+      }
+      default:
+        throw new Error(`Unsupported binary operator: ${ts.SyntaxKind[operator]}`)
     }
   }
 
@@ -277,22 +603,39 @@ export class Compiler {
     }
   }
 
-  private compileBlock(node: ts.Block) {
-    for (const statement of node.statements) {
-      this.visitNode(statement)
+  private compileBlock(node: ts.Block, options: { createScope?: boolean } = {}) {
+    const createScope = options.createScope !== false
+    if (createScope) {
+      this.pushScope(ScopeKind.Block)
+    }
+    try {
+      for (const statement of node.statements) {
+        this.visitNode(statement)
+      }
+    } finally {
+      if (createScope) {
+        this.popScope()
+      }
     }
   }
 
   private compileExpressionStatement(node: ts.ExpressionStatement) {
     this.compileExpression(node.expression)
-    this.emitOpcode(Opcode.OP_drop)
+    let dropDebug: EmitDebugInfoOptions | undefined
+    if (ts.isCallExpression(node.expression)) {
+      const callDebugPos = this.getCallExpressionOpenParenPos(node.expression)
+      if (callDebugPos !== undefined) {
+        dropDebug = { tsSourcePos: callDebugPos }
+      }
+    }
+    this.emitOpcode(Opcode.OP_drop, [], undefined, dropDebug)
   }
   private compileForOfStatement(node: ts.ForOfStatement) {
     if (node.awaitModifier) {
       throw new Error('for await is not supported yet')
     }
 
-    this.pushScope()
+  this.pushScope(ScopeKind.Block)
 
     if (!ts.isVariableDeclarationList(node.initializer)) {
       throw new Error('for-of initializer must be a variable declaration')
@@ -319,9 +662,8 @@ export class Compiler {
     const isConst = (flags & ts.NodeFlags.Const) !== 0
     const isLet = (flags & ts.NodeFlags.Let) !== 0
 
-    const loopVarIndex = this.declareLexicalVariable(atom, { isConst, isLet, capture: false })
-    const loopVarSlot = this.localVarIndices.get(atom)!
-    this.bindCurrentScope(loopVarIndex)
+  this.declareLexicalVariable(atom, { isConst, isLet, capture: false })
+  const loopVarSlot = this.localVarIndices.get(atom)!
     this.emitSetLocalUninitialized(loopVarSlot)
 
     this.compileExpression(node.expression)
@@ -333,10 +675,10 @@ export class Compiler {
     this.emitJump(Opcode.OP_goto8, labelCheck)
 
     this.markLabel(labelBody)
-  this.emitStoreToLocal(loopVarSlot)
+    this.emitStoreToLocal(loopVarSlot)
 
     if (ts.isBlock(node.statement)) {
-      this.compileBlock(node.statement)
+      this.compileBlock(node.statement, { createScope: false })
     } else {
       this.visitNode(node.statement)
     }
@@ -374,6 +716,11 @@ export class Compiler {
         return
       }
 
+      if (ts.isBinaryExpression(expression)) {
+        this.compileBinaryExpression(expression)
+        return
+      }
+
       if (ts.isCallExpression(expression)) {
         this.compileCallExpression(expression)
         return
@@ -407,17 +754,69 @@ export class Compiler {
       this.compileExpression(propertyAccess.expression)
     })
     const propertyAtom = this.atomTable.getAtomId(propertyAccess.name.text)
-    this.emitOpcode(Opcode.OP_get_field2, [propertyAtom], propertyAccess.name)
+    const propertyOperatorPos = this.getPropertyAccessOperatorPos(propertyAccess)
+    const propertyAccessDebug: EmitDebugInfoOptions | undefined = propertyOperatorPos !== undefined
+      ? { tsSourcePos: propertyOperatorPos }
+      : undefined
+    this.emitOpcode(Opcode.OP_get_field2, [propertyAtom], propertyAccess.name, propertyAccessDebug)
 
     for (const arg of expression.arguments) {
       this.withSourceNode(arg, () => this.compileExpression(arg))
     }
+    const callDebugPos = this.getCallExpressionOpenParenPos(expression)
+    const callDebug: EmitDebugInfoOptions | undefined = callDebugPos !== undefined
+      ? { tsSourcePos: callDebugPos }
+      : undefined
 
-    this.emitOpcode(Opcode.OP_call_method, [expression.arguments.length], expression)
+    this.emitOpcode(Opcode.OP_call_method, [expression.arguments.length], expression, callDebug)
+  }
+
+  private emitLoadArgument(index: number, node?: ts.Node) {
+    switch (index) {
+      case 0:
+        this.emitOpcode(Opcode.OP_get_arg0, [], node)
+        return
+      case 1:
+        this.emitOpcode(Opcode.OP_get_arg1, [], node)
+        return
+      case 2:
+        this.emitOpcode(Opcode.OP_get_arg2, [], node)
+        return
+      case 3:
+        this.emitOpcode(Opcode.OP_get_arg3, [], node)
+        return
+      default:
+        this.emitOpcode(Opcode.OP_get_arg, [index], node)
+        return
+    }
+  }
+
+  private emitStoreArgument(index: number, node?: ts.Node) {
+    switch (index) {
+      case 0:
+        this.emitOpcode(Opcode.OP_put_arg0, [], node)
+        return
+      case 1:
+        this.emitOpcode(Opcode.OP_put_arg1, [], node)
+        return
+      case 2:
+        this.emitOpcode(Opcode.OP_put_arg2, [], node)
+        return
+      case 3:
+        this.emitOpcode(Opcode.OP_put_arg3, [], node)
+        return
+      default:
+        this.emitOpcode(Opcode.OP_put_arg, [index], node)
+        return
+    }
   }
 
   private emitLoadIdentifier(identifier: ts.Identifier) {
     const atom = this.atomTable.getAtomId(identifier.text)
+    if (this.argumentIndices.has(atom)) {
+      this.emitLoadArgument(this.argumentIndices.get(atom)!, identifier)
+      return
+    }
     if (this.localVarIndices.has(atom)) {
       this.emitLoadLocalCheck(this.localVarIndices.get(atom)!, identifier)
       return
@@ -456,6 +855,20 @@ export class Compiler {
     }
   }
 
+  private emitPutVarRef(index: number) {
+    const shortOpcodes = [
+      Opcode.OP_put_var_ref0,
+      Opcode.OP_put_var_ref1,
+      Opcode.OP_put_var_ref2,
+      Opcode.OP_put_var_ref3,
+    ]
+    if (index < shortOpcodes.length) {
+      this.emitOpcode(shortOpcodes[index])
+    } else {
+      this.emitOpcode(Opcode.OP_put_var_ref, [index])
+    }
+  }
+
   private emitLoadLocalCheck(index: number, node?: ts.Node) {
     this.emitOpcode(Opcode.OP_get_loc_check, [index], node)
   }
@@ -480,7 +893,7 @@ export class Compiler {
       if (target === undefined) {
         throw new Error(`Unresolved label ${pending.label}`)
       }
-      const def = this.opcodeInfoByCode.get(pending.opcode)
+  const def = getOpcodeDefinition(pending.opcode)
       if (!def) {
         throw new Error(`Unknown opcode ${pending.opcode}`)
       }
@@ -501,49 +914,129 @@ export class Compiler {
     }
   }
 
-  private declareLexicalVariable(atom: Atom, options: { isConst: boolean; isLet: boolean; capture?: boolean }): number {
+  private declareLexicalVariable(atom: Atom, options: { isConst: boolean; isLet: boolean; capture?: boolean; kind?: VarKind }): number {
     const isCaptured = options.capture !== false
+    const isLexical = options.isConst || options.isLet
+    const declarationKind =
+      options.kind === VarKind.FUNCTION_DECL
+        ? VarDeclarationKind.Function
+        : options.isConst
+          ? VarDeclarationKind.Const
+          : options.isLet
+            ? VarDeclarationKind.Let
+            : VarDeclarationKind.Var
     const variable = new Var(atom, {
       isConst: options.isConst,
-      isLexical: true,
+      isLexical,
       isCaptured,
-      kind: VarKind.NORMAL,
-      scopeLevel: this.scopeManager.currentScope(),
+      kind: options.kind ?? VarKind.NORMAL,
+      declarationKind,
     })
     const varIndex = this.currentFunction.addVar(variable)
+    this.scopeManager.bindVariable(varIndex, atom, declarationKind)
     if (isCaptured) {
-      this.registerClosureVar(atom, varIndex, options)
+      this.registerClosureVar(atom, varIndex, { ...options, kind: variable.kind })
     } else {
       const slot = this.nextLocalSlot++
-      variable.funcPoolIndex = slot
+      variable.localSlot = slot
       this.localVarIndices.set(atom, slot)
     }
     return varIndex
   }
 
-  private bindCurrentScope(index: number) {
-    this.scopeManager.bindVarToCurrentScope(index)
-  }
-
-  private registerClosureVar(atom: Atom, varIndex: number, options: { isConst: boolean; isLet: boolean; capture?: boolean }) {
+  private registerClosureVar(atom: Atom, varIndex: number, options: { isConst: boolean; isLet: boolean; capture?: boolean; kind?: VarKind }) {
     if (this.closureVarIndices.has(atom)) return
     const closureVar = new ClosureVar(atom, {
       isLocal: true,
       isArgument: false,
       isConst: options.isConst,
-      isLexical: true,
-      kind: VarKind.NORMAL,
+      isLexical: options.isConst || options.isLet,
+      kind: options.kind === VarKind.FUNCTION_DECL ? VarKind.NORMAL : options.kind ?? VarKind.NORMAL,
       varIndex,
     })
     const closureIndex = this.currentFunction.bytecode.addClosureVar(closureVar)
     this.closureVarIndices.set(atom, closureIndex)
   }
 
-  private emitStoreToClosure(atom: Atom) {
-    const index = this.closureVarIndices.get(atom)
-    if (index === undefined) {
-      throw new Error('Unknown closure variable')
+  private emitStoreToLexical(atom: Atom) {
+    const slot = this.localVarIndices.get(atom)
+    if (slot !== undefined) {
+      this.emitStoreToLocal(slot)
+      return
     }
+    const closureIndex = this.closureVarIndices.get(atom)
+    if (closureIndex === undefined) {
+      throw new Error('Unknown lexical variable')
+    }
+    this.emitPutVarRef(closureIndex)
+  }
+
+  private emitModulePrologue() {
+    this.withoutDebugRecording(() => {
+      this.emitOpcode(Opcode.OP_push_this)
+      const conditionalOpcode = env.supportsShortOpcodes ? Opcode.OP_if_false8 : Opcode.OP_if_false
+      const skipReturnLabel = this.createLabel()
+      this.emitJump(conditionalOpcode, skipReturnLabel)
+      const returnIndex = this.emitOpcode(Opcode.OP_return_undef)
+      this.moduleHoistInsertionIndex = returnIndex
+      this.markLabel(skipReturnLabel)
+    })
+  }
+
+  private injectModuleHoistedDefinitions(func: FunctionDef) {
+    if (!func.module) {
+      return
+    }
+    const hoisted = this.buildHoistedDefinitionInstructions(func)
+    if (hoisted.length === 0) {
+      return
+    }
+    const insertionIndex = func === this.currentFunction && this.moduleHoistInsertionIndex !== null ? this.moduleHoistInsertionIndex : 0
+    this.insertInstructions(func, insertionIndex, hoisted)
+    if (func === this.currentFunction) {
+      this.moduleHoistInsertionIndex = null
+    }
+  }
+
+  private buildHoistedDefinitionInstructions(func: FunctionDef): Instruction[] {
+    const instructions: Instruction[] = []
+
+    for (let index = 0; index < func.args.length; index++) {
+      const arg = func.args[index]
+      if (arg.funcPoolIndex >= 0) {
+        instructions.push(this.buildFclosureInstruction(arg.funcPoolIndex))
+        instructions.push({ opcode: Opcode.OP_put_arg, operands: [index] })
+      }
+    }
+
+    const bodyScope = func.bodyScope
+    for (let varIndex = 0; varIndex < func.vars.length; varIndex++) {
+      const variable = func.vars[varIndex]
+      if (variable.funcPoolIndex < 0) {
+        continue
+      }
+      if (bodyScope >= 0 && variable.scopeLevel !== bodyScope) {
+        continue
+      }
+      instructions.push(this.buildFclosureInstruction(variable.funcPoolIndex))
+      if (variable.isCaptured) {
+        const closureIndex = this.closureVarIndices.get(variable.name)
+        if (closureIndex === undefined) {
+          throw new Error(`Hoisted captured variable missing closure index for ${varIndex}`)
+        }
+        instructions.push(this.buildPutClosureInstruction(closureIndex))
+      } else {
+        if (variable.localSlot < 0) {
+          throw new Error(`Hoisted variable missing local slot for index ${varIndex}`)
+        }
+        instructions.push(this.buildStoreToLocalInstruction(variable.localSlot))
+      }
+    }
+
+    return instructions
+  }
+
+  private buildPutClosureInstruction(index: number): Instruction {
     const shortOpcodes = [
       Opcode.OP_put_var_ref0,
       Opcode.OP_put_var_ref1,
@@ -551,40 +1044,148 @@ export class Compiler {
       Opcode.OP_put_var_ref3,
     ]
     if (index < shortOpcodes.length) {
-      this.emitOpcode(shortOpcodes[index])
-    } else {
-      this.emitOpcode(Opcode.OP_put_var_ref, [index])
+      return { opcode: shortOpcodes[index], operands: [] }
+    }
+    return { opcode: Opcode.OP_put_var_ref, operands: [index] }
+  }
+
+  private buildFclosureInstruction(constantIndex: number): Instruction {
+    if (env.supportsShortOpcodes && constantIndex <= 0xff) {
+      return { opcode: Opcode.OP_fclosure8, operands: [constantIndex] }
+    }
+    return { opcode: Opcode.OP_fclosure, operands: [constantIndex] }
+  }
+
+  private buildStoreToLocalInstruction(slot: number): Instruction {
+    switch (slot) {
+      case 0:
+        return { opcode: Opcode.OP_put_loc0, operands: [] }
+      case 1:
+        return { opcode: Opcode.OP_put_loc1, operands: [] }
+      case 2:
+        return { opcode: Opcode.OP_put_loc2, operands: [] }
+      case 3:
+        return { opcode: Opcode.OP_put_loc3, operands: [] }
+      default: {
+        if (env.supportsShortOpcodes && slot <= 0xff) {
+          return { opcode: Opcode.OP_put_loc8, operands: [slot] }
+        }
+        return { opcode: Opcode.OP_put_loc, operands: [slot] }
+      }
     }
   }
 
-  private emitModulePrologue() {
-    this.withoutDebugRecording(() => {
-      this.emitOpcode(Opcode.OP_push_this)
-      const skipReturnLabel = this.createLabel()
-      this.emitJump(Opcode.OP_if_false8, skipReturnLabel)
-      this.emitOpcode(Opcode.OP_return_undef)
-      this.markLabel(skipReturnLabel)
-    })
+  private insertInstructions(func: FunctionDef, index: number, instructions: Instruction[]) {
+    if (instructions.length === 0) {
+      return
+    }
+
+    const bytecode = func.bytecode
+    const delta = instructions.reduce((sum, ins) => sum + this.getInstructionSize(ins), 0)
+    const insertionOffset = this.getInstructionOffset(func, index)
+
+    bytecode.instructions.splice(index, 0, ...instructions)
+
+    if (func === this.currentFunction) {
+      const { offsets, totalSize } = this.recomputeInstructionOffsets(bytecode.instructions)
+      this.instructionOffsets.length = offsets.length
+      for (let i = 0; i < offsets.length; i++) {
+        this.instructionOffsets[i] = offsets[i]
+      }
+      this.currentOffset = totalSize
+
+      for (const pending of this.pendingJumps) {
+        if (pending.index >= index) {
+          pending.index += instructions.length
+        }
+      }
+
+      for (const [label, position] of this.labelPositions) {
+        if (position >= insertionOffset) {
+          this.labelPositions.set(label, position + delta)
+        }
+      }
+    }
+
+    for (const entry of bytecode.lineNumberTable) {
+      if (entry.pc >= insertionOffset) {
+        entry.pc += delta
+      }
+    }
   }
 
-  private emitOpcode(opcode: Opcode, operands: number[] = [], node?: ts.Node | null): number {
-    const def = this.opcodeInfoByCode.get(opcode)
+  private recomputeInstructionOffsets(instructions: Instruction[]): { offsets: number[]; totalSize: number } {
+    const offsets = new Array<number>(instructions.length)
+    let offset = 0
+    for (let i = 0; i < instructions.length; i++) {
+      offsets[i] = offset
+      offset += this.getInstructionSize(instructions[i])
+    }
+    return { offsets, totalSize: offset }
+  }
+
+  private getInstructionOffset(func: FunctionDef, index: number): number {
+    if (func === this.currentFunction && this.instructionOffsets[index] !== undefined) {
+      return this.instructionOffsets[index]
+    }
+    let offset = 0
+    for (let i = 0; i < index && i < func.bytecode.instructions.length; i++) {
+      offset += this.getInstructionSize(func.bytecode.instructions[i])
+    }
+    return offset
+  }
+
+  private getInstructionSize(instruction: Instruction): number {
+    const def = getOpcodeDefinition(instruction.opcode)
+    if (!def) {
+      throw new Error(`Unknown opcode: ${instruction.opcode}`)
+    }
+    return def.size
+  }
+
+  private getNormalizedPosition(pos: number): number {
+    if (pos <= 0) {
+      return 0
+    }
+    if (pos >= this.normalizedPosByPos.length) {
+      return this.normalizedPosByPos[this.normalizedPosByPos.length - 1]
+    }
+    return this.normalizedPosByPos[pos]
+  }
+
+  private emitOpcode(
+    opcode: Opcode,
+    operands: number[] = [],
+    node?: ts.Node | null,
+    debugOptions?: EmitDebugInfoOptions
+  ): number {
+  const def = getOpcodeDefinition(opcode)
     if (!def) {
       throw new Error(`Unknown opcode: ${opcode}`)
     }
 
-  const recordNode = node === null ? null : node ?? this.currentStatementNode ?? this.currentSourceNode
-    if (!this.suppressDebugRecording && recordNode) {
-      const tsSourcePos = recordNode.getStart(this.sourceFile, false)
-      if (tsSourcePos >= 0) {
+    const recordNode = node === null ? null : node ?? this.currentStatementNode ?? this.currentSourceNode
+    if (!this.suppressDebugRecording && (recordNode || debugOptions?.tsSourcePos !== undefined)) {
+      let tsSourcePos = debugOptions?.tsSourcePos
+      if (tsSourcePos === undefined && recordNode) {
+        tsSourcePos = recordNode.getStart(this.sourceFile, false)
+      }
+      if (tsSourcePos !== undefined && tsSourcePos >= 0) {
         const sourcePos = this.toUtf8Offset(tsSourcePos)
-        const isStatementRecord = node === undefined && recordNode === this.currentStatementNode
+        const isStatementRecord = debugOptions?.tsSourcePos === undefined && node === undefined && recordNode === this.currentStatementNode
         if (!isStatementRecord || !this.recordedStatementPositions.has(sourcePos)) {
           if (isStatementRecord) {
             this.recordedStatementPositions.add(sourcePos)
           }
           const { line, column } = this.getLineColumnFromUtf8Offset(sourcePos)
           this.currentFunction.bytecode.recordLineNumber(this.currentOffset, line, column, sourcePos)
+          if (!isStatementRecord && this.currentStatementNode) {
+            const statementStart = this.currentStatementNode.getStart(this.sourceFile, false)
+            if (statementStart >= 0) {
+              const statementPos = this.toUtf8Offset(statementStart)
+              this.recordedStatementPositions.add(statementPos)
+            }
+          }
         }
       }
     }
@@ -608,7 +1209,7 @@ export class Compiler {
   }
 
   private getStackEffect(opcode: Opcode, operands: number[] = []): { nPop: number; nPush: number } {
-    const def = this.opcodeInfoByCode.get(opcode)
+  const def = getOpcodeDefinition(opcode)
     if (!def) {
       throw new Error(`Unknown opcode: ${opcode}`)
     }
@@ -678,7 +1279,7 @@ export class Compiler {
     let bytecodeLength = 0
     for (let i = 0; i < instructions.length; i++) {
       const instruction = instructions[i]
-      const def = this.opcodeInfoByCode.get(instruction.opcode)
+  const def = getOpcodeDefinition(instruction.opcode)
       if (!def) {
         throw new Error(`Unknown opcode: ${instruction.opcode}`)
       }
@@ -754,7 +1355,7 @@ export class Compiler {
         continue
       }
       const instruction = instructions[instructionIndex]
-      const def = this.opcodeInfoByCode.get(instruction.opcode)
+      const def = getOpcodeDefinition(instruction.opcode)
       if (!def) {
         throw new Error(`Unknown opcode: ${instruction.opcode}`)
       }
@@ -885,8 +1486,8 @@ export class Compiler {
     return stackLenMax
   }
 
-  private pushScope() {
-    this.scopeManager.enterScope()
+  private pushScope(kind: ScopeKind = ScopeKind.Block) {
+    this.scopeManager.enterScope(kind)
   }
 
   private popScope() {
@@ -898,8 +1499,30 @@ export class Compiler {
       .filter((entry) => entry.sourcePos >= 0)
       .sort((a, b) => a.pc - b.pc)
 
-    if (entries.length === 0) {
+    if (entries.length === 0 || entries[0].pc !== 0) {
+      entries.unshift({ pc: 0, line: 0, column: 0, sourcePos: 0 })
+    }
+
+    const normalized: typeof entries = []
+    for (const entry of entries) {
+      const previous = normalized[normalized.length - 1]
+      if (previous) {
+        if (entry.pc === previous.pc) {
+          previous.line = entry.line
+          previous.column = entry.column
+          previous.sourcePos = entry.sourcePos
+          continue
+        }
+        if (entry.sourcePos === previous.sourcePos) {
+          continue
+        }
+      }
+      normalized.push({ ...entry })
+    }
+
+    if (normalized.length === 0) {
       func.bytecode.pc2line = []
+      func.bytecode.pc2column = []
       return
     }
 
@@ -914,21 +1537,23 @@ export class Compiler {
     }
 
     const pc2line: number[] = []
+    const pc2column: number[] = []
     if (process.env.DEBUG_PC2LINE === '1') {
-      console.log('pc2line:lineNumberTable', entries.map((entry) => ({ ...entry })))
+      console.log('pc2line:lineNumberTable', normalized.map((entry) => ({ ...entry })))
     }
 
-    const first = entries[0]
+    const first = normalized[0]
     const firstPos = getLineColumn(first.sourcePos)
     pc2line.push(...this.encodeULEB128(firstPos.line))
     pc2line.push(...this.encodeULEB128(firstPos.column))
+    pc2column.push(...this.encodeULEB128(firstPos.column))
 
     let lastPc = first.pc
     let lastLine = firstPos.line
     let lastColumn = firstPos.column
 
-    for (let index = 1; index < entries.length; index++) {
-      const entry = entries[index]
+    for (let index = 1; index < normalized.length; index++) {
+      const entry = normalized[index]
       if (entry.pc < lastPc) {
         continue
       }
@@ -956,6 +1581,7 @@ export class Compiler {
       }
 
       pc2line.push(...this.encodeSLEB128(diffColumn))
+      pc2column.push(...this.encodeSLEB128(diffColumn))
 
       lastPc = entry.pc
       lastLine = current.line
@@ -963,8 +1589,19 @@ export class Compiler {
     }
 
     func.bytecode.pc2line = pc2line
+    func.bytecode.pc2column = pc2column
     func.bytecode.source = ''
     func.bytecode.sourceLength = 0
+  }
+
+  private finalizeFunction(func: FunctionDef) {
+    const lexicalVars = func.vars.filter((variable) => !variable.isCaptured)
+    func.bytecode.setVarDefs(lexicalVars)
+    func.bytecode.setArgDefs(func.args)
+    func.bytecode.stackSize = this.computeStackSize(func.bytecode)
+    this.buildDebugInfo(func)
+    func.bytecode.argCount = func.args.length
+    func.bytecode.definedArgCount = func.definedArgCount
   }
 
   private encodeULEB128(value: number): number[] {
@@ -983,20 +1620,236 @@ export class Compiler {
 
   private encodeSLEB128(value: number): number[] {
     const result: number[] = []
-    let v = value | 0
-    let more = true
-    while (more) {
-      let byte = v & 0x7f
-      v >>= 7
-      const signBit = byte & 0x40
-      if ((v === 0 && signBit === 0) || (v === -1 && signBit !== 0)) {
-        more = false
-      } else {
+    const v = value | 0
+    let zigzag = ((v << 1) ^ (v >> 31)) >>> 0
+    do {
+      let byte = zigzag & 0x7f
+      zigzag >>>= 7
+      if (zigzag !== 0) {
         byte |= 0x80
       }
-      result.push(byte & 0xff)
-    }
+      result.push(byte)
+    } while (zigzag !== 0)
     return result
+  }
+
+  private getPropertyAccessOperatorPos(node: ts.PropertyAccessExpression): number | undefined {
+    const nameStart = node.name.getStart(this.sourceFile, false)
+    let pos = this.skipTriviaForward(node.expression.getEnd())
+    if (pos >= nameStart) {
+      pos = nameStart - 1
+    }
+    while (pos >= 0 && pos < nameStart) {
+      const code = this.sourceCode.charCodeAt(pos)
+      if (code === 0x2e) {
+        return pos
+      }
+      if (code === 0x3f && pos + 1 < nameStart && this.sourceCode.charCodeAt(pos + 1) === 0x2e) {
+        return pos + 1
+      }
+      if (!this.isWhitespaceChar(code)) {
+        break
+      }
+      pos += 1
+    }
+    return undefined
+  }
+
+  private getCallExpressionOpenParenPos(node: ts.CallExpression): number | undefined {
+    let pos = node.expression.getEnd()
+    if (node.typeArguments && node.typeArguments.length > 0) {
+      pos = node.typeArguments.end
+    }
+    while (pos < this.sourceCode.length) {
+      pos = this.skipTriviaForward(pos)
+      if (pos >= this.sourceCode.length) {
+        break
+      }
+      const code = this.sourceCode.charCodeAt(pos)
+      if (code === 0x28) {
+        return pos
+      }
+      if (code === 0x3c) {
+        pos = this.skipTypeArgumentSequence(pos)
+        continue
+      }
+      break
+    }
+    return undefined
+  }
+
+  private skipTriviaForward(pos: number): number {
+    let current = pos
+    while (current < this.sourceCode.length) {
+      const code = this.sourceCode.charCodeAt(current)
+      if (this.isWhitespaceChar(code)) {
+        current += 1
+        continue
+      }
+      if (code === 0x2f && current + 1 < this.sourceCode.length) {
+        const next = this.sourceCode.charCodeAt(current + 1)
+        if (next === 0x2f) {
+          current = this.skipLineComment(current + 2)
+          continue
+        }
+        if (next === 0x2a) {
+          current = this.skipBlockComment(current + 2)
+          continue
+        }
+      }
+      break
+    }
+    return current
+  }
+
+  private skipLineComment(pos: number): number {
+    let current = pos
+    while (current < this.sourceCode.length) {
+      const code = this.sourceCode.charCodeAt(current)
+      if (this.isLineTerminator(code)) {
+        return current
+      }
+      current += 1
+    }
+    return current
+  }
+
+  private skipBlockComment(pos: number): number {
+    let current = pos
+    while (current < this.sourceCode.length) {
+      const code = this.sourceCode.charCodeAt(current)
+      if (code === 0x2a && current + 1 < this.sourceCode.length && this.sourceCode.charCodeAt(current + 1) === 0x2f) {
+        return current + 2
+      }
+      current += 1
+    }
+    return current
+  }
+
+  private skipTypeArgumentSequence(pos: number): number {
+    let current = pos
+    let depth = 0
+    while (current < this.sourceCode.length) {
+      const code = this.sourceCode.charCodeAt(current)
+      if (code === 0x3c) {
+        depth += 1
+      } else if (code === 0x3e) {
+        depth -= 1
+        current += 1
+        if (depth <= 0) {
+          return current
+        }
+        continue
+      } else if (code === 0x27 || code === 0x22) {
+        current = this.skipStringLiteral(current)
+        continue
+      } else if (code === 0x2f && current + 1 < this.sourceCode.length) {
+        const next = this.sourceCode.charCodeAt(current + 1)
+        if (next === 0x2f) {
+          current = this.skipLineComment(current + 2)
+          continue
+        }
+        if (next === 0x2a) {
+          current = this.skipBlockComment(current + 2)
+          continue
+        }
+      }
+      current += 1
+    }
+    return current
+  }
+
+  private skipStringLiteral(pos: number): number {
+    const quote = this.sourceCode.charCodeAt(pos)
+    let current = pos + 1
+    while (current < this.sourceCode.length) {
+      const code = this.sourceCode.charCodeAt(current)
+      if (code === quote) {
+        return current + 1
+      }
+      if (code === 0x5c) {
+        current += 2
+        continue
+      }
+      current += 1
+    }
+    return current
+  }
+
+  private isWhitespaceChar(code: number): boolean {
+    return code === 0x20 || code === 0x09 || code === 0x0b || code === 0x0c || code === 0x0d || code === 0x0a
+  }
+
+  private isLineTerminator(code: number): boolean {
+    return code === 0x0a || code === 0x0d || code === 0x2028 || code === 0x2029
+  }
+
+  private collectStripSegments(source: string, pattern: RegExp, segments: Array<{ start: number; end: number }>) {
+    pattern.lastIndex = 0
+    for (const match of source.matchAll(pattern)) {
+      const index = match.index ?? 0
+      const text = match[0]
+      if (!text) continue
+      segments.push({ start: index, end: index + text.length })
+    }
+  }
+
+  private computeDebugSourceMapping(source: string): { strippedSource: string; normalizedPosByPos: Uint32Array } {
+    const segments: Array<{ start: number; end: number }> = []
+    this.collectStripSegments(source, /:\s*[^=;,)]+(?=[=;,)])/g, segments)
+    this.collectStripSegments(source, /<\s*[^>]+\s*>/g, segments)
+    this.collectStripSegments(source, /\b(interface|type)\s+\w+\s*=\s*[^;]+;?/g, segments)
+    this.collectStripSegments(source, /\s+as\s+const\b/g, segments)
+
+    segments.sort((a, b) => a.start - b.start)
+
+    const merged: Array<{ start: number; end: number }> = []
+    for (const segment of segments) {
+      const start = Math.max(0, Math.min(segment.start, source.length))
+      const end = Math.max(start, Math.min(segment.end, source.length))
+      if (start === end) {
+        continue
+      }
+      const last = merged[merged.length - 1]
+      if (last && start <= last.end) {
+        if (end > last.end) {
+          last.end = end
+        }
+        continue
+      }
+      merged.push({ start, end })
+    }
+
+    const normalizedPosByPos = new Uint32Array(source.length + 1)
+    const builder: string[] = []
+    let removedSoFar = 0
+    let segmentIndex = 0
+    let current = merged[segmentIndex]
+
+    for (let pos = 0; pos <= source.length; pos++) {
+      while (current && pos >= current.end) {
+        removedSoFar += current.end - current.start
+        segmentIndex += 1
+        current = merged[segmentIndex]
+      }
+
+      if (current && pos >= current.start) {
+        normalizedPosByPos[pos] = current.start - removedSoFar
+      } else {
+        normalizedPosByPos[pos] = pos - removedSoFar
+      }
+
+      if (pos === source.length) {
+        break
+      }
+
+      if (!(current && pos >= current.start && pos < current.end)) {
+        builder.push(source.charAt(pos))
+      }
+    }
+
+    const strippedSource = builder.join('')
+    return { strippedSource, normalizedPosByPos }
   }
 
   private withoutDebugRecording<T>(fn: () => T): T {
@@ -1010,13 +1863,14 @@ export class Compiler {
   }
 
   private toUtf8Offset(pos: number): number {
-    if (pos <= 0) {
+    const normalizedPos = this.getNormalizedPosition(pos)
+    if (normalizedPos <= 0) {
       return 0
     }
-    if (pos >= this.utf8OffsetByPos.length) {
+    if (normalizedPos >= this.utf8OffsetByPos.length) {
       return this.utf8OffsetByPos[this.utf8OffsetByPos.length - 1]
     }
-    return this.utf8OffsetByPos[pos]
+    return this.utf8OffsetByPos[normalizedPos]
   }
 
   private getLineColumnFromUtf8Offset(offset: number): { line: number; column: number } {

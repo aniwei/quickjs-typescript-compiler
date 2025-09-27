@@ -1,4 +1,4 @@
-import { Atom } from './atoms';
+import { Atom } from './atoms'
 
 export enum VarKind {
   NORMAL = 0,
@@ -13,67 +13,82 @@ export enum VarKind {
   PRIVATE_GETTER_SETTER = 9,
 }
 
+export enum VarDeclarationKind {
+  Var = 'var',
+  Let = 'let',
+  Const = 'const',
+  Function = 'function',
+  Parameter = 'parameter',
+  Catch = 'catch',
+}
+
 export interface VarOptions {
-  scopeLevel?: number;
-  scopeNext?: number;
-  isConst?: boolean;
-  isLexical?: boolean;
-  isCaptured?: boolean;
-  isStaticPrivate?: boolean;
-  kind?: VarKind;
-  funcPoolIndex?: number;
+  scopeLevel?: number
+  scopeNext?: number
+  isConst?: boolean
+  isLexical?: boolean
+  isCaptured?: boolean
+  isStaticPrivate?: boolean
+  kind?: VarKind
+  funcPoolIndex?: number
+  localSlot?: number
+  declarationKind?: VarDeclarationKind
 }
 
 export class Var {
-  name: Atom;
-  scopeLevel: number;
-  scopeNext: number;
-  isConst: boolean;
-  isLexical: boolean;
-  isCaptured: boolean;
-  isStaticPrivate: boolean;
-  kind: VarKind;
-  funcPoolIndex: number;
+  name: Atom
+  scopeLevel: number
+  scopeNext: number
+  isConst: boolean
+  isLexical: boolean
+  isCaptured: boolean
+  isStaticPrivate: boolean
+  kind: VarKind
+  funcPoolIndex: number
+  localSlot: number
+  declarationKind: VarDeclarationKind
 
   constructor(name: Atom, options: VarOptions = {}) {
-    this.name = name;
-    this.scopeLevel = options.scopeLevel ?? 0;
-    this.scopeNext = options.scopeNext ?? -1;
-    this.isConst = options.isConst ?? false;
-    this.isLexical = options.isLexical ?? false;
-    this.isCaptured = options.isCaptured ?? false;
-    this.isStaticPrivate = options.isStaticPrivate ?? false;
-    this.kind = options.kind ?? VarKind.NORMAL;
-    this.funcPoolIndex = options.funcPoolIndex ?? -1;
+    this.name = name
+  this.scopeLevel = options.scopeLevel ?? -1
+    this.scopeNext = options.scopeNext ?? -1
+    this.isConst = options.isConst ?? false
+    this.isLexical = options.isLexical ?? false
+    this.isCaptured = options.isCaptured ?? false
+    this.isStaticPrivate = options.isStaticPrivate ?? false
+    this.kind = options.kind ?? VarKind.NORMAL
+    this.funcPoolIndex = options.funcPoolIndex ?? -1
+    this.localSlot = options.localSlot ?? -1
+    this.declarationKind = options.declarationKind ?? VarDeclarationKind.Var
   }
 }
 
 export interface ClosureVarOptions {
-  isLocal?: boolean;
-  isArgument?: boolean;
-  isConst?: boolean;
-  isLexical?: boolean;
-  kind?: VarKind;
-  varIndex?: number;
+  isLocal?: boolean
+  isArgument?: boolean
+  isConst?: boolean
+  isLexical?: boolean
+  kind?: VarKind
+  varIndex?: number
 }
 
 export class ClosureVar {
-  name: Atom;
-  isLocal: boolean;
-  isArgument: boolean;
-  isConst: boolean;
-  isLexical: boolean;
-  kind: VarKind;
-  varIndex: number;
+  name: Atom
+  isLocal: boolean
+  isArgument: boolean
+  isConst: boolean
+  isLexical: boolean
+  kind: VarKind
+  varIndex: number
 
   constructor(name: Atom, options: ClosureVarOptions = {}) {
-    this.name = name;
-    this.isLocal = options.isLocal ?? true;
-    this.isArgument = options.isArgument ?? false;
-    this.isConst = options.isConst ?? false;
-    this.isLexical = options.isLexical ?? false;
-    this.kind = options.kind ?? VarKind.NORMAL;
-    this.varIndex = options.varIndex ?? -1;
+    this.name = name
+    this.isLocal = options.isLocal ?? true
+    this.isArgument = options.isArgument ?? false
+    this.isConst = options.isConst ?? false
+    this.isLexical = options.isLexical ?? false
+    this.kind = options.kind ?? VarKind.NORMAL
+    this.varIndex = options.varIndex ?? -1
   }
 }
 

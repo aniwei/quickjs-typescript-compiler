@@ -124,6 +124,9 @@ export class FunctionBytecode {
     }
     const last = this.lineNumberTable[this.lineNumberTable.length - 1];
     if (last) {
+      if (pc < last.pc) {
+        return;
+      }
       if (last.pc === pc) {
         last.line = line;
         last.column = column;

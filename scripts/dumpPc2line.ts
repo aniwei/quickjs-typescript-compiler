@@ -253,18 +253,8 @@ function decodePc2line(buffer: Uint8Array): Pc2LineEntry[] {
     return result >>> 0
   }
   const readSLEB = (): number => {
-    let result = 0
-    let shift = 0
-    let byte: number
-    do {
-      byte = buffer[offset++]
-      result |= (byte & 0x7f) << shift
-      shift += 7
-    } while (byte & 0x80)
-    if (shift < 32 && (byte & 0x40)) {
-      result |= (~0 << shift)
-    }
-    return result | 0
+    const encoded = readULEB()
+    return ((encoded >>> 1) ^ -(encoded & 1)) | 0
   }
 
   const entries: Pc2LineEntry[] = []

@@ -11,10 +11,24 @@ describe('simple-var bytecode alignment', () => {
     const source = await fs.readFile(fixturePath, 'utf-8')
 
     const tsCompiler = new TypeScriptCompiler()
-    const tsBytecode = await tsCompiler.compileSource(source, path.relative(process.cwd(), fixturePath))
+    const moduleFileName = toModuleFileName(path.relative(process.cwd(), fixturePath))
+    const tsBytecode = await tsCompiler.compileSource(source, moduleFileName)
 
-    const quickjsBytecode = await QuickJSLib.compileSource('const x = 1;\n', path.relative(process.cwd(), fixturePath))
+    const quickjsBytecode = await QuickJSLib.compileSource('const x = 1;\n', moduleFileName)
 
     expect(Buffer.from(tsBytecode)).toEqual(Buffer.from(quickjsBytecode))
   })
 })
+
+function toModuleFileName(filePath: string): string {
+  return filePath.replace(/\.(cts|mts|tsx|ts)$/i, (match) => {
+    switch (match.toLowerCase()) {
+      case '.cts':
+        return '.cjs'
+      case '.mts':
+        return '.mjs'
+      default:
+        return '.js'
+    }
+  })
+}

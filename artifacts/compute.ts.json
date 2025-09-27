@@ -68,7 +68,7 @@
       "stackSize": 6,
       "closureVarCount": 1,
       "constantPoolCount": 0,
-      "instructionLength": 42,
+      "instructionLength": 46,
       "varDefs": [
         {
           "name": {
@@ -195,76 +195,75 @@
           "opcode": 57,
           "opcodeName": "OP_get_var",
           "operand": {
-            "type": "atom",
-            "id": 231,
-            "name": "console"
+            "type": "tagged-int",
+            "value": 115
           }
         },
         {
-          "offset": 24,
+          "offset": 26,
           "size": 5,
           "opcode": 67,
           "opcodeName": "OP_get_field2",
           "operand": {
             "type": "atom",
-            "id": 232,
-            "name": "log"
+            "id": 116,
+            "name": "this_active_func"
           }
         },
         {
-          "offset": 27,
+          "offset": 31,
           "size": 3,
           "opcode": 100,
           "opcodeName": "OP_get_loc_check",
           "operand": 0
         },
         {
-          "offset": 30,
+          "offset": 34,
           "size": 3,
           "opcode": 36,
           "opcodeName": "OP_call_method",
           "operand": 1
         },
         {
-          "offset": 33,
+          "offset": 37,
           "size": 1,
           "opcode": 14,
           "opcodeName": "OP_drop"
         },
         {
-          "offset": 34,
+          "offset": 38,
           "size": 2,
           "opcode": 130,
           "opcodeName": "OP_for_of_next",
           "operand": 0
         },
         {
-          "offset": 36,
+          "offset": 40,
           "size": 2,
           "opcode": 236,
           "opcodeName": "OP_if_false8",
           "operand": -21
         },
         {
-          "offset": 38,
+          "offset": 42,
           "size": 1,
           "opcode": 14,
           "opcodeName": "OP_drop"
         },
         {
-          "offset": 39,
+          "offset": 43,
           "size": 1,
           "opcode": 134,
           "opcodeName": "OP_iterator_close"
         },
         {
-          "offset": 40,
+          "offset": 44,
           "size": 1,
           "opcode": 6,
           "opcodeName": "OP_undefined"
         },
         {
-          "offset": 41,
+          "offset": 45,
           "size": 1,
           "opcode": 47,
           "opcodeName": "OP_return_async"
@@ -279,34 +278,16 @@
         "pc2line": [
           0,
           0,
-          22,
-          13,
-          7,
-          3,
-          7,
-          3,
-          7,
-          121,
-          17,
-          122,
-          8,
-          122,
-          17,
-          19,
-          17,
-          109,
-          23,
-          2,
+          73,
+          38,
+          38,
+          33,
           27,
-          8,
+          14,
           27,
-          4,
+          10,
           17,
-          116,
-          21,
-          126,
-          31,
-          0
+          1
         ],
         "sourceLength": 0,
         "source": null

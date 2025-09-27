@@ -1,29 +1,12 @@
 import { TextDecoder } from 'node:util'
-import {
-  ATOM_STRINGS,
-  BytecodeTag,
-  env,
-  FunctionKind,
-  JSMode,
-  Opcode,
-  OPCODE_DEFS,
-  OpFormat,
-  type OpcodeDefinition,
-} from './env'
+import { ATOM_STRINGS, BytecodeTag, env, FunctionKind, JSMode, OpFormat } from './env'
 import { VarKind } from './vars'
 import { enumFlagNames, enumName, enumNameOrFallback } from './utils/enum'
+import { getOpcodeDefinition, getOpcodeName } from './utils/opcode'
 
 const BUILTIN_ATOMS = new Map<number, string>(
   Object.entries(ATOM_STRINGS).map(([id, value]) => [Number(id), value])
 )
-
-const opcodeInfoByCode = new Map<number, OpcodeDefinition>()
-for (const [key, def] of Object.entries(OPCODE_DEFS)) {
-  const opcodeValue = (Opcode as unknown as Record<string, number>)[key]
-  if (typeof opcodeValue === 'number') {
-    opcodeInfoByCode.set(opcodeValue, def)
-  }
-}
 
 const utf8Decoder = new TextDecoder()
 
@@ -294,6 +277,16 @@ function getAtomName(atomId: number, customAtoms: Map<number, string>): string |
 
 function readAtomRef(reader: ByteReader, customAtoms: Map<number, string>): AtomRef {
   const encoded = reader.readULEB128()
+  if ((encoded & 1) === 1) {
+    return { type: 'tagged-int', value: encoded >> 1 }
+  }
+  const atomId = encoded >> 1
+  const name = getAtomName(atomId, customAtoms)
+  return { type: 'atom', id: atomId, name }
+}
+
+function readAtomOperandRef(reader: ByteReader, customAtoms: Map<number, string>): AtomRef {
+  const encoded = reader.readU32()
   if ((encoded & 1) === 1) {
     return { type: 'tagged-int', value: encoded >> 1 }
   }
@@ -622,13 +615,13 @@ function parseInstructions(bytes: Uint8Array, customAtoms: Map<number, string>):
   while (!reader.isEOF()) {
     const offset = reader.tell()
     const opcode = reader.readU8()
-    const def = opcodeInfoByCode.get(opcode)
+    const def = getOpcodeDefinition(opcode)
     if (!def) {
       throw new Error(`Unknown opcode encountered: ${opcode}`)
     }
 
-  const operand = readOperandByFormat(reader, def.format, customAtoms)
-  const opcodeName = enumNameOrFallback(Opcode, opcode, def.id ?? `OP_${opcode}`)
+    const operand = readOperandByFormat(reader, def.format, customAtoms)
+    const opcodeName = getOpcodeName(opcode) ?? def.id ?? `OP_${opcode}`
     const instruction: ParsedInstruction = {
       offset,
       size: def.size,
@@ -683,26 +676,26 @@ function readOperandByFormat(
     case OpFormat.label:
       return reader.readInt32()
     case OpFormat.atom:
-      return readAtomRef(reader, customAtoms)
+      return readAtomOperandRef(reader, customAtoms)
     case OpFormat.atom_u8:
       return {
-        atom: readAtomRef(reader, customAtoms),
+        atom: readAtomOperandRef(reader, customAtoms),
         value: reader.readU8(),
       }
     case OpFormat.atom_u16:
       return {
-        atom: readAtomRef(reader, customAtoms),
+        atom: readAtomOperandRef(reader, customAtoms),
         value: reader.readU16(),
       }
     case OpFormat.atom_label_u8:
       return {
-        atom: readAtomRef(reader, customAtoms),
+        atom: readAtomOperandRef(reader, customAtoms),
         label: reader.readU32(),
         delta: reader.readInt8(),
       }
     case OpFormat.atom_label_u16:
       return {
-        atom: readAtomRef(reader, customAtoms),
+        atom: readAtomOperandRef(reader, customAtoms),
         label: reader.readU32(),
         value: reader.readU16(),
       }
