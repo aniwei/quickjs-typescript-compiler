@@ -6,21 +6,24 @@
 - [x] 重构 `BytecodeWriter` 常量池写出逻辑，覆盖基础标量、数组、对象、子函数常量。
 - [x] 补齐模块/函数头、闭包、pc2line、子函数等字段的完整写出逻辑，严格依据 `env.ts` 定义。
 - [x] 编写辅助脚本，将 QuickJS wasm 生成的 `.qbc` 解析成 JSON，便于比对字段差异。
-- [ ] 调整模块函数前言（`push_this`/`if_false8`/`return_undef`）的插入逻辑，与 QuickJS `instantiate_hoisted_definitions` 条件保持一致。
+- [x] 调整模块函数前言（`push_this`/`if_false8`/`return_undef`）的插入逻辑，与 QuickJS `instantiate_hoisted_definitions` 条件保持一致。
 - [x] 在编译阶段实现 `for...of`、数组字面量、属性访问/方法调用的指令序列，先以 `__tests__/compiler/fixtures/compute.ts` 为基准，输出与 QuickJS 字节码逐字节对齐。
 - [x] 提炼复用的枚举值→名称映射工具，避免在 `bytecodeReader` 等模块重复实现。
 - [x] 将 TypeScript 编译器产出的字节码交给 QuickJS wasm 运行，验证运行时行为一致。
 - [x] 将 `disasm.ts` 与调试脚本的 opcode 解析迁移到共享元数据助手，保持所有指令解码逻辑一致。
-- [ ] 丰富 `disasm.ts` 输出：解析常量池、闭包子函数与多函数模块，生成更贴近 QuickJS wasm 的完整报告。
-- [ ] 精读 QuickJS `instantiate_hoisted_definitions`，梳理 hoisted 函数/变量插入的指令序列与短/长跳用法。
+- [x] 丰富 `disasm.ts` 输出：解析常量池、闭包子函数与多函数模块，生成更贴近 QuickJS wasm 的完整报告。
+- [x] 精读 QuickJS `instantiate_hoisted_definitions`，梳理 hoisted 函数/变量插入的指令序列与短/长跳用法。
 - [x] 在 `compiler` 中实现等价的 hoisted 定义注入逻辑，联动 `supportsShortOpcodes` 选择短/长指令。
-- [ ] 覆盖 hoisted 定义在闭包捕获、块级作用域及全局变量上的残余差异，确保与 QuickJS 完全一致。
+- [x] 记录 hoist 行为文档，沉淀 `instantiate_hoisted_definitions` 步骤与指令参数（`docs/hoist-behavior.md`）。
+- [ ] 在编译阶段补足 module/global hoist 元数据（模拟 `global_vars`），生成 `define_func`/`define_var`/`put_var` 流水并处理 `_var_`/`_arg_var_` 闭包。
+- [x] 覆盖 hoisted 定义在闭包捕获、块级作用域及全局变量上的残余差异，确保与 QuickJS 完全一致。
 - [ ] 更新 fixtures 与 `compareWithWasm` 脚本验证，确保新增 hoisted 流水与 QuickJS 字节码完全对齐。
-- [ ] 修复 `QuickJSLib.compileSource` 编译本地 JS 文件时的语法错误，必要时先生成临时 JS 源或改用 `compileSourceWithPath`，确保对齐测试能直接拉起 QuickJS 基准。
+- [ ] 对 `function-add.ts`/`compute.ts` 等基准进行二进制 diff，确认模块 guard 与 hoist 序列 100% 匹配。
 - [ ] 为 hoisted 函数场景补充更复杂的 fixture（多重函数、嵌套捕获等），并纳入 `compareWithWasm` 差异回归。
 
 ## 📌 阶段 2：作用域与符号系统
 - [ ] 扩展 `ScopeManager`/`Var`/`ClosureVar`，支持 `var/let/const`、函数声明/表达式、块级作用域、捕获变量、参数列表等。
+- [x] 引入独立的参数作用域，补充 `ScopeManager` 单元测试验证 `var` 提升与 `let/const` 词法隔离。
 - [ ] 针对 `catch`、`switch`、传统 `for`/`while` 等结构完善作用域划分与变量捕获策略，并补充对应 fixture 校验。
 - [x] 与 QuickJS 的 `JSFunctionDef` 对齐：补齐 `funcKind`、`hasSimpleParameterList`、`newTargetAllowed`、`argumentsAllowed` 等标志位，由 wasm 暴露的枚举生成到 `env.ts`。
 - [ ] 调整变量槽位/闭包索引分配策略，使其与 QuickJS 行为一致。

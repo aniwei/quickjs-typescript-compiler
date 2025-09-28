@@ -73,6 +73,7 @@ export class FunctionDef {
 
   isEval: boolean;
   isFuncExpr: boolean;
+  isGlobalVar = false;
   jsMode = 0;
   funcName: Atom;
 
@@ -87,6 +88,8 @@ export class FunctionDef {
   bodyScope = -1;
 
   globalVarCount = 0;
+  globalVars: GlobalVar[] = [];
+  private readonly globalVarMap = new Map<string, GlobalVar>();
 
   closureVars: ClosureVar[] = [];
 
@@ -139,4 +142,57 @@ export class FunctionDef {
     child.parent = this;
     this.children.push(child);
   }
+
+  addOrUpdateGlobalVar(name: Atom, options: GlobalVarUpdate): GlobalVar {
+    const scopeLevel = options.scopeLevel;
+    const key = `${name}:${scopeLevel}`;
+    let entry = this.globalVarMap.get(key);
+    if (!entry) {
+      entry = {
+        name,
+        scopeLevel,
+        funcPoolIndex: -1,
+        forceInit: false,
+        isLexical: false,
+        isConst: false,
+      };
+      this.globalVars.push(entry);
+      this.globalVarMap.set(key, entry);
+      this.globalVarCount = this.globalVars.length;
+    } else if (scopeLevel !== entry.scopeLevel) {
+      entry.scopeLevel = scopeLevel;
+    }
+
+    if (options.funcPoolIndex !== undefined) {
+      entry.funcPoolIndex = options.funcPoolIndex;
+    }
+    if (options.forceInit !== undefined) {
+      entry.forceInit = entry.forceInit || options.forceInit;
+    }
+    if (options.isLexical !== undefined) {
+      entry.isLexical = options.isLexical;
+    }
+    if (options.isConst !== undefined) {
+      entry.isConst = options.isConst;
+    }
+
+    return entry;
+  }
+}
+
+export interface GlobalVar {
+  name: Atom;
+  scopeLevel: number;
+  funcPoolIndex: number;
+  forceInit: boolean;
+  isLexical: boolean;
+  isConst: boolean;
+}
+
+export interface GlobalVarUpdate {
+  scopeLevel: number;
+  funcPoolIndex?: number;
+  forceInit?: boolean;
+  isLexical?: boolean;
+  isConst?: boolean;
 }

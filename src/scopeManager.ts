@@ -25,6 +25,22 @@ export class ScopeManager {
       this.bindings.set(rootIndex, new Map())
       func.scopeLevel = rootIndex
       func.scopeFirst = rootScope.first
+      if (rootScope.kind === ScopeKind.Function) {
+        const parameterScope = new Scope({
+          parent: rootIndex,
+          kind: ScopeKind.Parameter,
+          isVarScope: false,
+        })
+        const parameterIndex = func.addScope(parameterScope)
+        parameterScope.varParent = this.findVarScope(parameterScope.parent)
+        this.scopeStack.push(parameterIndex)
+        this.bindings.set(parameterIndex, new Map())
+        func.scopeLevel = parameterIndex
+        func.scopeFirst = parameterScope.first
+        if (func.bodyScope === -1) {
+          func.bodyScope = parameterIndex
+        }
+      }
       if (func.bodyScope === -1 && rootScope.kind !== ScopeKind.Module) {
         func.bodyScope = rootIndex
       }
@@ -135,6 +151,13 @@ export class ScopeManager {
     return null
   }
 
+  getBindingInfo(atom: Atom): { scopeIndex: number; scope: Scope; binding: ScopeBinding } | null {
+    const result = this.lookup(atom)
+    if (!result) return null
+    const scope = this.func.scopes[result.scopeIndex]
+    return { scopeIndex: result.scopeIndex, scope, binding: result.binding }
+  }
+
   private ensureBindingMap(scopeIndex: number): Map<Atom, ScopeBinding> {
     let map = this.bindings.get(scopeIndex)
     if (!map) {
@@ -152,8 +175,9 @@ export class ScopeManager {
     switch (kind) {
       case VarDeclarationKind.Var:
       case VarDeclarationKind.Function:
-      case VarDeclarationKind.Parameter:
         return this.findVarScope(currentScopeIndex)
+      case VarDeclarationKind.Parameter:
+        return this.findParameterScope(currentScopeIndex)
       default:
         return currentScopeIndex
     }
@@ -169,5 +193,17 @@ export class ScopeManager {
       index = scope.parent
     }
     return -1
+  }
+
+  private findParameterScope(scopeIndex: number): number {
+    let index = scopeIndex
+    while (index >= 0) {
+      const scope = this.func.scopes[index]
+      if (scope.kind === ScopeKind.Parameter) {
+        return index
+      }
+      index = scope.parent
+    }
+    return this.findVarScope(scopeIndex)
   }
 }

@@ -10,11 +10,11 @@ const BUILTIN_ATOMS = new Map<number, string>(
 
 const utf8Decoder = new TextDecoder()
 
-type AtomRef =
+export type AtomRef =
   | { type: 'atom'; id: number; name: string | null }
   | { type: 'tagged-int'; value: number }
 
-type ParsedTaggedValue = {
+export type ParsedTaggedValue = {
   tag: string
   value?: unknown
 }

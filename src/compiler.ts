@@ -1,6 +1,6 @@
 import path from 'node:path'
 import * as ts from 'typescript'
-import { Atom, AtomTable } from './atoms'
+import { Atom, AtomTable, JSAtom } from './atoms'
 import { FunctionDef, createEmptyModuleRecord } from './functionDef'
 import { FunctionBytecode, type Instruction } from './functionBytecode'
 import { ScopeManager } from './scopeManager'
@@ -8,11 +8,17 @@ import { ScopeKind } from './scopes'
 import { Var, VarKind, ClosureVar, VarDeclarationKind } from './vars'
 import { Opcode, OpFormat, PC2Line, BytecodeTag, FunctionKind, JSMode, env, type OpcodeDefinition } from './env'
 import { getOpcodeDefinition, getOpcodeName } from './utils/opcode'
+import { getIndexedOpcode, getPushIntOpcode } from './utils/opcodeVariants'
 
 const PC2LINE_BASE = PC2Line.PC2LINE_BASE
 const PC2LINE_OP_FIRST = PC2Line.PC2LINE_OP_FIRST
 const PC2LINE_RANGE = PC2Line.PC2LINE_RANGE
 const PC2LINE_DIFF_PC_MAX = PC2Line.PC2LINE_DIFF_PC_MAX
+
+const JS_PROP_CONFIGURABLE = 1 << 0
+const JS_PROP_WRITABLE = 1 << 1
+const DEFINE_GLOBAL_FUNC_VAR = 1 << 6
+const DEFINE_GLOBAL_LEX_VAR = 1 << 7
 
 export interface CompilerOptions {
   atomTable?: AtomTable
@@ -38,6 +44,8 @@ interface FunctionContextSnapshot {
   lineColCache: { offset: number; line: number; column: number }
   recordedStatementPositions: Set<number>
   hasExplicitReturn: boolean
+  moduleHoistInsertionIndex: number | null
+  moduleHoistLabel: string | null
 }
 
 interface EmitDebugInfoOptions {
@@ -76,6 +84,7 @@ export class Compiler {
   private readonly recordedStatementPositions = new Set<number>()
   private hasExplicitReturn = false
   private moduleHoistInsertionIndex: number | null = null
+  private moduleHoistLabel: string | null = null
 
   constructor(private readonly fileName: string, private readonly sourceCode: string, options: CompilerOptions = {}) {
     this.atomTable = options.atomTable ?? new AtomTable()
@@ -129,18 +138,21 @@ export class Compiler {
     this.resetCodegenState()
     const evalAtom = this.atomTable.getAtomId('_eval_')
     const rootFunction = new FunctionDef(evalAtom, this.sourceCode, this.fileName)
+    
+    rootFunction.isGlobalVar = true
     this.currentFunction = rootFunction
     this.scopeManager = new ScopeManager(rootFunction)
 
     const moduleFileName = this.toModuleFileName(path.relative(process.cwd(), this.fileName) || this.fileName)
     this.moduleAtom = this.atomTable.getAtomId(moduleFileName)
+    
     if (!rootFunction.module) {
       rootFunction.module = createEmptyModuleRecord()
     }
     rootFunction.module.moduleName = this.moduleAtom
 
-  rootFunction.bytecode.jsMode = JSMode.JS_MODE_STRICT
-  rootFunction.bytecode.funcKind = FunctionKind.JS_FUNC_ASYNC
+    rootFunction.bytecode.jsMode = JSMode.JS_MODE_STRICT
+    rootFunction.bytecode.funcKind = FunctionKind.JS_FUNC_ASYNC
     rootFunction.bytecode.argumentsAllowed = true
     rootFunction.bytecode.hasSimpleParameterList = false
     rootFunction.bytecode.hasDebug = true
@@ -184,6 +196,7 @@ export class Compiler {
     this.lineColCache = { offset: 0, line: 0, column: 0 }
     this.recordedStatementPositions.clear()
     this.hasExplicitReturn = false
+    this.moduleHoistLabel = null
   }
 
   private toModuleFileName(filePath: string): string {
@@ -223,6 +236,8 @@ export class Compiler {
       lineColCache: { ...this.lineColCache },
       recordedStatementPositions: new Set(this.recordedStatementPositions),
       hasExplicitReturn: this.hasExplicitReturn,
+      moduleHoistInsertionIndex: this.moduleHoistInsertionIndex,
+      moduleHoistLabel: this.moduleHoistLabel,
     }
   }
 
@@ -256,6 +271,8 @@ export class Compiler {
       this.recordedStatementPositions.add(value)
     }
     this.hasExplicitReturn = snapshot.hasExplicitReturn
+    this.moduleHoistInsertionIndex = snapshot.moduleHoistInsertionIndex
+    this.moduleHoistLabel = snapshot.moduleHoistLabel
   }
 
   private restoreMap<K, V>(target: Map<K, V>, source: Map<K, V>) {
@@ -344,7 +361,17 @@ export class Compiler {
           throw new Error(`Missing initializer in const declaration for '${nameText}'`)
         }
 
-        this.declareLexicalVariable(atom, { isConst, isLet })
+        const varIndex = this.declareLexicalVariable(atom, { isConst, isLet })
+        const variable = this.currentFunction.vars[varIndex]
+        if (this.isGlobalVarContext()) {
+          const forceInit = variable.isLexical && !declaration.initializer
+          this.registerGlobalVar(atom, {
+            scopeLevel: variable.scopeLevel,
+            isLexical: variable.isLexical,
+            isConst: variable.isConst,
+            forceInit,
+          })
+        }
 
         if (declaration.initializer) {
           this.compileExpression(declaration.initializer)
@@ -374,12 +401,25 @@ export class Compiler {
       throw new Error(`Identifier '${node.name.text}' has already been declared in this scope`)
     }
 
+    const isModuleTopLevel =
+      this.currentFunction.parent === null &&
+      this.currentFunction.module !== null &&
+      this.scopeManager.currentScope() === this.currentFunction.bodyScope
+
     const varIndex = this.declareLexicalVariable(atom, {
       isConst: false,
       isLet: false,
       kind: VarKind.FUNCTION_DECL,
+      capture: isModuleTopLevel,
     })
     const variable = this.currentFunction.vars[varIndex]
+    if (this.isGlobalVarContext()) {
+      this.registerGlobalVar(atom, {
+        scopeLevel: variable.scopeLevel,
+        isLexical: variable.isLexical,
+        isConst: variable.isConst,
+      })
+    }
 
     const childFunction = this.compileChildFunction(node, atom, { isExpression: false })
     const constantIndex = this.currentFunction.bytecode.addConstant({
@@ -387,11 +427,14 @@ export class Compiler {
       value: childFunction.bytecode,
     })
     variable.funcPoolIndex = constantIndex
-
-    const isModuleTopLevel =
-      this.currentFunction.parent === null &&
-      this.currentFunction.module !== null &&
-      this.scopeManager.currentScope() === this.currentFunction.bodyScope
+    if (this.isGlobalVarContext()) {
+      this.registerGlobalVar(atom, {
+        scopeLevel: variable.scopeLevel,
+        isLexical: variable.isLexical,
+        isConst: variable.isConst,
+        funcPoolIndex: constantIndex,
+      })
+    }
 
     if (isModuleTopLevel) {
       return
@@ -584,23 +627,14 @@ export class Compiler {
 
   private compileNumericLiteral(node: ts.NumericLiteral) {
     const value = Number(node.text)
-    if (Number.isInteger(value) && value >= -1 && value <= 7) {
-      const shortOpcodes = [
-        Opcode.OP_push_minus1,
-        Opcode.OP_push_0,
-        Opcode.OP_push_1,
-        Opcode.OP_push_2,
-        Opcode.OP_push_3,
-        Opcode.OP_push_4,
-        Opcode.OP_push_5,
-        Opcode.OP_push_6,
-        Opcode.OP_push_7,
-      ]
-      const opcode = shortOpcodes[value + 1]
-      this.emitOpcode(opcode)
-    } else {
-      this.emitOpcode(Opcode.OP_push_i32, [value | 0])
+    if (Number.isInteger(value)) {
+      const shortOpcode = getPushIntOpcode(value)
+      if (shortOpcode !== undefined) {
+        this.emitOpcode(shortOpcode)
+        return
+      }
     }
+    this.emitOpcode(Opcode.OP_push_i32, [value | 0])
   }
 
   private compileBlock(node: ts.Block, options: { createScope?: boolean } = {}) {
@@ -772,43 +806,21 @@ export class Compiler {
   }
 
   private emitLoadArgument(index: number, node?: ts.Node) {
-    switch (index) {
-      case 0:
-        this.emitOpcode(Opcode.OP_get_arg0, [], node)
-        return
-      case 1:
-        this.emitOpcode(Opcode.OP_get_arg1, [], node)
-        return
-      case 2:
-        this.emitOpcode(Opcode.OP_get_arg2, [], node)
-        return
-      case 3:
-        this.emitOpcode(Opcode.OP_get_arg3, [], node)
-        return
-      default:
-        this.emitOpcode(Opcode.OP_get_arg, [index], node)
-        return
+    const shortOpcode = getIndexedOpcode('OP_get_arg', index)
+    if (shortOpcode !== undefined) {
+      this.emitOpcode(shortOpcode, [], node)
+      return
     }
+    this.emitOpcode(Opcode.OP_get_arg, [index], node)
   }
 
   private emitStoreArgument(index: number, node?: ts.Node) {
-    switch (index) {
-      case 0:
-        this.emitOpcode(Opcode.OP_put_arg0, [], node)
-        return
-      case 1:
-        this.emitOpcode(Opcode.OP_put_arg1, [], node)
-        return
-      case 2:
-        this.emitOpcode(Opcode.OP_put_arg2, [], node)
-        return
-      case 3:
-        this.emitOpcode(Opcode.OP_put_arg3, [], node)
-        return
-      default:
-        this.emitOpcode(Opcode.OP_put_arg, [index], node)
-        return
+    const shortOpcode = getIndexedOpcode('OP_put_arg', index)
+    if (shortOpcode !== undefined) {
+      this.emitOpcode(shortOpcode, [], node)
+      return
     }
+    this.emitOpcode(Opcode.OP_put_arg, [index], node)
   }
 
   private emitLoadIdentifier(identifier: ts.Identifier) {
@@ -836,37 +848,25 @@ export class Compiler {
   }
 
   private emitStoreToLocal(index: number) {
-    switch (index) {
-      case 0:
-        this.emitOpcode(Opcode.OP_put_loc0)
-        break
-      case 1:
-        this.emitOpcode(Opcode.OP_put_loc1)
-        break
-      case 2:
-        this.emitOpcode(Opcode.OP_put_loc2)
-        break
-      case 3:
-        this.emitOpcode(Opcode.OP_put_loc3)
-        break
-      default:
-        this.emitOpcode(Opcode.OP_put_loc, [index])
-        break
+    const shortOpcode = getIndexedOpcode('OP_put_loc', index)
+    if (shortOpcode !== undefined) {
+      this.emitOpcode(shortOpcode)
+      return
     }
+    if (env.supportsShortOpcodes && index <= 0xff) {
+      this.emitOpcode(Opcode.OP_put_loc8, [index])
+      return
+    }
+    this.emitOpcode(Opcode.OP_put_loc, [index])
   }
 
   private emitPutVarRef(index: number) {
-    const shortOpcodes = [
-      Opcode.OP_put_var_ref0,
-      Opcode.OP_put_var_ref1,
-      Opcode.OP_put_var_ref2,
-      Opcode.OP_put_var_ref3,
-    ]
-    if (index < shortOpcodes.length) {
-      this.emitOpcode(shortOpcodes[index])
-    } else {
-      this.emitOpcode(Opcode.OP_put_var_ref, [index])
+    const shortOpcode = getIndexedOpcode('OP_put_var_ref', index)
+    if (shortOpcode !== undefined) {
+      this.emitOpcode(shortOpcode)
+      return
     }
+    this.emitOpcode(Opcode.OP_put_var_ref, [index])
   }
 
   private emitLoadLocalCheck(index: number, node?: ts.Node) {
@@ -915,7 +915,7 @@ export class Compiler {
   }
 
   private declareLexicalVariable(atom: Atom, options: { isConst: boolean; isLet: boolean; capture?: boolean; kind?: VarKind }): number {
-    const isCaptured = options.capture !== false
+    const isCaptured = options.capture === true
     const isLexical = options.isConst || options.isLet
     const declarationKind =
       options.kind === VarKind.FUNCTION_DECL
@@ -978,8 +978,32 @@ export class Compiler {
       const skipReturnLabel = this.createLabel()
       this.emitJump(conditionalOpcode, skipReturnLabel)
       const returnIndex = this.emitOpcode(Opcode.OP_return_undef)
-      this.moduleHoistInsertionIndex = returnIndex
+      this.moduleHoistInsertionIndex = returnIndex + 1
+      this.moduleHoistLabel = skipReturnLabel
       this.markLabel(skipReturnLabel)
+    })
+  }
+
+  private isGlobalVarContext(): boolean {
+    return this.currentFunction.isGlobalVar
+  }
+
+  private registerGlobalVar(atom: Atom, options: {
+    scopeLevel: number
+    isLexical: boolean
+    isConst: boolean
+    forceInit?: boolean
+    funcPoolIndex?: number
+  }) {
+    if (!this.isGlobalVarContext()) {
+      return
+    }
+    this.currentFunction.addOrUpdateGlobalVar(atom, {
+      scopeLevel: options.scopeLevel,
+      isLexical: options.isLexical,
+      isConst: options.isConst,
+      forceInit: options.forceInit,
+      funcPoolIndex: options.funcPoolIndex,
     })
   }
 
@@ -992,9 +1016,14 @@ export class Compiler {
       return
     }
     const insertionIndex = func === this.currentFunction && this.moduleHoistInsertionIndex !== null ? this.moduleHoistInsertionIndex : 0
+    const insertionOffset = this.getInstructionOffset(func, insertionIndex)
     this.insertInstructions(func, insertionIndex, hoisted)
     if (func === this.currentFunction) {
       this.moduleHoistInsertionIndex = null
+      if (this.moduleHoistLabel) {
+        this.labelPositions.set(this.moduleHoistLabel, insertionOffset)
+        this.moduleHoistLabel = null
+      }
     }
   }
 
@@ -1033,20 +1062,104 @@ export class Compiler {
       }
     }
 
+    instructions.push(...this.buildGlobalHoistInstructions(func))
+
+    return instructions
+  }
+
+  private buildGlobalHoistInstructions(func: FunctionDef): Instruction[] {
+    if (func.globalVars.length === 0) {
+      return []
+    }
+
+    const instructions: Instruction[] = []
+    const closureIndexByAtom = new Map<Atom, number>()
+    for (let index = 0; index < func.bytecode.closureVars.length; index++) {
+      const closureVar = func.bytecode.closureVars[index]
+      closureIndexByAtom.set(closureVar.name, index)
+    }
+
+    const varEnvIndex = closureIndexByAtom.get(JSAtom.JS_ATOM__var_)
+    const argVarEnvIndex = closureIndexByAtom.get(JSAtom.JS_ATOM__arg_var_)
+    const isModule = Boolean(func.module)
+
+    for (const globalVar of func.globalVars) {
+      let hasClosure = 0
+      let closureIndex: number | undefined
+      let envIndex: number | undefined
+      let forceInit = globalVar.forceInit
+
+      if (closureIndexByAtom.has(globalVar.name)) {
+        hasClosure = 2
+        closureIndex = closureIndexByAtom.get(globalVar.name)
+        forceInit = false
+      } else if (varEnvIndex !== undefined) {
+        hasClosure = 1
+        envIndex = varEnvIndex
+        forceInit = true
+      } else if (argVarEnvIndex !== undefined) {
+        hasClosure = 1
+        envIndex = argVarEnvIndex
+        forceInit = true
+      }
+
+      if (hasClosure === 1 && envIndex !== undefined) {
+        instructions.push(this.buildGetVarRefInstruction(envIndex))
+      }
+
+      let flags = isModule ? JS_PROP_CONFIGURABLE : 0
+      if (globalVar.isLexical) {
+        flags |= DEFINE_GLOBAL_LEX_VAR
+        if (!globalVar.isConst) {
+          flags |= JS_PROP_WRITABLE
+        }
+      }
+
+      if (globalVar.funcPoolIndex >= 0 && !globalVar.isLexical) {
+        instructions.push(this.buildFclosureInstruction(globalVar.funcPoolIndex))
+        instructions.push(this.buildDefineFuncInstruction(globalVar.name, flags))
+      } else {
+        instructions.push({ opcode: Opcode.OP_define_var, operands: [globalVar.name, flags] })
+      }
+
+      if (globalVar.funcPoolIndex >= 0 || forceInit) {
+        if (globalVar.funcPoolIndex >= 0) {
+          instructions.push(this.buildFclosureInstruction(globalVar.funcPoolIndex))
+          if (globalVar.name === JSAtom.JS_ATOM__default_) {
+            instructions.push({ opcode: Opcode.OP_set_name, operands: [JSAtom.JS_ATOM_default] })
+          }
+        } else {
+          instructions.push({ opcode: Opcode.OP_undefined, operands: [] })
+        }
+
+        if (hasClosure === 2 && closureIndex !== undefined) {
+          instructions.push(this.buildPutClosureInstruction(closureIndex))
+        } else if (hasClosure === 1) {
+          instructions.push({ opcode: Opcode.OP_define_field, operands: [globalVar.name] })
+          instructions.push({ opcode: Opcode.OP_drop, operands: [] })
+        } else {
+          instructions.push({ opcode: Opcode.OP_put_var, operands: [globalVar.name] })
+        }
+      }
+    }
+
     return instructions
   }
 
   private buildPutClosureInstruction(index: number): Instruction {
-    const shortOpcodes = [
-      Opcode.OP_put_var_ref0,
-      Opcode.OP_put_var_ref1,
-      Opcode.OP_put_var_ref2,
-      Opcode.OP_put_var_ref3,
-    ]
-    if (index < shortOpcodes.length) {
-      return { opcode: shortOpcodes[index], operands: [] }
+    const shortOpcode = getIndexedOpcode('OP_put_var_ref', index)
+    if (shortOpcode !== undefined) {
+      return { opcode: shortOpcode, operands: [] }
     }
     return { opcode: Opcode.OP_put_var_ref, operands: [index] }
+  }
+
+  private buildGetVarRefInstruction(index: number): Instruction {
+    const shortOpcode = getIndexedOpcode('OP_get_var_ref', index)
+    if (shortOpcode !== undefined) {
+      return { opcode: shortOpcode, operands: [] }
+    }
+    return { opcode: Opcode.OP_get_var_ref, operands: [index] }
   }
 
   private buildFclosureInstruction(constantIndex: number): Instruction {
@@ -1056,23 +1169,19 @@ export class Compiler {
     return { opcode: Opcode.OP_fclosure, operands: [constantIndex] }
   }
 
+  private buildDefineFuncInstruction(atom: Atom, flags: number): Instruction {
+    return { opcode: Opcode.OP_define_func, operands: [atom, flags] }
+  }
+
   private buildStoreToLocalInstruction(slot: number): Instruction {
-    switch (slot) {
-      case 0:
-        return { opcode: Opcode.OP_put_loc0, operands: [] }
-      case 1:
-        return { opcode: Opcode.OP_put_loc1, operands: [] }
-      case 2:
-        return { opcode: Opcode.OP_put_loc2, operands: [] }
-      case 3:
-        return { opcode: Opcode.OP_put_loc3, operands: [] }
-      default: {
-        if (env.supportsShortOpcodes && slot <= 0xff) {
-          return { opcode: Opcode.OP_put_loc8, operands: [slot] }
-        }
-        return { opcode: Opcode.OP_put_loc, operands: [slot] }
-      }
+    const shortOpcode = getIndexedOpcode('OP_put_loc', slot)
+    if (shortOpcode !== undefined) {
+      return { opcode: shortOpcode, operands: [] }
     }
+    if (env.supportsShortOpcodes && slot <= 0xff) {
+      return { opcode: Opcode.OP_put_loc8, operands: [slot] }
+    }
+    return { opcode: Opcode.OP_put_loc, operands: [slot] }
   }
 
   private insertInstructions(func: FunctionDef, index: number, instructions: Instruction[]) {
