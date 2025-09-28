@@ -25,7 +25,7 @@ export class ScopeManager {
       this.bindings.set(rootIndex, new Map())
       func.scopeLevel = rootIndex
       func.scopeFirst = rootScope.first
-      if (func.bodyScope === -1) {
+      if (func.bodyScope === -1 && rootScope.kind !== ScopeKind.Module) {
         func.bodyScope = rootIndex
       }
     } else if (func.scopeLevel >= 0) {
@@ -110,7 +110,8 @@ export class ScopeManager {
       return
     }
     arg.declarationKind = VarDeclarationKind.Parameter
-    arg.scopeLevel = targetScopeIndex
+    const varScopeIndex = scope.isVarScope ? scope.varParent : scope.parent
+    arg.scopeLevel = varScopeIndex >= 0 ? varScopeIndex : targetScopeIndex
     arg.scopeNext = 0
     const bindingMap = this.ensureBindingMap(targetScopeIndex)
     bindingMap.set(atom, { kind: VarDeclarationKind.Parameter, index: argIndex })

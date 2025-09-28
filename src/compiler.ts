@@ -1499,7 +1499,7 @@ export class Compiler {
       .filter((entry) => entry.sourcePos >= 0)
       .sort((a, b) => a.pc - b.pc)
 
-    if (entries.length === 0 || entries[0].pc !== 0) {
+    if (entries.length === 0 || entries[0].pc !== 0 || entries[0].line !== 0 || entries[0].column !== 0) {
       entries.unshift({ pc: 0, line: 0, column: 0, sourcePos: 0 })
     }
 
@@ -1507,13 +1507,7 @@ export class Compiler {
     for (const entry of entries) {
       const previous = normalized[normalized.length - 1]
       if (previous) {
-        if (entry.pc === previous.pc) {
-          previous.line = entry.line
-          previous.column = entry.column
-          previous.sourcePos = entry.sourcePos
-          continue
-        }
-        if (entry.sourcePos === previous.sourcePos) {
+        if (entry.sourcePos === previous.sourcePos && entry.pc === previous.pc) {
           continue
         }
       }
@@ -1562,7 +1556,7 @@ export class Compiler {
       const diffLine = current.line - lastLine
       const diffColumn = current.column - lastColumn
 
-      if (diffPc === 0 && diffLine === 0 && diffColumn === 0) {
+      if (diffLine === 0 && diffColumn === 0) {
         continue
       }
 
