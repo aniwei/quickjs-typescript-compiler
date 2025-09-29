@@ -12,6 +12,7 @@
     "eval": "tsx scripts/eval.ts",
     "dump": "tsx scripts/dump.ts",
     "compare": "tsx scripts/compareWithWasm.ts",
+    "compare:fixtures": "tsx scripts/compareAllFixtures.ts",
     "parse-bytecode": "tsx scripts/parseBytecode.ts",
     "test": "npm run gen:env && jest"
   },

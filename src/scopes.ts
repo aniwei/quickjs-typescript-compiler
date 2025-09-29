@@ -3,6 +3,7 @@ export enum ScopeKind {
   Function = 'function',
   Block = 'block',
   Catch = 'catch',
+  Switch = 'switch',
   Parameter = 'parameter',
 }
 

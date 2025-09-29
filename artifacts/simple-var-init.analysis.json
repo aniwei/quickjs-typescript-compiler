@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-09-27T06:56:11.766Z",
-  "inputFile": "__tests__/compiler/fixtures/simple-var-init.ts",
+  "timestamp": "2025-09-29T07:45:00.240Z",
+  "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/simple-var-init.ts",
   "compilation": {
     "typescript": {
       "size": 91,

@@ -41,7 +41,7 @@ interface FunctionContextSnapshot {
   labelCounter: number
   labelPositions: Map<string, number>
   pendingJumps: Array<{ index: number; label: string; opcode: Opcode }>
-  lineColCache: { offset: number; line: number; column: number }
+  lineColCache: { offset: number; line: number; rawColumn: number }
   recordedStatementPositions: Set<number>
   hasExplicitReturn: boolean
   moduleHoistInsertionIndex: number | null
@@ -80,7 +80,7 @@ export class Compiler {
   private readonly sourceUtf8: Uint8Array
   private readonly utf8OffsetByPos: Uint32Array
   private readonly normalizedPosByPos: Uint32Array
-  private lineColCache = { offset: 0, line: 0, column: 0 }
+  private lineColCache = { offset: 0, line: 0, rawColumn: 0 }
   private readonly recordedStatementPositions = new Set<number>()
   private hasExplicitReturn = false
   private moduleHoistInsertionIndex: number | null = null
@@ -193,7 +193,7 @@ export class Compiler {
     this.pendingJumps.length = 0
     this.currentSourceNode = null
     this.currentStatementNode = null
-    this.lineColCache = { offset: 0, line: 0, column: 0 }
+    this.lineColCache = { offset: 0, line: 0, rawColumn: 0 }
     this.recordedStatementPositions.clear()
     this.hasExplicitReturn = false
     this.moduleHoistLabel = null
@@ -343,48 +343,76 @@ export class Compiler {
     const flags = node.declarationList.flags
     const isConst = (flags & ts.NodeFlags.Const) !== 0
     const isLet = (flags & ts.NodeFlags.Let) !== 0
+    const isModuleTopLevel =
+      this.currentFunction.parent === null &&
+      this.currentFunction.module !== null &&
+      this.scopeManager.currentScope() === this.currentFunction.bodyScope
 
     for (const declaration of node.declarationList.declarations) {
-      this.withSourceNode(declaration, () => {
-        if (!ts.isIdentifier(declaration.name)) {
-          throw new Error('Destructuring is not supported yet')
-        }
+      const compileDeclaration = () => {
+        this.withSourceNode(declaration, () => {
+          if (!ts.isIdentifier(declaration.name)) {
+            throw new Error('Destructuring is not supported yet')
+          }
 
-        const nameText = declaration.name.text
-        const atom = this.atomTable.getAtomId(nameText)
+          const nameText = declaration.name.text
+          const atom = this.atomTable.getAtomId(nameText)
 
-        if ((isConst || isLet) && this.scopeManager.hasBindingInCurrentScope(atom)) {
-          throw new Error(`Identifier '${nameText}' has already been declared in this scope`)
-        }
+          if ((isConst || isLet) && this.scopeManager.hasBindingInCurrentScope(atom)) {
+            throw new Error(`Identifier '${nameText}' has already been declared in this scope`)
+          }
 
-        if (isConst && !declaration.initializer) {
-          throw new Error(`Missing initializer in const declaration for '${nameText}'`)
-        }
+          if (isConst && !declaration.initializer) {
+            throw new Error(`Missing initializer in const declaration for '${nameText}'`)
+          }
 
-        const varIndex = this.declareLexicalVariable(atom, { isConst, isLet })
-        const variable = this.currentFunction.vars[varIndex]
-        if (this.isGlobalVarContext()) {
-          const forceInit = variable.isLexical && !declaration.initializer
-          this.registerGlobalVar(atom, {
-            scopeLevel: variable.scopeLevel,
-            isLexical: variable.isLexical,
-            isConst: variable.isConst,
-            forceInit,
-          })
-        }
+          const capture = isModuleTopLevel
+          const varIndex = this.declareLexicalVariable(atom, { isConst, isLet, capture })
+          const variable = this.currentFunction.vars[varIndex]
+          if (this.isGlobalVarContext()) {
+            const forceInit = variable.isLexical && !declaration.initializer
+            this.registerGlobalVar(atom, {
+              scopeLevel: variable.scopeLevel,
+              isLexical: variable.isLexical,
+              isConst: variable.isConst,
+              forceInit,
+            })
+          }
 
-        if (declaration.initializer) {
-          this.compileExpression(declaration.initializer)
-          this.emitStoreToLexical(atom)
-          return
-        }
+          const suppressInitializerDebug =
+            isModuleTopLevel && this.shouldSuppressTopLevelInitializerDebug(declaration.initializer)
 
-        if (isConst || isLet) {
-          // Lexical declarations without initializer are initialized to undefined
-          this.emitOpcode(Opcode.OP_undefined)
-          this.emitStoreToLexical(atom)
-        }
-      })
+          if (declaration.initializer) {
+            const emitInitializer = () => {
+              this.compileExpression(declaration.initializer!)
+              this.emitStoreToLexical(atom)
+            }
+
+            if (suppressInitializerDebug) {
+              this.withoutDebugRecording(emitInitializer)
+            } else {
+              emitInitializer()
+            }
+            return
+          }
+
+          if (isConst || isLet) {
+            const emitDefaultInitializer = () => {
+              // Lexical declarations without initializer are initialized to undefined
+              this.emitOpcode(Opcode.OP_undefined)
+              this.emitStoreToLexical(atom)
+            }
+
+            if (isModuleTopLevel) {
+              this.withoutDebugRecording(emitDefaultInitializer)
+            } else {
+              emitDefaultInitializer()
+            }
+          }
+        })
+      }
+
+      compileDeclaration()
     }
   }
 
@@ -408,7 +436,7 @@ export class Compiler {
 
     const varIndex = this.declareLexicalVariable(atom, {
       isConst: false,
-      isLet: false,
+      isLet: isModuleTopLevel,
       kind: VarKind.FUNCTION_DECL,
       capture: isModuleTopLevel,
     })
@@ -492,7 +520,10 @@ export class Compiler {
     this.currentFunction = childFunction
     this.scopeManager = new ScopeManager(childFunction)
 
-  this.pushScope(ScopeKind.Function)
+    const startLineColumn = this.getLineColumnFromUtf8Offset(childFunction.sourcePos)
+    this.currentFunction.bytecode.recordLineNumber(0, startLineColumn.line, startLineColumn.column, childFunction.sourcePos)
+
+    this.pushScope(ScopeKind.Function)
 
     childFunction.definedArgCount = node.parameters.length
     for (let index = 0; index < node.parameters.length; index++) {
@@ -508,8 +539,7 @@ export class Compiler {
     }
 
     if (!this.hasExplicitReturn) {
-      this.emitOpcode(Opcode.OP_undefined)
-      this.emitReturnOpcode()
+      this.emitVoidReturnOpcode()
     }
 
     this.popScope()
@@ -589,15 +619,20 @@ export class Compiler {
   private compileReturnStatement(node: ts.ReturnStatement) {
     if (node.expression) {
       this.compileExpression(node.expression)
+      this.emitReturnOpcode(node)
     } else {
-      this.emitOpcode(Opcode.OP_undefined)
+      this.emitVoidReturnOpcode(node)
     }
-    this.emitReturnOpcode(node)
     this.hasExplicitReturn = true
   }
 
   private emitReturnOpcode(node?: ts.Node) {
     const opcode = this.getReturnOpcodeForFunction(this.currentFunction.bytecode.funcKind)
+    this.emitOpcode(opcode, [], node)
+  }
+
+  private emitVoidReturnOpcode(node?: ts.Node) {
+    const opcode = this.getVoidReturnOpcodeForFunction(this.currentFunction.bytecode.funcKind)
     this.emitOpcode(opcode, [], node)
   }
 
@@ -611,18 +646,33 @@ export class Compiler {
     }
   }
 
+  private getVoidReturnOpcodeForFunction(funcKind: FunctionKind): Opcode {
+    switch (funcKind) {
+      case FunctionKind.JS_FUNC_ASYNC:
+      case FunctionKind.JS_FUNC_ASYNC_GENERATOR:
+        return Opcode.OP_return_async
+      default:
+        return Opcode.OP_return_undef
+    }
+  }
+
   private compileBinaryExpression(expression: ts.BinaryExpression) {
     const operator = expression.operatorToken.kind
+    let opcode: Opcode | null = null
     switch (operator) {
-      case ts.SyntaxKind.PlusToken: {
-        this.compileExpression(expression.left)
-        this.compileExpression(expression.right)
-        this.emitOpcode(Opcode.OP_add, [], expression.operatorToken)
-        return
-      }
+      case ts.SyntaxKind.PlusToken:
+        opcode = Opcode.OP_add
+        break
+      case ts.SyntaxKind.AsteriskToken:
+        opcode = Opcode.OP_mul
+        break
       default:
         throw new Error(`Unsupported binary operator: ${ts.SyntaxKind[operator]}`)
     }
+
+    this.compileExpression(expression.left)
+    this.compileExpression(expression.right)
+    this.emitOpcode(opcode, [], expression.operatorToken)
   }
 
   private compileNumericLiteral(node: ts.NumericLiteral) {
@@ -631,6 +681,14 @@ export class Compiler {
       const shortOpcode = getPushIntOpcode(value)
       if (shortOpcode !== undefined) {
         this.emitOpcode(shortOpcode)
+        return
+      }
+      if (value >= -0x80 && value <= 0x7f) {
+        this.emitOpcode(Opcode.OP_push_i8, [value])
+        return
+      }
+      if (value >= -0x8000 && value <= 0x7fff) {
+        this.emitOpcode(Opcode.OP_push_i16, [value])
         return
       }
     }
@@ -740,6 +798,11 @@ export class Compiler {
         return
       }
 
+      if (ts.isStringLiteral(expression)) {
+        this.compileStringLiteral(expression)
+        return
+      }
+
       if (ts.isArrayLiteralExpression(expression)) {
         this.compileArrayLiteral(expression)
         return
@@ -766,6 +829,11 @@ export class Compiler {
     }
   }
 
+  private compileStringLiteral(expression: ts.StringLiteral) {
+    const atom = this.atomTable.getAtomId(expression.text)
+    this.emitOpcode(Opcode.OP_push_atom_value, [atom], expression)
+  }
+
   private compileArrayLiteral(expression: ts.ArrayLiteralExpression) {
     const elements = expression.elements
     const values = elements.filter((el) => !ts.isOmittedExpression(el))
@@ -779,30 +847,41 @@ export class Compiler {
   }
 
   private compileCallExpression(expression: ts.CallExpression) {
-    if (!ts.isPropertyAccessExpression(expression.expression)) {
-      throw new Error('Only property access calls are supported for now')
-    }
+    const callee = expression.expression
 
-    const propertyAccess = expression.expression
-    this.withSourceNode(propertyAccess.expression, () => {
-      this.compileExpression(propertyAccess.expression)
-    })
-    const propertyAtom = this.atomTable.getAtomId(propertyAccess.name.text)
-    const propertyOperatorPos = this.getPropertyAccessOperatorPos(propertyAccess)
-    const propertyAccessDebug: EmitDebugInfoOptions | undefined = propertyOperatorPos !== undefined
-      ? { tsSourcePos: propertyOperatorPos }
-      : undefined
-    this.emitOpcode(Opcode.OP_get_field2, [propertyAtom], propertyAccess.name, propertyAccessDebug)
-
-    for (const arg of expression.arguments) {
-      this.withSourceNode(arg, () => this.compileExpression(arg))
-    }
     const callDebugPos = this.getCallExpressionOpenParenPos(expression)
     const callDebug: EmitDebugInfoOptions | undefined = callDebugPos !== undefined
       ? { tsSourcePos: callDebugPos }
       : undefined
 
-    this.emitOpcode(Opcode.OP_call_method, [expression.arguments.length], expression, callDebug)
+    if (ts.isPropertyAccessExpression(callee)) {
+      this.withSourceNode(callee.expression, () => {
+        this.compileExpression(callee.expression)
+      })
+      const propertyAtom = this.atomTable.getAtomId(callee.name.text)
+      const propertyOperatorPos = this.getPropertyAccessOperatorPos(callee)
+      const propertyAccessDebug: EmitDebugInfoOptions | undefined = propertyOperatorPos !== undefined
+        ? { tsSourcePos: propertyOperatorPos }
+        : undefined
+      this.emitOpcode(Opcode.OP_get_field2, [propertyAtom], callee.name, propertyAccessDebug)
+
+      for (const arg of expression.arguments) {
+        this.withSourceNode(arg, () => this.compileExpression(arg))
+      }
+
+      this.emitOpcode(Opcode.OP_call_method, [expression.arguments.length], expression, callDebug)
+      return
+    }
+
+    this.withSourceNode(callee, () => {
+      this.compileExpression(callee)
+    })
+
+    for (const arg of expression.arguments) {
+      this.withSourceNode(arg, () => this.compileExpression(arg))
+    }
+
+    this.emitCall(expression.arguments.length, expression, callDebug)
   }
 
   private emitLoadArgument(index: number, node?: ts.Node) {
@@ -823,6 +902,18 @@ export class Compiler {
     this.emitOpcode(Opcode.OP_put_arg, [index], node)
   }
 
+  private emitCall(argCount: number, node?: ts.Node, debugOptions?: EmitDebugInfoOptions) {
+    if (argCount < 0) {
+      throw new Error('Call argument count cannot be negative')
+    }
+    if (env.supportsShortOpcodes && argCount <= 3) {
+      const opcode = (Opcode.OP_call0 + argCount) as Opcode
+      this.emitOpcode(opcode, [], node, debugOptions)
+      return
+    }
+    this.emitOpcode(Opcode.OP_call, [argCount], node, debugOptions)
+  }
+
   private emitLoadIdentifier(identifier: ts.Identifier) {
     const atom = this.atomTable.getAtomId(identifier.text)
     if (this.argumentIndices.has(atom)) {
@@ -835,7 +926,18 @@ export class Compiler {
     }
     if (this.closureVarIndices.has(atom)) {
       const index = this.closureVarIndices.get(atom)!
-      this.emitOpcode(Opcode.OP_get_var_ref_check, [index], identifier)
+      const closureVar = this.currentFunction.bytecode.closureVars[index]
+      const isLexicalClosure = closureVar?.isLexical ?? true
+      if (isLexicalClosure) {
+        this.emitOpcode(Opcode.OP_get_var_ref_check, [index], identifier)
+        return
+      }
+      const shortOpcode = getIndexedOpcode('OP_get_var_ref', index)
+      if (shortOpcode !== undefined) {
+        this.emitOpcode(shortOpcode, [], identifier)
+        return
+      }
+      this.emitOpcode(Opcode.OP_get_var_ref, [index], identifier)
       return
     }
     this.emitOpcode(Opcode.OP_get_var, [atom], identifier)
@@ -946,12 +1048,13 @@ export class Compiler {
 
   private registerClosureVar(atom: Atom, varIndex: number, options: { isConst: boolean; isLet: boolean; capture?: boolean; kind?: VarKind }) {
     if (this.closureVarIndices.has(atom)) return
+    const isFunctionDeclaration = options.kind === VarKind.FUNCTION_DECL
     const closureVar = new ClosureVar(atom, {
       isLocal: true,
       isArgument: false,
       isConst: options.isConst,
-      isLexical: options.isConst || options.isLet,
-      kind: options.kind === VarKind.FUNCTION_DECL ? VarKind.NORMAL : options.kind ?? VarKind.NORMAL,
+      isLexical: isFunctionDeclaration ? false : options.isConst || options.isLet,
+      kind: isFunctionDeclaration ? VarKind.NORMAL : options.kind ?? VarKind.NORMAL,
       varIndex,
     })
     const closureIndex = this.currentFunction.bytecode.addClosureVar(closureVar)
@@ -978,7 +1081,7 @@ export class Compiler {
       const skipReturnLabel = this.createLabel()
       this.emitJump(conditionalOpcode, skipReturnLabel)
       const returnIndex = this.emitOpcode(Opcode.OP_return_undef)
-      this.moduleHoistInsertionIndex = returnIndex + 1
+      this.moduleHoistInsertionIndex = returnIndex
       this.moduleHoistLabel = skipReturnLabel
       this.markLabel(skipReturnLabel)
     })
@@ -1021,7 +1124,6 @@ export class Compiler {
     if (func === this.currentFunction) {
       this.moduleHoistInsertionIndex = null
       if (this.moduleHoistLabel) {
-        this.labelPositions.set(this.moduleHoistLabel, insertionOffset)
         this.moduleHoistLabel = null
       }
     }
@@ -1115,11 +1217,21 @@ export class Compiler {
         }
       }
 
-      if (globalVar.funcPoolIndex >= 0 && !globalVar.isLexical) {
-        instructions.push(this.buildFclosureInstruction(globalVar.funcPoolIndex))
-        instructions.push(this.buildDefineFuncInstruction(globalVar.name, flags))
-      } else {
-        instructions.push({ opcode: Opcode.OP_define_var, operands: [globalVar.name, flags] })
+      if (globalVar.isLexical && hasClosure === 2 && closureIndex !== undefined) {
+        // Lexical bindings captured in the module scope are handled via closure hoisting.
+        // QuickJS does not emit additional global definitions for these entries.
+        continue
+      }
+
+      const skipGlobalDefine = hasClosure === 2 && closureIndex !== undefined
+
+      if (!skipGlobalDefine) {
+        if (globalVar.funcPoolIndex >= 0 && !globalVar.isLexical) {
+          instructions.push(this.buildFclosureInstruction(globalVar.funcPoolIndex))
+          instructions.push(this.buildDefineFuncInstruction(globalVar.name, flags))
+        } else {
+          instructions.push({ opcode: Opcode.OP_define_var, operands: [globalVar.name, flags] })
+        }
       }
 
       if (globalVar.funcPoolIndex >= 0 || forceInit) {
@@ -1608,7 +1720,8 @@ export class Compiler {
       .filter((entry) => entry.sourcePos >= 0)
       .sort((a, b) => a.pc - b.pc)
 
-    if (entries.length === 0 || entries[0].pc !== 0 || entries[0].line !== 0 || entries[0].column !== 0) {
+    const firstEntry = entries[0]
+    if (!firstEntry || firstEntry.pc !== 0 || firstEntry.sourcePos !== 0) {
       entries.unshift({ pc: 0, line: 0, column: 0, sourcePos: 0 })
     }
 
@@ -1887,26 +2000,106 @@ export class Compiler {
     return code === 0x0a || code === 0x0d || code === 0x2028 || code === 0x2029
   }
 
-  private collectStripSegments(source: string, pattern: RegExp, segments: Array<{ start: number; end: number }>) {
+  private collectStripSegments(
+    source: string,
+    pattern: RegExp,
+    segments: Array<{ start: number; end: number; replacement: string }>,
+    replacement = ''
+  ) {
     pattern.lastIndex = 0
     for (const match of source.matchAll(pattern)) {
       const index = match.index ?? 0
       const text = match[0]
       if (!text) continue
-      segments.push({ start: index, end: index + text.length })
+      segments.push({ start: index, end: index + text.length, replacement })
     }
   }
 
+  private collectEmptyStatementNewlineSegments(
+    source: string,
+    segments: Array<{ start: number; end: number; replacement: string }>
+  ) {
+    const visit = (node: ts.Node) => {
+      if (ts.isEmptyStatement(node)) {
+        const start = node.getStart(this.sourceFile, false)
+        const end = node.end
+        if (start >= 0 && end > start && end <= source.length) {
+          let cursor = end
+          let hasLineBreak = false
+          while (cursor < source.length) {
+            const code = source.charCodeAt(cursor)
+            if (this.isLineTerminator(code)) {
+              hasLineBreak = true
+              break
+            }
+            if (!this.isWhitespaceChar(code)) {
+              break
+            }
+            cursor += 1
+          }
+          if (!hasLineBreak) {
+            const replacement = `${source.slice(start, end)}\n`
+            segments.push({ start, end, replacement })
+          }
+        }
+      }
+      ts.forEachChild(node, visit)
+    }
+
+    visit(this.sourceFile)
+  }
+
+  private shouldSuppressTopLevelInitializerDebug(initializer?: ts.Expression): boolean {
+    if (!initializer) {
+      return true
+    }
+
+    while (ts.isParenthesizedExpression(initializer)) {
+      initializer = initializer.expression
+    }
+
+    if (ts.isLiteralExpression(initializer)) {
+      return true
+    }
+
+    switch (initializer.kind) {
+      case ts.SyntaxKind.TrueKeyword:
+      case ts.SyntaxKind.FalseKeyword:
+      case ts.SyntaxKind.NullKeyword:
+        return true
+      default:
+        break
+    }
+
+    if (ts.isIdentifier(initializer)) {
+      return true
+    }
+
+    if (ts.isPrefixUnaryExpression(initializer)) {
+      switch (initializer.operator) {
+        case ts.SyntaxKind.PlusToken:
+        case ts.SyntaxKind.MinusToken:
+          return this.shouldSuppressTopLevelInitializerDebug(initializer.operand)
+        default:
+          return false
+      }
+    }
+
+    return false
+  }
+
   private computeDebugSourceMapping(source: string): { strippedSource: string; normalizedPosByPos: Uint32Array } {
-    const segments: Array<{ start: number; end: number }> = []
-    this.collectStripSegments(source, /:\s*[^=;,)]+(?=[=;,)])/g, segments)
+    const segments: Array<{ start: number; end: number; replacement: string }> = []
+    this.collectEmptyStatementNewlineSegments(source, segments)
+    this.collectCollapsedBlankLineSegments(source, segments)
+  this.collectStripSegments(source, /:\s*[^=;,){}\r\n]+(?=[=;,){}])/g, segments, ' ')
     this.collectStripSegments(source, /<\s*[^>]+\s*>/g, segments)
     this.collectStripSegments(source, /\b(interface|type)\s+\w+\s*=\s*[^;]+;?/g, segments)
     this.collectStripSegments(source, /\s+as\s+const\b/g, segments)
 
     segments.sort((a, b) => a.start - b.start)
 
-    const merged: Array<{ start: number; end: number }> = []
+    const merged: Array<{ start: number; end: number; replacement: string }> = []
     for (const segment of segments) {
       const start = Math.max(0, Math.min(segment.start, source.length))
       const end = Math.max(start, Math.min(segment.end, source.length))
@@ -1918,9 +2111,12 @@ export class Compiler {
         if (end > last.end) {
           last.end = end
         }
+        if (!last.replacement && segment.replacement) {
+          last.replacement = segment.replacement
+        }
         continue
       }
-      merged.push({ start, end })
+      merged.push({ start, end, replacement: segment.replacement })
     }
 
     const normalizedPosByPos = new Uint32Array(source.length + 1)
@@ -1931,7 +2127,8 @@ export class Compiler {
 
     for (let pos = 0; pos <= source.length; pos++) {
       while (current && pos >= current.end) {
-        removedSoFar += current.end - current.start
+        const replacementLength = current.replacement.length
+        removedSoFar += (current.end - current.start) - replacementLength
         segmentIndex += 1
         current = merged[segmentIndex]
       }
@@ -1946,6 +2143,10 @@ export class Compiler {
         break
       }
 
+      if (current && pos === current.start && current.replacement.length > 0) {
+        builder.push(current.replacement)
+      }
+
       if (!(current && pos >= current.start && pos < current.end)) {
         builder.push(source.charAt(pos))
       }
@@ -1953,6 +2154,19 @@ export class Compiler {
 
     const strippedSource = builder.join('')
     return { strippedSource, normalizedPosByPos }
+  }
+
+  private collectCollapsedBlankLineSegments(
+    source: string,
+    segments: Array<{ start: number; end: number; replacement: string }>
+  ) {
+    const pattern = /(\r?\n)(?:\s*\r?\n)+/g
+    for (const match of source.matchAll(pattern)) {
+      const index = match.index ?? 0
+      const text = match[0]
+      if (!text) continue
+      segments.push({ start: index, end: index + text.length, replacement: match[1] })
+    }
   }
 
   private withoutDebugRecording<T>(fn: () => T): T {
@@ -1983,7 +2197,7 @@ export class Compiler {
     let column: number
     if (clampedOffset >= cache.offset) {
       line = cache.line
-      column = cache.column
+      column = cache.rawColumn
       for (let i = cache.offset; i < clampedOffset; i++) {
         const byte = this.sourceUtf8[i]
         if (byte === 0x0a) {
@@ -1994,8 +2208,8 @@ export class Compiler {
         }
       }
     } else {
-      line = 0
-      column = 0
+  line = 0
+  column = 0
       for (let i = 0; i < clampedOffset; i++) {
         const byte = this.sourceUtf8[i]
         if (byte === 0x0a) {
@@ -2006,8 +2220,47 @@ export class Compiler {
         }
       }
     }
-    this.lineColCache = { offset: clampedOffset, line, column }
-    return { line, column }
+    const lineStart = this.findLineStartUtf8Offset(clampedOffset)
+    const indentColumns = this.computeIndentColumnsFromUtf8Offset(lineStart)
+    const adjustedColumn = column + indentColumns
+    this.lineColCache = { offset: clampedOffset, line, rawColumn: column }
+    return { line, column: adjustedColumn }
+  }
+
+  private findLineStartUtf8Offset(offset: number): number {
+    let current = offset
+    while (current > 0) {
+      const byte = this.sourceUtf8[current - 1]
+      if (byte === 0x0a) {
+        break
+      }
+      if (byte >= 0x80 && byte < 0xc0) {
+        current -= 1
+        continue
+      }
+      current -= 1
+    }
+    return current
+  }
+
+  private computeIndentColumnsFromUtf8Offset(offset: number): number {
+    let indent = 0
+    for (let index = offset; index < this.sourceUtf8.length; index += 1) {
+      const byte = this.sourceUtf8[index]
+      if (byte === 0x20) {
+        indent += 1
+        continue
+      }
+      if (byte === 0x09) {
+        indent += 1
+        continue
+      }
+      if (byte === 0x0d) {
+        continue
+      }
+      break
+    }
+    return indent
   }
 
   private getUtf8ByteLength(codePoint: number): number {

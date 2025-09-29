@@ -1,7 +1,7 @@
 # 字节码分析报告
 
-**输入文件**: __tests__/compiler/fixtures/console-log.ts
-**生成时间**: 2025-09-27T06:20:44.226Z
+**输入文件**: /Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/console-log.ts
+**生成时间**: 2025-09-29T07:45:00.121Z
 
 ## 大小对比
 

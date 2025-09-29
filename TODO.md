@@ -17,21 +17,27 @@
 - [x] 记录 hoist 行为文档，沉淀 `instantiate_hoisted_definitions` 步骤与指令参数（`docs/hoist-behavior.md`）。
 - [ ] 在编译阶段补足 module/global hoist 元数据（模拟 `global_vars`），生成 `define_func`/`define_var`/`put_var` 流水并处理 `_var_`/`_arg_var_` 闭包。
 - [x] 覆盖 hoisted 定义在闭包捕获、块级作用域及全局变量上的残余差异，确保与 QuickJS 完全一致。
-- [ ] 更新 fixtures 与 `compareWithWasm` 脚本验证，确保新增 hoisted 流水与 QuickJS 字节码完全对齐。
+- [x] 更新 fixtures 与 `compareWithWasm` 脚本验证，确保新增 hoisted 流水与 QuickJS 字节码完全对齐。（新增 `scripts/compareAllFixtures.ts` 批量对比工具，并补充 `pnpm compare:fixtures` 命令）
 - [ ] 对 `function-add.ts`/`compute.ts` 等基准进行二进制 diff，确认模块 guard 与 hoist 序列 100% 匹配。
 - [ ] 为 hoisted 函数场景补充更复杂的 fixture（多重函数、嵌套捕获等），并纳入 `compareWithWasm` 差异回归。
 
 ## 📌 阶段 2：作用域与符号系统
 - [ ] 扩展 `ScopeManager`/`Var`/`ClosureVar`，支持 `var/let/const`、函数声明/表达式、块级作用域、捕获变量、参数列表等。
+	- [x] catch 块作用域与 `var` 提升/`catch` 形参绑定（2025-09-29）
 - [x] 引入独立的参数作用域，补充 `ScopeManager` 单元测试验证 `var` 提升与 `let/const` 词法隔离。
 - [ ] 针对 `catch`、`switch`、传统 `for`/`while` 等结构完善作用域划分与变量捕获策略，并补充对应 fixture 校验。
 - [x] 与 QuickJS 的 `JSFunctionDef` 对齐：补齐 `funcKind`、`hasSimpleParameterList`、`newTargetAllowed`、`argumentsAllowed` 等标志位，由 wasm 暴露的枚举生成到 `env.ts`。
 - [ ] 调整变量槽位/闭包索引分配策略，使其与 QuickJS 行为一致。
+- [ ] 复刻 QuickJS 对未初始化 `const` 的语义（抛错/指令序列），修复 `simple-decl-init.ts` fixture 的差异。
 
 ## 📌 阶段 3：指令生成与控制流
 - [ ] 设计基于 label 的控制流生成器，涵盖 `if/else/while/for/switch`、短路逻辑、break/continue 等。
 - [ ] 为表达式与语句实现 QuickJS 同义的指令序列（算术、比较、调用、对象/数组字面量等）。
 - [ ] 精确维护运行时栈深度，保证 `stackSize` 与 QuickJS 结果一致。
+- [x] 实现乘法 `*` 运算发射，补齐 `complex-functions.ts` fixture 中的 `BinaryExpression` 支持。（2025-09-29）
+- [x] 支持普通字符串字面量常量写出，解决 `custom-atoms.ts` fixture 的报错。（2025-09-29）
+- [ ] 支持普通标识符函数调用与条件判断生成，解除 `complex-functions.ts` “Only property access calls” 限制。
+- [ ] 复盘 `compute.ts` / `simple-array.ts` 的零字节差异，逐条对齐常量池与调试信息。
 
 ## 📌 阶段 4：常量池与原子管理
 - [ ] 在编译流程中引入 `ConstantTable`，并在适当位置填充常量引用。
@@ -46,6 +52,7 @@
 - [ ] 维护一组覆盖 ES5/ES6 主要语法的 fixture，与 QuickJS wasm 编译结果做逐字节对比。
 - [ ] 在 CI/本地测试中跑完所有 flag 组合（`short opcode`、`bigint`、`strict mode` 等），确保输出稳定。
 - [ ] 对比失败时输出差异报告，指明模块/函数/指令位置。
+- [ ] 当上述差异修复后，重跑 `pnpm compare:fixtures -- --filter simple`，确认退出码回归 0。
 
 ## 📌 阶段 7：硬编码清理
 - [ ] 审核现有实现中的硬编码（模块前言、短 opcode 列表等），逐项替换为数据驱动的逻辑。

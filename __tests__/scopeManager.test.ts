@@ -71,4 +71,37 @@ describe('ScopeManager', () => {
     expect(info).not.toBeNull()
     expect(info?.scope.kind).toBe(ScopeKind.Parameter)
   })
+
+  it('binds catch parameters to the nearest catch scope', () => {
+    const { func, scopeManager } = createFunctionScopeManager()
+    const catchAtom = atomTable.getAtomId('err')
+    const catchVar = new Var(catchAtom, { kind: VarKind.CATCH })
+    const catchScopeIndex = scopeManager.enterScope(ScopeKind.Catch)
+    const varIndex = func.addVar(catchVar)
+
+    scopeManager.bindVariable(varIndex, catchAtom, VarDeclarationKind.Catch)
+
+    const info = scopeManager.getBindingInfo(catchAtom)
+    expect(info).not.toBeNull()
+    expect(info?.scopeIndex).toBe(catchScopeIndex)
+    expect(info?.scope.kind).toBe(ScopeKind.Catch)
+
+    scopeManager.leaveScope()
+    expect(scopeManager.getBindingInfo(catchAtom)).toBeNull()
+  })
+
+  it('hoists var declarations inside catch blocks to the function scope', () => {
+    const { func, scopeManager } = createFunctionScopeManager()
+    const atom = atomTable.getAtomId('hoisted')
+    const hoistedVar = new Var(atom, { kind: VarKind.NORMAL })
+    const catchScopeIndex = scopeManager.enterScope(ScopeKind.Catch)
+    const varIndex = func.addVar(hoistedVar)
+
+    scopeManager.bindVariable(varIndex, atom, VarDeclarationKind.Var)
+
+    const info = scopeManager.getBindingInfo(atom)
+    expect(info).not.toBeNull()
+    expect(info?.scope.kind).toBe(ScopeKind.Function)
+    expect(info?.scopeIndex).not.toBe(catchScopeIndex)
+  })
 })

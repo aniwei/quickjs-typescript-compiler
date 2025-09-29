@@ -8,11 +8,12 @@
 
 import fs from 'fs/promises'
 import path from 'path'
+import * as ts from 'typescript'
 import { TypeScriptCompiler } from '../src/index'
 import { createAdvancedDisassembly } from '../src/disasm'
 import { QuickJSLib } from './QuickJSLib'
 
-interface ComparisonOptions {
+export interface ComparisonOptions {
   inputTs: string
   inputJs?: string
   disasm?: boolean
@@ -31,16 +32,25 @@ interface CompilationResult {
   opcodes?: string[]
 }
 
+export interface ComparisonSummary {
+  identical: boolean
+  tsSize: number
+  wasmSize: number
+  sizeDiff: number
+  sizeDiffPercent: number | null
+}
+
 class BytecodeComparator {
   private options: ComparisonOptions
   private artifactsDir: string
+  private lastSummary: ComparisonSummary | null = null
 
   constructor(options: ComparisonOptions) {
     this.options = options
     this.artifactsDir = options.artifactsDir || 'artifacts'
   }
 
-  async compare(): Promise<void> {
+  async compare(): Promise<ComparisonSummary> {
     console.log('🔍 Starting bytecode comparison...')
     
     // Ensure artifacts directory exists
@@ -58,7 +68,13 @@ class BytecodeComparator {
     await this.saveArtifacts(tsResult, wasmResult)
     
     // Compare results
-    this.compareResults(tsResult, wasmResult)
+    const summary = this.compareResults(tsResult, wasmResult)
+    this.lastSummary = summary
+    return summary
+  }
+
+  getLastSummary(): ComparisonSummary | null {
+    return this.lastSummary
   }
 
   private async ensureArtifactsDir(): Promise<void> {
@@ -131,18 +147,36 @@ class BytecodeComparator {
       let jsCode: string
       let jsPath: string
       if (this.options.inputJs) {
-        // Read the provided file; if it's TypeScript, strip types
-        jsCode = await fs.readFile(this.options.inputJs, 'utf-8')
         jsPath = this.options.inputJs
         if (/\.ts$/i.test(jsPath)) {
-          jsCode = this.stripTypeScript(jsCode)
+          const tsCode = await fs.readFile(jsPath, 'utf-8')
+          jsCode = this.stripTypeScript(tsCode, jsPath)
           jsPath = jsPath.replace(/\.ts$/i, '.js')
+        } else {
+          const maybeJs = await this.readMaybeTextFile(jsPath)
+          if (maybeJs === null) {
+            throw new Error(`Provided --input-js file is not valid JavaScript: ${jsPath}`)
+          }
+          jsCode = this.normalizeJavaScriptSource(maybeJs, jsPath)
         }
       } else {
-        // Convert TypeScript to JavaScript
-        const tsCode = await fs.readFile(this.options.inputTs, 'utf-8')
-        jsCode = this.stripTypeScript(tsCode)
-        jsPath = this.options.inputTs.replace(/\.ts$/, '.js')
+        const inferredJsPath = this.options.inputTs.replace(/\.ts$/i, '.js')
+        if (await this.fileExists(inferredJsPath)) {
+          const maybeJs = await this.readMaybeTextFile(inferredJsPath)
+          if (maybeJs !== null) {
+            jsCode = this.normalizeJavaScriptSource(maybeJs, inferredJsPath)
+            jsPath = inferredJsPath
+          } else {
+            const tsCode = await fs.readFile(this.options.inputTs, 'utf-8')
+            jsCode = this.stripTypeScript(tsCode, this.options.inputTs)
+            jsPath = inferredJsPath
+          }
+        } else {
+          // Convert TypeScript to JavaScript
+          const tsCode = await fs.readFile(this.options.inputTs, 'utf-8')
+          jsCode = this.stripTypeScript(tsCode, this.options.inputTs)
+          jsPath = inferredJsPath
+        }
       }
       
       // Compile with QuickJS WASM (placeholder - would need actual WASM binding)
@@ -180,17 +214,90 @@ class BytecodeComparator {
     }
   }
 
-  private stripTypeScript(tsCode: string): string {
-    // Simple TypeScript stripping - remove common type annotations and interfaces
+  private async fileExists(filePath: string): Promise<boolean> {
+    try {
+      await fs.access(filePath)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  private stripTypeScript(tsCode: string, fileName?: string): string {
+    try {
+      const transpiled = ts.transpileModule(tsCode, {
+        fileName,
+        reportDiagnostics: true,
+        compilerOptions: {
+          module: ts.ModuleKind.ESNext,
+          target: ts.ScriptTarget.ES2020,
+          jsx: ts.JsxEmit.Preserve,
+          importHelpers: false,
+          esModuleInterop: false,
+        },
+      })
+
+      if (transpiled.diagnostics && transpiled.diagnostics.length > 0) {
+        const formatted = transpiled.diagnostics
+          .map((diag) => this.formatDiagnostic(diag))
+          .join('\n')
+        const context = fileName ? ` for ${fileName}` : ''
+        console.warn(`⚠️  TypeScript transpile diagnostics${context}:\n${formatted}`)
+      }
+
+      if (!transpiled.outputText) {
+        throw new Error('Empty transpile output')
+      }
+
+      return transpiled.outputText
+    } catch (error) {
+      const context = fileName ? ` for ${fileName}` : ''
+      console.warn(`⚠️  Using fallback TypeScript stripper${context}:`, error)
+      return this.basicStripTypeScript(tsCode)
+    }
+  }
+
+  private basicStripTypeScript(tsCode: string): string {
     return tsCode
       // Remove basic type annotations after colons (e.g., const x: number = ...)
-      .replace(/:\s*[^=;,)]+(?=[=;,)])/g, '')
+      .replace(/:\s*[^=;,){}]+(?=[=;,){}])/g, '')
+      // Remove function return type annotations before block or arrow
+      .replace(/([)\]])\s*:\s*[^=;{=>]+(?=\s*(\{|=>))/g, '$1')
       // Remove generic type parameters in simple cases (e.g., Array<number>)
       .replace(/<\s*[^>]+\s*>/g, '')
       // Remove interface and type declarations (very naive)
-      .replace(/\b(interface|type)\s+\w+\s*=\s*[^;]+;?/g, '')
+      .replace(/\b(interface|type)\s+\w+[^{;]*[{][^}]*}[;]?/g, '')
+      // Remove declare keywords
+      .replace(/\bdeclare\s+/g, '')
       // Remove TS-only assertion syntax as const, satisfies, etc. (naive)
       .replace(/\s+as\s+const\b/g, '')
+      .replace(/\s+satisfies\s+[^;]+/g, '')
+  }
+
+  private formatDiagnostic(diagnostic: ts.Diagnostic): string {
+    const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
+    if (diagnostic.file && diagnostic.start !== undefined) {
+      const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start)
+      const fileName = diagnostic.file.fileName
+      return `${fileName} (${line + 1},${character + 1}): ${message}`
+    }
+    return message
+  }
+
+  private normalizeJavaScriptSource(code: string, fileName?: string): string {
+    return this.stripTypeScript(code, fileName)
+  }
+
+  private async readMaybeTextFile(filePath: string): Promise<string | null> {
+    try {
+      const buffer = await fs.readFile(filePath)
+      if (buffer.includes(0)) {
+        return null
+      }
+      return buffer.toString('utf-8')
+    } catch {
+      return null
+    }
   }
 
   private async compileJavaScriptWithWasm(jsCode: string, jsPath?: string): Promise<Uint8Array> {
@@ -477,7 +584,7 @@ class BytecodeComparator {
     return lines.join('\n')
   }
 
-  private compareResults(tsResult: CompilationResult, wasmResult: CompilationResult): void {
+  private compareResults(tsResult: CompilationResult, wasmResult: CompilationResult): ComparisonSummary {
     console.log('\n📊 Comparison Results:')
     console.log('─'.repeat(50))
     
@@ -486,8 +593,9 @@ class BytecodeComparator {
     console.log(`WASM compiler:       ${wasmResult.size} bytes`)
     
     const sizeDiff = tsResult.size - wasmResult.size
-    const sizePercent = wasmResult.size > 0 ? (sizeDiff / wasmResult.size * 100).toFixed(1) : 'N/A'
-    console.log(`Size difference:     ${sizeDiff > 0 ? '+' : ''}${sizeDiff} bytes (${sizePercent}%)`)
+    const sizePercent = wasmResult.size > 0 ? (sizeDiff / wasmResult.size) * 100 : null
+    const sizePercentDisplay = sizePercent === null ? 'N/A' : `${sizePercent >= 0 ? '+' : ''}${sizePercent.toFixed(1)}`
+    console.log(`Size difference:     ${sizeDiff > 0 ? '+' : ''}${sizeDiff} bytes (${sizePercentDisplay}%)`)
     
     // Bytecode comparison
     const identical = this.compareBytes(tsResult.bytecode, wasmResult.bytecode)
@@ -509,6 +617,14 @@ class BytecodeComparator {
       console.log('🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.')
     } else {
       console.log('⚠️  Differences found. Review artifacts for detailed analysis.')
+    }
+
+    return {
+      identical,
+      tsSize: tsResult.size,
+      wasmSize: wasmResult.size,
+      sizeDiff,
+      sizeDiffPercent: sizePercent,
     }
   }
 
@@ -628,4 +744,4 @@ if (require.main === module) {
   main()
 }
 
-export { BytecodeComparator, ComparisonOptions }
+export { BytecodeComparator }

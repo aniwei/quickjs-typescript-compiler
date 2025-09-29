@@ -178,9 +178,23 @@ export class ScopeManager {
         return this.findVarScope(currentScopeIndex)
       case VarDeclarationKind.Parameter:
         return this.findParameterScope(currentScopeIndex)
+      case VarDeclarationKind.Catch:
+        return this.findCatchScope(currentScopeIndex)
       default:
         return currentScopeIndex
     }
+  }
+
+  private findCatchScope(scopeIndex: number): number {
+    let index = scopeIndex
+    while (index >= 0) {
+      const scope = this.func.scopes[index]
+      if (scope.kind === ScopeKind.Catch) {
+        return index
+      }
+      index = scope.parent
+    }
+    return scopeIndex
   }
 
   private findVarScope(scopeIndex: number): number {
