@@ -1,0 +1,260 @@
+{
+  "version": 5,
+  "atoms": [
+    {
+      "id": 228,
+      "value": "__tests__/compiler/fixtures/loop-break.js"
+    },
+    {
+      "id": 229,
+      "value": "first"
+    },
+    {
+      "id": 230,
+      "value": "second"
+    },
+    {
+      "id": 231,
+      "value": "console"
+    },
+    {
+      "id": 232,
+      "value": "log"
+    }
+  ],
+  "root": {
+    "type": "module",
+    "moduleName": {
+      "type": "atom",
+      "id": 228,
+      "name": "__tests__/compiler/fixtures/loop-break.js"
+    },
+    "requireEntries": [],
+    "exportEntries": [],
+    "starExportEntries": [],
+    "importEntries": [],
+    "hasTopLevelAwait": false,
+    "function": {
+      "type": "function",
+      "flags": {
+        "raw": 1568,
+        "hasPrototype": false,
+        "hasSimpleParameterList": false,
+        "isDerivedClassConstructor": false,
+        "needHomeObject": false,
+        "funcKind": {
+          "value": 2,
+          "name": "JS_FUNC_ASYNC"
+        },
+        "newTargetAllowed": false,
+        "superCallAllowed": false,
+        "superAllowed": false,
+        "argumentsAllowed": true,
+        "hasDebug": true,
+        "isDirectOrIndirectEval": false
+      },
+      "jsMode": 1,
+      "jsModeFlags": [
+        "JS_MODE_STRICT"
+      ],
+      "name": {
+        "type": "atom",
+        "id": 82,
+        "name": "_eval_"
+      },
+      "argCount": 0,
+      "varCount": 2,
+      "definedArgCount": 0,
+      "stackSize": 4,
+      "closureVarCount": 0,
+      "constantPoolCount": 0,
+      "instructionLength": 37,
+      "varDefs": [
+        {
+          "name": {
+            "type": "atom",
+            "id": 229,
+            "name": "first"
+          },
+          "scopeLevel": 2,
+          "scopeNext": -1,
+          "isConst": true,
+          "isLexical": true,
+          "isCaptured": false,
+          "kind": {
+            "value": 0,
+            "name": "NORMAL"
+          }
+        },
+        {
+          "name": {
+            "type": "atom",
+            "id": 230,
+            "name": "second"
+          },
+          "scopeLevel": 2,
+          "scopeNext": 0,
+          "isConst": true,
+          "isLexical": true,
+          "isCaptured": false,
+          "kind": {
+            "value": 0,
+            "name": "NORMAL"
+          }
+        }
+      ],
+      "closureVars": [],
+      "instructions": [
+        {
+          "offset": 0,
+          "size": 1,
+          "opcode": 8,
+          "opcodeName": "OP_push_this"
+        },
+        {
+          "offset": 1,
+          "size": 2,
+          "opcode": 236,
+          "opcodeName": "OP_if_false8",
+          "operand": 2
+        },
+        {
+          "offset": 3,
+          "size": 1,
+          "opcode": 41,
+          "opcodeName": "OP_return_undef"
+        },
+        {
+          "offset": 4,
+          "size": 3,
+          "opcode": 99,
+          "opcodeName": "OP_set_loc_uninitialized",
+          "operand": 1
+        },
+        {
+          "offset": 7,
+          "size": 3,
+          "opcode": 99,
+          "opcodeName": "OP_set_loc_uninitialized",
+          "operand": 0
+        },
+        {
+          "offset": 10,
+          "size": 1,
+          "opcode": 184,
+          "opcodeName": "OP_push_1"
+        },
+        {
+          "offset": 11,
+          "size": 1,
+          "opcode": 203,
+          "opcodeName": "OP_put_loc0"
+        },
+        {
+          "offset": 12,
+          "size": 1,
+          "opcode": 185,
+          "opcodeName": "OP_push_2"
+        },
+        {
+          "offset": 13,
+          "size": 1,
+          "opcode": 204,
+          "opcodeName": "OP_put_loc1"
+        },
+        {
+          "offset": 14,
+          "size": 5,
+          "opcode": 57,
+          "opcodeName": "OP_get_var",
+          "operand": {
+            "type": "tagged-int",
+            "value": 115
+          }
+        },
+        {
+          "offset": 19,
+          "size": 5,
+          "opcode": 67,
+          "opcodeName": "OP_get_field2",
+          "operand": {
+            "type": "atom",
+            "id": 116,
+            "name": "this_active_func"
+          }
+        },
+        {
+          "offset": 24,
+          "size": 3,
+          "opcode": 100,
+          "opcodeName": "OP_get_loc_check",
+          "operand": 0
+        },
+        {
+          "offset": 27,
+          "size": 3,
+          "opcode": 100,
+          "opcodeName": "OP_get_loc_check",
+          "operand": 1
+        },
+        {
+          "offset": 30,
+          "size": 1,
+          "opcode": 159,
+          "opcodeName": "OP_add"
+        },
+        {
+          "offset": 31,
+          "size": 3,
+          "opcode": 36,
+          "opcodeName": "OP_call_method",
+          "operand": 1
+        },
+        {
+          "offset": 34,
+          "size": 1,
+          "opcode": 14,
+          "opcodeName": "OP_drop"
+        },
+        {
+          "offset": 35,
+          "size": 1,
+          "opcode": 6,
+          "opcodeName": "OP_undefined"
+        },
+        {
+          "offset": 36,
+          "size": 1,
+          "opcode": 47,
+          "opcodeName": "OP_return_async"
+        }
+      ],
+      "debug": {
+        "filename": {
+          "type": "atom",
+          "id": 228,
+          "name": "__tests__/compiler/fixtures/loop-break.js"
+        },
+        "pc2line": [
+          0,
+          0,
+          75,
+          8,
+          27,
+          14,
+          27,
+          10,
+          17,
+          16,
+          17,
+          3,
+          7,
+          13
+        ],
+        "sourceLength": 0,
+        "source": null
+      },
+      "constantPool": []
+    }
+  }
+}

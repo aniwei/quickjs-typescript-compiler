@@ -1,7 +1,7 @@
 # 字节码分析报告
 
-**输入文件**: /Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/simple-add.ts
-**生成时间**: 2025-09-29T07:45:00.182Z
+**输入文件**: __tests__/compiler/fixtures/simple-add.ts
+**生成时间**: 2025-10-02T17:33:07.079Z
 
 ## 大小对比
 

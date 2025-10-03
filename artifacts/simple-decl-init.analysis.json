@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-09-29T07:45:00.218Z",
-  "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/simple-decl-init.ts",
+  "timestamp": "2025-10-02T17:33:41.190Z",
+  "inputFile": "__tests__/compiler/fixtures/simple-decl-init.ts",
   "compilation": {
     "typescript": {
       "size": 96,

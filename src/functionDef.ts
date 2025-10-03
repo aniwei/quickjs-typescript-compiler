@@ -1,4 +1,5 @@
 import { Atom } from './atoms';
+import { ConstantTable } from './constant';
 import { FunctionBytecode, type ConstantEntry } from './functionBytecode';
 import { Scope } from './scopes';
 import { ClosureVar, Var } from './vars';
@@ -94,6 +95,7 @@ export class FunctionDef {
   closureVars: ClosureVar[] = [];
 
   bytecode: FunctionBytecode;
+  private readonly constantTable = new ConstantTable();
 
   sourcePos: number;
   module: ModuleRecord | null;
@@ -141,6 +143,14 @@ export class FunctionDef {
   appendChild(child: FunctionDef) {
     child.parent = this;
     this.children.push(child);
+  }
+
+  addConstant(entry: ConstantEntry, options?: { key?: string | null }): number {
+    return this.constantTable.add(entry, options ?? {});
+  }
+
+  getConstantPoolEntries(): ConstantEntry[] {
+    return this.constantTable.getEntries();
   }
 
   addOrUpdateGlobalVar(name: Atom, options: GlobalVarUpdate): GlobalVar {

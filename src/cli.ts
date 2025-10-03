@@ -224,18 +224,8 @@ function decodePc2line(buffer: number[]) {
     return result >>> 0
   }
   const readSLEB = (): number => {
-    let result = 0
-    let shift = 0
-    let byte: number
-    do {
-      byte = data[offset++]
-      result |= (byte & 0x7f) << shift
-      shift += 7
-    } while (byte & 0x80)
-    if (shift < 32 && (byte & 0x40)) {
-      result |= (~0 << shift)
-    }
-    return result | 0
+    const encoded = readULEB()
+    return ((encoded >>> 1) ^ -(encoded & 1)) | 0
   }
 
   const entries: Array<{ pc: number; line: number; column: number; deltaPc: number; deltaLine: number; deltaColumn: number }> = []

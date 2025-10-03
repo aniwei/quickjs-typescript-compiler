@@ -65,7 +65,7 @@ export class FunctionBytecode {
   columnInfo: LineInfoEntry[] = [];
   pc2line: number[] = [];
   pc2column: number[] = [];
-  lineNumberTable: Array<{ pc: number; line: number; column: number; sourcePos: number }> = [];
+  lineNumberTable: Array<{ pc: number; line: number; column: number; sourcePos: number; instructionIndex: number }> = [];
 
   filename: Atom | null = null;
   source: string;
@@ -118,7 +118,7 @@ export class FunctionBytecode {
     this.columnInfo.push(info);
   }
 
-  recordLineNumber(pc: number, line: number, column: number, sourcePos: number) {
+  recordLineNumber(pc: number, line: number, column: number, sourcePos: number, instructionIndex: number) {
     if (line < 0 || column < 0) {
       return;
     }
@@ -128,19 +128,25 @@ export class FunctionBytecode {
         return;
       }
       if (last.pc === pc) {
-        last.line = line;
-        last.column = column;
-        last.sourcePos = sourcePos;
-        return;
-      }
-      if (last.line === line && last.column === column) {
-        return;
-      }
-      if (last.sourcePos === sourcePos) {
-        return;
+        if (last.sourcePos === sourcePos) {
+          last.line = line;
+          last.column = column;
+          last.instructionIndex = instructionIndex;
+          return;
+        }
+        if (last.line === line && last.column === column) {
+          return;
+        }
+      } else {
+        if (last.line === line && last.column === column) {
+          return;
+        }
+        if (last.sourcePos === sourcePos) {
+          return;
+        }
       }
     }
-    this.lineNumberTable.push({ pc, line, column, sourcePos });
+    this.lineNumberTable.push({ pc, line, column, sourcePos, instructionIndex });
   }
 
   private normalizeVarEntry(entry: Var | VarDefEntry): VarDefEntry {

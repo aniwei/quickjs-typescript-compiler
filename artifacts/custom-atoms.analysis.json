@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-09-29T07:45:00.141Z",
-  "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/custom-atoms.ts",
+  "timestamp": "2025-10-03T03:42:33.492Z",
+  "inputFile": "__tests__/compiler/fixtures/custom-atoms.ts",
   "compilation": {
     "typescript": {
       "size": 169,

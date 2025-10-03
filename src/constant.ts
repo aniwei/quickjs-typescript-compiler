@@ -1,29 +1,60 @@
-/*
- * @see https://github.com/bellard/quickjs/blob/master/quickjs.h#L322
- */
-
 import { BytecodeTag } from './env'
+import type { ConstantEntry } from './functionBytecode'
 
 export class ConstantTable {
-  private constants: Map<string, { tag: BytecodeTag; value: unknown; index: number }> = new Map()
-  private nextIndex = 0
+  private readonly entries: ConstantEntry[] = []
+  private readonly indexByKey = new Map<string, number>()
 
-  addConstant(tag: BytecodeTag, value: unknown): number {
-    const key = `${tag}:${String(value)}`
-    if (this.constants.has(key)) {
-      return this.constants.get(key)!.index
+  add(entry: ConstantEntry, options: { key?: string | null } = {}): number {
+    const key = options.key ?? this.createDefaultKey(entry)
+    if (key !== null) {
+      const existing = this.indexByKey.get(key)
+      if (existing !== undefined) {
+        return existing
+      }
     }
-    const index = this.nextIndex++
-    this.constants.set(key, { tag, value, index })
+
+    const index = this.entries.length
+    this.entries.push(entry)
+    if (key !== null) {
+      this.indexByKey.set(key, index)
+    }
     return index
   }
 
-  getConstants(): { tag: BytecodeTag; value: unknown }[] {
-    const sorted = Array.from(this.constants.values()).sort((a, b) => a.index - b.index)
-    return sorted.map(({ tag, value }) => ({ tag, value }))
+  getEntries(): ConstantEntry[] {
+    return [...this.entries]
   }
 
   size(): number {
-    return this.constants.size
+    return this.entries.length
+  }
+
+  private createDefaultKey(entry: ConstantEntry): string | null {
+    switch (entry.tag) {
+      case BytecodeTag.TC_TAG_NULL:
+      case BytecodeTag.TC_TAG_UNDEFINED:
+      case BytecodeTag.TC_TAG_BOOL_FALSE:
+      case BytecodeTag.TC_TAG_BOOL_TRUE:
+        return `tag:${entry.tag}`
+      case BytecodeTag.TC_TAG_INT32:
+        return `tag:${entry.tag}:value:${entry.value}`
+      case BytecodeTag.TC_TAG_FLOAT64:
+        return `tag:${entry.tag}:value:${this.serializeNumber(entry.value)}`
+      case BytecodeTag.TC_TAG_STRING:
+        return `tag:${entry.tag}:value:${JSON.stringify(entry.value)}`
+      default:
+        return null
+    }
+  }
+
+  private serializeNumber(value: number): string {
+    if (Number.isNaN(value)) {
+      return 'NaN'
+    }
+    if (Object.is(value, -0)) {
+      return '-0'
+    }
+    return value.toString()
   }
 }

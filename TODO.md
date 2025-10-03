@@ -36,13 +36,23 @@
 - [ ] 精确维护运行时栈深度，保证 `stackSize` 与 QuickJS 结果一致。
 - [x] 实现乘法 `*` 运算发射，补齐 `complex-functions.ts` fixture 中的 `BinaryExpression` 支持。（2025-09-29）
 - [x] 支持普通字符串字面量常量写出，解决 `custom-atoms.ts` fixture 的报错。（2025-09-29）
+- [x] 修正 switch 默认分支位于中间时的跳转与 pc2line 差异，`tmp-switch-default-middle.ts` / `switch-branch.ts` 均与 QuickJS 对齐。（2025-10-03）
 - [ ] 支持普通标识符函数调用与条件判断生成，解除 `complex-functions.ts` “Only property access calls” 限制。
 - [ ] 复盘 `compute.ts` / `simple-array.ts` 的零字节差异，逐条对齐常量池与调试信息。
 
 ## 📌 阶段 4：常量池与原子管理
 - [ ] 在编译流程中引入 `ConstantTable`，并在适当位置填充常量引用。
+	- [ ] 参考 QuickJS `JSFunctionDef.constant_pool` 的写出顺序，整理各常量类型的指令使用场景（2025-10-03）
+	- [ ] 将 `compileLiteral`/`compileArrayLiteral` 等入口改为先写入常量池，再发射 `OP_get_var_ref`/`OP_get_field` 等引用指令
+	- [ ] 重新编号常量索引，确保与 wasm 基线的去重规则一致，并在 `scripts/parseBytecode.ts` 中补充校验
 - [ ] 确保所有标识符/属性名通过 `AtomTable` 管理，原子起始值来源于 `env.firstAtomId`，不再存在手动常量。
+	- [ ] 为 `AtomTable` 增加“已分配 atom → UTF-8` value`”的调试输出，定位遗漏的动态插入点
+	- [ ] 改写 `emitIdentifier`/`emitPropertyAccess` 等路径，统一从 `AtomTable` 获取 ID
+	- [ ] 比对 QuickJS wasm 产出的 atom 列表，确认自增顺序与去重策略一致
 - [ ] 支持正则字面量、模板字符串占位符等特殊常量写出。
+	- [ ] 先实现模板字符串（无表达式）写出，补充 fixture 验证
+	- [ ] 解析 `RegExpLiteral`，串联 `ConstantTable` 与 `AtomTable`，验证与 QuickJS 字节码一致
+	- [ ] 新增 `regex-literal.ts`/`template-tag.ts` fixture，并纳入 `compareWithWasm` 回归
 
 ## 📌 阶段 5：调试和元数据
 - [x] 实现 `pc2line`、`pc2column` 的构建逻辑，复刻 QuickJS 的行列号处理。
@@ -50,6 +60,7 @@
 
 ## 📌 阶段 6：测试矩阵与对齐验证
 - [ ] 维护一组覆盖 ES5/ES6 主要语法的 fixture，与 QuickJS wasm 编译结果做逐字节对比。
+- [x] 将 `switch-branch.ts` 納入对齐矩阵，验证默认分支位于中间的控制流对齐。（2025-10-03）
 - [ ] 在 CI/本地测试中跑完所有 flag 组合（`short opcode`、`bigint`、`strict mode` 等），确保输出稳定。
 - [ ] 对比失败时输出差异报告，指明模块/函数/指令位置。
 - [ ] 当上述差异修复后，重跑 `pnpm compare:fixtures -- --filter simple`，确认退出码回归 0。

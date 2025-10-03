@@ -44,6 +44,8 @@ class BytecodeComparator {
   private options: ComparisonOptions
   private artifactsDir: string
   private lastSummary: ComparisonSummary | null = null
+  private referenceJs: { code: string; path: string } | null = null
+  private referenceJsError: unknown | null = null
 
   constructor(options: ComparisonOptions) {
     this.options = options
@@ -87,6 +89,8 @@ class BytecodeComparator {
 
   private async compileWithTypeScript(): Promise<CompilationResult> {
     const sourceCode = await fs.readFile(this.options.inputTs, 'utf-8')
+
+    const reference = await this.resolveReferenceJavaScript({ tolerateErrors: true })
     
     // 从 WASM 查询 firstAtomId（JS_ATOM_END），用于对齐用户原子阈值
     let firstAtomId: number | undefined
@@ -108,7 +112,10 @@ class BytecodeComparator {
       firstAtomId
     } as const
 
-    const compiler = new TypeScriptCompiler(flags as any)
+    const compiler = new TypeScriptCompiler({
+      ...(flags as any),
+      referenceJsSource: reference?.code,
+    })
     const bytecode = await compiler.compileFile(this.options.inputTs);
 
     let disassembly: string | undefined
@@ -143,9 +150,64 @@ class BytecodeComparator {
         // Could implement WASM building here
       }
       
-      // Use JavaScript input if provided, otherwise convert TypeScript
-      let jsCode: string
+      const reference = await this.resolveReferenceJavaScript()
+      if (!reference) {
+        throw new Error('Unable to resolve JavaScript source for QuickJS compilation')
+      }
+      
+      // Compile with QuickJS WASM (placeholder - would need actual WASM binding)
+      const bytecode = await this.compileJavaScriptWithWasm(reference.code, reference.path)
+      
+      let disassembly: string | undefined
+      if (this.options.disasm) {
+  disassembly = await this.disassembleBytecode(bytecode, 'wasm')
+      }
+
+      let assembly: string | undefined
+      if (this.options.asm) {
+  assembly = await QuickJSLib.dumpBytesToString(bytecode)
+      }
+
+      return {
+        bytecode,
+        assembly,
+        disassembly,
+        size: bytecode.length,
+        opcodes: this.extractOpcodes(bytecode)
+      }
+      
+    } catch (error) {
+      console.log('⚠️  WASM compilation failed, creating mock result:', error)
+      
+      // Return mock result for comparison
+      const mockBytecode = new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05])
+      return {
+        bytecode: mockBytecode,
+        disassembly: 'Mock WASM disassembly',
+        size: mockBytecode.length,
+        opcodes: ['mock_opcode_1', 'mock_opcode_2']
+      }
+    }
+  }
+
+  private async resolveReferenceJavaScript(options: { tolerateErrors?: boolean } = {}): Promise<{ code: string; path: string } | null> {
+    if (this.referenceJs) {
+      return this.referenceJs
+    }
+
+    if (this.referenceJsError) {
+      if (options.tolerateErrors) {
+        return null
+      }
+      throw this.referenceJsError
+    }
+
+    const tolerateErrors = options.tolerateErrors === true
+
+    try {
       let jsPath: string
+      let jsCode: string
+
       if (this.options.inputJs) {
         jsPath = this.options.inputJs
         if (/\.ts$/i.test(jsPath)) {
@@ -172,45 +234,20 @@ class BytecodeComparator {
             jsPath = inferredJsPath
           }
         } else {
-          // Convert TypeScript to JavaScript
           const tsCode = await fs.readFile(this.options.inputTs, 'utf-8')
           jsCode = this.stripTypeScript(tsCode, this.options.inputTs)
           jsPath = inferredJsPath
         }
       }
-      
-      // Compile with QuickJS WASM (placeholder - would need actual WASM binding)
-      const bytecode = await this.compileJavaScriptWithWasm(jsCode, jsPath)
-      
-      let disassembly: string | undefined
-      if (this.options.disasm) {
-        disassembly = await this.disassembleBytecode(bytecode, 'wasm')
-      }
 
-      let assembly: string | undefined
-      if (this.options.asm) {
-        assembly = await QuickJSLib.dumpBytesToString(bytecode)
-      }
-
-      return {
-        bytecode,
-        assembly,
-        disassembly,
-        size: bytecode.length,
-        opcodes: this.extractOpcodes(bytecode)
-      }
-      
+      this.referenceJs = { code: jsCode, path: jsPath }
+      return this.referenceJs
     } catch (error) {
-      console.log('⚠️  WASM compilation failed, creating mock result:', error)
-      
-      // Return mock result for comparison
-      const mockBytecode = new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05])
-      return {
-        bytecode: mockBytecode,
-        disassembly: 'Mock WASM disassembly',
-        size: mockBytecode.length,
-        opcodes: ['mock_opcode_1', 'mock_opcode_2']
+      this.referenceJsError = error
+      if (tolerateErrors) {
+        return null
       }
+      throw error
     }
   }
 
@@ -285,6 +322,12 @@ class BytecodeComparator {
   }
 
   private normalizeJavaScriptSource(code: string, fileName?: string): string {
+    if (fileName) {
+      const ext = path.extname(fileName).toLowerCase()
+      if (ext === '.js' || ext === '.mjs' || ext === '.cjs') {
+        return code
+      }
+    }
     return this.stripTypeScript(code, fileName)
   }
 

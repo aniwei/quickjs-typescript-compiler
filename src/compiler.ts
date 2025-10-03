@@ -2,13 +2,14 @@ import path from 'node:path'
 import * as ts from 'typescript'
 import { Atom, AtomTable, JSAtom } from './atoms'
 import { FunctionDef, createEmptyModuleRecord } from './functionDef'
-import { FunctionBytecode, type Instruction } from './functionBytecode'
+import { FunctionBytecode, type Instruction, type ConstantEntry } from './functionBytecode'
 import { ScopeManager } from './scopeManager'
 import { ScopeKind } from './scopes'
 import { Var, VarKind, ClosureVar, VarDeclarationKind } from './vars'
 import { Opcode, OpFormat, PC2Line, BytecodeTag, FunctionKind, JSMode, env, type OpcodeDefinition } from './env'
 import { getOpcodeDefinition, getOpcodeName } from './utils/opcode'
 import { getIndexedOpcode, getPushIntOpcode } from './utils/opcodeVariants'
+import { ControlFlowBuilder, ControlFlowTarget, ControlFlowTargetKind, LoopControlFlowTarget } from './controlFlow'
 
 const PC2LINE_BASE = PC2Line.PC2LINE_BASE
 const PC2LINE_OP_FIRST = PC2Line.PC2LINE_OP_FIRST
@@ -22,6 +23,7 @@ const DEFINE_GLOBAL_LEX_VAR = 1 << 7
 
 export interface CompilerOptions {
   atomTable?: AtomTable
+  referenceJsSource?: string | null
 }
 
 interface FunctionContextSnapshot {
@@ -46,7 +48,13 @@ interface FunctionContextSnapshot {
   hasExplicitReturn: boolean
   moduleHoistInsertionIndex: number | null
   moduleHoistLabel: string | null
+  controlFlowTargets: ControlFlowTarget[]
+  loopCleanupEntries: Array<[string, LoopCleanupInfo]>
 }
+
+type LoopCleanupInfo = { kind: 'for-of' }
+
+type ColumnAdjustment = { startColumn: number; delta: number }
 
 interface EmitDebugInfoOptions {
   tsSourcePos?: number
@@ -77,10 +85,16 @@ export class Compiler {
   private labelCounter = 0
   private readonly labelPositions = new Map<string, number>()
   private readonly pendingJumps: Array<{ index: number; label: string; opcode: Opcode }> = []
+  private readonly controlFlow = new ControlFlowBuilder({
+    emitGoto: (label) => this.emitGoto(label),
+  })
+  private readonly loopCleanupByBreakLabel = new Map<string, LoopCleanupInfo>()
+  private readonly lexicalInitByScope = new Map<number, { insertionIndex: number }>()
   private readonly sourceUtf8: Uint8Array
   private readonly utf8OffsetByPos: Uint32Array
   private readonly normalizedPosByPos: Uint32Array
   private lineColCache = { offset: 0, line: 0, rawColumn: 0 }
+  private columnAdjustments: Map<number, ColumnAdjustment> = new Map()
   private readonly recordedStatementPositions = new Set<number>()
   private hasExplicitReturn = false
   private moduleHoistInsertionIndex: number | null = null
@@ -111,8 +125,9 @@ export class Compiler {
     this.program = ts.createProgram([this.fileName], compilerOptions, host)
     this.checker = this.program.getTypeChecker()
 
-    const { strippedSource, normalizedPosByPos } = this.computeDebugSourceMapping(this.sourceCode)
-    this.normalizedPosByPos = normalizedPosByPos
+  const { strippedSource, normalizedPosByPos } = this.computeDebugSourceMapping(this.sourceCode)
+  this.normalizedPosByPos = normalizedPosByPos
+  this.columnAdjustments = this.computeColumnAdjustments(strippedSource, options.referenceJsSource)
 
     const encoder = new TextEncoder()
     this.sourceUtf8 = encoder.encode(strippedSource)
@@ -158,7 +173,7 @@ export class Compiler {
     rootFunction.bytecode.hasDebug = true
     rootFunction.bytecode.filename = this.moduleAtom
 
-  this.pushScope(ScopeKind.Function)
+    this.pushScope(ScopeKind.Function)
     this.withStatementNode(this.sourceFile, () => {
       this.emitModulePrologue()
     })
@@ -197,6 +212,9 @@ export class Compiler {
     this.recordedStatementPositions.clear()
     this.hasExplicitReturn = false
     this.moduleHoistLabel = null
+    this.controlFlow.reset()
+    this.loopCleanupByBreakLabel.clear()
+    this.lexicalInitByScope.clear()
   }
 
   private toModuleFileName(filePath: string): string {
@@ -238,6 +256,8 @@ export class Compiler {
       hasExplicitReturn: this.hasExplicitReturn,
       moduleHoistInsertionIndex: this.moduleHoistInsertionIndex,
       moduleHoistLabel: this.moduleHoistLabel,
+      controlFlowTargets: this.controlFlow.createSnapshot(),
+      loopCleanupEntries: Array.from(this.loopCleanupByBreakLabel.entries()),
     }
   }
 
@@ -273,6 +293,11 @@ export class Compiler {
     this.hasExplicitReturn = snapshot.hasExplicitReturn
     this.moduleHoistInsertionIndex = snapshot.moduleHoistInsertionIndex
     this.moduleHoistLabel = snapshot.moduleHoistLabel
+    this.controlFlow.restoreSnapshot(snapshot.controlFlowTargets)
+    this.loopCleanupByBreakLabel.clear()
+    for (const [label, info] of snapshot.loopCleanupEntries) {
+      this.loopCleanupByBreakLabel.set(label, info)
+    }
   }
 
   private restoreMap<K, V>(target: Map<K, V>, source: Map<K, V>) {
@@ -306,14 +331,35 @@ export class Compiler {
   private markStatementStart(node: ts.Node) {
     if (node === this.sourceFile) return
     if (this.suppressDebugRecording) return
-    const tsSourcePos = node.getStart(this.sourceFile, false)
-    if (tsSourcePos < 0) return
-    // 延迟到首次相关 opcode 发射时再记录调试信息，避免重复
+    if (!ts.isIfStatement(node)) return
+    if (process.env.DEBUG_PC2LINE === '1') {
+      const tsSourcePos = node.getStart(this.sourceFile, false)
+      if (tsSourcePos >= 0) {
+        const sourcePos = this.toUtf8Offset(tsSourcePos)
+        const { line, column } = this.getLineColumnFromUtf8Offset(sourcePos)
+        console.log('pc2line:statement-start-skip', {
+          offset: this.currentOffset,
+          nodeKind: ts.SyntaxKind[node.kind],
+          tsSourcePos,
+          sourcePos,
+          line,
+          column,
+        })
+      }
+    }
   }
 
   private visitNode(node: ts.Node): void {
+    if (ts.isLabeledStatement(node)) {
+      this.withStatementNode(node, () => this.compileLabeledStatement(node))
+      return
+    }
     if (ts.isFunctionDeclaration(node)) {
       this.withStatementNode(node, () => this.compileFunctionDeclaration(node))
+      return
+    }
+    if (ts.isIfStatement(node)) {
+      this.withStatementNode(node, () => this.compileIfStatement(node))
       return
     }
     if (ts.isVariableStatement(node)) {
@@ -322,6 +368,26 @@ export class Compiler {
     }
     if (ts.isForOfStatement(node)) {
       this.withStatementNode(node, () => this.compileForOfStatement(node))
+      return
+    }
+    if (ts.isWhileStatement(node)) {
+      this.withStatementNode(node, () => this.compileWhileStatement(node))
+      return
+    }
+    if (ts.isForStatement(node)) {
+      this.withStatementNode(node, () => this.compileForStatement(node))
+      return
+    }
+    if (ts.isSwitchStatement(node)) {
+      this.withStatementNode(node, () => this.compileSwitchStatement(node))
+      return
+    }
+    if (ts.isBreakStatement(node)) {
+      this.withStatementNode(node, () => this.compileBreakStatement(node))
+      return
+    }
+    if (ts.isContinueStatement(node)) {
+      this.withStatementNode(node, () => this.compileContinueStatement(node))
       return
     }
     if (ts.isBlock(node)) {
@@ -369,7 +435,7 @@ export class Compiler {
           const capture = isModuleTopLevel
           const varIndex = this.declareLexicalVariable(atom, { isConst, isLet, capture })
           const variable = this.currentFunction.vars[varIndex]
-          if (this.isGlobalVarContext()) {
+          if (this.isGlobalVarContext() && isModuleTopLevel) {
             const forceInit = variable.isLexical && !declaration.initializer
             this.registerGlobalVar(atom, {
               scopeLevel: variable.scopeLevel,
@@ -381,6 +447,11 @@ export class Compiler {
 
           const suppressInitializerDebug =
             isModuleTopLevel && this.shouldSuppressTopLevelInitializerDebug(declaration.initializer)
+
+          const localSlot = this.localVarIndices.get(atom)
+          if (localSlot !== undefined && (isConst || isLet)) {
+            this.emitSetLocalUninitialized(localSlot, variable.scopeLevel)
+          }
 
           if (declaration.initializer) {
             const emitInitializer = () => {
@@ -441,7 +512,7 @@ export class Compiler {
       capture: isModuleTopLevel,
     })
     const variable = this.currentFunction.vars[varIndex]
-    if (this.isGlobalVarContext()) {
+    if (this.isGlobalVarContext() && isModuleTopLevel) {
       this.registerGlobalVar(atom, {
         scopeLevel: variable.scopeLevel,
         isLexical: variable.isLexical,
@@ -450,12 +521,15 @@ export class Compiler {
     }
 
     const childFunction = this.compileChildFunction(node, atom, { isExpression: false })
-    const constantIndex = this.currentFunction.bytecode.addConstant({
-      tag: BytecodeTag.TC_TAG_FUNCTION_BYTECODE,
-      value: childFunction.bytecode,
-    })
+    const constantIndex = this.currentFunction.addConstant(
+      {
+        tag: BytecodeTag.TC_TAG_FUNCTION_BYTECODE,
+        value: childFunction.bytecode,
+      },
+      { key: null }
+    )
     variable.funcPoolIndex = constantIndex
-    if (this.isGlobalVarContext()) {
+    if (this.isGlobalVarContext() && isModuleTopLevel) {
       this.registerGlobalVar(atom, {
         scopeLevel: variable.scopeLevel,
         isLexical: variable.isLexical,
@@ -520,8 +594,8 @@ export class Compiler {
     this.currentFunction = childFunction
     this.scopeManager = new ScopeManager(childFunction)
 
-    const startLineColumn = this.getLineColumnFromUtf8Offset(childFunction.sourcePos)
-    this.currentFunction.bytecode.recordLineNumber(0, startLineColumn.line, startLineColumn.column, childFunction.sourcePos)
+  const startLineColumn = this.getLineColumnFromUtf8Offset(childFunction.sourcePos)
+  this.currentFunction.bytecode.recordLineNumber(0, startLineColumn.line, startLineColumn.column, childFunction.sourcePos, 0)
 
     this.pushScope(ScopeKind.Function)
 
@@ -626,6 +700,112 @@ export class Compiler {
     this.hasExplicitReturn = true
   }
 
+  private compileBreakStatement(node: ts.BreakStatement) {
+    const { target, unwindTargets } = this.controlFlow.resolveBreak(node)
+    for (const unwind of unwindTargets) {
+      this.emitControlFlowUnwind(unwind)
+    }
+    this.emitGoto(target.breakLabel)
+  }
+
+  private compileContinueStatement(node: ts.ContinueStatement) {
+    const { target, unwindTargets } = this.controlFlow.resolveContinue(node)
+    for (const unwind of unwindTargets) {
+      this.emitControlFlowUnwind(unwind)
+    }
+    this.emitGoto(target.continueLabel)
+  }
+
+  private compileLabeledStatement(node: ts.LabeledStatement) {
+    const labelName = node.label.text
+
+    if (ts.isForOfStatement(node.statement)) {
+      this.compileForOfStatement(node.statement, { labelName })
+      return
+    }
+    if (ts.isWhileStatement(node.statement)) {
+      this.compileWhileStatement(node.statement, { labelName })
+      return
+    }
+    if (ts.isForStatement(node.statement)) {
+      this.compileForStatement(node.statement, { labelName })
+      return
+    }
+    if (ts.isSwitchStatement(node.statement)) {
+      this.compileSwitchStatement(node.statement, { labelName })
+      return
+    }
+
+    const breakLabel = this.createLabel()
+    this.controlFlow.pushLabel(labelName, breakLabel)
+    try {
+      this.visitNode(node.statement)
+    } finally {
+      this.controlFlow.pop(ControlFlowTargetKind.Label)
+    }
+    this.markLabel(breakLabel)
+  }
+
+  private emitControlFlowUnwind(target: ControlFlowTarget) {
+    switch (target.kind) {
+      case ControlFlowTargetKind.Loop:
+        this.emitLoopCleanup(target)
+        break
+      default:
+        break
+    }
+  }
+
+  private compileIfStatement(node: ts.IfStatement) {
+    this.compileExpression(node.expression)
+
+    const elseLabel = this.createLabel()
+    const hasElse = node.elseStatement !== undefined
+    const endLabel = hasElse ? this.createLabel() : null
+    const conditionalOpcode = env.supportsShortOpcodes ? Opcode.OP_if_false8 : Opcode.OP_if_false
+
+    this.emitJump(conditionalOpcode, elseLabel)
+
+    if (ts.isBlock(node.thenStatement)) {
+      this.compileBlock(node.thenStatement)
+    } else {
+      this.visitNode(node.thenStatement)
+    }
+
+    if (hasElse && endLabel) {
+      this.emitGoto(endLabel)
+    }
+
+    this.markLabel(elseLabel)
+
+    if (hasElse) {
+      const elseStatement = node.elseStatement!
+      if (ts.isBlock(elseStatement)) {
+        this.compileBlock(elseStatement)
+      } else {
+        this.visitNode(elseStatement)
+      }
+
+      if (endLabel) {
+        this.markLabel(endLabel)
+      }
+    }
+  }
+
+  private emitLoopCleanup(target: LoopControlFlowTarget) {
+    const cleanup = this.loopCleanupByBreakLabel.get(target.breakLabel)
+    if (!cleanup) {
+      return
+    }
+    switch (cleanup.kind) {
+      case 'for-of':
+        this.emitOpcode(Opcode.OP_iterator_close)
+        break
+      default:
+        throw new Error(`Unsupported loop cleanup kind '${cleanup.kind}'`)
+    }
+  }
+
   private emitReturnOpcode(node?: ts.Node) {
     const opcode = this.getReturnOpcodeForFunction(this.currentFunction.bytecode.funcKind)
     this.emitOpcode(opcode, [], node)
@@ -666,6 +846,12 @@ export class Compiler {
       case ts.SyntaxKind.AsteriskToken:
         opcode = Opcode.OP_mul
         break
+      case ts.SyntaxKind.MinusToken:
+        opcode = Opcode.OP_sub
+        break
+      case ts.SyntaxKind.LessThanEqualsToken:
+        opcode = Opcode.OP_lte
+        break
       default:
         throw new Error(`Unsupported binary operator: ${ts.SyntaxKind[operator]}`)
     }
@@ -675,24 +861,49 @@ export class Compiler {
     this.emitOpcode(opcode, [], expression.operatorToken)
   }
 
+  private emitPushConstant(
+    entry: ConstantEntry,
+    options: { key?: string | null; node?: ts.Node | null } = {}
+  ): number {
+    const constantIndex = this.currentFunction.addConstant(entry, { key: options.key })
+    const debugNode = options.node === undefined ? undefined : options.node
+    if (env.supportsShortOpcodes && constantIndex <= 0xff) {
+      this.emitOpcode(Opcode.OP_push_const8, [constantIndex], debugNode)
+    } else {
+      this.emitOpcode(Opcode.OP_push_const, [constantIndex], debugNode)
+    }
+    return constantIndex
+  }
+
   private compileNumericLiteral(node: ts.NumericLiteral) {
     const value = Number(node.text)
-    if (Number.isInteger(value)) {
+    if (Number.isInteger(value) && Number.isFinite(value)) {
       const shortOpcode = getPushIntOpcode(value)
       if (shortOpcode !== undefined) {
-        this.emitOpcode(shortOpcode)
+        this.emitOpcode(shortOpcode, [], null)
         return
       }
       if (value >= -0x80 && value <= 0x7f) {
-        this.emitOpcode(Opcode.OP_push_i8, [value])
+        this.emitOpcode(Opcode.OP_push_i8, [value], null)
         return
       }
       if (value >= -0x8000 && value <= 0x7fff) {
-        this.emitOpcode(Opcode.OP_push_i16, [value])
+        this.emitOpcode(Opcode.OP_push_i16, [value], null)
+        return
+      }
+      if (value >= -0x80000000 && value <= 0x7fffffff) {
+        this.emitOpcode(Opcode.OP_push_i32, [value], null)
         return
       }
     }
-    this.emitOpcode(Opcode.OP_push_i32, [value | 0])
+
+    this.emitPushConstant(
+      {
+        tag: BytecodeTag.TC_TAG_FLOAT64,
+        value,
+      },
+      { node }
+    )
   }
 
   private compileBlock(node: ts.Block, options: { createScope?: boolean } = {}) {
@@ -720,14 +931,20 @@ export class Compiler {
         dropDebug = { tsSourcePos: callDebugPos }
       }
     }
-    this.emitOpcode(Opcode.OP_drop, [], undefined, dropDebug)
+    if (dropDebug) {
+      this.emitOpcode(Opcode.OP_drop, [], undefined, dropDebug)
+    } else {
+      this.withoutDebugRecording(() => {
+        this.emitOpcode(Opcode.OP_drop)
+      })
+    }
   }
-  private compileForOfStatement(node: ts.ForOfStatement) {
+  private compileForOfStatement(node: ts.ForOfStatement, options: { labelName?: string } = {}) {
     if (node.awaitModifier) {
       throw new Error('for await is not supported yet')
     }
 
-  this.pushScope(ScopeKind.Block)
+    this.pushScope(ScopeKind.Block)
 
     if (!ts.isVariableDeclarationList(node.initializer)) {
       throw new Error('for-of initializer must be a variable declaration')
@@ -754,34 +971,411 @@ export class Compiler {
     const isConst = (flags & ts.NodeFlags.Const) !== 0
     const isLet = (flags & ts.NodeFlags.Let) !== 0
 
-  this.declareLexicalVariable(atom, { isConst, isLet, capture: false })
+  const varIndex = this.declareLexicalVariable(atom, { isConst, isLet, capture: false })
   const loopVarSlot = this.localVarIndices.get(atom)!
-    this.emitSetLocalUninitialized(loopVarSlot)
+  const variable = this.currentFunction.vars[varIndex]
+  this.emitSetLocalUninitialized(loopVarSlot, variable.scopeLevel)
 
     this.compileExpression(node.expression)
-    this.emitOpcode(Opcode.OP_for_of_start)
+    this.withoutDebugRecording(() => {
+      this.emitOpcode(Opcode.OP_for_of_start)
+    })
 
-    const labelBody = this.createLabel()
-    const labelCheck = this.createLabel()
+    const bodyLabel = this.createLabel()
+    const continueLabel = this.createLabel()
+    const exitLabel = this.createLabel()
 
-    this.emitJump(Opcode.OP_goto8, labelCheck)
+    this.loopCleanupByBreakLabel.set(exitLabel, { kind: 'for-of' })
+    this.controlFlow.pushLoop(exitLabel, continueLabel, { labelName: options.labelName })
+    try {
+      this.emitGoto(continueLabel)
 
-    this.markLabel(labelBody)
-    this.emitStoreToLocal(loopVarSlot)
+      this.markLabel(bodyLabel)
+      this.withoutDebugRecording(() => {
+        this.emitStoreToLocal(loopVarSlot)
+      })
 
-    if (ts.isBlock(node.statement)) {
-      this.compileBlock(node.statement, { createScope: false })
-    } else {
-      this.visitNode(node.statement)
+      if (ts.isBlock(node.statement)) {
+        this.compileBlock(node.statement, { createScope: false })
+      } else {
+        this.visitNode(node.statement)
+      }
+
+      this.markLabel(continueLabel)
+      this.withoutDebugRecording(() => {
+        this.emitOpcode(Opcode.OP_for_of_next, [0])
+      })
+      this.emitJump(Opcode.OP_if_false8, bodyLabel)
+      this.withoutDebugRecording(() => {
+        this.emitOpcode(Opcode.OP_drop)
+      })
+    } finally {
+      this.popScope()
+      this.controlFlow.pop(ControlFlowTargetKind.Loop)
     }
 
-    this.popScope()
+    this.markLabel(exitLabel)
+    this.withoutDebugRecording(() => {
+      this.emitOpcode(Opcode.OP_iterator_close)
+    })
+    this.loopCleanupByBreakLabel.delete(exitLabel)
+  }
 
-    this.markLabel(labelCheck)
-    this.emitOpcode(Opcode.OP_for_of_next, [0])
-    this.emitJump(Opcode.OP_if_false8, labelBody)
-    this.emitOpcode(Opcode.OP_drop)
-    this.emitOpcode(Opcode.OP_iterator_close)
+  private compileWhileStatement(node: ts.WhileStatement, options: { labelName?: string } = {}) {
+    const conditionLabel = this.createLabel()
+    const exitLabel = this.createLabel()
+
+    this.controlFlow.pushLoop(exitLabel, conditionLabel, { labelName: options.labelName })
+    try {
+      this.markLabel(conditionLabel)
+      this.compileExpression(node.expression)
+      this.emitJump(Opcode.OP_if_false8, exitLabel)
+
+      if (ts.isBlock(node.statement)) {
+        this.compileBlock(node.statement)
+      } else {
+        this.visitNode(node.statement)
+      }
+
+      this.emitGoto(conditionLabel)
+    } finally {
+      this.controlFlow.pop(ControlFlowTargetKind.Loop)
+    }
+
+    this.markLabel(exitLabel)
+  }
+
+  private compileForStatement(node: ts.ForStatement, options: { labelName?: string } = {}) {
+    this.pushScope(ScopeKind.Block)
+    try {
+      if (node.initializer) {
+        if (ts.isVariableDeclarationList(node.initializer)) {
+          this.compileForVariableDeclarationList(node.initializer)
+        } else {
+          this.compileExpression(node.initializer)
+          this.emitOpcode(Opcode.OP_drop)
+        }
+      }
+
+      const loopStartLabel = this.createLabel()
+      const continueLabel = this.createLabel()
+      const exitLabel = this.createLabel()
+
+      this.controlFlow.pushLoop(exitLabel, continueLabel, { labelName: options.labelName })
+      try {
+        this.markLabel(loopStartLabel)
+
+        if (node.condition) {
+          this.compileExpression(node.condition)
+          this.emitJump(Opcode.OP_if_false8, exitLabel)
+        }
+
+        if (ts.isBlock(node.statement)) {
+          this.compileBlock(node.statement, { createScope: false })
+        } else {
+          this.visitNode(node.statement)
+        }
+
+        this.markLabel(continueLabel)
+        if (node.incrementor) {
+          this.compileExpression(node.incrementor)
+          this.emitOpcode(Opcode.OP_drop)
+        }
+        this.emitGoto(loopStartLabel)
+      } finally {
+        this.controlFlow.pop(ControlFlowTargetKind.Loop)
+      }
+
+      this.markLabel(exitLabel)
+    } finally {
+      this.popScope()
+    }
+  }
+
+  private compileSwitchStatement(node: ts.SwitchStatement, options: { labelName?: string } = {}) {
+    this.withSourceNode(node.expression, () => {
+      this.compileExpression(node.expression)
+
+      const exitLabel = this.createLabel()
+      const clauses = node.caseBlock.clauses
+      const pendingFallthroughLabels: string[] = []
+      let nextCaseLabel: string | null = null
+      let previousClauseFallsThrough = false
+      let hasDefaultClause = false
+      let requiresDropAfterSwitch = false
+
+      const defaultClauseIndex = clauses.findIndex((clause) => ts.isDefaultClause(clause))
+      const defaultLabel = defaultClauseIndex >= 0 ? this.createLabel() : null
+      const afterDefaultLabel =
+        defaultClauseIndex >= 0 && defaultClauseIndex < clauses.length - 1 ? this.createLabel() : null
+      let shouldMarkAfterDefaultLabel = false
+
+      this.controlFlow.pushSwitch(exitLabel, { labelName: options.labelName })
+      try {
+        for (let index = 0; index < clauses.length; index += 1) {
+          const clause = clauses[index]
+
+          if (ts.isCaseClause(clause)) {
+            if (nextCaseLabel !== null) {
+              if (previousClauseFallsThrough) {
+                const fallthroughLabel = this.createLabel()
+                this.emitGoto(fallthroughLabel)
+                pendingFallthroughLabels.push(fallthroughLabel)
+              }
+              this.markLabel(nextCaseLabel)
+              nextCaseLabel = null
+            }
+
+            const caseChain: ts.CaseClause[] = [clause]
+            while (index + 1 < clauses.length) {
+              const nextClause = clauses[index + 1]
+              if (ts.isCaseClause(nextClause) && nextClause.statements.length === 0) {
+                caseChain.push(nextClause)
+                index += 1
+              } else {
+                break
+              }
+            }
+
+            const nextClause = clauses[index + 1]
+            const isAfterDefault = defaultClauseIndex >= 0 && index > defaultClauseIndex
+            const isNextClauseDefault = !!nextClause && ts.isDefaultClause(nextClause)
+
+            let caseEntryLabel: string
+            if (isNextClauseDefault) {
+              caseEntryLabel = defaultLabel ?? this.createLabel()
+            } else {
+              caseEntryLabel = this.createLabel()
+            }
+
+            let testFailureLabel: string
+            if (isAfterDefault && defaultLabel) {
+              testFailureLabel = defaultLabel
+            } else if (isNextClauseDefault && afterDefaultLabel) {
+              testFailureLabel = afterDefaultLabel
+              shouldMarkAfterDefaultLabel = true
+            } else if (isNextClauseDefault && defaultLabel) {
+              testFailureLabel = defaultLabel
+            } else {
+              testFailureLabel = caseEntryLabel
+            }
+
+            let sharedTrueLabel: string | null = null
+            for (let chainIndex = 0; chainIndex < caseChain.length; chainIndex += 1) {
+              const currentClause = caseChain[chainIndex]
+              this.withoutDebugRecording(() => {
+                this.emitOpcode(Opcode.OP_dup, [], null)
+                this.compileExpression(currentClause.expression)
+                this.emitOpcode(Opcode.OP_strict_eq, [], null)
+              })
+
+              const isLastClauseInChain = chainIndex === caseChain.length - 1
+              if (!isLastClauseInChain) {
+                sharedTrueLabel = this.emitConditionalJumpChain(Opcode.OP_if_true8, sharedTrueLabel)
+              } else {
+                nextCaseLabel = caseEntryLabel
+                this.emitJump(Opcode.OP_if_false8, testFailureLabel)
+                if (sharedTrueLabel) {
+                  this.markLabel(sharedTrueLabel)
+                }
+              }
+            }
+
+            this.flushPendingLabels(pendingFallthroughLabels)
+
+            const lastClause = caseChain[caseChain.length - 1]
+            const clauseControl = this.compileSwitchClauseStatements(lastClause.statements, options.labelName)
+            const fallsThrough = clauseControl.fallsThrough
+            if (fallsThrough) {
+              requiresDropAfterSwitch = true
+            }
+            if (clauseControl.exitsSwitch) {
+              requiresDropAfterSwitch = true
+            }
+            previousClauseFallsThrough = fallsThrough
+
+            if (!previousClauseFallsThrough && nextCaseLabel !== null) {
+              if (defaultLabel !== null && nextCaseLabel === defaultLabel) {
+                // Defer marking the default label until the default clause to allow non-matching cases to skip it.
+              } else if (afterDefaultLabel !== null && nextCaseLabel === afterDefaultLabel) {
+                // The label after the default clause is marked once the default body has been emitted.
+              } else {
+                this.markLabel(nextCaseLabel)
+                nextCaseLabel = null
+              }
+            }
+          } else {
+            hasDefaultClause = true
+            const labelForDefault = defaultLabel ?? this.createLabel()
+
+            if (nextCaseLabel === null) {
+              nextCaseLabel = labelForDefault
+            }
+
+            if (previousClauseFallsThrough) {
+              const fallthroughLabel = this.createLabel()
+              this.emitGoto(fallthroughLabel)
+              pendingFallthroughLabels.push(fallthroughLabel)
+            }
+
+            if (nextCaseLabel !== labelForDefault) {
+              this.markLabel(nextCaseLabel)
+              nextCaseLabel = labelForDefault
+            }
+
+            this.markLabel(labelForDefault)
+            nextCaseLabel = null
+
+            this.flushPendingLabels(pendingFallthroughLabels)
+
+            const clauseControl = this.compileSwitchClauseStatements(clause.statements, options.labelName)
+            const fallsThrough = clauseControl.fallsThrough
+            if (fallsThrough) {
+              requiresDropAfterSwitch = true
+            }
+            if (clauseControl.exitsSwitch) {
+              requiresDropAfterSwitch = true
+            }
+            previousClauseFallsThrough = fallsThrough
+
+            if (!previousClauseFallsThrough && nextCaseLabel !== null) {
+              this.markLabel(nextCaseLabel)
+              nextCaseLabel = null
+            }
+
+            if (afterDefaultLabel !== null && shouldMarkAfterDefaultLabel) {
+              this.markLabel(afterDefaultLabel)
+              shouldMarkAfterDefaultLabel = false
+            }
+          }
+        }
+
+        if (nextCaseLabel !== null) {
+          this.markLabel(nextCaseLabel)
+        }
+
+        this.flushPendingLabels(pendingFallthroughLabels)
+        this.markLabel(exitLabel)
+      } finally {
+        this.controlFlow.pop(ControlFlowTargetKind.Switch)
+      }
+
+      if (!hasDefaultClause) {
+        requiresDropAfterSwitch = true
+      }
+
+      if (requiresDropAfterSwitch) {
+        this.emitOpcode(Opcode.OP_drop, [], null)
+      }
+    })
+  }
+
+  private emitConditionalJumpChain(opcode: Opcode, sharedTrueLabel: string | null): string {
+    const targetLabel = sharedTrueLabel ?? this.createLabel()
+    this.emitJump(opcode, targetLabel)
+    return targetLabel
+  }
+
+  private flushPendingLabels(labels: string[]) {
+    while (labels.length > 0) {
+      const label = labels.shift()!
+      this.markLabel(label)
+    }
+  }
+
+  private compileSwitchClauseStatements(
+    statements: readonly ts.Statement[],
+    switchLabelName?: string
+  ): { fallsThrough: boolean; exitsSwitch: boolean } {
+    for (const statement of statements) {
+      this.visitNode(statement)
+    }
+    return this.analyzeSwitchClauseControl(statements, switchLabelName)
+  }
+
+  private analyzeSwitchClauseControl(
+    statements: readonly ts.Statement[],
+    switchLabelName?: string
+  ): { fallsThrough: boolean; exitsSwitch: boolean } {
+    if (statements.length === 0) {
+      return { fallsThrough: true, exitsSwitch: false }
+    }
+
+    const last = statements[statements.length - 1]
+
+    if (ts.isBlock(last)) {
+      return this.analyzeSwitchClauseControl(last.statements, switchLabelName)
+    }
+
+    if (ts.isReturnStatement(last) || ts.isThrowStatement(last)) {
+      return { fallsThrough: false, exitsSwitch: false }
+    }
+
+    if (ts.isBreakStatement(last)) {
+      if (!last.label) {
+        return { fallsThrough: false, exitsSwitch: true }
+      }
+      if (switchLabelName && last.label.text === switchLabelName) {
+        return { fallsThrough: false, exitsSwitch: true }
+      }
+      return { fallsThrough: false, exitsSwitch: false }
+    }
+
+    if (ts.isContinueStatement(last)) {
+      return { fallsThrough: false, exitsSwitch: false }
+    }
+
+    return { fallsThrough: true, exitsSwitch: false }
+  }
+
+  private compileForVariableDeclarationList(list: ts.VariableDeclarationList) {
+    const flags = list.flags
+    const isConst = (flags & ts.NodeFlags.Const) !== 0
+    const isLet = (flags & ts.NodeFlags.Let) !== 0
+    const isModuleTopLevel =
+      this.currentFunction.parent === null &&
+      this.currentFunction.module !== null &&
+      this.scopeManager.currentScope() === this.currentFunction.bodyScope
+
+    for (const declaration of list.declarations) {
+      this.withSourceNode(declaration, () => {
+        if (!ts.isIdentifier(declaration.name)) {
+          throw new Error('Destructuring is not supported yet')
+        }
+
+        const nameText = declaration.name.text
+        const atom = this.atomTable.getAtomId(nameText)
+
+        if ((isConst || isLet) && this.scopeManager.hasBindingInCurrentScope(atom)) {
+          throw new Error(`Identifier '${nameText}' has already been declared in this scope`)
+        }
+
+        if (isConst && !declaration.initializer) {
+          throw new Error(`Missing initializer in const declaration for '${nameText}'`)
+        }
+
+  const capture = isModuleTopLevel
+        const varIndex = this.declareLexicalVariable(atom, { isConst, isLet, capture })
+        const variable = this.currentFunction.vars[varIndex]
+        if (this.isGlobalVarContext() && isModuleTopLevel) {
+          const forceInit = variable.isLexical && !declaration.initializer
+          this.registerGlobalVar(atom, {
+            scopeLevel: variable.scopeLevel,
+            isLexical: variable.isLexical,
+            isConst: variable.isConst,
+            forceInit,
+          })
+        }
+
+        if (declaration.initializer) {
+          this.compileExpression(declaration.initializer)
+          this.emitStoreToLexical(atom)
+        } else if (isConst || isLet) {
+          this.emitOpcode(Opcode.OP_undefined)
+          this.emitStoreToLexical(atom)
+        }
+      })
+    }
   }
 
   private compileExpression(expression: ts.Expression): void {
@@ -803,8 +1397,18 @@ export class Compiler {
         return
       }
 
+      if (ts.isNoSubstitutionTemplateLiteral(expression)) {
+        this.compileNoSubstitutionTemplateLiteral(expression)
+        return
+      }
+
       if (ts.isArrayLiteralExpression(expression)) {
         this.compileArrayLiteral(expression)
+        return
+      }
+
+      if (ts.isObjectLiteralExpression(expression)) {
+        this.compileObjectLiteral(expression)
         return
       }
 
@@ -829,21 +1433,91 @@ export class Compiler {
     }
   }
 
+  private emitStringLiteral(value: string, node: ts.Node) {
+    const atom = this.atomTable.getAtomId(value)
+    this.emitOpcode(Opcode.OP_push_atom_value, [atom], node)
+  }
+
   private compileStringLiteral(expression: ts.StringLiteral) {
-    const atom = this.atomTable.getAtomId(expression.text)
-    this.emitOpcode(Opcode.OP_push_atom_value, [atom], expression)
+    this.emitStringLiteral(expression.text, expression)
+  }
+
+  private compileNoSubstitutionTemplateLiteral(expression: ts.NoSubstitutionTemplateLiteral) {
+    this.emitStringLiteral(expression.text, expression)
   }
 
   private compileArrayLiteral(expression: ts.ArrayLiteralExpression) {
     const elements = expression.elements
-    const values = elements.filter((el) => !ts.isOmittedExpression(el))
+    const values = elements.filter((el): el is ts.Expression => !ts.isOmittedExpression(el))
     if (values.length !== elements.length) {
       throw new Error('Array holes are not supported yet')
     }
-    for (const element of values) {
-      this.compileExpression(element as ts.Expression)
+
+    const currentStatement = this.currentStatementNode
+    if (currentStatement && ts.isExpressionStatement(currentStatement) && currentStatement.expression === expression) {
+      this.recordDebugPoint(expression)
     }
-    this.emitOpcode(Opcode.OP_array_from, [values.length])
+
+    for (const element of values) {
+      this.compileExpression(element)
+    }
+    this.emitOpcode(Opcode.OP_array_from, [values.length], null)
+  }
+
+  private compileObjectLiteral(expression: ts.ObjectLiteralExpression) {
+    const properties = expression.properties
+    if (properties.length === 0) {
+      this.emitOpcode(Opcode.OP_object, [], expression)
+      return
+    }
+
+    const assignments = properties.map((property) => {
+      if (ts.isPropertyAssignment(property)) {
+        const name = property.name
+        if (ts.isComputedPropertyName(name)) {
+          throw new Error('Computed property names are not supported yet')
+        }
+        if (ts.isPrivateIdentifier(name)) {
+          throw new Error('Private identifiers are not supported in object literals')
+        }
+        const initializer = property.initializer
+        if (!initializer) {
+          throw new Error('Property assignments must have an initializer')
+        }
+        return { property, name, initializer }
+      }
+
+      if (ts.isShorthandPropertyAssignment(property)) {
+        const name = property.name
+        if (ts.isPrivateIdentifier(name)) {
+          throw new Error('Private identifiers are not supported in object literals')
+        }
+        return { property, name, initializer: name }
+      }
+
+      throw new Error(`Unsupported object literal property: ${ts.SyntaxKind[property.kind]}`)
+    })
+
+    this.emitOpcode(Opcode.OP_object, [], expression)
+
+    for (const { property, name, initializer } of assignments) {
+      let propertyAtom: Atom
+      if (ts.isIdentifier(name)) {
+        propertyAtom = this.atomTable.getAtomId(name.text)
+      } else if (ts.isStringLiteral(name) || ts.isNoSubstitutionTemplateLiteral(name)) {
+        propertyAtom = this.atomTable.getAtomId(name.text)
+      } else if (ts.isNumericLiteral(name)) {
+        propertyAtom = this.atomTable.getAtomId(name.text)
+      } else {
+        throw new Error(`Unsupported object literal property name kind: ${ts.SyntaxKind[name.kind]}`)
+      }
+
+      this.withSourceNode(initializer, () => {
+        this.compileExpression(initializer)
+      })
+
+      this.emitOpcode(Opcode.OP_define_field, [propertyAtom], property)
+    }
   }
 
   private compileCallExpression(expression: ts.CallExpression) {
@@ -940,13 +1614,70 @@ export class Compiler {
       this.emitOpcode(Opcode.OP_get_var_ref, [index], identifier)
       return
     }
+    const captured = this.resolveCapturedIdentifier(atom)
+    if (captured) {
+      if (captured.isLexical) {
+        this.emitOpcode(Opcode.OP_get_var_ref_check, [captured.index], identifier)
+        return
+      }
+      const shortOpcode = getIndexedOpcode('OP_get_var_ref', captured.index)
+      if (shortOpcode !== undefined) {
+        this.emitOpcode(shortOpcode, [], identifier)
+        return
+      }
+      this.emitOpcode(Opcode.OP_get_var_ref, [captured.index], identifier)
+      return
+    }
     this.emitOpcode(Opcode.OP_get_var, [atom], identifier)
   }
 
-  private emitSetLocalUninitialized(index: number) {
-    this.withoutDebugRecording(() => {
-      this.emitOpcode(Opcode.OP_set_loc_uninitialized, [index])
-    })
+  private emitSetLocalUninitialized(index: number, scopeLevel: number) {
+    const scopeInfo = this.ensureLexicalInitializationScope(scopeLevel)
+    const instruction: Instruction = {
+      opcode: Opcode.OP_set_loc_uninitialized,
+      operands: [index],
+    }
+    this.insertLexicalInitialization(scopeLevel, scopeInfo.insertionIndex, instruction)
+  }
+
+  private ensureLexicalInitializationScope(scopeLevel: number): { insertionIndex: number } {
+    if (scopeLevel < 0) {
+      scopeLevel = this.scopeManager.currentScope()
+    }
+    let scopeInfo = this.lexicalInitByScope.get(scopeLevel)
+    if (!scopeInfo) {
+      scopeInfo = {
+        insertionIndex: this.currentFunction.bytecode.instructions.length,
+      }
+      this.lexicalInitByScope.set(scopeLevel, scopeInfo)
+    }
+    return scopeInfo
+  }
+
+  private insertLexicalInitialization(scopeLevel: number, insertionIndex: number, instruction: Instruction) {
+    const func = this.currentFunction
+    const insertionPc = this.getInstructionOffset(func, insertionIndex)
+    const labelsToRestore: string[] = []
+    for (const [label, position] of this.labelPositions) {
+      if (position === insertionPc) {
+        labelsToRestore.push(label)
+      }
+    }
+
+    this.insertInstructions(func, insertionIndex, [instruction])
+
+    for (const label of labelsToRestore) {
+      this.labelPositions.set(label, insertionPc)
+    }
+
+    for (const [otherScope, info] of this.lexicalInitByScope) {
+      if (otherScope === scopeLevel) {
+        continue
+      }
+      if (info.insertionIndex >= insertionIndex) {
+        info.insertionIndex += 1
+      }
+    }
   }
 
   private emitStoreToLocal(index: number) {
@@ -975,6 +1706,65 @@ export class Compiler {
     this.emitOpcode(Opcode.OP_get_loc_check, [index], node)
   }
 
+  private resolveCapturedIdentifier(atom: Atom): { index: number; isLexical: boolean } | null {
+    const capture = this.findCapturedVariableInParents(atom)
+    if (!capture) {
+      return null
+    }
+    return this.ensureCapturedClosureVar(atom, capture)
+  }
+
+  private findCapturedVariableInParents(atom: Atom): { functionDef: FunctionDef; variable: Var; varIndex: number } | null {
+    let current = this.currentFunction.parent
+    while (current) {
+      for (let index = 0; index < current.vars.length; index += 1) {
+        const variable = current.vars[index]
+        if (variable.name !== atom) {
+          continue
+        }
+        if (!variable.isCaptured) {
+          continue
+        }
+        return { functionDef: current, variable, varIndex: index }
+      }
+      current = current.parent
+    }
+    return null
+  }
+
+  private ensureCapturedClosureVar(
+    atom: Atom,
+    capture: { functionDef: FunctionDef; variable: Var; varIndex: number }
+  ): { index: number; isLexical: boolean } {
+    if (this.closureVarIndices.has(atom)) {
+      const existingIndex = this.closureVarIndices.get(atom)!
+      const closureVar = this.currentFunction.bytecode.closureVars[existingIndex]
+      const isLexical = closureVar?.isLexical ?? capture.variable.isLexical
+      return { index: existingIndex, isLexical }
+    }
+
+    const parentClosureVar = capture.functionDef.bytecode.closureVars.find((cv) => cv.name === atom)
+    const isLexical = parentClosureVar?.isLexical ?? capture.variable.isLexical
+    const isConst = parentClosureVar?.isConst ?? capture.variable.isConst
+    const kind = parentClosureVar?.kind ?? capture.variable.kind
+    const varIndex = parentClosureVar?.varIndex ?? capture.varIndex
+    const isArgument = parentClosureVar?.isArgument ?? false
+
+    const closureVar = new ClosureVar(atom, {
+      isLocal: false,
+      isArgument,
+      isConst,
+      isLexical,
+      kind,
+      varIndex,
+    })
+
+    const closureIndex = this.currentFunction.addClosureVar(closureVar)
+    this.closureVarIndices.set(atom, closureIndex)
+
+    return { index: closureIndex, isLexical: closureVar.isLexical }
+  }
+
   private createLabel(): string {
     return `L${this.labelCounter++}`
   }
@@ -984,8 +1774,12 @@ export class Compiler {
   }
 
   private emitJump(opcode: Opcode, label: string) {
-    const index = this.emitOpcode(opcode, [0])
+    const index = this.emitOpcode(opcode, [0], null)
     this.pendingJumps.push({ index, label, opcode })
+  }
+
+  private emitGoto(label: string) {
+    this.emitJump(Opcode.OP_goto8, label)
   }
 
   private resolvePendingJumps() {
@@ -1064,14 +1858,18 @@ export class Compiler {
   private emitStoreToLexical(atom: Atom) {
     const slot = this.localVarIndices.get(atom)
     if (slot !== undefined) {
-      this.emitStoreToLocal(slot)
+      this.withoutDebugRecording(() => {
+        this.emitStoreToLocal(slot)
+      })
       return
     }
     const closureIndex = this.closureVarIndices.get(atom)
     if (closureIndex === undefined) {
       throw new Error('Unknown lexical variable')
     }
-    this.emitPutVarRef(closureIndex)
+    this.withoutDebugRecording(() => {
+      this.emitPutVarRef(closureIndex)
+    })
   }
 
   private emitModulePrologue() {
@@ -1329,6 +2127,9 @@ export class Compiler {
     }
 
     for (const entry of bytecode.lineNumberTable) {
+      if (entry.instructionIndex >= index) {
+        entry.instructionIndex += instructions.length
+      }
       if (entry.pc >= insertionOffset) {
         entry.pc += delta
       }
@@ -1385,7 +2186,20 @@ export class Compiler {
       throw new Error(`Unknown opcode: ${opcode}`)
     }
 
-    const recordNode = node === null ? null : node ?? this.currentStatementNode ?? this.currentSourceNode
+  const instructionIndex = this.currentFunction.bytecode.instructions.length
+  const recordNode = node === null ? null : node ?? this.currentStatementNode ?? this.currentSourceNode
+    if (process.env.DEBUG_PC2LINE === '1') {
+      console.log('pc2line:emit', {
+        opcode: Opcode[opcode],
+        offset: this.currentOffset,
+        instructionIndex,
+        recordNodeKind: recordNode ? ts.SyntaxKind[recordNode.kind] : null,
+        currentStatementKind: this.currentStatementNode ? ts.SyntaxKind[this.currentStatementNode.kind] : null,
+        currentSourceKind: this.currentSourceNode ? ts.SyntaxKind[this.currentSourceNode.kind] : null,
+        hasDebugOptions: debugOptions?.tsSourcePos !== undefined,
+        suppress: this.suppressDebugRecording,
+      })
+    }
     if (!this.suppressDebugRecording && (recordNode || debugOptions?.tsSourcePos !== undefined)) {
       let tsSourcePos = debugOptions?.tsSourcePos
       if (tsSourcePos === undefined && recordNode) {
@@ -1393,15 +2207,29 @@ export class Compiler {
       }
       if (tsSourcePos !== undefined && tsSourcePos >= 0) {
         const sourcePos = this.toUtf8Offset(tsSourcePos)
-        const isStatementRecord = debugOptions?.tsSourcePos === undefined && node === undefined && recordNode === this.currentStatementNode
+        const statementNode = this.currentStatementNode
+        const isStatementRecord = debugOptions?.tsSourcePos === undefined && node === undefined && recordNode === statementNode
         if (!isStatementRecord || !this.recordedStatementPositions.has(sourcePos)) {
           if (isStatementRecord) {
             this.recordedStatementPositions.add(sourcePos)
           }
-          const { line, column } = this.getLineColumnFromUtf8Offset(sourcePos)
-          this.currentFunction.bytecode.recordLineNumber(this.currentOffset, line, column, sourcePos)
-          if (!isStatementRecord && this.currentStatementNode) {
-            const statementStart = this.currentStatementNode.getStart(this.sourceFile, false)
+          let { line, column } = this.getLineColumnFromUtf8Offset(sourcePos)
+          if (process.env.DEBUG_PC2LINE === '1') {
+            console.log('pc2line:record', {
+              offset: this.currentOffset,
+              instructionIndex,
+              opcode: Opcode[opcode],
+              nodeKind: recordNode ? ts.SyntaxKind[recordNode.kind] : null,
+              isStatementRecord,
+              tsSourcePos,
+              sourcePos,
+              line,
+              column,
+            })
+          }
+          this.currentFunction.bytecode.recordLineNumber(this.currentOffset, line, column, sourcePos, instructionIndex)
+          if (!isStatementRecord && statementNode && recordNode === statementNode) {
+            const statementStart = statementNode.getStart(this.sourceFile, false)
             if (statementStart >= 0) {
               const statementPos = this.toUtf8Offset(statementStart)
               this.recordedStatementPositions.add(statementPos)
@@ -1422,11 +2250,28 @@ export class Compiler {
       this.maxStackDepth = this.stackDepth
     }
 
-    const instructionIndex = this.currentFunction.bytecode.instructions.length
     this.currentFunction.bytecode.pushOpcode(opcode, operands)
     this.instructionOffsets[instructionIndex] = this.currentOffset
     this.currentOffset += def.size
     return instructionIndex
+  }
+
+  private recordDebugPoint(node: ts.Node) {
+    if (this.suppressDebugRecording) {
+      return
+    }
+    const tsSourcePos = node.getStart(this.sourceFile, false)
+    if (tsSourcePos < 0) {
+      return
+    }
+    const sourcePos = this.toUtf8Offset(tsSourcePos)
+    if (this.recordedStatementPositions.has(sourcePos)) {
+      return
+    }
+    const { line, column } = this.getLineColumnFromUtf8Offset(sourcePos)
+    const instructionIndex = this.currentFunction.bytecode.instructions.length
+    this.currentFunction.bytecode.recordLineNumber(this.currentOffset, line, column, sourcePos, instructionIndex)
+    this.recordedStatementPositions.add(sourcePos)
   }
 
   private getStackEffect(opcode: Opcode, operands: number[] = []): { nPop: number; nPush: number } {
@@ -1708,28 +2553,70 @@ export class Compiler {
   }
 
   private pushScope(kind: ScopeKind = ScopeKind.Block) {
-    this.scopeManager.enterScope(kind)
+    const scopeIndex = this.scopeManager.enterScope(kind)
+    if (!this.lexicalInitByScope.has(scopeIndex)) {
+      this.lexicalInitByScope.set(scopeIndex, {
+        insertionIndex: this.currentFunction.bytecode.instructions.length,
+      })
+    }
   }
 
   private popScope() {
-    this.scopeManager.leaveScope()
+    const popped = this.scopeManager.leaveScope()
+    if (popped !== undefined) {
+      this.lexicalInitByScope.delete(popped)
+    }
   }
 
   private buildDebugInfo(func: FunctionDef) {
-    const entries = [...func.bytecode.lineNumberTable]
-      .filter((entry) => entry.sourcePos >= 0)
-      .sort((a, b) => a.pc - b.pc)
-
-    const firstEntry = entries[0]
-    if (!firstEntry || firstEntry.pc !== 0 || firstEntry.sourcePos !== 0) {
-      entries.unshift({ pc: 0, line: 0, column: 0, sourcePos: 0 })
+    const instructions = func.bytecode.instructions
+    const instructionOffsets: number[] = new Array(instructions.length)
+    let runningOffset = 0
+    for (let index = 0; index < instructions.length; index += 1) {
+      instructionOffsets[index] = runningOffset
+      runningOffset += this.getInstructionSize(instructions[index])
     }
 
-    const normalized: typeof entries = []
-    for (const entry of entries) {
+    const sortedEntries = [...func.bytecode.lineNumberTable]
+      .filter((entry) => entry.sourcePos >= 0)
+      .map((entry) => {
+        const actualPc = entry.instructionIndex < instructionOffsets.length ? instructionOffsets[entry.instructionIndex] : entry.pc
+        return {
+          pc: actualPc,
+          line: entry.line,
+          column: entry.column,
+          sourcePos: entry.sourcePos,
+        }
+      })
+      .sort((a, b) => a.pc - b.pc)
+
+    const baseSourcePos = func.sourcePos ?? 0
+    const baseLinePos = this.getLineColumnFromUtf8Offset(baseSourcePos)
+
+    const combinedEntries: typeof sortedEntries = [
+      {
+        pc: 0,
+        line: baseLinePos.line,
+        column: baseLinePos.column,
+        sourcePos: baseSourcePos,
+      },
+      ...sortedEntries,
+    ]
+
+    const normalized: typeof combinedEntries = []
+    if (process.env.DEBUG_PC2LINE === '1') {
+      console.log('pc2line:rawTable', combinedEntries.map((entry) => ({ ...entry })))
+    }
+    for (const entry of combinedEntries) {
       const previous = normalized[normalized.length - 1]
       if (previous) {
         if (entry.sourcePos === previous.sourcePos && entry.pc === previous.pc) {
+          continue
+        }
+        if (previous.line === entry.line && previous.column === entry.column) {
+          continue
+        }
+        if (previous.sourcePos === entry.sourcePos) {
           continue
         }
       }
@@ -1742,16 +2629,6 @@ export class Compiler {
       return
     }
 
-    const lineCache = new Map<number, { line: number; column: number }>()
-    const getLineColumn = (sourcePos: number) => {
-      let cached = lineCache.get(sourcePos)
-      if (!cached) {
-        cached = this.getLineColumnFromUtf8Offset(sourcePos)
-        lineCache.set(sourcePos, cached)
-      }
-      return cached
-    }
-
     const pc2line: number[] = []
     const pc2column: number[] = []
     if (process.env.DEBUG_PC2LINE === '1') {
@@ -1759,24 +2636,27 @@ export class Compiler {
     }
 
     const first = normalized[0]
-    const firstPos = getLineColumn(first.sourcePos)
-    pc2line.push(...this.encodeULEB128(firstPos.line))
-    pc2line.push(...this.encodeULEB128(firstPos.column))
-    pc2column.push(...this.encodeULEB128(firstPos.column))
+    // QuickJS stores zero-based line/column values directly in the pc2line stream.
+    const firstLine = first.line
+    const firstColumn = first.column
+    pc2line.push(...this.encodeULEB128(firstLine))
+    pc2line.push(...this.encodeULEB128(firstColumn))
+    pc2column.push(...this.encodeULEB128(firstColumn))
 
     let lastPc = first.pc
-    let lastLine = firstPos.line
-    let lastColumn = firstPos.column
+    let lastLine = firstLine
+    let lastColumn = firstColumn
 
     for (let index = 1; index < normalized.length; index++) {
       const entry = normalized[index]
       if (entry.pc < lastPc) {
         continue
       }
-      const current = getLineColumn(entry.sourcePos)
-      const diffPc = entry.pc - lastPc
-      const diffLine = current.line - lastLine
-      const diffColumn = current.column - lastColumn
+    const diffPc = entry.pc - lastPc
+    const currentLine = entry.line
+    const diffLine = currentLine - lastLine
+    const currentColumn = entry.column
+    const diffColumn = currentColumn - lastColumn
 
       if (diffLine === 0 && diffColumn === 0) {
         continue
@@ -1800,24 +2680,172 @@ export class Compiler {
       pc2column.push(...this.encodeSLEB128(diffColumn))
 
       lastPc = entry.pc
-      lastLine = current.line
-      lastColumn = current.column
+    lastLine = currentLine
+    lastColumn = currentColumn
     }
 
     func.bytecode.pc2line = pc2line
     func.bytecode.pc2column = pc2column
+    if (process.env.DEBUG_PC2LINE === '1') {
+      console.log('pc2line:encoded', pc2line)
+    }
     func.bytecode.source = ''
     func.bytecode.sourceLength = 0
   }
 
   private finalizeFunction(func: FunctionDef) {
+    const funcName = this.atomTable.getAtomString(func.bytecode.name)
+    if (funcName === 'multiply' || funcName === 'factorial') {
+      console.log('lineNumberTable.before', funcName, func.bytecode.lineNumberTable)
+    }
+    func.bytecode.constantPool = func.getConstantPoolEntries()
+    this.pruneUnusedClosureVars(func)
     const lexicalVars = func.vars.filter((variable) => !variable.isCaptured)
+    for (const variable of lexicalVars) {
+      if (variable.scopeLevel >= 0) {
+        variable.scopeLevel = this.remapScopeLevel(func, variable.scopeLevel)
+      }
+    }
     func.bytecode.setVarDefs(lexicalVars)
     func.bytecode.setArgDefs(func.args)
     func.bytecode.stackSize = this.computeStackSize(func.bytecode)
     this.buildDebugInfo(func)
+    if (funcName === 'multiply' || funcName === 'factorial') {
+      console.log('pc2line.after', funcName, func.bytecode.pc2line)
+    }
     func.bytecode.argCount = func.args.length
     func.bytecode.definedArgCount = func.definedArgCount
+  }
+
+  private pruneUnusedClosureVars(func: FunctionDef) {
+    const closureVars = func.bytecode.closureVars
+    if (closureVars.length === 0) {
+      return
+    }
+
+    const used = this.collectClosureVarUsage(func)
+    if (used.size === closureVars.length) {
+      return
+    }
+
+    const remap = new Map<number, number>()
+    const filtered: typeof closureVars = []
+    for (let index = 0; index < closureVars.length; index++) {
+      if (!used.has(index)) {
+        continue
+      }
+      remap.set(index, filtered.length)
+      filtered.push(closureVars[index])
+    }
+
+    if (filtered.length === closureVars.length) {
+      return
+    }
+
+    if (process.env.DEBUG_UNUSED_CLOSURE === '1') {
+      const nameAtom = func.bytecode.name
+      const name = this.atomTable.getAtomString(nameAtom) ?? '<anonymous>'
+      console.log('pruneUnusedClosureVars', {
+        functionName: name,
+        originalCount: closureVars.length,
+        used: [...used].sort((a, b) => a - b),
+      })
+    }
+
+    if (remap.size === 0) {
+      func.bytecode.closureVars = []
+      func.closureVars = []
+      this.closureVarIndices.clear()
+      return
+    }
+
+    this.rewriteClosureVarInstructions(func.bytecode.instructions, remap)
+
+    func.bytecode.closureVars = filtered
+    func.closureVars = [...filtered]
+
+    this.closureVarIndices.clear()
+    for (let newIndex = 0; newIndex < filtered.length; newIndex++) {
+      this.closureVarIndices.set(filtered[newIndex].name, newIndex)
+    }
+  }
+
+  private collectClosureVarUsage(func: FunctionDef): Set<number> {
+    const used = new Set<number>()
+    for (const instruction of func.bytecode.instructions) {
+      const def = getOpcodeDefinition(instruction.opcode)
+      if (!def) {
+        continue
+      }
+      if (def.format === OpFormat.var_ref) {
+        if (instruction.operands.length === 0) {
+          continue
+        }
+        const index = instruction.operands[instruction.operands.length - 1]
+        used.add(index)
+        continue
+      }
+      if (def.format === OpFormat.none_var_ref) {
+        const name = getOpcodeName(instruction.opcode)
+        if (!name) {
+          continue
+        }
+        const match = name.match(/^(OP_[a-z_]+)(\d)$/)
+        if (!match) {
+          continue
+        }
+        const index = Number(match[2])
+        used.add(index)
+      }
+    }
+    return used
+  }
+
+  private rewriteClosureVarInstructions(instructions: Instruction[], remap: Map<number, number>) {
+    for (const instruction of instructions) {
+      const def = getOpcodeDefinition(instruction.opcode)
+      if (!def) {
+        continue
+      }
+      if (def.format === OpFormat.var_ref) {
+        if (instruction.operands.length === 0) {
+          continue
+        }
+        const oldIndex = instruction.operands[instruction.operands.length - 1]
+        const newIndex = remap.get(oldIndex)
+        if (newIndex === undefined) {
+          continue
+        }
+        instruction.operands[instruction.operands.length - 1] = newIndex
+        continue
+      }
+      if (def.format === OpFormat.none_var_ref) {
+        const name = getOpcodeName(instruction.opcode)
+        if (!name) {
+          continue
+        }
+        const match = name.match(/^(OP_[a-z_]+)(\d)$/)
+        if (!match) {
+          continue
+        }
+        const oldIndex = Number(match[2])
+        const newIndex = remap.get(oldIndex)
+        if (newIndex === undefined) {
+          continue
+        }
+        const baseName = match[1]
+        const updatedOpcode = getIndexedOpcode(baseName, newIndex)
+        if (updatedOpcode !== undefined) {
+          instruction.opcode = updatedOpcode
+          continue
+        }
+        const fallbackOpcode = (Opcode as unknown as Record<string, number>)[baseName]
+        if (typeof fallbackOpcode === 'number') {
+          instruction.opcode = fallbackOpcode
+          instruction.operands = [newIndex]
+        }
+      }
+    }
   }
 
   private encodeULEB128(value: number): number[] {
@@ -1836,16 +2864,15 @@ export class Compiler {
 
   private encodeSLEB128(value: number): number[] {
     const result: number[] = []
-    const v = value | 0
-    let zigzag = ((v << 1) ^ (v >> 31)) >>> 0
+    let encoded = ((value << 1) ^ (value >> 31)) >>> 0
     do {
-      let byte = zigzag & 0x7f
-      zigzag >>>= 7
-      if (zigzag !== 0) {
+      let byte = encoded & 0x7f
+      encoded >>>= 7
+      if (encoded !== 0) {
         byte |= 0x80
       }
       result.push(byte)
-    } while (zigzag !== 0)
+    } while (encoded !== 0)
     return result
   }
 
@@ -2038,7 +3065,8 @@ export class Compiler {
             cursor += 1
           }
           if (!hasLineBreak) {
-            const replacement = `${source.slice(start, end)}\n`
+            const text = source.slice(start, end)
+            const replacement = `${text}\n`
             segments.push({ start, end, replacement })
           }
         }
@@ -2059,6 +3087,47 @@ export class Compiler {
     }
 
     if (ts.isLiteralExpression(initializer)) {
+      return true
+    }
+
+    if (ts.isArrayLiteralExpression(initializer)) {
+      if (initializer.elements.some((element) => ts.isOmittedExpression(element) || ts.isSpreadElement(element))) {
+        return false
+      }
+      return initializer.elements
+        .filter((element): element is ts.Expression => !ts.isOmittedExpression(element) && !ts.isSpreadElement(element))
+        .every((element) => this.shouldSuppressTopLevelInitializerDebug(element))
+    }
+
+    if (ts.isObjectLiteralExpression(initializer)) {
+      for (const property of initializer.properties) {
+        if (ts.isPropertyAssignment(property)) {
+          const name = property.name
+          if (!name || ts.isComputedPropertyName(name) || ts.isPrivateIdentifier(name)) {
+            return false
+          }
+          if (!property.initializer) {
+            return false
+          }
+          if (!this.shouldSuppressTopLevelInitializerDebug(property.initializer)) {
+            return false
+          }
+          continue
+        }
+
+        if (ts.isShorthandPropertyAssignment(property)) {
+          const name = property.name
+          if (!name || ts.isPrivateIdentifier(name)) {
+            return false
+          }
+          if (!this.shouldSuppressTopLevelInitializerDebug(name)) {
+            return false
+          }
+          continue
+        }
+
+        return false
+      }
       return true
     }
 
@@ -2090,9 +3159,8 @@ export class Compiler {
 
   private computeDebugSourceMapping(source: string): { strippedSource: string; normalizedPosByPos: Uint32Array } {
     const segments: Array<{ start: number; end: number; replacement: string }> = []
-    this.collectEmptyStatementNewlineSegments(source, segments)
-    this.collectCollapsedBlankLineSegments(source, segments)
-  this.collectStripSegments(source, /:\s*[^=;,){}\r\n]+(?=[=;,){}])/g, segments, ' ')
+  this.collectEmptyStatementNewlineSegments(source, segments)
+    this.collectStripSegments(source, /:\s*[^=;,){}\r\n]+(?=[=;,){}])/g, segments)
     this.collectStripSegments(source, /<\s*[^>]+\s*>/g, segments)
     this.collectStripSegments(source, /\b(interface|type)\s+\w+\s*=\s*[^;]+;?/g, segments)
     this.collectStripSegments(source, /\s+as\s+const\b/g, segments)
@@ -2156,6 +3224,88 @@ export class Compiler {
     return { strippedSource, normalizedPosByPos }
   }
 
+  private computeColumnAdjustments(strippedSource: string, referenceJsSource?: string | null): Map<number, ColumnAdjustment> {
+    const adjustments = new Map<number, ColumnAdjustment>()
+    if (referenceJsSource === null) {
+      return adjustments
+    }
+
+    let comparisonJs: string | undefined
+
+    if (typeof referenceJsSource === 'string') {
+      comparisonJs = referenceJsSource
+    } else {
+      try {
+        const result = ts.transpileModule(this.sourceCode, {
+          fileName: this.fileName,
+          reportDiagnostics: false,
+          compilerOptions: {
+            module: ts.ModuleKind.ESNext,
+            target: ts.ScriptTarget.ES2020,
+            jsx: ts.JsxEmit.Preserve,
+            importHelpers: false,
+            esModuleInterop: false,
+          },
+        })
+        comparisonJs = result.outputText ?? undefined
+      } catch {
+        comparisonJs = undefined
+      }
+    }
+
+    if (!comparisonJs) {
+      return adjustments
+    }
+
+    const originalLines = strippedSource.split(/\r?\n/)
+    const comparisonLines = comparisonJs.split(/\r?\n/)
+    const commonLineCount = Math.min(originalLines.length, comparisonLines.length)
+
+    for (let lineIndex = 0; lineIndex < commonLineCount; lineIndex += 1) {
+      const originalLine = originalLines[lineIndex]
+      const comparisonLine = comparisonLines[lineIndex]
+      const originalIndent = this.countLeadingColumns(originalLine)
+      const comparisonIndent = this.countLeadingColumns(comparisonLine)
+      const delta = comparisonIndent - originalIndent
+      if (delta !== 0) {
+        adjustments.set(lineIndex, { startColumn: originalIndent, delta })
+      }
+    }
+
+    return adjustments
+  }
+
+  private countLeadingColumns(line: string): number {
+    let columns = 0
+    for (let index = 0; index < line.length; index += 1) {
+      const code = line.charCodeAt(index)
+      if (code === 0x20) {
+        columns += 1
+        continue
+      }
+      if (code === 0x09) {
+        columns += 1
+        continue
+      }
+      if (code === 0x0d || code === 0x0a) {
+        continue
+      }
+      break
+    }
+    return columns
+  }
+
+  private adjustColumnForTranspiled(line: number, column: number): number {
+    const entry = this.columnAdjustments.get(line)
+    if (!entry) {
+      return 0
+    }
+    if (column < entry.startColumn) {
+      return 0
+    }
+    return entry.delta
+  }
+
   private collectCollapsedBlankLineSegments(
     source: string,
     segments: Array<{ start: number; end: number; replacement: string }>
@@ -2208,8 +3358,8 @@ export class Compiler {
         }
       }
     } else {
-  line = 0
-  column = 0
+      line = 0
+      column = 0
       for (let i = 0; i < clampedOffset; i++) {
         const byte = this.sourceUtf8[i]
         if (byte === 0x0a) {
@@ -2220,11 +3370,10 @@ export class Compiler {
         }
       }
     }
-    const lineStart = this.findLineStartUtf8Offset(clampedOffset)
-    const indentColumns = this.computeIndentColumnsFromUtf8Offset(lineStart)
-    const adjustedColumn = column + indentColumns
     this.lineColCache = { offset: clampedOffset, line, rawColumn: column }
-    return { line, column: adjustedColumn }
+    const adjustment = this.adjustColumnForTranspiled(line, column)
+    const adjustedColumn = column + adjustment
+    return { line, column: adjustedColumn < 0 ? 0 : adjustedColumn }
   }
 
   private findLineStartUtf8Offset(offset: number): number {
@@ -2241,6 +3390,22 @@ export class Compiler {
       current -= 1
     }
     return current
+  }
+
+  private shouldAdjustStatementIndent(statement: ts.Node): boolean {
+    return (
+      ts.isExpressionStatement(statement) ||
+      ts.isReturnStatement(statement) ||
+      ts.isVariableStatement(statement) ||
+      ts.isIfStatement(statement) ||
+      ts.isWhileStatement(statement) ||
+      ts.isDoStatement(statement) ||
+      ts.isForStatement(statement) ||
+      ts.isForInStatement(statement) ||
+      ts.isForOfStatement(statement) ||
+      ts.isSwitchStatement(statement) ||
+      ts.isThrowStatement(statement)
+    )
   }
 
   private computeIndentColumnsFromUtf8Offset(offset: number): number {
@@ -2261,6 +3426,25 @@ export class Compiler {
       break
     }
     return indent
+  }
+
+  private remapScopeLevel(func: FunctionDef, scopeLevel: number): number {
+    if (scopeLevel < 0 || scopeLevel >= func.scopes.length) {
+      return scopeLevel
+    }
+    let adjusted = scopeLevel
+    let current = scopeLevel
+    while (current >= 0) {
+      const scope = func.scopes[current]
+      if (!scope) {
+        break
+      }
+      if (scope.kind === ScopeKind.Parameter) {
+        adjusted -= 1
+      }
+      current = scope.parent
+    }
+    return adjusted
   }
 
   private getUtf8ByteLength(codePoint: number): number {

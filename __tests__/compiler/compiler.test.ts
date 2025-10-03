@@ -2,7 +2,8 @@ import { promises as fs } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { TypeScriptCompiler } from '../../src'
-import { FunctionKind } from '../../src/env'
+import { Compiler } from '../../src/compiler'
+import { FunctionKind, Opcode, BytecodeTag } from '../../src/env'
 import { QuickJSLib } from '../../scripts/QuickJSLib'
 
 describe('TypeScriptCompiler', () => {
@@ -54,5 +55,66 @@ describe('TypeScriptCompiler', () => {
     expect(child.bytecode.newTargetAllowed).toBe(true)
     expect(child.bytecode.argumentsAllowed).toBe(true)
     expect(child.bytecode.hasSimpleParameterList).toBe(true)
+  })
+
+  test('decimal numeric literals use float constant pool entries', async () => {
+    const compiler = new TypeScriptCompiler()
+    const source = 'const value = 3.5\n'
+    const { functionDef } = await compiler.compileSourceWithArtifacts(source, 'float-literal.ts')
+
+    const pool = functionDef.bytecode.constantPool
+    expect(pool.length).toBeGreaterThan(0)
+    const floatEntry = pool.find((entry) => entry.tag === BytecodeTag.TC_TAG_FLOAT64)
+    expect(floatEntry).toBeDefined()
+    if (!floatEntry) {
+      return
+    }
+    expect(floatEntry.tag).toBe(BytecodeTag.TC_TAG_FLOAT64)
+    if ('value' in floatEntry) {
+      expect(floatEntry.value).toBe(3.5)
+    } else {
+      throw new Error('Float constant entry missing value field')
+    }
+
+    const hasPushConst = functionDef.bytecode.instructions.some(
+      (instruction) => instruction.opcode === Opcode.OP_push_const || instruction.opcode === Opcode.OP_push_const8
+    )
+    expect(hasPushConst).toBe(true)
+  })
+
+  test('no-substitution template literals emit atom pushes', async () => {
+    const compiler = new TypeScriptCompiler()
+    const source = 'const value = `template literal`\n'
+    const { functionDef } = await compiler.compileSourceWithArtifacts(source, 'template-literal.ts')
+
+    const hasPushAtomValue = functionDef.bytecode.instructions.some(
+      (instruction) => instruction.opcode === Opcode.OP_push_atom_value
+    )
+    expect(hasPushAtomValue).toBe(true)
+    expect(functionDef.bytecode.constantPool).toHaveLength(0)
+  })
+
+  test('column adjustments honor explicit reference JS source', () => {
+    const sourceTs = [
+      'if (true) {',
+      '  console.log("ts")',
+      '}',
+      '',
+    ].join('\n')
+
+    const referenceJs = [
+      'if (true) {',
+      'console.log("ts")',
+      '}',
+      '',
+    ].join('\n')
+
+    const compiler = new Compiler('inline.ts', sourceTs, { referenceJsSource: referenceJs })
+    const adjustments = (compiler as any).columnAdjustments as Map<number, { startColumn: number; delta: number }>
+    const entry = adjustments.get(1)
+
+    expect(entry).toBeDefined()
+    expect(entry?.startColumn).toBe(2)
+    expect(entry?.delta).toBe(-2)
   })
 })
