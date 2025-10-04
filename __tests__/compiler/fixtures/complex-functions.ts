@@ -3,7 +3,7 @@ function multiply(a, b) {
   return result
 }
 
-function factorial(n) number {
+function factorial(n) {
   if (n <= 1) {
     return 1
   }

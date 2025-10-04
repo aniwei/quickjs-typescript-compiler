@@ -125,7 +125,7 @@ export class Compiler {
     this.program = ts.createProgram([this.fileName], compilerOptions, host)
     this.checker = this.program.getTypeChecker()
 
-    const { strippedSource, normalizedPosByPos, columnAdjustments } = this.computeDebugSourceMapping(this.sourceCode)
+  const { strippedSource, normalizedPosByPos, columnAdjustments } = this.computeDebugSourceMapping(this.sourceCode)
     this.normalizedPosByPos = normalizedPosByPos
     this.columnAdjustments = columnAdjustments
     if (options.referenceJsSource !== undefined) {
@@ -152,6 +152,7 @@ export class Compiler {
       }
       index += step
     }
+
   }
 
   compile(): FunctionDef {
@@ -2657,11 +2658,11 @@ export class Compiler {
       if (entry.pc < lastPc) {
         continue
       }
-    const diffPc = entry.pc - lastPc
-    const currentLine = entry.line
-    const diffLine = currentLine - lastLine
-    const currentColumn = entry.column
-    const diffColumn = currentColumn - lastColumn
+      const diffPc = entry.pc - lastPc
+      const currentLine = entry.line
+      const diffLine = currentLine - lastLine
+      const currentColumn = entry.column
+      const diffColumn = currentColumn - lastColumn
 
       if (diffLine === 0 && diffColumn === 0) {
         continue
@@ -2685,8 +2686,8 @@ export class Compiler {
       pc2column.push(...this.encodeSLEB128(diffColumn))
 
       lastPc = entry.pc
-    lastLine = currentLine
-    lastColumn = currentColumn
+      lastLine = currentLine
+      lastColumn = currentColumn
     }
 
     func.bytecode.pc2line = pc2line
@@ -2700,9 +2701,6 @@ export class Compiler {
 
   private finalizeFunction(func: FunctionDef) {
     const funcName = this.atomTable.getAtomString(func.bytecode.name)
-    if (funcName === 'multiply' || funcName === 'factorial') {
-      console.log('lineNumberTable.before', funcName, func.bytecode.lineNumberTable)
-    }
     func.bytecode.constantPool = func.getConstantPoolEntries()
     this.pruneUnusedClosureVars(func)
     const lexicalVars = func.vars.filter((variable) => !variable.isCaptured)
@@ -2715,9 +2713,6 @@ export class Compiler {
     func.bytecode.setArgDefs(func.args)
     func.bytecode.stackSize = this.computeStackSize(func.bytecode)
     this.buildDebugInfo(func)
-    if (funcName === 'multiply' || funcName === 'factorial') {
-      console.log('pc2line.after', funcName, func.bytecode.pc2line)
-    }
     func.bytecode.argCount = func.args.length
     func.bytecode.definedArgCount = func.definedArgCount
   }
@@ -3164,15 +3159,19 @@ export class Compiler {
 
   private computeDebugSourceMapping(
     source: string
-  ): { strippedSource: string; normalizedPosByPos: Uint32Array; columnAdjustments: Map<number, ColumnAdjustment[]> } {
+  ): {
+    strippedSource: string
+    normalizedPosByPos: Uint32Array
+    columnAdjustments: Map<number, ColumnAdjustment[]>
+  } {
     const segments: Array<{ start: number; end: number; replacement: string }> = []
-  this.collectStripSegments(source, /(?<=\b[_$a-zA-Z][_$0-9a-zA-Z]*)[ \t]*:(?![ \t]*\()[ \t]*[^=;,){}\r\n]+(?=\s*[,)])/g, segments)
-  this.collectStripSegments(source, /:[ \t]*(?!\()[ \t]*[^=;,){}\r\n]+(?=\s*[=;,){}])/g, segments)
+    this.collectStripSegments(source, /(?<=\b[_$a-zA-Z][_$0-9a-zA-Z]*)[ \t]*:(?![ \t]*\()[ \t]*[^=;,){}\r\n]+(?=\s*[,)])/g, segments)
+    this.collectStripSegments(source, /:[ \t]*(?!\()[ \t]*[^=;,){}\r\n]+(?=\s*[=;,){}])/g, segments)
     this.removeObjectPropertyAssignmentSegments(source, segments)
     this.collectStripSegments(source, /<\s*[^>]+\s*>/g, segments)
     this.collectStripSegments(source, /\b(interface|type)\s+\w+\s*=\s*[^;]+;?/g, segments)
     this.collectStripSegments(source, /\s+as\s+const\b/g, segments)
-  this.collectCollapsedBlankLineSegments(source, segments)
+    this.collectCollapsedBlankLineSegments(source, segments)
 
     segments.sort((a, b) => a.start - b.start)
 
@@ -3493,7 +3492,8 @@ export class Compiler {
       const text = match[0]
       if (!text) continue
       const newline = match[1] ?? '\n'
-      segments.push({ start: index, end: index + text.length, replacement: newline.repeat(2) })
+      const entry = { start: index, end: index + text.length, replacement: newline }
+      segments.push(entry)
     }
   }
 
@@ -3549,9 +3549,13 @@ export class Compiler {
       }
     }
     this.lineColCache = { offset: clampedOffset, line, rawColumn: column }
+
     const adjustment = this.adjustColumnForTranspiled(line, column)
     const adjustedColumn = column + adjustment
-    return { line, column: adjustedColumn < 0 ? 0 : adjustedColumn }
+    return {
+      line,
+      column: adjustedColumn < 0 ? 0 : adjustedColumn,
+    }
   }
 
   private findLineStartUtf8Offset(offset: number): number {
