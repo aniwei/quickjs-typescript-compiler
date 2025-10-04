@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-10-02T17:08:30.729Z",
-  "inputFile": "__tests__/compiler/fixtures/complex-functions.ts",
+  "timestamp": "2025-10-04T12:28:59.959Z",
+  "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/complex-functions.ts",
   "compilation": {
     "typescript": {
       "size": 251,

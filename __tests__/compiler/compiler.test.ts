@@ -110,11 +110,12 @@ describe('TypeScriptCompiler', () => {
     ].join('\n')
 
     const compiler = new Compiler('inline.ts', sourceTs, { referenceJsSource: referenceJs })
-    const adjustments = (compiler as any).columnAdjustments as Map<number, { startColumn: number; delta: number }>
-    const entry = adjustments.get(1)
+    const adjustments = (compiler as any).columnAdjustments as Map<number, Array<{ startColumn: number; delta: number }>>
+    const entries = adjustments.get(1)
 
-    expect(entry).toBeDefined()
-    expect(entry?.startColumn).toBe(2)
-    expect(entry?.delta).toBe(-2)
+    expect(entries).toBeDefined()
+    expect(entries && entries[0]).toBeDefined()
+    expect(entries?.[0].startColumn).toBe(2)
+    expect(entries?.[0].delta).toBe(-2)
   })
 })

@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-10-03T03:51:33.935Z",
-  "inputFile": "__tests__/compiler/fixtures/template-literal.ts",
+  "timestamp": "2025-10-04T12:29:00.230Z",
+  "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/template-literal.ts",
   "compilation": {
     "typescript": {
       "size": 111,

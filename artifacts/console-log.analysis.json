@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-10-02T17:31:48.012Z",
-  "inputFile": "__tests__/compiler/fixtures/console-log.ts",
+  "timestamp": "2025-10-04T12:29:00.004Z",
+  "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/console-log.ts",
   "compilation": {
     "typescript": {
       "size": 110,

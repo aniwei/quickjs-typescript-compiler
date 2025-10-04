@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-10-02T18:52:47.155Z",
-  "inputFile": "__tests__/compiler/fixtures/function-add.ts",
+  "timestamp": "2025-10-04T12:29:00.026Z",
+  "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/function-add.ts",
   "compilation": {
     "typescript": {
       "size": 133,

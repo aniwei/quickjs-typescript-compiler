@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-10-02T18:01:20.134Z",
-  "inputFile": "__tests__/compiler/fixtures/loop-break.ts",
+  "timestamp": "2025-10-04T12:29:00.042Z",
+  "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/loop-break.ts",
   "compilation": {
     "typescript": {
       "size": 156,

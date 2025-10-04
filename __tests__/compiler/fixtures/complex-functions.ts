@@ -1,9 +1,9 @@
-function multiply(a: number, b: number): number {
+function multiply(a, b) {
   const result = a * b
   return result
 }
 
-function factorial(n: number): number {
+function factorial(n) number {
   if (n <= 1) {
     return 1
   }

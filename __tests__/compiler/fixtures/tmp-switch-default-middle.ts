@@ -1,4 +1,4 @@
-function mix(value: number) {
+function mix(value) {
   switch (value) {
     case 0:
       return 1

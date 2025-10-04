@@ -1,7 +1,7 @@
 # 字节码分析报告
 
-**输入文件**: __tests__/compiler/fixtures/complex-functions.ts
-**生成时间**: 2025-10-02T17:08:30.729Z
+**输入文件**: /Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/complex-functions.ts
+**生成时间**: 2025-10-04T12:28:59.959Z
 
 ## 大小对比
 

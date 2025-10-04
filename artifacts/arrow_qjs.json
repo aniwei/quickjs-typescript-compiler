@@ -1,0 +1,782 @@
+{
+  "version": 5,
+  "atoms": [
+    {
+      "id": 228,
+      "value": "tmp/arrow-fn-basic.js"
+    },
+    {
+      "id": 229,
+      "value": "double"
+    },
+    {
+      "id": 230,
+      "value": "arrArrow"
+    },
+    {
+      "id": 231,
+      "value": "obj"
+    },
+    {
+      "id": 232,
+      "value": "map"
+    },
+    {
+      "id": 233,
+      "value": "fn"
+    },
+    {
+      "id": 234,
+      "value": "a"
+    },
+    {
+      "id": 235,
+      "value": "b"
+    },
+    {
+      "id": 236,
+      "value": "x"
+    }
+  ],
+  "root": {
+    "type": "module",
+    "moduleName": {
+      "type": "atom",
+      "id": 228,
+      "name": "tmp/arrow-fn-basic.js"
+    },
+    "requireEntries": [],
+    "exportEntries": [],
+    "starExportEntries": [],
+    "importEntries": [],
+    "hasTopLevelAwait": false,
+    "function": {
+      "type": "function",
+      "flags": {
+        "raw": 1568,
+        "hasPrototype": false,
+        "hasSimpleParameterList": false,
+        "isDerivedClassConstructor": false,
+        "needHomeObject": false,
+        "funcKind": {
+          "value": 2,
+          "name": "JS_FUNC_ASYNC"
+        },
+        "newTargetAllowed": false,
+        "superCallAllowed": false,
+        "superAllowed": false,
+        "argumentsAllowed": true,
+        "hasDebug": true,
+        "isDirectOrIndirectEval": false
+      },
+      "jsMode": 1,
+      "jsModeFlags": [
+        "JS_MODE_STRICT"
+      ],
+      "name": {
+        "type": "atom",
+        "id": 82,
+        "name": "_eval_"
+      },
+      "argCount": 0,
+      "varCount": 0,
+      "definedArgCount": 0,
+      "stackSize": 3,
+      "closureVarCount": 4,
+      "constantPoolCount": 4,
+      "instructionLength": 53,
+      "varDefs": [],
+      "closureVars": [
+        {
+          "name": {
+            "type": "atom",
+            "id": 106,
+            "name": "add"
+          },
+          "varIndex": 0,
+          "isLocal": true,
+          "isArgument": false,
+          "isConst": true,
+          "isLexical": true,
+          "kind": {
+            "value": 0,
+            "name": "NORMAL"
+          }
+        },
+        {
+          "name": {
+            "type": "atom",
+            "id": 229,
+            "name": "double"
+          },
+          "varIndex": 1,
+          "isLocal": true,
+          "isArgument": false,
+          "isConst": true,
+          "isLexical": true,
+          "kind": {
+            "value": 0,
+            "name": "NORMAL"
+          }
+        },
+        {
+          "name": {
+            "type": "atom",
+            "id": 230,
+            "name": "arrArrow"
+          },
+          "varIndex": 2,
+          "isLocal": true,
+          "isArgument": false,
+          "isConst": true,
+          "isLexical": true,
+          "kind": {
+            "value": 0,
+            "name": "NORMAL"
+          }
+        },
+        {
+          "name": {
+            "type": "atom",
+            "id": 231,
+            "name": "obj"
+          },
+          "varIndex": 3,
+          "isLocal": true,
+          "isArgument": false,
+          "isConst": true,
+          "isLexical": true,
+          "kind": {
+            "value": 0,
+            "name": "NORMAL"
+          }
+        }
+      ],
+      "instructions": [
+        {
+          "offset": 0,
+          "size": 1,
+          "opcode": 8,
+          "opcodeName": "OP_push_this"
+        },
+        {
+          "offset": 1,
+          "size": 2,
+          "opcode": 236,
+          "opcodeName": "OP_if_false8",
+          "operand": 2
+        },
+        {
+          "offset": 3,
+          "size": 1,
+          "opcode": 41,
+          "opcodeName": "OP_return_undef"
+        },
+        {
+          "offset": 4,
+          "size": 2,
+          "opcode": 194,
+          "opcodeName": "OP_fclosure8",
+          "operand": 0
+        },
+        {
+          "offset": 6,
+          "size": 5,
+          "opcode": 79,
+          "opcodeName": "OP_set_name",
+          "operand": {
+            "type": "atom",
+            "id": 53,
+            "name": "cause"
+          }
+        },
+        {
+          "offset": 11,
+          "size": 1,
+          "opcode": 227,
+          "opcodeName": "OP_put_var_ref0"
+        },
+        {
+          "offset": 12,
+          "size": 2,
+          "opcode": 194,
+          "opcodeName": "OP_fclosure8",
+          "operand": 1
+        },
+        {
+          "offset": 14,
+          "size": 5,
+          "opcode": 79,
+          "opcodeName": "OP_set_name",
+          "operand": {
+            "type": "tagged-int",
+            "value": 114
+          }
+        },
+        {
+          "offset": 19,
+          "size": 1,
+          "opcode": 228,
+          "opcodeName": "OP_put_var_ref1"
+        },
+        {
+          "offset": 20,
+          "size": 1,
+          "opcode": 184,
+          "opcodeName": "OP_push_1"
+        },
+        {
+          "offset": 21,
+          "size": 1,
+          "opcode": 185,
+          "opcodeName": "OP_push_2"
+        },
+        {
+          "offset": 22,
+          "size": 1,
+          "opcode": 186,
+          "opcodeName": "OP_push_3"
+        },
+        {
+          "offset": 23,
+          "size": 3,
+          "opcode": 38,
+          "opcodeName": "OP_array_from",
+          "operand": 3
+        },
+        {
+          "offset": 26,
+          "size": 5,
+          "opcode": 67,
+          "opcodeName": "OP_get_field2",
+          "operand": {
+            "type": "atom",
+            "id": 116,
+            "name": "this_active_func"
+          }
+        },
+        {
+          "offset": 31,
+          "size": 2,
+          "opcode": 194,
+          "opcodeName": "OP_fclosure8",
+          "operand": 2
+        },
+        {
+          "offset": 33,
+          "size": 3,
+          "opcode": 36,
+          "opcodeName": "OP_call_method",
+          "operand": 1
+        },
+        {
+          "offset": 36,
+          "size": 1,
+          "opcode": 229,
+          "opcodeName": "OP_put_var_ref2"
+        },
+        {
+          "offset": 37,
+          "size": 1,
+          "opcode": 11,
+          "opcodeName": "OP_object"
+        },
+        {
+          "offset": 38,
+          "size": 2,
+          "opcode": 194,
+          "opcodeName": "OP_fclosure8",
+          "operand": 3
+        },
+        {
+          "offset": 40,
+          "size": 5,
+          "opcode": 79,
+          "opcodeName": "OP_set_name",
+          "operand": {
+            "type": "tagged-int",
+            "value": 116
+          }
+        },
+        {
+          "offset": 45,
+          "size": 5,
+          "opcode": 78,
+          "opcodeName": "OP_define_field",
+          "operand": {
+            "type": "tagged-int",
+            "value": 116
+          }
+        },
+        {
+          "offset": 50,
+          "size": 1,
+          "opcode": 230,
+          "opcodeName": "OP_put_var_ref3"
+        },
+        {
+          "offset": 51,
+          "size": 1,
+          "opcode": 6,
+          "opcodeName": "OP_undefined"
+        },
+        {
+          "offset": 52,
+          "size": 1,
+          "opcode": 47,
+          "opcodeName": "OP_return_async"
+        }
+      ],
+      "debug": {
+        "filename": {
+          "type": "atom",
+          "id": 228,
+          "name": "tmp/arrow-fn-basic.js"
+        },
+        "pc2line": [
+          0,
+          0,
+          0,
+          26,
+          8,
+          52,
+          37,
+          8
+        ],
+        "sourceLength": 0,
+        "source": null
+      },
+      "constantPool": [
+        {
+          "tag": "TC_TAG_FUNCTION_BYTECODE",
+          "value": {
+            "type": "function",
+            "flags": {
+              "raw": 1538,
+              "hasPrototype": false,
+              "hasSimpleParameterList": true,
+              "isDerivedClassConstructor": false,
+              "needHomeObject": false,
+              "funcKind": {
+                "value": 0,
+                "name": "JS_FUNC_NORMAL"
+              },
+              "newTargetAllowed": false,
+              "superCallAllowed": false,
+              "superAllowed": false,
+              "argumentsAllowed": true,
+              "hasDebug": true,
+              "isDirectOrIndirectEval": false
+            },
+            "jsMode": 1,
+            "jsModeFlags": [
+              "JS_MODE_STRICT"
+            ],
+            "name": {
+              "type": "atom",
+              "id": 0,
+              "name": null
+            },
+            "argCount": 2,
+            "varCount": 0,
+            "definedArgCount": 2,
+            "stackSize": 2,
+            "closureVarCount": 0,
+            "constantPoolCount": 0,
+            "instructionLength": 4,
+            "varDefs": [
+              {
+                "name": {
+                  "type": "atom",
+                  "id": 234,
+                  "name": "a"
+                },
+                "scopeLevel": 0,
+                "scopeNext": 0,
+                "isConst": false,
+                "isLexical": false,
+                "isCaptured": false,
+                "kind": {
+                  "value": 0,
+                  "name": "NORMAL"
+                }
+              },
+              {
+                "name": {
+                  "type": "atom",
+                  "id": 235,
+                  "name": "b"
+                },
+                "scopeLevel": 0,
+                "scopeNext": 0,
+                "isConst": false,
+                "isLexical": false,
+                "isCaptured": false,
+                "kind": {
+                  "value": 0,
+                  "name": "NORMAL"
+                }
+              }
+            ],
+            "closureVars": [],
+            "instructions": [
+              {
+                "offset": 0,
+                "size": 1,
+                "opcode": 211,
+                "opcodeName": "OP_get_arg0"
+              },
+              {
+                "offset": 1,
+                "size": 1,
+                "opcode": 212,
+                "opcodeName": "OP_get_arg1"
+              },
+              {
+                "offset": 2,
+                "size": 1,
+                "opcode": 159,
+                "opcodeName": "OP_add"
+              },
+              {
+                "offset": 3,
+                "size": 1,
+                "opcode": 40,
+                "opcodeName": "OP_return"
+              }
+            ],
+            "debug": {
+              "filename": {
+                "type": "atom",
+                "id": 228,
+                "name": "tmp/arrow-fn-basic.js"
+              },
+              "pc2line": [
+                0,
+                12,
+                2,
+                20,
+                7,
+                8,
+                7,
+                3
+              ],
+              "sourceLength": 0,
+              "source": null
+            },
+            "constantPool": []
+          }
+        },
+        {
+          "tag": "TC_TAG_FUNCTION_BYTECODE",
+          "value": {
+            "type": "function",
+            "flags": {
+              "raw": 1538,
+              "hasPrototype": false,
+              "hasSimpleParameterList": true,
+              "isDerivedClassConstructor": false,
+              "needHomeObject": false,
+              "funcKind": {
+                "value": 0,
+                "name": "JS_FUNC_NORMAL"
+              },
+              "newTargetAllowed": false,
+              "superCallAllowed": false,
+              "superAllowed": false,
+              "argumentsAllowed": true,
+              "hasDebug": true,
+              "isDirectOrIndirectEval": false
+            },
+            "jsMode": 1,
+            "jsModeFlags": [
+              "JS_MODE_STRICT"
+            ],
+            "name": {
+              "type": "atom",
+              "id": 0,
+              "name": null
+            },
+            "argCount": 1,
+            "varCount": 0,
+            "definedArgCount": 1,
+            "stackSize": 2,
+            "closureVarCount": 0,
+            "constantPoolCount": 0,
+            "instructionLength": 4,
+            "varDefs": [
+              {
+                "name": {
+                  "type": "atom",
+                  "id": 236,
+                  "name": "x"
+                },
+                "scopeLevel": 0,
+                "scopeNext": 0,
+                "isConst": false,
+                "isLexical": false,
+                "isCaptured": false,
+                "kind": {
+                  "value": 0,
+                  "name": "NORMAL"
+                }
+              }
+            ],
+            "closureVars": [],
+            "instructions": [
+              {
+                "offset": 0,
+                "size": 1,
+                "opcode": 211,
+                "opcodeName": "OP_get_arg0"
+              },
+              {
+                "offset": 1,
+                "size": 1,
+                "opcode": 185,
+                "opcodeName": "OP_push_2"
+              },
+              {
+                "offset": 2,
+                "size": 1,
+                "opcode": 156,
+                "opcodeName": "OP_mul"
+              },
+              {
+                "offset": 3,
+                "size": 1,
+                "opcode": 40,
+                "opcodeName": "OP_return"
+              }
+            ],
+            "debug": {
+              "filename": {
+                "type": "atom",
+                "id": 228,
+                "name": "tmp/arrow-fn-basic.js"
+              },
+              "pc2line": [
+                1,
+                15,
+                3,
+                7,
+                12,
+                4,
+                7,
+                17
+              ],
+              "sourceLength": 0,
+              "source": null
+            },
+            "constantPool": []
+          }
+        },
+        {
+          "tag": "TC_TAG_FUNCTION_BYTECODE",
+          "value": {
+            "type": "function",
+            "flags": {
+              "raw": 1538,
+              "hasPrototype": false,
+              "hasSimpleParameterList": true,
+              "isDerivedClassConstructor": false,
+              "needHomeObject": false,
+              "funcKind": {
+                "value": 0,
+                "name": "JS_FUNC_NORMAL"
+              },
+              "newTargetAllowed": false,
+              "superCallAllowed": false,
+              "superAllowed": false,
+              "argumentsAllowed": true,
+              "hasDebug": true,
+              "isDirectOrIndirectEval": false
+            },
+            "jsMode": 1,
+            "jsModeFlags": [
+              "JS_MODE_STRICT"
+            ],
+            "name": {
+              "type": "atom",
+              "id": 0,
+              "name": null
+            },
+            "argCount": 1,
+            "varCount": 0,
+            "definedArgCount": 1,
+            "stackSize": 2,
+            "closureVarCount": 0,
+            "constantPoolCount": 0,
+            "instructionLength": 5,
+            "varDefs": [
+              {
+                "name": {
+                  "type": "atom",
+                  "id": 236,
+                  "name": "x"
+                },
+                "scopeLevel": 0,
+                "scopeNext": 0,
+                "isConst": false,
+                "isLexical": false,
+                "isCaptured": false,
+                "kind": {
+                  "value": 0,
+                  "name": "NORMAL"
+                }
+              }
+            ],
+            "closureVars": [],
+            "instructions": [
+              {
+                "offset": 0,
+                "size": 1,
+                "opcode": 211,
+                "opcodeName": "OP_get_arg0"
+              },
+              {
+                "offset": 1,
+                "size": 2,
+                "opcode": 191,
+                "opcodeName": "OP_push_i8",
+                "operand": 10
+              },
+              {
+                "offset": 3,
+                "size": 1,
+                "opcode": 156,
+                "opcodeName": "OP_mul"
+              },
+              {
+                "offset": 4,
+                "size": 1,
+                "opcode": 40,
+                "opcodeName": "OP_return"
+              }
+            ],
+            "debug": {
+              "filename": {
+                "type": "atom",
+                "id": 228,
+                "name": "tmp/arrow-fn-basic.js"
+              },
+              "pc2line": [
+                4,
+                31,
+                2,
+                10,
+                17,
+                4
+              ],
+              "sourceLength": 0,
+              "source": null
+            },
+            "constantPool": []
+          }
+        },
+        {
+          "tag": "TC_TAG_FUNCTION_BYTECODE",
+          "value": {
+            "type": "function",
+            "flags": {
+              "raw": 1538,
+              "hasPrototype": false,
+              "hasSimpleParameterList": true,
+              "isDerivedClassConstructor": false,
+              "needHomeObject": false,
+              "funcKind": {
+                "value": 0,
+                "name": "JS_FUNC_NORMAL"
+              },
+              "newTargetAllowed": false,
+              "superCallAllowed": false,
+              "superAllowed": false,
+              "argumentsAllowed": true,
+              "hasDebug": true,
+              "isDirectOrIndirectEval": false
+            },
+            "jsMode": 1,
+            "jsModeFlags": [
+              "JS_MODE_STRICT"
+            ],
+            "name": {
+              "type": "atom",
+              "id": 0,
+              "name": null
+            },
+            "argCount": 1,
+            "varCount": 0,
+            "definedArgCount": 1,
+            "stackSize": 2,
+            "closureVarCount": 0,
+            "constantPoolCount": 0,
+            "instructionLength": 4,
+            "varDefs": [
+              {
+                "name": {
+                  "type": "atom",
+                  "id": 236,
+                  "name": "x"
+                },
+                "scopeLevel": 0,
+                "scopeNext": 0,
+                "isConst": false,
+                "isLexical": false,
+                "isCaptured": false,
+                "kind": {
+                  "value": 0,
+                  "name": "NORMAL"
+                }
+              }
+            ],
+            "closureVars": [],
+            "instructions": [
+              {
+                "offset": 0,
+                "size": 1,
+                "opcode": 211,
+                "opcodeName": "OP_get_arg0"
+              },
+              {
+                "offset": 1,
+                "size": 1,
+                "opcode": 184,
+                "opcodeName": "OP_push_1"
+              },
+              {
+                "offset": 2,
+                "size": 1,
+                "opcode": 159,
+                "opcodeName": "OP_add"
+              },
+              {
+                "offset": 3,
+                "size": 1,
+                "opcode": 40,
+                "opcodeName": "OP_return"
+              }
+            ],
+            "debug": {
+              "filename": {
+                "type": "atom",
+                "id": 228,
+                "name": "tmp/arrow-fn-basic.js"
+              },
+              "pc2line": [
+                5,
+                18,
+                2,
+                14,
+                12,
+                4
+              ],
+              "sourceLength": 0,
+              "source": null
+            },
+            "constantPool": []
+          }
+        }
+      ]
+    }
+  }
+}
