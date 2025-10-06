@@ -1,7 +1,7 @@
 import path from 'node:path'
 import * as ts from 'typescript'
 import { Atom, AtomTable, JSAtom } from './atoms'
-import { FunctionDef, createEmptyModuleRecord } from './functionDef'
+import { FunctionDef, ModuleExportType, createEmptyModuleRecord, type ModuleExportEntryLocal } from './functionDef'
 import { FunctionBytecode, type Instruction, type ConstantEntry } from './functionBytecode'
 import { ScopeManager } from './scopeManager'
 import { ScopeKind } from './scopes'
@@ -125,7 +125,10 @@ export class Compiler {
     this.program = ts.createProgram([this.fileName], compilerOptions, host)
     this.checker = this.program.getTypeChecker()
 
-  const { strippedSource, normalizedPosByPos, columnAdjustments } = this.computeDebugSourceMapping(this.sourceCode)
+    const { strippedSource, normalizedPosByPos, columnAdjustments } = this.computeDebugSourceMapping(
+      this.sourceCode,
+      options.referenceJsSource ?? undefined
+    )
     this.normalizedPosByPos = normalizedPosByPos
     this.columnAdjustments = columnAdjustments
     if (options.referenceJsSource !== undefined) {
@@ -364,6 +367,14 @@ export class Compiler {
       this.withStatementNode(node, () => this.compileFunctionDeclaration(node))
       return
     }
+    if (ts.isExportDeclaration(node)) {
+      this.withStatementNode(node, () => this.compileExportDeclaration(node))
+      return
+    }
+    if (ts.isExportAssignment(node)) {
+      this.withStatementNode(node, () => this.compileExportAssignment(node))
+      return
+    }
     if (ts.isIfStatement(node)) {
       this.withStatementNode(node, () => this.compileIfStatement(node))
       return
@@ -415,6 +426,8 @@ export class Compiler {
     const flags = node.declarationList.flags
     const isConst = (flags & ts.NodeFlags.Const) !== 0
     const isLet = (flags & ts.NodeFlags.Let) !== 0
+    const hasExportModifier =
+      node.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword) ?? false
     const isModuleTopLevel =
       this.currentFunction.parent === null &&
       this.currentFunction.module !== null &&
@@ -449,6 +462,10 @@ export class Compiler {
               isConst: variable.isConst,
               forceInit,
             })
+          }
+
+          if (isModuleTopLevel && hasExportModifier) {
+            this.registerModuleLocalExport(atom, varIndex)
           }
 
           const suppressInitializerDebug =
@@ -493,6 +510,74 @@ export class Compiler {
     }
   }
 
+  private compileExportDeclaration(node: ts.ExportDeclaration) {
+    if (this.currentFunction.parent !== null || this.currentFunction.module === null) {
+      throw new Error('Export declarations are only supported at the module top level')
+    }
+    if (node.isTypeOnly) {
+      return
+    }
+    if (node.moduleSpecifier) {
+      throw new Error('Re-exporting from other modules is not supported yet')
+    }
+    const clause = node.exportClause
+    if (!clause) {
+      throw new Error('Wildcard export declarations are not supported yet')
+    }
+    if (!ts.isNamedExports(clause)) {
+      throw new Error('Only named export declarations are supported currently')
+    }
+
+    for (const element of clause.elements) {
+      const exportedIdentifier = element.name
+      if (!ts.isIdentifier(exportedIdentifier)) {
+        throw new Error('Unsupported export name form')
+      }
+      const exportedAtom = this.atomTable.getAtomId(exportedIdentifier.text)
+      const localName = element.propertyName ?? element.name
+      if (!ts.isIdentifier(localName)) {
+        throw new Error('Unsupported local export target')
+      }
+      const localAtom = this.atomTable.getAtomId(localName.text)
+      const bindingInfo = this.scopeManager.getBindingInfo(localAtom)
+      if (!bindingInfo) {
+        throw new Error(`Cannot export undeclared identifier '${localName.text}'`)
+      }
+      const { index: varIndex } = bindingInfo.binding
+      if (varIndex < 0 || varIndex >= this.currentFunction.vars.length) {
+        throw new Error(`Export target '${localName.text}' is not a module variable`)
+      }
+      this.registerModuleLocalExport(exportedAtom, varIndex)
+    }
+  }
+
+  private compileExportAssignment(node: ts.ExportAssignment) {
+    if (node.isExportEquals) {
+      throw new Error('CommonJS export assignment is not supported yet')
+    }
+    if (this.currentFunction.parent !== null || this.currentFunction.module === null) {
+      throw new Error('Export assignments are only supported at the module top level')
+    }
+
+    const expression = node.expression
+    if (!ts.isIdentifier(expression)) {
+      throw new Error('Only identifier default exports are supported currently')
+    }
+
+    const localAtom = this.atomTable.getAtomId(expression.text)
+    const bindingInfo = this.scopeManager.getBindingInfo(localAtom)
+    if (!bindingInfo) {
+      throw new Error(`Cannot export undeclared identifier '${expression.text}'`)
+    }
+    const { index: varIndex } = bindingInfo.binding
+    if (varIndex < 0 || varIndex >= this.currentFunction.vars.length) {
+      throw new Error(`Export target '${expression.text}' is not a module variable`)
+    }
+
+    const exportedAtom = this.atomTable.getAtomId('default')
+    this.registerModuleLocalExport(exportedAtom, varIndex)
+  }
+
   private compileFunctionDeclaration(node: ts.FunctionDeclaration) {
     if (!node.name) {
       throw new Error('Function declaration must have a name')
@@ -500,6 +585,9 @@ export class Compiler {
     if (!node.body) {
       throw new Error(`Function '${node.name.text}' is missing a body`)
     }
+
+    const hasExportModifier = node.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword) ?? false
+    const hasDefaultModifier = node.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.DefaultKeyword) ?? false
 
     const atom = this.atomTable.getAtomId(node.name.text)
     if (this.scopeManager.hasBindingInCurrentScope(atom)) {
@@ -544,6 +632,11 @@ export class Compiler {
       })
     }
 
+    if (isModuleTopLevel && hasExportModifier) {
+      const exportedName = hasDefaultModifier ? this.atomTable.getAtomId('default') : atom
+      this.registerModuleLocalExport(exportedName, varIndex)
+    }
+
     if (isModuleTopLevel) {
       return
     }
@@ -553,7 +646,7 @@ export class Compiler {
     } else {
       this.emitOpcode(Opcode.OP_fclosure, [constantIndex], node)
     }
-  this.emitStoreToLexical(atom)
+    this.emitStoreToLexical(atom)
   }
 
   private compileChildFunction(
@@ -844,27 +937,183 @@ export class Compiler {
 
   private compileBinaryExpression(expression: ts.BinaryExpression) {
     const operator = expression.operatorToken.kind
-    let opcode: Opcode | null = null
-    switch (operator) {
-      case ts.SyntaxKind.PlusToken:
-        opcode = Opcode.OP_add
-        break
-      case ts.SyntaxKind.AsteriskToken:
-        opcode = Opcode.OP_mul
-        break
-      case ts.SyntaxKind.MinusToken:
-        opcode = Opcode.OP_sub
-        break
-      case ts.SyntaxKind.LessThanEqualsToken:
-        opcode = Opcode.OP_lte
-        break
-      default:
-        throw new Error(`Unsupported binary operator: ${ts.SyntaxKind[operator]}`)
+    if (operator >= ts.SyntaxKind.FirstAssignment && operator <= ts.SyntaxKind.LastAssignment) {
+      this.compileAssignmentExpression(expression)
+      return
     }
 
+    const opcode = this.getBinaryOperationOpcode(operator)
+    if (opcode === null) {
+      throw new Error(`Unsupported binary operator: ${ts.SyntaxKind[operator]}`)
+    }
     this.compileExpression(expression.left)
     this.compileExpression(expression.right)
     this.emitOpcode(opcode, [], expression.operatorToken)
+  }
+
+  private compileAssignmentExpression(expression: ts.BinaryExpression) {
+    const operator = expression.operatorToken.kind
+    const left = expression.left
+    if (ts.isIdentifier(left)) {
+      this.compileIdentifierAssignment(left, expression.right, operator, expression)
+      return
+    }
+    if (ts.isPropertyAccessExpression(left)) {
+      this.compilePropertyAssignment(left, expression.right, operator, expression)
+      return
+    }
+    throw new Error(`Unsupported assignment target: ${ts.SyntaxKind[left.kind]}`)
+  }
+
+  private compileIdentifierAssignment(
+    left: ts.Identifier,
+    right: ts.Expression,
+    operator: ts.SyntaxKind,
+    expression: ts.BinaryExpression
+  ) {
+    const atom = this.atomTable.getAtomId(left.text)
+
+    if (operator === ts.SyntaxKind.EqualsToken) {
+      this.compileExpression(right)
+    } else {
+      const opcode = this.getCompoundAssignmentOpcode(operator)
+      this.emitLoadIdentifier(left)
+      this.compileExpression(right)
+      this.emitOpcode(opcode, [], expression.operatorToken)
+    }
+
+    this.emitOpcode(Opcode.OP_dup)
+    this.emitStoreIdentifier(atom, left)
+  }
+
+  private compilePropertyAssignment(
+    left: ts.PropertyAccessExpression,
+    right: ts.Expression,
+    operator: ts.SyntaxKind,
+    expression: ts.BinaryExpression
+  ) {
+    const propertyAtom = this.atomTable.getAtomId(left.name.text)
+    const propertyOperatorPos = this.getPropertyAccessOperatorPos(left)
+    const propertyDebug: EmitDebugInfoOptions | undefined = propertyOperatorPos !== undefined
+      ? { tsSourcePos: propertyOperatorPos }
+      : undefined
+
+    this.withSourceNode(left.expression, () => {
+      this.compileExpression(left.expression)
+    })
+
+    if (operator === ts.SyntaxKind.EqualsToken) {
+      this.compileExpression(right)
+    } else {
+      const opcode = this.getCompoundAssignmentOpcode(operator)
+      this.emitOpcode(Opcode.OP_dup)
+      this.emitOpcode(Opcode.OP_get_field, [propertyAtom], left.name, propertyDebug)
+      this.compileExpression(right)
+      this.emitOpcode(opcode, [], expression.operatorToken)
+    }
+
+    this.emitOpcode(Opcode.OP_dup)
+    this.emitOpcode(Opcode.OP_rot3r)
+    this.emitOpcode(Opcode.OP_put_field, [propertyAtom], left.name, propertyDebug)
+  }
+
+  private emitStoreIdentifier(atom: Atom, identifier: ts.Identifier) {
+    if (this.argumentIndices.has(atom)) {
+      this.emitStoreArgument(this.argumentIndices.get(atom)!, identifier)
+      return
+    }
+    if (this.localVarIndices.has(atom) || this.closureVarIndices.has(atom)) {
+      this.emitStoreToLexical(atom)
+      return
+    }
+    const captured = this.resolveCapturedIdentifier(atom)
+    if (captured) {
+      this.emitStoreToLexical(atom)
+      return
+    }
+    this.emitOpcode(Opcode.OP_put_var, [atom], identifier)
+  }
+
+  private getCompoundAssignmentOpcode(operator: ts.SyntaxKind): Opcode {
+    switch (operator) {
+      case ts.SyntaxKind.PlusEqualsToken:
+        return Opcode.OP_add
+      case ts.SyntaxKind.MinusEqualsToken:
+        return Opcode.OP_sub
+      case ts.SyntaxKind.AsteriskEqualsToken:
+        return Opcode.OP_mul
+      case ts.SyntaxKind.SlashEqualsToken:
+        return Opcode.OP_div
+      case ts.SyntaxKind.PercentEqualsToken:
+        return Opcode.OP_mod
+      case ts.SyntaxKind.AmpersandEqualsToken:
+        return Opcode.OP_and
+      case ts.SyntaxKind.BarEqualsToken:
+        return Opcode.OP_or
+      case ts.SyntaxKind.CaretEqualsToken:
+        return Opcode.OP_xor
+      case ts.SyntaxKind.LessThanLessThanEqualsToken:
+        return Opcode.OP_shl
+      case ts.SyntaxKind.GreaterThanGreaterThanEqualsToken:
+        return Opcode.OP_sar
+      case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken:
+        return Opcode.OP_shr
+      case ts.SyntaxKind.AsteriskAsteriskEqualsToken:
+        return Opcode.OP_pow
+      default:
+        throw new Error(`Unsupported assignment operator: ${ts.SyntaxKind[operator]}`)
+    }
+  }
+
+  private getBinaryOperationOpcode(operator: ts.SyntaxKind): Opcode | null {
+    switch (operator) {
+      case ts.SyntaxKind.PlusToken:
+        return Opcode.OP_add
+      case ts.SyntaxKind.AsteriskToken:
+        return Opcode.OP_mul
+      case ts.SyntaxKind.AsteriskAsteriskToken:
+        return Opcode.OP_pow
+      case ts.SyntaxKind.MinusToken:
+        return Opcode.OP_sub
+      case ts.SyntaxKind.SlashToken:
+        return Opcode.OP_div
+      case ts.SyntaxKind.PercentToken:
+        return Opcode.OP_mod
+      case ts.SyntaxKind.LessThanLessThanToken:
+        return Opcode.OP_shl
+      case ts.SyntaxKind.LessThanToken:
+        return Opcode.OP_lt
+      case ts.SyntaxKind.LessThanEqualsToken:
+        return Opcode.OP_lte
+      case ts.SyntaxKind.GreaterThanGreaterThanToken:
+        return Opcode.OP_sar
+      case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanToken:
+        return Opcode.OP_shr
+      case ts.SyntaxKind.GreaterThanToken:
+        return Opcode.OP_gt
+      case ts.SyntaxKind.GreaterThanEqualsToken:
+        return Opcode.OP_gte
+      case ts.SyntaxKind.AmpersandToken:
+        return Opcode.OP_and
+      case ts.SyntaxKind.BarToken:
+        return Opcode.OP_or
+      case ts.SyntaxKind.CaretToken:
+        return Opcode.OP_xor
+      case ts.SyntaxKind.EqualsEqualsToken:
+        return Opcode.OP_eq
+      case ts.SyntaxKind.ExclamationEqualsToken:
+        return Opcode.OP_neq
+      case ts.SyntaxKind.EqualsEqualsEqualsToken:
+        return Opcode.OP_strict_eq
+      case ts.SyntaxKind.ExclamationEqualsEqualsToken:
+        return Opcode.OP_strict_neq
+      case ts.SyntaxKind.InstanceOfKeyword:
+        return Opcode.OP_instanceof
+      case ts.SyntaxKind.InKeyword:
+        return Opcode.OP_in
+      default:
+        return null
+    }
   }
 
   private emitPushConstant(
@@ -1134,13 +1383,16 @@ export class Compiler {
 
             const caseChain: ts.CaseClause[] = [clause]
             while (index + 1 < clauses.length) {
-              const nextClause = clauses[index + 1]
-              if (ts.isCaseClause(nextClause) && nextClause.statements.length === 0) {
-                caseChain.push(nextClause)
-                index += 1
-              } else {
+              const lastInChain = caseChain[caseChain.length - 1]
+              if (lastInChain.statements.length > 0) {
                 break
               }
+              const nextClause = clauses[index + 1]
+              if (!ts.isCaseClause(nextClause)) {
+                break
+              }
+              caseChain.push(nextClause)
+              index += 1
             }
 
             const nextClause = clauses[index + 1]
@@ -1189,8 +1441,9 @@ export class Compiler {
 
             this.flushPendingLabels(pendingFallthroughLabels)
 
-            const lastClause = caseChain[caseChain.length - 1]
-            const clauseControl = this.compileSwitchClauseStatements(lastClause.statements, options.labelName)
+            const bodyClause =
+              [...caseChain].reverse().find((entry) => entry.statements.length > 0) ?? caseChain[caseChain.length - 1]
+            const clauseControl = this.compileSwitchClauseStatements(bodyClause.statements, options.labelName)
             const fallsThrough = clauseControl.fallsThrough
             if (fallsThrough) {
               requiresDropAfterSwitch = true
@@ -1398,6 +1651,11 @@ export class Compiler {
         return
       }
 
+      if (expression.kind === ts.SyntaxKind.TrueKeyword || expression.kind === ts.SyntaxKind.FalseKeyword) {
+        this.compileBooleanLiteral(expression)
+        return
+      }
+
       if (ts.isStringLiteral(expression)) {
         this.compileStringLiteral(expression)
         return
@@ -1405,6 +1663,16 @@ export class Compiler {
 
       if (ts.isNoSubstitutionTemplateLiteral(expression)) {
         this.compileNoSubstitutionTemplateLiteral(expression)
+        return
+      }
+
+      if (expression.kind === ts.SyntaxKind.NullKeyword) {
+        this.compileNullLiteral(expression)
+        return
+      }
+
+      if (expression.kind === ts.SyntaxKind.ThisKeyword) {
+        this.compileThisExpression(expression)
         return
       }
 
@@ -1433,10 +1701,25 @@ export class Compiler {
         return
       }
 
+      if (ts.isNewExpression(expression)) {
+        this.compileNewExpression(expression)
+        return
+      }
+
+      if (ts.isPropertyAccessExpression(expression)) {
+        this.compilePropertyAccessExpression(expression)
+        return
+      }
+
       throw new Error(`Unsupported expression kind: ${ts.SyntaxKind[expression.kind]}`)
     } finally {
       this.currentSourceNode = previous
     }
+  }
+
+  private compileBooleanLiteral(expression: ts.Expression) {
+    const opcode = expression.kind === ts.SyntaxKind.TrueKeyword ? Opcode.OP_push_true : Opcode.OP_push_false
+    this.emitOpcode(opcode, [], expression)
   }
 
   private emitStringLiteral(value: string, node: ts.Node) {
@@ -1450,6 +1733,14 @@ export class Compiler {
 
   private compileNoSubstitutionTemplateLiteral(expression: ts.NoSubstitutionTemplateLiteral) {
     this.emitStringLiteral(expression.text, expression)
+  }
+
+  private compileNullLiteral(expression: ts.Expression) {
+    this.emitOpcode(Opcode.OP_null, [], expression)
+  }
+
+  private compileThisExpression(expression: ts.Expression) {
+    this.emitOpcode(Opcode.OP_push_this, [], expression)
   }
 
   private compileArrayLiteral(expression: ts.ArrayLiteralExpression) {
@@ -1564,6 +1855,38 @@ export class Compiler {
     this.emitCall(expression.arguments.length, expression, callDebug)
   }
 
+  private compileNewExpression(expression: ts.NewExpression) {
+    const callDebugPos = this.getNewExpressionOpenParenPos(expression)
+    const callDebug: EmitDebugInfoOptions | undefined = callDebugPos !== undefined
+      ? { tsSourcePos: callDebugPos }
+      : undefined
+
+    this.withSourceNode(expression.expression, () => {
+      this.compileExpression(expression.expression)
+    })
+
+    this.emitOpcode(Opcode.OP_dup)
+
+    const args = expression.arguments ?? []
+    for (const arg of args) {
+      this.withSourceNode(arg, () => this.compileExpression(arg))
+    }
+
+    this.emitConstruct(args.length, expression, callDebug)
+  }
+
+  private compilePropertyAccessExpression(expression: ts.PropertyAccessExpression) {
+    this.withSourceNode(expression.expression, () => {
+      this.compileExpression(expression.expression)
+    })
+    const propertyAtom = this.atomTable.getAtomId(expression.name.text)
+    const operatorPos = this.getPropertyAccessOperatorPos(expression)
+    const debug: EmitDebugInfoOptions | undefined = operatorPos !== undefined
+      ? { tsSourcePos: operatorPos }
+      : undefined
+    this.emitOpcode(Opcode.OP_get_field, [propertyAtom], expression.name, debug)
+  }
+
   private emitLoadArgument(index: number, node?: ts.Node) {
     const shortOpcode = getIndexedOpcode('OP_get_arg', index)
     if (shortOpcode !== undefined) {
@@ -1592,6 +1915,13 @@ export class Compiler {
       return
     }
     this.emitOpcode(Opcode.OP_call, [argCount], node, debugOptions)
+  }
+
+  private emitConstruct(argCount: number, node?: ts.Node, debugOptions?: EmitDebugInfoOptions) {
+    if (argCount < 0) {
+      throw new Error('Constructor argument count cannot be negative')
+    }
+    this.emitOpcode(Opcode.OP_call_constructor, [argCount], node, debugOptions)
   }
 
   private emitLoadIdentifier(identifier: ts.Identifier) {
@@ -1687,7 +2017,7 @@ export class Compiler {
   }
 
   private emitStoreToLocal(index: number) {
-    const shortOpcode = getIndexedOpcode('OP_put_loc', index)
+    const shortOpcode = index <= 3 ? getIndexedOpcode('OP_put_loc', index) : undefined
     if (shortOpcode !== undefined) {
       this.emitOpcode(shortOpcode)
       return
@@ -1914,6 +2244,29 @@ export class Compiler {
     })
   }
 
+  private registerModuleLocalExport(exportedName: Atom, localVarIndex: number) {
+    const moduleRecord = this.currentFunction.module
+    if (!moduleRecord) {
+      return
+    }
+
+    const existingIndex = moduleRecord.exportEntries.findIndex((entry) => {
+      return entry.type === ModuleExportType.Local && entry.exportedName === exportedName
+    })
+
+    const exportEntry: ModuleExportEntryLocal = {
+      type: ModuleExportType.Local,
+      exportedName,
+      localVarIndex,
+    }
+
+    if (existingIndex >= 0) {
+      moduleRecord.exportEntries[existingIndex] = exportEntry
+    } else {
+      moduleRecord.exportEntries.push(exportEntry)
+    }
+  }
+
   private injectModuleHoistedDefinitions(func: FunctionDef) {
     if (!func.module) {
       return
@@ -2090,7 +2443,7 @@ export class Compiler {
   }
 
   private buildStoreToLocalInstruction(slot: number): Instruction {
-    const shortOpcode = getIndexedOpcode('OP_put_loc', slot)
+    const shortOpcode = slot <= 3 ? getIndexedOpcode('OP_put_loc', slot) : undefined
     if (shortOpcode !== undefined) {
       return { opcode: shortOpcode, operands: [] }
     }
@@ -2921,6 +3274,32 @@ export class Compiler {
     return undefined
   }
 
+  private getNewExpressionOpenParenPos(node: ts.NewExpression): number | undefined {
+    if (!node.arguments || node.arguments.length === 0) {
+      return undefined
+    }
+    let pos = node.expression.getEnd()
+    if (node.typeArguments && node.typeArguments.length > 0) {
+      pos = node.typeArguments.end
+    }
+    while (pos < this.sourceCode.length) {
+      pos = this.skipTriviaForward(pos)
+      if (pos >= this.sourceCode.length) {
+        break
+      }
+      const code = this.sourceCode.charCodeAt(pos)
+      if (code === 0x28) {
+        return pos
+      }
+      if (code === 0x3c) {
+        pos = this.skipTypeArgumentSequence(pos)
+        continue
+      }
+      break
+    }
+    return undefined
+  }
+
   private skipTriviaForward(pos: number): number {
     let current = pos
     while (current < this.sourceCode.length) {
@@ -3158,7 +3537,8 @@ export class Compiler {
   }
 
   private computeDebugSourceMapping(
-    source: string
+    source: string,
+    referenceJsSource?: string | null
   ): {
     strippedSource: string
     normalizedPosByPos: Uint32Array
@@ -3171,7 +3551,13 @@ export class Compiler {
     this.collectStripSegments(source, /<\s*[^>]+\s*>/g, segments)
     this.collectStripSegments(source, /\b(interface|type)\s+\w+\s*=\s*[^;]+;?/g, segments)
     this.collectStripSegments(source, /\s+as\s+const\b/g, segments)
-    this.collectCollapsedBlankLineSegments(source, segments)
+
+    if (referenceJsSource !== undefined && referenceJsSource !== null) {
+      this.collectBlankLineAlignmentSegments(source, referenceJsSource, segments)
+    } else {
+      this.collectCollapsedBlankLineSegments(source, segments)
+    }
+
 
     segments.sort((a, b) => a.start - b.start)
 
@@ -3495,6 +3881,119 @@ export class Compiler {
       const entry = { start: index, end: index + text.length, replacement: newline }
       segments.push(entry)
     }
+  }
+
+  private collectBlankLineAlignmentSegments(
+    source: string,
+    referenceJsSource: string,
+    segments: Array<{ start: number; end: number; replacement: string }>
+  ) {
+    const originalLines = this.getLineInfos(source)
+    const referenceLines = this.getLineInfos(referenceJsSource)
+
+    let refIndex = 0
+    const collapseLineIndices: number[] = []
+
+    for (let lineIndex = 0; lineIndex < originalLines.length; lineIndex += 1) {
+      const line = originalLines[lineIndex]
+      const isBlank = line.text.trim().length === 0
+      const refLine = refIndex < referenceLines.length ? referenceLines[refIndex] : undefined
+      const refIsBlank = refLine ? refLine.text.trim().length === 0 : false
+
+      if (isBlank) {
+        if (refLine && refIsBlank) {
+          refIndex += 1
+        } else {
+          collapseLineIndices.push(lineIndex)
+        }
+      } else if (refIndex < referenceLines.length) {
+        refIndex += 1
+      }
+    }
+
+    if (collapseLineIndices.length === 0) {
+      return
+    }
+
+    const ranges: Array<{ start: number; end: number }> = []
+    let rangeStart = collapseLineIndices[0]
+    let rangeEnd = collapseLineIndices[0]
+    for (let index = 1; index < collapseLineIndices.length; index += 1) {
+      const current = collapseLineIndices[index]
+      if (current === rangeEnd + 1) {
+        rangeEnd = current
+      } else {
+        ranges.push({ start: rangeStart, end: rangeEnd })
+        rangeStart = current
+        rangeEnd = current
+      }
+    }
+    ranges.push({ start: rangeStart, end: rangeEnd })
+
+    for (const range of ranges) {
+      const startLine = range.start
+      const endLine = range.end
+
+      const previousLine = startLine > 0 ? originalLines[startLine - 1] : undefined
+      const finalLine = originalLines[endLine]
+
+      let segmentStart: number
+      let replacement = ''
+
+      if (previousLine) {
+        segmentStart = previousLine.start + previousLine.text.length
+        replacement = previousLine.newline
+      } else {
+        segmentStart = originalLines[startLine].start
+      }
+
+      const segmentEnd = finalLine.start + finalLine.text.length + finalLine.newline.length
+
+      if (segmentEnd <= segmentStart) {
+        continue
+      }
+
+      segments.push({ start: segmentStart, end: segmentEnd, replacement })
+    }
+  }
+
+  private getLineInfos(text: string): Array<{ start: number; text: string; newline: string }> {
+    const lines = text.split(/\r?\n/)
+    const newlineValues: string[] = []
+    for (let index = 0; index < text.length; ) {
+      const code = text.charCodeAt(index)
+      if (code === 0x0d) {
+        if (index + 1 < text.length && text.charCodeAt(index + 1) === 0x0a) {
+          newlineValues.push('\r\n')
+          index += 2
+        } else {
+          newlineValues.push('\r')
+          index += 1
+        }
+        continue
+      }
+      if (code === 0x0a) {
+        newlineValues.push('\n')
+        index += 1
+        continue
+      }
+      index += 1
+    }
+
+    const infos: Array<{ start: number; text: string; newline: string }> = []
+    let offset = 0
+    for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
+      const textPart = lines[lineIndex] ?? ''
+      const newline = newlineValues[lineIndex] ?? ''
+      infos.push({ start: offset, text: textPart, newline })
+      offset += textPart.length + newline.length
+    }
+
+    if (lines.length === 0) {
+      infos.push({ start: 0, text: '', newline: '' })
+    }
+
+    return infos
   }
 
   private withoutDebugRecording<T>(fn: () => T): T {

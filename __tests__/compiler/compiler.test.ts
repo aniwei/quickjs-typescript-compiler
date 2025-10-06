@@ -4,7 +4,10 @@ import path from 'node:path'
 import { TypeScriptCompiler } from '../../src'
 import { Compiler } from '../../src/compiler'
 import { FunctionKind, Opcode, BytecodeTag } from '../../src/env'
+import { ModuleExportType } from '../../src/functionDef'
 import { QuickJSLib } from '../../scripts/QuickJSLib'
+
+jest.setTimeout(30000)
 
 describe('TypeScriptCompiler', () => {
   test('compiles simple module to bytecode', async () => {
@@ -92,6 +95,258 @@ describe('TypeScriptCompiler', () => {
     )
     expect(hasPushAtomValue).toBe(true)
     expect(functionDef.bytecode.constantPool).toHaveLength(0)
+  })
+
+  test('boolean, null and comparison operations use dedicated opcodes', async () => {
+    const compiler = new TypeScriptCompiler()
+    const source = `
+      const truthy = true
+      const falsy = false
+      const empty = null
+
+      function check(value: number) {
+        if (value === 1) {
+          return true
+        }
+        return value !== 2
+      }
+    `
+    const { functionDef } = await compiler.compileSourceWithArtifacts(source, 'boolean-comparisons.ts')
+
+    const moduleOpcodes = functionDef.bytecode.instructions.map((instruction) => instruction.opcode)
+    expect(moduleOpcodes).toEqual(
+      expect.arrayContaining([Opcode.OP_push_true, Opcode.OP_push_false, Opcode.OP_null])
+    )
+
+    const childFunction = functionDef.children.find((child) => child.bytecode.funcKind === FunctionKind.JS_FUNC_NORMAL)
+    expect(childFunction).toBeDefined()
+    if (!childFunction) {
+      return
+    }
+    const childOpcodes = childFunction.bytecode.instructions.map((instruction) => instruction.opcode)
+    expect(childOpcodes).toEqual(expect.arrayContaining([Opcode.OP_strict_eq, Opcode.OP_strict_neq]))
+  })
+
+  test('bitwise, shift, exponent, in and instanceof operations use dedicated opcodes', async () => {
+    const compiler = new TypeScriptCompiler()
+    const source = `
+      function operations(value: number, mask: number, obj: any, ctor: any) {
+        const shiftLeft = value << 2
+        const shiftRight = value >> 1
+        const shiftUnsigned = value >>> 1
+        const power = value ** 3
+        const bitwiseAnd = value & mask
+        const bitwiseOr = value | mask
+        const bitwiseXor = value ^ mask
+        const hasKey = 'key' in obj
+        const isInstance = obj instanceof ctor
+        const base =
+          shiftLeft +
+          shiftRight +
+          shiftUnsigned +
+          power +
+          bitwiseAnd +
+          bitwiseOr +
+          bitwiseXor
+        if (hasKey) {
+          if (isInstance) {
+            return base + 2
+          }
+          return base + 1
+        }
+        if (isInstance) {
+          return base + 1
+        }
+        return base
+      }
+    `
+    const { functionDef } = await compiler.compileSourceWithArtifacts(source, 'bitwise-opcodes.ts')
+
+    const childFunction = functionDef.children.find((child) => child.bytecode.funcKind === FunctionKind.JS_FUNC_NORMAL)
+    expect(childFunction).toBeDefined()
+    if (!childFunction) {
+      return
+    }
+
+    const opcodes = childFunction.bytecode.instructions.map((instruction) => instruction.opcode)
+    expect(opcodes).toEqual(
+      expect.arrayContaining([
+        Opcode.OP_shl,
+        Opcode.OP_sar,
+        Opcode.OP_shr,
+        Opcode.OP_pow,
+        Opcode.OP_and,
+        Opcode.OP_or,
+        Opcode.OP_xor,
+        Opcode.OP_in,
+        Opcode.OP_instanceof,
+      ])
+    )
+  })
+
+  test('records module exports for variable statements, named export declarations and default assignments', async () => {
+    const fixturePath = path.join(__dirname, 'fixtures', 'module-exports.ts')
+    const source = await fs.readFile(fixturePath, 'utf8')
+    const compiler = new Compiler(fixturePath, source, { referenceJsSource: null })
+    const functionDef = compiler.compile()
+    const moduleRecord = functionDef.module
+    expect(moduleRecord).not.toBeNull()
+    if (!moduleRecord) {
+      return
+    }
+
+    const atomTable = (compiler as any).atomTable
+    const exportSummaries = moduleRecord.exportEntries.map((entry) => ({
+      type: entry.type,
+      exportedName: atomTable.getAtomString(entry.exportedName),
+      localVarIndex: entry.type === ModuleExportType.Local ? entry.localVarIndex : -1,
+    }))
+
+    expect(exportSummaries).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: ModuleExportType.Local,
+          exportedName: 'alpha',
+          localVarIndex: 0,
+        }),
+        expect.objectContaining({
+          type: ModuleExportType.Local,
+          exportedName: 'gamma',
+          localVarIndex: 1,
+        }),
+        expect.objectContaining({
+          type: ModuleExportType.Local,
+          exportedName: 'default',
+          localVarIndex: 2,
+        }),
+        expect.objectContaining({
+          type: ModuleExportType.Local,
+          exportedName: 'delta',
+          localVarIndex: 3,
+        }),
+      ])
+    )
+  })
+
+  test('module exports fixture executes under QuickJS WASM', async () => {
+    const fixturePath = path.join(__dirname, 'fixtures', 'module-exports.ts')
+    const compiler = new TypeScriptCompiler()
+    const { bytecode } = await compiler.compileFileWithArtifacts(fixturePath)
+
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'module-exports-bytecode-'))
+    const bytecodePath = path.join(tempDir, 'module-exports.qbc')
+    try {
+      await fs.writeFile(bytecodePath, bytecode)
+      await expect(QuickJSLib.runWithBinaryPath(bytecodePath)).resolves.toBeUndefined()
+    } finally {
+      await fs.rm(tempDir, { recursive: true, force: true })
+    }
+  })
+
+  test('default function export fixture records module metadata', async () => {
+    const fixturePath = path.join(__dirname, 'fixtures', 'module-exports-default.ts')
+    const source = await fs.readFile(fixturePath, 'utf8')
+    const compiler = new Compiler(fixturePath, source, { referenceJsSource: null })
+    const functionDef = compiler.compile()
+    const moduleRecord = functionDef.module
+    expect(moduleRecord).not.toBeNull()
+    if (!moduleRecord) {
+      return
+    }
+
+    const atomTable = (compiler as any).atomTable
+    const exportSummaries = moduleRecord.exportEntries.map((entry) => ({
+      type: entry.type,
+      exportedName: atomTable.getAtomString(entry.exportedName),
+      localVarIndex: entry.type === ModuleExportType.Local ? entry.localVarIndex : -1,
+    }))
+
+    expect(exportSummaries).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: ModuleExportType.Local,
+          exportedName: 'default',
+        }),
+        expect.objectContaining({
+          type: ModuleExportType.Local,
+          exportedName: 'multiply',
+        }),
+        expect.objectContaining({
+          type: ModuleExportType.Local,
+          exportedName: 'ultimateAnswer',
+        }),
+      ])
+    )
+  })
+
+  test('default function export fixture executes under QuickJS WASM', async () => {
+    const fixturePath = path.join(__dirname, 'fixtures', 'module-exports-default.ts')
+    const compiler = new TypeScriptCompiler()
+    const { bytecode } = await compiler.compileFileWithArtifacts(fixturePath)
+
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'module-exports-default-bytecode-'))
+    const bytecodePath = path.join(tempDir, 'module-exports-default.qbc')
+    try {
+      await fs.writeFile(bytecodePath, bytecode)
+      await expect(QuickJSLib.runWithBinaryPath(bytecodePath)).resolves.toBeUndefined()
+    } finally {
+      await fs.rm(tempDir, { recursive: true, force: true })
+    }
+  })
+
+  test('class export fixture records module metadata', async () => {
+    const fixturePath = path.join(__dirname, 'fixtures', 'module-exports-class.ts')
+    const source = await fs.readFile(fixturePath, 'utf8')
+    const compiler = new Compiler(fixturePath, source, { referenceJsSource: null })
+    const functionDef = compiler.compile()
+    const moduleRecord = functionDef.module
+    expect(moduleRecord).not.toBeNull()
+    if (!moduleRecord) {
+      return
+    }
+
+    const atomTable = (compiler as any).atomTable
+    const exportSummaries = moduleRecord.exportEntries.map((entry) => ({
+      type: entry.type,
+      exportedName: atomTable.getAtomString(entry.exportedName),
+      localVarIndex: entry.type === ModuleExportType.Local ? entry.localVarIndex : -1,
+    }))
+
+    expect(exportSummaries).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: ModuleExportType.Local,
+          exportedName: 'Counter',
+        }),
+        expect.objectContaining({
+          type: ModuleExportType.Local,
+          exportedName: 'createCounter',
+        }),
+        expect.objectContaining({
+          type: ModuleExportType.Local,
+          exportedName: 'sharedCounter',
+        }),
+        expect.objectContaining({
+          type: ModuleExportType.Local,
+          exportedName: 'default',
+        }),
+      ])
+    )
+  })
+
+  test('class export fixture executes under QuickJS WASM', async () => {
+    const fixturePath = path.join(__dirname, 'fixtures', 'module-exports-class.ts')
+    const compiler = new TypeScriptCompiler()
+    const { bytecode } = await compiler.compileFileWithArtifacts(fixturePath)
+
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'module-exports-class-bytecode-'))
+    const bytecodePath = path.join(tempDir, 'module-exports-class.qbc')
+    try {
+      await fs.writeFile(bytecodePath, bytecode)
+      await expect(QuickJSLib.runWithBinaryPath(bytecodePath)).resolves.toBeUndefined()
+    } finally {
+      await fs.rm(tempDir, { recursive: true, force: true })
+    }
   })
 
   test('column adjustments honor explicit reference JS source', () => {
