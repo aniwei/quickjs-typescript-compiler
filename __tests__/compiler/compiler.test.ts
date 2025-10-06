@@ -97,6 +97,87 @@ describe('TypeScriptCompiler', () => {
     expect(functionDef.bytecode.constantPool).toHaveLength(0)
   })
 
+  test('logical, unary and template operations compile with expected opcodes and execute correctly', async () => {
+    const compiler = new TypeScriptCompiler()
+    const source = `
+      let left = 0
+      left ||= 5
+
+      let right = 2
+      right &&= 3
+
+      let fallback: number | undefined
+      fallback ??= 10
+
+      const logicalOr = left || right
+      const logicalAnd = left && right
+      const nullish = fallback ?? 0
+
+      const unaryPlus = +right
+      const unaryMinus = -right
+      const logicalNot = !right
+      const bitwiseNot = ~right
+      const voidResult = void right
+
+      const message = \`left=\${left}, right=\${right}\`
+
+      const container: { count: number; fallback?: number } = { count: 0 }
+      container.count ||= 4
+      container.count &&= 9
+      container.fallback ??= 11
+
+      const directNullish = undefined ?? 99
+      const zeroNullish = 0 ?? 99
+
+      if (left !== 5) throw new Error('left ||=')
+      if (right !== 3) throw new Error('right &&=')
+      if (fallback !== 10) throw new Error('fallback ??=')
+      if (logicalOr !== 5) throw new Error('logicalOr')
+      if (logicalAnd !== 3) throw new Error('logicalAnd')
+      if (nullish !== 10) throw new Error('nullish')
+      if (unaryPlus !== 3) throw new Error('unaryPlus')
+      if (unaryMinus !== -3) throw new Error('unaryMinus')
+      if (logicalNot !== false) throw new Error('logicalNot')
+      if (bitwiseNot !== -4) throw new Error('bitwiseNot')
+      if (voidResult !== undefined) throw new Error('voidResult')
+      if (message !== 'left=5, right=3') throw new Error('template message')
+      if (container.count !== 9) throw new Error('container.count')
+      if (container.fallback !== 11) throw new Error('container.fallback')
+      if (directNullish !== 99) throw new Error('directNullish')
+      if (zeroNullish !== 0) throw new Error('zeroNullish')
+    `
+
+    const { functionDef, bytecode } = await compiler.compileSourceWithArtifacts(source, 'logical-unary-template.ts')
+
+    const moduleOpcodes = functionDef.bytecode.instructions.map((instruction) => instruction.opcode)
+    const hasIfTrue = moduleOpcodes.some((opcode) => opcode === Opcode.OP_if_true || opcode === Opcode.OP_if_true8)
+    const hasIfFalse = moduleOpcodes.some((opcode) => opcode === Opcode.OP_if_false || opcode === Opcode.OP_if_false8)
+    const hasNullishCheck = moduleOpcodes.includes(Opcode.OP_is_undefined_or_null)
+    expect(hasIfTrue).toBe(true)
+    expect(hasIfFalse).toBe(true)
+    expect(hasNullishCheck).toBe(true)
+
+    expect(moduleOpcodes).toEqual(
+      expect.arrayContaining([
+        Opcode.OP_lnot,
+        Opcode.OP_not,
+        Opcode.OP_neg,
+        Opcode.OP_plus,
+        Opcode.OP_push_empty_string,
+        Opcode.OP_add,
+      ])
+    )
+
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'logical-unary-template-'))
+    const bytecodePath = path.join(tempDir, 'module.qbc')
+    try {
+      await fs.writeFile(bytecodePath, bytecode)
+      await expect(QuickJSLib.runWithBinaryPath(bytecodePath)).resolves.toBeUndefined()
+    } finally {
+      await fs.rm(tempDir, { recursive: true, force: true })
+    }
+  })
+
   test('boolean, null and comparison operations use dedicated opcodes', async () => {
     const compiler = new TypeScriptCompiler()
     const source = `

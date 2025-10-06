@@ -1,8 +1,8 @@
-export default function namedDefault(value) {
+export default function namedDefault(value: number): number {
   return value + 1
 }
 
-export function multiply(value, factor = 2) {
+export function multiply(value: number, factor: number = 2): number {
   return value * factor
 }
 

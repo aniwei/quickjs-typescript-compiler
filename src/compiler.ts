@@ -649,6 +649,24 @@ export class Compiler {
     this.emitStoreToLexical(atom)
   }
 
+  private compileFunctionExpression(node: ts.FunctionExpression) {
+  const nameAtom = node.name ? this.atomTable.getAtomId(node.name.text) : this.atomTable.getAtomId('')
+    const childFunction = this.compileChildFunction(node, nameAtom, { isExpression: true })
+    const constantIndex = this.currentFunction.addConstant(
+      {
+        tag: BytecodeTag.TC_TAG_FUNCTION_BYTECODE,
+        value: childFunction.bytecode,
+      },
+      { key: null }
+    )
+
+    if (constantIndex <= 0xff) {
+      this.emitOpcode(Opcode.OP_fclosure8, [constantIndex], node)
+    } else {
+      this.emitOpcode(Opcode.OP_fclosure, [constantIndex], node)
+    }
+  }
+
   private compileChildFunction(
     node: ts.FunctionDeclaration | ts.FunctionExpression,
     nameAtom: Atom,
@@ -698,9 +716,11 @@ export class Compiler {
 
     this.pushScope(ScopeKind.Function)
 
-    childFunction.definedArgCount = node.parameters.length
-    for (let index = 0; index < node.parameters.length; index++) {
-      this.compileFunctionParameter(node.parameters[index], index, node.parameters.length)
+    const parameters = node.parameters.filter((parameter) => !this.isThisParameter(parameter))
+
+    childFunction.definedArgCount = parameters.length
+    for (let index = 0; index < parameters.length; index++) {
+      this.compileFunctionParameter(parameters[index], index, parameters.length)
     }
 
     if (!node.body || !ts.isBlock(node.body)) {
@@ -721,6 +741,10 @@ export class Compiler {
     this.restoreFunctionContext(snapshot)
 
     return childFunction
+  }
+
+  private isThisParameter(parameter: ts.ParameterDeclaration): boolean {
+    return ts.isIdentifier(parameter.name) && parameter.name.text === 'this'
   }
 
   private compileFunctionParameter(parameter: ts.ParameterDeclaration, index: number, totalParams: number) {
@@ -942,6 +966,15 @@ export class Compiler {
       return
     }
 
+    if (
+      operator === ts.SyntaxKind.BarBarToken ||
+      operator === ts.SyntaxKind.AmpersandAmpersandToken ||
+      operator === ts.SyntaxKind.QuestionQuestionToken
+    ) {
+      this.compileLogicalBinaryExpression(expression)
+      return
+    }
+
     const opcode = this.getBinaryOperationOpcode(operator)
     if (opcode === null) {
       throw new Error(`Unsupported binary operator: ${ts.SyntaxKind[operator]}`)
@@ -954,6 +987,19 @@ export class Compiler {
   private compileAssignmentExpression(expression: ts.BinaryExpression) {
     const operator = expression.operatorToken.kind
     const left = expression.left
+
+    if (this.isLogicalAssignmentOperator(operator)) {
+      if (ts.isIdentifier(left)) {
+        this.compileLogicalAssignmentIdentifier(left, expression.right, operator, expression)
+        return
+      }
+      if (ts.isPropertyAccessExpression(left)) {
+        this.compileLogicalAssignmentProperty(left, expression.right, operator, expression)
+        return
+      }
+      throw new Error(`Unsupported logical assignment target: ${ts.SyntaxKind[left.kind]}`)
+    }
+
     if (ts.isIdentifier(left)) {
       this.compileIdentifierAssignment(left, expression.right, operator, expression)
       return
@@ -1017,6 +1063,156 @@ export class Compiler {
     this.emitOpcode(Opcode.OP_put_field, [propertyAtom], left.name, propertyDebug)
   }
 
+  private compileLogicalBinaryExpression(expression: ts.BinaryExpression) {
+    const operator = expression.operatorToken.kind
+    const endLabel = this.createLabel()
+
+    this.compileExpression(expression.left)
+
+    switch (operator) {
+      case ts.SyntaxKind.BarBarToken: {
+        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
+        this.emitJump(this.getIfTrueOpcode(), endLabel)
+        this.emitOpcode(Opcode.OP_drop)
+        this.compileExpression(expression.right)
+        break
+      }
+      case ts.SyntaxKind.AmpersandAmpersandToken: {
+        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
+        this.emitJump(this.getIfFalseOpcode(), endLabel)
+        this.emitOpcode(Opcode.OP_drop)
+        this.compileExpression(expression.right)
+        break
+      }
+      case ts.SyntaxKind.QuestionQuestionToken: {
+        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
+        this.emitOpcode(Opcode.OP_is_undefined_or_null, [], expression.operatorToken)
+        this.emitJump(this.getIfFalseOpcode(), endLabel)
+        this.emitOpcode(Opcode.OP_drop)
+        this.compileExpression(expression.right)
+        break
+      }
+      default:
+        throw new Error(`Unsupported logical operator: ${ts.SyntaxKind[operator]}`)
+    }
+
+    this.markLabel(endLabel)
+  }
+
+  private compileLogicalAssignmentIdentifier(
+    left: ts.Identifier,
+    right: ts.Expression,
+    operator: ts.SyntaxKind,
+    expression: ts.BinaryExpression
+  ) {
+    const atom = this.atomTable.getAtomId(left.text)
+    const skipLabel = this.createLabel()
+
+    this.emitLoadIdentifier(left)
+
+    switch (operator) {
+      case ts.SyntaxKind.BarBarEqualsToken: {
+        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
+        this.emitJump(this.getIfTrueOpcode(), skipLabel)
+        this.emitOpcode(Opcode.OP_drop)
+        this.compileExpression(right)
+        this.emitOpcode(Opcode.OP_dup)
+        this.emitStoreIdentifier(atom, left)
+        break
+      }
+      case ts.SyntaxKind.AmpersandAmpersandEqualsToken: {
+        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
+        this.emitJump(this.getIfFalseOpcode(), skipLabel)
+        this.emitOpcode(Opcode.OP_drop)
+        this.compileExpression(right)
+        this.emitOpcode(Opcode.OP_dup)
+        this.emitStoreIdentifier(atom, left)
+        break
+      }
+      case ts.SyntaxKind.QuestionQuestionEqualsToken: {
+        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
+        this.emitOpcode(Opcode.OP_is_undefined_or_null, [], expression.operatorToken)
+        this.emitJump(this.getIfFalseOpcode(), skipLabel)
+        this.emitOpcode(Opcode.OP_drop)
+        this.compileExpression(right)
+        this.emitOpcode(Opcode.OP_dup)
+        this.emitStoreIdentifier(atom, left)
+        break
+      }
+      default:
+        throw new Error(`Unsupported logical assignment operator: ${ts.SyntaxKind[operator]}`)
+    }
+
+    this.markLabel(skipLabel)
+  }
+
+  private compileLogicalAssignmentProperty(
+    left: ts.PropertyAccessExpression,
+    right: ts.Expression,
+    operator: ts.SyntaxKind,
+    expression: ts.BinaryExpression
+  ) {
+    const propertyAtom = this.atomTable.getAtomId(left.name.text)
+    const propertyOperatorPos = this.getPropertyAccessOperatorPos(left)
+    const propertyDebug: EmitDebugInfoOptions | undefined = propertyOperatorPos !== undefined
+      ? { tsSourcePos: propertyOperatorPos }
+      : undefined
+
+    const skipLabel = this.createLabel()
+    const endLabel = this.createLabel()
+
+    this.withSourceNode(left.expression, () => {
+      this.compileExpression(left.expression)
+    })
+
+    this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
+    this.emitOpcode(Opcode.OP_get_field, [propertyAtom], left.name, propertyDebug)
+
+    switch (operator) {
+      case ts.SyntaxKind.BarBarEqualsToken: {
+        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
+        this.emitJump(this.getIfTrueOpcode(), skipLabel)
+        this.emitOpcode(Opcode.OP_drop)
+        this.compileExpression(right)
+        this.emitOpcode(Opcode.OP_dup)
+        this.emitOpcode(Opcode.OP_rot3r)
+        this.emitOpcode(Opcode.OP_put_field, [propertyAtom], left.name, propertyDebug)
+        this.emitGoto(endLabel)
+        break
+      }
+      case ts.SyntaxKind.AmpersandAmpersandEqualsToken: {
+        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
+        this.emitJump(this.getIfFalseOpcode(), skipLabel)
+        this.emitOpcode(Opcode.OP_drop)
+        this.compileExpression(right)
+        this.emitOpcode(Opcode.OP_dup)
+        this.emitOpcode(Opcode.OP_rot3r)
+        this.emitOpcode(Opcode.OP_put_field, [propertyAtom], left.name, propertyDebug)
+        this.emitGoto(endLabel)
+        break
+      }
+      case ts.SyntaxKind.QuestionQuestionEqualsToken: {
+        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
+        this.emitOpcode(Opcode.OP_is_undefined_or_null, [], expression.operatorToken)
+        this.emitJump(this.getIfFalseOpcode(), skipLabel)
+        this.emitOpcode(Opcode.OP_drop)
+        this.compileExpression(right)
+        this.emitOpcode(Opcode.OP_dup)
+        this.emitOpcode(Opcode.OP_rot3r)
+        this.emitOpcode(Opcode.OP_put_field, [propertyAtom], left.name, propertyDebug)
+        this.emitGoto(endLabel)
+        break
+      }
+      default:
+        throw new Error(`Unsupported logical assignment operator: ${ts.SyntaxKind[operator]}`)
+    }
+
+    this.markLabel(skipLabel)
+    this.emitOpcode(Opcode.OP_swap)
+    this.emitOpcode(Opcode.OP_drop)
+    this.markLabel(endLabel)
+  }
+
   private emitStoreIdentifier(atom: Atom, identifier: ts.Identifier) {
     if (this.argumentIndices.has(atom)) {
       this.emitStoreArgument(this.argumentIndices.get(atom)!, identifier)
@@ -1063,6 +1259,22 @@ export class Compiler {
       default:
         throw new Error(`Unsupported assignment operator: ${ts.SyntaxKind[operator]}`)
     }
+  }
+
+  private isLogicalAssignmentOperator(operator: ts.SyntaxKind): boolean {
+    return (
+      operator === ts.SyntaxKind.BarBarEqualsToken ||
+      operator === ts.SyntaxKind.AmpersandAmpersandEqualsToken ||
+      operator === ts.SyntaxKind.QuestionQuestionEqualsToken
+    )
+  }
+
+  private getIfTrueOpcode(): Opcode {
+    return env.supportsShortOpcodes ? Opcode.OP_if_true8 : Opcode.OP_if_true
+  }
+
+  private getIfFalseOpcode(): Opcode {
+    return env.supportsShortOpcodes ? Opcode.OP_if_false8 : Opcode.OP_if_false
   }
 
   private getBinaryOperationOpcode(operator: ts.SyntaxKind): Opcode | null {
@@ -1666,6 +1878,11 @@ export class Compiler {
         return
       }
 
+      if (ts.isTemplateExpression(expression)) {
+        this.compileTemplateExpression(expression)
+        return
+      }
+
       if (expression.kind === ts.SyntaxKind.NullKeyword) {
         this.compileNullLiteral(expression)
         return
@@ -1708,6 +1925,36 @@ export class Compiler {
 
       if (ts.isPropertyAccessExpression(expression)) {
         this.compilePropertyAccessExpression(expression)
+        return
+      }
+
+      if (ts.isFunctionExpression(expression)) {
+        this.compileFunctionExpression(expression)
+        return
+      }
+
+      if (ts.isAsExpression(expression)) {
+        this.compileExpression(expression.expression)
+        return
+      }
+
+      if (ts.isTypeAssertionExpression(expression)) {
+        this.compileExpression(expression.expression)
+        return
+      }
+
+      if (ts.isVoidExpression(expression)) {
+        this.compileVoidExpression(expression)
+        return
+      }
+
+      if (ts.isPrefixUnaryExpression(expression)) {
+        this.compilePrefixUnaryExpression(expression)
+        return
+      }
+
+      if (ts.isPostfixUnaryExpression(expression)) {
+        this.compilePostfixUnaryExpression(expression)
         return
       }
 
@@ -1885,6 +2132,70 @@ export class Compiler {
       ? { tsSourcePos: operatorPos }
       : undefined
     this.emitOpcode(Opcode.OP_get_field, [propertyAtom], expression.name, debug)
+  }
+
+  private compileTemplateExpression(expression: ts.TemplateExpression) {
+    this.emitOpcode(Opcode.OP_push_empty_string, [], expression)
+
+    const headText = expression.head.text
+    if (headText.length > 0) {
+      this.emitStringLiteral(headText, expression.head)
+      this.emitOpcode(Opcode.OP_add, [], expression.head)
+    }
+
+    for (const span of expression.templateSpans) {
+      this.compileExpression(span.expression)
+      this.emitOpcode(Opcode.OP_add, [], span.expression)
+
+      const literalText = span.literal.text
+      if (literalText.length > 0) {
+        this.emitStringLiteral(literalText, span.literal)
+        this.emitOpcode(Opcode.OP_add, [], span.literal)
+      }
+    }
+  }
+
+  private compilePrefixUnaryExpression(expression: ts.PrefixUnaryExpression) {
+    const operator = expression.operator
+
+    switch (operator) {
+      case ts.SyntaxKind.PlusToken:
+      case ts.SyntaxKind.MinusToken:
+      case ts.SyntaxKind.TildeToken:
+      case ts.SyntaxKind.ExclamationToken:
+        break
+      default:
+        throw new Error(`Unsupported prefix unary operator: ${ts.SyntaxKind[operator]}`)
+    }
+
+    this.compileExpression(expression.operand)
+
+    switch (operator) {
+      case ts.SyntaxKind.PlusToken:
+        this.emitOpcode(Opcode.OP_plus, [], expression)
+        break
+      case ts.SyntaxKind.MinusToken:
+        this.emitOpcode(Opcode.OP_neg, [], expression)
+        break
+      case ts.SyntaxKind.TildeToken:
+        this.emitOpcode(Opcode.OP_not, [], expression)
+        break
+      case ts.SyntaxKind.ExclamationToken:
+        this.emitOpcode(Opcode.OP_lnot, [], expression)
+        break
+      default:
+        throw new Error(`Unsupported prefix unary operator: ${ts.SyntaxKind[operator]}`)
+    }
+  }
+
+  private compilePostfixUnaryExpression(expression: ts.PostfixUnaryExpression): never {
+    throw new Error(`Unsupported postfix unary operator: ${ts.SyntaxKind[expression.operator]}`)
+  }
+
+  private compileVoidExpression(expression: ts.VoidExpression) {
+    this.compileExpression(expression.expression)
+    this.emitOpcode(Opcode.OP_drop)
+    this.emitOpcode(Opcode.OP_undefined, [], expression)
   }
 
   private emitLoadArgument(index: number, node?: ts.Node) {
