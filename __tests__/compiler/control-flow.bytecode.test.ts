@@ -47,6 +47,42 @@ describe('compiler control-flow integration', () => {
     expect(continueJump.operands[0]).toBeGreaterThan(0)
   })
 
+  test('for-in break emits cleanup drop before exiting the loop', async () => {
+    const instructions = await compileInstructions(
+      `
+      const obj = { a: 1 }
+      for (const key in obj) {
+        break
+      }
+    `,
+      'for-in-break.ts'
+    )
+
+    expect(instructions.some((instruction) => instruction.opcode === Opcode.OP_for_in_start)).toBe(true)
+    expect(instructions.some((instruction) => instruction.opcode === Opcode.OP_for_in_next)).toBe(true)
+
+    const exitDropIndex = instructions.findIndex((instruction, index, list) => {
+      return instruction.opcode === Opcode.OP_drop && list[index + 1]?.opcode === Opcode.OP_undefined
+    })
+    expect(exitDropIndex).toBeGreaterThan(-1)
+  })
+
+  test('for-in with identifier initializer emits for-in opcodes', async () => {
+    const instructions = await compileInstructions(
+      `
+      let key
+      const obj = { a: 1 }
+      for (key in obj) {
+        continue
+      }
+    `,
+      'for-in-identifier.ts'
+    )
+
+    expect(instructions.some((instruction) => instruction.opcode === Opcode.OP_for_in_start)).toBe(true)
+    expect(instructions.some((instruction) => instruction.opcode === Opcode.OP_for_in_next)).toBe(true)
+  })
+
   test('labeled break unwinds inner loop before exiting outer loop', async () => {
     const instructions = await compileInstructions(
       `
@@ -85,6 +121,29 @@ describe('compiler control-flow integration', () => {
       instruction.opcode === Opcode.OP_goto8 && instruction.operands[0] < 0
     )
     expect(continueGotoIndex).toBeGreaterThan(-1)
+  })
+
+  test('do-while loop jumps back on true condition', async () => {
+    const instructions = await compileInstructions(
+      `
+      let value = 1
+      do {
+        value = value - 1
+      } while (value)
+    `,
+      'do-while.ts'
+    )
+
+    const hasBackwardIfTrue = instructions.some((instruction) => {
+      if (instruction.operands.length === 0) return false
+      const operand = instruction.operands[instruction.operands.length - 1]
+      return (
+        (instruction.opcode === Opcode.OP_if_true8 || instruction.opcode === Opcode.OP_if_true) &&
+        operand < 0
+      )
+    })
+
+    expect(hasBackwardIfTrue).toBe(true)
   })
 
   test('for loop increment is evaluated on continue', async () => {

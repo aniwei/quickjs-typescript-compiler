@@ -1,3 +1,4 @@
+import { ensureStatementVisitorsInitialized, getStatementVisitor } from './compiler/visitors/statementVisitors'
 import path from 'node:path'
 import * as ts from 'typescript'
 import { Atom, AtomTable, JSAtom } from './atoms'
@@ -9,7 +10,14 @@ import { Var, VarKind, ClosureVar, VarDeclarationKind } from './vars'
 import { Opcode, OpFormat, PC2Line, BytecodeTag, FunctionKind, JSMode, env, type OpcodeDefinition } from './env'
 import { getOpcodeDefinition, getOpcodeName } from './utils/opcode'
 import { getIndexedOpcode, getPushIntOpcode } from './utils/opcodeVariants'
-import { ControlFlowBuilder, ControlFlowTarget, ControlFlowTargetKind, LoopControlFlowTarget } from './controlFlow'
+import {
+  ControlFlowBuilder,
+  ControlFlowTarget,
+  ControlFlowTargetKind,
+  LoopControlFlowTarget,
+  type BreakResolution,
+  type ContinueResolution,
+} from './controlFlow'
 
 const PC2LINE_BASE = PC2Line.PC2LINE_BASE
 const PC2LINE_OP_FIRST = PC2Line.PC2LINE_OP_FIRST
@@ -52,7 +60,7 @@ interface FunctionContextSnapshot {
   loopCleanupEntries: Array<[string, LoopCleanupInfo]>
 }
 
-type LoopCleanupInfo = { kind: 'for-of' }
+type LoopCleanupInfo = { kind: 'for-of' | 'for-in' }
 
 type ColumnAdjustment = { startColumn: number; delta: number }
 
@@ -160,6 +168,7 @@ export class Compiler {
 
   compile(): FunctionDef {
     this.resetCodegenState()
+    ensureStatementVisitorsInitialized()
     const evalAtom = this.atomTable.getAtomId('_eval_')
     const rootFunction = new FunctionDef(evalAtom, this.sourceCode, this.fileName)
     
@@ -327,7 +336,7 @@ export class Compiler {
     }
   }
 
-  private withSourceNode<T>(node: ts.Node, fn: () => T): T {
+  public withSourceNode<T>(node: ts.Node, fn: () => T): T {
     const previous = this.currentSourceNode
     this.currentSourceNode = node
     try {
@@ -359,315 +368,35 @@ export class Compiler {
   }
 
   private visitNode(node: ts.Node): void {
-    if (ts.isLabeledStatement(node)) {
-      this.withStatementNode(node, () => this.compileLabeledStatement(node))
-      return
-    }
-    if (ts.isFunctionDeclaration(node)) {
-      this.withStatementNode(node, () => this.compileFunctionDeclaration(node))
-      return
-    }
-    if (ts.isExportDeclaration(node)) {
-      this.withStatementNode(node, () => this.compileExportDeclaration(node))
-      return
-    }
-    if (ts.isExportAssignment(node)) {
-      this.withStatementNode(node, () => this.compileExportAssignment(node))
-      return
-    }
-    if (ts.isIfStatement(node)) {
-      this.withStatementNode(node, () => this.compileIfStatement(node))
-      return
-    }
-    if (ts.isVariableStatement(node)) {
-      this.withStatementNode(node, () => this.compileVariableStatement(node))
-      return
-    }
-    if (ts.isForOfStatement(node)) {
-      this.withStatementNode(node, () => this.compileForOfStatement(node))
-      return
-    }
-    if (ts.isWhileStatement(node)) {
-      this.withStatementNode(node, () => this.compileWhileStatement(node))
-      return
-    }
-    if (ts.isForStatement(node)) {
-      this.withStatementNode(node, () => this.compileForStatement(node))
-      return
-    }
-    if (ts.isSwitchStatement(node)) {
-      this.withStatementNode(node, () => this.compileSwitchStatement(node))
-      return
-    }
-    if (ts.isBreakStatement(node)) {
-      this.withStatementNode(node, () => this.compileBreakStatement(node))
-      return
-    }
-    if (ts.isContinueStatement(node)) {
-      this.withStatementNode(node, () => this.compileContinueStatement(node))
-      return
-    }
-    if (ts.isBlock(node)) {
-      this.withStatementNode(node, () => this.compileBlock(node))
-      return
-    }
-    if (ts.isExpressionStatement(node)) {
-      this.withStatementNode(node, () => this.compileExpressionStatement(node))
-      return
-    }
-    if (ts.isReturnStatement(node)) {
-      this.withStatementNode(node, () => this.compileReturnStatement(node))
-      return
+    if (ts.isStatement(node)) {
+      const visitor = getStatementVisitor(node.kind)
+      if (visitor) {
+        this.withStatementNode(node, () => visitor(this, node))
+        return
+      }
     }
     ts.forEachChild(node, (child) => this.visitNode(child))
   }
 
-  private compileVariableStatement(node: ts.VariableStatement) {
-    const flags = node.declarationList.flags
-    const isConst = (flags & ts.NodeFlags.Const) !== 0
-    const isLet = (flags & ts.NodeFlags.Let) !== 0
-    const hasExportModifier =
-      node.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword) ?? false
-    const isModuleTopLevel =
-      this.currentFunction.parent === null &&
-      this.currentFunction.module !== null &&
-      this.scopeManager.currentScope() === this.currentFunction.bodyScope
-
-    for (const declaration of node.declarationList.declarations) {
-      const compileDeclaration = () => {
-        this.withSourceNode(declaration, () => {
-          if (!ts.isIdentifier(declaration.name)) {
-            throw new Error('Destructuring is not supported yet')
-          }
-
-          const nameText = declaration.name.text
-          const atom = this.atomTable.getAtomId(nameText)
-
-          if ((isConst || isLet) && this.scopeManager.hasBindingInCurrentScope(atom)) {
-            throw new Error(`Identifier '${nameText}' has already been declared in this scope`)
-          }
-
-          if (isConst && !declaration.initializer) {
-            throw new Error(`Missing initializer in const declaration for '${nameText}'`)
-          }
-
-          const capture = isModuleTopLevel
-          const varIndex = this.declareLexicalVariable(atom, { isConst, isLet, capture })
-          const variable = this.currentFunction.vars[varIndex]
-          if (this.isGlobalVarContext() && isModuleTopLevel) {
-            const forceInit = variable.isLexical && !declaration.initializer
-            this.registerGlobalVar(atom, {
-              scopeLevel: variable.scopeLevel,
-              isLexical: variable.isLexical,
-              isConst: variable.isConst,
-              forceInit,
-            })
-          }
-
-          if (isModuleTopLevel && hasExportModifier) {
-            this.registerModuleLocalExport(atom, varIndex)
-          }
-
-          const suppressInitializerDebug =
-            isModuleTopLevel && this.shouldSuppressTopLevelInitializerDebug(declaration.initializer)
-
-          const localSlot = this.localVarIndices.get(atom)
-          if (localSlot !== undefined && (isConst || isLet)) {
-            this.emitSetLocalUninitialized(localSlot, variable.scopeLevel)
-          }
-
-          if (declaration.initializer) {
-            const emitInitializer = () => {
-              this.compileExpression(declaration.initializer!)
-              this.emitStoreToLexical(atom)
-            }
-
-            if (suppressInitializerDebug) {
-              this.withoutDebugRecording(emitInitializer)
-            } else {
-              emitInitializer()
-            }
-            return
-          }
-
-          if (isConst || isLet) {
-            const emitDefaultInitializer = () => {
-              // Lexical declarations without initializer are initialized to undefined
-              this.emitOpcode(Opcode.OP_undefined)
-              this.emitStoreToLexical(atom)
-            }
-
-            if (isModuleTopLevel) {
-              this.withoutDebugRecording(emitDefaultInitializer)
-            } else {
-              emitDefaultInitializer()
-            }
-          }
-        })
-      }
-
-      compileDeclaration()
-    }
-  }
-
-  private compileExportDeclaration(node: ts.ExportDeclaration) {
-    if (this.currentFunction.parent !== null || this.currentFunction.module === null) {
-      throw new Error('Export declarations are only supported at the module top level')
-    }
-    if (node.isTypeOnly) {
+  public compileStatement(node: ts.Statement): void {
+    const visitor = getStatementVisitor(node.kind)
+    if (visitor) {
+      this.withStatementNode(node, () => visitor(this, node))
       return
     }
-    if (node.moduleSpecifier) {
-      throw new Error('Re-exporting from other modules is not supported yet')
-    }
-    const clause = node.exportClause
-    if (!clause) {
-      throw new Error('Wildcard export declarations are not supported yet')
-    }
-    if (!ts.isNamedExports(clause)) {
-      throw new Error('Only named export declarations are supported currently')
-    }
-
-    for (const element of clause.elements) {
-      const exportedIdentifier = element.name
-      if (!ts.isIdentifier(exportedIdentifier)) {
-        throw new Error('Unsupported export name form')
-      }
-      const exportedAtom = this.atomTable.getAtomId(exportedIdentifier.text)
-      const localName = element.propertyName ?? element.name
-      if (!ts.isIdentifier(localName)) {
-        throw new Error('Unsupported local export target')
-      }
-      const localAtom = this.atomTable.getAtomId(localName.text)
-      const bindingInfo = this.scopeManager.getBindingInfo(localAtom)
-      if (!bindingInfo) {
-        throw new Error(`Cannot export undeclared identifier '${localName.text}'`)
-      }
-      const { index: varIndex } = bindingInfo.binding
-      if (varIndex < 0 || varIndex >= this.currentFunction.vars.length) {
-        throw new Error(`Export target '${localName.text}' is not a module variable`)
-      }
-      this.registerModuleLocalExport(exportedAtom, varIndex)
-    }
-  }
-
-  private compileExportAssignment(node: ts.ExportAssignment) {
-    if (node.isExportEquals) {
-      throw new Error('CommonJS export assignment is not supported yet')
-    }
-    if (this.currentFunction.parent !== null || this.currentFunction.module === null) {
-      throw new Error('Export assignments are only supported at the module top level')
-    }
-
-    const expression = node.expression
-    if (!ts.isIdentifier(expression)) {
-      throw new Error('Only identifier default exports are supported currently')
-    }
-
-    const localAtom = this.atomTable.getAtomId(expression.text)
-    const bindingInfo = this.scopeManager.getBindingInfo(localAtom)
-    if (!bindingInfo) {
-      throw new Error(`Cannot export undeclared identifier '${expression.text}'`)
-    }
-    const { index: varIndex } = bindingInfo.binding
-    if (varIndex < 0 || varIndex >= this.currentFunction.vars.length) {
-      throw new Error(`Export target '${expression.text}' is not a module variable`)
-    }
-
-    const exportedAtom = this.atomTable.getAtomId('default')
-    this.registerModuleLocalExport(exportedAtom, varIndex)
-  }
-
-  private compileFunctionDeclaration(node: ts.FunctionDeclaration) {
-    if (!node.name) {
-      throw new Error('Function declaration must have a name')
-    }
-    if (!node.body) {
-      throw new Error(`Function '${node.name.text}' is missing a body`)
-    }
-
-    const hasExportModifier = node.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword) ?? false
-    const hasDefaultModifier = node.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.DefaultKeyword) ?? false
-
-    const atom = this.atomTable.getAtomId(node.name.text)
-    if (this.scopeManager.hasBindingInCurrentScope(atom)) {
-      throw new Error(`Identifier '${node.name.text}' has already been declared in this scope`)
-    }
-
-    const isModuleTopLevel =
-      this.currentFunction.parent === null &&
-      this.currentFunction.module !== null &&
-      this.scopeManager.currentScope() === this.currentFunction.bodyScope
-
-    const varIndex = this.declareLexicalVariable(atom, {
-      isConst: false,
-      isLet: isModuleTopLevel,
-      kind: VarKind.FUNCTION_DECL,
-      capture: isModuleTopLevel,
+    this.withStatementNode(node, () => {
+      ts.forEachChild(node, (child) => this.visitNode(child))
     })
-    const variable = this.currentFunction.vars[varIndex]
-    if (this.isGlobalVarContext() && isModuleTopLevel) {
-      this.registerGlobalVar(atom, {
-        scopeLevel: variable.scopeLevel,
-        isLexical: variable.isLexical,
-        isConst: variable.isConst,
-      })
-    }
-
-    const childFunction = this.compileChildFunction(node, atom, { isExpression: false })
-    const constantIndex = this.currentFunction.addConstant(
-      {
-        tag: BytecodeTag.TC_TAG_FUNCTION_BYTECODE,
-        value: childFunction.bytecode,
-      },
-      { key: null }
-    )
-    variable.funcPoolIndex = constantIndex
-    if (this.isGlobalVarContext() && isModuleTopLevel) {
-      this.registerGlobalVar(atom, {
-        scopeLevel: variable.scopeLevel,
-        isLexical: variable.isLexical,
-        isConst: variable.isConst,
-        funcPoolIndex: constantIndex,
-      })
-    }
-
-    if (isModuleTopLevel && hasExportModifier) {
-      const exportedName = hasDefaultModifier ? this.atomTable.getAtomId('default') : atom
-      this.registerModuleLocalExport(exportedName, varIndex)
-    }
-
-    if (isModuleTopLevel) {
-      return
-    }
-
-    if (constantIndex <= 0xff) {
-      this.emitOpcode(Opcode.OP_fclosure8, [constantIndex], node)
-    } else {
-      this.emitOpcode(Opcode.OP_fclosure, [constantIndex], node)
-    }
-    this.emitStoreToLexical(atom)
   }
 
   private compileFunctionExpression(node: ts.FunctionExpression) {
-  const nameAtom = node.name ? this.atomTable.getAtomId(node.name.text) : this.atomTable.getAtomId('')
+    const nameAtom = node.name ? this.atomTable.getAtomId(node.name.text) : this.atomTable.getAtomId('')
     const childFunction = this.compileChildFunction(node, nameAtom, { isExpression: true })
-    const constantIndex = this.currentFunction.addConstant(
-      {
-        tag: BytecodeTag.TC_TAG_FUNCTION_BYTECODE,
-        value: childFunction.bytecode,
-      },
-      { key: null }
-    )
-
-    if (constantIndex <= 0xff) {
-      this.emitOpcode(Opcode.OP_fclosure8, [constantIndex], node)
-    } else {
-      this.emitOpcode(Opcode.OP_fclosure, [constantIndex], node)
-    }
+    const constantIndex = this.addFunctionConstant(childFunction)
+    this.emitFunctionClosure(constantIndex, node)
   }
 
-  private compileChildFunction(
+  public compileChildFunction(
     node: ts.FunctionDeclaration | ts.FunctionExpression,
     nameAtom: Atom,
     options: { isExpression: boolean }
@@ -813,105 +542,13 @@ export class Compiler {
     }
   }
 
-  private compileReturnStatement(node: ts.ReturnStatement) {
-    if (node.expression) {
-      this.compileExpression(node.expression)
-      this.emitReturnOpcode(node)
-    } else {
-      this.emitVoidReturnOpcode(node)
-    }
-    this.hasExplicitReturn = true
-  }
-
-  private compileBreakStatement(node: ts.BreakStatement) {
-    const { target, unwindTargets } = this.controlFlow.resolveBreak(node)
-    for (const unwind of unwindTargets) {
-      this.emitControlFlowUnwind(unwind)
-    }
-    this.emitGoto(target.breakLabel)
-  }
-
-  private compileContinueStatement(node: ts.ContinueStatement) {
-    const { target, unwindTargets } = this.controlFlow.resolveContinue(node)
-    for (const unwind of unwindTargets) {
-      this.emitControlFlowUnwind(unwind)
-    }
-    this.emitGoto(target.continueLabel)
-  }
-
-  private compileLabeledStatement(node: ts.LabeledStatement) {
-    const labelName = node.label.text
-
-    if (ts.isForOfStatement(node.statement)) {
-      this.compileForOfStatement(node.statement, { labelName })
-      return
-    }
-    if (ts.isWhileStatement(node.statement)) {
-      this.compileWhileStatement(node.statement, { labelName })
-      return
-    }
-    if (ts.isForStatement(node.statement)) {
-      this.compileForStatement(node.statement, { labelName })
-      return
-    }
-    if (ts.isSwitchStatement(node.statement)) {
-      this.compileSwitchStatement(node.statement, { labelName })
-      return
-    }
-
-    const breakLabel = this.createLabel()
-    this.controlFlow.pushLabel(labelName, breakLabel)
-    try {
-      this.visitNode(node.statement)
-    } finally {
-      this.controlFlow.pop(ControlFlowTargetKind.Label)
-    }
-    this.markLabel(breakLabel)
-  }
-
-  private emitControlFlowUnwind(target: ControlFlowTarget) {
+  public emitControlFlowUnwind(target: ControlFlowTarget) {
     switch (target.kind) {
       case ControlFlowTargetKind.Loop:
         this.emitLoopCleanup(target)
         break
       default:
         break
-    }
-  }
-
-  private compileIfStatement(node: ts.IfStatement) {
-    this.compileExpression(node.expression)
-
-    const elseLabel = this.createLabel()
-    const hasElse = node.elseStatement !== undefined
-    const endLabel = hasElse ? this.createLabel() : null
-    const conditionalOpcode = env.supportsShortOpcodes ? Opcode.OP_if_false8 : Opcode.OP_if_false
-
-    this.emitJump(conditionalOpcode, elseLabel)
-
-    if (ts.isBlock(node.thenStatement)) {
-      this.compileBlock(node.thenStatement)
-    } else {
-      this.visitNode(node.thenStatement)
-    }
-
-    if (hasElse && endLabel) {
-      this.emitGoto(endLabel)
-    }
-
-    this.markLabel(elseLabel)
-
-    if (hasElse) {
-      const elseStatement = node.elseStatement!
-      if (ts.isBlock(elseStatement)) {
-        this.compileBlock(elseStatement)
-      } else {
-        this.visitNode(elseStatement)
-      }
-
-      if (endLabel) {
-        this.markLabel(endLabel)
-      }
     }
   }
 
@@ -924,19 +561,66 @@ export class Compiler {
       case 'for-of':
         this.emitOpcode(Opcode.OP_iterator_close)
         break
+      case 'for-in':
+        this.emitOpcode(Opcode.OP_drop)
+        break
       default:
         throw new Error(`Unsupported loop cleanup kind '${cleanup.kind}'`)
     }
   }
 
-  private emitReturnOpcode(node?: ts.Node) {
+  public registerLoopCleanup(breakLabel: string, info: LoopCleanupInfo): void {
+    this.loopCleanupByBreakLabel.set(breakLabel, info)
+  }
+
+  public clearLoopCleanup(breakLabel: string): void {
+    this.loopCleanupByBreakLabel.delete(breakLabel)
+  }
+
+  public pushLoopTarget(breakLabel: string, continueLabel: string, options: { labelName?: string } = {}): void {
+    this.controlFlow.pushLoop(breakLabel, continueLabel, options)
+  }
+
+  public popLoopTarget(): void {
+    this.controlFlow.pop(ControlFlowTargetKind.Loop)
+  }
+
+  public pushSwitchTarget(breakLabel: string, options: { labelName?: string } = {}): void {
+    this.controlFlow.pushSwitch(breakLabel, options)
+  }
+
+  public popSwitchTarget(): void {
+    this.controlFlow.pop(ControlFlowTargetKind.Switch)
+  }
+
+  public pushLabelTarget(labelName: string, breakLabel: string): void {
+    this.controlFlow.pushLabel(labelName, breakLabel)
+  }
+
+  public popLabelTarget(): void {
+    this.controlFlow.pop(ControlFlowTargetKind.Label)
+  }
+
+  public resolveBreak(node?: ts.BreakStatement): BreakResolution {
+    return this.controlFlow.resolveBreak(node)
+  }
+
+  public resolveContinue(node?: ts.ContinueStatement): ContinueResolution {
+    return this.controlFlow.resolveContinue(node)
+  }
+
+  public emitReturnOpcode(node?: ts.Node) {
     const opcode = this.getReturnOpcodeForFunction(this.currentFunction.bytecode.funcKind)
     this.emitOpcode(opcode, [], node)
   }
 
-  private emitVoidReturnOpcode(node?: ts.Node) {
+  public emitVoidReturnOpcode(node?: ts.Node) {
     const opcode = this.getVoidReturnOpcodeForFunction(this.currentFunction.bytecode.funcKind)
     this.emitOpcode(opcode, [], node)
+  }
+
+  public markExplicitReturn(): void {
+    this.hasExplicitReturn = true
   }
 
   private getReturnOpcodeForFunction(funcKind: FunctionKind): Opcode {
@@ -1213,7 +897,7 @@ export class Compiler {
     this.markLabel(endLabel)
   }
 
-  private emitStoreIdentifier(atom: Atom, identifier: ts.Identifier) {
+  public emitStoreIdentifier(atom: Atom, identifier: ts.Identifier) {
     if (this.argumentIndices.has(atom)) {
       this.emitStoreArgument(this.argumentIndices.get(atom)!, identifier)
       return
@@ -1373,7 +1057,7 @@ export class Compiler {
     )
   }
 
-  private compileBlock(node: ts.Block, options: { createScope?: boolean } = {}) {
+  public compileBlock(node: ts.Block, options: { createScope?: boolean } = {}) {
     const createScope = options.createScope !== false
     if (createScope) {
       this.pushScope(ScopeKind.Block)
@@ -1389,7 +1073,7 @@ export class Compiler {
     }
   }
 
-  private compileExpressionStatement(node: ts.ExpressionStatement) {
+  public compileExpressionStatement(node: ts.ExpressionStatement) {
     this.compileExpression(node.expression)
     let dropDebug: EmitDebugInfoOptions | undefined
     if (ts.isCallExpression(node.expression)) {
@@ -1406,450 +1090,7 @@ export class Compiler {
       })
     }
   }
-  private compileForOfStatement(node: ts.ForOfStatement, options: { labelName?: string } = {}) {
-    if (node.awaitModifier) {
-      throw new Error('for await is not supported yet')
-    }
-
-    this.pushScope(ScopeKind.Block)
-
-    if (!ts.isVariableDeclarationList(node.initializer)) {
-      throw new Error('for-of initializer must be a variable declaration')
-    }
-    if (node.initializer.declarations.length !== 1) {
-      throw new Error('Only single variable declarations are supported in for-of')
-    }
-
-    const declaration = node.initializer.declarations[0]
-    if (!ts.isIdentifier(declaration.name)) {
-      throw new Error('Destructuring in for-of is not supported yet')
-    }
-    if (declaration.initializer) {
-      throw new Error('for-of loop variable cannot have an initializer')
-    }
-
-    const nameText = declaration.name.text
-    const atom = this.atomTable.getAtomId(nameText)
-    if (this.scopeManager.hasBindingInCurrentScope(atom)) {
-      throw new Error(`Identifier '${nameText}' has already been declared in this scope`)
-    }
-
-    const flags = node.initializer.flags
-    const isConst = (flags & ts.NodeFlags.Const) !== 0
-    const isLet = (flags & ts.NodeFlags.Let) !== 0
-
-    const varIndex = this.declareLexicalVariable(atom, { isConst, isLet, capture: false })
-    const loopVarSlot = this.localVarIndices.get(atom)!
-    const variable = this.currentFunction.vars[varIndex]
-    this.emitSetLocalUninitialized(loopVarSlot, variable.scopeLevel)
-
-    this.compileExpression(node.expression)
-    this.withoutDebugRecording(() => {
-      this.emitOpcode(Opcode.OP_for_of_start)
-    })
-
-    const bodyLabel = this.createLabel()
-    const continueLabel = this.createLabel()
-    const exitLabel = this.createLabel()
-
-    this.loopCleanupByBreakLabel.set(exitLabel, { kind: 'for-of' })
-    this.controlFlow.pushLoop(exitLabel, continueLabel, { labelName: options.labelName })
-    try {
-      this.emitGoto(continueLabel)
-
-      this.markLabel(bodyLabel)
-      this.withoutDebugRecording(() => {
-        this.emitStoreToLocal(loopVarSlot)
-      })
-
-      if (ts.isBlock(node.statement)) {
-        this.compileBlock(node.statement, { createScope: false })
-      } else {
-        this.visitNode(node.statement)
-      }
-
-      this.markLabel(continueLabel)
-      this.withoutDebugRecording(() => {
-        this.emitOpcode(Opcode.OP_for_of_next, [0])
-      })
-      this.emitJump(Opcode.OP_if_false8, bodyLabel)
-      this.withoutDebugRecording(() => {
-        this.emitOpcode(Opcode.OP_drop)
-      })
-    } finally {
-      this.popScope()
-      this.controlFlow.pop(ControlFlowTargetKind.Loop)
-    }
-
-    this.markLabel(exitLabel)
-    this.withoutDebugRecording(() => {
-      this.emitOpcode(Opcode.OP_iterator_close)
-    })
-    this.loopCleanupByBreakLabel.delete(exitLabel)
-  }
-
-  private compileWhileStatement(node: ts.WhileStatement, options: { labelName?: string } = {}) {
-    const conditionLabel = this.createLabel()
-    const exitLabel = this.createLabel()
-
-    this.controlFlow.pushLoop(exitLabel, conditionLabel, { labelName: options.labelName })
-    try {
-      this.markLabel(conditionLabel)
-      this.compileExpression(node.expression)
-      this.emitJump(Opcode.OP_if_false8, exitLabel)
-
-      if (ts.isBlock(node.statement)) {
-        this.compileBlock(node.statement)
-      } else {
-        this.visitNode(node.statement)
-      }
-
-      this.emitGoto(conditionLabel)
-    } finally {
-      this.controlFlow.pop(ControlFlowTargetKind.Loop)
-    }
-
-    this.markLabel(exitLabel)
-  }
-
-  private compileForStatement(node: ts.ForStatement, options: { labelName?: string } = {}) {
-    this.pushScope(ScopeKind.Block)
-    try {
-      if (node.initializer) {
-        if (ts.isVariableDeclarationList(node.initializer)) {
-          this.compileForVariableDeclarationList(node.initializer)
-        } else {
-          this.compileExpression(node.initializer)
-          this.emitOpcode(Opcode.OP_drop)
-        }
-      }
-
-      const loopStartLabel = this.createLabel()
-      const continueLabel = this.createLabel()
-      const exitLabel = this.createLabel()
-
-      this.controlFlow.pushLoop(exitLabel, continueLabel, { labelName: options.labelName })
-      try {
-        this.markLabel(loopStartLabel)
-
-        if (node.condition) {
-          this.compileExpression(node.condition)
-          this.emitJump(Opcode.OP_if_false8, exitLabel)
-        }
-
-        if (ts.isBlock(node.statement)) {
-          this.compileBlock(node.statement, { createScope: false })
-        } else {
-          this.visitNode(node.statement)
-        }
-
-        this.markLabel(continueLabel)
-        if (node.incrementor) {
-          this.compileExpression(node.incrementor)
-          this.emitOpcode(Opcode.OP_drop)
-        }
-        this.emitGoto(loopStartLabel)
-      } finally {
-        this.controlFlow.pop(ControlFlowTargetKind.Loop)
-      }
-
-      this.markLabel(exitLabel)
-    } finally {
-      this.popScope()
-    }
-  }
-
-  private compileSwitchStatement(node: ts.SwitchStatement, options: { labelName?: string } = {}) {
-    this.withSourceNode(node.expression, () => {
-      this.compileExpression(node.expression)
-
-      const exitLabel = this.createLabel()
-      const clauses = node.caseBlock.clauses
-      const pendingFallthroughLabels: string[] = []
-      let nextCaseLabel: string | null = null
-      let previousClauseFallsThrough = false
-      let hasDefaultClause = false
-      let requiresDropAfterSwitch = false
-
-      const defaultClauseIndex = clauses.findIndex((clause) => ts.isDefaultClause(clause))
-      const defaultLabel = defaultClauseIndex >= 0 ? this.createLabel() : null
-      const afterDefaultLabel =
-        defaultClauseIndex >= 0 && defaultClauseIndex < clauses.length - 1 ? this.createLabel() : null
-      let shouldMarkAfterDefaultLabel = false
-
-      this.controlFlow.pushSwitch(exitLabel, { labelName: options.labelName })
-      try {
-        for (let index = 0; index < clauses.length; index += 1) {
-          const clause = clauses[index]
-
-          if (ts.isCaseClause(clause)) {
-            if (nextCaseLabel !== null) {
-              if (previousClauseFallsThrough) {
-                const fallthroughLabel = this.createLabel()
-                this.emitGoto(fallthroughLabel)
-                pendingFallthroughLabels.push(fallthroughLabel)
-              }
-              this.markLabel(nextCaseLabel)
-              nextCaseLabel = null
-            }
-
-            const caseChain: ts.CaseClause[] = [clause]
-            while (index + 1 < clauses.length) {
-              const lastInChain = caseChain[caseChain.length - 1]
-              if (lastInChain.statements.length > 0) {
-                break
-              }
-              const nextClause = clauses[index + 1]
-              if (!ts.isCaseClause(nextClause)) {
-                break
-              }
-              caseChain.push(nextClause)
-              index += 1
-            }
-
-            const nextClause = clauses[index + 1]
-            const isAfterDefault = defaultClauseIndex >= 0 && index > defaultClauseIndex
-            const isNextClauseDefault = !!nextClause && ts.isDefaultClause(nextClause)
-
-            let caseEntryLabel: string
-            if (isNextClauseDefault) {
-              caseEntryLabel = defaultLabel ?? this.createLabel()
-            } else {
-              caseEntryLabel = this.createLabel()
-            }
-
-            let testFailureLabel: string
-            if (isAfterDefault && defaultLabel) {
-              testFailureLabel = defaultLabel
-            } else if (isNextClauseDefault && afterDefaultLabel) {
-              testFailureLabel = afterDefaultLabel
-              shouldMarkAfterDefaultLabel = true
-            } else if (isNextClauseDefault && defaultLabel) {
-              testFailureLabel = defaultLabel
-            } else {
-              testFailureLabel = caseEntryLabel
-            }
-
-            let sharedTrueLabel: string | null = null
-            for (let chainIndex = 0; chainIndex < caseChain.length; chainIndex += 1) {
-              const currentClause = caseChain[chainIndex]
-              this.withoutDebugRecording(() => {
-                this.emitOpcode(Opcode.OP_dup, [], null)
-                this.compileExpression(currentClause.expression)
-                this.emitOpcode(Opcode.OP_strict_eq, [], null)
-              })
-
-              const isLastClauseInChain = chainIndex === caseChain.length - 1
-              if (!isLastClauseInChain) {
-                sharedTrueLabel = this.emitConditionalJumpChain(Opcode.OP_if_true8, sharedTrueLabel)
-              } else {
-                nextCaseLabel = caseEntryLabel
-                this.emitJump(Opcode.OP_if_false8, testFailureLabel)
-                if (sharedTrueLabel) {
-                  this.markLabel(sharedTrueLabel)
-                }
-              }
-            }
-
-            this.flushPendingLabels(pendingFallthroughLabels)
-
-            const bodyClause =
-              [...caseChain].reverse().find((entry) => entry.statements.length > 0) ?? caseChain[caseChain.length - 1]
-            const clauseControl = this.compileSwitchClauseStatements(bodyClause.statements, options.labelName)
-            const fallsThrough = clauseControl.fallsThrough
-            if (fallsThrough) {
-              requiresDropAfterSwitch = true
-            }
-            if (clauseControl.exitsSwitch) {
-              requiresDropAfterSwitch = true
-            }
-            previousClauseFallsThrough = fallsThrough
-
-            if (!previousClauseFallsThrough && nextCaseLabel !== null) {
-              if (defaultLabel !== null && nextCaseLabel === defaultLabel) {
-                // Defer marking the default label until the default clause to allow non-matching cases to skip it.
-              } else if (afterDefaultLabel !== null && nextCaseLabel === afterDefaultLabel) {
-                // The label after the default clause is marked once the default body has been emitted.
-              } else {
-                this.markLabel(nextCaseLabel)
-                nextCaseLabel = null
-              }
-            }
-          } else {
-            hasDefaultClause = true
-            const labelForDefault = defaultLabel ?? this.createLabel()
-
-            if (nextCaseLabel === null) {
-              nextCaseLabel = labelForDefault
-            }
-
-            if (previousClauseFallsThrough) {
-              const fallthroughLabel = this.createLabel()
-              this.emitGoto(fallthroughLabel)
-              pendingFallthroughLabels.push(fallthroughLabel)
-            }
-
-            if (nextCaseLabel !== labelForDefault) {
-              this.markLabel(nextCaseLabel)
-              nextCaseLabel = labelForDefault
-            }
-
-            this.markLabel(labelForDefault)
-            nextCaseLabel = null
-
-            this.flushPendingLabels(pendingFallthroughLabels)
-
-            const clauseControl = this.compileSwitchClauseStatements(clause.statements, options.labelName)
-            const fallsThrough = clauseControl.fallsThrough
-            if (fallsThrough) {
-              requiresDropAfterSwitch = true
-            }
-            if (clauseControl.exitsSwitch) {
-              requiresDropAfterSwitch = true
-            }
-            previousClauseFallsThrough = fallsThrough
-
-            if (!previousClauseFallsThrough && nextCaseLabel !== null) {
-              this.markLabel(nextCaseLabel)
-              nextCaseLabel = null
-            }
-
-            if (afterDefaultLabel !== null && shouldMarkAfterDefaultLabel) {
-              this.markLabel(afterDefaultLabel)
-              shouldMarkAfterDefaultLabel = false
-            }
-          }
-        }
-
-        if (nextCaseLabel !== null) {
-          this.markLabel(nextCaseLabel)
-        }
-
-        this.flushPendingLabels(pendingFallthroughLabels)
-        this.markLabel(exitLabel)
-      } finally {
-        this.controlFlow.pop(ControlFlowTargetKind.Switch)
-      }
-
-      if (!hasDefaultClause) {
-        requiresDropAfterSwitch = true
-      }
-
-      if (requiresDropAfterSwitch) {
-        this.emitOpcode(Opcode.OP_drop, [], null)
-      }
-    })
-  }
-
-  private emitConditionalJumpChain(opcode: Opcode, sharedTrueLabel: string | null): string {
-    const targetLabel = sharedTrueLabel ?? this.createLabel()
-    this.emitJump(opcode, targetLabel)
-    return targetLabel
-  }
-
-  private flushPendingLabels(labels: string[]) {
-    while (labels.length > 0) {
-      const label = labels.shift()!
-      this.markLabel(label)
-    }
-  }
-
-  private compileSwitchClauseStatements(
-    statements: readonly ts.Statement[],
-    switchLabelName?: string
-  ): { fallsThrough: boolean; exitsSwitch: boolean } {
-    for (const statement of statements) {
-      this.visitNode(statement)
-    }
-    return this.analyzeSwitchClauseControl(statements, switchLabelName)
-  }
-
-  private analyzeSwitchClauseControl(
-    statements: readonly ts.Statement[],
-    switchLabelName?: string
-  ): { fallsThrough: boolean; exitsSwitch: boolean } {
-    if (statements.length === 0) {
-      return { fallsThrough: true, exitsSwitch: false }
-    }
-
-    const last = statements[statements.length - 1]
-
-    if (ts.isBlock(last)) {
-      return this.analyzeSwitchClauseControl(last.statements, switchLabelName)
-    }
-
-    if (ts.isReturnStatement(last) || ts.isThrowStatement(last)) {
-      return { fallsThrough: false, exitsSwitch: false }
-    }
-
-    if (ts.isBreakStatement(last)) {
-      if (!last.label) {
-        return { fallsThrough: false, exitsSwitch: true }
-      }
-      if (switchLabelName && last.label.text === switchLabelName) {
-        return { fallsThrough: false, exitsSwitch: true }
-      }
-      return { fallsThrough: false, exitsSwitch: false }
-    }
-
-    if (ts.isContinueStatement(last)) {
-      return { fallsThrough: false, exitsSwitch: false }
-    }
-
-    return { fallsThrough: true, exitsSwitch: false }
-  }
-
-  private compileForVariableDeclarationList(list: ts.VariableDeclarationList) {
-    const flags = list.flags
-    const isConst = (flags & ts.NodeFlags.Const) !== 0
-    const isLet = (flags & ts.NodeFlags.Let) !== 0
-    const isModuleTopLevel =
-      this.currentFunction.parent === null &&
-      this.currentFunction.module !== null &&
-      this.scopeManager.currentScope() === this.currentFunction.bodyScope
-
-    for (const declaration of list.declarations) {
-      this.withSourceNode(declaration, () => {
-        if (!ts.isIdentifier(declaration.name)) {
-          throw new Error('Destructuring is not supported yet')
-        }
-
-        const nameText = declaration.name.text
-        const atom = this.atomTable.getAtomId(nameText)
-
-        if ((isConst || isLet) && this.scopeManager.hasBindingInCurrentScope(atom)) {
-          throw new Error(`Identifier '${nameText}' has already been declared in this scope`)
-        }
-
-        if (isConst && !declaration.initializer) {
-          throw new Error(`Missing initializer in const declaration for '${nameText}'`)
-        }
-
-  const capture = isModuleTopLevel
-        const varIndex = this.declareLexicalVariable(atom, { isConst, isLet, capture })
-        const variable = this.currentFunction.vars[varIndex]
-        if (this.isGlobalVarContext() && isModuleTopLevel) {
-          const forceInit = variable.isLexical && !declaration.initializer
-          this.registerGlobalVar(atom, {
-            scopeLevel: variable.scopeLevel,
-            isLexical: variable.isLexical,
-            isConst: variable.isConst,
-            forceInit,
-          })
-        }
-
-        if (declaration.initializer) {
-          this.compileExpression(declaration.initializer)
-          this.emitStoreToLexical(atom)
-        } else if (isConst || isLet) {
-          this.emitOpcode(Opcode.OP_undefined)
-          this.emitStoreToLexical(atom)
-        }
-      })
-    }
-  }
-
-  private compileExpression(expression: ts.Expression): void {
+  public compileExpression(expression: ts.Expression): void {
     const previous = this.currentSourceNode
     this.currentSourceNode = expression
     try {
@@ -2278,7 +1519,7 @@ export class Compiler {
     this.emitOpcode(Opcode.OP_get_var, [atom], identifier)
   }
 
-  private emitSetLocalUninitialized(index: number, scopeLevel: number) {
+  public emitSetLocalUninitialized(index: number, scopeLevel: number) {
     const scopeInfo = this.ensureLexicalInitializationScope(scopeLevel)
     const instruction: Instruction = {
       opcode: Opcode.OP_set_loc_uninitialized,
@@ -2327,7 +1568,7 @@ export class Compiler {
     }
   }
 
-  private emitStoreToLocal(index: number) {
+  public emitStoreToLocal(index: number) {
     const shortOpcode = index <= 3 ? getIndexedOpcode('OP_put_loc', index) : undefined
     if (shortOpcode !== undefined) {
       this.emitOpcode(shortOpcode)
@@ -2412,20 +1653,20 @@ export class Compiler {
     return { index: closureIndex, isLexical: closureVar.isLexical }
   }
 
-  private createLabel(): string {
+  public createLabel(): string {
     return `L${this.labelCounter++}`
   }
 
-  private markLabel(label: string) {
+  public markLabel(label: string) {
     this.labelPositions.set(label, this.currentOffset)
   }
 
-  private emitJump(opcode: Opcode, label: string) {
+  public emitJump(opcode: Opcode, label: string) {
     const index = this.emitOpcode(opcode, [0], null)
     this.pendingJumps.push({ index, label, opcode })
   }
 
-  private emitGoto(label: string) {
+  public emitGoto(label: string) {
     this.emitJump(Opcode.OP_goto8, label)
   }
 
@@ -2457,7 +1698,10 @@ export class Compiler {
     }
   }
 
-  private declareLexicalVariable(atom: Atom, options: { isConst: boolean; isLet: boolean; capture?: boolean; kind?: VarKind }): number {
+  public declareLexicalVariable(
+    atom: Atom,
+    options: { isConst: boolean; isLet: boolean; capture?: boolean; kind?: VarKind }
+  ): number {
     const isCaptured = options.capture === true
     const isLexical = options.isConst || options.isLet
     const declarationKind =
@@ -2487,6 +1731,61 @@ export class Compiler {
     return varIndex
   }
 
+  public getFunctionVar(index: number): Var {
+    const variable = this.currentFunction.vars[index]
+    if (!variable) {
+      throw new Error(`Variable index ${index} is out of bounds`)
+    }
+    return variable
+  }
+
+  public getCurrentFunctionVarCount(): number {
+    return this.currentFunction.vars.length
+  }
+
+  public getAtomId(name: string): Atom {
+    return this.atomTable.getAtomId(name)
+  }
+
+  public getBindingInfo(atom: Atom): ReturnType<ScopeManager['getBindingInfo']> {
+    return this.scopeManager.getBindingInfo(atom)
+  }
+
+  public addFunctionConstant(func: FunctionDef): number {
+    return this.currentFunction.addConstant(
+      {
+        tag: BytecodeTag.TC_TAG_FUNCTION_BYTECODE,
+        value: func.bytecode,
+      },
+      { key: null }
+    )
+  }
+
+  public emitFunctionClosure(constantIndex: number, node?: ts.Node | null) {
+    const debugNode = node ?? null
+    if (constantIndex <= 0xff) {
+      this.emitOpcode(Opcode.OP_fclosure8, [constantIndex], debugNode)
+    } else {
+      this.emitOpcode(Opcode.OP_fclosure, [constantIndex], debugNode)
+    }
+  }
+
+  public hasBindingInCurrentScope(atom: Atom): boolean {
+    return this.scopeManager.hasBindingInCurrentScope(atom)
+  }
+
+  public getLocalVarSlot(atom: Atom): number | undefined {
+    return this.localVarIndices.get(atom)
+  }
+
+  public isModuleTopLevelScope(): boolean {
+    return (
+      this.currentFunction.parent === null &&
+      this.currentFunction.module !== null &&
+      this.scopeManager.currentScope() === this.currentFunction.bodyScope
+    )
+  }
+
   private registerClosureVar(atom: Atom, varIndex: number, options: { isConst: boolean; isLet: boolean; capture?: boolean; kind?: VarKind }) {
     if (this.closureVarIndices.has(atom)) return
     const isFunctionDeclaration = options.kind === VarKind.FUNCTION_DECL
@@ -2502,7 +1801,7 @@ export class Compiler {
     this.closureVarIndices.set(atom, closureIndex)
   }
 
-  private emitStoreToLexical(atom: Atom) {
+  public emitStoreToLexical(atom: Atom) {
     const slot = this.localVarIndices.get(atom)
     if (slot !== undefined) {
       this.withoutDebugRecording(() => {
@@ -2532,11 +1831,11 @@ export class Compiler {
     })
   }
 
-  private isGlobalVarContext(): boolean {
+  public isGlobalVarContext(): boolean {
     return this.currentFunction.isGlobalVar
   }
 
-  private registerGlobalVar(atom: Atom, options: {
+  public registerGlobalVar(atom: Atom, options: {
     scopeLevel: number
     isLexical: boolean
     isConst: boolean
@@ -2555,7 +1854,7 @@ export class Compiler {
     })
   }
 
-  private registerModuleLocalExport(exportedName: Atom, localVarIndex: number) {
+  public registerModuleLocalExport(exportedName: Atom, localVarIndex: number) {
     const moduleRecord = this.currentFunction.module
     if (!moduleRecord) {
       return
@@ -2843,6 +2142,15 @@ export class Compiler {
       return this.normalizedPosByPos[this.normalizedPosByPos.length - 1]
     }
     return this.normalizedPosByPos[pos]
+  }
+
+  public emitInstruction(
+    opcode: Opcode,
+    operands: number[] = [],
+    node?: ts.Node | null,
+    debugOptions?: EmitDebugInfoOptions
+  ): number {
+    return this.emitOpcode(opcode, operands, node, debugOptions)
   }
 
   private emitOpcode(
@@ -3222,7 +2530,7 @@ export class Compiler {
     return stackLenMax
   }
 
-  private pushScope(kind: ScopeKind = ScopeKind.Block) {
+  public pushScope(kind: ScopeKind = ScopeKind.Block) {
     const scopeIndex = this.scopeManager.enterScope(kind)
     if (!this.lexicalInitByScope.has(scopeIndex)) {
       this.lexicalInitByScope.set(scopeIndex, {
@@ -3231,7 +2539,7 @@ export class Compiler {
     }
   }
 
-  private popScope() {
+  public popScope() {
     const popped = this.scopeManager.leaveScope()
     if (popped !== undefined) {
       this.lexicalInitByScope.delete(popped)
@@ -3767,7 +3075,7 @@ export class Compiler {
     visit(this.sourceFile)
   }
 
-  private shouldSuppressTopLevelInitializerDebug(initializer?: ts.Expression): boolean {
+  public shouldSuppressTopLevelInitializerDebug(initializer?: ts.Expression): boolean {
     if (!initializer) {
       return true
     }
@@ -4307,7 +3615,7 @@ export class Compiler {
     return infos
   }
 
-  private withoutDebugRecording<T>(fn: () => T): T {
+  public withoutDebugRecording<T>(fn: () => T): T {
     const previous = this.suppressDebugRecording
     this.suppressDebugRecording = true
     try {
