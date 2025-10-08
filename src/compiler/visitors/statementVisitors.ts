@@ -3,7 +3,7 @@ import type { Compiler } from '../../compiler'
 import { registerControlFlowStatements } from '../statements/controlFlow'
 import { registerLoopStatements } from '../statements/loops'
 import { registerDeclarationStatements } from '../statements/declarations'
-import { registerSimpleStatements } from '../statements/simple'
+import { registerSimpleStatements } from '../statements/simple/index'
 
 export type StatementVisitor = (compiler: Compiler, node: ts.Statement) => void
 

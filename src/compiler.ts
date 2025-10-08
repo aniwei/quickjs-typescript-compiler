@@ -1,4 +1,23 @@
 import { ensureStatementVisitorsInitialized, getStatementVisitor } from './compiler/visitors/statementVisitors'
+import {
+  compileBooleanLiteral,
+  compileNoSubstitutionTemplateLiteral,
+  compileNullLiteral,
+  compileNumericLiteral,
+  compileStringLiteral,
+  compileTemplateExpression,
+  compileThisExpression,
+} from './compiler/expressions/literals'
+import { compileCallExpression, compileNewExpression } from './compiler/expressions/calls'
+import { compileArrayLiteralExpression, compileObjectLiteralExpression } from './compiler/expressions/collections'
+import {
+  compileBinaryExpression,
+  compilePostfixUnaryExpression,
+  compilePrefixUnaryExpression,
+  compilePropertyAccessExpression,
+  compileVoidExpression,
+} from './compiler/expressions/operators'
+import { compileBlockStatement, compileExpressionStatement as compileExpressionStatementNode } from './compiler/statements/simple/index'
 import path from 'node:path'
 import * as ts from 'typescript'
 import { Atom, AtomTable, JSAtom } from './atoms'
@@ -8,8 +27,9 @@ import { ScopeManager } from './scopeManager'
 import { ScopeKind } from './scopes'
 import { Var, VarKind, ClosureVar, VarDeclarationKind } from './vars'
 import { Opcode, OpFormat, PC2Line, BytecodeTag, FunctionKind, JSMode, env, type OpcodeDefinition } from './env'
-import { getOpcodeDefinition, getOpcodeName } from './utils/opcode'
-import { getIndexedOpcode, getPushIntOpcode } from './utils/opcodeVariants'
+import { getOpcodeDefinition } from './utils/opcode'
+import { getIndexedOpcode } from './utils/opcodeVariants'
+import { pruneUnusedClosureVars } from './compiler/core/closureVarUtils'
 import {
   ControlFlowBuilder,
   ControlFlowTarget,
@@ -643,260 +663,6 @@ export class Compiler {
     }
   }
 
-  private compileBinaryExpression(expression: ts.BinaryExpression) {
-    const operator = expression.operatorToken.kind
-    if (operator >= ts.SyntaxKind.FirstAssignment && operator <= ts.SyntaxKind.LastAssignment) {
-      this.compileAssignmentExpression(expression)
-      return
-    }
-
-    if (
-      operator === ts.SyntaxKind.BarBarToken ||
-      operator === ts.SyntaxKind.AmpersandAmpersandToken ||
-      operator === ts.SyntaxKind.QuestionQuestionToken
-    ) {
-      this.compileLogicalBinaryExpression(expression)
-      return
-    }
-
-    const opcode = this.getBinaryOperationOpcode(operator)
-    if (opcode === null) {
-      throw new Error(`Unsupported binary operator: ${ts.SyntaxKind[operator]}`)
-    }
-    this.compileExpression(expression.left)
-    this.compileExpression(expression.right)
-    this.emitOpcode(opcode, [], expression.operatorToken)
-  }
-
-  private compileAssignmentExpression(expression: ts.BinaryExpression) {
-    const operator = expression.operatorToken.kind
-    const left = expression.left
-
-    if (this.isLogicalAssignmentOperator(operator)) {
-      if (ts.isIdentifier(left)) {
-        this.compileLogicalAssignmentIdentifier(left, expression.right, operator, expression)
-        return
-      }
-      if (ts.isPropertyAccessExpression(left)) {
-        this.compileLogicalAssignmentProperty(left, expression.right, operator, expression)
-        return
-      }
-      throw new Error(`Unsupported logical assignment target: ${ts.SyntaxKind[left.kind]}`)
-    }
-
-    if (ts.isIdentifier(left)) {
-      this.compileIdentifierAssignment(left, expression.right, operator, expression)
-      return
-    }
-    if (ts.isPropertyAccessExpression(left)) {
-      this.compilePropertyAssignment(left, expression.right, operator, expression)
-      return
-    }
-    throw new Error(`Unsupported assignment target: ${ts.SyntaxKind[left.kind]}`)
-  }
-
-  private compileIdentifierAssignment(
-    left: ts.Identifier,
-    right: ts.Expression,
-    operator: ts.SyntaxKind,
-    expression: ts.BinaryExpression
-  ) {
-    const atom = this.atomTable.getAtomId(left.text)
-
-    if (operator === ts.SyntaxKind.EqualsToken) {
-      this.compileExpression(right)
-    } else {
-      const opcode = this.getCompoundAssignmentOpcode(operator)
-      this.emitLoadIdentifier(left)
-      this.compileExpression(right)
-      this.emitOpcode(opcode, [], expression.operatorToken)
-    }
-
-    this.emitOpcode(Opcode.OP_dup)
-    this.emitStoreIdentifier(atom, left)
-  }
-
-  private compilePropertyAssignment(
-    left: ts.PropertyAccessExpression,
-    right: ts.Expression,
-    operator: ts.SyntaxKind,
-    expression: ts.BinaryExpression
-  ) {
-    const propertyAtom = this.atomTable.getAtomId(left.name.text)
-    const propertyOperatorPos = this.getPropertyAccessOperatorPos(left)
-    const propertyDebug: EmitDebugInfoOptions | undefined = propertyOperatorPos !== undefined
-      ? { tsSourcePos: propertyOperatorPos }
-      : undefined
-
-    this.withSourceNode(left.expression, () => {
-      this.compileExpression(left.expression)
-    })
-
-    if (operator === ts.SyntaxKind.EqualsToken) {
-      this.compileExpression(right)
-    } else {
-      const opcode = this.getCompoundAssignmentOpcode(operator)
-      this.emitOpcode(Opcode.OP_dup)
-      this.emitOpcode(Opcode.OP_get_field, [propertyAtom], left.name, propertyDebug)
-      this.compileExpression(right)
-      this.emitOpcode(opcode, [], expression.operatorToken)
-    }
-
-    this.emitOpcode(Opcode.OP_dup)
-    this.emitOpcode(Opcode.OP_rot3r)
-    this.emitOpcode(Opcode.OP_put_field, [propertyAtom], left.name, propertyDebug)
-  }
-
-  private compileLogicalBinaryExpression(expression: ts.BinaryExpression) {
-    const operator = expression.operatorToken.kind
-    const endLabel = this.createLabel()
-
-    this.compileExpression(expression.left)
-
-    switch (operator) {
-      case ts.SyntaxKind.BarBarToken: {
-        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
-        this.emitJump(this.getIfTrueOpcode(), endLabel)
-        this.emitOpcode(Opcode.OP_drop)
-        this.compileExpression(expression.right)
-        break
-      }
-      case ts.SyntaxKind.AmpersandAmpersandToken: {
-        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
-        this.emitJump(this.getIfFalseOpcode(), endLabel)
-        this.emitOpcode(Opcode.OP_drop)
-        this.compileExpression(expression.right)
-        break
-      }
-      case ts.SyntaxKind.QuestionQuestionToken: {
-        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
-        this.emitOpcode(Opcode.OP_is_undefined_or_null, [], expression.operatorToken)
-        this.emitJump(this.getIfFalseOpcode(), endLabel)
-        this.emitOpcode(Opcode.OP_drop)
-        this.compileExpression(expression.right)
-        break
-      }
-      default:
-        throw new Error(`Unsupported logical operator: ${ts.SyntaxKind[operator]}`)
-    }
-
-    this.markLabel(endLabel)
-  }
-
-  private compileLogicalAssignmentIdentifier(
-    left: ts.Identifier,
-    right: ts.Expression,
-    operator: ts.SyntaxKind,
-    expression: ts.BinaryExpression
-  ) {
-    const atom = this.atomTable.getAtomId(left.text)
-    const skipLabel = this.createLabel()
-
-    this.emitLoadIdentifier(left)
-
-    switch (operator) {
-      case ts.SyntaxKind.BarBarEqualsToken: {
-        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
-        this.emitJump(this.getIfTrueOpcode(), skipLabel)
-        this.emitOpcode(Opcode.OP_drop)
-        this.compileExpression(right)
-        this.emitOpcode(Opcode.OP_dup)
-        this.emitStoreIdentifier(atom, left)
-        break
-      }
-      case ts.SyntaxKind.AmpersandAmpersandEqualsToken: {
-        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
-        this.emitJump(this.getIfFalseOpcode(), skipLabel)
-        this.emitOpcode(Opcode.OP_drop)
-        this.compileExpression(right)
-        this.emitOpcode(Opcode.OP_dup)
-        this.emitStoreIdentifier(atom, left)
-        break
-      }
-      case ts.SyntaxKind.QuestionQuestionEqualsToken: {
-        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
-        this.emitOpcode(Opcode.OP_is_undefined_or_null, [], expression.operatorToken)
-        this.emitJump(this.getIfFalseOpcode(), skipLabel)
-        this.emitOpcode(Opcode.OP_drop)
-        this.compileExpression(right)
-        this.emitOpcode(Opcode.OP_dup)
-        this.emitStoreIdentifier(atom, left)
-        break
-      }
-      default:
-        throw new Error(`Unsupported logical assignment operator: ${ts.SyntaxKind[operator]}`)
-    }
-
-    this.markLabel(skipLabel)
-  }
-
-  private compileLogicalAssignmentProperty(
-    left: ts.PropertyAccessExpression,
-    right: ts.Expression,
-    operator: ts.SyntaxKind,
-    expression: ts.BinaryExpression
-  ) {
-    const propertyAtom = this.atomTable.getAtomId(left.name.text)
-    const propertyOperatorPos = this.getPropertyAccessOperatorPos(left)
-    const propertyDebug: EmitDebugInfoOptions | undefined = propertyOperatorPos !== undefined
-      ? { tsSourcePos: propertyOperatorPos }
-      : undefined
-
-    const skipLabel = this.createLabel()
-    const endLabel = this.createLabel()
-
-    this.withSourceNode(left.expression, () => {
-      this.compileExpression(left.expression)
-    })
-
-    this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
-    this.emitOpcode(Opcode.OP_get_field, [propertyAtom], left.name, propertyDebug)
-
-    switch (operator) {
-      case ts.SyntaxKind.BarBarEqualsToken: {
-        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
-        this.emitJump(this.getIfTrueOpcode(), skipLabel)
-        this.emitOpcode(Opcode.OP_drop)
-        this.compileExpression(right)
-        this.emitOpcode(Opcode.OP_dup)
-        this.emitOpcode(Opcode.OP_rot3r)
-        this.emitOpcode(Opcode.OP_put_field, [propertyAtom], left.name, propertyDebug)
-        this.emitGoto(endLabel)
-        break
-      }
-      case ts.SyntaxKind.AmpersandAmpersandEqualsToken: {
-        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
-        this.emitJump(this.getIfFalseOpcode(), skipLabel)
-        this.emitOpcode(Opcode.OP_drop)
-        this.compileExpression(right)
-        this.emitOpcode(Opcode.OP_dup)
-        this.emitOpcode(Opcode.OP_rot3r)
-        this.emitOpcode(Opcode.OP_put_field, [propertyAtom], left.name, propertyDebug)
-        this.emitGoto(endLabel)
-        break
-      }
-      case ts.SyntaxKind.QuestionQuestionEqualsToken: {
-        this.emitOpcode(Opcode.OP_dup, [], expression.operatorToken)
-        this.emitOpcode(Opcode.OP_is_undefined_or_null, [], expression.operatorToken)
-        this.emitJump(this.getIfFalseOpcode(), skipLabel)
-        this.emitOpcode(Opcode.OP_drop)
-        this.compileExpression(right)
-        this.emitOpcode(Opcode.OP_dup)
-        this.emitOpcode(Opcode.OP_rot3r)
-        this.emitOpcode(Opcode.OP_put_field, [propertyAtom], left.name, propertyDebug)
-        this.emitGoto(endLabel)
-        break
-      }
-      default:
-        throw new Error(`Unsupported logical assignment operator: ${ts.SyntaxKind[operator]}`)
-    }
-
-    this.markLabel(skipLabel)
-    this.emitOpcode(Opcode.OP_swap)
-    this.emitOpcode(Opcode.OP_drop)
-    this.markLabel(endLabel)
-  }
-
   public emitStoreIdentifier(atom: Atom, identifier: ts.Identifier) {
     if (this.argumentIndices.has(atom)) {
       this.emitStoreArgument(this.argumentIndices.get(atom)!, identifier)
@@ -914,105 +680,7 @@ export class Compiler {
     this.emitOpcode(Opcode.OP_put_var, [atom], identifier)
   }
 
-  private getCompoundAssignmentOpcode(operator: ts.SyntaxKind): Opcode {
-    switch (operator) {
-      case ts.SyntaxKind.PlusEqualsToken:
-        return Opcode.OP_add
-      case ts.SyntaxKind.MinusEqualsToken:
-        return Opcode.OP_sub
-      case ts.SyntaxKind.AsteriskEqualsToken:
-        return Opcode.OP_mul
-      case ts.SyntaxKind.SlashEqualsToken:
-        return Opcode.OP_div
-      case ts.SyntaxKind.PercentEqualsToken:
-        return Opcode.OP_mod
-      case ts.SyntaxKind.AmpersandEqualsToken:
-        return Opcode.OP_and
-      case ts.SyntaxKind.BarEqualsToken:
-        return Opcode.OP_or
-      case ts.SyntaxKind.CaretEqualsToken:
-        return Opcode.OP_xor
-      case ts.SyntaxKind.LessThanLessThanEqualsToken:
-        return Opcode.OP_shl
-      case ts.SyntaxKind.GreaterThanGreaterThanEqualsToken:
-        return Opcode.OP_sar
-      case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken:
-        return Opcode.OP_shr
-      case ts.SyntaxKind.AsteriskAsteriskEqualsToken:
-        return Opcode.OP_pow
-      default:
-        throw new Error(`Unsupported assignment operator: ${ts.SyntaxKind[operator]}`)
-    }
-  }
-
-  private isLogicalAssignmentOperator(operator: ts.SyntaxKind): boolean {
-    return (
-      operator === ts.SyntaxKind.BarBarEqualsToken ||
-      operator === ts.SyntaxKind.AmpersandAmpersandEqualsToken ||
-      operator === ts.SyntaxKind.QuestionQuestionEqualsToken
-    )
-  }
-
-  private getIfTrueOpcode(): Opcode {
-    return env.supportsShortOpcodes ? Opcode.OP_if_true8 : Opcode.OP_if_true
-  }
-
-  private getIfFalseOpcode(): Opcode {
-    return env.supportsShortOpcodes ? Opcode.OP_if_false8 : Opcode.OP_if_false
-  }
-
-  private getBinaryOperationOpcode(operator: ts.SyntaxKind): Opcode | null {
-    switch (operator) {
-      case ts.SyntaxKind.PlusToken:
-        return Opcode.OP_add
-      case ts.SyntaxKind.AsteriskToken:
-        return Opcode.OP_mul
-      case ts.SyntaxKind.AsteriskAsteriskToken:
-        return Opcode.OP_pow
-      case ts.SyntaxKind.MinusToken:
-        return Opcode.OP_sub
-      case ts.SyntaxKind.SlashToken:
-        return Opcode.OP_div
-      case ts.SyntaxKind.PercentToken:
-        return Opcode.OP_mod
-      case ts.SyntaxKind.LessThanLessThanToken:
-        return Opcode.OP_shl
-      case ts.SyntaxKind.LessThanToken:
-        return Opcode.OP_lt
-      case ts.SyntaxKind.LessThanEqualsToken:
-        return Opcode.OP_lte
-      case ts.SyntaxKind.GreaterThanGreaterThanToken:
-        return Opcode.OP_sar
-      case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanToken:
-        return Opcode.OP_shr
-      case ts.SyntaxKind.GreaterThanToken:
-        return Opcode.OP_gt
-      case ts.SyntaxKind.GreaterThanEqualsToken:
-        return Opcode.OP_gte
-      case ts.SyntaxKind.AmpersandToken:
-        return Opcode.OP_and
-      case ts.SyntaxKind.BarToken:
-        return Opcode.OP_or
-      case ts.SyntaxKind.CaretToken:
-        return Opcode.OP_xor
-      case ts.SyntaxKind.EqualsEqualsToken:
-        return Opcode.OP_eq
-      case ts.SyntaxKind.ExclamationEqualsToken:
-        return Opcode.OP_neq
-      case ts.SyntaxKind.EqualsEqualsEqualsToken:
-        return Opcode.OP_strict_eq
-      case ts.SyntaxKind.ExclamationEqualsEqualsToken:
-        return Opcode.OP_strict_neq
-      case ts.SyntaxKind.InstanceOfKeyword:
-        return Opcode.OP_instanceof
-      case ts.SyntaxKind.InKeyword:
-        return Opcode.OP_in
-      default:
-        return null
-    }
-  }
-
-  private emitPushConstant(
+  public emitPushConstant(
     entry: ConstantEntry,
     options: { key?: string | null; node?: ts.Node | null } = {}
   ): number {
@@ -1026,70 +694,15 @@ export class Compiler {
     return constantIndex
   }
 
-  private compileNumericLiteral(node: ts.NumericLiteral) {
-    const value = Number(node.text)
-    if (Number.isInteger(value) && Number.isFinite(value)) {
-      const shortOpcode = getPushIntOpcode(value)
-      if (shortOpcode !== undefined) {
-        this.emitOpcode(shortOpcode, [], null)
-        return
-      }
-      if (value >= -0x80 && value <= 0x7f) {
-        this.emitOpcode(Opcode.OP_push_i8, [value], null)
-        return
-      }
-      if (value >= -0x8000 && value <= 0x7fff) {
-        this.emitOpcode(Opcode.OP_push_i16, [value], null)
-        return
-      }
-      if (value >= -0x80000000 && value <= 0x7fffffff) {
-        this.emitOpcode(Opcode.OP_push_i32, [value], null)
-        return
-      }
-    }
-
-    this.emitPushConstant(
-      {
-        tag: BytecodeTag.TC_TAG_FLOAT64,
-        value,
-      },
-      { node }
-    )
-  }
-
   public compileBlock(node: ts.Block, options: { createScope?: boolean } = {}) {
-    const createScope = options.createScope !== false
-    if (createScope) {
-      this.pushScope(ScopeKind.Block)
-    }
-    try {
-      for (const statement of node.statements) {
-        this.visitNode(statement)
-      }
-    } finally {
-      if (createScope) {
-        this.popScope()
-      }
-    }
+    compileBlockStatement(this, node, options)
   }
 
   public compileExpressionStatement(node: ts.ExpressionStatement) {
-    this.compileExpression(node.expression)
-    let dropDebug: EmitDebugInfoOptions | undefined
-    if (ts.isCallExpression(node.expression)) {
-      const callDebugPos = this.getCallExpressionOpenParenPos(node.expression)
-      if (callDebugPos !== undefined) {
-        dropDebug = { tsSourcePos: callDebugPos }
-      }
-    }
-    if (dropDebug) {
-      this.emitOpcode(Opcode.OP_drop, [], undefined, dropDebug)
-    } else {
-      this.withoutDebugRecording(() => {
-        this.emitOpcode(Opcode.OP_drop)
-      })
-    }
+    compileExpressionStatementNode(this, node)
+
   }
+
   public compileExpression(expression: ts.Expression): void {
     const previous = this.currentSourceNode
     this.currentSourceNode = expression
@@ -1100,47 +713,47 @@ export class Compiler {
       }
 
       if (ts.isNumericLiteral(expression)) {
-        this.compileNumericLiteral(expression)
+        compileNumericLiteral(this, expression)
         return
       }
 
       if (expression.kind === ts.SyntaxKind.TrueKeyword || expression.kind === ts.SyntaxKind.FalseKeyword) {
-        this.compileBooleanLiteral(expression)
+        compileBooleanLiteral(this, expression)
         return
       }
 
       if (ts.isStringLiteral(expression)) {
-        this.compileStringLiteral(expression)
+        compileStringLiteral(this, expression)
         return
       }
 
       if (ts.isNoSubstitutionTemplateLiteral(expression)) {
-        this.compileNoSubstitutionTemplateLiteral(expression)
+        compileNoSubstitutionTemplateLiteral(this, expression)
         return
       }
 
       if (ts.isTemplateExpression(expression)) {
-        this.compileTemplateExpression(expression)
+        compileTemplateExpression(this, expression)
         return
       }
 
       if (expression.kind === ts.SyntaxKind.NullKeyword) {
-        this.compileNullLiteral(expression)
+        compileNullLiteral(this, expression)
         return
       }
 
       if (expression.kind === ts.SyntaxKind.ThisKeyword) {
-        this.compileThisExpression(expression)
+        compileThisExpression(this, expression)
         return
       }
 
       if (ts.isArrayLiteralExpression(expression)) {
-        this.compileArrayLiteral(expression)
+        compileArrayLiteralExpression(this, expression)
         return
       }
 
       if (ts.isObjectLiteralExpression(expression)) {
-        this.compileObjectLiteral(expression)
+        compileObjectLiteralExpression(this, expression)
         return
       }
 
@@ -1150,22 +763,22 @@ export class Compiler {
       }
 
       if (ts.isBinaryExpression(expression)) {
-        this.compileBinaryExpression(expression)
+        compileBinaryExpression(this, expression)
         return
       }
 
       if (ts.isCallExpression(expression)) {
-        this.compileCallExpression(expression)
+        compileCallExpression(this, expression)
         return
       }
 
       if (ts.isNewExpression(expression)) {
-        this.compileNewExpression(expression)
+        compileNewExpression(this, expression)
         return
       }
 
       if (ts.isPropertyAccessExpression(expression)) {
-        this.compilePropertyAccessExpression(expression)
+        compilePropertyAccessExpression(this, expression)
         return
       }
 
@@ -1185,17 +798,17 @@ export class Compiler {
       }
 
       if (ts.isVoidExpression(expression)) {
-        this.compileVoidExpression(expression)
+        compileVoidExpression(this, expression)
         return
       }
 
       if (ts.isPrefixUnaryExpression(expression)) {
-        this.compilePrefixUnaryExpression(expression)
+        compilePrefixUnaryExpression(this, expression)
         return
       }
 
       if (ts.isPostfixUnaryExpression(expression)) {
-        this.compilePostfixUnaryExpression(expression)
+        compilePostfixUnaryExpression(this, expression)
         return
       }
 
@@ -1205,162 +818,16 @@ export class Compiler {
     }
   }
 
-  private compileBooleanLiteral(expression: ts.Expression) {
-    const opcode = expression.kind === ts.SyntaxKind.TrueKeyword ? Opcode.OP_push_true : Opcode.OP_push_false
-    this.emitOpcode(opcode, [], expression)
-  }
-
-  private emitStringLiteral(value: string, node: ts.Node) {
+  public emitStringLiteral(value: string, node: ts.Node) {
     const atom = this.atomTable.getAtomId(value)
     this.emitOpcode(Opcode.OP_push_atom_value, [atom], node)
   }
 
-  private compileStringLiteral(expression: ts.StringLiteral) {
-    this.emitStringLiteral(expression.text, expression)
-  }
-
-  private compileNoSubstitutionTemplateLiteral(expression: ts.NoSubstitutionTemplateLiteral) {
-    this.emitStringLiteral(expression.text, expression)
-  }
-
-  private compileNullLiteral(expression: ts.Expression) {
-    this.emitOpcode(Opcode.OP_null, [], expression)
-  }
-
-  private compileThisExpression(expression: ts.Expression) {
-    this.emitOpcode(Opcode.OP_push_this, [], expression)
-  }
-
-  private compileArrayLiteral(expression: ts.ArrayLiteralExpression) {
-    const elements = expression.elements
-    const values = elements.filter((el): el is ts.Expression => !ts.isOmittedExpression(el))
-    if (values.length !== elements.length) {
-      throw new Error('Array holes are not supported yet')
-    }
-
+  public recordExpressionStatementDebug(expression: ts.Expression) {
     const currentStatement = this.currentStatementNode
     if (currentStatement && ts.isExpressionStatement(currentStatement) && currentStatement.expression === expression) {
       this.recordDebugPoint(expression)
     }
-
-    for (const element of values) {
-      this.compileExpression(element)
-    }
-    this.emitOpcode(Opcode.OP_array_from, [values.length], null)
-  }
-
-  private compileObjectLiteral(expression: ts.ObjectLiteralExpression) {
-    const properties = expression.properties
-    if (properties.length === 0) {
-      this.emitOpcode(Opcode.OP_object, [], expression)
-      return
-    }
-
-    const assignments = properties.map((property) => {
-      if (ts.isPropertyAssignment(property)) {
-        const name = property.name
-        if (ts.isComputedPropertyName(name)) {
-          throw new Error('Computed property names are not supported yet')
-        }
-        if (ts.isPrivateIdentifier(name)) {
-          throw new Error('Private identifiers are not supported in object literals')
-        }
-        const initializer = property.initializer
-        if (!initializer) {
-          throw new Error('Property assignments must have an initializer')
-        }
-        return { property, name, initializer }
-      }
-
-      if (ts.isShorthandPropertyAssignment(property)) {
-        const name = property.name
-        if (ts.isPrivateIdentifier(name)) {
-          throw new Error('Private identifiers are not supported in object literals')
-        }
-        return { property, name, initializer: name }
-      }
-
-      throw new Error(`Unsupported object literal property: ${ts.SyntaxKind[property.kind]}`)
-    })
-
-    this.emitOpcode(Opcode.OP_object, [], expression)
-
-    for (const { property, name, initializer } of assignments) {
-      let propertyAtom: Atom
-      if (ts.isIdentifier(name)) {
-        propertyAtom = this.atomTable.getAtomId(name.text)
-      } else if (ts.isStringLiteral(name) || ts.isNoSubstitutionTemplateLiteral(name)) {
-        propertyAtom = this.atomTable.getAtomId(name.text)
-      } else if (ts.isNumericLiteral(name)) {
-        propertyAtom = this.atomTable.getAtomId(name.text)
-      } else {
-        throw new Error(`Unsupported object literal property name kind: ${ts.SyntaxKind[name.kind]}`)
-      }
-
-      this.withSourceNode(initializer, () => {
-        this.compileExpression(initializer)
-      })
-
-      this.emitOpcode(Opcode.OP_define_field, [propertyAtom], property)
-    }
-  }
-
-  private compileCallExpression(expression: ts.CallExpression) {
-    const callee = expression.expression
-
-    const callDebugPos = this.getCallExpressionOpenParenPos(expression)
-    const callDebug: EmitDebugInfoOptions | undefined = callDebugPos !== undefined
-      ? { tsSourcePos: callDebugPos }
-      : undefined
-
-    if (ts.isPropertyAccessExpression(callee)) {
-      this.withSourceNode(callee.expression, () => {
-        this.compileExpression(callee.expression)
-      })
-      const propertyAtom = this.atomTable.getAtomId(callee.name.text)
-      const propertyOperatorPos = this.getPropertyAccessOperatorPos(callee)
-      const propertyAccessDebug: EmitDebugInfoOptions | undefined = propertyOperatorPos !== undefined
-        ? { tsSourcePos: propertyOperatorPos }
-        : undefined
-      this.emitOpcode(Opcode.OP_get_field2, [propertyAtom], callee.name, propertyAccessDebug)
-
-      for (const arg of expression.arguments) {
-        this.withSourceNode(arg, () => this.compileExpression(arg))
-      }
-
-      this.emitOpcode(Opcode.OP_call_method, [expression.arguments.length], expression, callDebug)
-      return
-    }
-
-    this.withSourceNode(callee, () => {
-      this.compileExpression(callee)
-    })
-
-    for (const arg of expression.arguments) {
-      this.withSourceNode(arg, () => this.compileExpression(arg))
-    }
-
-    this.emitCall(expression.arguments.length, expression, callDebug)
-  }
-
-  private compileNewExpression(expression: ts.NewExpression) {
-    const callDebugPos = this.getNewExpressionOpenParenPos(expression)
-    const callDebug: EmitDebugInfoOptions | undefined = callDebugPos !== undefined
-      ? { tsSourcePos: callDebugPos }
-      : undefined
-
-    this.withSourceNode(expression.expression, () => {
-      this.compileExpression(expression.expression)
-    })
-
-    this.emitOpcode(Opcode.OP_dup)
-
-    const args = expression.arguments ?? []
-    for (const arg of args) {
-      this.withSourceNode(arg, () => this.compileExpression(arg))
-    }
-
-    this.emitConstruct(args.length, expression, callDebug)
   }
 
   private compilePropertyAccessExpression(expression: ts.PropertyAccessExpression) {
@@ -1373,27 +840,6 @@ export class Compiler {
       ? { tsSourcePos: operatorPos }
       : undefined
     this.emitOpcode(Opcode.OP_get_field, [propertyAtom], expression.name, debug)
-  }
-
-  private compileTemplateExpression(expression: ts.TemplateExpression) {
-    this.emitOpcode(Opcode.OP_push_empty_string, [], expression)
-
-    const headText = expression.head.text
-    if (headText.length > 0) {
-      this.emitStringLiteral(headText, expression.head)
-      this.emitOpcode(Opcode.OP_add, [], expression.head)
-    }
-
-    for (const span of expression.templateSpans) {
-      this.compileExpression(span.expression)
-      this.emitOpcode(Opcode.OP_add, [], span.expression)
-
-      const literalText = span.literal.text
-      if (literalText.length > 0) {
-        this.emitStringLiteral(literalText, span.literal)
-        this.emitOpcode(Opcode.OP_add, [], span.literal)
-      }
-    }
   }
 
   private compilePrefixUnaryExpression(expression: ts.PrefixUnaryExpression) {
@@ -1457,26 +903,7 @@ export class Compiler {
     this.emitOpcode(Opcode.OP_put_arg, [index], node)
   }
 
-  private emitCall(argCount: number, node?: ts.Node, debugOptions?: EmitDebugInfoOptions) {
-    if (argCount < 0) {
-      throw new Error('Call argument count cannot be negative')
-    }
-    if (env.supportsShortOpcodes && argCount <= 3) {
-      const opcode = (Opcode.OP_call0 + argCount) as Opcode
-      this.emitOpcode(opcode, [], node, debugOptions)
-      return
-    }
-    this.emitOpcode(Opcode.OP_call, [argCount], node, debugOptions)
-  }
-
-  private emitConstruct(argCount: number, node?: ts.Node, debugOptions?: EmitDebugInfoOptions) {
-    if (argCount < 0) {
-      throw new Error('Constructor argument count cannot be negative')
-    }
-    this.emitOpcode(Opcode.OP_call_constructor, [argCount], node, debugOptions)
-  }
-
-  private emitLoadIdentifier(identifier: ts.Identifier) {
+  public emitLoadIdentifier(identifier: ts.Identifier) {
     const atom = this.atomTable.getAtomId(identifier.text)
     if (this.argumentIndices.has(atom)) {
       this.emitLoadArgument(this.argumentIndices.get(atom)!, identifier)
@@ -2674,7 +2101,13 @@ export class Compiler {
   private finalizeFunction(func: FunctionDef) {
     const funcName = this.atomTable.getAtomString(func.bytecode.name)
     func.bytecode.constantPool = func.getConstantPoolEntries()
-    this.pruneUnusedClosureVars(func)
+    pruneUnusedClosureVars(
+      {
+        atomTable: this.atomTable,
+        closureVarIndices: this.closureVarIndices,
+      },
+      func
+    )
     const lexicalVars = func.vars.filter((variable) => !variable.isCaptured)
     for (const variable of lexicalVars) {
       if (variable.scopeLevel >= 0) {
@@ -2689,136 +2122,6 @@ export class Compiler {
     func.bytecode.definedArgCount = func.definedArgCount
   }
 
-  private pruneUnusedClosureVars(func: FunctionDef) {
-    const closureVars = func.bytecode.closureVars
-    if (closureVars.length === 0) {
-      return
-    }
-
-    const used = this.collectClosureVarUsage(func)
-    if (used.size === closureVars.length) {
-      return
-    }
-
-    const remap = new Map<number, number>()
-    const filtered: typeof closureVars = []
-    for (let index = 0; index < closureVars.length; index++) {
-      if (!used.has(index)) {
-        continue
-      }
-      remap.set(index, filtered.length)
-      filtered.push(closureVars[index])
-    }
-
-    if (filtered.length === closureVars.length) {
-      return
-    }
-
-    if (process.env.DEBUG_UNUSED_CLOSURE === '1') {
-      const nameAtom = func.bytecode.name
-      const name = this.atomTable.getAtomString(nameAtom) ?? '<anonymous>'
-      console.log('pruneUnusedClosureVars', {
-        functionName: name,
-        originalCount: closureVars.length,
-        used: [...used].sort((a, b) => a - b),
-      })
-    }
-
-    if (remap.size === 0) {
-      func.bytecode.closureVars = []
-      func.closureVars = []
-      this.closureVarIndices.clear()
-      return
-    }
-
-    this.rewriteClosureVarInstructions(func.bytecode.instructions, remap)
-
-    func.bytecode.closureVars = filtered
-    func.closureVars = [...filtered]
-
-    this.closureVarIndices.clear()
-    for (let newIndex = 0; newIndex < filtered.length; newIndex++) {
-      this.closureVarIndices.set(filtered[newIndex].name, newIndex)
-    }
-  }
-
-  private collectClosureVarUsage(func: FunctionDef): Set<number> {
-    const used = new Set<number>()
-    for (const instruction of func.bytecode.instructions) {
-      const def = getOpcodeDefinition(instruction.opcode)
-      if (!def) {
-        continue
-      }
-      if (def.format === OpFormat.var_ref) {
-        if (instruction.operands.length === 0) {
-          continue
-        }
-        const index = instruction.operands[instruction.operands.length - 1]
-        used.add(index)
-        continue
-      }
-      if (def.format === OpFormat.none_var_ref) {
-        const name = getOpcodeName(instruction.opcode)
-        if (!name) {
-          continue
-        }
-        const match = name.match(/^(OP_[a-z_]+)(\d)$/)
-        if (!match) {
-          continue
-        }
-        const index = Number(match[2])
-        used.add(index)
-      }
-    }
-    return used
-  }
-
-  private rewriteClosureVarInstructions(instructions: Instruction[], remap: Map<number, number>) {
-    for (const instruction of instructions) {
-      const def = getOpcodeDefinition(instruction.opcode)
-      if (!def) {
-        continue
-      }
-      if (def.format === OpFormat.var_ref) {
-        if (instruction.operands.length === 0) {
-          continue
-        }
-        const oldIndex = instruction.operands[instruction.operands.length - 1]
-        const newIndex = remap.get(oldIndex)
-        if (newIndex === undefined) {
-          continue
-        }
-        instruction.operands[instruction.operands.length - 1] = newIndex
-        continue
-      }
-      if (def.format === OpFormat.none_var_ref) {
-        const name = getOpcodeName(instruction.opcode)
-        if (!name) {
-          continue
-        }
-        const match = name.match(/^(OP_[a-z_]+)(\d)$/)
-        if (!match) {
-          continue
-        }
-        const oldIndex = Number(match[2])
-        const newIndex = remap.get(oldIndex)
-        if (newIndex === undefined) {
-          continue
-        }
-        const baseName = match[1]
-        const updatedOpcode = getIndexedOpcode(baseName, newIndex)
-        if (updatedOpcode !== undefined) {
-          instruction.opcode = updatedOpcode
-          continue
-        }
-        const fallbackOpcode = (Opcode as unknown as Record<string, number>)[baseName]
-        if (typeof fallbackOpcode === 'number') {
-          instruction.opcode = fallbackOpcode
-          instruction.operands = [newIndex]
-        }
-      }
-    }
-  }
 
   private encodeULEB128(value: number): number[] {
     const result: number[] = []
@@ -2848,7 +2151,7 @@ export class Compiler {
     return result
   }
 
-  private getPropertyAccessOperatorPos(node: ts.PropertyAccessExpression): number | undefined {
+  public getPropertyAccessOperatorPos(node: ts.PropertyAccessExpression): number | undefined {
     const nameStart = node.name.getStart(this.sourceFile, false)
     let pos = this.skipTriviaForward(node.expression.getEnd())
     if (pos >= nameStart) {
@@ -2870,7 +2173,7 @@ export class Compiler {
     return undefined
   }
 
-  private getCallExpressionOpenParenPos(node: ts.CallExpression): number | undefined {
+  public getCallExpressionOpenParenPos(node: ts.CallExpression): number | undefined {
     let pos = node.expression.getEnd()
     if (node.typeArguments && node.typeArguments.length > 0) {
       pos = node.typeArguments.end
@@ -2893,7 +2196,7 @@ export class Compiler {
     return undefined
   }
 
-  private getNewExpressionOpenParenPos(node: ts.NewExpression): number | undefined {
+  public getNewExpressionOpenParenPos(node: ts.NewExpression): number | undefined {
     if (!node.arguments || node.arguments.length === 0) {
       return undefined
     }
