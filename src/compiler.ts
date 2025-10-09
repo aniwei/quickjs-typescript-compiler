@@ -1614,10 +1614,7 @@ export class Compiler {
         const sourcePos = this.toUtf8Offset(tsSourcePos)
         const statementNode = this.currentStatementNode
         const isStatementRecord = debugOptions?.tsSourcePos === undefined && node === undefined && recordNode === statementNode
-        if (!isStatementRecord || !this.recordedStatementPositions.has(sourcePos)) {
-          if (isStatementRecord) {
-            this.recordedStatementPositions.add(sourcePos)
-          }
+        if (!this.recordedStatementPositions.has(sourcePos)) {
           let { line, column } = this.getLineColumnFromUtf8Offset(sourcePos)
           if (process.env.DEBUG_PC2LINE === '1') {
             console.log('pc2line:record', {
@@ -1633,6 +1630,7 @@ export class Compiler {
             })
           }
           this.currentFunction.bytecode.recordLineNumber(this.currentOffset, line, column, sourcePos, instructionIndex)
+          this.recordedStatementPositions.add(sourcePos)
           if (!isStatementRecord && statementNode && recordNode === statementNode) {
             const statementStart = statementNode.getStart(this.sourceFile, false)
             if (statementStart >= 0) {

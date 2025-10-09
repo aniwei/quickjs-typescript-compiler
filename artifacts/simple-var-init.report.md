@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/simple-var-init.ts
-**生成时间**: 2025-10-04T20:09:18.609Z
+**生成时间**: 2025-10-09T19:23:32.820Z
 
 ## 大小对比
 
