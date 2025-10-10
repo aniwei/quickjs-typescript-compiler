@@ -22,8 +22,12 @@ import {
   type ColumnAdjustment,
 } from './compiler/debug/sourceMapping'
 import { computeFunctionStackSize } from './compiler/analysis/stackSize'
+import { getInstructionSize, getStackEffect as getOpcodeStackEffect } from './compiler/analysis/opcodeInfo'
 import { buildFunctionDebugInfo } from './compiler/debug/pc2line'
-import { resolvePendingJumps as resolvePendingJumpEntries } from './compiler/analysis/jumpResolution'
+import {
+  resolvePendingJumps as resolvePendingJumpEntries,
+  type PendingJump,
+} from './compiler/analysis/jumpResolution'
 import {
   ControlFlowBuilder,
   ControlFlowTarget,
@@ -94,7 +98,7 @@ export class Compiler {
   private readonly instructionOffsets: number[] = []
   private labelCounter = 0
   private readonly labelPositions = new Map<string, number>()
-  private readonly pendingJumps: Array<{ index: number; label: string; opcode: Opcode }> = []
+  private readonly pendingJumps: PendingJump[] = []
   private readonly controlFlow = new ControlFlowBuilder({
     emitGoto: (label) => this.emitGoto(label),
   })
@@ -1119,13 +1123,13 @@ export class Compiler {
     }
 
     const bytecode = func.bytecode
-    const delta = instructions.reduce((sum, ins) => sum + this.getInstructionSize(ins), 0)
+  const delta = instructions.reduce((sum, ins) => sum + getInstructionSize(ins), 0)
     const insertionOffset = this.getInstructionOffset(func, index)
 
     bytecode.instructions.splice(index, 0, ...instructions)
 
     if (func === this.currentFunction) {
-      const { offsets, totalSize } = this.recomputeInstructionOffsets(bytecode.instructions)
+  const { offsets, totalSize } = this.recomputeInstructionOffsets(bytecode.instructions)
       this.instructionOffsets.length = offsets.length
       for (let i = 0; i < offsets.length; i++) {
         this.instructionOffsets[i] = offsets[i]
@@ -1160,7 +1164,7 @@ export class Compiler {
     let offset = 0
     for (let i = 0; i < instructions.length; i++) {
       offsets[i] = offset
-      offset += this.getInstructionSize(instructions[i])
+      offset += getInstructionSize(instructions[i])
     }
     return { offsets, totalSize: offset }
   }
@@ -1171,17 +1175,9 @@ export class Compiler {
     }
     let offset = 0
     for (let i = 0; i < index && i < func.bytecode.instructions.length; i++) {
-      offset += this.getInstructionSize(func.bytecode.instructions[i])
+      offset += getInstructionSize(func.bytecode.instructions[i])
     }
     return offset
-  }
-
-  private getInstructionSize(instruction: Instruction): number {
-    const def = getOpcodeDefinition(instruction.opcode)
-    if (!def) {
-      throw new Error(`Unknown opcode: ${instruction.opcode}`)
-    }
-    return def.size
   }
 
   private getNormalizedPosition(pos: number): number {
@@ -1209,13 +1205,13 @@ export class Compiler {
     node?: ts.Node | null,
     debugOptions?: EmitDebugInfoOptions
   ): number {
-  const def = getOpcodeDefinition(opcode)
+    const def = getOpcodeDefinition(opcode)
     if (!def) {
       throw new Error(`Unknown opcode: ${opcode}`)
     }
 
-  const instructionIndex = this.currentFunction.bytecode.instructions.length
-  const recordNode = node === null ? null : node ?? this.currentStatementNode ?? this.currentSourceNode
+    const instructionIndex = this.currentFunction.bytecode.instructions.length
+    const recordNode = node === null ? null : node ?? this.currentStatementNode ?? this.currentSourceNode
     if (process.env.DEBUG_PC2LINE === '1') {
       console.log('pc2line:emit', {
         opcode: Opcode[opcode],
@@ -1265,7 +1261,7 @@ export class Compiler {
       }
     }
 
-    const { nPop, nPush } = this.getStackEffect(opcode, operands)
+    const { nPop, nPush } = getOpcodeStackEffect(opcode, operands)
 
     this.stackDepth -= nPop
     if (this.stackDepth < 0) {
@@ -1298,32 +1294,6 @@ export class Compiler {
     const instructionIndex = this.currentFunction.bytecode.instructions.length
     this.currentFunction.bytecode.recordLineNumber(this.currentOffset, line, column, sourcePos, instructionIndex)
     this.recordedStatementPositions.add(sourcePos)
-  }
-
-  private getStackEffect(opcode: Opcode, operands: number[] = []): { nPop: number; nPush: number } {
-  const def = getOpcodeDefinition(opcode)
-    if (!def) {
-      throw new Error(`Unknown opcode: ${opcode}`)
-    }
-
-    let nPop = def.nPop
-    switch (def.format) {
-      case OpFormat.npop:
-      case OpFormat.npop_u16:
-        nPop += operands[0] ?? 0
-        break
-      case OpFormat.npopx:
-        if (opcode >= Opcode.OP_call0 && opcode <= Opcode.OP_call3) {
-          nPop += opcode - Opcode.OP_call0
-        } else {
-          throw new Error(`Unsupported npopx opcode: ${opcode}`)
-        }
-        break
-      default:
-        break
-    }
-
-    return { nPop, nPush: def.nPush }
   }
 
   public pushScope(kind: ScopeKind = ScopeKind.Block) {
@@ -1360,13 +1330,10 @@ export class Compiler {
     }
     func.bytecode.setVarDefs(lexicalVars)
     func.bytecode.setArgDefs(func.args)
-    func.bytecode.stackSize = computeFunctionStackSize({
-      bytecode: func.bytecode,
-      getStackEffect: (opcode, operands) => this.getStackEffect(opcode, operands),
-    })
+    func.bytecode.stackSize = computeFunctionStackSize(func.bytecode)
     buildFunctionDebugInfo({
       func,
-      getInstructionSize: (instruction) => this.getInstructionSize(instruction),
+      getInstructionSize,
       getLineColumnFromUtf8Offset: (offset) => this.getLineColumnFromUtf8Offset(offset),
     })
     func.bytecode.argCount = func.args.length

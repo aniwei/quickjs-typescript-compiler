@@ -2,14 +2,9 @@ import { Opcode } from '../../env'
 import type { FunctionBytecode } from '../../functionBytecode'
 import { getOpcodeDefinition } from '../../utils/opcode'
 import { getBranchDelta, getJumpBaseOffset } from './branches'
+import { getInstructionSize, getStackEffect } from './opcodeInfo'
 
-interface ComputeStackSizeParams {
-  bytecode: FunctionBytecode
-  getStackEffect: (opcode: Opcode, operands: number[]) => { nPop: number; nPush: number }
-}
-
-export function computeFunctionStackSize(params: ComputeStackSizeParams): number {
-  const { bytecode, getStackEffect } = params
+export function computeFunctionStackSize(bytecode: FunctionBytecode): number {
   const instructions = bytecode.instructions
   if (instructions.length === 0) {
     return 0
@@ -19,12 +14,8 @@ export function computeFunctionStackSize(params: ComputeStackSizeParams): number
   let bytecodeLength = 0
   for (let i = 0; i < instructions.length; i++) {
     const instruction = instructions[i]
-    const def = getOpcodeDefinition(instruction.opcode)
-    if (!def) {
-      throw new Error(`Unknown opcode: ${instruction.opcode}`)
-    }
     offsetToIndex.set(bytecodeLength, i)
-    bytecodeLength += def.size
+    bytecodeLength += getInstructionSize(instruction)
   }
 
   const stackLevel = new Array<number>(bytecodeLength).fill(-1)
