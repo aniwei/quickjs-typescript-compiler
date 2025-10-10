@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-10-10T14:55:07.886Z",
+  "timestamp": "2025-10-10T15:00:28.656Z",
   "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/simple-var-init.ts",
   "compilation": {
     "typescript": {
