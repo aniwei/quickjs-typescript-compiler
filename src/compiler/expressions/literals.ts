@@ -3,6 +3,11 @@ import type { Compiler } from '../../compiler'
 import { BytecodeTag, Opcode, env } from '../../env'
 import { getPushIntOpcode } from '../../utils/opcodeVariants'
 
+function emitStringLiteral(compiler: Compiler, value: string, node: ts.Node) {
+  const atom = compiler.getAtomId(value)
+  compiler.emitInstruction(Opcode.OP_push_atom_value, [atom], node)
+}
+
 export function compileNumericLiteral(compiler: Compiler, node: ts.NumericLiteral) {
   const value = Number(node.text)
   if (Number.isInteger(value) && Number.isFinite(value)) {
@@ -37,14 +42,14 @@ export function compileBooleanLiteral(compiler: Compiler, expression: ts.Express
 }
 
 export function compileStringLiteral(compiler: Compiler, expression: ts.StringLiteral) {
-  compiler.emitStringLiteral(expression.text, expression)
+  emitStringLiteral(compiler, expression.text, expression)
 }
 
 export function compileNoSubstitutionTemplateLiteral(
   compiler: Compiler,
   expression: ts.NoSubstitutionTemplateLiteral
 ) {
-  compiler.emitStringLiteral(expression.text, expression)
+  emitStringLiteral(compiler, expression.text, expression)
 }
 
 export function compileNullLiteral(compiler: Compiler, expression: ts.Expression) {
@@ -60,7 +65,7 @@ export function compileTemplateExpression(compiler: Compiler, expression: ts.Tem
 
   const headText = expression.head.text
   if (headText.length > 0) {
-    compiler.emitStringLiteral(headText, expression.head)
+    emitStringLiteral(compiler, headText, expression.head)
     compiler.emitInstruction(Opcode.OP_add, [], expression.head)
   }
 
@@ -70,7 +75,7 @@ export function compileTemplateExpression(compiler: Compiler, expression: ts.Tem
 
     const literalText = span.literal.text
     if (literalText.length > 0) {
-      compiler.emitStringLiteral(literalText, span.literal)
+      emitStringLiteral(compiler, literalText, span.literal)
       compiler.emitInstruction(Opcode.OP_add, [], span.literal)
     }
   }

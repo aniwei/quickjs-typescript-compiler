@@ -3,6 +3,7 @@ import type { Compiler } from '../../compiler'
 import { Opcode } from '../../env'
 import { ScopeKind } from '../../scopes'
 import type { StatementVisitor, StatementVisitorRegistrar } from '../visitors/statementVisitors'
+import { compileBlockStatement } from './simple/index'
 
 export function compileForOfStatement(
   compiler: Compiler,
@@ -68,7 +69,7 @@ export function compileForOfStatement(
     })
 
     if (ts.isBlock(node.statement)) {
-      compiler.compileBlock(node.statement, { createScope: false })
+      compileBlockStatement(compiler, node.statement, { createScope: false })
     } else {
       compiler.compileStatement(node.statement)
     }
@@ -172,7 +173,7 @@ export function compileForInStatement(
     storeValue()
 
     if (ts.isBlock(node.statement)) {
-      compiler.compileBlock(node.statement, { createScope: false })
+      compileBlockStatement(compiler, node.statement, { createScope: false })
     } else {
       compiler.compileStatement(node.statement)
     }
@@ -212,7 +213,7 @@ export function compileWhileStatement(
     compiler.emitJump(Opcode.OP_if_false8, exitLabel)
 
     if (ts.isBlock(node.statement)) {
-      compiler.compileBlock(node.statement)
+      compileBlockStatement(compiler, node.statement)
     } else {
       compiler.compileStatement(node.statement)
     }
@@ -239,7 +240,7 @@ export function compileDoWhileStatement(
     compiler.markLabel(bodyLabel)
 
     if (ts.isBlock(node.statement)) {
-      compiler.compileBlock(node.statement)
+      compileBlockStatement(compiler, node.statement)
     } else {
       compiler.compileStatement(node.statement)
     }
@@ -284,7 +285,7 @@ export function compileForStatement(
       }
 
       if (ts.isBlock(node.statement)) {
-        compiler.compileBlock(node.statement, { createScope: false })
+  compileBlockStatement(compiler, node.statement, { createScope: false })
       } else {
         compiler.compileStatement(node.statement)
       }

@@ -1,4 +1,4 @@
-export default function namedDefault(value)number {
+export default function namedDefault(value) {
   return value + 1
 }
 

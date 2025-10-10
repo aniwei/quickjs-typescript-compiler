@@ -1,23 +1,5 @@
 import { ensureStatementVisitorsInitialized, getStatementVisitor } from './compiler/visitors/statementVisitors'
-import {
-  compileBooleanLiteral,
-  compileNoSubstitutionTemplateLiteral,
-  compileNullLiteral,
-  compileNumericLiteral,
-  compileStringLiteral,
-  compileTemplateExpression,
-  compileThisExpression,
-} from './compiler/expressions/literals'
-import { compileCallExpression, compileNewExpression } from './compiler/expressions/calls'
-import { compileArrayLiteralExpression, compileObjectLiteralExpression } from './compiler/expressions/collections'
-import {
-  compileBinaryExpression,
-  compilePostfixUnaryExpression,
-  compilePrefixUnaryExpression,
-  compilePropertyAccessExpression,
-  compileVoidExpression,
-} from './compiler/expressions/operators'
-import { compileBlockStatement, compileExpressionStatement as compileExpressionStatementNode } from './compiler/statements/simple/index'
+import { compileExpression as compileExpressionNode } from './compiler/expressions'
 import path from 'node:path'
 import * as ts from 'typescript'
 import { Atom, AtomTable, JSAtom } from './atoms'
@@ -31,6 +13,15 @@ import { getOpcodeDefinition } from './utils/opcode'
 import { getIndexedOpcode } from './utils/opcodeVariants'
 import { pruneUnusedClosureVars } from './compiler/core/closureVarUtils'
 import {
+  adjustColumnForTranspiled,
+  buildSourceMapping,
+  computeReferenceColumnAdjustments,
+  mergeColumnAdjustments,
+  sortColumnAdjustments,
+  type ColumnAdjustment,
+} from './compiler/debug/sourceMapping'
+import { buildHoistedDefinitionInstructions } from './compiler/module/moduleHoisting'
+import {
   ControlFlowBuilder,
   ControlFlowTarget,
   ControlFlowTargetKind,
@@ -43,11 +34,6 @@ const PC2LINE_BASE = PC2Line.PC2LINE_BASE
 const PC2LINE_OP_FIRST = PC2Line.PC2LINE_OP_FIRST
 const PC2LINE_RANGE = PC2Line.PC2LINE_RANGE
 const PC2LINE_DIFF_PC_MAX = PC2Line.PC2LINE_DIFF_PC_MAX
-
-const JS_PROP_CONFIGURABLE = 1 << 0
-const JS_PROP_WRITABLE = 1 << 1
-const DEFINE_GLOBAL_FUNC_VAR = 1 << 6
-const DEFINE_GLOBAL_LEX_VAR = 1 << 7
 
 export interface CompilerOptions {
   atomTable?: AtomTable
@@ -81,8 +67,6 @@ interface FunctionContextSnapshot {
 }
 
 type LoopCleanupInfo = { kind: 'for-of' | 'for-in' }
-
-type ColumnAdjustment = { startColumn: number; delta: number }
 
 interface EmitDebugInfoOptions {
   tsSourcePos?: number
@@ -153,17 +137,23 @@ export class Compiler {
     this.program = ts.createProgram([this.fileName], compilerOptions, host)
     this.checker = this.program.getTypeChecker()
 
-    const { strippedSource, normalizedPosByPos, columnAdjustments } = this.computeDebugSourceMapping(
-      this.sourceCode,
-      options.referenceJsSource ?? undefined
-    )
+    const { strippedSource, normalizedPosByPos, columnAdjustments } = buildSourceMapping({
+      source: this.sourceCode,
+      sourceFile: this.sourceFile,
+      referenceJsSource: options.referenceJsSource ?? undefined,
+    })
     this.normalizedPosByPos = normalizedPosByPos
     this.columnAdjustments = columnAdjustments
     if (options.referenceJsSource !== undefined) {
-      const referenceAdjustments = this.computeReferenceColumnAdjustments(strippedSource, options.referenceJsSource)
-      this.mergeColumnAdjustments(referenceAdjustments)
+      const referenceAdjustments = computeReferenceColumnAdjustments(
+        strippedSource,
+        this.sourceCode,
+        options.referenceJsSource,
+        this.fileName
+      )
+      mergeColumnAdjustments(this.columnAdjustments, referenceAdjustments)
     }
-    this.sortColumnAdjustments(this.columnAdjustments)
+    sortColumnAdjustments(this.columnAdjustments)
 
     const encoder = new TextEncoder()
     this.sourceUtf8 = encoder.encode(strippedSource)
@@ -407,13 +397,6 @@ export class Compiler {
     this.withStatementNode(node, () => {
       ts.forEachChild(node, (child) => this.visitNode(child))
     })
-  }
-
-  private compileFunctionExpression(node: ts.FunctionExpression) {
-    const nameAtom = node.name ? this.atomTable.getAtomId(node.name.text) : this.atomTable.getAtomId('')
-    const childFunction = this.compileChildFunction(node, nameAtom, { isExpression: true })
-    const constantIndex = this.addFunctionConstant(childFunction)
-    this.emitFunctionClosure(constantIndex, node)
   }
 
   public compileChildFunction(
@@ -694,133 +677,14 @@ export class Compiler {
     return constantIndex
   }
 
-  public compileBlock(node: ts.Block, options: { createScope?: boolean } = {}) {
-    compileBlockStatement(this, node, options)
-  }
-
-  public compileExpressionStatement(node: ts.ExpressionStatement) {
-    compileExpressionStatementNode(this, node)
-
-  }
-
   public compileExpression(expression: ts.Expression): void {
     const previous = this.currentSourceNode
     this.currentSourceNode = expression
     try {
-      if (ts.isParenthesizedExpression(expression)) {
-        this.compileExpression(expression.expression)
-        return
-      }
-
-      if (ts.isNumericLiteral(expression)) {
-        compileNumericLiteral(this, expression)
-        return
-      }
-
-      if (expression.kind === ts.SyntaxKind.TrueKeyword || expression.kind === ts.SyntaxKind.FalseKeyword) {
-        compileBooleanLiteral(this, expression)
-        return
-      }
-
-      if (ts.isStringLiteral(expression)) {
-        compileStringLiteral(this, expression)
-        return
-      }
-
-      if (ts.isNoSubstitutionTemplateLiteral(expression)) {
-        compileNoSubstitutionTemplateLiteral(this, expression)
-        return
-      }
-
-      if (ts.isTemplateExpression(expression)) {
-        compileTemplateExpression(this, expression)
-        return
-      }
-
-      if (expression.kind === ts.SyntaxKind.NullKeyword) {
-        compileNullLiteral(this, expression)
-        return
-      }
-
-      if (expression.kind === ts.SyntaxKind.ThisKeyword) {
-        compileThisExpression(this, expression)
-        return
-      }
-
-      if (ts.isArrayLiteralExpression(expression)) {
-        compileArrayLiteralExpression(this, expression)
-        return
-      }
-
-      if (ts.isObjectLiteralExpression(expression)) {
-        compileObjectLiteralExpression(this, expression)
-        return
-      }
-
-      if (ts.isIdentifier(expression)) {
-        this.emitLoadIdentifier(expression)
-        return
-      }
-
-      if (ts.isBinaryExpression(expression)) {
-        compileBinaryExpression(this, expression)
-        return
-      }
-
-      if (ts.isCallExpression(expression)) {
-        compileCallExpression(this, expression)
-        return
-      }
-
-      if (ts.isNewExpression(expression)) {
-        compileNewExpression(this, expression)
-        return
-      }
-
-      if (ts.isPropertyAccessExpression(expression)) {
-        compilePropertyAccessExpression(this, expression)
-        return
-      }
-
-      if (ts.isFunctionExpression(expression)) {
-        this.compileFunctionExpression(expression)
-        return
-      }
-
-      if (ts.isAsExpression(expression)) {
-        this.compileExpression(expression.expression)
-        return
-      }
-
-      if (ts.isTypeAssertionExpression(expression)) {
-        this.compileExpression(expression.expression)
-        return
-      }
-
-      if (ts.isVoidExpression(expression)) {
-        compileVoidExpression(this, expression)
-        return
-      }
-
-      if (ts.isPrefixUnaryExpression(expression)) {
-        compilePrefixUnaryExpression(this, expression)
-        return
-      }
-
-      if (ts.isPostfixUnaryExpression(expression)) {
-        compilePostfixUnaryExpression(this, expression)
-        return
-      }
-
-      throw new Error(`Unsupported expression kind: ${ts.SyntaxKind[expression.kind]}`)
+      compileExpressionNode(this, expression)
     } finally {
       this.currentSourceNode = previous
     }
-  }
-
-  public emitStringLiteral(value: string, node: ts.Node) {
-    const atom = this.atomTable.getAtomId(value)
-    this.emitOpcode(Opcode.OP_push_atom_value, [atom], node)
   }
 
   public recordExpressionStatementDebug(expression: ts.Expression) {
@@ -828,61 +692,6 @@ export class Compiler {
     if (currentStatement && ts.isExpressionStatement(currentStatement) && currentStatement.expression === expression) {
       this.recordDebugPoint(expression)
     }
-  }
-
-  private compilePropertyAccessExpression(expression: ts.PropertyAccessExpression) {
-    this.withSourceNode(expression.expression, () => {
-      this.compileExpression(expression.expression)
-    })
-    const propertyAtom = this.atomTable.getAtomId(expression.name.text)
-    const operatorPos = this.getPropertyAccessOperatorPos(expression)
-    const debug: EmitDebugInfoOptions | undefined = operatorPos !== undefined
-      ? { tsSourcePos: operatorPos }
-      : undefined
-    this.emitOpcode(Opcode.OP_get_field, [propertyAtom], expression.name, debug)
-  }
-
-  private compilePrefixUnaryExpression(expression: ts.PrefixUnaryExpression) {
-    const operator = expression.operator
-
-    switch (operator) {
-      case ts.SyntaxKind.PlusToken:
-      case ts.SyntaxKind.MinusToken:
-      case ts.SyntaxKind.TildeToken:
-      case ts.SyntaxKind.ExclamationToken:
-        break
-      default:
-        throw new Error(`Unsupported prefix unary operator: ${ts.SyntaxKind[operator]}`)
-    }
-
-    this.compileExpression(expression.operand)
-
-    switch (operator) {
-      case ts.SyntaxKind.PlusToken:
-        this.emitOpcode(Opcode.OP_plus, [], expression)
-        break
-      case ts.SyntaxKind.MinusToken:
-        this.emitOpcode(Opcode.OP_neg, [], expression)
-        break
-      case ts.SyntaxKind.TildeToken:
-        this.emitOpcode(Opcode.OP_not, [], expression)
-        break
-      case ts.SyntaxKind.ExclamationToken:
-        this.emitOpcode(Opcode.OP_lnot, [], expression)
-        break
-      default:
-        throw new Error(`Unsupported prefix unary operator: ${ts.SyntaxKind[operator]}`)
-    }
-  }
-
-  private compilePostfixUnaryExpression(expression: ts.PostfixUnaryExpression): never {
-    throw new Error(`Unsupported postfix unary operator: ${ts.SyntaxKind[expression.operator]}`)
-  }
-
-  private compileVoidExpression(expression: ts.VoidExpression) {
-    this.compileExpression(expression.expression)
-    this.emitOpcode(Opcode.OP_drop)
-    this.emitOpcode(Opcode.OP_undefined, [], expression)
   }
 
   private emitLoadArgument(index: number, node?: ts.Node) {
@@ -1308,12 +1117,14 @@ export class Compiler {
     if (!func.module) {
       return
     }
-    const hoisted = this.buildHoistedDefinitionInstructions(func)
+    const hoisted = buildHoistedDefinitionInstructions({
+      func,
+      closureVarIndices: this.closureVarIndices,
+    })
     if (hoisted.length === 0) {
       return
     }
-    const insertionIndex = func === this.currentFunction && this.moduleHoistInsertionIndex !== null ? this.moduleHoistInsertionIndex : 0
-    const insertionOffset = this.getInstructionOffset(func, insertionIndex)
+  const insertionIndex = func === this.currentFunction && this.moduleHoistInsertionIndex !== null ? this.moduleHoistInsertionIndex : 0
     this.insertInstructions(func, insertionIndex, hoisted)
     if (func === this.currentFunction) {
       this.moduleHoistInsertionIndex = null
@@ -1321,173 +1132,6 @@ export class Compiler {
         this.moduleHoistLabel = null
       }
     }
-  }
-
-  private buildHoistedDefinitionInstructions(func: FunctionDef): Instruction[] {
-    const instructions: Instruction[] = []
-
-    for (let index = 0; index < func.args.length; index++) {
-      const arg = func.args[index]
-      if (arg.funcPoolIndex >= 0) {
-        instructions.push(this.buildFclosureInstruction(arg.funcPoolIndex))
-        instructions.push({ opcode: Opcode.OP_put_arg, operands: [index] })
-      }
-    }
-
-    const bodyScope = func.bodyScope
-    for (let varIndex = 0; varIndex < func.vars.length; varIndex++) {
-      const variable = func.vars[varIndex]
-      if (variable.funcPoolIndex < 0) {
-        continue
-      }
-      if (bodyScope >= 0 && variable.scopeLevel !== bodyScope) {
-        continue
-      }
-      instructions.push(this.buildFclosureInstruction(variable.funcPoolIndex))
-      if (variable.isCaptured) {
-        const closureIndex = this.closureVarIndices.get(variable.name)
-        if (closureIndex === undefined) {
-          throw new Error(`Hoisted captured variable missing closure index for ${varIndex}`)
-        }
-        instructions.push(this.buildPutClosureInstruction(closureIndex))
-      } else {
-        if (variable.localSlot < 0) {
-          throw new Error(`Hoisted variable missing local slot for index ${varIndex}`)
-        }
-        instructions.push(this.buildStoreToLocalInstruction(variable.localSlot))
-      }
-    }
-
-    instructions.push(...this.buildGlobalHoistInstructions(func))
-
-    return instructions
-  }
-
-  private buildGlobalHoistInstructions(func: FunctionDef): Instruction[] {
-    if (func.globalVars.length === 0) {
-      return []
-    }
-
-    const instructions: Instruction[] = []
-    const closureIndexByAtom = new Map<Atom, number>()
-    for (let index = 0; index < func.bytecode.closureVars.length; index++) {
-      const closureVar = func.bytecode.closureVars[index]
-      closureIndexByAtom.set(closureVar.name, index)
-    }
-
-    const varEnvIndex = closureIndexByAtom.get(JSAtom.JS_ATOM__var_)
-    const argVarEnvIndex = closureIndexByAtom.get(JSAtom.JS_ATOM__arg_var_)
-    const isModule = Boolean(func.module)
-
-    for (const globalVar of func.globalVars) {
-      let hasClosure = 0
-      let closureIndex: number | undefined
-      let envIndex: number | undefined
-      let forceInit = globalVar.forceInit
-
-      if (closureIndexByAtom.has(globalVar.name)) {
-        hasClosure = 2
-        closureIndex = closureIndexByAtom.get(globalVar.name)
-        forceInit = false
-      } else if (varEnvIndex !== undefined) {
-        hasClosure = 1
-        envIndex = varEnvIndex
-        forceInit = true
-      } else if (argVarEnvIndex !== undefined) {
-        hasClosure = 1
-        envIndex = argVarEnvIndex
-        forceInit = true
-      }
-
-      if (hasClosure === 1 && envIndex !== undefined) {
-        instructions.push(this.buildGetVarRefInstruction(envIndex))
-      }
-
-      let flags = isModule ? JS_PROP_CONFIGURABLE : 0
-      if (globalVar.isLexical) {
-        flags |= DEFINE_GLOBAL_LEX_VAR
-        if (!globalVar.isConst) {
-          flags |= JS_PROP_WRITABLE
-        }
-      }
-
-      if (globalVar.isLexical && hasClosure === 2 && closureIndex !== undefined) {
-        // Lexical bindings captured in the module scope are handled via closure hoisting.
-        // QuickJS does not emit additional global definitions for these entries.
-        continue
-      }
-
-      const skipGlobalDefine = hasClosure === 2 && closureIndex !== undefined
-
-      if (!skipGlobalDefine) {
-        if (globalVar.funcPoolIndex >= 0 && !globalVar.isLexical) {
-          instructions.push(this.buildFclosureInstruction(globalVar.funcPoolIndex))
-          instructions.push(this.buildDefineFuncInstruction(globalVar.name, flags))
-        } else {
-          instructions.push({ opcode: Opcode.OP_define_var, operands: [globalVar.name, flags] })
-        }
-      }
-
-      if (globalVar.funcPoolIndex >= 0 || forceInit) {
-        if (globalVar.funcPoolIndex >= 0) {
-          instructions.push(this.buildFclosureInstruction(globalVar.funcPoolIndex))
-          if (globalVar.name === JSAtom.JS_ATOM__default_) {
-            instructions.push({ opcode: Opcode.OP_set_name, operands: [JSAtom.JS_ATOM_default] })
-          }
-        } else {
-          instructions.push({ opcode: Opcode.OP_undefined, operands: [] })
-        }
-
-        if (hasClosure === 2 && closureIndex !== undefined) {
-          instructions.push(this.buildPutClosureInstruction(closureIndex))
-        } else if (hasClosure === 1) {
-          instructions.push({ opcode: Opcode.OP_define_field, operands: [globalVar.name] })
-          instructions.push({ opcode: Opcode.OP_drop, operands: [] })
-        } else {
-          instructions.push({ opcode: Opcode.OP_put_var, operands: [globalVar.name] })
-        }
-      }
-    }
-
-    return instructions
-  }
-
-  private buildPutClosureInstruction(index: number): Instruction {
-    const shortOpcode = getIndexedOpcode('OP_put_var_ref', index)
-    if (shortOpcode !== undefined) {
-      return { opcode: shortOpcode, operands: [] }
-    }
-    return { opcode: Opcode.OP_put_var_ref, operands: [index] }
-  }
-
-  private buildGetVarRefInstruction(index: number): Instruction {
-    const shortOpcode = getIndexedOpcode('OP_get_var_ref', index)
-    if (shortOpcode !== undefined) {
-      return { opcode: shortOpcode, operands: [] }
-    }
-    return { opcode: Opcode.OP_get_var_ref, operands: [index] }
-  }
-
-  private buildFclosureInstruction(constantIndex: number): Instruction {
-    if (env.supportsShortOpcodes && constantIndex <= 0xff) {
-      return { opcode: Opcode.OP_fclosure8, operands: [constantIndex] }
-    }
-    return { opcode: Opcode.OP_fclosure, operands: [constantIndex] }
-  }
-
-  private buildDefineFuncInstruction(atom: Atom, flags: number): Instruction {
-    return { opcode: Opcode.OP_define_func, operands: [atom, flags] }
-  }
-
-  private buildStoreToLocalInstruction(slot: number): Instruction {
-    const shortOpcode = slot <= 3 ? getIndexedOpcode('OP_put_loc', slot) : undefined
-    if (shortOpcode !== undefined) {
-      return { opcode: shortOpcode, operands: [] }
-    }
-    if (env.supportsShortOpcodes && slot <= 0xff) {
-      return { opcode: Opcode.OP_put_loc8, operands: [slot] }
-    }
-    return { opcode: Opcode.OP_put_loc, operands: [slot] }
   }
 
   private insertInstructions(func: FunctionDef, index: number, instructions: Instruction[]) {
@@ -2326,56 +1970,6 @@ export class Compiler {
     return code === 0x0a || code === 0x0d || code === 0x2028 || code === 0x2029
   }
 
-  private collectStripSegments(
-    source: string,
-    pattern: RegExp,
-    segments: Array<{ start: number; end: number; replacement: string }>,
-    replacement = ''
-  ) {
-    pattern.lastIndex = 0
-    for (const match of source.matchAll(pattern)) {
-      const index = match.index ?? 0
-      const text = match[0]
-      if (!text) continue
-      segments.push({ start: index, end: index + text.length, replacement })
-    }
-  }
-
-  private collectEmptyStatementNewlineSegments(
-    source: string,
-    segments: Array<{ start: number; end: number; replacement: string }>
-  ) {
-    const visit = (node: ts.Node) => {
-      if (ts.isEmptyStatement(node)) {
-        const start = node.getStart(this.sourceFile, false)
-        const end = node.end
-        if (start >= 0 && end > start && end <= source.length) {
-          let cursor = end
-          let hasLineBreak = false
-          while (cursor < source.length) {
-            const code = source.charCodeAt(cursor)
-            if (this.isLineTerminator(code)) {
-              hasLineBreak = true
-              break
-            }
-            if (!this.isWhitespaceChar(code)) {
-              break
-            }
-            cursor += 1
-          }
-          if (!hasLineBreak) {
-            const text = source.slice(start, end)
-            const replacement = `${text}\n`
-            segments.push({ start, end, replacement })
-          }
-        }
-      }
-      ts.forEachChild(node, visit)
-    }
-
-    visit(this.sourceFile)
-  }
-
   public shouldSuppressTopLevelInitializerDebug(initializer?: ts.Expression): boolean {
     if (!initializer) {
       return true
@@ -2456,466 +2050,6 @@ export class Compiler {
     return false
   }
 
-  private computeDebugSourceMapping(
-    source: string,
-    referenceJsSource?: string | null
-  ): {
-    strippedSource: string
-    normalizedPosByPos: Uint32Array
-    columnAdjustments: Map<number, ColumnAdjustment[]>
-  } {
-    const segments: Array<{ start: number; end: number; replacement: string }> = []
-    this.collectStripSegments(source, /(?<=\b[_$a-zA-Z][_$0-9a-zA-Z]*)[ \t]*:(?![ \t]*\()[ \t]*[^=;,){}\r\n]+(?=\s*[,)])/g, segments)
-    this.collectStripSegments(source, /:[ \t]*(?!\()[ \t]*[^=;,){}\r\n]+(?=\s*[=;,){}])/g, segments)
-    this.removeObjectPropertyAssignmentSegments(source, segments)
-    this.collectStripSegments(source, /<\s*[^>]+\s*>/g, segments)
-    this.collectStripSegments(source, /\b(interface|type)\s+\w+\s*=\s*[^;]+;?/g, segments)
-    this.collectStripSegments(source, /\s+as\s+const\b/g, segments)
-
-    if (referenceJsSource !== undefined && referenceJsSource !== null) {
-      this.collectBlankLineAlignmentSegments(source, referenceJsSource, segments)
-    } else {
-      this.collectCollapsedBlankLineSegments(source, segments)
-    }
-
-
-    segments.sort((a, b) => a.start - b.start)
-
-    const merged: Array<{ start: number; end: number; replacement: string }> = []
-    for (const segment of segments) {
-      const start = Math.max(0, Math.min(segment.start, source.length))
-      const end = Math.max(start, Math.min(segment.end, source.length))
-      if (start === end) {
-        continue
-      }
-      const last = merged[merged.length - 1]
-      if (last && start <= last.end) {
-        if (end > last.end) {
-          last.end = end
-        }
-        if (!last.replacement && segment.replacement) {
-          last.replacement = segment.replacement
-        }
-        continue
-      }
-      merged.push({ start, end, replacement: segment.replacement })
-    }
-
-    const normalizedPosByPos = new Uint32Array(source.length + 1)
-    const builder: string[] = []
-    let removedSoFar = 0
-    let segmentIndex = 0
-    let current = merged[segmentIndex]
-
-    for (let pos = 0; pos <= source.length; pos++) {
-      while (current && pos >= current.end) {
-        const replacementLength = current.replacement.length
-        removedSoFar += (current.end - current.start) - replacementLength
-        segmentIndex += 1
-        current = merged[segmentIndex]
-      }
-
-      if (current && pos >= current.start) {
-        normalizedPosByPos[pos] = current.start - removedSoFar
-      } else {
-        normalizedPosByPos[pos] = pos - removedSoFar
-      }
-
-      if (pos === source.length) {
-        break
-      }
-
-      if (current && pos === current.start && current.replacement.length > 0) {
-        builder.push(current.replacement)
-      }
-
-      if (!(current && pos >= current.start && pos < current.end)) {
-        builder.push(source.charAt(pos))
-      }
-    }
-
-    const strippedSource = builder.join('')
-    const columnAdjustments = this.computeColumnAdjustmentsFromSegments(source, strippedSource, normalizedPosByPos, merged)
-    return { strippedSource, normalizedPosByPos, columnAdjustments }
-  }
-
-  private computeColumnAdjustmentsFromSegments(
-    originalSource: string,
-    strippedSource: string,
-    normalizedPosByPos: Uint32Array,
-    segments: Array<{ start: number; end: number; replacement: string }>
-  ): Map<number, ColumnAdjustment[]> {
-    const adjustments = new Map<number, ColumnAdjustment[]>()
-    if (segments.length === 0) {
-      return adjustments
-    }
-
-    const lineStarts = this.collectLineStartOffsets(strippedSource)
-
-    for (const segment of segments) {
-      const removedLength = segment.end - segment.start
-      const replacementLength = segment.replacement.length
-      const delta = removedLength - replacementLength
-      if (delta <= 0) {
-        continue
-      }
-
-      const removedText = originalSource.slice(segment.start, segment.end)
-      if (removedText.includes('\n')) {
-        continue
-      }
-
-      const normalizedStart = normalizedPosByPos[segment.start]
-      const { line, column } = this.getLineColumnFromStrippedOffset(strippedSource, lineStarts, normalizedStart)
-      this.addColumnAdjustment(adjustments, line, column, delta)
-    }
-
-    this.sortColumnAdjustments(adjustments)
-    return adjustments
-  }
-
-  private computeReferenceColumnAdjustments(
-    strippedSource: string,
-    referenceJsSource?: string | null
-  ): Map<number, ColumnAdjustment[]> {
-    const adjustments = new Map<number, ColumnAdjustment[]>()
-    if (referenceJsSource === null) {
-      return adjustments
-    }
-
-    let comparisonJs: string | undefined
-    if (typeof referenceJsSource === 'string') {
-      comparisonJs = referenceJsSource
-    } else {
-      try {
-        const result = ts.transpileModule(this.sourceCode, {
-          fileName: this.fileName,
-          reportDiagnostics: false,
-          compilerOptions: {
-            module: ts.ModuleKind.ESNext,
-            target: ts.ScriptTarget.ES2020,
-            jsx: ts.JsxEmit.Preserve,
-            importHelpers: false,
-            esModuleInterop: false,
-          },
-        })
-        comparisonJs = result.outputText ?? undefined
-      } catch {
-        comparisonJs = undefined
-      }
-    }
-
-    if (!comparisonJs) {
-      return adjustments
-    }
-
-    const originalLines = strippedSource.split(/\r?\n/)
-    const comparisonLines = comparisonJs.split(/\r?\n/)
-    const limit = Math.min(originalLines.length, comparisonLines.length)
-
-    for (let lineIndex = 0; lineIndex < limit; lineIndex += 1) {
-      const originalLine = originalLines[lineIndex]
-      const comparisonLine = comparisonLines[lineIndex]
-      const originalTrimmed = originalLine.trimStart()
-      const comparisonTrimmed = comparisonLine.trimStart()
-      if (originalTrimmed.length === 0 || comparisonTrimmed.length === 0) {
-        continue
-      }
-      if (originalTrimmed.charCodeAt(0) !== comparisonTrimmed.charCodeAt(0)) {
-        continue
-      }
-
-      const originalIndent = this.countLeadingColumns(originalLine)
-      const comparisonIndent = this.countLeadingColumns(comparisonLine)
-      const delta = comparisonIndent - originalIndent
-      if (delta !== 0) {
-        this.addColumnAdjustment(adjustments, lineIndex, originalIndent, delta)
-      }
-    }
-
-    this.sortColumnAdjustments(adjustments)
-    return adjustments
-  }
-
-  private collectLineStartOffsets(text: string): number[] {
-    const starts: number[] = [0]
-    for (let index = 0; index < text.length; index += 1) {
-      if (text.charCodeAt(index) === 0x0a) {
-        starts.push(index + 1)
-      }
-    }
-    return starts
-  }
-
-  private getLineColumnFromStrippedOffset(
-    text: string,
-    lineStarts: number[],
-    offset: number
-  ): { line: number; column: number } {
-    const clampedOffset = Math.max(0, Math.min(offset, text.length))
-    let line = 0
-    while (line + 1 < lineStarts.length && lineStarts[line + 1] <= clampedOffset) {
-      line += 1
-    }
-
-    const lineStart = lineStarts[line]
-    let column = 0
-    for (let index = lineStart; index < clampedOffset; ) {
-      const codePoint = text.codePointAt(index) ?? 0
-      column += 1
-      index += codePoint > 0xffff ? 2 : 1
-    }
-
-    return { line, column }
-  }
-
-  private addColumnAdjustment(
-    map: Map<number, ColumnAdjustment[]>,
-    line: number,
-    startColumn: number,
-    delta: number
-  ) {
-    if (!map.has(line)) {
-      map.set(line, [])
-    }
-    map.get(line)!.push({ startColumn, delta })
-  }
-
-  private sortColumnAdjustments(map: Map<number, ColumnAdjustment[]>) {
-    for (const entries of map.values()) {
-      entries.sort((a, b) => a.startColumn - b.startColumn)
-    }
-  }
-
-  private mergeColumnAdjustments(extra: Map<number, ColumnAdjustment[]>) {
-    for (const [line, entries] of extra) {
-      if (!this.columnAdjustments.has(line)) {
-        this.columnAdjustments.set(line, [...entries])
-        continue
-      }
-      const target = this.columnAdjustments.get(line)!
-      target.push(...entries)
-      target.sort((a, b) => a.startColumn - b.startColumn)
-    }
-  }
-
-  private removeObjectPropertyAssignmentSegments(
-    source: string,
-    segments: Array<{ start: number; end: number; replacement: string }>
-  ) {
-    const indicesToRemove = new Set<number>()
-
-    const visit = (node: ts.Node) => {
-      if (ts.isObjectLiteralExpression(node)) {
-        for (const property of node.properties) {
-          if (!ts.isPropertyAssignment(property)) {
-            continue
-          }
-          if (!ts.isIdentifier(property.name) && !ts.isStringLiteral(property.name) && !ts.isNumericLiteral(property.name)) {
-            continue
-          }
-          if (!property.initializer) {
-            continue
-          }
-          const nameEnd = property.name.getEnd()
-          const initializerStart = property.initializer.getStart(this.sourceFile, false)
-          if (initializerStart <= nameEnd) {
-            continue
-          }
-          const colonIndex = source.indexOf(':', nameEnd)
-          if (colonIndex < 0 || colonIndex >= initializerStart) {
-            continue
-          }
-          for (let index = 0; index < segments.length; index += 1) {
-            const segment = segments[index]
-            if (segment.start <= colonIndex && colonIndex < segment.end) {
-              indicesToRemove.add(index)
-            }
-          }
-        }
-      }
-      ts.forEachChild(node, visit)
-    }
-
-    visit(this.sourceFile)
-
-    if (indicesToRemove.size === 0) {
-      return
-    }
-
-    const filtered: typeof segments = []
-    for (let index = 0; index < segments.length; index += 1) {
-      if (!indicesToRemove.has(index)) {
-        filtered.push(segments[index])
-      }
-    }
-    segments.length = 0
-    segments.push(...filtered)
-  }
-
-  private countLeadingColumns(line: string): number {
-    let columns = 0
-    for (let index = 0; index < line.length; index += 1) {
-      const code = line.charCodeAt(index)
-      if (code === 0x20) {
-        columns += 1
-        continue
-      }
-      if (code === 0x09) {
-        columns += 1
-        continue
-      }
-      if (code === 0x0d || code === 0x0a) {
-        continue
-      }
-      break
-    }
-    return columns
-  }
-
-  private adjustColumnForTranspiled(line: number, column: number): number {
-    const entries = this.columnAdjustments.get(line)
-    if (!entries) {
-      return 0
-    }
-    let delta = 0
-    for (const entry of entries) {
-      if (column < entry.startColumn) {
-        break
-      }
-      delta += entry.delta
-    }
-    return delta
-  }
-
-  private collectCollapsedBlankLineSegments(
-    source: string,
-    segments: Array<{ start: number; end: number; replacement: string }>
-  ) {
-    const pattern = /(\r?\n)(?:\s*\r?\n)+/g
-    for (const match of source.matchAll(pattern)) {
-      const index = match.index ?? 0
-      const text = match[0]
-      if (!text) continue
-      const newline = match[1] ?? '\n'
-      const entry = { start: index, end: index + text.length, replacement: newline }
-      segments.push(entry)
-    }
-  }
-
-  private collectBlankLineAlignmentSegments(
-    source: string,
-    referenceJsSource: string,
-    segments: Array<{ start: number; end: number; replacement: string }>
-  ) {
-    const originalLines = this.getLineInfos(source)
-    const referenceLines = this.getLineInfos(referenceJsSource)
-
-    let refIndex = 0
-    const collapseLineIndices: number[] = []
-
-    for (let lineIndex = 0; lineIndex < originalLines.length; lineIndex += 1) {
-      const line = originalLines[lineIndex]
-      const isBlank = line.text.trim().length === 0
-      const refLine = refIndex < referenceLines.length ? referenceLines[refIndex] : undefined
-      const refIsBlank = refLine ? refLine.text.trim().length === 0 : false
-
-      if (isBlank) {
-        if (refLine && refIsBlank) {
-          refIndex += 1
-        } else {
-          collapseLineIndices.push(lineIndex)
-        }
-      } else if (refIndex < referenceLines.length) {
-        refIndex += 1
-      }
-    }
-
-    if (collapseLineIndices.length === 0) {
-      return
-    }
-
-    const ranges: Array<{ start: number; end: number }> = []
-    let rangeStart = collapseLineIndices[0]
-    let rangeEnd = collapseLineIndices[0]
-    for (let index = 1; index < collapseLineIndices.length; index += 1) {
-      const current = collapseLineIndices[index]
-      if (current === rangeEnd + 1) {
-        rangeEnd = current
-      } else {
-        ranges.push({ start: rangeStart, end: rangeEnd })
-        rangeStart = current
-        rangeEnd = current
-      }
-    }
-    ranges.push({ start: rangeStart, end: rangeEnd })
-
-    for (const range of ranges) {
-      const startLine = range.start
-      const endLine = range.end
-
-      const previousLine = startLine > 0 ? originalLines[startLine - 1] : undefined
-      const finalLine = originalLines[endLine]
-
-      let segmentStart: number
-      let replacement = ''
-
-      if (previousLine) {
-        segmentStart = previousLine.start + previousLine.text.length
-        replacement = previousLine.newline
-      } else {
-        segmentStart = originalLines[startLine].start
-      }
-
-      const segmentEnd = finalLine.start + finalLine.text.length + finalLine.newline.length
-
-      if (segmentEnd <= segmentStart) {
-        continue
-      }
-
-      segments.push({ start: segmentStart, end: segmentEnd, replacement })
-    }
-  }
-
-  private getLineInfos(text: string): Array<{ start: number; text: string; newline: string }> {
-    const lines = text.split(/\r?\n/)
-    const newlineValues: string[] = []
-    for (let index = 0; index < text.length; ) {
-      const code = text.charCodeAt(index)
-      if (code === 0x0d) {
-        if (index + 1 < text.length && text.charCodeAt(index + 1) === 0x0a) {
-          newlineValues.push('\r\n')
-          index += 2
-        } else {
-          newlineValues.push('\r')
-          index += 1
-        }
-        continue
-      }
-      if (code === 0x0a) {
-        newlineValues.push('\n')
-        index += 1
-        continue
-      }
-      index += 1
-    }
-
-    const infos: Array<{ start: number; text: string; newline: string }> = []
-    let offset = 0
-    for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
-      const textPart = lines[lineIndex] ?? ''
-      const newline = newlineValues[lineIndex] ?? ''
-      infos.push({ start: offset, text: textPart, newline })
-      offset += textPart.length + newline.length
-    }
-
-    if (lines.length === 0) {
-      infos.push({ start: 0, text: '', newline: '' })
-    }
-
-    return infos
-  }
-
   public withoutDebugRecording<T>(fn: () => T): T {
     const previous = this.suppressDebugRecording
     this.suppressDebugRecording = true
@@ -2969,7 +2103,7 @@ export class Compiler {
     }
     this.lineColCache = { offset: clampedOffset, line, rawColumn: column }
 
-    const adjustment = this.adjustColumnForTranspiled(line, column)
+    const adjustment = adjustColumnForTranspiled(this.columnAdjustments, line, column)
     const adjustedColumn = column + adjustment
     return {
       line,

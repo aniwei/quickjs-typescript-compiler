@@ -32,8 +32,8 @@ export function compileExpressionStatement(compiler: Compiler, node: ts.Expressi
 }
 
 const simpleStatementVisitors = new Map<ts.SyntaxKind, StatementVisitor>([
-  [ts.SyntaxKind.Block, (compiler, node) => compiler.compileBlock(node as ts.Block)],
-  [ts.SyntaxKind.ExpressionStatement, (compiler, node) => compiler.compileExpressionStatement(node as ts.ExpressionStatement)],
+  [ts.SyntaxKind.Block, (compiler, node) => compileBlockStatement(compiler, node as ts.Block)],
+  [ts.SyntaxKind.ExpressionStatement, (compiler, node) => compileExpressionStatement(compiler, node as ts.ExpressionStatement)],
 ])
 
 export function registerSimpleStatements(register: StatementVisitorRegistrar) {

@@ -1,29 +1,28 @@
-export interface CounterInstance {
-  value: number
-  increment(step?: number): number
+export class Counter {
+  private value
+
+  constructor(initial = 0) {
+    this.value = initial
+  }
+
+  increment(step = 1) {
+    this.value += step
+    return this.value
+  }
+
+  get current() {
+    return this.value
+  }
 }
 
-type CounterConstructor = new (initial?: number) => CounterInstance
-
-function CounterImpl(this: CounterInstance, initial: number = 0) {
-  this.value = initial
+export function createCounter(initial = 0) {
+  return new Counter(initial)
 }
 
-CounterImpl.prototype.increment = function (this: CounterInstance, step: number = 1): number {
-  this.value += step
-  return this.value
+export const sharedCounter = new Counter(42)
+
+export default class DefaultCounter extends Counter {
+  constructor() {
+    super(0)
+  }
 }
-
-export const Counter: CounterConstructor = CounterImpl as unknown as CounterConstructor
-
-const sharedCounter: CounterInstance = new Counter(10)
-sharedCounter.value = sharedCounter.increment(2)
-
-export function createCounter(initial: number = 0): CounterInstance {
-  const counter = new Counter(initial)
-  counter.value *= 2
-  return counter
-}
-
-export { sharedCounter }
-export default sharedCounter

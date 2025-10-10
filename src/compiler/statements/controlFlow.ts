@@ -3,6 +3,7 @@ import type { Compiler } from '../../compiler'
 import { Opcode, env } from '../../env'
 import type { StatementVisitor, StatementVisitorRegistrar } from '../visitors/statementVisitors'
 import { compileForInStatement, compileForOfStatement, compileForStatement, compileWhileStatement } from './loops'
+import { compileBlockStatement } from './simple/index'
 
 function labeledStatementVisitor(compiler: Compiler, node: ts.Statement) {
   compileLabeledStatement(compiler, node as ts.LabeledStatement)
@@ -19,7 +20,7 @@ function compileIfStatement(compiler: Compiler, node: ts.IfStatement) {
   compiler.emitJump(conditionalOpcode, elseLabel)
 
   if (ts.isBlock(node.thenStatement)) {
-    compiler.compileBlock(node.thenStatement)
+    compileBlockStatement(compiler, node.thenStatement)
   } else {
     compiler.compileStatement(node.thenStatement)
   }
@@ -33,7 +34,7 @@ function compileIfStatement(compiler: Compiler, node: ts.IfStatement) {
   if (hasElse) {
     const elseStatement = node.elseStatement!
     if (ts.isBlock(elseStatement)) {
-      compiler.compileBlock(elseStatement)
+      compileBlockStatement(compiler, elseStatement)
     } else {
       compiler.compileStatement(elseStatement)
     }
