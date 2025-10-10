@@ -12,6 +12,7 @@ import { Opcode, OpFormat, PC2Line, BytecodeTag, FunctionKind, JSMode, env, type
 import { getOpcodeDefinition } from './utils/opcode'
 import { getIndexedOpcode } from './utils/opcodeVariants'
 import { pruneUnusedClosureVars } from './compiler/core/closureVarUtils'
+import { buildHoistedDefinitionInstructions } from './compiler/module/moduleHoisting'
 import {
   adjustColumnForTranspiled,
   buildSourceMapping,
@@ -20,7 +21,6 @@ import {
   sortColumnAdjustments,
   type ColumnAdjustment,
 } from './compiler/debug/sourceMapping'
-import { buildHoistedDefinitionInstructions } from './compiler/module/moduleHoisting'
 import {
   ControlFlowBuilder,
   ControlFlowTarget,
@@ -2103,7 +2103,7 @@ export class Compiler {
     }
     this.lineColCache = { offset: clampedOffset, line, rawColumn: column }
 
-    const adjustment = adjustColumnForTranspiled(this.columnAdjustments, line, column)
+  const adjustment = adjustColumnForTranspiled(this.columnAdjustments, line, column)
     const adjustedColumn = column + adjustment
     return {
       line,

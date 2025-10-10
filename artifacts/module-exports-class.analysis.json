@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-10-10T14:41:25.448Z",
+  "timestamp": "2025-10-10T14:55:07.851Z",
   "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/module-exports-class.ts",
   "compilation": {
     "typescript": {
