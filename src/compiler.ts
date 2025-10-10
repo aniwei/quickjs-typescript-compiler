@@ -8,7 +8,7 @@ import { FunctionBytecode, type Instruction, type ConstantEntry } from './functi
 import { ScopeManager } from './scopeManager'
 import { ScopeKind } from './scopes'
 import { Var, VarKind, ClosureVar, VarDeclarationKind } from './vars'
-import { Opcode, OpFormat, BytecodeTag, FunctionKind, JSMode, env, type OpcodeDefinition } from './env'
+import { Opcode, OpFormat, BytecodeTag, FunctionKind, JSMode, env } from './env'
 import { getOpcodeDefinition } from './utils/opcode'
 import { getIndexedOpcode } from './utils/opcodeVariants'
 import { pruneUnusedClosureVars } from './compiler/core/closureVarUtils'
@@ -23,6 +23,7 @@ import {
 } from './compiler/debug/sourceMapping'
 import { computeFunctionStackSize } from './compiler/analysis/stackSize'
 import { buildFunctionDebugInfo } from './compiler/debug/pc2line'
+import { resolvePendingJumps as resolvePendingJumpEntries } from './compiler/analysis/jumpResolution'
 import {
   ControlFlowBuilder,
   ControlFlowTarget,
@@ -904,31 +905,12 @@ export class Compiler {
   }
 
   private resolvePendingJumps() {
-    const instructions = this.currentFunction.bytecode.instructions
-    for (const pending of this.pendingJumps) {
-      const target = this.labelPositions.get(pending.label)
-      if (target === undefined) {
-        throw new Error(`Unresolved label ${pending.label}`)
-      }
-  const def = getOpcodeDefinition(pending.opcode)
-      if (!def) {
-        throw new Error(`Unknown opcode ${pending.opcode}`)
-      }
-      const start = this.instructionOffsets[pending.index]
-      const baseOffset = this.getJumpBaseOffset(def)
-      const offset = target - (start + baseOffset)
-      if (def.format === OpFormat.label8) {
-        if (offset < -128 || offset > 127) {
-          throw new Error('Jump offset out of range for label8')
-        }
-      }
-      const instruction = instructions[pending.index]
-      if (instruction.operands.length === 0) {
-        instruction.operands.push(offset)
-      } else {
-        instruction.operands[instruction.operands.length - 1] = offset
-      }
-    }
+    resolvePendingJumpEntries({
+      pendingJumps: this.pendingJumps,
+      labelPositions: this.labelPositions,
+      instructionOffsets: this.instructionOffsets,
+      instructions: this.currentFunction.bytecode.instructions,
+    })
   }
 
   public declareLexicalVariable(
@@ -1342,21 +1324,6 @@ export class Compiler {
     }
 
     return { nPop, nPush: def.nPush }
-  }
-
-  private getJumpBaseOffset(def: OpcodeDefinition): number {
-    switch (def.format) {
-      case OpFormat.label:
-      case OpFormat.label8:
-      case OpFormat.label16:
-      case OpFormat.label_u16:
-        return 1
-      case OpFormat.atom_label_u8:
-      case OpFormat.atom_label_u16:
-        return 5
-      default:
-        return def.size
-    }
   }
 
   public pushScope(kind: ScopeKind = ScopeKind.Block) {
