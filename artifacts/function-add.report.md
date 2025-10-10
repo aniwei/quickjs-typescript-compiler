@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/function-add.ts
-**生成时间**: 2025-10-10T15:00:28.589Z
+**生成时间**: 2025-10-10T15:03:29.503Z
 
 ## 大小对比
 

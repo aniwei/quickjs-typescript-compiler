@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-10-10T15:00:28.597Z",
+  "timestamp": "2025-10-10T15:03:29.511Z",
   "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/loop-break.ts",
   "compilation": {
     "typescript": {

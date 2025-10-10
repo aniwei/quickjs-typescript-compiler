@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/tmp-switch-default-middle.ts
-**生成时间**: 2025-10-10T15:00:28.682Z
+**生成时间**: 2025-10-10T15:03:29.592Z
 
 ## 大小对比
 
