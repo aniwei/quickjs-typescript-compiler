@@ -5,6 +5,11 @@ import { getPushIntOpcode } from '../../utils/opcodeVariants'
 
 function emitStringLiteral(compiler: Compiler, value: string, node: ts.Node) {
   const atom = compiler.getAtomId(value)
+  const parent = node.parent
+  if (parent && ts.isBinaryExpression(parent) && parent.operatorToken.kind === ts.SyntaxKind.InKeyword && parent.left === node) {
+    compiler.emitInstruction(Opcode.OP_push_atom_value, [atom], null)
+    return
+  }
   compiler.emitInstruction(Opcode.OP_push_atom_value, [atom], node)
 }
 

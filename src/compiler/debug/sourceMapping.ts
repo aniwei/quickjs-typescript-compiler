@@ -434,7 +434,7 @@ export function buildSourceMapping(options: {
 			const text = match[0]
 			if (!text) continue
 			const newline = match[1] ?? '\n'
-			const entry: StripSegment = { start: index, end: index + text.length, replacement: newline }
+			const entry: StripSegment = { start: index, end: index + text.length, replacement: newline + newline }
 			segments.push(entry)
 		}
 	}
