@@ -105,7 +105,12 @@ export class LineRecorder {
     )
     this.recordedPositions.add(sourcePos)
 
-    if (!isStatementRecord && params.statementNode && params.recordNode === params.statementNode) {
+    if (
+      !isStatementRecord &&
+      params.statementNode &&
+      params.recordNode === params.statementNode &&
+      params.debugTsSourcePos === undefined
+    ) {
       const statementStart = params.statementNode.getStart(this.sourceFile, false)
       if (statementStart >= 0) {
         const statementPos = this.utf8Tracker.toUtf8Offset(statementStart)

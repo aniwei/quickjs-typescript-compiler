@@ -1,6 +1,7 @@
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
-import { Compiler, CompilerOptions } from './compiler'
+import * as ts from 'typescript'
+import { Compiler, type CompilerOptions } from './compiler'
 import { AtomTable } from './atoms'
 import { BytecodeWriter } from './bytecodeWriter'
 import { FunctionDef } from './functionDef'
@@ -21,12 +22,13 @@ export interface TypeScriptCompilerOptions extends CompileFlags {
 export class TypeScriptCompiler {
   private readonly atomTable: AtomTable
   private readonly compilerOptions: CompilerOptions
+  private readonly defaultReferenceJsSource: string | null | undefined
 
   constructor(options: TypeScriptCompilerOptions = {}) {
     this.atomTable = options.atomTable ?? new AtomTable()
+    this.defaultReferenceJsSource = options.referenceJsSource
     this.compilerOptions = {
       atomTable: this.atomTable,
-      referenceJsSource: options.referenceJsSource ?? undefined,
     }
   }
 
@@ -38,18 +40,7 @@ export class TypeScriptCompiler {
   async compileFileWithArtifacts(filePath: string): Promise<{ functionDef: FunctionDef; bytecode: Uint8Array }> {
     const source = await fs.readFile(filePath, 'utf-8')
     const relativePath = path.relative(process.cwd(), filePath) || filePath
-    let referenceJsSource = this.compilerOptions.referenceJsSource
-    if (referenceJsSource === undefined) {
-      const jsCandidate = filePath.replace(/\.ts$/i, '.js')
-      if (jsCandidate !== filePath) {
-        try {
-          referenceJsSource = await fs.readFile(jsCandidate, 'utf-8')
-        } catch {
-          referenceJsSource = undefined
-        }
-      }
-    }
-    return this.compileSourceWithArtifacts(source, relativePath, { referenceJsSource })
+    return this.compileSourceWithArtifacts(source, relativePath)
   }
 
   async compileSource(
@@ -57,32 +48,75 @@ export class TypeScriptCompiler {
     fileName = '<stdin>',
     options: { referenceJsSource?: string | null } = {}
   ): Promise<Uint8Array> {
-    let referenceJsSource = options.referenceJsSource
-    if (referenceJsSource === undefined && fileName !== '<stdin>') {
-      const resolved = path.isAbsolute(fileName) ? fileName : path.resolve(process.cwd(), fileName)
-      try {
-        referenceJsSource = await fs.readFile(resolved, 'utf-8')
-      } catch {
-        referenceJsSource = undefined
-      }
-    }
-
-    const { bytecode } = await this.compileSourceWithArtifacts(source, fileName, {
-      ...options,
-      referenceJsSource,
-    })
+    const { bytecode } = await this.compileSourceWithArtifacts(source, fileName, options)
     return bytecode
   }
 
-  async compileSourceWithArtifacts(source: string, fileName = '<stdin>', options: { referenceJsSource?: string | null } = {}): Promise<{ functionDef: FunctionDef; bytecode: Uint8Array }> {
+  async compileSourceWithArtifacts(
+    source: string,
+    fileName = '<stdin>',
+    options: { referenceJsSource?: string | null } = {}
+  ): Promise<{ functionDef: FunctionDef; bytecode: Uint8Array }> {
+    const referenceJsSource = await this.resolveReferenceJsSource(source, fileName, options.referenceJsSource)
     const compiler = new Compiler(fileName, source, {
       ...this.compilerOptions,
-      referenceJsSource: options.referenceJsSource ?? this.compilerOptions.referenceJsSource,
+      referenceJsSource,
     })
     const functionDef = compiler.compile()
     const writer = new BytecodeWriter(this.atomTable)
     const bytecode = writer.writeModule(functionDef)
     return { functionDef, bytecode }
+  }
+
+  private async resolveReferenceJsSource(
+    source: string,
+    fileName: string,
+    explicit: string | null | undefined
+  ): Promise<string | null | undefined> {
+    if (explicit !== undefined) {
+      return explicit
+    }
+    if (this.defaultReferenceJsSource !== undefined) {
+      return this.defaultReferenceJsSource
+    }
+
+    if (fileName !== '<stdin>') {
+      const absolutePath = path.isAbsolute(fileName) ? fileName : path.resolve(process.cwd(), fileName)
+      const jsCandidate = absolutePath.replace(/\.(cts|mts|tsx|ts)$/i, '.js')
+      if (jsCandidate !== absolutePath) {
+        try {
+          const jsSource = await fs.readFile(jsCandidate, 'utf-8')
+          return jsSource
+        } catch {
+          // ignore: fall back to transpilation below
+        }
+      }
+    }
+
+    return this.transpileReferenceSource(source, fileName)
+  }
+
+  private transpileReferenceSource(source: string, fileName: string): string | undefined {
+    try {
+      const result = ts.transpileModule(source, {
+        fileName,
+        compilerOptions: {
+          module: ts.ModuleKind.ESNext,
+          target: ts.ScriptTarget.ES2020,
+          jsx: ts.JsxEmit.Preserve,
+          importHelpers: false,
+          esModuleInterop: false,
+        },
+        reportDiagnostics: false,
+      })
+      const output = result.outputText
+      if (!output) {
+        return undefined
+      }
+      return output.replace(/\r\n/g, '\n')
+    } catch {
+      return undefined
+    }
   }
 }
 

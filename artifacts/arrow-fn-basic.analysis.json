@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-10-11T19:50:03.988Z",
+  "timestamp": "2025-10-11T20:06:13.806Z",
   "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/arrow-fn-basic.ts",
   "compilation": {
     "typescript": {
