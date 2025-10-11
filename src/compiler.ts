@@ -13,14 +13,12 @@ import { getOpcodeDefinition } from './utils/opcode'
 import { getIndexedOpcode } from './utils/opcodeVariants'
 import { pruneUnusedClosureVars } from './compiler/core/closureVarUtils'
 import { buildHoistedDefinitionInstructions } from './compiler/module/moduleHoisting'
+import { emitModulePrologue } from './compiler/module/modulePrologue'
 import {
-  adjustColumnForTranspiled,
-  buildSourceMapping,
-  computeReferenceColumnAdjustments,
-  mergeColumnAdjustments,
-  sortColumnAdjustments,
-  type ColumnAdjustment,
-} from './compiler/debug/sourceMapping'
+  LineRecorder,
+  type LineRecorderSnapshot,
+} from './compiler/debug/lineRecorder'
+import { buildSourceMapping, computeReferenceColumnAdjustments, mergeColumnAdjustments, sortColumnAdjustments } from './compiler/debug/sourceMapping'
 import { computeFunctionStackSize } from './compiler/analysis/stackSize'
 import { getInstructionSize, getStackEffect as getOpcodeStackEffect } from './compiler/analysis/opcodeInfo'
 import { buildFunctionDebugInfo } from './compiler/debug/pc2line'
@@ -45,6 +43,11 @@ import {
   getCallExpressionOpenParenPos as locateCallOpenParen,
   getNewExpressionOpenParenPos as locateNewOpenParen,
 } from './compiler/utils/sourceNavigation'
+import {
+  Utf8PositionTracker,
+  type Utf8PositionTrackerSnapshot,
+  createUtf8PositionTracker,
+} from './compiler/debug/utf8PositionTracker'
 import {
   ControlFlowBuilder,
   ControlFlowTarget,
@@ -76,8 +79,8 @@ interface FunctionContextSnapshot {
   labelCounter: number
   labelPositions: Map<string, number>
   pendingJumps: Array<{ index: number; label: string; opcode: Opcode }>
-  lineColCache: { offset: number; line: number; rawColumn: number }
-  recordedStatementPositions: Set<number>
+  utf8PositionSnapshot: Utf8PositionTrackerSnapshot
+  lineRecorderSnapshot: LineRecorderSnapshot
   hasExplicitReturn: boolean
   moduleHoistInsertionIndex: number | null
   moduleHoistLabel: string | null
@@ -118,12 +121,8 @@ export class Compiler {
   })
   private readonly loopCleanup = new LoopCleanupManager()
   private readonly lexicalInitByScope = new Map<number, { insertionIndex: number }>()
-  private readonly sourceUtf8: Uint8Array
-  private readonly utf8OffsetByPos: Uint32Array
-  private readonly normalizedPosByPos: Uint32Array
-  private lineColCache = { offset: 0, line: 0, rawColumn: 0 }
-  private columnAdjustments: Map<number, ColumnAdjustment[]> = new Map()
-  private readonly recordedStatementPositions = new Set<number>()
+  private readonly utf8Tracker: Utf8PositionTracker
+  private readonly lineRecorder: LineRecorder
   private hasExplicitReturn = false
   private moduleHoistInsertionIndex: number | null = null
   private moduleHoistLabel: string | null = null
@@ -158,8 +157,7 @@ export class Compiler {
       sourceFile: this.sourceFile,
       referenceJsSource: options.referenceJsSource ?? undefined,
     })
-    this.normalizedPosByPos = normalizedPosByPos
-    this.columnAdjustments = columnAdjustments
+    const columnAdjustmentMap = columnAdjustments
     if (options.referenceJsSource !== undefined) {
       const referenceAdjustments = computeReferenceColumnAdjustments(
         strippedSource,
@@ -167,28 +165,17 @@ export class Compiler {
         options.referenceJsSource,
         this.fileName
       )
-      mergeColumnAdjustments(this.columnAdjustments, referenceAdjustments)
+      mergeColumnAdjustments(columnAdjustmentMap, referenceAdjustments)
     }
-    sortColumnAdjustments(this.columnAdjustments)
+    sortColumnAdjustments(columnAdjustmentMap)
 
-    const encoder = new TextEncoder()
-    this.sourceUtf8 = encoder.encode(strippedSource)
-    this.utf8OffsetByPos = new Uint32Array(strippedSource.length + 1)
-    let utf8Offset = 0
-    let index = 0
-    this.utf8OffsetByPos[0] = 0
-    while (index < strippedSource.length) {
-      const codePoint = strippedSource.codePointAt(index) ?? 0
-      const step = codePoint > 0xffff ? 2 : 1
-      utf8Offset += this.getUtf8ByteLength(codePoint)
-      for (let j = 1; j <= step; j++) {
-        const target = index + j
-        if (target <= strippedSource.length) {
-          this.utf8OffsetByPos[target] = utf8Offset
-        }
-      }
-      index += step
-    }
+    this.utf8Tracker = createUtf8PositionTracker({
+      strippedSource,
+      normalizedPosByPos,
+      columnAdjustments: columnAdjustmentMap,
+    })
+
+    this.lineRecorder = new LineRecorder(this.sourceFile, this.utf8Tracker)
 
   }
 
@@ -219,7 +206,15 @@ export class Compiler {
 
     this.pushScope(ScopeKind.Function)
     this.withStatementNode(this.sourceFile, () => {
-      this.emitModulePrologue()
+      const prologue = emitModulePrologue({
+        withoutDebugRecording: (fn) => this.withoutDebugRecording(fn),
+        emitOpcode: (opcode, operands, node) => this.emitOpcode(opcode, operands ?? [], node),
+        emitJump: (opcode, label) => this.emitJump(opcode, label),
+        createLabel: () => this.createLabel(),
+        markLabel: (label) => this.markLabel(label),
+      })
+      this.moduleHoistInsertionIndex = prologue.hoistInsertionIndex
+      this.moduleHoistLabel = prologue.hoistLabel
     })
     ts.forEachChild(this.sourceFile, (node) => this.visitNode(node))
     this.withoutDebugRecording(() => {
@@ -252,12 +247,12 @@ export class Compiler {
     this.pendingJumps.length = 0
     this.currentSourceNode = null
     this.currentStatementNode = null
-    this.lineColCache = { offset: 0, line: 0, rawColumn: 0 }
-    this.recordedStatementPositions.clear()
+    this.utf8Tracker.resetCache()
+  this.lineRecorder.reset()
     this.hasExplicitReturn = false
     this.moduleHoistLabel = null
     this.controlFlow.reset()
-  this.loopCleanup.reset()
+    this.loopCleanup.reset()
     this.lexicalInitByScope.clear()
   }
 
@@ -295,13 +290,13 @@ export class Compiler {
       labelCounter: this.labelCounter,
       labelPositions: new Map(this.labelPositions),
       pendingJumps: this.pendingJumps.map((entry) => ({ ...entry })),
-      lineColCache: { ...this.lineColCache },
-      recordedStatementPositions: new Set(this.recordedStatementPositions),
+      utf8PositionSnapshot: this.utf8Tracker.createSnapshot(),
+  lineRecorderSnapshot: this.lineRecorder.createSnapshot(),
       hasExplicitReturn: this.hasExplicitReturn,
       moduleHoistInsertionIndex: this.moduleHoistInsertionIndex,
       moduleHoistLabel: this.moduleHoistLabel,
       controlFlowTargets: this.controlFlow.createSnapshot(),
-  loopCleanupEntries: this.loopCleanup.getEntries(),
+      loopCleanupEntries: this.loopCleanup.getEntries(),
     }
   }
 
@@ -329,11 +324,8 @@ export class Compiler {
     for (const entry of snapshot.pendingJumps) {
       this.pendingJumps.push({ ...entry })
     }
-    this.lineColCache = { ...snapshot.lineColCache }
-    this.recordedStatementPositions.clear()
-    for (const value of snapshot.recordedStatementPositions) {
-      this.recordedStatementPositions.add(value)
-    }
+    this.utf8Tracker.restoreSnapshot(snapshot.utf8PositionSnapshot)
+    this.lineRecorder.restoreSnapshot(snapshot.lineRecorderSnapshot)
     this.hasExplicitReturn = snapshot.hasExplicitReturn
     this.moduleHoistInsertionIndex = snapshot.moduleHoistInsertionIndex
     this.moduleHoistLabel = snapshot.moduleHoistLabel
@@ -1009,19 +1001,6 @@ export class Compiler {
     })
   }
 
-  private emitModulePrologue() {
-    this.withoutDebugRecording(() => {
-      this.emitOpcode(Opcode.OP_push_this)
-      const conditionalOpcode = env.supportsShortOpcodes ? Opcode.OP_if_false8 : Opcode.OP_if_false
-      const skipReturnLabel = this.createLabel()
-      this.emitJump(conditionalOpcode, skipReturnLabel)
-      const returnIndex = this.emitOpcode(Opcode.OP_return_undef)
-      this.moduleHoistInsertionIndex = returnIndex
-      this.moduleHoistLabel = skipReturnLabel
-      this.markLabel(skipReturnLabel)
-    })
-  }
-
   public isGlobalVarContext(): boolean {
     return this.currentFunction.isGlobalVar
   }
@@ -1164,18 +1143,6 @@ export class Compiler {
     return offset
   }
 
-  private getNormalizedPosition(pos: number): number {
-    if (pos <= 0) {
-      return 0
-    }
-
-    if (pos >= this.normalizedPosByPos.length) {
-      return this.normalizedPosByPos[this.normalizedPosByPos.length - 1]
-    }
-
-    return this.normalizedPosByPos[pos]
-  }
-
   public emitInstruction(
     opcode: Opcode,
     operands: number[] = [],
@@ -1212,42 +1179,17 @@ export class Compiler {
       })
     }
 
-    if (!this.suppressDebugRecording && (recordNode || debugOptions?.tsSourcePos !== undefined)) {
-      let tsSourcePos = debugOptions?.tsSourcePos
-      if (tsSourcePos === undefined && recordNode) {
-        tsSourcePos = recordNode.getStart(this.sourceFile, false)
-      }
-      if (tsSourcePos !== undefined && tsSourcePos >= 0) {
-        const sourcePos = this.toUtf8Offset(tsSourcePos)
-        const statementNode = this.currentStatementNode
-        const isStatementRecord = debugOptions?.tsSourcePos === undefined && node === undefined && recordNode === statementNode
-        if (!this.recordedStatementPositions.has(sourcePos)) {
-          let { line, column } = this.getLineColumnFromUtf8Offset(sourcePos)
-          if (process.env.DEBUG_PC2LINE === '1') {
-            console.log('pc2line:record', {
-              offset: this.currentOffset,
-              instructionIndex,
-              opcode: Opcode[opcode],
-              nodeKind: recordNode ? ts.SyntaxKind[recordNode.kind] : null,
-              isStatementRecord,
-              tsSourcePos,
-              sourcePos,
-              line,
-              column,
-            })
-          }
-          this.currentFunction.bytecode.recordLineNumber(this.currentOffset, line, column, sourcePos, instructionIndex)
-          this.recordedStatementPositions.add(sourcePos)
-          if (!isStatementRecord && statementNode && recordNode === statementNode) {
-            const statementStart = statementNode.getStart(this.sourceFile, false)
-            if (statementStart >= 0) {
-              const statementPos = this.toUtf8Offset(statementStart)
-              this.recordedStatementPositions.add(statementPos)
-            }
-          }
-        }
-      }
-    }
+    this.lineRecorder.recordInstruction({
+      suppressDebugRecording: this.suppressDebugRecording,
+      recordNode,
+      statementNode: this.currentStatementNode,
+      debugTsSourcePos: debugOptions?.tsSourcePos,
+      nodeArgumentWasUndefined: node === undefined,
+      opcode,
+      currentFunction: this.currentFunction,
+      currentOffset: this.currentOffset,
+      instructionIndex,
+    })
 
     const { nPop, nPush } = getOpcodeStackEffect(opcode, operands)
 
@@ -1267,21 +1209,12 @@ export class Compiler {
   }
 
   private recordDebugPoint(node: ts.Node) {
-    if (this.suppressDebugRecording) {
-      return
-    }
-    const tsSourcePos = node.getStart(this.sourceFile, false)
-    if (tsSourcePos < 0) {
-      return
-    }
-    const sourcePos = this.toUtf8Offset(tsSourcePos)
-    if (this.recordedStatementPositions.has(sourcePos)) {
-      return
-    }
-    const { line, column } = this.getLineColumnFromUtf8Offset(sourcePos)
-    const instructionIndex = this.currentFunction.bytecode.instructions.length
-    this.currentFunction.bytecode.recordLineNumber(this.currentOffset, line, column, sourcePos, instructionIndex)
-    this.recordedStatementPositions.add(sourcePos)
+    this.lineRecorder.recordDebugPoint({
+      suppressDebugRecording: this.suppressDebugRecording,
+      node,
+      currentFunction: this.currentFunction,
+      currentOffset: this.currentOffset,
+    })
   }
 
   public pushScope(kind: ScopeKind = ScopeKind.Block) {
@@ -1364,70 +1297,15 @@ export class Compiler {
   }
 
   private toUtf8Offset(pos: number): number {
-    const normalizedPos = this.getNormalizedPosition(pos)
-    if (normalizedPos <= 0) {
-      return 0
-    }
-    if (normalizedPos >= this.utf8OffsetByPos.length) {
-      return this.utf8OffsetByPos[this.utf8OffsetByPos.length - 1]
-    }
-    return this.utf8OffsetByPos[normalizedPos]
+    return this.utf8Tracker.toUtf8Offset(pos)
   }
 
   private getLineColumnFromUtf8Offset(offset: number): { line: number; column: number } {
-    const clampedOffset = Math.max(0, Math.min(offset, this.sourceUtf8.length))
-    const cache = this.lineColCache
-    let line: number
-    let column: number
-    if (clampedOffset >= cache.offset) {
-      line = cache.line
-      column = cache.rawColumn
-      for (let i = cache.offset; i < clampedOffset; i++) {
-        const byte = this.sourceUtf8[i]
-        if (byte === 0x0a) {
-          line += 1
-          column = 0
-        } else if (byte < 0x80 || byte >= 0xc0) {
-          column += 1
-        }
-      }
-    } else {
-      line = 0
-      column = 0
-      for (let i = 0; i < clampedOffset; i++) {
-        const byte = this.sourceUtf8[i]
-        if (byte === 0x0a) {
-          line += 1
-          column = 0
-        } else if (byte < 0x80 || byte >= 0xc0) {
-          column += 1
-        }
-      }
-    }
-    this.lineColCache = { offset: clampedOffset, line, rawColumn: column }
-
-  const adjustment = adjustColumnForTranspiled(this.columnAdjustments, line, column)
-    const adjustedColumn = column + adjustment
-    return {
-      line,
-      column: adjustedColumn < 0 ? 0 : adjustedColumn,
-    }
+    return this.utf8Tracker.getLineColumnFromUtf8Offset(offset)
   }
 
   private findLineStartUtf8Offset(offset: number): number {
-    let current = offset
-    while (current > 0) {
-      const byte = this.sourceUtf8[current - 1]
-      if (byte === 0x0a) {
-        break
-      }
-      if (byte >= 0x80 && byte < 0xc0) {
-        current -= 1
-        continue
-      }
-      current -= 1
-    }
-    return current
+    return this.utf8Tracker.findLineStartUtf8Offset(offset)
   }
 
   private shouldAdjustStatementIndent(statement: ts.Node): boolean {
@@ -1447,23 +1325,7 @@ export class Compiler {
   }
 
   private computeIndentColumnsFromUtf8Offset(offset: number): number {
-    let indent = 0
-    for (let index = offset; index < this.sourceUtf8.length; index += 1) {
-      const byte = this.sourceUtf8[index]
-      if (byte === 0x20) {
-        indent += 1
-        continue
-      }
-      if (byte === 0x09) {
-        indent += 1
-        continue
-      }
-      if (byte === 0x0d) {
-        continue
-      }
-      break
-    }
-    return indent
+    return this.utf8Tracker.computeIndentColumnsFromUtf8Offset(offset)
   }
 
   private remapScopeLevel(func: FunctionDef, scopeLevel: number): number {
@@ -1485,12 +1347,6 @@ export class Compiler {
     return adjusted
   }
 
-  private getUtf8ByteLength(codePoint: number): number {
-    if (codePoint <= 0x7f) return 1
-    if (codePoint <= 0x7ff) return 2
-    if (codePoint <= 0xffff) return 3
-    return 4
-  }
 }
 
 export function createNewCompiler(fileName: string, sourceCode: string, options: CompilerOptions = {}) {
