@@ -21,7 +21,7 @@ export function buildSourceMapping(options: {
 	collectStripSegments(source, /(?<=\b[_$a-zA-Z][_$0-9a-zA-Z]*)[ \t]*:(?![ \t]*\()[ \t]*[^=;,\){}\r\n]+(?=\s*[,)])/g, segments)
 	collectStripSegments(source, /:[ \t]*(?!\()[ \t]*[^=;,\){}\r\n]+(?=\s*[=;,){}])/g, segments)
 	removeObjectPropertyAssignmentSegments(source, sourceFile, segments)
-	collectStripSegments(source, /<\s*[^>]+\s*>/g, segments)
+	collectTypeArgumentAndParameterSegments(source, sourceFile, segments)
 	collectStripSegments(source, /\b(interface|type)\s+\w+\s*=\s*[^;]+;?/g, segments)
 	collectStripSegments(source, /\s+as\s+const\b/g, segments)
 
@@ -156,6 +156,22 @@ export function buildSourceMapping(options: {
 			if (delta !== 0) {
 				addColumnAdjustment(adjustments, lineIndex, originalIndent, delta)
 			}
+
+			const originalIndentLength = getLeadingWhitespaceLength(originalLine)
+			const comparisonIndentLength = getLeadingWhitespaceLength(comparisonLine)
+			const originalIndexStart = Math.min(originalIndentLength, originalLine.length)
+			const comparisonIndexStart = Math.min(comparisonIndentLength, comparisonLine.length)
+			applyIntraLineColumnAdjustments(
+				adjustments,
+				lineIndex,
+				originalLine,
+				comparisonLine,
+				originalIndexStart,
+				comparisonIndexStart,
+				originalIndent,
+				comparisonIndent,
+				delta
+			)
 		}
 
 		sortColumnAdjustments(adjustments)
@@ -305,6 +321,110 @@ export function buildSourceMapping(options: {
 		}
 		segments.length = 0
 		segments.push(...filtered)
+	}
+
+	function collectTypeArgumentAndParameterSegments(
+		source: string,
+		sourceFile: ts.SourceFile,
+		segments: StripSegment[]
+	) {
+		const pushSegment = (start: number, end: number) => {
+			if (start < 0 || end <= start) {
+				return
+			}
+			segments.push({ start, end, replacement: '' })
+		}
+
+		const addNodeArrayRange = (nodeArray?: ts.NodeArray<ts.Node>) => {
+			if (!nodeArray || nodeArray.length === 0) {
+				return
+			}
+			const range = findAngleBracketRange(source, nodeArray.pos, nodeArray.end)
+			if (range) {
+				pushSegment(range.start, range.end)
+			}
+		}
+
+		const visit = (node: ts.Node) => {
+			if (
+				ts.isCallExpression(node) ||
+				ts.isNewExpression(node) ||
+				ts.isExpressionWithTypeArguments(node) ||
+				ts.isJsxOpeningLikeElement(node)
+			) {
+				addNodeArrayRange(node.typeArguments)
+			}
+
+			if (ts.isTypeReferenceNode(node)) {
+				addNodeArrayRange(node.typeArguments)
+			}
+
+			if (
+				ts.isFunctionDeclaration(node) ||
+				ts.isFunctionExpression(node) ||
+				ts.isArrowFunction(node) ||
+				ts.isMethodDeclaration(node) ||
+				ts.isConstructorDeclaration(node) ||
+				ts.isGetAccessorDeclaration(node) ||
+				ts.isSetAccessorDeclaration(node) ||
+				ts.isClassDeclaration(node) ||
+				ts.isClassExpression(node) ||
+				ts.isInterfaceDeclaration(node) ||
+				ts.isTypeAliasDeclaration(node)
+			) {
+				addNodeArrayRange(node.typeParameters)
+			}
+
+			if (ts.isTypeAssertionExpression(node)) {
+				const range = findAngleBracketRange(source, node.type.pos, node.type.end)
+				if (range) {
+					pushSegment(range.start, range.end)
+				}
+			}
+
+			ts.forEachChild(node, visit)
+		}
+
+		visit(sourceFile)
+	}
+
+	function findAngleBracketRange(source: string, contentStart: number, contentEnd: number): { start: number; end: number } | null {
+		let start = contentStart
+		while (start > 0) {
+			const code = source.charCodeAt(start - 1) | 0
+			if (code === 60 /* < */) {
+				start -= 1
+				break
+			}
+			if (!ts.isWhiteSpaceLike(code)) {
+				return null
+			}
+			start -= 1
+		}
+
+		if (start < 0 || source.charCodeAt(start) !== 60 /* < */) {
+			return null
+		}
+
+		let end = contentEnd
+		while (end < source.length) {
+			const code = source.charCodeAt(end) | 0
+			if (code === 62 /* > */) {
+				end += 1
+				break
+			}
+			if (!ts.isWhiteSpaceLike(code)) {
+				end += 1
+				continue
+			}
+			end += 1
+		}
+
+		if (end > source.length || source.charCodeAt(end - 1) !== 62 /* > */) {
+			return null
+		}
+
+		return { start, end }
 	}
 
 	function collectCollapsedBlankLineSegments(source: string, segments: StripSegment[]) {
@@ -464,6 +584,86 @@ export function buildSourceMapping(options: {
 		return { line, column }
 	}
 
+		function applyIntraLineColumnAdjustments(
+			map: Map<number, ColumnAdjustment[]>,
+			line: number,
+			originalLine: string,
+			referenceLine: string,
+			originalIndexStart: number,
+			referenceIndexStart: number,
+			originalColumnStart: number,
+			referenceColumnStart: number,
+			initialDelta: number
+		) {
+			let originalIndex = originalIndexStart
+			let referenceIndex = referenceIndexStart
+			let originalColumn = originalColumnStart
+			let referenceColumn = referenceColumnStart
+			let activeDelta = initialDelta
+			let mismatch = false
+
+			const applyDelta = (column: number, desiredDelta: number) => {
+				const deltaChange = desiredDelta - activeDelta
+				if (deltaChange !== 0) {
+					addColumnAdjustment(map, line, column, deltaChange)
+					activeDelta = desiredDelta
+				}
+			}
+
+			while (originalIndex < originalLine.length && referenceIndex < referenceLine.length) {
+				const originalCodePoint = originalLine.codePointAt(originalIndex) ?? 0
+				const referenceCodePoint = referenceLine.codePointAt(referenceIndex) ?? 0
+
+				if (originalCodePoint === referenceCodePoint) {
+					const desiredDelta = referenceColumn - originalColumn
+					applyDelta(originalColumn, desiredDelta)
+					const originalStep = originalCodePoint > 0xffff ? 2 : 1
+					const referenceStep = referenceCodePoint > 0xffff ? 2 : 1
+					originalIndex += originalStep
+					referenceIndex += referenceStep
+					originalColumn += 1
+					referenceColumn += 1
+					continue
+				}
+
+				if (isWhitespaceCode(referenceCodePoint) && !isWhitespaceCode(originalCodePoint)) {
+					const referenceStep = referenceCodePoint > 0xffff ? 2 : 1
+					referenceIndex += referenceStep
+					referenceColumn += 1
+					continue
+				}
+
+				if (isWhitespaceCode(originalCodePoint) && !isWhitespaceCode(referenceCodePoint)) {
+					const desiredDelta = referenceColumn - originalColumn
+					applyDelta(originalColumn, desiredDelta)
+					const originalStep = originalCodePoint > 0xffff ? 2 : 1
+					originalIndex += originalStep
+					originalColumn += 1
+					continue
+				}
+
+				mismatch = true
+				break
+			}
+
+			if (!mismatch) {
+				const desiredDelta = referenceColumn - originalColumn
+				applyDelta(originalColumn, desiredDelta)
+			}
+		}
+
+		function getLeadingWhitespaceLength(line: string): number {
+			let index = 0
+			while (index < line.length) {
+				const code = line.charCodeAt(index)
+				if (!isWhitespaceCode(code)) {
+					break
+				}
+				index += 1
+			}
+			return index
+		}
+
 	function addColumnAdjustment(
 		map: Map<number, ColumnAdjustment[]>,
 		line: number,
@@ -475,6 +675,10 @@ export function buildSourceMapping(options: {
 		}
 		map.get(line)!.push({ startColumn, delta })
 	}
+
+		function isWhitespaceCode(code: number): boolean {
+			return code === 0x20 || code === 0x09 || code === 0x0d || code === 0x0a
+		}
 
 	function countLeadingColumns(line: string): number {
 		let columns = 0

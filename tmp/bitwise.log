@@ -1,0 +1,1593 @@
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+pc2line:emit {
+  opcode: 'OP_push_this',
+  offset: 0,
+  instructionIndex: 0,
+  recordNodeKind: 'SourceFile',
+  currentStatementKind: 'SourceFile',
+  currentSourceKind: 'SourceFile',
+  hasDebugOptions: false,
+  suppress: true
+}
+pc2line:emit {
+  opcode: 'OP_if_false8',
+  offset: 1,
+  instructionIndex: 1,
+  recordNodeKind: null,
+  currentStatementKind: 'SourceFile',
+  currentSourceKind: 'SourceFile',
+  hasDebugOptions: false,
+  suppress: true
+}
+pc2line:emit {
+  opcode: 'OP_return_undef',
+  offset: 3,
+  instructionIndex: 2,
+  recordNodeKind: 'SourceFile',
+  currentStatementKind: 'SourceFile',
+  currentSourceKind: 'SourceFile',
+  hasDebugOptions: false,
+  suppress: true
+}
+pc2line:emit {
+  opcode: 'OP_get_arg0',
+  offset: 3,
+  instructionIndex: 1,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 3,
+  instructionIndex: 1,
+  opcode: 'OP_get_arg0',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 73,
+  sourcePos: 73,
+  line: 1,
+  column: 22
+}
+pc2line:emit {
+  opcode: 'OP_push_2',
+  offset: 4,
+  instructionIndex: 2,
+  recordNodeKind: null,
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'FirstLiteralToken',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:emit {
+  opcode: 'OP_shl',
+  offset: 5,
+  instructionIndex: 3,
+  recordNodeKind: 'LessThanLessThanToken',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 5,
+  instructionIndex: 3,
+  opcode: 'OP_shl',
+  nodeKind: 'LessThanLessThanToken',
+  isStatementRecord: false,
+  tsSourcePos: 79,
+  sourcePos: 79,
+  line: 1,
+  column: 28
+}
+pc2line:emit {
+  opcode: 'OP_put_loc0',
+  offset: 6,
+  instructionIndex: 4,
+  recordNodeKind: 'FirstStatement',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'VariableDeclaration',
+  hasDebugOptions: false,
+  suppress: true
+}
+pc2line:emit {
+  opcode: 'OP_get_arg0',
+  offset: 10,
+  instructionIndex: 6,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:emit {
+  opcode: 'OP_push_1',
+  offset: 11,
+  instructionIndex: 7,
+  recordNodeKind: null,
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'FirstLiteralToken',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:emit {
+  opcode: 'OP_sar',
+  offset: 12,
+  instructionIndex: 8,
+  recordNodeKind: 'GreaterThanGreaterThanToken',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:emit {
+  opcode: 'OP_put_loc1',
+  offset: 13,
+  instructionIndex: 9,
+  recordNodeKind: 'FirstStatement',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'VariableDeclaration',
+  hasDebugOptions: false,
+  suppress: true
+}
+pc2line:emit {
+  opcode: 'OP_get_arg0',
+  offset: 17,
+  instructionIndex: 11,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 17,
+  instructionIndex: 11,
+  opcode: 'OP_get_arg0',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 140,
+  sourcePos: 107,
+  line: 2,
+  column: 26
+}
+pc2line:emit {
+  opcode: 'OP_push_1',
+  offset: 18,
+  instructionIndex: 12,
+  recordNodeKind: null,
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'FirstLiteralToken',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:emit {
+  opcode: 'OP_shr',
+  offset: 19,
+  instructionIndex: 13,
+  recordNodeKind: 'GreaterThanGreaterThanGreaterThanToken',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 19,
+  instructionIndex: 13,
+  opcode: 'OP_shr',
+  nodeKind: 'GreaterThanGreaterThanGreaterThanToken',
+  isStatementRecord: false,
+  tsSourcePos: 146,
+  sourcePos: 113,
+  line: 2,
+  column: 32
+}
+pc2line:emit {
+  opcode: 'OP_put_loc2',
+  offset: 20,
+  instructionIndex: 14,
+  recordNodeKind: 'FirstStatement',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'VariableDeclaration',
+  hasDebugOptions: false,
+  suppress: true
+}
+pc2line:emit {
+  opcode: 'OP_get_arg0',
+  offset: 24,
+  instructionIndex: 16,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 24,
+  instructionIndex: 16,
+  opcode: 'OP_get_arg0',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 168,
+  sourcePos: 135,
+  line: 3,
+  column: 18
+}
+pc2line:emit {
+  opcode: 'OP_push_3',
+  offset: 25,
+  instructionIndex: 17,
+  recordNodeKind: null,
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'FirstLiteralToken',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:emit {
+  opcode: 'OP_pow',
+  offset: 26,
+  instructionIndex: 18,
+  recordNodeKind: 'AsteriskAsteriskToken',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 26,
+  instructionIndex: 18,
+  opcode: 'OP_pow',
+  nodeKind: 'AsteriskAsteriskToken',
+  isStatementRecord: false,
+  tsSourcePos: 174,
+  sourcePos: 141,
+  line: 3,
+  column: 24
+}
+pc2line:emit {
+  opcode: 'OP_put_loc3',
+  offset: 27,
+  instructionIndex: 19,
+  recordNodeKind: 'FirstStatement',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'VariableDeclaration',
+  hasDebugOptions: false,
+  suppress: true
+}
+pc2line:emit {
+  opcode: 'OP_get_arg0',
+  offset: 31,
+  instructionIndex: 21,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 31,
+  instructionIndex: 21,
+  opcode: 'OP_get_arg0',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 200,
+  sourcePos: 167,
+  line: 4,
+  column: 23
+}
+pc2line:emit {
+  opcode: 'OP_get_arg1',
+  offset: 32,
+  instructionIndex: 22,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 32,
+  instructionIndex: 22,
+  opcode: 'OP_get_arg1',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 208,
+  sourcePos: 175,
+  line: 4,
+  column: 31
+}
+pc2line:emit {
+  opcode: 'OP_and',
+  offset: 33,
+  instructionIndex: 23,
+  recordNodeKind: 'AmpersandToken',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 33,
+  instructionIndex: 23,
+  opcode: 'OP_and',
+  nodeKind: 'AmpersandToken',
+  isStatementRecord: false,
+  tsSourcePos: 206,
+  sourcePos: 173,
+  line: 4,
+  column: 29
+}
+pc2line:emit {
+  opcode: 'OP_put_loc8',
+  offset: 34,
+  instructionIndex: 24,
+  recordNodeKind: 'FirstStatement',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'VariableDeclaration',
+  hasDebugOptions: false,
+  suppress: true
+}
+pc2line:emit {
+  opcode: 'OP_get_arg0',
+  offset: 39,
+  instructionIndex: 26,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 39,
+  instructionIndex: 26,
+  opcode: 'OP_get_arg0',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 233,
+  sourcePos: 200,
+  line: 5,
+  column: 22
+}
+pc2line:emit {
+  opcode: 'OP_get_arg1',
+  offset: 40,
+  instructionIndex: 27,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 40,
+  instructionIndex: 27,
+  opcode: 'OP_get_arg1',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 241,
+  sourcePos: 208,
+  line: 5,
+  column: 30
+}
+pc2line:emit {
+  opcode: 'OP_or',
+  offset: 41,
+  instructionIndex: 28,
+  recordNodeKind: 'BarToken',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 41,
+  instructionIndex: 28,
+  opcode: 'OP_or',
+  nodeKind: 'BarToken',
+  isStatementRecord: false,
+  tsSourcePos: 239,
+  sourcePos: 206,
+  line: 5,
+  column: 28
+}
+pc2line:emit {
+  opcode: 'OP_put_loc8',
+  offset: 42,
+  instructionIndex: 29,
+  recordNodeKind: 'FirstStatement',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'VariableDeclaration',
+  hasDebugOptions: false,
+  suppress: true
+}
+pc2line:emit {
+  opcode: 'OP_get_arg0',
+  offset: 47,
+  instructionIndex: 31,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 47,
+  instructionIndex: 31,
+  opcode: 'OP_get_arg0',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 267,
+  sourcePos: 234,
+  line: 6,
+  column: 23
+}
+pc2line:emit {
+  opcode: 'OP_get_arg1',
+  offset: 48,
+  instructionIndex: 32,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 48,
+  instructionIndex: 32,
+  opcode: 'OP_get_arg1',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 275,
+  sourcePos: 242,
+  line: 6,
+  column: 31
+}
+pc2line:emit {
+  opcode: 'OP_xor',
+  offset: 49,
+  instructionIndex: 33,
+  recordNodeKind: 'CaretToken',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 49,
+  instructionIndex: 33,
+  opcode: 'OP_xor',
+  nodeKind: 'CaretToken',
+  isStatementRecord: false,
+  tsSourcePos: 273,
+  sourcePos: 240,
+  line: 6,
+  column: 29
+}
+pc2line:emit {
+  opcode: 'OP_put_loc8',
+  offset: 50,
+  instructionIndex: 34,
+  recordNodeKind: 'FirstStatement',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'VariableDeclaration',
+  hasDebugOptions: false,
+  suppress: true
+}
+pc2line:emit {
+  opcode: 'OP_push_atom_value',
+  offset: 55,
+  instructionIndex: 36,
+  recordNodeKind: 'StringLiteral',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'StringLiteral',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 55,
+  instructionIndex: 36,
+  opcode: 'OP_push_atom_value',
+  nodeKind: 'StringLiteral',
+  isStatementRecord: false,
+  tsSourcePos: 297,
+  sourcePos: 264,
+  line: 7,
+  column: 19
+}
+pc2line:emit {
+  opcode: 'OP_get_arg2',
+  offset: 60,
+  instructionIndex: 37,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 60,
+  instructionIndex: 37,
+  opcode: 'OP_get_arg2',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 306,
+  sourcePos: 273,
+  line: 7,
+  column: 28
+}
+pc2line:emit {
+  opcode: 'OP_in',
+  offset: 61,
+  instructionIndex: 38,
+  recordNodeKind: 'InKeyword',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 61,
+  instructionIndex: 38,
+  opcode: 'OP_in',
+  nodeKind: 'InKeyword',
+  isStatementRecord: false,
+  tsSourcePos: 303,
+  sourcePos: 270,
+  line: 7,
+  column: 25
+}
+pc2line:emit {
+  opcode: 'OP_put_loc8',
+  offset: 62,
+  instructionIndex: 39,
+  recordNodeKind: 'FirstStatement',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'VariableDeclaration',
+  hasDebugOptions: false,
+  suppress: true
+}
+pc2line:emit {
+  opcode: 'OP_get_arg2',
+  offset: 67,
+  instructionIndex: 41,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 67,
+  instructionIndex: 41,
+  opcode: 'OP_get_arg2',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 331,
+  sourcePos: 298,
+  line: 8,
+  column: 23
+}
+pc2line:emit {
+  opcode: 'OP_get_arg3',
+  offset: 68,
+  instructionIndex: 42,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 68,
+  instructionIndex: 42,
+  opcode: 'OP_get_arg3',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 346,
+  sourcePos: 313,
+  line: 8,
+  column: 38
+}
+pc2line:emit {
+  opcode: 'OP_instanceof',
+  offset: 69,
+  instructionIndex: 43,
+  recordNodeKind: 'InstanceOfKeyword',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 69,
+  instructionIndex: 43,
+  opcode: 'OP_instanceof',
+  nodeKind: 'InstanceOfKeyword',
+  isStatementRecord: false,
+  tsSourcePos: 335,
+  sourcePos: 302,
+  line: 8,
+  column: 27
+}
+pc2line:emit {
+  opcode: 'OP_put_loc8',
+  offset: 70,
+  instructionIndex: 44,
+  recordNodeKind: 'FirstStatement',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'VariableDeclaration',
+  hasDebugOptions: false,
+  suppress: true
+}
+pc2line:emit {
+  opcode: 'OP_get_loc_check',
+  offset: 75,
+  instructionIndex: 46,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 75,
+  instructionIndex: 46,
+  opcode: 'OP_get_loc_check',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 371,
+  sourcePos: 337,
+  line: 10,
+  column: 4
+}
+pc2line:emit {
+  opcode: 'OP_get_loc_check',
+  offset: 78,
+  instructionIndex: 47,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 78,
+  instructionIndex: 47,
+  opcode: 'OP_get_loc_check',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 387,
+  sourcePos: 353,
+  line: 11,
+  column: 8
+}
+pc2line:emit {
+  opcode: 'OP_add',
+  offset: 81,
+  instructionIndex: 48,
+  recordNodeKind: 'PlusToken',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 81,
+  instructionIndex: 48,
+  opcode: 'OP_add',
+  nodeKind: 'PlusToken',
+  isStatementRecord: false,
+  tsSourcePos: 381,
+  sourcePos: 347,
+  line: 10,
+  column: 14
+}
+pc2line:emit {
+  opcode: 'OP_get_loc_check',
+  offset: 82,
+  instructionIndex: 49,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 82,
+  instructionIndex: 49,
+  opcode: 'OP_get_loc_check',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 404,
+  sourcePos: 370,
+  line: 12,
+  column: 8
+}
+pc2line:emit {
+  opcode: 'OP_add',
+  offset: 85,
+  instructionIndex: 50,
+  recordNodeKind: 'PlusToken',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 85,
+  instructionIndex: 50,
+  opcode: 'OP_add',
+  nodeKind: 'PlusToken',
+  isStatementRecord: false,
+  tsSourcePos: 398,
+  sourcePos: 364,
+  line: 11,
+  column: 19
+}
+pc2line:emit {
+  opcode: 'OP_get_loc_check',
+  offset: 86,
+  instructionIndex: 51,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 86,
+  instructionIndex: 51,
+  opcode: 'OP_get_loc_check',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 424,
+  sourcePos: 390,
+  line: 13,
+  column: 8
+}
+pc2line:emit {
+  opcode: 'OP_add',
+  offset: 89,
+  instructionIndex: 52,
+  recordNodeKind: 'PlusToken',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 89,
+  instructionIndex: 52,
+  opcode: 'OP_add',
+  nodeKind: 'PlusToken',
+  isStatementRecord: false,
+  tsSourcePos: 418,
+  sourcePos: 384,
+  line: 12,
+  column: 22
+}
+pc2line:emit {
+  opcode: 'OP_get_loc_check',
+  offset: 90,
+  instructionIndex: 53,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 90,
+  instructionIndex: 53,
+  opcode: 'OP_get_loc_check',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 436,
+  sourcePos: 402,
+  line: 14,
+  column: 8
+}
+pc2line:emit {
+  opcode: 'OP_add',
+  offset: 93,
+  instructionIndex: 54,
+  recordNodeKind: 'PlusToken',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 93,
+  instructionIndex: 54,
+  opcode: 'OP_add',
+  nodeKind: 'PlusToken',
+  isStatementRecord: false,
+  tsSourcePos: 430,
+  sourcePos: 396,
+  line: 13,
+  column: 14
+}
+pc2line:emit {
+  opcode: 'OP_get_loc_check',
+  offset: 94,
+  instructionIndex: 55,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 94,
+  instructionIndex: 55,
+  opcode: 'OP_get_loc_check',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 453,
+  sourcePos: 419,
+  line: 15,
+  column: 8
+}
+pc2line:emit {
+  opcode: 'OP_add',
+  offset: 97,
+  instructionIndex: 56,
+  recordNodeKind: 'PlusToken',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 97,
+  instructionIndex: 56,
+  opcode: 'OP_add',
+  nodeKind: 'PlusToken',
+  isStatementRecord: false,
+  tsSourcePos: 447,
+  sourcePos: 413,
+  line: 14,
+  column: 19
+}
+pc2line:emit {
+  opcode: 'OP_get_loc_check',
+  offset: 98,
+  instructionIndex: 57,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 98,
+  instructionIndex: 57,
+  opcode: 'OP_get_loc_check',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 469,
+  sourcePos: 435,
+  line: 16,
+  column: 8
+}
+pc2line:emit {
+  opcode: 'OP_add',
+  offset: 101,
+  instructionIndex: 58,
+  recordNodeKind: 'PlusToken',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 101,
+  instructionIndex: 58,
+  opcode: 'OP_add',
+  nodeKind: 'PlusToken',
+  isStatementRecord: false,
+  tsSourcePos: 463,
+  sourcePos: 429,
+  line: 15,
+  column: 18
+}
+pc2line:emit {
+  opcode: 'OP_put_loc8',
+  offset: 102,
+  instructionIndex: 59,
+  recordNodeKind: 'FirstStatement',
+  currentStatementKind: 'FirstStatement',
+  currentSourceKind: 'VariableDeclaration',
+  hasDebugOptions: false,
+  suppress: true
+}
+pc2line:statement-start-skip {
+  offset: 104,
+  nodeKind: 'IfStatement',
+  tsSourcePos: 483,
+  sourcePos: 448,
+  line: 17,
+  column: 4
+}
+pc2line:emit {
+  opcode: 'OP_get_loc_check',
+  offset: 104,
+  instructionIndex: 60,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'IfStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 104,
+  instructionIndex: 60,
+  opcode: 'OP_get_loc_check',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 487,
+  sourcePos: 452,
+  line: 17,
+  column: 8
+}
+pc2line:emit {
+  opcode: 'OP_if_false8',
+  offset: 107,
+  instructionIndex: 61,
+  recordNodeKind: null,
+  currentStatementKind: 'IfStatement',
+  currentSourceKind: 'IfStatement',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:statement-start-skip {
+  offset: 109,
+  nodeKind: 'IfStatement',
+  tsSourcePos: 501,
+  sourcePos: 466,
+  line: 18,
+  column: 8
+}
+pc2line:emit {
+  opcode: 'OP_get_loc_check',
+  offset: 109,
+  instructionIndex: 62,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'IfStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 109,
+  instructionIndex: 62,
+  opcode: 'OP_get_loc_check',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 505,
+  sourcePos: 470,
+  line: 18,
+  column: 12
+}
+pc2line:emit {
+  opcode: 'OP_if_false8',
+  offset: 112,
+  instructionIndex: 63,
+  recordNodeKind: null,
+  currentStatementKind: 'IfStatement',
+  currentSourceKind: 'IfStatement',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:emit {
+  opcode: 'OP_get_loc_check',
+  offset: 114,
+  instructionIndex: 64,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'ReturnStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 114,
+  instructionIndex: 64,
+  opcode: 'OP_get_loc_check',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 532,
+  sourcePos: 497,
+  line: 19,
+  column: 19
+}
+pc2line:emit {
+  opcode: 'OP_push_2',
+  offset: 117,
+  instructionIndex: 65,
+  recordNodeKind: null,
+  currentStatementKind: 'ReturnStatement',
+  currentSourceKind: 'FirstLiteralToken',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:emit {
+  opcode: 'OP_add',
+  offset: 118,
+  instructionIndex: 66,
+  recordNodeKind: 'PlusToken',
+  currentStatementKind: 'ReturnStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 118,
+  instructionIndex: 66,
+  opcode: 'OP_add',
+  nodeKind: 'PlusToken',
+  isStatementRecord: false,
+  tsSourcePos: 537,
+  sourcePos: 502,
+  line: 19,
+  column: 24
+}
+pc2line:emit {
+  opcode: 'OP_return',
+  offset: 119,
+  instructionIndex: 67,
+  recordNodeKind: 'ReturnStatement',
+  currentStatementKind: 'ReturnStatement',
+  currentSourceKind: 'ReturnStatement',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 119,
+  instructionIndex: 67,
+  opcode: 'OP_return',
+  nodeKind: 'ReturnStatement',
+  isStatementRecord: false,
+  tsSourcePos: 525,
+  sourcePos: 490,
+  line: 19,
+  column: 12
+}
+pc2line:emit {
+  opcode: 'OP_get_loc_check',
+  offset: 120,
+  instructionIndex: 68,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'ReturnStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 120,
+  instructionIndex: 68,
+  opcode: 'OP_get_loc_check',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 558,
+  sourcePos: 523,
+  line: 21,
+  column: 15
+}
+pc2line:emit {
+  opcode: 'OP_push_1',
+  offset: 123,
+  instructionIndex: 69,
+  recordNodeKind: null,
+  currentStatementKind: 'ReturnStatement',
+  currentSourceKind: 'FirstLiteralToken',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:emit {
+  opcode: 'OP_add',
+  offset: 124,
+  instructionIndex: 70,
+  recordNodeKind: 'PlusToken',
+  currentStatementKind: 'ReturnStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 124,
+  instructionIndex: 70,
+  opcode: 'OP_add',
+  nodeKind: 'PlusToken',
+  isStatementRecord: false,
+  tsSourcePos: 563,
+  sourcePos: 528,
+  line: 21,
+  column: 20
+}
+pc2line:emit {
+  opcode: 'OP_return',
+  offset: 125,
+  instructionIndex: 71,
+  recordNodeKind: 'ReturnStatement',
+  currentStatementKind: 'ReturnStatement',
+  currentSourceKind: 'ReturnStatement',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 125,
+  instructionIndex: 71,
+  opcode: 'OP_return',
+  nodeKind: 'ReturnStatement',
+  isStatementRecord: false,
+  tsSourcePos: 551,
+  sourcePos: 516,
+  line: 21,
+  column: 8
+}
+pc2line:statement-start-skip {
+  offset: 126,
+  nodeKind: 'IfStatement',
+  tsSourcePos: 574,
+  sourcePos: 538,
+  line: 23,
+  column: 4
+}
+pc2line:emit {
+  opcode: 'OP_get_loc_check',
+  offset: 126,
+  instructionIndex: 72,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'IfStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 126,
+  instructionIndex: 72,
+  opcode: 'OP_get_loc_check',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 578,
+  sourcePos: 542,
+  line: 23,
+  column: 8
+}
+pc2line:emit {
+  opcode: 'OP_if_false8',
+  offset: 129,
+  instructionIndex: 73,
+  recordNodeKind: null,
+  currentStatementKind: 'IfStatement',
+  currentSourceKind: 'IfStatement',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:emit {
+  opcode: 'OP_get_loc_check',
+  offset: 131,
+  instructionIndex: 74,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'ReturnStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 131,
+  instructionIndex: 74,
+  opcode: 'OP_get_loc_check',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 603,
+  sourcePos: 567,
+  line: 24,
+  column: 15
+}
+pc2line:emit {
+  opcode: 'OP_push_1',
+  offset: 134,
+  instructionIndex: 75,
+  recordNodeKind: null,
+  currentStatementKind: 'ReturnStatement',
+  currentSourceKind: 'FirstLiteralToken',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:emit {
+  opcode: 'OP_add',
+  offset: 135,
+  instructionIndex: 76,
+  recordNodeKind: 'PlusToken',
+  currentStatementKind: 'ReturnStatement',
+  currentSourceKind: 'BinaryExpression',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 135,
+  instructionIndex: 76,
+  opcode: 'OP_add',
+  nodeKind: 'PlusToken',
+  isStatementRecord: false,
+  tsSourcePos: 608,
+  sourcePos: 572,
+  line: 24,
+  column: 20
+}
+pc2line:emit {
+  opcode: 'OP_return',
+  offset: 136,
+  instructionIndex: 77,
+  recordNodeKind: 'ReturnStatement',
+  currentStatementKind: 'ReturnStatement',
+  currentSourceKind: 'ReturnStatement',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 136,
+  instructionIndex: 77,
+  opcode: 'OP_return',
+  nodeKind: 'ReturnStatement',
+  isStatementRecord: false,
+  tsSourcePos: 596,
+  sourcePos: 560,
+  line: 24,
+  column: 8
+}
+pc2line:emit {
+  opcode: 'OP_get_loc_check',
+  offset: 137,
+  instructionIndex: 78,
+  recordNodeKind: 'Identifier',
+  currentStatementKind: 'ReturnStatement',
+  currentSourceKind: 'Identifier',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 137,
+  instructionIndex: 78,
+  opcode: 'OP_get_loc_check',
+  nodeKind: 'Identifier',
+  isStatementRecord: false,
+  tsSourcePos: 626,
+  sourcePos: 589,
+  line: 26,
+  column: 11
+}
+pc2line:emit {
+  opcode: 'OP_return',
+  offset: 140,
+  instructionIndex: 79,
+  recordNodeKind: 'ReturnStatement',
+  currentStatementKind: 'ReturnStatement',
+  currentSourceKind: 'ReturnStatement',
+  hasDebugOptions: false,
+  suppress: false
+}
+pc2line:record {
+  offset: 140,
+  instructionIndex: 79,
+  opcode: 'OP_return',
+  nodeKind: 'ReturnStatement',
+  isStatementRecord: false,
+  tsSourcePos: 619,
+  sourcePos: 582,
+  line: 26,
+  column: 4
+}
+pc2line:rawTable [
+  { pc: 30, sourcePos: 7 },
+  { pc: 30, sourcePos: 73 },
+  { pc: 32, sourcePos: 79 },
+  { pc: 38, sourcePos: 107 },
+  { pc: 40, sourcePos: 113 },
+  { pc: 42, sourcePos: 135 },
+  { pc: 44, sourcePos: 141 },
+  { pc: 46, sourcePos: 167 },
+  { pc: 47, sourcePos: 175 },
+  { pc: 48, sourcePos: 173 },
+  { pc: 51, sourcePos: 200 },
+  { pc: 52, sourcePos: 208 },
+  { pc: 53, sourcePos: 206 },
+  { pc: 56, sourcePos: 234 },
+  { pc: 57, sourcePos: 242 },
+  { pc: 58, sourcePos: 240 },
+  { pc: 61, sourcePos: 264 },
+  { pc: 66, sourcePos: 273 },
+  { pc: 67, sourcePos: 270 },
+  { pc: 70, sourcePos: 298 },
+  { pc: 71, sourcePos: 313 },
+  { pc: 72, sourcePos: 302 },
+  { pc: 75, sourcePos: 337 },
+  { pc: 78, sourcePos: 353 },
+  { pc: 81, sourcePos: 347 },
+  { pc: 82, sourcePos: 370 },
+  { pc: 85, sourcePos: 364 },
+  { pc: 86, sourcePos: 390 },
+  { pc: 89, sourcePos: 384 },
+  { pc: 90, sourcePos: 402 },
+  { pc: 93, sourcePos: 396 },
+  { pc: 94, sourcePos: 419 },
+  { pc: 97, sourcePos: 413 },
+  { pc: 98, sourcePos: 435 },
+  { pc: 101, sourcePos: 429 },
+  { pc: 104, sourcePos: 452 },
+  { pc: 109, sourcePos: 470 },
+  { pc: 114, sourcePos: 497 },
+  { pc: 118, sourcePos: 502 },
+  { pc: 119, sourcePos: 490 },
+  { pc: 120, sourcePos: 523 },
+  { pc: 124, sourcePos: 528 },
+  { pc: 125, sourcePos: 516 },
+  { pc: 126, sourcePos: 542 },
+  { pc: 131, sourcePos: 567 },
+  { pc: 135, sourcePos: 572 },
+  { pc: 136, sourcePos: 560 },
+  { pc: 137, sourcePos: 589 },
+  { pc: 140, sourcePos: 582 }
+]
+pc2line:trackedEntries [
+  { pc: 30, sourcePos: 73 },
+  { pc: 32, sourcePos: 79 },
+  { pc: 38, sourcePos: 107 },
+  { pc: 40, sourcePos: 113 },
+  { pc: 42, sourcePos: 135 },
+  { pc: 44, sourcePos: 141 },
+  { pc: 46, sourcePos: 167 },
+  { pc: 47, sourcePos: 175 },
+  { pc: 48, sourcePos: 173 },
+  { pc: 51, sourcePos: 200 },
+  { pc: 52, sourcePos: 208 },
+  { pc: 53, sourcePos: 206 },
+  { pc: 56, sourcePos: 234 },
+  { pc: 57, sourcePos: 242 },
+  { pc: 58, sourcePos: 240 },
+  { pc: 61, sourcePos: 264 },
+  { pc: 66, sourcePos: 273 },
+  { pc: 67, sourcePos: 270 },
+  { pc: 70, sourcePos: 298 },
+  { pc: 71, sourcePos: 313 },
+  { pc: 72, sourcePos: 302 },
+  { pc: 75, sourcePos: 337 },
+  { pc: 78, sourcePos: 353 },
+  { pc: 81, sourcePos: 347 },
+  { pc: 82, sourcePos: 370 },
+  { pc: 85, sourcePos: 364 },
+  { pc: 86, sourcePos: 390 },
+  { pc: 89, sourcePos: 384 },
+  { pc: 90, sourcePos: 402 },
+  { pc: 93, sourcePos: 396 },
+  { pc: 94, sourcePos: 419 },
+  { pc: 97, sourcePos: 413 },
+  { pc: 98, sourcePos: 435 },
+  { pc: 101, sourcePos: 429 },
+  { pc: 104, sourcePos: 452 },
+  { pc: 109, sourcePos: 470 },
+  { pc: 114, sourcePos: 497 },
+  { pc: 118, sourcePos: 502 },
+  { pc: 119, sourcePos: 490 },
+  { pc: 120, sourcePos: 523 },
+  { pc: 124, sourcePos: 528 },
+  { pc: 125, sourcePos: 516 },
+  { pc: 126, sourcePos: 542 },
+  { pc: 131, sourcePos: 567 },
+  { pc: 135, sourcePos: 572 },
+  { pc: 136, sourcePos: 560 },
+  { pc: 137, sourcePos: 589 },
+  { pc: 140, sourcePos: 582 }
+]
+pc2line:encoded [
+   0,  7, 153, 30, 12, 12, 33,  3, 12, 12, 13, 27,
+  12, 12,  13,  1,  7, 16,  7,  3, 18, 13,  7, 16,
+   7,  3,  18,  9,  7, 16,  7,  3, 18, 19, 27, 18,
+   7,  5,  18,  3,  7, 30,  7, 21, 19, 45, 18,  8,
+  16, 12,   9, 11, 16, 22,  9, 21, 16, 28,  9, 27,
+  16, 12,   9, 11, 16, 22,  9, 21, 16, 20, 19, 19,
+  28,  8,  28, 14, 22, 10,  7, 23,  9,  6, 22, 10,
+   7, 23,   9,  0, 28, 14, 22, 10,  7, 23,  9,  6,
+  17, 13
+]
+pc2line:emit {
+  opcode: 'OP_undefined',
+  offset: 4,
+  instructionIndex: 3,
+  recordNodeKind: 'SourceFile',
+  currentStatementKind: 'SourceFile',
+  currentSourceKind: 'SourceFile',
+  hasDebugOptions: false,
+  suppress: true
+}
+pc2line:emit {
+  opcode: 'OP_return_async',
+  offset: 5,
+  instructionIndex: 4,
+  recordNodeKind: 'SourceFile',
+  currentStatementKind: 'SourceFile',
+  currentSourceKind: 'SourceFile',
+  hasDebugOptions: false,
+  suppress: true
+}
+pc2line:rawTable []
+pc2line:trackedEntries []
+pc2line:encoded [ 0, 0 ]
+🌐 Compiling with QuickJS WASM...
+[pc2line] trace init env=<unset> enabled=1
+[pc2line] start func=0x479c8 source_pos=7 line=0 col=7
+[pc2line] slot i=0 pc=30 source_pos=75 diff_pc=30 diff_line=1 diff_col=15 short_op=152 new_pc=30 new_line=1 new_col=22
+[pc2line] slot i=1 pc=32 source_pos=81 diff_pc=2 diff_line=0 diff_col=6 short_op=11 new_pc=32 new_line=1 new_col=28
+[pc2line] slot i=2 pc=34 source_pos=110 diff_pc=2 diff_line=1 diff_col=-5 short_op=12 new_pc=34 new_line=2 new_col=23
+[pc2line] slot i=3 pc=36 source_pos=116 diff_pc=2 diff_line=0 diff_col=6 short_op=11 new_pc=36 new_line=2 new_col=29
+[pc2line] slot i=4 pc=38 source_pos=148 diff_pc=2 diff_line=1 diff_col=-3 short_op=12 new_pc=38 new_line=3 new_col=26
+[pc2line] slot i=5 pc=40 source_pos=154 diff_pc=2 diff_line=0 diff_col=6 short_op=11 new_pc=40 new_line=3 new_col=32
+[pc2line] slot i=6 pc=42 source_pos=179 diff_pc=2 diff_line=1 diff_col=-14 short_op=12 new_pc=42 new_line=4 new_col=18
+[pc2line] slot i=7 pc=44 source_pos=185 diff_pc=2 diff_line=0 diff_col=6 short_op=11 new_pc=44 new_line=4 new_col=24
+[pc2line] slot i=8 pc=46 source_pos=214 diff_pc=2 diff_line=1 diff_col=-1 short_op=12 new_pc=46 new_line=5 new_col=23
+[pc2line] slot i=9 pc=47 source_pos=222 diff_pc=1 diff_line=0 diff_col=8 short_op=6 new_pc=47 new_line=5 new_col=31
+[pc2line] slot i=10 pc=48 source_pos=220 diff_pc=1 diff_line=0 diff_col=-2 short_op=6 new_pc=48 new_line=5 new_col=29
+[pc2line] slot i=11 pc=51 source_pos=250 diff_pc=3 diff_line=1 diff_col=-7 short_op=17 new_pc=51 new_line=6 new_col=22
+[pc2line] slot i=12 pc=52 source_pos=258 diff_pc=1 diff_line=0 diff_col=8 short_op=6 new_pc=52 new_line=6 new_col=30
+[pc2line] slot i=13 pc=53 source_pos=256 diff_pc=1 diff_line=0 diff_col=-2 short_op=6 new_pc=53 new_line=6 new_col=28
+[pc2line] slot i=14 pc=56 source_pos=287 diff_pc=3 diff_line=1 diff_col=-5 short_op=17 new_pc=56 new_line=7 new_col=23
+[pc2line] slot i=15 pc=57 source_pos=295 diff_pc=1 diff_line=0 diff_col=8 short_op=6 new_pc=57 new_line=7 new_col=31
+[pc2line] slot i=16 pc=58 source_pos=293 diff_pc=1 diff_line=0 diff_col=-2 short_op=6 new_pc=58 new_line=7 new_col=29
+[pc2line] slot i=17 pc=66 source_pos=329 diff_pc=8 diff_line=1 diff_col=-1 short_op=42 new_pc=66 new_line=8 new_col=28
+[pc2line] slot i=18 pc=67 source_pos=326 diff_pc=1 diff_line=0 diff_col=-3 short_op=6 new_pc=67 new_line=8 new_col=25
+[pc2line] slot i=19 pc=70 source_pos=357 diff_pc=3 diff_line=1 diff_col=-2 short_op=17 new_pc=70 new_line=9 new_col=23
+[pc2line] slot i=20 pc=71 source_pos=372 diff_pc=1 diff_line=0 diff_col=15 short_op=6 new_pc=71 new_line=9 new_col=38
+[pc2line] slot i=21 pc=72 source_pos=361 diff_pc=1 diff_line=0 diff_col=-11 short_op=6 new_pc=72 new_line=9 new_col=27
+[pc2line] slot i=22 pc=75 source_pos=395 diff_pc=3 diff_line=1 diff_col=-10 short_op=17 new_pc=75 new_line=10 new_col=17
+[pc2line] slot i=23 pc=78 source_pos=415 diff_pc=3 diff_line=1 diff_col=-9 short_op=17 new_pc=78 new_line=11 new_col=8
+[pc2line] slot i=24 pc=81 source_pos=405 diff_pc=3 diff_line=-1 diff_col=19 short_op=15 new_pc=81 new_line=10 new_col=27
+[pc2line] slot i=25 pc=82 source_pos=436 diff_pc=1 diff_line=2 diff_col=-19 short_op=8 new_pc=82 new_line=12 new_col=8
+[pc2line] slot i=26 pc=85 source_pos=426 diff_pc=3 diff_line=-1 diff_col=11 short_op=15 new_pc=85 new_line=11 new_col=19
+[pc2line] slot i=27 pc=86 source_pos=460 diff_pc=1 diff_line=2 diff_col=-11 short_op=8 new_pc=86 new_line=13 new_col=8
+[pc2line] slot i=28 pc=89 source_pos=450 diff_pc=3 diff_line=-1 diff_col=14 short_op=15 new_pc=89 new_line=12 new_col=22
+[pc2line] slot i=29 pc=90 source_pos=476 diff_pc=1 diff_line=2 diff_col=-14 short_op=8 new_pc=90 new_line=14 new_col=8
+[pc2line] slot i=30 pc=93 source_pos=466 diff_pc=3 diff_line=-1 diff_col=6 short_op=15 new_pc=93 new_line=13 new_col=14
+[pc2line] slot i=31 pc=94 source_pos=497 diff_pc=1 diff_line=2 diff_col=-6 short_op=8 new_pc=94 new_line=15 new_col=8
+[pc2line] slot i=32 pc=97 source_pos=487 diff_pc=3 diff_line=-1 diff_col=11 short_op=15 new_pc=97 new_line=14 new_col=19
+[pc2line] slot i=33 pc=98 source_pos=517 diff_pc=1 diff_line=2 diff_col=-11 short_op=8 new_pc=98 new_line=16 new_col=8
+[pc2line] slot i=34 pc=101 source_pos=507 diff_pc=3 diff_line=-1 diff_col=10 short_op=15 new_pc=101 new_line=15 new_col=18
+[pc2line] slot i=35 pc=104 source_pos=537 diff_pc=3 diff_line=2 diff_col=-10 short_op=18 new_pc=104 new_line=17 new_col=8
+[pc2line] slot i=36 pc=109 source_pos=559 diff_pc=5 diff_line=1 diff_col=4 short_op=27 new_pc=109 new_line=18 new_col=12
+[pc2line] slot i=37 pc=114 source_pos=592 diff_pc=5 diff_line=1 diff_col=7 short_op=27 new_pc=114 new_line=19 new_col=19
+[pc2line] slot i=38 pc=118 source_pos=597 diff_pc=4 diff_line=0 diff_col=5 short_op=21 new_pc=118 new_line=19 new_col=24
+[pc2line] slot i=39 pc=119 source_pos=585 diff_pc=1 diff_line=0 diff_col=-12 short_op=6 new_pc=119 new_line=19 new_col=12
+[pc2line] slot i=40 pc=120 source_pos=627 diff_pc=1 diff_line=2 diff_col=3 short_op=8 new_pc=120 new_line=21 new_col=15
+[pc2line] slot i=41 pc=124 source_pos=632 diff_pc=4 diff_line=0 diff_col=5 short_op=21 new_pc=124 new_line=21 new_col=20
+[pc2line] slot i=42 pc=125 source_pos=620 diff_pc=1 diff_line=0 diff_col=-12 short_op=6 new_pc=125 new_line=21 new_col=8
+[pc2line] slot i=43 pc=126 source_pos=651 diff_pc=1 diff_line=2 diff_col=0 short_op=8 new_pc=126 new_line=23 new_col=8
+[pc2line] slot i=44 pc=131 source_pos=680 diff_pc=5 diff_line=1 diff_col=7 short_op=27 new_pc=131 new_line=24 new_col=15
+[pc2line] slot i=45 pc=135 source_pos=685 diff_pc=4 diff_line=0 diff_col=5 short_op=21 new_pc=135 new_line=24 new_col=20
+[pc2line] slot i=46 pc=136 source_pos=673 diff_pc=1 diff_line=0 diff_col=-12 short_op=6 new_pc=136 new_line=24 new_col=8
+[pc2line] slot i=47 pc=137 source_pos=707 diff_pc=1 diff_line=2 diff_col=3 short_op=8 new_pc=137 new_line=26 new_col=11
+[pc2line] slot i=48 pc=140 source_pos=700 diff_pc=3 diff_line=0 diff_col=-7 short_op=16 new_pc=140 new_line=26 new_col=4
+__tests__/compiler/fixtures/bitwise-ops.js:1:8: function: bitwiseOps
+  mode: strict
+  args: value mask obj ctor
+  locals:
+    0: const shiftLeft [level:1 next:-1]
+    1: const shiftRight [level:1 next:0]
+    2: const shiftUnsigned [level:1 next:1]
+    3: const power [level:1 next:2]
+    4: const bitwiseAnd [level:1 next:3]
+    5: const bitwiseOr [level:1 next:4]
+    6: const bitwiseXor [level:1 next:5]
+    7: const hasKey [level:1 next:6]
+    8: const isInstance [level:1 next:7]
+    9: const base [level:1 next:8]
+  stack_size: 2
+  opcodes:
+        set_loc_uninitialized 9: base
+        set_loc_uninitialized 8: isInstance
+        set_loc_uninitialized 7: hasKey
+        set_loc_uninitialized 6: bitwiseXor
+        set_loc_uninitialized 5: bitwiseOr
+        set_loc_uninitialized 4: bitwiseAnd
+        set_loc_uninitialized 3: power
+        set_loc_uninitialized 2: shiftUnsigned
+        set_loc_uninitialized 1: shiftRight
+        set_loc_uninitialized 0: shiftLeft
+        get_arg0 0: value
+        push_2 2
+        shl
+        put_loc0 0: shiftLeft
+        get_arg0 0: value
+        push_1 1
+        sar
+        put_loc1 1: shiftRight
+        get_arg0 0: value
+        push_1 1
+        shr
+        put_loc2 2: shiftUnsigned
+        get_arg0 0: value
+        push_3 3
+        pow
+        put_loc3 3: power
+        get_arg0 0: value
+        get_arg1 1: mask
+        and
+        put_loc8 4: bitwiseAnd
+        get_arg0 0: value
+        get_arg1 1: mask
+        or
+        put_loc8 5: bitwiseOr
+        get_arg0 0: value
+        get_arg1 1: mask
+        xor
+        put_loc8 6: bitwiseXor
+        push_atom_value key
+        get_arg2 2: obj
+        in
+        put_loc8 7: hasKey
+        get_arg2 2: obj
+        get_arg3 3: ctor
+        instanceof
+        put_loc8 8: isInstance
+        get_loc_check 0: shiftLeft
+        get_loc_check 1: shiftRight
+        add
+        get_loc_check 2: shiftUnsigned
+        add
+        get_loc_check 3: power
+        add
+        get_loc_check 4: bitwiseAnd
+        add
+        get_loc_check 5: bitwiseOr
+        add
+        get_loc_check 6: bitwiseXor
+        add
+        put_loc8 9: base
+        get_loc_check 7: hasKey
+        if_false8 126
+        get_loc_check 8: isInstance
+        if_false8 120
+        get_loc_check 9: base
+        push_2 2
+        add
+        return
+  120:  get_loc_check 9: base
+        push_1 1
+        add
+        return
+  126:  get_loc_check 8: isInstance
+        if_false8 137
+        get_loc_check 9: base
+        push_1 1
+        add
+        return
+  137:  get_loc_check 9: base
+        return
+
+[pc2line] start func=0x477c8 source_pos=0 line=0 col=0
+__tests__/compiler/fixtures/bitwise-ops.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: bitwiseOps local:loc0 var
+  stack_size: 1
+  opcodes:
+        push_this
+        if_false8 7
+        fclosure8 0: [bytecode bitwiseOps]
+        put_var_ref0 0: bitwiseOps
+        return_undef
+    7:  undefined
+        return_async
+
+💾 Artifacts saved to artifacts/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 543 bytes
+WASM compiler:       545 bytes
+Size difference:     -2 bytes (-0.4%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.

@@ -410,7 +410,7 @@ export class Compiler {
     options: { isExpression: boolean }
   ): FunctionDef {
     const parentFunction = this.currentFunction
-    const sourcePos = this.toUtf8Offset(node.getStart(this.sourceFile, false))
+    const sourcePos = this.computeFunctionDebugStart(node)
     const childFunction = new FunctionDef(nameAtom, this.sourceCode, this.fileName, {
       parent: parentFunction,
       isFuncExpr: options.isExpression,
@@ -440,8 +440,8 @@ export class Compiler {
     childFunction.bytecode.filename = this.moduleAtom
     childFunction.bytecode.argumentsAllowed = true
     childFunction.bytecode.hasSimpleParameterList = true
-  childFunction.bytecode.hasPrototype = !isArrowFunction && funcKind === FunctionKind.JS_FUNC_NORMAL
-  childFunction.bytecode.newTargetAllowed = !isArrowFunction
+    childFunction.bytecode.hasPrototype = !isArrowFunction && funcKind === FunctionKind.JS_FUNC_NORMAL
+    childFunction.bytecode.newTargetAllowed = !isArrowFunction
 
     parentFunction.appendChild(childFunction)
 
@@ -450,8 +450,8 @@ export class Compiler {
     this.currentFunction = childFunction
     this.scopeManager = new ScopeManager(childFunction)
 
-  const startLineColumn = this.getLineColumnFromUtf8Offset(childFunction.sourcePos)
-  this.currentFunction.bytecode.recordLineNumber(0, startLineColumn.line, startLineColumn.column, childFunction.sourcePos, 0)
+    const startLineColumn = this.getLineColumnFromUtf8Offset(childFunction.sourcePos)
+    this.currentFunction.bytecode.recordLineNumber(0, startLineColumn.line, startLineColumn.column, childFunction.sourcePos, 0)
 
     this.pushScope(ScopeKind.Function)
 
@@ -797,26 +797,26 @@ export class Compiler {
     })
   }
 
-  public emitStoreToLocal(index: number) {
+  public emitStoreToLocal(index: number, node?: ts.Node | null) {
     const shortOpcode = index <= 3 ? getIndexedOpcode('OP_put_loc', index) : undefined
     if (shortOpcode !== undefined) {
-      this.emitOpcode(shortOpcode)
+      this.emitOpcode(shortOpcode, [], node ?? undefined)
       return
     }
     if (env.supportsShortOpcodes && index <= 0xff) {
-      this.emitOpcode(Opcode.OP_put_loc8, [index])
+      this.emitOpcode(Opcode.OP_put_loc8, [index], node ?? undefined)
       return
     }
-    this.emitOpcode(Opcode.OP_put_loc, [index])
+    this.emitOpcode(Opcode.OP_put_loc, [index], node ?? undefined)
   }
 
-  private emitPutVarRef(index: number) {
+  private emitPutVarRef(index: number, node?: ts.Node | null) {
     const shortOpcode = getIndexedOpcode('OP_put_var_ref', index)
     if (shortOpcode !== undefined) {
-      this.emitOpcode(shortOpcode)
+      this.emitOpcode(shortOpcode, [], node ?? undefined)
       return
     }
-    this.emitOpcode(Opcode.OP_put_var_ref, [index])
+    this.emitOpcode(Opcode.OP_put_var_ref, [index], node ?? undefined)
   }
 
   private emitLoadLocalCheck(index: number, node?: ts.Node) {
@@ -1011,12 +1011,13 @@ export class Compiler {
     this.closureVarIndices.set(atom, closureIndex)
   }
 
-  public emitStoreToLexical(atom: Atom, options: { suppressDebug?: boolean } = {}) {
+  public emitStoreToLexical(atom: Atom, options: { suppressDebug?: boolean; node?: ts.Node | null } = {}) {
     const suppressDebug = options.suppressDebug ?? true
+    const debugNode = options.node ?? null
     const slot = this.localVarIndices.get(atom)
     if (slot !== undefined) {
       const write = () => {
-        this.emitStoreToLocal(slot)
+        this.emitStoreToLocal(slot, debugNode ?? undefined)
       }
       if (suppressDebug) {
         this.withoutDebugRecording(write)
@@ -1030,7 +1031,7 @@ export class Compiler {
       throw new Error('Unknown lexical variable')
     }
     const writeClosure = () => {
-      this.emitPutVarRef(closureIndex)
+      this.emitPutVarRef(closureIndex, debugNode ?? undefined)
     }
     if (suppressDebug) {
       this.withoutDebugRecording(writeClosure)
@@ -1381,6 +1382,71 @@ export class Compiler {
       source: this.sourceCode,
       node,
     })
+  }
+
+  private computeFunctionDebugStart(
+    node: ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction
+  ): number {
+    let tsStart = node.getStart(this.sourceFile, false)
+    const modifiers = node.modifiers ? Array.from(node.modifiers) : []
+    if (modifiers.length > 0) {
+      modifiers.sort((a, b) => a.getStart(this.sourceFile, false) - b.getStart(this.sourceFile, false))
+      let adjusted = tsStart
+      for (const modifier of modifiers) {
+        const kind = modifier.kind
+        if (kind === ts.SyntaxKind.ExportKeyword || kind === ts.SyntaxKind.DefaultKeyword) {
+          const modifierEnd = modifier.getEnd()
+          if (modifierEnd > adjusted) {
+            adjusted = modifierEnd
+          }
+          continue
+        }
+        break
+      }
+      if (adjusted !== tsStart) {
+        tsStart = this.skipTriviaForward(adjusted)
+      }
+    }
+    return this.toUtf8Offset(tsStart)
+  }
+
+  private skipTriviaForward(start: number): number {
+    const text = this.sourceCode
+    let index = start
+    while (index < text.length) {
+      const code = text.charCodeAt(index)
+      if (code === 0x20 || code === 0x09 || code === 0x0d || code === 0x0a) {
+        index += 1
+        continue
+      }
+      if (code === 0x2f) {
+        const next = text.charCodeAt(index + 1)
+        if (next === 0x2f) {
+          index += 2
+          while (index < text.length) {
+            const ch = text.charCodeAt(index)
+            if (ch === 0x0a || ch === 0x0d) {
+              break
+            }
+            index += 1
+          }
+          continue
+        }
+        if (next === 0x2a) {
+          index += 2
+          while (index + 1 < text.length) {
+            if (text.charCodeAt(index) === 0x2a && text.charCodeAt(index + 1) === 0x2f) {
+              index += 2
+              break
+            }
+            index += 1
+          }
+          continue
+        }
+      }
+      break
+    }
+    return index
   }
 
   public withoutDebugRecording<T>(fn: () => T): T {

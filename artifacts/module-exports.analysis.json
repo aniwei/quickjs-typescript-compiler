@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-10-11T11:50:00.039Z",
+  "timestamp": "2025-10-11T18:26:02.477Z",
   "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/module-exports.ts",
   "compilation": {
     "typescript": {
@@ -252,9 +252,9 @@
         "0x03",
         "0x0c",
         "0x0a",
-        "0x00",
+        "0x07",
         "0x02",
-        "0x3e",
+        "0x30",
         "0x3a",
         "0x2b",
         "0x07",
@@ -281,7 +281,7 @@
         "000000c0: 00 28 c8 03 06 03 00 03 12 11 0d 00 0c 41 06 01 |.(...........A..|",
         "000000d0: ce 03 01 00 01 02 01 00 10 01 d4 03 00 01 00 d2 |................|",
         "000000e0: 03 02 00 d3 11 f4 ec 06 0e b7 d7 ee 02 0e df f0 |................|",
-        "000000f0: d3 9f 28 c8 03 0c 0a 00 02 3e 3a 2b 07 0c 07 0a |..(......>:+....|",
+        "000000f0: d3 9f 28 c8 03 0c 0a 07 02 30 3a 2b 07 0c 07 0a |..(......0:+....|",
         "00000100: 07 03 00                                        |...|"
       ],
       "structure": {
@@ -935,9 +935,9 @@
     {
       "offset": 247,
       "offsetHex": "0xf7",
-      "typescript": "0x00",
+      "typescript": "0x07",
       "wasm": "0xcb",
-      "typescriptDecimal": 0,
+      "typescriptDecimal": 7,
       "wasmDecimal": 203
     },
     {
@@ -951,9 +951,9 @@
     {
       "offset": 249,
       "offsetHex": "0xf9",
-      "typescript": "0x3e",
+      "typescript": "0x30",
       "wasm": "0xf0",
-      "typescriptDecimal": 62,
+      "typescriptDecimal": 48,
       "wasmDecimal": 240
     },
     {

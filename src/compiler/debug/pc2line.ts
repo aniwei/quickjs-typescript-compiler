@@ -23,94 +23,65 @@ export function buildFunctionDebugInfo(context: BuildDebugInfoContext): void {
     runningOffset += getInstructionSize(instructions[index])
   }
 
+  const baseSourcePos = func.sourcePos ?? 0
+  const baseLinePos = getLineColumnFromUtf8Offset(baseSourcePos)
+
   const sortedEntries = [...func.bytecode.lineNumberTable]
     .filter((entry) => entry.sourcePos >= 0)
     .map((entry) => {
       const actualPc = entry.instructionIndex < instructionOffsets.length ? instructionOffsets[entry.instructionIndex] : entry.pc
       return {
         pc: actualPc,
-        line: entry.line,
-        column: entry.column,
         sourcePos: entry.sourcePos,
       }
     })
     .sort((a, b) => a.pc - b.pc)
 
-  const baseSourcePos = func.sourcePos ?? 0
-  const baseLinePos = getLineColumnFromUtf8Offset(baseSourcePos)
-
-  const combinedEntries: typeof sortedEntries = [
-    {
-      pc: 0,
-      line: baseLinePos.line,
-      column: baseLinePos.column,
-      sourcePos: baseSourcePos,
-    },
-    ...sortedEntries,
-  ]
-
-  const normalized: typeof combinedEntries = []
-  if (process.env.DEBUG_PC2LINE === '1') {
-    console.log('pc2line:rawTable', combinedEntries.map((entry) => ({ ...entry })))
-  }
-  for (const entry of combinedEntries) {
-    const previous = normalized[normalized.length - 1]
-    if (previous) {
-      if (entry.sourcePos === previous.sourcePos && entry.pc === previous.pc) {
-        continue
-      }
-      if (previous.line === entry.line && previous.column === entry.column) {
-        continue
-      }
-      if (previous.sourcePos === entry.sourcePos) {
-        continue
-      }
+  const pcTrackedEntries: typeof sortedEntries = []
+  let lastTrackedPc = 0
+  let lastTrackedSourcePos = baseSourcePos
+  for (const entry of sortedEntries) {
+    if (entry.pc < lastTrackedPc) {
+      continue
     }
-    normalized.push({ ...entry })
-  }
-
-  const filtered = normalized.filter((entry, index) => {
-    if (index === 0) {
-      return true
+    if (entry.sourcePos === lastTrackedSourcePos) {
+      continue
     }
-    if (entry.column === 0) {
-      return false
-    }
-    return true
-  })
-
-  if (filtered.length === 0) {
-    func.bytecode.pc2line = []
-    func.bytecode.pc2column = []
-    return
+    pcTrackedEntries.push({ ...entry })
+    lastTrackedPc = entry.pc
+    lastTrackedSourcePos = entry.sourcePos
   }
 
   const pc2line: number[] = []
   const pc2column: number[] = []
   if (process.env.DEBUG_PC2LINE === '1') {
-    console.log('pc2line:lineNumberTable', filtered.map((entry) => ({ ...entry })))
+    console.log('pc2line:rawTable', sortedEntries.map((entry) => ({ ...entry })))
+    console.log('pc2line:trackedEntries', pcTrackedEntries.map((entry) => ({ ...entry })))
   }
 
-  const first = filtered[0]
-  const firstLine = first.line
-  const firstColumn = first.column
+  const firstLine = baseLinePos.line
+  const firstColumn = baseLinePos.column
   pc2line.push(...encodeULEB128(firstLine))
   pc2line.push(...encodeULEB128(firstColumn))
   pc2column.push(...encodeULEB128(firstColumn))
 
-  let lastPc = first.pc
+  let lastPc = 0
   let lastLine = firstLine
   let lastColumn = firstColumn
 
-  for (let index = 1; index < filtered.length; index++) {
-    const entry = filtered[index]
-    if (entry.pc < lastPc) {
+  for (const entry of pcTrackedEntries) {
+    const diffPc = entry.pc - lastPc
+    if (diffPc < 0) {
       continue
     }
-    const diffPc = entry.pc - lastPc
-    const currentLine = entry.line
+    const position = getLineColumnFromUtf8Offset(entry.sourcePos)
+    const currentLine = position.line
+    const currentColumn = position.column
+
+    if (entry.pc !== 0 && currentColumn === 0) {
+      continue
+    }
     const diffLine = currentLine - lastLine
-    const currentColumn = entry.column
     const diffColumn = currentColumn - lastColumn
 
     if (diffLine === 0 && diffColumn === 0) {
@@ -118,7 +89,6 @@ export function buildFunctionDebugInfo(context: BuildDebugInfoContext): void {
     }
 
     if (
-      diffPc >= 0 &&
       diffPc <= PC2LINE_DIFF_PC_MAX &&
       diffLine >= PC2LINE_BASE &&
       diffLine < PC2LINE_BASE + PC2LINE_RANGE
@@ -131,8 +101,8 @@ export function buildFunctionDebugInfo(context: BuildDebugInfoContext): void {
       pc2line.push(...encodeSLEB128(diffLine))
     }
 
-    pc2line.push(...encodeSLEB128(diffColumn))
-    pc2column.push(...encodeSLEB128(diffColumn))
+  pc2line.push(...encodeSLEB128(diffColumn))
+  pc2column.push(...encodeSLEB128(diffColumn))
 
     lastPc = entry.pc
     lastLine = currentLine
