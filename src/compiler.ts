@@ -29,6 +29,23 @@ import {
   type PendingJump,
 } from './compiler/analysis/jumpResolution'
 import {
+  ensureLexicalInitializationScope,
+  insertLexicalInitialization,
+  createSetLocalUninitializedInstruction,
+} from './compiler/analysis/lexicalInit'
+import {
+  LoopCleanupManager,
+  type LoopCleanupInfo,
+} from './compiler/analysis/loopCleanup'
+import {
+  isWhitespaceChar,
+  skipTriviaForward,
+  skipTypeArgumentSequence,
+  getPropertyAccessOperatorPos as locatePropertyAccessOperator,
+  getCallExpressionOpenParenPos as locateCallOpenParen,
+  getNewExpressionOpenParenPos as locateNewOpenParen,
+} from './compiler/utils/sourceNavigation'
+import {
   ControlFlowBuilder,
   ControlFlowTarget,
   ControlFlowTargetKind,
@@ -67,9 +84,6 @@ interface FunctionContextSnapshot {
   controlFlowTargets: ControlFlowTarget[]
   loopCleanupEntries: Array<[string, LoopCleanupInfo]>
 }
-
-type LoopCleanupInfo = { kind: 'for-of' | 'for-in' }
-
 interface EmitDebugInfoOptions {
   tsSourcePos?: number
 }
@@ -102,7 +116,7 @@ export class Compiler {
   private readonly controlFlow = new ControlFlowBuilder({
     emitGoto: (label) => this.emitGoto(label),
   })
-  private readonly loopCleanupByBreakLabel = new Map<string, LoopCleanupInfo>()
+  private readonly loopCleanup = new LoopCleanupManager()
   private readonly lexicalInitByScope = new Map<number, { insertionIndex: number }>()
   private readonly sourceUtf8: Uint8Array
   private readonly utf8OffsetByPos: Uint32Array
@@ -243,7 +257,7 @@ export class Compiler {
     this.hasExplicitReturn = false
     this.moduleHoistLabel = null
     this.controlFlow.reset()
-    this.loopCleanupByBreakLabel.clear()
+  this.loopCleanup.reset()
     this.lexicalInitByScope.clear()
   }
 
@@ -287,7 +301,7 @@ export class Compiler {
       moduleHoistInsertionIndex: this.moduleHoistInsertionIndex,
       moduleHoistLabel: this.moduleHoistLabel,
       controlFlowTargets: this.controlFlow.createSnapshot(),
-      loopCleanupEntries: Array.from(this.loopCleanupByBreakLabel.entries()),
+  loopCleanupEntries: this.loopCleanup.getEntries(),
     }
   }
 
@@ -324,10 +338,8 @@ export class Compiler {
     this.moduleHoistInsertionIndex = snapshot.moduleHoistInsertionIndex
     this.moduleHoistLabel = snapshot.moduleHoistLabel
     this.controlFlow.restoreSnapshot(snapshot.controlFlowTargets)
-    this.loopCleanupByBreakLabel.clear()
-    for (const [label, info] of snapshot.loopCleanupEntries) {
-      this.loopCleanupByBreakLabel.set(label, info)
-    }
+    this.loopCleanup.reset()
+    this.loopCleanup.restoreEntries(snapshot.loopCleanupEntries)
   }
 
   private restoreMap<K, V>(target: Map<K, V>, source: Map<K, V>) {
@@ -558,28 +570,17 @@ export class Compiler {
   }
 
   private emitLoopCleanup(target: LoopControlFlowTarget) {
-    const cleanup = this.loopCleanupByBreakLabel.get(target.breakLabel)
-    if (!cleanup) {
-      return
-    }
-    switch (cleanup.kind) {
-      case 'for-of':
-        this.emitOpcode(Opcode.OP_iterator_close)
-        break
-      case 'for-in':
-        this.emitOpcode(Opcode.OP_drop)
-        break
-      default:
-        throw new Error(`Unsupported loop cleanup kind '${cleanup.kind}'`)
-    }
+    this.loopCleanup.emitLoopCleanup(target.breakLabel, (opcode) => {
+      this.emitOpcode(opcode)
+    })
   }
 
   public registerLoopCleanup(breakLabel: string, info: LoopCleanupInfo): void {
-    this.loopCleanupByBreakLabel.set(breakLabel, info)
+    this.loopCleanup.register(breakLabel, info)
   }
 
   public clearLoopCleanup(breakLabel: string): void {
-    this.loopCleanupByBreakLabel.delete(breakLabel)
+    this.loopCleanup.clear(breakLabel)
   }
 
   public pushLoopTarget(breakLabel: string, continueLabel: string, options: { labelName?: string } = {}): void {
@@ -758,52 +759,23 @@ export class Compiler {
   }
 
   public emitSetLocalUninitialized(index: number, scopeLevel: number) {
-    const scopeInfo = this.ensureLexicalInitializationScope(scopeLevel)
-    const instruction: Instruction = {
-      opcode: Opcode.OP_set_loc_uninitialized,
-      operands: [index],
-    }
-    this.insertLexicalInitialization(scopeLevel, scopeInfo.insertionIndex, instruction)
-  }
-
-  private ensureLexicalInitializationScope(scopeLevel: number): { insertionIndex: number } {
-    if (scopeLevel < 0) {
-      scopeLevel = this.scopeManager.currentScope()
-    }
-    let scopeInfo = this.lexicalInitByScope.get(scopeLevel)
-    if (!scopeInfo) {
-      scopeInfo = {
-        insertionIndex: this.currentFunction.bytecode.instructions.length,
-      }
-      this.lexicalInitByScope.set(scopeLevel, scopeInfo)
-    }
-    return scopeInfo
-  }
-
-  private insertLexicalInitialization(scopeLevel: number, insertionIndex: number, instruction: Instruction) {
-    const func = this.currentFunction
-    const insertionPc = this.getInstructionOffset(func, insertionIndex)
-    const labelsToRestore: string[] = []
-    for (const [label, position] of this.labelPositions) {
-      if (position === insertionPc) {
-        labelsToRestore.push(label)
-      }
-    }
-
-    this.insertInstructions(func, insertionIndex, [instruction])
-
-    for (const label of labelsToRestore) {
-      this.labelPositions.set(label, insertionPc)
-    }
-
-    for (const [otherScope, info] of this.lexicalInitByScope) {
-      if (otherScope === scopeLevel) {
-        continue
-      }
-      if (info.insertionIndex >= insertionIndex) {
-        info.insertionIndex += 1
-      }
-    }
+    const { scopeLevel: resolvedScopeLevel, scopeInfo } = ensureLexicalInitializationScope({
+      scopeLevel,
+      scopeManager: this.scopeManager,
+      lexicalInitByScope: this.lexicalInitByScope,
+      currentFunction: this.currentFunction,
+    })
+    const instruction = createSetLocalUninitializedInstruction(index)
+    insertLexicalInitialization({
+      scopeLevel: resolvedScopeLevel,
+      insertionIndex: scopeInfo.insertionIndex,
+      currentFunction: this.currentFunction,
+      labelPositions: this.labelPositions,
+      lexicalInitByScope: this.lexicalInitByScope,
+      instruction,
+      getInstructionOffset: (func, idx) => this.getInstructionOffset(func, idx),
+      insertInstructions: (func, idx, instructions) => this.insertInstructions(func, idx, instructions),
+    })
   }
 
   public emitStoreToLocal(index: number) {
@@ -1100,17 +1072,21 @@ export class Compiler {
     if (!func.module) {
       return
     }
+
     const hoisted = buildHoistedDefinitionInstructions({
       func,
       closureVarIndices: this.closureVarIndices,
     })
+
     if (hoisted.length === 0) {
       return
     }
-  const insertionIndex = func === this.currentFunction && this.moduleHoistInsertionIndex !== null ? this.moduleHoistInsertionIndex : 0
+    const insertionIndex = func === this.currentFunction && this.moduleHoistInsertionIndex !== null ? this.moduleHoistInsertionIndex : 0
     this.insertInstructions(func, insertionIndex, hoisted)
+
     if (func === this.currentFunction) {
       this.moduleHoistInsertionIndex = null
+
       if (this.moduleHoistLabel) {
         this.moduleHoistLabel = null
       }
@@ -1123,17 +1099,19 @@ export class Compiler {
     }
 
     const bytecode = func.bytecode
-  const delta = instructions.reduce((sum, ins) => sum + getInstructionSize(ins), 0)
+    const delta = instructions.reduce((sum, ins) => sum + getInstructionSize(ins), 0)
     const insertionOffset = this.getInstructionOffset(func, index)
 
     bytecode.instructions.splice(index, 0, ...instructions)
 
     if (func === this.currentFunction) {
-  const { offsets, totalSize } = this.recomputeInstructionOffsets(bytecode.instructions)
+      const { offsets, totalSize } = this.recomputeInstructionOffsets(bytecode.instructions)
       this.instructionOffsets.length = offsets.length
+      
       for (let i = 0; i < offsets.length; i++) {
         this.instructionOffsets[i] = offsets[i]
       }
+      
       this.currentOffset = totalSize
 
       for (const pending of this.pendingJumps) {
@@ -1153,6 +1131,7 @@ export class Compiler {
       if (entry.instructionIndex >= index) {
         entry.instructionIndex += instructions.length
       }
+
       if (entry.pc >= insertionOffset) {
         entry.pc += delta
       }
@@ -1162,10 +1141,12 @@ export class Compiler {
   private recomputeInstructionOffsets(instructions: Instruction[]): { offsets: number[]; totalSize: number } {
     const offsets = new Array<number>(instructions.length)
     let offset = 0
+
     for (let i = 0; i < instructions.length; i++) {
       offsets[i] = offset
       offset += getInstructionSize(instructions[i])
     }
+
     return { offsets, totalSize: offset }
   }
 
@@ -1173,10 +1154,13 @@ export class Compiler {
     if (func === this.currentFunction && this.instructionOffsets[index] !== undefined) {
       return this.instructionOffsets[index]
     }
+
     let offset = 0
+    
     for (let i = 0; i < index && i < func.bytecode.instructions.length; i++) {
       offset += getInstructionSize(func.bytecode.instructions[i])
     }
+
     return offset
   }
 
@@ -1184,9 +1168,11 @@ export class Compiler {
     if (pos <= 0) {
       return 0
     }
+
     if (pos >= this.normalizedPosByPos.length) {
       return this.normalizedPosByPos[this.normalizedPosByPos.length - 1]
     }
+
     return this.normalizedPosByPos[pos]
   }
 
@@ -1212,6 +1198,7 @@ export class Compiler {
 
     const instructionIndex = this.currentFunction.bytecode.instructions.length
     const recordNode = node === null ? null : node ?? this.currentStatementNode ?? this.currentSourceNode
+
     if (process.env.DEBUG_PC2LINE === '1') {
       console.log('pc2line:emit', {
         opcode: Opcode[opcode],
@@ -1224,6 +1211,7 @@ export class Compiler {
         suppress: this.suppressDebugRecording,
       })
     }
+
     if (!this.suppressDebugRecording && (recordNode || debugOptions?.tsSourcePos !== undefined)) {
       let tsSourcePos = debugOptions?.tsSourcePos
       if (tsSourcePos === undefined && recordNode) {
@@ -1341,260 +1329,28 @@ export class Compiler {
   }
 
   public getPropertyAccessOperatorPos(node: ts.PropertyAccessExpression): number | undefined {
-    const nameStart = node.name.getStart(this.sourceFile, false)
-    let pos = this.skipTriviaForward(node.expression.getEnd())
-    if (pos >= nameStart) {
-      pos = nameStart - 1
-    }
-    while (pos >= 0 && pos < nameStart) {
-      const code = this.sourceCode.charCodeAt(pos)
-      if (code === 0x2e) {
-        return pos
-      }
-      if (code === 0x3f && pos + 1 < nameStart && this.sourceCode.charCodeAt(pos + 1) === 0x2e) {
-        return pos + 1
-      }
-      if (!this.isWhitespaceChar(code)) {
-        break
-      }
-      pos += 1
-    }
-    return undefined
+    return locatePropertyAccessOperator({
+      source: this.sourceCode,
+      sourceFile: this.sourceFile,
+      node,
+    })
   }
 
   public getCallExpressionOpenParenPos(node: ts.CallExpression): number | undefined {
-    let pos = node.expression.getEnd()
-    if (node.typeArguments && node.typeArguments.length > 0) {
-      pos = node.typeArguments.end
-    }
-    while (pos < this.sourceCode.length) {
-      pos = this.skipTriviaForward(pos)
-      if (pos >= this.sourceCode.length) {
-        break
-      }
-      const code = this.sourceCode.charCodeAt(pos)
-      if (code === 0x28) {
-        return pos
-      }
-      if (code === 0x3c) {
-        pos = this.skipTypeArgumentSequence(pos)
-        continue
-      }
-      break
-    }
-    return undefined
+    return locateCallOpenParen({
+      source: this.sourceCode,
+      node,
+    })
   }
 
   public getNewExpressionOpenParenPos(node: ts.NewExpression): number | undefined {
     if (!node.arguments || node.arguments.length === 0) {
       return undefined
     }
-    let pos = node.expression.getEnd()
-    if (node.typeArguments && node.typeArguments.length > 0) {
-      pos = node.typeArguments.end
-    }
-    while (pos < this.sourceCode.length) {
-      pos = this.skipTriviaForward(pos)
-      if (pos >= this.sourceCode.length) {
-        break
-      }
-      const code = this.sourceCode.charCodeAt(pos)
-      if (code === 0x28) {
-        return pos
-      }
-      if (code === 0x3c) {
-        pos = this.skipTypeArgumentSequence(pos)
-        continue
-      }
-      break
-    }
-    return undefined
-  }
-
-  private skipTriviaForward(pos: number): number {
-    let current = pos
-    while (current < this.sourceCode.length) {
-      const code = this.sourceCode.charCodeAt(current)
-      if (this.isWhitespaceChar(code)) {
-        current += 1
-        continue
-      }
-      if (code === 0x2f && current + 1 < this.sourceCode.length) {
-        const next = this.sourceCode.charCodeAt(current + 1)
-        if (next === 0x2f) {
-          current = this.skipLineComment(current + 2)
-          continue
-        }
-        if (next === 0x2a) {
-          current = this.skipBlockComment(current + 2)
-          continue
-        }
-      }
-      break
-    }
-    return current
-  }
-
-  private skipLineComment(pos: number): number {
-    let current = pos
-    while (current < this.sourceCode.length) {
-      const code = this.sourceCode.charCodeAt(current)
-      if (this.isLineTerminator(code)) {
-        return current
-      }
-      current += 1
-    }
-    return current
-  }
-
-  private skipBlockComment(pos: number): number {
-    let current = pos
-    while (current < this.sourceCode.length) {
-      const code = this.sourceCode.charCodeAt(current)
-      if (code === 0x2a && current + 1 < this.sourceCode.length && this.sourceCode.charCodeAt(current + 1) === 0x2f) {
-        return current + 2
-      }
-      current += 1
-    }
-    return current
-  }
-
-  private skipTypeArgumentSequence(pos: number): number {
-    let current = pos
-    let depth = 0
-    while (current < this.sourceCode.length) {
-      const code = this.sourceCode.charCodeAt(current)
-      if (code === 0x3c) {
-        depth += 1
-      } else if (code === 0x3e) {
-        depth -= 1
-        current += 1
-        if (depth <= 0) {
-          return current
-        }
-        continue
-      } else if (code === 0x27 || code === 0x22) {
-        current = this.skipStringLiteral(current)
-        continue
-      } else if (code === 0x2f && current + 1 < this.sourceCode.length) {
-        const next = this.sourceCode.charCodeAt(current + 1)
-        if (next === 0x2f) {
-          current = this.skipLineComment(current + 2)
-          continue
-        }
-        if (next === 0x2a) {
-          current = this.skipBlockComment(current + 2)
-          continue
-        }
-      }
-      current += 1
-    }
-    return current
-  }
-
-  private skipStringLiteral(pos: number): number {
-    const quote = this.sourceCode.charCodeAt(pos)
-    let current = pos + 1
-    while (current < this.sourceCode.length) {
-      const code = this.sourceCode.charCodeAt(current)
-      if (code === quote) {
-        return current + 1
-      }
-      if (code === 0x5c) {
-        current += 2
-        continue
-      }
-      current += 1
-    }
-    return current
-  }
-
-  private isWhitespaceChar(code: number): boolean {
-    return code === 0x20 || code === 0x09 || code === 0x0b || code === 0x0c || code === 0x0d || code === 0x0a
-  }
-
-  private isLineTerminator(code: number): boolean {
-    return code === 0x0a || code === 0x0d || code === 0x2028 || code === 0x2029
-  }
-
-  public shouldSuppressTopLevelInitializerDebug(initializer?: ts.Expression): boolean {
-    if (!initializer) {
-      return true
-    }
-
-    while (ts.isParenthesizedExpression(initializer)) {
-      initializer = initializer.expression
-    }
-
-    if (ts.isLiteralExpression(initializer)) {
-      return true
-    }
-
-    if (ts.isArrayLiteralExpression(initializer)) {
-      if (initializer.elements.some((element) => ts.isOmittedExpression(element) || ts.isSpreadElement(element))) {
-        return false
-      }
-      return initializer.elements
-        .filter((element): element is ts.Expression => !ts.isOmittedExpression(element) && !ts.isSpreadElement(element))
-        .every((element) => this.shouldSuppressTopLevelInitializerDebug(element))
-    }
-
-    if (ts.isObjectLiteralExpression(initializer)) {
-      for (const property of initializer.properties) {
-        if (ts.isPropertyAssignment(property)) {
-          const name = property.name
-          if (!name || ts.isComputedPropertyName(name) || ts.isPrivateIdentifier(name)) {
-            return false
-          }
-          if (!property.initializer) {
-            return false
-          }
-          if (!this.shouldSuppressTopLevelInitializerDebug(property.initializer)) {
-            return false
-          }
-          continue
-        }
-
-        if (ts.isShorthandPropertyAssignment(property)) {
-          const name = property.name
-          if (!name || ts.isPrivateIdentifier(name)) {
-            return false
-          }
-          if (!this.shouldSuppressTopLevelInitializerDebug(name)) {
-            return false
-          }
-          continue
-        }
-
-        return false
-      }
-      return true
-    }
-
-    switch (initializer.kind) {
-      case ts.SyntaxKind.TrueKeyword:
-      case ts.SyntaxKind.FalseKeyword:
-      case ts.SyntaxKind.NullKeyword:
-        return true
-      default:
-        break
-    }
-
-    if (ts.isIdentifier(initializer)) {
-      return true
-    }
-
-    if (ts.isPrefixUnaryExpression(initializer)) {
-      switch (initializer.operator) {
-        case ts.SyntaxKind.PlusToken:
-        case ts.SyntaxKind.MinusToken:
-          return this.shouldSuppressTopLevelInitializerDebug(initializer.operand)
-        default:
-          return false
-      }
-    }
-
-    return false
+    return locateNewOpenParen({
+      source: this.sourceCode,
+      node,
+    })
   }
 
   public withoutDebugRecording<T>(fn: () => T): T {

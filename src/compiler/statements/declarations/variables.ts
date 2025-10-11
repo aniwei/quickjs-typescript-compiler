@@ -1,7 +1,7 @@
 import * as ts from 'typescript'
 import type { Compiler } from '../../../compiler'
 import { Opcode } from '../../../env'
-import { VarKind } from '../../../vars'
+import { shouldSuppressTopLevelInitializerDebug } from '../../debug/initializerSuppression'
 
 export function compileVariableStatement(compiler: Compiler, node: ts.VariableStatement) {
   const flags = node.declarationList.flags
@@ -46,7 +46,7 @@ export function compileVariableStatement(compiler: Compiler, node: ts.VariableSt
       }
 
       const suppressInitializerDebug =
-        isModuleTopLevel && compiler.shouldSuppressTopLevelInitializerDebug(declaration.initializer)
+        isModuleTopLevel && shouldSuppressTopLevelInitializerDebug(declaration.initializer)
 
       const localSlot = compiler.getLocalVarSlot(atom)
       if (localSlot !== undefined && (isConst || isLet)) {

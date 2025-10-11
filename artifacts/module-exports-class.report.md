@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/module-exports-class.ts
-**生成时间**: 2025-10-10T15:13:41.019Z
+**生成时间**: 2025-10-11T03:39:35.099Z
 
 ## 大小对比
 
