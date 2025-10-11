@@ -1,6 +1,7 @@
 import * as ts from 'typescript'
 import type { Compiler } from '../../../compiler'
 import { Opcode } from '../../../env'
+import { getAnonymousFunctionExpression } from '../../utils/functionName'
 import { shouldSuppressTopLevelInitializerDebug } from '../../debug/initializerSuppression'
 
 export function compileVariableStatement(compiler: Compiler, node: ts.VariableStatement) {
@@ -55,7 +56,12 @@ export function compileVariableStatement(compiler: Compiler, node: ts.VariableSt
 
       if (declaration.initializer) {
         const emitInitializer = () => {
-          compiler.compileExpression(declaration.initializer!)
+          const initializer = declaration.initializer!
+          compiler.compileExpression(initializer)
+          const anonymousFunc = getAnonymousFunctionExpression(initializer)
+          if (anonymousFunc) {
+            compiler.emitSetFunctionName(atom, anonymousFunc)
+          }
           compiler.emitStoreToLexical(atom)
         }
 

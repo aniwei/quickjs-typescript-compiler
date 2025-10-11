@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/compute.ts
-**生成时间**: 2025-10-11T10:43:16.304Z
+**生成时间**: 2025-10-11T11:49:59.933Z
 
 ## 大小对比
 

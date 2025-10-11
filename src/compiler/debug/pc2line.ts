@@ -69,7 +69,17 @@ export function buildFunctionDebugInfo(context: BuildDebugInfoContext): void {
     normalized.push({ ...entry })
   }
 
-  if (normalized.length === 0) {
+  const filtered = normalized.filter((entry, index) => {
+    if (index === 0) {
+      return true
+    }
+    if (entry.column === 0) {
+      return false
+    }
+    return true
+  })
+
+  if (filtered.length === 0) {
     func.bytecode.pc2line = []
     func.bytecode.pc2column = []
     return
@@ -78,10 +88,10 @@ export function buildFunctionDebugInfo(context: BuildDebugInfoContext): void {
   const pc2line: number[] = []
   const pc2column: number[] = []
   if (process.env.DEBUG_PC2LINE === '1') {
-    console.log('pc2line:lineNumberTable', normalized.map((entry) => ({ ...entry })))
+    console.log('pc2line:lineNumberTable', filtered.map((entry) => ({ ...entry })))
   }
 
-  const first = normalized[0]
+  const first = filtered[0]
   const firstLine = first.line
   const firstColumn = first.column
   pc2line.push(...encodeULEB128(firstLine))
@@ -92,8 +102,8 @@ export function buildFunctionDebugInfo(context: BuildDebugInfoContext): void {
   let lastLine = firstLine
   let lastColumn = firstColumn
 
-  for (let index = 1; index < normalized.length; index++) {
-    const entry = normalized[index]
+  for (let index = 1; index < filtered.length; index++) {
+    const entry = filtered[index]
     if (entry.pc < lastPc) {
       continue
     }

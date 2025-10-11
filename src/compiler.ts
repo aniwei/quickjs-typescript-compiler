@@ -1039,6 +1039,12 @@ export class Compiler {
     }
   }
 
+  public emitSetFunctionName(nameAtom: Atom, node?: ts.Node | null): void {
+    this.withoutDebugRecording(() => {
+      this.emitInstruction(Opcode.OP_set_name, [nameAtom], node ?? null)
+    })
+  }
+
   public isGlobalVarContext(): boolean {
     return this.currentFunction.isGlobalVar
   }
@@ -1238,7 +1244,24 @@ export class Compiler {
     }
 
     const instructionIndex = this.currentFunction.bytecode.instructions.length
-    const recordNode = node === null ? null : node ?? this.currentStatementNode ?? this.currentSourceNode
+    let recordNode: ts.Node | null
+    const isTokenNode =
+      node !== undefined &&
+      node !== null &&
+      node.kind >= ts.SyntaxKind.FirstToken &&
+      node.kind <= ts.SyntaxKind.LastToken
+
+    if (node === null) {
+      recordNode = null
+    } else if (isTokenNode) {
+      recordNode = node
+    } else if (this.currentStatementNode) {
+      recordNode = this.currentStatementNode
+    } else if (node !== undefined) {
+      recordNode = node
+    } else {
+      recordNode = this.currentSourceNode ?? null
+    }
 
     if (process.env.DEBUG_PC2LINE === '1') {
       console.log('pc2line:emit', {

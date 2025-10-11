@@ -1,6 +1,7 @@
 import * as ts from 'typescript'
 import type { Compiler } from '../../compiler'
 import { Opcode } from '../../env'
+import { getAnonymousFunctionExpression } from '../utils/functionName'
 
 export function compileArrayLiteralExpression(compiler: Compiler, expression: ts.ArrayLiteralExpression) {
   const elements = expression.elements
@@ -68,6 +69,10 @@ export function compileObjectLiteralExpression(compiler: Compiler, expression: t
 
     compiler.withSourceNode(initializer, () => {
       compiler.compileExpression(initializer)
+      const anonymousFunc = getAnonymousFunctionExpression(initializer)
+      if (anonymousFunc) {
+        compiler.emitSetFunctionName(propertyAtom, anonymousFunc)
+      }
     })
 
     compiler.emitInstruction(Opcode.OP_define_field, [propertyAtom], property)
