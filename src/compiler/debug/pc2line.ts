@@ -78,9 +78,6 @@ export function buildFunctionDebugInfo(context: BuildDebugInfoContext): void {
     const currentLine = position.line
     const currentColumn = position.column
 
-    if (entry.pc !== 0 && currentColumn === 0) {
-      continue
-    }
     const diffLine = currentLine - lastLine
     const diffColumn = currentColumn - lastColumn
 

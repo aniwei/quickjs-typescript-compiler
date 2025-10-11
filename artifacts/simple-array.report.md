@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/simple-array.ts
-**生成时间**: 2025-10-11T18:26:02.503Z
+**生成时间**: 2025-10-11T18:46:55.067Z
 
 ## 大小对比
 

@@ -11,6 +11,10 @@ export function shouldSuppressTopLevelInitializerDebug(
     initializer = initializer.expression
   }
 
+  if (ts.isFunctionExpression(initializer) || ts.isArrowFunction(initializer)) {
+    return true
+  }
+
   if (ts.isLiteralExpression(initializer)) {
     return true
   }

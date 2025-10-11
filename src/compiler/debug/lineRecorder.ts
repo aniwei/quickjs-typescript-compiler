@@ -53,6 +53,10 @@ export class LineRecorder {
       return
     }
 
+    if (params.opcode === Opcode.OP_fclosure || params.opcode === Opcode.OP_fclosure8) {
+      return
+    }
+
     if (!params.recordNode && params.debugTsSourcePos === undefined) {
       return
     }

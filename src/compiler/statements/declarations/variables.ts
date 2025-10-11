@@ -55,20 +55,31 @@ export function compileVariableStatement(compiler: Compiler, node: ts.VariableSt
       }
 
       if (declaration.initializer) {
-        const emitInitializer = () => {
-          const initializer = declaration.initializer!
-          compiler.compileExpression(initializer)
-          const anonymousFunc = getAnonymousFunctionExpression(initializer)
+        const initializer = declaration.initializer
+        const lineTableStart = compiler.getLineNumberTableLength()
+        compiler.compileExpression(initializer)
+
+        if (suppressInitializerDebug) {
+          compiler.truncateLineNumberTable(lineTableStart)
+        }
+
+        const anonymousFunc = getAnonymousFunctionExpression(initializer)
+        const emitSetFunctionName = () => {
           if (anonymousFunc) {
             compiler.emitSetFunctionName(atom, anonymousFunc)
           }
-          compiler.emitStoreToLexical(atom)
         }
 
         if (suppressInitializerDebug) {
-          compiler.withoutDebugRecording(emitInitializer)
+          if (anonymousFunc) {
+            compiler.withoutDebugRecording(emitSetFunctionName)
+          }
+          compiler.withoutDebugRecording(() => {
+            compiler.emitStoreToLexical(atom)
+          })
         } else {
-          emitInitializer()
+          emitSetFunctionName()
+          compiler.emitStoreToLexical(atom)
         }
         return
       }

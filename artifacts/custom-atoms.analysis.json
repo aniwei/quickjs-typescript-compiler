@@ -1,9 +1,9 @@
 {
-  "timestamp": "2025-10-11T18:26:02.434Z",
+  "timestamp": "2025-10-11T18:46:54.998Z",
   "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/custom-atoms.ts",
   "compilation": {
     "typescript": {
-      "size": 167,
+      "size": 169,
       "bytecode": [
         "0x05",
         "0x06",
@@ -162,10 +162,12 @@
         "0x2f",
         "0xc8",
         "0x03",
-        "0x08",
+        "0x0a",
         "0x00",
         "0x00",
-        "0x5e",
+        "0x45",
+        "0x00",
+        "0x1b",
         "0x0e",
         "0x1b",
         "0x0a",
@@ -183,8 +185,8 @@
         "00000060: 00 00 00 00 00 0c 20 06 01 a4 01 00 00 00 03 02 |...... .........|",
         "00000070: 00 20 00 ca 03 00 0d cc 03 01 0d 08 ec 02 29 04 |. ............).|",
         "00000080: e7 00 00 00 e3 bf 2a e4 39 e8 00 00 00 43 e9 00 |......*.9....C..|",
-        "00000090: 00 00 68 00 00 24 01 00 0e 06 2f c8 03 08 00 00 |..h..$..../.....|",
-        "000000a0: 5e 0e 1b 0a 11 01 00                            |^......|"
+        "00000090: 00 00 68 00 00 24 01 00 0e 06 2f c8 03 0a 00 00 |..h..$..../.....|",
+        "000000a0: 45 00 1b 0e 1b 0a 11 01 00                      |E........|"
       ],
       "structure": {
         "source": "TypeScript",
@@ -243,7 +245,7 @@
         "functionHeader": {
           "offset": 93,
           "tag": "0xd",
-          "remaining": 74
+          "remaining": 76
         }
       }
     },
@@ -495,80 +497,9 @@
       }
     }
   },
-  "differences": [
-    {
-      "offset": 157,
-      "offsetHex": "0x9d",
-      "typescript": "0x08",
-      "wasm": "0x0a",
-      "typescriptDecimal": 8,
-      "wasmDecimal": 10
-    },
-    {
-      "offset": 160,
-      "offsetHex": "0xa0",
-      "typescript": "0x5e",
-      "wasm": "0x45",
-      "typescriptDecimal": 94,
-      "wasmDecimal": 69
-    },
-    {
-      "offset": 161,
-      "offsetHex": "0xa1",
-      "typescript": "0x0e",
-      "wasm": "0x00",
-      "typescriptDecimal": 14,
-      "wasmDecimal": 0
-    },
-    {
-      "offset": 163,
-      "offsetHex": "0xa3",
-      "typescript": "0x0a",
-      "wasm": "0x0e",
-      "typescriptDecimal": 10,
-      "wasmDecimal": 14
-    },
-    {
-      "offset": 164,
-      "offsetHex": "0xa4",
-      "typescript": "0x11",
-      "wasm": "0x1b",
-      "typescriptDecimal": 17,
-      "wasmDecimal": 27
-    },
-    {
-      "offset": 165,
-      "offsetHex": "0xa5",
-      "typescript": "0x01",
-      "wasm": "0x0a",
-      "typescriptDecimal": 1,
-      "wasmDecimal": 10
-    },
-    {
-      "offset": 166,
-      "offsetHex": "0xa6",
-      "typescript": "0x00",
-      "wasm": "0x11",
-      "typescriptDecimal": 0,
-      "wasmDecimal": 17
-    },
-    {
-      "offset": 167,
-      "offsetHex": "0xa7",
-      "typescript": "EOF",
-      "wasm": "0x01",
-      "wasmDecimal": 1
-    },
-    {
-      "offset": 168,
-      "offsetHex": "0xa8",
-      "typescript": "EOF",
-      "wasm": "0x00",
-      "wasmDecimal": 0
-    }
-  ],
+  "differences": [],
   "sizeDifference": {
-    "absolute": -2,
-    "percentage": "-1.18"
+    "absolute": 0,
+    "percentage": "0.00"
   }
 }

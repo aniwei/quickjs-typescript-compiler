@@ -971,6 +971,20 @@ export class Compiler {
     )
   }
 
+  public getLineNumberTableLength(): number {
+    return this.currentFunction.bytecode.lineNumberTable.length
+  }
+
+  public truncateLineNumberTable(length: number) {
+    if (length < 0) {
+      throw new Error('Line number table length cannot be negative')
+    }
+    this.currentFunction.bytecode.lineNumberTable.length = Math.min(
+      length,
+      this.currentFunction.bytecode.lineNumberTable.length
+    )
+  }
+
   public emitFunctionClosure(constantIndex: number, node?: ts.Node | null) {
     const debugNode = node ?? null
     if (constantIndex <= 0xff) {
