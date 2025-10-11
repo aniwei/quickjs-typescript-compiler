@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/conditional-return.ts
-**生成时间**: 2025-10-11T04:14:52.905Z
+**生成时间**: 2025-10-11T10:43:16.314Z
 
 ## 大小对比
 

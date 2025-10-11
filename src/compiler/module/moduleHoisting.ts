@@ -49,22 +49,21 @@ export function buildHoistedDefinitionInstructions(context: ModuleHoistContext):
     }
   }
 
-  instructions.push(...buildGlobalHoistInstructions(func))
+  instructions.push(...buildGlobalHoistInstructions(func, closureVarIndices))
 
   return instructions
 }
 
-function buildGlobalHoistInstructions(func: FunctionDef): Instruction[] {
+function buildGlobalHoistInstructions(
+  func: FunctionDef,
+  closureVarIndices: Map<Atom, number>
+): Instruction[] {
   if (func.globalVars.length === 0) {
     return []
   }
 
   const instructions: Instruction[] = []
-  const closureIndexByAtom = new Map<Atom, number>()
-  for (let index = 0; index < func.bytecode.closureVars.length; index++) {
-    const closureVar = func.bytecode.closureVars[index]
-    closureIndexByAtom.set(closureVar.name, index)
-  }
+  const closureIndexByAtom = closureVarIndices
 
   const varEnvIndex = closureIndexByAtom.get(JSAtom.JS_ATOM__var_)
   const argVarEnvIndex = closureIndexByAtom.get(JSAtom.JS_ATOM__arg_var_)
@@ -117,7 +116,9 @@ function buildGlobalHoistInstructions(func: FunctionDef): Instruction[] {
       }
     }
 
-    if (globalVar.funcPoolIndex >= 0 || forceInit) {
+    const needsInit = globalVar.funcPoolIndex >= 0 || forceInit
+
+    if (needsInit) {
       if (globalVar.funcPoolIndex >= 0) {
         instructions.push(buildFclosureInstruction(globalVar.funcPoolIndex))
         if (globalVar.name === JSAtom.JS_ATOM__default_) {

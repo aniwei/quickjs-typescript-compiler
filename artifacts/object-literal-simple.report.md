@@ -1,12 +1,12 @@
 # 字节码分析报告
 
-**输入文件**: tmp/object-literal-simple.ts
-**生成时间**: 2025-10-03T06:57:23.317Z
+**输入文件**: /Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/object-literal-simple.ts
+**生成时间**: 2025-10-11T10:43:16.406Z
 
 ## 大小对比
 
-- TypeScript编译器: 120 字节
-- WASM编译器: 120 字节
+- TypeScript编译器: 144 字节
+- WASM编译器: 144 字节
 - 差异: 0 字节 (0.00%)
 
 ## 结构分析
@@ -20,10 +20,10 @@
   "atoms": [
     {
       "index": 0,
-      "rawLength": 56,
-      "actualLength": 28,
+      "rawLength": 104,
+      "actualLength": 52,
       "isWideChar": 0,
-      "string": "tmp/object-literal-simple.js",
+      "string": "__tests__/compiler/fixtures/object-literal-simple.js",
       "offset": 2
     },
     {
@@ -32,7 +32,7 @@
       "actualLength": 4,
       "isWideChar": 0,
       "string": "info",
-      "offset": 31
+      "offset": 55
     },
     {
       "index": 2,
@@ -40,7 +40,7 @@
       "actualLength": 1,
       "isWideChar": 0,
       "string": "a",
-      "offset": 36
+      "offset": 60
     },
     {
       "index": 3,
@@ -48,7 +48,7 @@
       "actualLength": 1,
       "isWideChar": 0,
       "string": "b",
-      "offset": 38
+      "offset": 62
     },
     {
       "index": 4,
@@ -56,7 +56,7 @@
       "actualLength": 5,
       "isWideChar": 0,
       "string": "hello",
-      "offset": 40
+      "offset": 64
     },
     {
       "index": 5,
@@ -64,11 +64,11 @@
       "actualLength": 1,
       "isWideChar": 0,
       "string": "c",
-      "offset": 46
+      "offset": 70
     }
   ],
   "functionHeader": {
-    "offset": 48,
+    "offset": 72,
     "tag": "0xd",
     "remaining": 72
   }
@@ -84,10 +84,10 @@
   "atoms": [
     {
       "index": 0,
-      "rawLength": 56,
-      "actualLength": 28,
+      "rawLength": 104,
+      "actualLength": 52,
       "isWideChar": 0,
-      "string": "tmp/object-literal-simple.js",
+      "string": "__tests__/compiler/fixtures/object-literal-simple.js",
       "offset": 2
     },
     {
@@ -96,7 +96,7 @@
       "actualLength": 4,
       "isWideChar": 0,
       "string": "info",
-      "offset": 31
+      "offset": 55
     },
     {
       "index": 2,
@@ -104,7 +104,7 @@
       "actualLength": 1,
       "isWideChar": 0,
       "string": "a",
-      "offset": 36
+      "offset": 60
     },
     {
       "index": 3,
@@ -112,7 +112,7 @@
       "actualLength": 1,
       "isWideChar": 0,
       "string": "b",
-      "offset": 38
+      "offset": 62
     },
     {
       "index": 4,
@@ -120,7 +120,7 @@
       "actualLength": 5,
       "isWideChar": 0,
       "string": "hello",
-      "offset": 40
+      "offset": 64
     },
     {
       "index": 5,
@@ -128,11 +128,11 @@
       "actualLength": 1,
       "isWideChar": 0,
       "string": "c",
-      "offset": 46
+      "offset": 70
     }
   ],
   "functionHeader": {
-    "offset": 48,
+    "offset": 72,
     "tag": "0xd",
     "remaining": 72
   }
@@ -148,24 +148,26 @@
 
 ### TypeScript
 ```
-00000000: 05 06 38 74 6d 70 2f 6f 62 6a 65 63 74 2d 6c 69 |..8tmp/object-li|
-00000010: 74 65 72 61 6c 2d 73 69 6d 70 6c 65 2e 6a 73 08 |teral-simple.js.|
-00000020: 69 6e 66 6f 02 61 02 62 0a 68 65 6c 6c 6f 02 63 |info.a.b.hello.c|
-00000030: 0d c8 03 00 00 00 00 00 0c 20 06 01 a4 01 00 00 |......... ......|
-00000040: 00 02 01 01 1f 00 ca 03 00 0d 08 ec 02 29 0b b8 |.............)..|
-00000050: 4e e6 00 00 00 c1 00 4e e7 00 00 00 04 e8 00 00 |N......N........|
-00000060: 00 4e e9 00 00 00 e3 06 2f c8 03 02 00 00 00 06 |.N....../.......|
-00000070: 00 00 00 00 00 00 0c 40                         |.......@|
+00000000: 05 06 68 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..h__tests__/com|
+00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 6f |piler/fixtures/o|
+00000020: 62 6a 65 63 74 2d 6c 69 74 65 72 61 6c 2d 73 69 |bject-literal-si|
+00000030: 6d 70 6c 65 2e 6a 73 08 69 6e 66 6f 02 61 02 62 |mple.js.info.a.b|
+00000040: 0a 68 65 6c 6c 6f 02 63 0d c8 03 00 00 00 00 00 |.hello.c........|
+00000050: 0c 20 06 01 a4 01 00 00 00 02 01 01 1f 00 ca 03 |. ..............|
+00000060: 00 0d 08 ec 02 29 0b b8 4e e6 00 00 00 c1 00 4e |.....)..N......N|
+00000070: e7 00 00 00 04 e8 00 00 00 4e e9 00 00 00 e3 06 |.........N......|
+00000080: 2f c8 03 02 00 00 00 06 00 00 00 00 00 00 0c 40 |/..............@|
 ```
 
 ### WASM
 ```
-00000000: 05 06 38 74 6d 70 2f 6f 62 6a 65 63 74 2d 6c 69 |..8tmp/object-li|
-00000010: 74 65 72 61 6c 2d 73 69 6d 70 6c 65 2e 6a 73 08 |teral-simple.js.|
-00000020: 69 6e 66 6f 02 61 02 62 0a 68 65 6c 6c 6f 02 63 |info.a.b.hello.c|
-00000030: 0d c8 03 00 00 00 00 00 0c 20 06 01 a4 01 00 00 |......... ......|
-00000040: 00 02 01 01 1f 00 ca 03 00 0d 08 ec 02 29 0b b8 |.............)..|
-00000050: 4e e6 00 00 00 c1 00 4e e7 00 00 00 04 e8 00 00 |N......N........|
-00000060: 00 4e e9 00 00 00 e3 06 2f c8 03 02 00 00 00 06 |.N....../.......|
-00000070: 00 00 00 00 00 00 0c 40                         |.......@|
+00000000: 05 06 68 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..h__tests__/com|
+00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 6f |piler/fixtures/o|
+00000020: 62 6a 65 63 74 2d 6c 69 74 65 72 61 6c 2d 73 69 |bject-literal-si|
+00000030: 6d 70 6c 65 2e 6a 73 08 69 6e 66 6f 02 61 02 62 |mple.js.info.a.b|
+00000040: 0a 68 65 6c 6c 6f 02 63 0d c8 03 00 00 00 00 00 |.hello.c........|
+00000050: 0c 20 06 01 a4 01 00 00 00 02 01 01 1f 00 ca 03 |. ..............|
+00000060: 00 0d 08 ec 02 29 0b b8 4e e6 00 00 00 c1 00 4e |.....)..N......N|
+00000070: e7 00 00 00 04 e8 00 00 00 4e e9 00 00 00 e3 06 |.........N......|
+00000080: 2f c8 03 02 00 00 00 06 00 00 00 00 00 00 0c 40 |/..............@|
 ```

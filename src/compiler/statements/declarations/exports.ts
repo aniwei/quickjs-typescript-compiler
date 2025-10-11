@@ -66,5 +66,18 @@ export function compileExportAssignment(compiler: Compiler, node: ts.ExportAssig
   }
 
   const exportedAtom = compiler.getAtomId('default')
-  compiler.registerModuleLocalExport(exportedAtom, varIndex)
+  const targetVarIndex = compiler.registerModuleLocalExport(exportedAtom, varIndex, {
+    createDefaultAlias: true,
+  })
+
+  compiler.emitLoadIdentifier(expression)
+  const targetVar = compiler.getFunctionVar(targetVarIndex)
+  compiler.emitStoreToLexical(targetVar.name, { suppressDebug: false })
+  if (process.env.DEBUG_PC2LINE === '1') {
+    console.log('pc2line:export-assignment', {
+      expression: expression.getText(),
+      nodeKind: ts.SyntaxKind[node.kind],
+    })
+  }
+  compiler.recordStatementDebug(node)
 }

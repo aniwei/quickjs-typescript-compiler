@@ -343,6 +343,10 @@ function getBinaryOperationOpcode(operator: ts.SyntaxKind): Opcode | null {
       return Opcode.OP_or
     case ts.SyntaxKind.CaretToken:
       return Opcode.OP_xor
+    case ts.SyntaxKind.InKeyword:
+      return Opcode.OP_in
+    case ts.SyntaxKind.InstanceOfKeyword:
+      return Opcode.OP_instanceof
     default:
       return null
   }

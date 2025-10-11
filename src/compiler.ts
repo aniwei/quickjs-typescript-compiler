@@ -176,7 +176,6 @@ export class Compiler {
     })
 
     this.lineRecorder = new LineRecorder(this.sourceFile, this.utf8Tracker)
-
   }
 
   compile(): FunctionDef {
@@ -248,7 +247,7 @@ export class Compiler {
     this.currentSourceNode = null
     this.currentStatementNode = null
     this.utf8Tracker.resetCache()
-  this.lineRecorder.reset()
+    this.lineRecorder.reset()
     this.hasExplicitReturn = false
     this.moduleHoistLabel = null
     this.controlFlow.reset()
@@ -291,7 +290,7 @@ export class Compiler {
       labelPositions: new Map(this.labelPositions),
       pendingJumps: this.pendingJumps.map((entry) => ({ ...entry })),
       utf8PositionSnapshot: this.utf8Tracker.createSnapshot(),
-  lineRecorderSnapshot: this.lineRecorder.createSnapshot(),
+      lineRecorderSnapshot: this.lineRecorder.createSnapshot(),
       hasExplicitReturn: this.hasExplicitReturn,
       moduleHoistInsertionIndex: this.moduleHoistInsertionIndex,
       moduleHoistLabel: this.moduleHoistLabel,
@@ -406,7 +405,7 @@ export class Compiler {
   }
 
   public compileChildFunction(
-    node: ts.FunctionDeclaration | ts.FunctionExpression,
+    node: ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction,
     nameAtom: Atom,
     options: { isExpression: boolean }
   ): FunctionDef {
@@ -417,6 +416,8 @@ export class Compiler {
       isFuncExpr: options.isExpression,
       sourcePos,
     })
+
+    const isArrowFunction = ts.isArrowFunction(node)
 
     const isAsync = node.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.AsyncKeyword) ?? false
     const isGenerator = Boolean(node.asteriskToken)
@@ -439,8 +440,8 @@ export class Compiler {
     childFunction.bytecode.filename = this.moduleAtom
     childFunction.bytecode.argumentsAllowed = true
     childFunction.bytecode.hasSimpleParameterList = true
-    childFunction.bytecode.hasPrototype = funcKind === FunctionKind.JS_FUNC_NORMAL
-    childFunction.bytecode.newTargetAllowed = true
+  childFunction.bytecode.hasPrototype = !isArrowFunction && funcKind === FunctionKind.JS_FUNC_NORMAL
+  childFunction.bytecode.newTargetAllowed = !isArrowFunction
 
     parentFunction.appendChild(childFunction)
 
@@ -461,12 +462,23 @@ export class Compiler {
       this.compileFunctionParameter(parameters[index], index, parameters.length)
     }
 
-    if (!node.body || !ts.isBlock(node.body)) {
-      throw new Error('Only block bodies are supported for function declarations')
+    if (!node.body) {
+      throw new Error('Function is missing a body')
     }
 
-    for (const statement of node.body.statements) {
-      this.visitNode(statement)
+    if (ts.isBlock(node.body)) {
+      for (const statement of node.body.statements) {
+        this.visitNode(statement)
+      }
+    } else if (isArrowFunction) {
+      const expressionBody = node.body
+      this.withSourceNode(expressionBody, () => {
+        this.compileExpression(expressionBody)
+      })
+      this.emitReturnOpcode(expressionBody)
+      this.markExplicitReturn()
+    } else {
+      throw new Error('Only block bodies are supported for function declarations')
     }
 
     if (!this.hasExplicitReturn) {
@@ -686,6 +698,21 @@ export class Compiler {
     const currentStatement = this.currentStatementNode
     if (currentStatement && ts.isExpressionStatement(currentStatement) && currentStatement.expression === expression) {
       this.recordDebugPoint(expression)
+    }
+  }
+
+  public recordStatementDebug(node: ts.Statement) {
+    const isCurrentStatement = this.currentStatementNode === node
+    if (process.env.DEBUG_PC2LINE === '1') {
+      console.log('pc2line:record-statement-attempt', {
+        nodeKind: ts.SyntaxKind[node.kind],
+        currentOffset: this.currentOffset,
+        isCurrentStatement,
+        currentStatementKind: this.currentStatementNode ? ts.SyntaxKind[this.currentStatementNode.kind] : null,
+      })
+    }
+    if (isCurrentStatement) {
+      this.recordDebugPoint(node)
     }
   }
 
@@ -984,21 +1011,32 @@ export class Compiler {
     this.closureVarIndices.set(atom, closureIndex)
   }
 
-  public emitStoreToLexical(atom: Atom) {
+  public emitStoreToLexical(atom: Atom, options: { suppressDebug?: boolean } = {}) {
+    const suppressDebug = options.suppressDebug ?? true
     const slot = this.localVarIndices.get(atom)
     if (slot !== undefined) {
-      this.withoutDebugRecording(() => {
+      const write = () => {
         this.emitStoreToLocal(slot)
-      })
+      }
+      if (suppressDebug) {
+        this.withoutDebugRecording(write)
+      } else {
+        write()
+      }
       return
     }
     const closureIndex = this.closureVarIndices.get(atom)
     if (closureIndex === undefined) {
       throw new Error('Unknown lexical variable')
     }
-    this.withoutDebugRecording(() => {
+    const writeClosure = () => {
       this.emitPutVarRef(closureIndex)
-    })
+    }
+    if (suppressDebug) {
+      this.withoutDebugRecording(writeClosure)
+    } else {
+      writeClosure()
+    }
   }
 
   public isGlobalVarContext(): boolean {
@@ -1024,10 +1062,44 @@ export class Compiler {
     })
   }
 
-  public registerModuleLocalExport(exportedName: Atom, localVarIndex: number) {
+  public registerModuleLocalExport(exportedName: Atom, localVarIndex: number, options: { createDefaultAlias?: boolean } = {}): number {
     const moduleRecord = this.currentFunction.module
     if (!moduleRecord) {
-      return
+      throw new Error('Not compiling a module')
+    }
+
+    let targetVarIndex = localVarIndex
+    const defaultAtom = this.getAtomId('default')
+    const isDefaultExport = exportedName === defaultAtom
+    const isModuleTopLevel = this.isModuleTopLevelScope()
+    const shouldCreateDefaultAlias = isDefaultExport && isModuleTopLevel && options.createDefaultAlias === true
+
+    if (shouldCreateDefaultAlias) {
+      const defaultAliasAtom = JSAtom.JS_ATOM__default_
+      const existingBinding = this.getBindingInfo(defaultAliasAtom)
+      let aliasVarIndex: number
+
+      if (existingBinding) {
+        aliasVarIndex = existingBinding.binding.index
+      } else {
+        aliasVarIndex = this.declareLexicalVariable(defaultAliasAtom, {
+          isConst: false,
+          isLet: true,
+          capture: true,
+        })
+      }
+
+      const aliasVariable = this.getFunctionVar(aliasVarIndex)
+
+      if (this.isGlobalVarContext()) {
+        this.registerGlobalVar(defaultAliasAtom, {
+          scopeLevel: aliasVariable.scopeLevel,
+          isLexical: aliasVariable.isLexical,
+          isConst: aliasVariable.isConst,
+          forceInit: true,
+        })
+      }
+      targetVarIndex = aliasVarIndex
     }
 
     const existingIndex = moduleRecord.exportEntries.findIndex((entry) => {
@@ -1037,7 +1109,7 @@ export class Compiler {
     const exportEntry: ModuleExportEntryLocal = {
       type: ModuleExportType.Local,
       exportedName,
-      localVarIndex,
+      localVarIndex: targetVarIndex,
     }
 
     if (existingIndex >= 0) {
@@ -1045,6 +1117,8 @@ export class Compiler {
     } else {
       moduleRecord.exportEntries.push(exportEntry)
     }
+
+    return targetVarIndex
   }
 
   private injectModuleHoistedDefinitions(func: FunctionDef) {

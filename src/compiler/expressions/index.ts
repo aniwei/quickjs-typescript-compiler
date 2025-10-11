@@ -18,7 +18,7 @@ import {
   compilePropertyAccessExpression,
   compileVoidExpression,
 } from './operators'
-import { compileFunctionExpression } from './function'
+import { compileArrowFunctionExpression, compileFunctionExpression } from './function'
 
 export function compileExpression(compiler: Compiler, expression: ts.Expression): void {
   if (ts.isParenthesizedExpression(expression)) {
@@ -98,6 +98,11 @@ export function compileExpression(compiler: Compiler, expression: ts.Expression)
 
   if (ts.isFunctionExpression(expression)) {
     compileFunctionExpression(compiler, expression)
+    return
+  }
+
+  if (ts.isArrowFunction(expression)) {
+    compileArrowFunctionExpression(compiler, expression)
     return
   }
 
