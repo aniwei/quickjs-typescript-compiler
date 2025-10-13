@@ -33,22 +33,24 @@ export function computeFunctionStackSize(bytecode: FunctionBytecode): number {
     if (stackLen > stackLenMax) {
       stackLenMax = stackLen
     }
-    if (stackLevel[pos] !== -1) {
-      if (stackLevel[pos] !== stackLen) {
-        throw new Error(
-          `inconsistent stack size at pc=${pos}: expected ${stackLevel[pos]}, got ${stackLen}`
-        )
+    const recordedLevel = stackLevel[pos]
+    if (recordedLevel !== -1) {
+      if (stackLen < recordedLevel || catchPos[pos] !== catchOffset) {
+        stackLevel[pos] = stackLen
+        catchPos[pos] = catchOffset
+        worklist.splice(worklistIndex, 0, pos)
+        return
       }
-      if (catchPos[pos] !== catchOffset) {
+      if (recordedLevel !== stackLen) {
         throw new Error(
-          `inconsistent catch position at pc=${pos}: expected ${catchPos[pos]}, got ${catchOffset}`
+          `inconsistent stack size at pc=${pos}: expected ${recordedLevel}, got ${stackLen}`
         )
       }
       return
     }
     stackLevel[pos] = stackLen
     catchPos[pos] = catchOffset
-    worklist.push(pos)
+    worklist.splice(worklistIndex, 0, pos)
   }
 
   const resolveCatch = (currentCatch: number, catchLevel: number): number => {

@@ -66,35 +66,10 @@ export function createConstructorFunctionExpression(
   node: ts.ClassDeclaration,
   classIdentifier: ts.Identifier,
   constructorDecl: ts.ConstructorDeclaration | undefined,
-  baseIdentifier: ts.Identifier | null
+  hasHeritage: boolean
 ): ts.FunctionExpression {
   if (constructorDecl) {
     const statements = constructorDecl.body ? [...constructorDecl.body.statements] : []
-    const transformedStatements = baseIdentifier
-      ? statements.map((statement) => {
-          if (
-            ts.isExpressionStatement(statement) &&
-            ts.isCallExpression(statement.expression) &&
-            statement.expression.expression.kind === ts.SyntaxKind.SuperKeyword
-          ) {
-                const callArguments = [
-                  ts.factory.createThis(),
-                  ...statement.expression.arguments.map((arg) => arg),
-                ]
-                const callExpression = setRangeFrom(
-                  ts.factory.createCallExpression(
-                    createPropertyAccessFromSource(baseIdentifier, 'call', statement),
-                    undefined,
-                    callArguments
-                  ),
-                  statement
-                )
-                return setRangeFrom(ts.factory.createExpressionStatement(callExpression), statement)
-          }
-          return statement
-        })
-      : statements
-
     const func = ts.factory.createFunctionExpression(
       undefined,
       undefined,
@@ -102,39 +77,30 @@ export function createConstructorFunctionExpression(
       undefined,
       constructorDecl.parameters,
       undefined,
-      ts.factory.createBlock(transformedStatements, true)
+      ts.factory.createBlock(statements, true)
     )
     return setRangeFrom(func, constructorDecl)
   }
 
-  if (baseIdentifier) {
-    const func = ts.factory.createFunctionExpression(
-      undefined,
-      undefined,
-      classIdentifier,
-      undefined,
-      [],
-      undefined,
-      ts.factory.createBlock(
-        [
-                    setRangeFrom(
-                        ts.factory.createExpressionStatement(
-                            setRangeFrom(
-                                ts.factory.createCallExpression(
-                                    createPropertyAccessFromSource(baseIdentifier, 'apply', node),
-                                    undefined,
-                                    [ts.factory.createThis(), createIdentifierFromSource('arguments', node)]
-                                ),
-                                node
-                            )
-                        ),
-                        node
-                    ),
-        ],
-        true
-      )
+  const bodyStatements: ts.Statement[] = []
+
+  if (hasHeritage) {
+    const argumentsIdentifier = createIdentifierFromSource('arguments', node)
+    const spreadArguments = setRangeFrom(ts.factory.createSpreadElement(argumentsIdentifier), node)
+    const superCall = setRangeFrom(
+      ts.factory.createExpressionStatement(
+        setRangeFrom(
+          ts.factory.createCallExpression(
+            ts.factory.createSuper(),
+            undefined,
+            [spreadArguments]
+          ),
+          node
+        )
+      ),
+      node
     )
-    return setRangeFrom(func, node)
+    bodyStatements.push(superCall)
   }
 
   const func = ts.factory.createFunctionExpression(
@@ -144,7 +110,7 @@ export function createConstructorFunctionExpression(
     undefined,
     [],
     undefined,
-    ts.factory.createBlock([], true)
+    ts.factory.createBlock(bodyStatements, true)
   )
   return setRangeFrom(func, node)
 }

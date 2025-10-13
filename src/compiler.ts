@@ -57,6 +57,16 @@ import {
   type ContinueResolution,
 } from './controlFlow'
 
+const enum SpecialObject {
+  Arguments = 0,
+  MappedArguments = 1,
+  ThisFunction = 2,
+  NewTarget = 3,
+  HomeObject = 4,
+  VarObject = 5,
+  ImportMeta = 6,
+}
+
 export interface CompilerOptions {
   atomTable?: AtomTable
   referenceJsSource?: string | null
@@ -89,6 +99,18 @@ interface FunctionContextSnapshot {
 }
 interface EmitDebugInfoOptions {
   tsSourcePos?: number
+}
+
+interface DerivedConstructorContext {
+  functionDef: FunctionDef
+  thisActiveSlot: number
+  newTargetSlot: number
+  thisSlot: number
+  thisScopeLevel: number
+  prologueInitialized: boolean
+  classFieldsVarRefIndex: number | null
+  classFieldsIsLexical: boolean
+  classFieldsCallEmitted: boolean
 }
 
 export class Compiler {
@@ -126,6 +148,8 @@ export class Compiler {
   private hasExplicitReturn = false
   private moduleHoistInsertionIndex: number | null = null
   private moduleHoistLabel: string | null = null
+  private pendingChildSetups: Array<(compiler: Compiler) => void> | null = null
+  private derivedConstructorContext: DerivedConstructorContext | null = null
 
   constructor(private readonly fileName: string, private readonly sourceCode: string, options: CompilerOptions = {}) {
     this.atomTable = options.atomTable ?? new AtomTable()
@@ -445,6 +469,9 @@ export class Compiler {
 
     parentFunction.appendChild(childFunction)
 
+    const scheduledSetups = this.pendingChildSetups
+    this.pendingChildSetups = null
+
     const snapshot = this.saveCurrentFunctionContext()
     this.resetCodegenState()
     this.currentFunction = childFunction
@@ -454,6 +481,12 @@ export class Compiler {
   this.currentFunction.bytecode.recordLineNumber(0, startLineColumn.line, startLineColumn.column, childFunction.sourcePos, 0)
 
     this.pushScope(ScopeKind.Function)
+
+    if (scheduledSetups) {
+      for (const setup of scheduledSetups) {
+        setup(this)
+      }
+    }
 
     const parameters = node.parameters.filter((parameter) => !this.isThisParameter(parameter))
 
@@ -482,15 +515,32 @@ export class Compiler {
     }
 
     if (!this.hasExplicitReturn) {
+      const derivedContext = this.getDerivedConstructorContext()
+      if (derivedContext) {
+        this.emitInstruction(Opcode.OP_get_loc_checkthis, [derivedContext.thisSlot], null)
+        this.emitInstruction(Opcode.OP_return, [], null)
+        this.markExplicitReturn()
+      }
+    }
+
+    if (!this.hasExplicitReturn) {
       this.emitVoidReturnOpcode()
     }
 
     this.popScope()
     this.resolvePendingJumps()
     this.finalizeFunction(childFunction)
+    this.endDerivedConstructorContext(childFunction)
     this.restoreFunctionContext(snapshot)
 
     return childFunction
+  }
+
+  public scheduleChildSetup(callback: (compiler: Compiler) => void) {
+    if (!this.pendingChildSetups) {
+      this.pendingChildSetups = []
+    }
+    this.pendingChildSetups.push(callback)
   }
 
   private isThisParameter(parameter: ts.ParameterDeclaration): boolean {
@@ -693,12 +743,177 @@ export class Compiler {
     }
   }
 
+  public beginDerivedConstructorContext() {
+    const existing = this.getDerivedConstructorContext()
+    if (existing) {
+      return
+    }
+
+    const thisActiveAtom = this.getAtomId('this.active_func')
+    this.declareLexicalVariable(thisActiveAtom, {
+      isConst: false,
+      isLet: false,
+      capture: false,
+    })
+    const thisActiveSlot = this.getLocalVarSlot(thisActiveAtom)
+    if (thisActiveSlot === undefined) {
+      throw new Error('Failed to allocate local slot for this.active_func')
+    }
+
+    const newTargetAtom = this.getAtomId('new.target')
+    this.declareLexicalVariable(newTargetAtom, {
+      isConst: false,
+      isLet: false,
+      capture: false,
+    })
+    const newTargetSlot = this.getLocalVarSlot(newTargetAtom)
+    if (newTargetSlot === undefined) {
+      throw new Error('Failed to allocate local slot for new.target')
+    }
+
+    const thisAtom = this.getAtomId('this')
+    const thisVarIndex = this.declareLexicalVariable(thisAtom, {
+      isConst: false,
+      isLet: true,
+      capture: false,
+    })
+    const thisVar = this.getFunctionVar(thisVarIndex)
+    const thisSlot = this.getLocalVarSlot(thisAtom)
+    if (thisSlot === undefined) {
+      throw new Error('Failed to allocate local slot for this binding')
+    }
+
+    const classFieldsAtom = this.getAtomId('class_fields_init')
+    const classFieldsCapture = this.resolveCapturedIdentifier(classFieldsAtom)
+    const classFieldsVarRefIndex = classFieldsCapture ? classFieldsCapture.index : null
+    const classFieldsIsLexical = classFieldsCapture ? classFieldsCapture.isLexical : false
+
+    this.derivedConstructorContext = {
+      functionDef: this.currentFunction,
+      thisActiveSlot,
+      newTargetSlot,
+      thisSlot,
+      thisScopeLevel: thisVar.scopeLevel,
+      prologueInitialized: false,
+      classFieldsVarRefIndex,
+      classFieldsIsLexical,
+      classFieldsCallEmitted: false,
+    }
+  }
+
+  private getDerivedConstructorContext(): DerivedConstructorContext | null {
+    if (!this.derivedConstructorContext) {
+      return null
+    }
+    if (this.derivedConstructorContext.functionDef !== this.currentFunction) {
+      return null
+    }
+    return this.derivedConstructorContext
+  }
+
+  private endDerivedConstructorContext(functionDef: FunctionDef) {
+    if (this.derivedConstructorContext && this.derivedConstructorContext.functionDef === functionDef) {
+      this.derivedConstructorContext = null
+    }
+  }
+
   public emitDefineClass(atom: Atom, flags: number, node?: ts.Node | null) {
     this.emitOpcode(Opcode.OP_define_class, [atom, flags], node ?? null)
   }
 
   public emitRawOpcode(opcode: Opcode, operands: number[] = [], node?: ts.Node | null) {
     this.emitOpcode(opcode, operands, node ?? null)
+  }
+  public emitDerivedConstructorSuperCall(
+    args: readonly ts.Expression[],
+    node: ts.CallExpression,
+    debugOptions: EmitDebugInfoOptions | undefined,
+  ) {
+    const context = this.getDerivedConstructorContext()
+    if (!context) {
+      throw new Error('super() call is only supported inside a derived class constructor')
+    }
+
+    if (process.env.DEBUG_DERIVED === '1') {
+      const funcAtom = this.currentFunction.bytecode.name
+      const funcName = typeof funcAtom === 'number' ? this.atomTable.getAtomString(funcAtom) ?? `<atom:${funcAtom}>` : funcAtom
+      console.log('emitDerivedConstructorSuperCall', {
+        args: args.length,
+        prologueInitialized: context.prologueInitialized,
+        functionName: funcName,
+      })
+    }
+
+    if (!context.prologueInitialized) {
+      this.emitInstruction(Opcode.OP_special_object, [SpecialObject.ThisFunction], node.expression)
+      this.emitStoreToLocal(context.thisActiveSlot)
+      this.emitInstruction(Opcode.OP_special_object, [SpecialObject.NewTarget], node.expression)
+      this.emitStoreToLocal(context.newTargetSlot)
+      this.emitSetLocalUninitialized(context.thisSlot, context.thisScopeLevel)
+      this.emitInstruction(Opcode.OP_check_ctor, [], node.expression)
+      context.prologueInitialized = true
+    }
+
+    this.emitLoadLocal(context.thisActiveSlot, node.expression)
+    this.emitInstruction(Opcode.OP_get_super, [], node.expression)
+    this.emitLoadLocal(context.newTargetSlot, node.expression)
+
+    for (const arg of args) {
+      this.withSourceNode(arg, () => {
+        this.compileExpression(arg)
+      })
+    }
+
+    this.emitInstruction(Opcode.OP_call_constructor, [args.length], node, debugOptions)
+    this.emitInstruction(Opcode.OP_dup, [], node)
+    this.emitInstruction(Opcode.OP_put_loc_check_init, [context.thisSlot], node)
+
+    if (context.classFieldsVarRefIndex !== null) {
+      if (context.classFieldsIsLexical) {
+        this.emitInstruction(Opcode.OP_get_var_ref_check, [context.classFieldsVarRefIndex], node)
+      } else {
+        const classFieldsAtom = this.getAtomId('class_fields_init')
+        this.emitInstruction(Opcode.OP_get_var, [classFieldsAtom], node)
+      }
+      this.emitInstruction(Opcode.OP_dup, [], node)
+  const skipLabel = this.createLabel()
+  this.emitJump(Opcode.OP_if_false8, skipLabel)
+      this.emitInstruction(Opcode.OP_get_loc_check, [context.thisSlot], node)
+      this.emitInstruction(Opcode.OP_swap, [], node)
+      this.emitInstruction(Opcode.OP_call_method, [0], node)
+  this.emitInstruction(Opcode.OP_drop, [], node)
+  this.markLabel(skipLabel)
+      this.emitInstruction(Opcode.OP_drop, [], node)
+  // fall through to shared continuation (matches QuickJS codegen)
+      context.classFieldsCallEmitted = true
+    }
+
+    if (process.env.DEBUG_DERIVED === '1') {
+      const instructions = this.currentFunction.bytecode.instructions.map((ins) => ({
+        opcode: Opcode[ins.opcode] ?? ins.opcode,
+        rawOpcode: ins.opcode,
+        operands: ins.operands,
+      }))
+      const offsets: number[] = []
+      let offset = 0
+      for (let i = 0; i < this.currentFunction.bytecode.instructions.length; i += 1) {
+        offsets.push(offset)
+        offset += getInstructionSize(this.currentFunction.bytecode.instructions[i])
+      }
+      console.log('derived instructions', instructions.map((entry, index) => ({
+        offset: offsets[index],
+        ...entry,
+      })))
+    }
+  }
+
+  public emitThisExpression(node: ts.Expression) {
+    const context = this.getDerivedConstructorContext()
+    if (context) {
+      this.emitInstruction(Opcode.OP_get_loc_checkthis, [context.thisSlot], node)
+      return
+    }
+    this.emitInstruction(Opcode.OP_push_this, [], node)
   }
 
   public compileExpression(expression: ts.Expression): void {
@@ -836,8 +1051,21 @@ export class Compiler {
     this.emitOpcode(Opcode.OP_put_var_ref, [index])
   }
 
-  private emitLoadLocalCheck(index: number, node?: ts.Node) {
+  public emitLoadLocalCheck(index: number, node?: ts.Node) {
     this.emitOpcode(Opcode.OP_get_loc_check, [index], node)
+  }
+
+  public emitLoadLocal(index: number, node?: ts.Node | null) {
+    const shortOpcode = getIndexedOpcode('OP_get_loc', index)
+    if (shortOpcode !== undefined) {
+      this.emitOpcode(shortOpcode, [], node ?? null)
+      return
+    }
+    if (env.supportsShortOpcodes && index <= 0xff) {
+      this.emitOpcode(Opcode.OP_get_loc8, [index], node ?? null)
+      return
+    }
+    this.emitOpcode(Opcode.OP_get_loc, [index], node ?? null)
   }
 
   private resolveCapturedIdentifier(atom: Atom): { index: number; isLexical: boolean } | null {
@@ -1249,6 +1477,15 @@ export class Compiler {
     node?: ts.Node | null,
     debugOptions?: EmitDebugInfoOptions
   ): number {
+    if (process.env.DEBUG_DERIVED === '1' && opcode === Opcode.OP_special_object) {
+      const funcAtom = this.currentFunction.bytecode.name
+      const funcName = typeof funcAtom === 'number' ? this.atomTable.getAtomString(funcAtom) ?? `<atom:${funcAtom}>` : funcAtom
+      console.log('emitOpcode(OP_special_object)', {
+        functionName: funcName,
+        operands,
+        instructionIndex: this.currentFunction.bytecode.instructions.length,
+      })
+    }
     const def = getOpcodeDefinition(opcode)
     if (!def) {
       throw new Error(`Unknown opcode: ${opcode}`)

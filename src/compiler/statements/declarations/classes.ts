@@ -4,11 +4,8 @@ import type { Compiler } from '../../../compiler'
 import { VarKind } from '../../../vars'
 import {
   createConstructorFunctionExpression,
-  createIdentifierFromSource,
   createInternalIdentifier,
   createMethodFunctionExpression,
-  createPropertyAccessFromSource,
-  setRangeFrom,
 } from './helpers'
 
 const enum ClassFlags {
@@ -77,31 +74,18 @@ export function compileClassDeclaration(compiler: Compiler, node: ts.ClassDeclar
   const heritageClause = node.heritageClauses?.find((clause) => clause.token === ts.SyntaxKind.ExtendsKeyword)
   const hasHeritage = Boolean(heritageClause)
 
-  let baseIdentifier: ts.Identifier | null = null
-
   if (heritageClause) {
     const baseType = heritageClause.types[0]
     if (!baseType) {
       throw new Error('Extends clause must specify a base type')
     }
-    baseIdentifier = createInternalIdentifier(`${classIdentifier.text}_base`, node)
-    const baseAtom = compiler.getAtomId(baseIdentifier.text)
-    const baseVarIndex = compiler.declareLexicalVariable(baseAtom, { isConst: true, isLet: true, capture: false })
-    const baseVar = compiler.getFunctionVar(baseVarIndex)
-    const baseSlot = compiler.getLocalVarSlot(baseAtom)
-    if (baseSlot !== undefined) {
-      compiler.emitSetLocalUninitialized(baseSlot, baseVar.scopeLevel)
-    }
-
     compiler.withSourceNode(baseType.expression, () => {
       compiler.compileExpression(baseType.expression)
     })
-    compiler.emitStoreToLexical(baseAtom)
-    compiler.emitLoadIdentifier(createIdentifierFromSource(baseIdentifier.text, node))
   } else {
     compiler.emitRawOpcode(Opcode.OP_undefined, [], node)
   }
-  const constructorInfo = compileConstructorFunction(compiler, node, classIdentifier, baseIdentifier, hasHeritage)
+  const constructorInfo = compileConstructorFunction(compiler, node, classIdentifier, hasHeritage)
   compiler.emitPushConstantIndex(constructorInfo.constantIndex, constructorInfo.debugNode)
   compiler.emitDefineClass(classAtom, hasHeritage ? ClassFlags.HasHeritage : ClassFlags.None, node)
 
@@ -139,49 +123,16 @@ function compileConstructorFunction(
   compiler: Compiler,
   classNode: ts.ClassDeclaration,
   classIdentifier: ts.Identifier,
-  baseIdentifier: ts.Identifier | null,
   hasHeritage: boolean,
 ) {
   const constructorDecl = classNode.members.find((member): member is ts.ConstructorDeclaration => ts.isConstructorDeclaration(member))
-  let ctorExpression = createConstructorFunctionExpression(classNode, classIdentifier, constructorDecl, baseIdentifier)
+  let ctorExpression = createConstructorFunctionExpression(classNode, classIdentifier, constructorDecl, hasHeritage)
 
-  if (ctorExpression.body) {
-    const classFieldsIdentifier = createIdentifierFromSource('class_fields_init', ctorExpression)
-    const callExpression = setRangeFrom(
-      ts.factory.createCallExpression(
-        createPropertyAccessFromSource(createIdentifierFromSource('class_fields_init', ctorExpression), 'call', ctorExpression),
-        undefined,
-        [ts.factory.createThis()]
-      ),
-      ctorExpression
-    )
-    const initStatement = setRangeFrom(
-      ts.factory.createIfStatement(
-        classFieldsIdentifier,
-        setRangeFrom(
-          ts.factory.createBlock(
-            [setRangeFrom(ts.factory.createExpressionStatement(callExpression), ctorExpression)],
-            true
-          ),
-          ctorExpression
-        ),
-        undefined
-      ),
-      ctorExpression
-    )
-    const updatedBody = ts.factory.updateBlock(ctorExpression.body, [initStatement, ...ctorExpression.body.statements])
-    ctorExpression = ts.factory.updateFunctionExpression(
-      ctorExpression,
-      ctorExpression.modifiers,
-      ctorExpression.asteriskToken,
-      ctorExpression.name,
-      ctorExpression.typeParameters,
-      ctorExpression.parameters,
-      ctorExpression.type,
-      updatedBody
-    )
+  if (hasHeritage) {
+    compiler.scheduleChildSetup((childCompiler: Compiler) => {
+      childCompiler.beginDerivedConstructorContext()
+    })
   }
-
   const constructorFunction = compiler.compileChildFunction(ctorExpression, compiler.getAtomId(classIdentifier.text), {
     isExpression: true,
   })

@@ -57,7 +57,7 @@ export function compileNullLiteral(compiler: Compiler, expression: ts.Expression
 }
 
 export function compileThisExpression(compiler: Compiler, expression: ts.Expression) {
-  compiler.emitInstruction(Opcode.OP_push_this, [], expression)
+  compiler.emitThisExpression(expression)
 }
 
 export function compileTemplateExpression(compiler: Compiler, expression: ts.TemplateExpression) {

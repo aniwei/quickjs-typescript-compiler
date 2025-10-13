@@ -5,5 +5,12 @@ import { Opcode } from '../../../env'
 export function compileExpressionStatement(compiler: Compiler, node: ts.ExpressionStatement) {
   compiler.recordExpressionStatementDebug(node.expression)
   compiler.compileExpression(node.expression)
-  compiler.emitInstruction(Opcode.OP_drop, [], node.expression)
+  if (
+    !(
+      ts.isCallExpression(node.expression) &&
+      node.expression.expression.kind === ts.SyntaxKind.SuperKeyword
+    )
+  ) {
+    compiler.emitInstruction(Opcode.OP_drop, [], node.expression)
+  }
 }

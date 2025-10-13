@@ -34,6 +34,11 @@ export function compileCallExpression(compiler: Compiler, expression: ts.CallExp
     return
   }
 
+  if (callee.kind === ts.SyntaxKind.SuperKeyword) {
+    compiler.emitDerivedConstructorSuperCall(expression.arguments, expression, callDebug)
+    return
+  }
+
   compiler.withSourceNode(callee, () => {
     compiler.compileExpression(callee)
   })
