@@ -134,8 +134,15 @@ ${atomEntries.map(a => `  ${a.key} = ${a.id},`).join('\n')}
     .filter((a, idx, arr) => arr.findIndex(x => x.id === a.id) === idx)
     .sort((a, b) => a.id - b.id)
 
+  const toAtomLiteral = (key: string): string => {
+    if (key === 'empty_string') {
+      return ''
+    }
+    return key
+  }
+
   const atomStrings = `export const ATOM_STRINGS: Record<number, string> = {
-${uniqueAtoms.map(a => `  ${a.id}: ${JSON.stringify(a.key)},`).join('\n')}
+${uniqueAtoms.map(a => `  ${a.id}: ${JSON.stringify(toAtomLiteral(a.key))},`).join('\n')}
 }
 `
 

@@ -684,6 +684,23 @@ export class Compiler {
     return constantIndex
   }
 
+  public emitPushConstantIndex(index: number, node?: ts.Node | null) {
+    const debugNode = node ?? null
+    if (env.supportsShortOpcodes && index <= 0xff) {
+      this.emitOpcode(Opcode.OP_push_const8, [index], debugNode)
+    } else {
+      this.emitOpcode(Opcode.OP_push_const, [index], debugNode)
+    }
+  }
+
+  public emitDefineClass(atom: Atom, flags: number, node?: ts.Node | null) {
+    this.emitOpcode(Opcode.OP_define_class, [atom, flags], node ?? null)
+  }
+
+  public emitRawOpcode(opcode: Opcode, operands: number[] = [], node?: ts.Node | null) {
+    this.emitOpcode(opcode, operands, node ?? null)
+  }
+
   public compileExpression(expression: ts.Expression): void {
     const previous = this.currentSourceNode
     this.currentSourceNode = expression

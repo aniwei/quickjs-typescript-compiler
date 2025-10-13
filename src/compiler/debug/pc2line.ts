@@ -23,84 +23,35 @@ export function buildFunctionDebugInfo(context: BuildDebugInfoContext): void {
     runningOffset += getInstructionSize(instructions[index])
   }
 
-  const sortedEntries = [...func.bytecode.lineNumberTable]
-    .filter((entry) => entry.sourcePos >= 0)
-    .map((entry) => {
-      const actualPc = entry.instructionIndex < instructionOffsets.length ? instructionOffsets[entry.instructionIndex] : entry.pc
-      return {
-        pc: actualPc,
-        line: entry.line,
-        column: entry.column,
-        sourcePos: entry.sourcePos,
-      }
-    })
-    .sort((a, b) => a.pc - b.pc)
-
   const baseSourcePos = func.sourcePos ?? 0
   const baseLinePos = getLineColumnFromUtf8Offset(baseSourcePos)
-
-  const combinedEntries: typeof sortedEntries = [
-    {
-      pc: 0,
-      line: baseLinePos.line,
-      column: baseLinePos.column,
-      sourcePos: baseSourcePos,
-    },
-    ...sortedEntries,
-  ]
-
-  const normalized: typeof combinedEntries = []
-  if (process.env.DEBUG_PC2LINE === '1') {
-    console.log('pc2line:rawTable', combinedEntries.map((entry) => ({ ...entry })))
-  }
-  for (const entry of combinedEntries) {
-    const previous = normalized[normalized.length - 1]
-    if (previous) {
-      if (entry.sourcePos === previous.sourcePos && entry.pc === previous.pc) {
-        continue
-      }
-      if (previous.line === entry.line && previous.column === entry.column) {
-        continue
-      }
-      if (previous.sourcePos === entry.sourcePos) {
-        continue
-      }
-    }
-    normalized.push({ ...entry })
-  }
-
-  if (normalized.length === 0) {
-    func.bytecode.pc2line = []
-    func.bytecode.pc2column = []
-    return
-  }
-
   const pc2line: number[] = []
   const pc2column: number[] = []
   if (process.env.DEBUG_PC2LINE === '1') {
-    console.log('pc2line:lineNumberTable', normalized.map((entry) => ({ ...entry })))
+    console.log('pc2line:lineNumberTable', func.bytecode.lineNumberTable.map((entry) => ({ ...entry })))
   }
 
-  const first = normalized[0]
-  const firstLine = first.line
-  const firstColumn = first.column
-  pc2line.push(...encodeULEB128(firstLine))
-  pc2line.push(...encodeULEB128(firstColumn))
-  pc2column.push(...encodeULEB128(firstColumn))
+  const baseLine = baseLinePos.line
+  const baseColumn = baseLinePos.column
+  pc2line.push(...encodeULEB128(baseLine))
+  pc2line.push(...encodeULEB128(baseColumn))
+  pc2column.push(...encodeULEB128(baseColumn))
 
-  let lastPc = first.pc
-  let lastLine = firstLine
-  let lastColumn = firstColumn
+  let lastPc = 0
+  let lastLine = baseLine
+  let lastColumn = baseColumn
 
-  for (let index = 1; index < normalized.length; index++) {
-    const entry = normalized[index]
-    if (entry.pc < lastPc) {
+  const slots = func.bytecode.lineNumberTable.filter((entry) => entry.sourcePos >= 0)
+
+  for (const slot of slots) {
+    const pc = slot.instructionIndex < instructionOffsets.length ? instructionOffsets[slot.instructionIndex] : slot.pc
+    if (pc < lastPc) {
       continue
     }
-    const diffPc = entry.pc - lastPc
-    const currentLine = entry.line
+
+    const { line: currentLine, column: currentColumn } = getLineColumnFromUtf8Offset(slot.sourcePos)
+    const diffPc = pc - lastPc
     const diffLine = currentLine - lastLine
-    const currentColumn = entry.column
     const diffColumn = currentColumn - lastColumn
 
     if (diffLine === 0 && diffColumn === 0) {
@@ -124,7 +75,7 @@ export function buildFunctionDebugInfo(context: BuildDebugInfoContext): void {
     pc2line.push(...encodeSLEB128(diffColumn))
     pc2column.push(...encodeSLEB128(diffColumn))
 
-    lastPc = entry.pc
+    lastPc = pc
     lastLine = currentLine
     lastColumn = currentColumn
   }

@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/loop-break.ts
-**生成时间**: 2025-10-11T10:43:16.347Z
+**生成时间**: 2025-10-13T07:12:56.916Z
 
 ## 大小对比
 
