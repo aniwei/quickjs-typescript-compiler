@@ -530,7 +530,11 @@ export class Compiler {
     this.popScope()
     this.resolvePendingJumps()
     this.finalizeFunction(childFunction)
-    if (process.env.DEBUG_DERIVED === '1' && childFunction.bytecode.isDerivedClassConstructor) {
+    if (
+      process.env.DEBUG_DERIVED === '1' &&
+      this.derivedConstructorContext &&
+      this.derivedConstructorContext.functionDef === childFunction
+    ) {
       const derivedDump = childFunction.bytecode.instructions.map((instruction, index) => ({
         offset: this.getInstructionOffset(childFunction, index),
         opcode: Opcode[instruction.opcode] ?? instruction.opcode,
@@ -888,15 +892,15 @@ export class Compiler {
         this.emitInstruction(Opcode.OP_get_var, [classFieldsAtom], node)
       }
       this.emitInstruction(Opcode.OP_dup, [], node)
-  const skipLabel = this.createLabel()
-  this.emitJump(Opcode.OP_if_false8, skipLabel)
+      const skipLabel = this.createLabel()
+      this.emitJump(Opcode.OP_if_false8, skipLabel)
       this.emitInstruction(Opcode.OP_get_loc_check, [context.thisSlot], node)
       this.emitInstruction(Opcode.OP_swap, [], node)
       this.emitInstruction(Opcode.OP_call_method, [0], node)
-  this.emitInstruction(Opcode.OP_drop, [], node)
-  this.markLabel(skipLabel)
-      this.emitInstruction(Opcode.OP_drop, [], node)
-  // fall through to shared continuation (matches QuickJS codegen)
+      this.markLabel(skipLabel)
+    this.emitInstruction(Opcode.OP_drop, [], node)
+    this.emitInstruction(Opcode.OP_drop, [], node)
+    // fall through to shared continuation (matches QuickJS codegen)
       context.classFieldsCallEmitted = true
     }
 
@@ -1219,13 +1223,27 @@ export class Compiler {
   }
 
   public addFunctionConstant(func: FunctionDef): number {
-    return this.currentFunction.addConstant(
+    const index = this.currentFunction.addConstant(
       {
         tag: BytecodeTag.TC_TAG_FUNCTION_BYTECODE,
         value: func.bytecode,
       },
       { key: null }
     )
+    if (process.env.DEBUG_DERIVED === '1' && func.bytecode.isDerivedClassConstructor) {
+      const dump = func.bytecode.instructions.map((instruction, dumpIndex) => ({
+        offset: this.getInstructionOffset(func, dumpIndex),
+        opcode: Opcode[instruction.opcode] ?? instruction.opcode,
+        rawOpcode: instruction.opcode,
+        operands: instruction.operands,
+      }))
+      console.log('derived addFunctionConstant', {
+        nameAtom: func.bytecode.name,
+        index,
+        dump,
+      })
+    }
+    return index
   }
 
   public emitFunctionClosure(constantIndex: number, node?: ts.Node | null) {
@@ -1576,6 +1594,16 @@ export class Compiler {
   private finalizeFunction(func: FunctionDef) {
     const funcName = this.atomTable.getAtomString(func.bytecode.name)
     func.bytecode.constantPool = func.getConstantPoolEntries()
+    if (
+      process.env.DEBUG_DERIVED === '1' &&
+      this.derivedConstructorContext &&
+      this.derivedConstructorContext.functionDef === func
+    ) {
+      console.log('derived finalize:beforePrune', {
+        funcName,
+        constantPoolCount: func.bytecode.constantPool.length,
+      })
+    }
     pruneUnusedClosureVars(
       {
         atomTable: this.atomTable,
@@ -1583,6 +1611,16 @@ export class Compiler {
       },
       func
     )
+    if (
+      process.env.DEBUG_DERIVED === '1' &&
+      this.derivedConstructorContext &&
+      this.derivedConstructorContext.functionDef === func
+    ) {
+      console.log('derived finalize:afterPrune', {
+        funcName,
+        constantPoolCount: func.bytecode.constantPool.length,
+      })
+    }
     const lexicalVars = func.vars.filter((variable) => !variable.isCaptured)
     for (const variable of lexicalVars) {
       if (variable.scopeLevel >= 0) {
@@ -1592,6 +1630,24 @@ export class Compiler {
     func.bytecode.setVarDefs(lexicalVars)
     func.bytecode.setArgDefs(func.args)
     func.bytecode.stackSize = computeFunctionStackSize(func.bytecode)
+    if (
+      process.env.DEBUG_DERIVED === '1' &&
+      this.derivedConstructorContext &&
+      this.derivedConstructorContext.functionDef === func
+    ) {
+      const dump = func.bytecode.instructions.map((instruction, index) => ({
+        offset: this.getInstructionOffset(func, index),
+        opcode: Opcode[instruction.opcode] ?? instruction.opcode,
+        rawOpcode: instruction.opcode,
+        operands: instruction.operands,
+      }))
+      console.log('derived finalize:afterStack', {
+        funcName,
+        stackSize: func.bytecode.stackSize,
+        instructionCount: dump.length,
+        dump,
+      })
+    }
     buildFunctionDebugInfo({
       func,
       getInstructionSize,

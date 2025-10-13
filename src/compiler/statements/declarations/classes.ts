@@ -2,6 +2,7 @@ import * as ts from 'typescript'
 import { Opcode } from '../../../env'
 import type { Compiler } from '../../../compiler'
 import { VarKind } from '../../../vars'
+import { getInstructionSize } from '../../analysis/opcodeInfo'
 import {
   createConstructorFunctionExpression,
   createInternalIdentifier,
@@ -141,6 +142,25 @@ function compileConstructorFunction(
   constructorFunction.bytecode.superAllowed = true
   constructorFunction.bytecode.superCallAllowed = hasHeritage
   constructorFunction.bytecode.isDerivedClassConstructor = hasHeritage
+
+  if (process.env.DEBUG_DERIVED === '1' && hasHeritage) {
+    const dump: Array<{ offset: number; opcode: string | number; rawOpcode: number; operands: number[] }> = []
+    let offset = 0
+    for (const instruction of constructorFunction.bytecode.instructions) {
+      dump.push({
+        offset,
+        opcode: Opcode[instruction.opcode] ?? instruction.opcode,
+        rawOpcode: instruction.opcode,
+        operands: instruction.operands,
+      })
+      offset += getInstructionSize(instruction)
+    }
+    console.log('derived constructor before constant', {
+      className: classIdentifier.text,
+      instructionCount: dump.length,
+      dump,
+    })
+  }
 
   const constantIndex = compiler.addFunctionConstant(constructorFunction)
   return { constantIndex, debugNode: constructorDecl ?? classNode }

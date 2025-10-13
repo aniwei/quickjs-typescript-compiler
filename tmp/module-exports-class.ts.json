@@ -19,31 +19,23 @@
     },
     {
       "id": 232,
-      "value": "__DefaultCounter_base_1"
-    },
-    {
-      "id": 233,
       "value": "DefaultCounter"
     },
     {
-      "id": 234,
+      "id": 233,
       "value": "increment"
     },
     {
-      "id": 235,
+      "id": 234,
       "value": "current"
     },
     {
-      "id": 236,
+      "id": 235,
       "value": "initial"
     },
     {
-      "id": 237,
+      "id": 236,
       "value": "step"
-    },
-    {
-      "id": 238,
-      "value": "call"
     }
   ],
   "root": {
@@ -71,7 +63,7 @@
           "id": 230,
           "name": "createCounter"
         },
-        "localVarIndex": 1
+        "localVarIndex": 2
       },
       {
         "type": "local",
@@ -80,7 +72,7 @@
           "id": 231,
           "name": "sharedCounter"
         },
-        "localVarIndex": 2
+        "localVarIndex": 3
       },
       {
         "type": "local",
@@ -89,7 +81,7 @@
           "id": 22,
           "name": "default"
         },
-        "localVarIndex": 3
+        "localVarIndex": 4
       }
     ],
     "starExportEntries": [],
@@ -124,30 +116,13 @@
         "name": "_eval_"
       },
       "argCount": 0,
-      "varCount": 1,
+      "varCount": 0,
       "definedArgCount": 0,
       "stackSize": 3,
-      "closureVarCount": 4,
+      "closureVarCount": 5,
       "constantPoolCount": 5,
-      "instructionLength": 68,
-      "varDefs": [
-        {
-          "name": {
-            "type": "atom",
-            "id": 232,
-            "name": "__DefaultCounter_base_1"
-          },
-          "scopeLevel": 1,
-          "scopeNext": 3,
-          "isConst": true,
-          "isLexical": true,
-          "isCaptured": false,
-          "kind": {
-            "value": 0,
-            "name": "NORMAL"
-          }
-        }
-      ],
+      "instructionLength": 65,
+      "varDefs": [],
       "closureVars": [
         {
           "name": {
@@ -168,10 +143,26 @@
         {
           "name": {
             "type": "atom",
+            "id": 120,
+            "name": "class_fields_init"
+          },
+          "varIndex": 1,
+          "isLocal": true,
+          "isArgument": false,
+          "isConst": true,
+          "isLexical": true,
+          "kind": {
+            "value": 0,
+            "name": "NORMAL"
+          }
+        },
+        {
+          "name": {
+            "type": "atom",
             "id": 230,
             "name": "createCounter"
           },
-          "varIndex": 1,
+          "varIndex": 2,
           "isLocal": true,
           "isArgument": false,
           "isConst": false,
@@ -187,7 +178,7 @@
             "id": 231,
             "name": "sharedCounter"
           },
-          "varIndex": 2,
+          "varIndex": 3,
           "isLocal": true,
           "isArgument": false,
           "isConst": true,
@@ -200,10 +191,10 @@
         {
           "name": {
             "type": "atom",
-            "id": 233,
+            "id": 232,
             "name": "DefaultCounter"
           },
-          "varIndex": 3,
+          "varIndex": 4,
           "isLocal": true,
           "isArgument": false,
           "isConst": true,
@@ -238,8 +229,8 @@
         {
           "offset": 5,
           "size": 1,
-          "opcode": 228,
-          "opcodeName": "OP_put_var_ref1"
+          "opcode": 229,
+          "opcodeName": "OP_put_var_ref2"
         },
         {
           "offset": 6,
@@ -276,8 +267,8 @@
         {
           "offset": 16,
           "size": 2,
-          "opcode": 194,
-          "opcodeName": "OP_fclosure8",
+          "opcode": 193,
+          "opcodeName": "OP_push_const8",
           "operand": 1
         },
         {
@@ -287,9 +278,8 @@
           "opcodeName": "OP_define_method",
           "operand": {
             "atom": {
-              "type": "atom",
-              "id": 117,
-              "name": "home_object"
+              "type": "tagged-int",
+              "value": 116
             },
             "value": 0
           }
@@ -297,8 +287,8 @@
         {
           "offset": 24,
           "size": 2,
-          "opcode": 194,
-          "opcodeName": "OP_fclosure8",
+          "opcode": 193,
+          "opcodeName": "OP_push_const8",
           "operand": 2
         },
         {
@@ -308,8 +298,9 @@
           "opcodeName": "OP_define_method",
           "operand": {
             "atom": {
-              "type": "tagged-int",
-              "value": 117
+              "type": "atom",
+              "id": 117,
+              "name": "home_object"
             },
             "value": 1
           }
@@ -317,127 +308,121 @@
         {
           "offset": 32,
           "size": 1,
+          "opcode": 6,
+          "opcodeName": "OP_undefined"
+        },
+        {
+          "offset": 33,
+          "size": 1,
+          "opcode": 228,
+          "opcodeName": "OP_put_var_ref1"
+        },
+        {
+          "offset": 34,
+          "size": 1,
           "opcode": 14,
           "opcodeName": "OP_drop"
         },
         {
-          "offset": 33,
+          "offset": 35,
           "size": 1,
           "opcode": 227,
           "opcodeName": "OP_put_var_ref0"
         },
         {
-          "offset": 34,
+          "offset": 36,
           "size": 3,
           "opcode": 104,
           "opcodeName": "OP_get_var_ref_check",
           "operand": 0
         },
         {
-          "offset": 37,
+          "offset": 39,
           "size": 1,
           "opcode": 17,
           "opcodeName": "OP_dup"
         },
         {
-          "offset": 38,
+          "offset": 40,
           "size": 2,
           "opcode": 191,
           "opcodeName": "OP_push_i8",
           "operand": 42
         },
         {
-          "offset": 40,
+          "offset": 42,
           "size": 3,
           "opcode": 33,
           "opcodeName": "OP_call_constructor",
           "operand": 1
         },
         {
-          "offset": 43,
+          "offset": 45,
           "size": 1,
-          "opcode": 229,
-          "opcodeName": "OP_put_var_ref2"
+          "opcode": 230,
+          "opcodeName": "OP_put_var_ref3"
         },
         {
-          "offset": 44,
-          "size": 3,
-          "opcode": 99,
-          "opcodeName": "OP_set_loc_uninitialized",
-          "operand": 0
-        },
-        {
-          "offset": 47,
+          "offset": 46,
           "size": 3,
           "opcode": 104,
           "opcodeName": "OP_get_var_ref_check",
           "operand": 0
         },
         {
-          "offset": 50,
-          "size": 1,
-          "opcode": 203,
-          "opcodeName": "OP_put_loc0"
-        },
-        {
-          "offset": 51,
-          "size": 3,
-          "opcode": 104,
-          "opcodeName": "OP_get_var_ref_check",
-          "operand": 0
-        },
-        {
-          "offset": 54,
-          "size": 1,
-          "opcode": 17,
-          "opcodeName": "OP_dup"
-        },
-        {
-          "offset": 55,
-          "size": 1,
-          "opcode": 203,
-          "opcodeName": "OP_put_loc0"
-        },
-        {
-          "offset": 56,
+          "offset": 49,
           "size": 2,
           "opcode": 193,
           "opcodeName": "OP_push_const8",
           "operand": 4
         },
         {
-          "offset": 58,
+          "offset": 51,
           "size": 6,
           "opcode": 88,
           "opcodeName": "OP_define_class",
           "operand": {
             "atom": {
-              "type": "tagged-int",
-              "value": 116
+              "type": "atom",
+              "id": 116,
+              "name": "this_active_func"
             },
             "value": 1
           }
         },
         {
-          "offset": 64,
-          "size": 1,
-          "opcode": 14,
-          "opcodeName": "OP_drop"
-        },
-        {
-          "offset": 65,
-          "size": 1,
-          "opcode": 230,
-          "opcodeName": "OP_put_var_ref3"
-        },
-        {
-          "offset": 66,
+          "offset": 57,
           "size": 1,
           "opcode": 6,
           "opcodeName": "OP_undefined"
         },
         {
-          "offset": 67,
+          "offset": 58,
+          "size": 1,
+          "opcode": 228,
+          "opcodeName": "OP_put_var_ref1"
+        },
+        {
+          "offset": 59,
+          "size": 1,
+          "opcode": 14,
+          "opcodeName": "OP_drop"
+        },
+        {
+          "offset": 60,
+          "size": 3,
+          "opcode": 97,
+          "opcodeName": "OP_put_var_ref",
+          "operand": 4
+        },
+        {
+          "offset": 63,
+          "size": 1,
+          "opcode": 6,
+          "opcodeName": "OP_undefined"
+        },
+        {
+          "offset": 64,
           "size": 1,
           "opcode": 47,
           "opcodeName": "OP_return_async"
@@ -452,18 +437,28 @@
         "pc2line": [
           0,
           0,
+          44,
+          4,
+          45,
           0,
-          34,
-          38,
-          66,
+          0,
+          8,
+          10,
+          0,
+          0,
+          12,
+          18,
+          62,
           17,
           65,
           17,
           80,
-          39,
+          24,
           8,
-          47,
-          87
+          18,
+          83,
+          11,
+          3
         ],
         "sourceLength": 0,
         "source": null
@@ -474,7 +469,7 @@
           "value": {
             "type": "function",
             "flags": {
-              "raw": 1984,
+              "raw": 1856,
               "hasPrototype": false,
               "hasSimpleParameterList": false,
               "isDerivedClassConstructor": false,
@@ -484,7 +479,7 @@
                 "name": "JS_FUNC_NORMAL"
               },
               "newTargetAllowed": true,
-              "superCallAllowed": true,
+              "superCallAllowed": false,
               "superAllowed": true,
               "argumentsAllowed": true,
               "hasDebug": true,
@@ -510,7 +505,7 @@
               {
                 "name": {
                   "type": "atom",
-                  "id": 236,
+                  "id": 235,
                   "name": "initial"
                 },
                 "scopeLevel": 0,
@@ -637,7 +632,7 @@
                 "name": "__tests__/compiler/fixtures/module-exports-class.js"
               },
               "pc2line": [
-                1,
+                2,
                 2,
                 2,
                 44,
@@ -659,7 +654,7 @@
           "value": {
             "type": "function",
             "flags": {
-              "raw": 1864,
+              "raw": 1544,
               "hasPrototype": false,
               "hasSimpleParameterList": false,
               "isDerivedClassConstructor": false,
@@ -668,9 +663,9 @@
                 "value": 0,
                 "name": "JS_FUNC_NORMAL"
               },
-              "newTargetAllowed": true,
+              "newTargetAllowed": false,
               "superCallAllowed": false,
-              "superAllowed": true,
+              "superAllowed": false,
               "argumentsAllowed": true,
               "hasDebug": true,
               "isDirectOrIndirectEval": false
@@ -681,7 +676,7 @@
             ],
             "name": {
               "type": "atom",
-              "id": 234,
+              "id": 233,
               "name": "increment"
             },
             "argCount": 1,
@@ -695,7 +690,7 @@
               {
                 "name": {
                   "type": "atom",
-                  "id": 237,
+                  "id": 236,
                   "name": "step"
                 },
                 "scopeLevel": 0,
@@ -892,7 +887,7 @@
           "value": {
             "type": "function",
             "flags": {
-              "raw": 1866,
+              "raw": 1546,
               "hasPrototype": false,
               "hasSimpleParameterList": true,
               "isDerivedClassConstructor": false,
@@ -901,9 +896,9 @@
                 "value": 0,
                 "name": "JS_FUNC_NORMAL"
               },
-              "newTargetAllowed": true,
+              "newTargetAllowed": false,
               "superCallAllowed": false,
-              "superAllowed": true,
+              "superAllowed": false,
               "argumentsAllowed": true,
               "hasDebug": true,
               "isDirectOrIndirectEval": false
@@ -914,7 +909,7 @@
             ],
             "name": {
               "type": "atom",
-              "id": 235,
+              "id": 234,
               "name": "current"
             },
             "argCount": 0,
@@ -1014,7 +1009,7 @@
               {
                 "name": {
                   "type": "atom",
-                  "id": 236,
+                  "id": 235,
                   "name": "initial"
                 },
                 "scopeLevel": 0,
@@ -1144,9 +1139,9 @@
               },
               "pc2line": [
                 15,
-                7,
+                0,
                 2,
-                66,
+                80,
                 58,
                 53,
                 17,
@@ -1189,71 +1184,232 @@
             ],
             "name": {
               "type": "atom",
-              "id": 233,
+              "id": 232,
               "name": "DefaultCounter"
             },
             "argCount": 0,
-            "varCount": 0,
+            "varCount": 3,
             "definedArgCount": 0,
-            "stackSize": 4,
-            "closureVarCount": 0,
+            "stackSize": 3,
+            "closureVarCount": 1,
             "constantPoolCount": 0,
-            "instructionLength": 17,
-            "varDefs": [],
-            "closureVars": [],
-            "instructions": [
+            "instructionLength": 40,
+            "varDefs": [
               {
-                "offset": 0,
-                "size": 5,
-                "opcode": 57,
-                "opcodeName": "OP_get_var",
-                "operand": {
+                "name": {
                   "type": "atom",
                   "id": 116,
                   "name": "this_active_func"
+                },
+                "scopeLevel": 1,
+                "scopeNext": -1,
+                "isConst": false,
+                "isLexical": false,
+                "isCaptured": false,
+                "kind": {
+                  "value": 0,
+                  "name": "NORMAL"
                 }
               },
               {
-                "offset": 5,
-                "size": 5,
-                "opcode": 67,
-                "opcodeName": "OP_get_field2",
-                "operand": {
+                "name": {
                   "type": "atom",
-                  "id": 119,
-                  "name": "static_computed_field"
+                  "id": 115,
+                  "name": "new_target"
+                },
+                "scopeLevel": 1,
+                "scopeNext": 0,
+                "isConst": false,
+                "isLexical": false,
+                "isCaptured": false,
+                "kind": {
+                  "value": 0,
+                  "name": "NORMAL"
                 }
+              },
+              {
+                "name": {
+                  "type": "atom",
+                  "id": 8,
+                  "name": "this"
+                },
+                "scopeLevel": 1,
+                "scopeNext": 1,
+                "isConst": false,
+                "isLexical": true,
+                "isCaptured": false,
+                "kind": {
+                  "value": 0,
+                  "name": "NORMAL"
+                }
+              }
+            ],
+            "closureVars": [
+              {
+                "name": {
+                  "type": "atom",
+                  "id": 120,
+                  "name": "class_fields_init"
+                },
+                "varIndex": 1,
+                "isLocal": false,
+                "isArgument": false,
+                "isConst": true,
+                "isLexical": true,
+                "kind": {
+                  "value": 0,
+                  "name": "NORMAL"
+                }
+              }
+            ],
+            "instructions": [
+              {
+                "offset": 0,
+                "size": 3,
+                "opcode": 99,
+                "opcodeName": "OP_set_loc_uninitialized",
+                "operand": 2
+              },
+              {
+                "offset": 3,
+                "size": 2,
+                "opcode": 12,
+                "opcodeName": "OP_special_object",
+                "operand": 2
+              },
+              {
+                "offset": 5,
+                "size": 1,
+                "opcode": 203,
+                "opcodeName": "OP_put_loc0"
+              },
+              {
+                "offset": 6,
+                "size": 2,
+                "opcode": 12,
+                "opcodeName": "OP_special_object",
+                "operand": 3
+              },
+              {
+                "offset": 8,
+                "size": 1,
+                "opcode": 204,
+                "opcodeName": "OP_put_loc1"
+              },
+              {
+                "offset": 9,
+                "size": 1,
+                "opcode": 43,
+                "opcodeName": "OP_check_ctor"
               },
               {
                 "offset": 10,
                 "size": 1,
-                "opcode": 8,
-                "opcodeName": "OP_push_this"
+                "opcode": 199,
+                "opcodeName": "OP_get_loc0"
               },
               {
                 "offset": 11,
+                "size": 1,
+                "opcode": 53,
+                "opcodeName": "OP_get_super"
+              },
+              {
+                "offset": 12,
+                "size": 1,
+                "opcode": 200,
+                "opcodeName": "OP_get_loc1"
+              },
+              {
+                "offset": 13,
                 "size": 1,
                 "opcode": 183,
                 "opcodeName": "OP_push_0"
               },
               {
-                "offset": 12,
+                "offset": 14,
                 "size": 3,
-                "opcode": 36,
-                "opcodeName": "OP_call_method",
+                "opcode": 33,
+                "opcodeName": "OP_call_constructor",
+                "operand": 1
+              },
+              {
+                "offset": 17,
+                "size": 1,
+                "opcode": 17,
+                "opcodeName": "OP_dup"
+              },
+              {
+                "offset": 18,
+                "size": 3,
+                "opcode": 102,
+                "opcodeName": "OP_put_loc_check_init",
                 "operand": 2
               },
               {
-                "offset": 15,
+                "offset": 21,
+                "size": 3,
+                "opcode": 104,
+                "opcodeName": "OP_get_var_ref_check",
+                "operand": 0
+              },
+              {
+                "offset": 24,
+                "size": 1,
+                "opcode": 17,
+                "opcodeName": "OP_dup"
+              },
+              {
+                "offset": 25,
+                "size": 2,
+                "opcode": 236,
+                "opcodeName": "OP_if_false8",
+                "operand": 8
+              },
+              {
+                "offset": 27,
+                "size": 3,
+                "opcode": 100,
+                "opcodeName": "OP_get_loc_check",
+                "operand": 2
+              },
+              {
+                "offset": 30,
+                "size": 1,
+                "opcode": 27,
+                "opcodeName": "OP_swap"
+              },
+              {
+                "offset": 31,
+                "size": 3,
+                "opcode": 36,
+                "opcodeName": "OP_call_method",
+                "operand": 0
+              },
+              {
+                "offset": 34,
                 "size": 1,
                 "opcode": 14,
                 "opcodeName": "OP_drop"
               },
               {
-                "offset": 16,
+                "offset": 35,
                 "size": 1,
-                "opcode": 41,
-                "opcodeName": "OP_return_undef"
+                "opcode": 14,
+                "opcodeName": "OP_drop"
+              },
+              {
+                "offset": 36,
+                "size": 3,
+                "opcode": 103,
+                "opcodeName": "OP_get_loc_checkthis",
+                "operand": 2
+              },
+              {
+                "offset": 39,
+                "size": 1,
+                "opcode": 40,
+                "opcodeName": "OP_return"
               }
             ],
             "debug": {
@@ -1265,8 +1421,10 @@
               "pc2line": [
                 22,
                 2,
-                3,
-                4
+                18,
+                4,
+                57,
+                10
               ],
               "sourceLength": 0,
               "source": null
