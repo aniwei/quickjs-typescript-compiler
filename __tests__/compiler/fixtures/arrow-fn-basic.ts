@@ -1,6 +1,9 @@
-const add = (a, b) => a + b;
-const double = (x) => {
-  return x * 2;
-}
-const arrArrow = [1,2,3].map(x => x * 10)
-const obj = { fn: (x) => x + 1 }
+const total = ((a, b) => a + b)(1, 2);
+
+const doubled = ((value) => value * 2)(total);
+
+const combined = ((value) => ((extra) => value + extra)(4))(doubled);
+
+void total;
+void doubled;
+void combined;
