@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-10-13T07:12:56.981Z",
+  "timestamp": "2025-10-13T07:45:53.865Z",
   "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/simple-decl-init.ts",
   "compilation": {
     "typescript": {

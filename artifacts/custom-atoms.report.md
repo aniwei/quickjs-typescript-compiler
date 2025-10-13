@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/custom-atoms.ts
-**生成时间**: 2025-10-13T07:12:56.902Z
+**生成时间**: 2025-10-13T07:45:53.780Z
 
 ## 大小对比
 

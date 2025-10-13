@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/object-literal-simple.ts
-**生成时间**: 2025-10-13T07:12:56.967Z
+**生成时间**: 2025-10-13T07:45:53.836Z
 
 ## 大小对比
 
