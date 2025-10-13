@@ -530,6 +530,18 @@ export class Compiler {
     this.popScope()
     this.resolvePendingJumps()
     this.finalizeFunction(childFunction)
+    if (process.env.DEBUG_DERIVED === '1' && childFunction.bytecode.isDerivedClassConstructor) {
+      const derivedDump = childFunction.bytecode.instructions.map((instruction, index) => ({
+        offset: this.getInstructionOffset(childFunction, index),
+        opcode: Opcode[instruction.opcode] ?? instruction.opcode,
+        rawOpcode: instruction.opcode,
+        operands: instruction.operands,
+      }))
+      console.log('derived finalize', {
+        nameAtom: childFunction.bytecode.name,
+        instructions: derivedDump,
+      })
+    }
     this.endDerivedConstructorContext(childFunction)
     this.restoreFunctionContext(snapshot)
 
@@ -749,7 +761,7 @@ export class Compiler {
       return
     }
 
-    const thisActiveAtom = this.getAtomId('this.active_func')
+  const thisActiveAtom = this.getAtomId('this_active_func')
     this.declareLexicalVariable(thisActiveAtom, {
       isConst: false,
       isLet: false,
@@ -757,10 +769,10 @@ export class Compiler {
     })
     const thisActiveSlot = this.getLocalVarSlot(thisActiveAtom)
     if (thisActiveSlot === undefined) {
-      throw new Error('Failed to allocate local slot for this.active_func')
+  throw new Error('Failed to allocate local slot for this_active_func')
     }
 
-    const newTargetAtom = this.getAtomId('new.target')
+  const newTargetAtom = this.getAtomId('new_target')
     this.declareLexicalVariable(newTargetAtom, {
       isConst: false,
       isLet: false,
@@ -768,7 +780,7 @@ export class Compiler {
     })
     const newTargetSlot = this.getLocalVarSlot(newTargetAtom)
     if (newTargetSlot === undefined) {
-      throw new Error('Failed to allocate local slot for new.target')
+  throw new Error('Failed to allocate local slot for new_target')
     }
 
     const thisAtom = this.getAtomId('this')

@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/switch-branch.ts
-**生成时间**: 2025-10-13T11:11:59.869Z
+**生成时间**: 2025-10-13T11:51:52.303Z
 
 ## 大小对比
 

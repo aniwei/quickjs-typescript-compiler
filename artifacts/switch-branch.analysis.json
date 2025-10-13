@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-10-13T11:11:59.869Z",
+  "timestamp": "2025-10-13T11:51:52.303Z",
   "inputFile": "/Users/weiyanhai/Desktop/workspace/quickjs-typescript-compiler/__tests__/compiler/fixtures/switch-branch.ts",
   "compilation": {
     "typescript": {
