@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
-import { Compiler } from '../src/compiler'
+import { Compiler } from '../arch/compiler'
 
 async function main() {
   const [, , target = '__tests__/compiler/fixtures/simple-decl-init.ts'] = process.argv

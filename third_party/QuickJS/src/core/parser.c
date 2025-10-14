@@ -27,6 +27,7 @@
 #include <stdio.h>
 
 #include "parser.h"
+#include "debug-log.h"
 #include "QuickJS/dtoa.h"
 #include "QuickJS/libregexp.h"
 #include "QuickJS/libunicode.h"
@@ -45,6 +46,48 @@
 /* JS parser */
 
 static __exception int next_token(JSParseState* s);
+
+static const char* qjs_func_type_name(JSParseFunctionEnum func_type) {
+  switch (func_type) {
+    case JS_PARSE_FUNC_STATEMENT:
+      return "statement";
+    case JS_PARSE_FUNC_EXPR:
+      return "expression";
+    case JS_PARSE_FUNC_ARROW:
+      return "arrow";
+    case JS_PARSE_FUNC_METHOD:
+      return "method";
+    case JS_PARSE_FUNC_GETTER:
+      return "getter";
+    case JS_PARSE_FUNC_SETTER:
+      return "setter";
+    case JS_PARSE_FUNC_VAR:
+      return "var";
+    case JS_PARSE_FUNC_CLASS_CONSTRUCTOR:
+      return "class_ctor";
+    case JS_PARSE_FUNC_DERIVED_CLASS_CONSTRUCTOR:
+      return "derived_ctor";
+    case JS_PARSE_FUNC_CLASS_STATIC_INIT:
+      return "class_static_init";
+    default:
+      return "unknown";
+  }
+}
+
+static const char* qjs_func_kind_name(JSFunctionKindEnum func_kind) {
+  switch (func_kind) {
+    case JS_FUNC_NORMAL:
+      return "normal";
+    case JS_FUNC_GENERATOR:
+      return "generator";
+    case JS_FUNC_ASYNC:
+      return "async";
+    case JS_FUNC_ASYNC_GENERATOR:
+      return "async_gen";
+    default:
+      return "unknown";
+  }
+}
 
 void free_token(JSParseState* s, JSToken* token) {
   switch (token->val) {
@@ -1764,14 +1807,38 @@ static BOOL js_is_live_code(JSParseState* s) {
 
 static void emit_u8(JSParseState* s, uint8_t val) {
   dbuf_putc(&s->cur_func->byte_code, val);
+  if (s->cur_func) {
+    qjs_trace(
+        "parser.emit_data",
+        "func=%s u8=0x%02x offset=%d",
+        qjs_func_type_name(s->cur_func->func_type),
+        val,
+        (int)s->cur_func->byte_code.size - 1);
+  }
 }
 
 static void emit_u16(JSParseState* s, uint16_t val) {
   dbuf_put_u16(&s->cur_func->byte_code, val);
+  if (s->cur_func) {
+    qjs_trace(
+        "parser.emit_data",
+        "func=%s u16=0x%04x offset=%d",
+        qjs_func_type_name(s->cur_func->func_type),
+        val,
+        (int)s->cur_func->byte_code.size - 2);
+  }
 }
 
 static void emit_u32(JSParseState* s, uint32_t val) {
   dbuf_put_u32(&s->cur_func->byte_code, val);
+  if (s->cur_func) {
+    qjs_trace(
+        "parser.emit_data",
+        "func=%s u32=0x%08x offset=%d",
+        qjs_func_type_name(s->cur_func->func_type),
+        val,
+        (int)s->cur_func->byte_code.size - 4);
+  }
 }
 
 static void emit_source_pos(JSParseState* s, const uint8_t* source_ptr) {
@@ -1789,6 +1856,13 @@ static void emit_op(JSParseState* s, uint8_t val) {
   JSFunctionDef* fd = s->cur_func;
   DynBuf* bc = &fd->byte_code;
 
+  if (fd->func_type == JS_PARSE_FUNC_ARROW) {
+    qjs_trace(
+        "parser.emit_op",
+        "arrow op=0x%02x offset=%d",
+        val,
+        (int)bc->size);
+  }
   fd->last_opcode_pos = bc->size;
   dbuf_putc(bc, val);
 }
@@ -1799,10 +1873,31 @@ static void emit_atom(JSParseState* s, JSAtom name) {
     return; /* not enough memory : don't duplicate the atom */
   put_u32(bc->buf + bc->size, JS_DupAtom(s->ctx, name));
   bc->size += 4;
+  if (s->cur_func) {
+    char atom_buf[ATOM_GET_STR_BUF_SIZE];
+    const char* atom_str = JS_AtomGetStr(
+        s->ctx, atom_buf, sizeof(atom_buf), name);
+    qjs_trace(
+        "parser.emit_atom",
+        "func=%s atom=%s offset=%d",
+        qjs_func_type_name(s->cur_func->func_type),
+        atom_str,
+        (int)bc->size - 4);
+  }
 }
 
 static void emit_ic(JSParseState* s, JSAtom atom) {
   add_ic_slot1(s->cur_func->ic, atom);
+  if (s->cur_func) {
+    char atom_buf[ATOM_GET_STR_BUF_SIZE];
+    const char* atom_str = JS_AtomGetStr(
+        s->ctx, atom_buf, sizeof(atom_buf), atom);
+    qjs_trace(
+        "parser.emit_ic",
+        "func=%s atom=%s",
+        qjs_func_type_name(s->cur_func->func_type),
+        atom_str);
+  }
 }
 
 static int update_label(JSFunctionDef* s, int label, int delta) {
@@ -2058,6 +2153,12 @@ int push_scope(JSParseState* s) {
     fd->scopes[scope].first = fd->scope_first;
     emit_op(s, OP_enter_scope);
     emit_u16(s, scope);
+    qjs_trace(
+        "parser.scope",
+        "push scope=%d parent=%d func=%s",
+        scope,
+        fd->scope_level,
+        qjs_func_type_name(fd->func_type));
     return fd->scope_level = scope;
   }
   return 0;
@@ -2082,6 +2183,12 @@ static void pop_scope(JSParseState* s) {
     emit_u16(s, scope);
     fd->scope_level = fd->scopes[scope].parent;
     fd->scope_first = get_first_lexical_var(fd, fd->scope_level);
+    qjs_trace(
+        "parser.scope",
+        "pop scope=%d new_scope=%d func=%s",
+        scope,
+        fd->scope_level,
+        qjs_func_type_name(fd->func_type));
   }
 }
 
@@ -2113,6 +2220,16 @@ static int add_var(JSContext* ctx, JSFunctionDef* fd, JSAtom name) {
   memset(vd, 0, sizeof(*vd));
   vd->var_name = JS_DupAtom(ctx, name);
   vd->func_pool_idx = -1;
+  {
+    char atom_buf[ATOM_GET_STR_BUF_SIZE];
+    const char* atom_str = JS_AtomGetStr(ctx, atom_buf, sizeof(atom_buf), name);
+    qjs_trace(
+        "parser.var",
+        "add_var name=%s index=%d func=%s",
+        atom_str,
+        fd->var_count - 1,
+        qjs_func_type_name(fd->func_type));
+  }
   return fd->var_count - 1;
 }
 
@@ -2129,6 +2246,17 @@ static int add_scope_var(
     vd->scope_next = fd->scope_first;
     fd->scopes[fd->scope_level].first = idx;
     fd->scope_first = idx;
+    {
+      char atom_buf[ATOM_GET_STR_BUF_SIZE];
+      const char* atom_str = JS_AtomGetStr(ctx, atom_buf, sizeof(atom_buf), name);
+      qjs_trace(
+          "parser.var",
+          "add_scope_var name=%s kind=%d scope=%d func=%s",
+          atom_str,
+          var_kind,
+          fd->scope_level,
+          qjs_func_type_name(fd->func_type));
+    }
   }
   return idx;
 }
@@ -2140,6 +2268,16 @@ static int add_func_var(JSContext* ctx, JSFunctionDef* fd, JSAtom name) {
     fd->vars[idx].var_kind = JS_VAR_FUNCTION_NAME;
     if (fd->js_mode & JS_MODE_STRICT)
       fd->vars[idx].is_const = TRUE;
+    {
+      char atom_buf[ATOM_GET_STR_BUF_SIZE];
+      const char* atom_str = JS_AtomGetStr(ctx, atom_buf, sizeof(atom_buf), name);
+      qjs_trace(
+          "parser.var",
+          "add_func_var name=%s index=%d func=%s",
+          atom_str,
+          idx,
+          qjs_func_type_name(fd->func_type));
+    }
   }
   return idx;
 }
@@ -2148,6 +2286,11 @@ static int add_arguments_var(JSContext* ctx, JSFunctionDef* fd) {
   int idx = fd->arguments_var_idx;
   if (idx < 0 && (idx = add_var(ctx, fd, JS_ATOM_arguments)) >= 0) {
     fd->arguments_var_idx = idx;
+    qjs_trace(
+        "parser.var",
+        "add_arguments_var index=%d func=%s",
+        idx,
+        qjs_func_type_name(fd->func_type));
   }
   return idx;
 }
@@ -2229,6 +2372,27 @@ typedef enum {
   JS_VAR_DEF_CATCH,
   JS_VAR_DEF_VAR,
 } JSVarDefEnum;
+
+static const char* qjs_var_def_type_name(JSVarDefEnum var_def_type) {
+  switch (var_def_type) {
+    case JS_VAR_DEF_WITH:
+      return "with";
+    case JS_VAR_DEF_LET:
+      return "let";
+    case JS_VAR_DEF_CONST:
+      return "const";
+    case JS_VAR_DEF_FUNCTION_DECL:
+      return "function_decl";
+    case JS_VAR_DEF_NEW_FUNCTION_DECL:
+      return "new_function_decl";
+    case JS_VAR_DEF_CATCH:
+      return "catch";
+    case JS_VAR_DEF_VAR:
+      return "var";
+    default:
+      return "unknown";
+  }
+}
 
 static int define_var(
     JSParseState* s,
@@ -2356,6 +2520,36 @@ static int define_var(
       break;
     default:
       abort();
+  }
+  if (idx >= 0) {
+    char atom_buf[ATOM_GET_STR_BUF_SIZE];
+    const char* atom_str = JS_AtomGetStr(ctx, atom_buf, sizeof(atom_buf), name);
+    const char* def_type_name = qjs_var_def_type_name(var_def_type);
+    if (idx >= GLOBAL_VAR_OFFSET) {
+      JSGlobalVar* hf = find_global_var(fd, name);
+      qjs_trace(
+          "parser.var",
+          "define_var name=%s type=%s idx=%d scope=global lexical=%d const=%d func=%s",
+          atom_str,
+          def_type_name,
+          idx,
+          hf ? hf->is_lexical : -1,
+          hf ? hf->is_const : -1,
+          qjs_func_type_name(fd->func_type));
+    } else {
+      JSVarDef* trace_vd = &fd->vars[idx];
+      qjs_trace(
+          "parser.var",
+          "define_var name=%s type=%s idx=%d scope=%d kind=%d lexical=%d const=%d func=%s",
+          atom_str,
+          def_type_name,
+          idx,
+          trace_vd->scope_level,
+          trace_vd->var_kind,
+          trace_vd->is_lexical,
+          trace_vd->is_const,
+          qjs_func_type_name(fd->func_type));
+    }
   }
   return idx;
 }
@@ -6131,6 +6325,10 @@ static __exception int js_parse_assign_expr2(JSParseState* s, int parse_flags) {
   } else if (
       s->token.val == '(' &&
       js_parse_skip_parens_token(s, NULL, TRUE) == TOK_ARROW) {
+  qjs_trace(
+    "parser.arrow",
+    "detected parenthesized arrow at offset=%ld",
+    (long)(s->token.ptr - s->buf_start));
     return js_parse_function_decl(
         s, JS_PARSE_FUNC_ARROW, JS_FUNC_NORMAL, JS_ATOM_NULL, s->token.ptr);
   } else if (token_is_pseudo_keyword(s, JS_ATOM_async)) {
@@ -6151,6 +6349,10 @@ static __exception int js_parse_assign_expr2(JSParseState* s, int parse_flags) {
          js_parse_skip_parens_token(s, NULL, TRUE) == TOK_ARROW) ||
         (s->token.val == TOK_IDENT && !s->token.u.ident.is_reserved &&
          peek_token(s, TRUE) == TOK_ARROW)) {
+  qjs_trace(
+      "parser.arrow",
+      "detected async arrow at offset=%ld",
+      (long)(source_ptr - s->buf_start));
       return js_parse_function_decl(
           s, JS_PARSE_FUNC_ARROW, JS_FUNC_ASYNC, JS_ATOM_NULL, source_ptr);
     } else {
@@ -6159,6 +6361,10 @@ static __exception int js_parse_assign_expr2(JSParseState* s, int parse_flags) {
         return -1;
     }
   } else if (s->token.val == TOK_IDENT && peek_token(s, TRUE) == TOK_ARROW) {
+  qjs_trace(
+    "parser.arrow",
+    "detected bare ident arrow at offset=%ld",
+    (long)(s->token.ptr - s->buf_start));
     return js_parse_function_decl(
         s, JS_PARSE_FUNC_ARROW, JS_FUNC_NORMAL, JS_ATOM_NULL, s->token.ptr);
   } else if (
@@ -6381,6 +6587,9 @@ static __exception int emit_break(JSParseState* s, JSAtom name, int is_cont) {
 static void emit_return(JSParseState* s, BOOL hasval) {
   BlockEnv* top;
 
+  if (s->cur_func->func_type == JS_PARSE_FUNC_ARROW) {
+    qjs_trace("parser.return", "arrow emit_return hasval=%d", hasval);
+  }
   if (s->cur_func->func_kind != JS_FUNC_NORMAL) {
     if (!hasval) {
       /* no value: direct return in case of async generator */
@@ -12950,6 +13159,22 @@ static __exception int js_parse_function_decl2(
   BOOL has_opt_arg;
   BOOL create_func_var = FALSE;
 
+  {
+    char atom_buf[ATOM_GET_STR_BUF_SIZE];
+    const char* func_name_str =
+        (func_name == JS_ATOM_NULL)
+            ? "<anon>"
+            : JS_AtomGetStr(ctx, atom_buf, sizeof(atom_buf), func_name);
+    qjs_trace(
+        "parser.function",
+        "enter type=%s kind=%s name=%s parent=%s at=%ld",
+        qjs_func_type_name(func_type),
+        qjs_func_kind_name(func_kind),
+        (func_name == JS_ATOM_NULL) ? "<anon>" : func_name_str,
+        fd ? qjs_func_type_name(fd->func_type) : "<root>",
+        ptr ? (long)(ptr - s->buf_start) : -1L);
+  }
+
   is_expr =
       (func_type != JS_PARSE_FUNC_STATEMENT && func_type != JS_PARSE_FUNC_VAR);
 
@@ -13125,6 +13350,15 @@ static __exception int js_parse_function_decl2(
       goto fail;
     }
     name = s->token.u.ident.atom;
+    {
+      char param_buf[ATOM_GET_STR_BUF_SIZE];
+      const char* param_name = JS_AtomGetStr(
+          s->ctx, param_buf, sizeof(param_buf), name);
+      qjs_trace(
+          "parser.params",
+          "arrow single param=%s",
+          param_name);
+    }
     if (add_arg(ctx, fd, name) < 0)
       goto fail;
     fd->defined_arg_count = 1;
@@ -13159,11 +13393,23 @@ static __exception int js_parse_function_decl2(
           goto fail_accessor;
         fd->has_simple_parameter_list = FALSE;
         rest = TRUE;
+        if (fd->func_type == JS_PARSE_FUNC_ARROW) {
+          qjs_trace(
+              "parser.params",
+              "arrow rest parameter start at offset=%ld",
+              (long)(s->token.ptr - s->buf_start));
+        }
         if (next_token(s))
           goto fail;
       }
       if (s->token.val == '[' || s->token.val == '{') {
         fd->has_simple_parameter_list = FALSE;
+        if (fd->func_type == JS_PARSE_FUNC_ARROW) {
+          qjs_trace(
+              "parser.params",
+              "arrow destructuring parameter token=%c",
+              s->token.val);
+        }
         if (rest) {
           emit_op(s, OP_rest);
           emit_u16(s, fd->arg_count);
@@ -13207,6 +13453,16 @@ static __exception int js_parse_function_decl2(
         idx = add_arg(ctx, fd, name);
         if (idx < 0)
           goto fail;
+        if (fd->func_type == JS_PARSE_FUNC_ARROW) {
+          char ident_buf[ATOM_GET_STR_BUF_SIZE];
+          const char* ident_name = JS_AtomGetStr(
+              s->ctx, ident_buf, sizeof(ident_buf), name);
+          qjs_trace(
+              "parser.params",
+              "arrow param[%d]=%s",
+              fd->arg_count - 1,
+              ident_name);
+        }
         if (next_token(s))
           goto fail;
         if (rest) {
@@ -13227,6 +13483,12 @@ static __exception int js_parse_function_decl2(
 
           fd->has_simple_parameter_list = FALSE;
           has_opt_arg = TRUE;
+          if (fd->func_type == JS_PARSE_FUNC_ARROW) {
+            qjs_trace(
+                "parser.params",
+                "arrow default initializer for param idx=%d",
+                idx);
+          }
 
           if (next_token(s))
             goto fail;
@@ -13336,6 +13598,10 @@ static __exception int js_parse_function_decl2(
       goto fail;
 
     if (s->token.val != '{') {
+      qjs_trace(
+          "parser.arrow",
+          "arrow expression body at offset=%ld",
+          (long)(s->token.ptr - s->buf_start));
       if (js_parse_function_check_names(s, fd, func_name))
         goto fail;
 
@@ -13394,6 +13660,22 @@ static __exception int js_parse_function_decl2(
     emit_return(s, FALSE);
   }
 done:
+  {
+    char atom_buf[ATOM_GET_STR_BUF_SIZE];
+    const char* func_name_str =
+        (fd->func_name == JS_ATOM_NULL)
+            ? "<anon>"
+            : JS_AtomGetStr(ctx, atom_buf, sizeof(atom_buf), fd->func_name);
+    qjs_trace(
+        "parser.function",
+        "exit type=%s kind=%s name=%s args=%d vars=%d bytecode=%d",
+        qjs_func_type_name(fd->func_type),
+        qjs_func_kind_name(fd->func_kind),
+        (fd->func_name == JS_ATOM_NULL) ? "<anon>" : func_name_str,
+        fd->arg_count,
+        fd->var_count,
+        (int)fd->byte_code.size);
+  }
   s->cur_func = fd->parent;
 
   /* Reparse identifiers after the function is terminated so that
@@ -13510,6 +13792,19 @@ done:
   }
   return 0;
 fail:
+  {
+    char atom_buf[ATOM_GET_STR_BUF_SIZE];
+    const char* func_name_str =
+        (fd && fd->func_name != JS_ATOM_NULL)
+            ? JS_AtomGetStr(ctx, atom_buf, sizeof(atom_buf), fd->func_name)
+            : "<anon>";
+    qjs_trace(
+        "parser.function",
+        "fail type=%s kind=%s name=%s",
+        qjs_func_type_name(func_type),
+        qjs_func_kind_name(func_kind),
+        func_name == JS_ATOM_NULL ? "<anon>" : func_name_str);
+  }
   s->cur_func = fd->parent;
   js_free_function_def(ctx, fd);
   if (pfd)

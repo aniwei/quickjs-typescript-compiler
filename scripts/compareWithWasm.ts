@@ -9,8 +9,8 @@
 import fs from 'fs/promises'
 import path from 'path'
 import * as ts from 'typescript'
-import { TypeScriptCompiler } from '../src/index'
-import { createAdvancedDisassembly } from '../src/disasm'
+import { TypeScriptCompiler } from '../arch/index'
+import { createAdvancedDisassembly } from '../arch/disasm'
 import { QuickJSLib } from './QuickJSLib'
 
 export interface ComparisonOptions {

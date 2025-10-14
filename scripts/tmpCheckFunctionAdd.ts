@@ -1,10 +1,10 @@
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
-import { TypeScriptCompiler } from '../src'
-import { parseBytecodeModule } from '../src/bytecodeReader'
-import { PC2Line } from '../src/env'
+import { TypeScriptCompiler } from '../arch'
+import { parseBytecodeModule } from '../arch/bytecodeReader'
+import { PC2Line } from '../arch/env'
 import { QuickJSLib } from './QuickJSLib'
-import { getOpcodeDefinition, getOpcodeName } from '../src/utils/opcode'
+import { getOpcodeDefinition, getOpcodeName } from '../arch/utils/opcode'
 
 async function main() {
   const target = process.argv[2] ?? path.join('__tests__', 'compiler', 'fixtures', 'function-add.ts')

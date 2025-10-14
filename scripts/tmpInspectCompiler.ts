@@ -3,7 +3,7 @@
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
-import { Compiler } from '../src/compiler'
+import { Compiler } from '../arch/compiler'
 
 async function main() {
   const [file, ...rest] = process.argv.slice(2)

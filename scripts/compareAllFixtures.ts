@@ -99,7 +99,7 @@ function parseArgs(args: string[]): RunnerOptions {
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index]
     if (arg === '--') {
-      break
+      continue
     }
     switch (arg) {
       case '--fixtures-dir':

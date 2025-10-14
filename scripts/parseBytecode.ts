@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs'
 import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
-import { parseBytecodeModule } from '../src/bytecodeReader'
+import { parseBytecodeModule } from '../arch/bytecodeReader'
 
 interface CliOptions {
   output?: string

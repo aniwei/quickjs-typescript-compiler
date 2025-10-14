@@ -1,8 +1,8 @@
 #!/usr/bin/env tsx
 
 import { readFile } from 'node:fs/promises'
-import { parseBytecodeModule } from '../src/bytecodeReader'
-import { PC2Line } from '../src/env'
+import { parseBytecodeModule } from '../arch/bytecodeReader'
+import { PC2Line } from '../arch/env'
 
 async function main() {
   const target = process.argv[2]

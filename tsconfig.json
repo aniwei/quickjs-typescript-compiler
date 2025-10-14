@@ -13,7 +13,7 @@
     "types.d.ts", 
     "example/**/*.ts", 
     "scripts/**/*.ts", 
-    "src/**/*.ts"
+    "arch/**/*.ts"
   ],
   "exclude": [
     

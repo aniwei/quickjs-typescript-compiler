@@ -1,0 +1,5 @@
+export { BasicFunctionIR } from './FunctionIRBuilder'
+export { IRBytecodeEmitter } from './IRBytecodeEmitter'
+export { ScopeManagerImpl, type ScopeManagerOptions } from './ScopeManagerImpl'
+export { IRLabelManager } from './IRLabelManager'
+export { TypeFactsTableImpl } from './TypeFactsTableImpl'

@@ -7,7 +7,7 @@
 
 import fs from 'fs/promises'
 import path from 'path'
-import { TypeScriptCompiler } from '../src/index'
+import { TypeScriptCompiler } from '../arch/index'
 import { execSync } from 'child_process'
 
 interface TestResult {
