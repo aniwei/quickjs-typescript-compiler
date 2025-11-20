@@ -2,7 +2,14 @@
 
 我们需要逐步实现与 QuickJS 前端等价的 TypeScript 编译管线，同时保持 wasm 仅用于元数据生成与回归对比。以下任务按优先顺序展开，完成一项后再进入下一项。
 
-## 📌 阶段 1：序列化基础设施
+## � 稳定性 Roadmap（2025 Q4）
+- [ ] **根函数语义对齐**：将顶层函数 `funcKind` 纠正为 `JS_FUNC_NORMAL`，仅在真正的 async 入口设置 `JS_MODE_ASYNC`，并验证返回指令为 `OP_return_undef`。
+- [ ] **跳转指令宽度自适应**：为 `emitJump/emitGoto` 引入长短指令回退（`OP_if_false`/`OP_goto/goto16`），当 `label8` 超出 ±127 时自动升级，确保大函数可编译。
+- [ ] **短指令能力开关**：所有 `*_8` / `*_const8` / `*_loc8` 发射都需检测 `env.supportsShortOpcodes`，在禁用场景降级为标准 opcode。
+- [ ] **回归 fixture 扩展**：新增用于长跳转、禁用短指令、模块 async/非 async 切换的 fixture，并纳入 `pnpm compare:fixtures`。
+- [ ] **文档与验证**：在 `docs/` 补充“跳转策略 & funcKind 对齐”章节，记录验证步骤；CI 需覆盖短/长指令两种构建模式。
+
+## �📌 阶段 1：序列化基础设施
 - [x] 重构 `BytecodeWriter` 常量池写出逻辑，覆盖基础标量、数组、对象、子函数常量。
 - [x] 补齐模块/函数头、闭包、pc2line、子函数等字段的完整写出逻辑，严格依据 `env.ts` 定义。
 - [x] 编写辅助脚本，将 QuickJS wasm 生成的 `.qbc` 解析成 JSON，便于比对字段差异。
