@@ -56,6 +56,7 @@ import {
   type BreakResolution,
   type ContinueResolution,
 } from './controlFlow'
+import { assertSupportedNode } from './compiler/utils/syntaxGuard'
 
 const enum SpecialObject {
   Arguments = 0,
@@ -408,16 +409,14 @@ export class Compiler {
 
   private visitNode(node: ts.Node): void {
     if (ts.isStatement(node)) {
-      const visitor = getStatementVisitor(node.kind)
-      if (visitor) {
-        this.withStatementNode(node, () => visitor(this, node))
-        return
-      }
+      this.compileStatement(node)
+      return
     }
     ts.forEachChild(node, (child) => this.visitNode(child))
   }
 
   public compileStatement(node: ts.Statement): void {
+    assertSupportedNode(node)
     const visitor = getStatementVisitor(node.kind)
     if (visitor) {
       this.withStatementNode(node, () => visitor(this, node))
@@ -932,11 +931,11 @@ export class Compiler {
     this.emitInstruction(Opcode.OP_push_this, [], node)
   }
 
-  public compileExpression(expression: ts.Expression): void {
+  public compileExpression(expression: ts.Expression, optionalChainEndLabel?: string): void {
     const previous = this.currentSourceNode
     this.currentSourceNode = expression
     try {
-      compileExpressionNode(this, expression)
+      compileExpressionNode(this, expression, optionalChainEndLabel)
     } finally {
       this.currentSourceNode = previous
     }
@@ -982,7 +981,7 @@ export class Compiler {
     this.emitOpcode(Opcode.OP_put_arg, [index], node)
   }
 
-  public emitLoadIdentifier(identifier: ts.Identifier) {
+  public emitLoadIdentifier(identifier: ts.Identifier, isTypeOf: boolean = false) {
     const atom = this.atomTable.getAtomId(identifier.text)
     if (this.argumentIndices.has(atom)) {
       this.emitLoadArgument(this.argumentIndices.get(atom)!, identifier)
@@ -1022,7 +1021,11 @@ export class Compiler {
       this.emitOpcode(Opcode.OP_get_var_ref, [captured.index], identifier)
       return
     }
-    this.emitOpcode(Opcode.OP_get_var, [atom], identifier)
+    if (isTypeOf) {
+      this.emitOpcode(Opcode.OP_get_var_undef, [atom], identifier)
+    } else {
+      this.emitOpcode(Opcode.OP_get_var, [atom], identifier)
+    }
   }
 
   public emitSetLocalUninitialized(index: number, scopeLevel: number) {

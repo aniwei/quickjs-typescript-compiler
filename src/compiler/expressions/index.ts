@@ -16,13 +16,39 @@ import {
   compilePostfixUnaryExpression,
   compilePrefixUnaryExpression,
   compilePropertyAccessExpression,
+  compileElementAccessExpression,
   compileVoidExpression,
+  compileConditionalExpression,
+  compileTypeOfExpression,
+  compileDeleteExpression,
 } from './operators'
 import { compileArrowFunctionExpression, compileFunctionExpression } from './function'
+import { assertSupportedNode } from '../utils/syntaxGuard'
 
-export function compileExpression(compiler: Compiler, expression: ts.Expression): void {
+export function compileExpression(
+  compiler: Compiler,
+  expression: ts.Expression,
+  optionalChainEndLabel?: string
+): void {
+  assertSupportedNode(expression)
+
+  if (ts.isOptionalChain(expression) && !optionalChainEndLabel) {
+    const endLabel = compiler.createLabel()
+    compileExpressionInternal(compiler, expression, endLabel)
+    compiler.markLabel(endLabel)
+    return
+  }
+
+  compileExpressionInternal(compiler, expression, optionalChainEndLabel)
+}
+
+function compileExpressionInternal(
+  compiler: Compiler,
+  expression: ts.Expression,
+  optionalChainEndLabel?: string
+): void {
   if (ts.isParenthesizedExpression(expression)) {
-    compiler.compileExpression(expression.expression)
+    compiler.compileExpression(expression.expression, optionalChainEndLabel)
     return
   }
 
@@ -82,7 +108,7 @@ export function compileExpression(compiler: Compiler, expression: ts.Expression)
   }
 
   if (ts.isCallExpression(expression)) {
-    compileCallExpression(compiler, expression)
+    compileCallExpression(compiler, expression, optionalChainEndLabel)
     return
   }
 
@@ -92,7 +118,12 @@ export function compileExpression(compiler: Compiler, expression: ts.Expression)
   }
 
   if (ts.isPropertyAccessExpression(expression)) {
-    compilePropertyAccessExpression(compiler, expression)
+    compilePropertyAccessExpression(compiler, expression, optionalChainEndLabel)
+    return
+  }
+
+  if (ts.isElementAccessExpression(expression)) {
+    compileElementAccessExpression(compiler, expression, optionalChainEndLabel)
     return
   }
 
@@ -128,6 +159,21 @@ export function compileExpression(compiler: Compiler, expression: ts.Expression)
 
   if (ts.isPostfixUnaryExpression(expression)) {
     compilePostfixUnaryExpression(compiler, expression)
+    return
+  }
+
+  if (ts.isConditionalExpression(expression)) {
+    compileConditionalExpression(compiler, expression)
+    return
+  }
+
+  if (ts.isTypeOfExpression(expression)) {
+    compileTypeOfExpression(compiler, expression)
+    return
+  }
+
+  if (ts.isDeleteExpression(expression)) {
+    compileDeleteExpression(compiler, expression)
     return
   }
 

@@ -6,7 +6,11 @@ type EmitDebugInfoOptions = Parameters<Compiler['emitInstruction']>[3]
 
 type DebuggableNode = ts.Node | undefined
 
-export function compileCallExpression(compiler: Compiler, expression: ts.CallExpression) {
+export function compileCallExpression(
+  compiler: Compiler,
+  expression: ts.CallExpression,
+  optionalChainEndLabel?: string
+) {
   const callDebugPos = compiler.getCallExpressionOpenParenPos(expression)
   const callDebug: EmitDebugInfoOptions | undefined = callDebugPos !== undefined
     ? { tsSourcePos: callDebugPos }
@@ -16,8 +20,19 @@ export function compileCallExpression(compiler: Compiler, expression: ts.CallExp
 
   if (ts.isPropertyAccessExpression(callee)) {
     compiler.withSourceNode(callee.expression, () => {
-      compiler.compileExpression(callee.expression)
+      compiler.compileExpression(callee.expression, optionalChainEndLabel)
     })
+
+    if (callee.questionDotToken && optionalChainEndLabel) {
+      compiler.emitInstruction(Opcode.OP_dup)
+      compiler.emitInstruction(Opcode.OP_is_undefined_or_null)
+      const continueLabel = compiler.createLabel()
+      compiler.emitJump(Opcode.OP_if_false8, continueLabel)
+      compiler.emitInstruction(Opcode.OP_drop)
+      compiler.emitInstruction(Opcode.OP_undefined)
+      compiler.emitJump(Opcode.OP_goto8, optionalChainEndLabel)
+      compiler.markLabel(continueLabel)
+    }
 
     const propertyAtom = compiler.getAtomId(callee.name.text)
     const propertyOperatorPos = compiler.getPropertyAccessOperatorPos(callee)
@@ -25,6 +40,19 @@ export function compileCallExpression(compiler: Compiler, expression: ts.CallExp
       ? { tsSourcePos: propertyOperatorPos }
       : undefined
     compiler.emitInstruction(Opcode.OP_get_field2, [propertyAtom], callee.name, propertyAccessDebug)
+
+    if (expression.questionDotToken && optionalChainEndLabel) {
+      // Stack: obj, method
+      compiler.emitInstruction(Opcode.OP_dup)
+      compiler.emitInstruction(Opcode.OP_is_undefined_or_null)
+      const continueLabel = compiler.createLabel()
+      compiler.emitJump(Opcode.OP_if_false8, continueLabel)
+      compiler.emitInstruction(Opcode.OP_drop) // drop method
+      compiler.emitInstruction(Opcode.OP_drop) // drop obj
+      compiler.emitInstruction(Opcode.OP_undefined)
+      compiler.emitJump(Opcode.OP_goto8, optionalChainEndLabel)
+      compiler.markLabel(continueLabel)
+    }
 
     for (const arg of expression.arguments) {
       compiler.withSourceNode(arg, () => compiler.compileExpression(arg))
@@ -40,8 +68,19 @@ export function compileCallExpression(compiler: Compiler, expression: ts.CallExp
   }
 
   compiler.withSourceNode(callee, () => {
-    compiler.compileExpression(callee)
+    compiler.compileExpression(callee, optionalChainEndLabel)
   })
+
+  if (expression.questionDotToken && optionalChainEndLabel) {
+    compiler.emitInstruction(Opcode.OP_dup)
+    compiler.emitInstruction(Opcode.OP_is_undefined_or_null)
+    const continueLabel = compiler.createLabel()
+    compiler.emitJump(Opcode.OP_if_false8, continueLabel)
+    compiler.emitInstruction(Opcode.OP_drop)
+    compiler.emitInstruction(Opcode.OP_undefined)
+    compiler.emitJump(Opcode.OP_goto8, optionalChainEndLabel)
+    compiler.markLabel(continueLabel)
+  }
 
   for (const arg of expression.arguments) {
     compiler.withSourceNode(arg, () => compiler.compileExpression(arg))

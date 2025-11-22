@@ -1,6 +1,7 @@
 import * as ts from 'typescript'
 import type { Compiler } from '../../../compiler'
 import { Opcode, env } from '../../../env'
+import { LValueBuilder } from '../../core/lvalue'
 
 type EmitDebugInfoOptions = Parameters<Compiler['emitInstruction']>[3]
 
@@ -20,6 +21,13 @@ export function compileBinaryExpression(compiler: Compiler, expression: ts.Binar
     return
   }
 
+  if (operator === ts.SyntaxKind.CommaToken) {
+    compiler.compileExpression(expression.left)
+    compiler.emitInstruction(Opcode.OP_drop)
+    compiler.compileExpression(expression.right)
+    return
+  }
+
   const opcode = getBinaryOperationOpcode(operator)
   if (opcode === null) {
     throw new Error(`Unsupported binary operator: ${ts.SyntaxKind[operator]}`)
@@ -32,82 +40,53 @@ export function compileBinaryExpression(compiler: Compiler, expression: ts.Binar
 function compileAssignmentExpression(compiler: Compiler, expression: ts.BinaryExpression) {
   const operator = expression.operatorToken.kind
   const left = expression.left
+  const right = expression.right
+
+  const lvalueBuilder = new LValueBuilder(compiler)
+  const lvalue = lvalueBuilder.prepare(left)
 
   if (isLogicalAssignmentOperator(operator)) {
-    if (ts.isIdentifier(left)) {
-      compileLogicalAssignmentIdentifier(compiler, left, expression.right, operator, expression)
-      return
+    // Logical assignment: a ||= b
+    // lvalue.loadForCompound() -> [context], value
+    lvalue.loadForCompound()
+    
+    const endLabel = compiler.createLabel()
+    
+    // Check condition
+    compiler.emitInstruction(Opcode.OP_dup) // [context], value, value
+    
+    if (operator === ts.SyntaxKind.BarBarEqualsToken) {
+      // if true, jump to end (result is value)
+      compiler.emitJump(getIfTrueOpcode(), endLabel)
+    } else if (operator === ts.SyntaxKind.AmpersandAmpersandEqualsToken) {
+      // if false, jump to end (result is value)
+      compiler.emitJump(getIfFalseOpcode(), endLabel)
+    } else if (operator === ts.SyntaxKind.QuestionQuestionEqualsToken) {
+      // if not null/undefined, jump to end (result is value)
+      compiler.emitInstruction(Opcode.OP_is_undefined_or_null)
+      compiler.emitJump(getIfFalseOpcode(), endLabel)
     }
-    if (ts.isPropertyAccessExpression(left)) {
-      compileLogicalAssignmentProperty(compiler, left, expression.right, operator, expression)
-      return
-    }
-    throw new Error(`Unsupported logical assignment target: ${ts.SyntaxKind[left.kind]}`)
-  }
 
-  if (ts.isIdentifier(left)) {
-    compileIdentifierAssignment(compiler, left, expression.right, operator, expression)
+    // If we are here, we need to assign.
+    // Stack: [context], value
+    compiler.emitInstruction(Opcode.OP_drop) // [context]
+    compiler.compileExpression(right) // [context], right
+    lvalue.store() // value (result)
+    
+    compiler.markLabel(endLabel)
     return
   }
-  if (ts.isPropertyAccessExpression(left)) {
-    compilePropertyAssignment(compiler, left, expression.right, operator, expression)
-    return
-  }
-  throw new Error(`Unsupported assignment target: ${ts.SyntaxKind[left.kind]}`)
-}
-
-function compileIdentifierAssignment(
-  compiler: Compiler,
-  left: ts.Identifier,
-  right: ts.Expression,
-  operator: ts.SyntaxKind,
-  expression: ts.BinaryExpression
-) {
-  const atom = compiler.getAtomId(left.text)
 
   if (operator === ts.SyntaxKind.EqualsToken) {
     compiler.compileExpression(right)
+    lvalue.store()
   } else {
     const opcode = getCompoundAssignmentOpcode(operator)
-    compiler.emitLoadIdentifier(left)
+    lvalue.loadForCompound()
     compiler.compileExpression(right)
     compiler.emitInstruction(opcode, [], expression.operatorToken)
+    lvalue.store()
   }
-
-  compiler.emitInstruction(Opcode.OP_dup)
-  compiler.emitStoreIdentifier(atom, left)
-}
-
-function compilePropertyAssignment(
-  compiler: Compiler,
-  left: ts.PropertyAccessExpression,
-  right: ts.Expression,
-  operator: ts.SyntaxKind,
-  expression: ts.BinaryExpression
-) {
-  const propertyAtom = compiler.getAtomId(left.name.text)
-  const propertyOperatorPos = compiler.getPropertyAccessOperatorPos(left)
-  const propertyDebug: EmitDebugInfoOptions | undefined = propertyOperatorPos !== undefined
-    ? { tsSourcePos: propertyOperatorPos }
-    : undefined
-
-  compiler.withSourceNode(left.expression, () => {
-    compiler.compileExpression(left.expression)
-  })
-
-  if (operator === ts.SyntaxKind.EqualsToken) {
-    compiler.compileExpression(right)
-  } else {
-    const opcode = getCompoundAssignmentOpcode(operator)
-    compiler.emitInstruction(Opcode.OP_dup)
-    compiler.emitInstruction(Opcode.OP_get_field, [propertyAtom], left.name, propertyDebug)
-    compiler.compileExpression(right)
-    compiler.emitInstruction(opcode, [], expression.operatorToken)
-  }
-
-  compiler.emitInstruction(Opcode.OP_dup)
-  compiler.emitInstruction(Opcode.OP_rot3r)
-  compiler.emitInstruction(Opcode.OP_put_field, [propertyAtom], left.name, propertyDebug)
 }
 
 function compileLogicalBinaryExpression(compiler: Compiler, expression: ts.BinaryExpression) {
@@ -143,122 +122,6 @@ function compileLogicalBinaryExpression(compiler: Compiler, expression: ts.Binar
       throw new Error(`Unsupported logical operator: ${ts.SyntaxKind[operator]}`)
   }
 
-  compiler.markLabel(endLabel)
-}
-
-function compileLogicalAssignmentIdentifier(
-  compiler: Compiler,
-  left: ts.Identifier,
-  right: ts.Expression,
-  operator: ts.SyntaxKind,
-  expression: ts.BinaryExpression
-) {
-  const atom = compiler.getAtomId(left.text)
-  const skipLabel = compiler.createLabel()
-
-  compiler.emitLoadIdentifier(left)
-
-  switch (operator) {
-    case ts.SyntaxKind.BarBarEqualsToken: {
-      compiler.emitInstruction(Opcode.OP_dup, [], expression.operatorToken)
-      compiler.emitJump(getIfTrueOpcode(), skipLabel)
-      compiler.emitInstruction(Opcode.OP_drop)
-      compiler.compileExpression(right)
-      compiler.emitInstruction(Opcode.OP_dup)
-      compiler.emitStoreIdentifier(atom, left)
-      break
-    }
-    case ts.SyntaxKind.AmpersandAmpersandEqualsToken: {
-      compiler.emitInstruction(Opcode.OP_dup, [], expression.operatorToken)
-      compiler.emitJump(getIfFalseOpcode(), skipLabel)
-      compiler.emitInstruction(Opcode.OP_drop)
-      compiler.compileExpression(right)
-      compiler.emitInstruction(Opcode.OP_dup)
-      compiler.emitStoreIdentifier(atom, left)
-      break
-    }
-    case ts.SyntaxKind.QuestionQuestionEqualsToken: {
-      compiler.emitInstruction(Opcode.OP_dup, [], expression.operatorToken)
-      compiler.emitInstruction(Opcode.OP_is_undefined_or_null, [], expression.operatorToken)
-      compiler.emitJump(getIfFalseOpcode(), skipLabel)
-      compiler.emitInstruction(Opcode.OP_drop)
-      compiler.compileExpression(right)
-      compiler.emitInstruction(Opcode.OP_dup)
-      compiler.emitStoreIdentifier(atom, left)
-      break
-    }
-    default:
-      throw new Error(`Unsupported logical assignment operator: ${ts.SyntaxKind[operator]}`)
-  }
-
-  compiler.markLabel(skipLabel)
-}
-
-function compileLogicalAssignmentProperty(
-  compiler: Compiler,
-  left: ts.PropertyAccessExpression,
-  right: ts.Expression,
-  operator: ts.SyntaxKind,
-  expression: ts.BinaryExpression
-) {
-  const propertyAtom = compiler.getAtomId(left.name.text)
-  const propertyOperatorPos = compiler.getPropertyAccessOperatorPos(left)
-  const propertyDebug: EmitDebugInfoOptions | undefined = propertyOperatorPos !== undefined
-    ? { tsSourcePos: propertyOperatorPos }
-    : undefined
-
-  const skipLabel = compiler.createLabel()
-  const endLabel = compiler.createLabel()
-
-  compiler.withSourceNode(left.expression, () => {
-    compiler.compileExpression(left.expression)
-  })
-
-  compiler.emitInstruction(Opcode.OP_dup, [], expression.operatorToken)
-  compiler.emitInstruction(Opcode.OP_get_field, [propertyAtom], left.name, propertyDebug)
-
-  switch (operator) {
-    case ts.SyntaxKind.BarBarEqualsToken: {
-      compiler.emitInstruction(Opcode.OP_dup, [], expression.operatorToken)
-      compiler.emitJump(getIfTrueOpcode(), skipLabel)
-      compiler.emitInstruction(Opcode.OP_drop)
-      compiler.compileExpression(right)
-      compiler.emitInstruction(Opcode.OP_dup)
-      compiler.emitInstruction(Opcode.OP_rot3r)
-      compiler.emitInstruction(Opcode.OP_put_field, [propertyAtom], left.name, propertyDebug)
-      compiler.emitGoto(endLabel)
-      break
-    }
-    case ts.SyntaxKind.AmpersandAmpersandEqualsToken: {
-      compiler.emitInstruction(Opcode.OP_dup, [], expression.operatorToken)
-      compiler.emitJump(getIfFalseOpcode(), skipLabel)
-      compiler.emitInstruction(Opcode.OP_drop)
-      compiler.compileExpression(right)
-      compiler.emitInstruction(Opcode.OP_dup)
-      compiler.emitInstruction(Opcode.OP_rot3r)
-      compiler.emitInstruction(Opcode.OP_put_field, [propertyAtom], left.name, propertyDebug)
-      compiler.emitGoto(endLabel)
-      break
-    }
-    case ts.SyntaxKind.QuestionQuestionEqualsToken: {
-      compiler.emitInstruction(Opcode.OP_dup, [], expression.operatorToken)
-      compiler.emitInstruction(Opcode.OP_is_undefined_or_null, [], expression.operatorToken)
-      compiler.emitJump(getIfFalseOpcode(), skipLabel)
-      compiler.emitInstruction(Opcode.OP_drop)
-      compiler.compileExpression(right)
-      compiler.emitInstruction(Opcode.OP_dup)
-      compiler.emitInstruction(Opcode.OP_rot3r)
-      compiler.emitInstruction(Opcode.OP_put_field, [propertyAtom], left.name, propertyDebug)
-      compiler.emitGoto(endLabel)
-      break
-    }
-    default:
-      throw new Error(`Unsupported logical assignment operator: ${ts.SyntaxKind[operator]}`)
-  }
-
-  compiler.markLabel(skipLabel)
-  compiler.emitInstruction(Opcode.OP_swap)
-  compiler.emitInstruction(Opcode.OP_drop)
   compiler.markLabel(endLabel)
 }
 

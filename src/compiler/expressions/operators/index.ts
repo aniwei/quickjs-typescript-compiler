@@ -1,4 +1,6 @@
 export { compileBinaryExpression } from './binary'
 export { compilePropertyAccessExpression } from './property'
-export { compilePrefixUnaryExpression, compilePostfixUnaryExpression } from './unary'
+export { compileElementAccessExpression } from './elementAccess'
+export { compilePrefixUnaryExpression, compilePostfixUnaryExpression, compileTypeOfExpression, compileDeleteExpression } from './unary'
 export { compileVoidExpression } from './void'
+export { compileConditionalExpression } from './conditional'
