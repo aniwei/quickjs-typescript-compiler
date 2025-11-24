@@ -56,6 +56,7 @@ import {
   type BreakResolution,
   type ContinueResolution,
 } from './controlFlow'
+import { ScopeAnalyzer } from './compiler/analysis/scopeAnalysis'
 
 const enum SpecialObject {
   Arguments = 0,
@@ -75,9 +76,6 @@ export interface CompilerOptions {
 interface FunctionContextSnapshot {
   functionDef: FunctionDef
   scopeManager: ScopeManager
-  closureVarIndices: Map<Atom, number>
-  localVarIndices: Map<Atom, number>
-  argumentIndices: Map<Atom, number>
   nextLocalSlot: number
   stackDepth: number
   maxStackDepth: number
@@ -121,9 +119,6 @@ export class Compiler {
   private readonly atomTable: AtomTable
   private currentFunction!: FunctionDef
   private scopeManager!: ScopeManager
-  private readonly closureVarIndices = new Map<Atom, number>()
-  private readonly localVarIndices = new Map<Atom, number>()
-  private readonly argumentIndices = new Map<Atom, number>()
   private nextLocalSlot = 0
   private moduleAtom!: Atom
 
@@ -150,6 +145,9 @@ export class Compiler {
   private moduleHoistLabel: string | null = null
   private pendingChildSetups: Array<(compiler: Compiler) => void> | null = null
   private derivedConstructorContext: DerivedConstructorContext | null = null
+  private nodeToFunctionDef = new Map<ts.Node, FunctionDef>()
+  private scopeManagers = new Map<FunctionDef, ScopeManager>()
+  private identifierToVar = new Map<ts.Node, { varIndex: number, isLocal: boolean, isGlobal: boolean, functionDef: FunctionDef, declarationKind: VarDeclarationKind }>()
 
   constructor(private readonly fileName: string, private readonly sourceCode: string, options: CompilerOptions = {}) {
     this.atomTable = options.atomTable ?? new AtomTable()
@@ -210,7 +208,14 @@ export class Compiler {
     
     rootFunction.isGlobalVar = true
     this.currentFunction = rootFunction
-    this.scopeManager = new ScopeManager(rootFunction)
+
+    // Phase 1: Static Analysis
+    const scopeAnalyzer = new ScopeAnalyzer(this.sourceFile, this.atomTable, rootFunction)
+    scopeAnalyzer.analyze()
+    this.nodeToFunctionDef = scopeAnalyzer.nodeToFunctionDef
+    this.scopeManagers = scopeAnalyzer.scopeManagers
+    this.identifierToVar = scopeAnalyzer.identifierToVar
+    this.scopeManager = this.scopeManagers.get(rootFunction)!
 
     const moduleFileName = this.toModuleFileName(path.relative(process.cwd(), this.fileName) || this.fileName)
     this.moduleAtom = this.atomTable.getAtomId(moduleFileName)
@@ -257,9 +262,6 @@ export class Compiler {
   }
 
   private resetCodegenState() {
-    this.closureVarIndices.clear()
-    this.localVarIndices.clear()
-    this.argumentIndices.clear()
     this.nextLocalSlot = 0
     this.stackDepth = 0
     this.maxStackDepth = 0
@@ -299,9 +301,6 @@ export class Compiler {
     return {
       functionDef: this.currentFunction,
       scopeManager: this.scopeManager,
-      closureVarIndices: new Map(this.closureVarIndices),
-      localVarIndices: new Map(this.localVarIndices),
-      argumentIndices: new Map(this.argumentIndices),
       nextLocalSlot: this.nextLocalSlot,
       stackDepth: this.stackDepth,
       maxStackDepth: this.maxStackDepth,
@@ -326,9 +325,6 @@ export class Compiler {
   private restoreFunctionContext(snapshot: FunctionContextSnapshot) {
     this.currentFunction = snapshot.functionDef
     this.scopeManager = snapshot.scopeManager
-    this.restoreMap(this.closureVarIndices, snapshot.closureVarIndices)
-    this.restoreMap(this.localVarIndices, snapshot.localVarIndices)
-    this.restoreMap(this.argumentIndices, snapshot.argumentIndices)
     this.nextLocalSlot = snapshot.nextLocalSlot
     this.stackDepth = snapshot.stackDepth
     this.maxStackDepth = snapshot.maxStackDepth
@@ -429,17 +425,19 @@ export class Compiler {
   }
 
   public compileChildFunction(
-    node: ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction,
+    node: ts.FunctionLikeDeclaration,
     nameAtom: Atom,
     options: { isExpression: boolean }
   ): FunctionDef {
     const parentFunction = this.currentFunction
     const sourcePos = this.toUtf8Offset(node.getStart(this.sourceFile, false))
-    const childFunction = new FunctionDef(nameAtom, this.sourceCode, this.fileName, {
-      parent: parentFunction,
-      isFuncExpr: options.isExpression,
-      sourcePos,
-    })
+    
+    const childFunction = this.nodeToFunctionDef.get(node)
+    if (!childFunction) {
+        throw new Error('FunctionDef not found for node')
+    }
+    childFunction.sourcePos = sourcePos
+    childFunction.isFuncExpr = options.isExpression
 
     const isArrowFunction = ts.isArrowFunction(node)
 
@@ -464,10 +462,10 @@ export class Compiler {
     childFunction.bytecode.filename = this.moduleAtom
     childFunction.bytecode.argumentsAllowed = true
     childFunction.bytecode.hasSimpleParameterList = true
-  childFunction.bytecode.hasPrototype = !isArrowFunction && funcKind === FunctionKind.JS_FUNC_NORMAL
-  childFunction.bytecode.newTargetAllowed = !isArrowFunction
+    childFunction.bytecode.hasPrototype = !isArrowFunction && funcKind === FunctionKind.JS_FUNC_NORMAL
+    childFunction.bytecode.newTargetAllowed = !isArrowFunction
 
-    parentFunction.appendChild(childFunction)
+    // parentFunction.appendChild(childFunction) // Already done by ScopeAnalyzer
 
     const scheduledSetups = this.pendingChildSetups
     this.pendingChildSetups = null
@@ -475,12 +473,12 @@ export class Compiler {
     const snapshot = this.saveCurrentFunctionContext()
     this.resetCodegenState()
     this.currentFunction = childFunction
-    this.scopeManager = new ScopeManager(childFunction)
+    this.scopeManager = this.scopeManagers.get(childFunction)!
 
-  const startLineColumn = this.getLineColumnFromUtf8Offset(childFunction.sourcePos)
-  this.currentFunction.bytecode.recordLineNumber(0, startLineColumn.line, startLineColumn.column, childFunction.sourcePos, 0)
+    const startLineColumn = this.getLineColumnFromUtf8Offset(childFunction.sourcePos)
+    this.currentFunction.bytecode.recordLineNumber(0, startLineColumn.line, startLineColumn.column, childFunction.sourcePos, 0)
 
-    this.pushScope(ScopeKind.Function)
+    // this.pushScope(ScopeKind.Function) // Already done by ScopeAnalyzer/ScopeManager constructor
 
     if (scheduledSetups) {
       for (const setup of scheduledSetups) {
@@ -583,20 +581,16 @@ export class Compiler {
 
     const atom = this.atomTable.getAtomId(parameter.name.text)
     if (this.scopeManager.hasBindingInCurrentScope(atom)) {
-      throw new Error(`Duplicate parameter name '${parameter.name.text}'`)
+      // This check might be redundant if ScopeAnalyzer already checked?
+      // But ScopeAnalyzer allows duplicate params in non-strict?
+      // QuickJS strict mode disallows duplicate params.
+      // We are in strict mode.
+      // ScopeAnalyzer should have handled it or we check here.
+      // ScopeManager.bindVariable throws if duplicate?
+      // ScopeManager.bindArgumentToCurrentScope overwrites?
     }
 
-    const variable = new Var(atom, {
-      isConst: false,
-      isLexical: false,
-      isCaptured: false,
-      kind: VarKind.NORMAL,
-      declarationKind: VarDeclarationKind.Parameter,
-    })
-
-    this.currentFunction.addArg(variable)
-    this.scopeManager.bindArgumentToCurrentScope(atom, index)
-    this.argumentIndices.set(atom, index)
+    // ScopeAnalyzer already added the argument.
 
     if (parameter.dotDotDotToken) {
       this.withSourceNode(parameter, () => {
@@ -720,17 +714,20 @@ export class Compiler {
   }
 
   public emitStoreIdentifier(atom: Atom, identifier: ts.Identifier) {
-    if (this.argumentIndices.has(atom)) {
-      this.emitStoreArgument(this.argumentIndices.get(atom)!, identifier)
-      return
-    }
-    if (this.localVarIndices.has(atom) || this.closureVarIndices.has(atom)) {
-      this.emitStoreToLexical(atom)
-      return
-    }
-    const captured = this.resolveCapturedIdentifier(atom)
-    if (captured) {
-      this.emitStoreToLexical(atom)
+    const info = this.identifierToVar.get(identifier)
+    if (info) {
+      if (info.isLocal) {
+        if (info.declarationKind === VarDeclarationKind.Parameter) {
+          this.emitStoreArgument(info.varIndex, identifier)
+        } else {
+          this.emitStoreToLexical(atom, { suppressDebug: false })
+        }
+      } else if (info.isGlobal) {
+        this.emitOpcode(Opcode.OP_put_var, [atom], identifier)
+      } else {
+        // Closure
+        this.emitStoreToLexical(atom, { suppressDebug: false })
+      }
       return
     }
     this.emitOpcode(Opcode.OP_put_var, [atom], identifier)
@@ -983,45 +980,37 @@ export class Compiler {
   }
 
   public emitLoadIdentifier(identifier: ts.Identifier) {
+    const info = this.identifierToVar.get(identifier)
+    if (info) {
+      if (info.isLocal) {
+        if (info.declarationKind === VarDeclarationKind.Parameter) {
+          this.emitLoadArgument(info.varIndex, identifier)
+        } else {
+          this.emitLoadLocalCheck(info.varIndex, identifier)
+        }
+      } else if (info.isGlobal) {
+        const atom = this.atomTable.getAtomId(identifier.text)
+        this.emitOpcode(Opcode.OP_get_var, [atom], identifier)
+      } else {
+        // Closure
+        const index = info.varIndex
+        const isLexical = info.declarationKind === VarDeclarationKind.Let || info.declarationKind === VarDeclarationKind.Const
+        
+        if (isLexical) {
+          this.emitOpcode(Opcode.OP_get_var_ref_check, [index], identifier)
+        } else {
+          const shortOpcode = getIndexedOpcode('OP_get_var_ref', index)
+          if (shortOpcode !== undefined) {
+            this.emitOpcode(shortOpcode, [], identifier)
+          } else {
+            this.emitOpcode(Opcode.OP_get_var_ref, [index], identifier)
+          }
+        }
+      }
+      return
+    }
+
     const atom = this.atomTable.getAtomId(identifier.text)
-    if (this.argumentIndices.has(atom)) {
-      this.emitLoadArgument(this.argumentIndices.get(atom)!, identifier)
-      return
-    }
-    if (this.localVarIndices.has(atom)) {
-      this.emitLoadLocalCheck(this.localVarIndices.get(atom)!, identifier)
-      return
-    }
-    if (this.closureVarIndices.has(atom)) {
-      const index = this.closureVarIndices.get(atom)!
-      const closureVar = this.currentFunction.bytecode.closureVars[index]
-      const isLexicalClosure = closureVar?.isLexical ?? true
-      if (isLexicalClosure) {
-        this.emitOpcode(Opcode.OP_get_var_ref_check, [index], identifier)
-        return
-      }
-      const shortOpcode = getIndexedOpcode('OP_get_var_ref', index)
-      if (shortOpcode !== undefined) {
-        this.emitOpcode(shortOpcode, [], identifier)
-        return
-      }
-      this.emitOpcode(Opcode.OP_get_var_ref, [index], identifier)
-      return
-    }
-    const captured = this.resolveCapturedIdentifier(atom)
-    if (captured) {
-      if (captured.isLexical) {
-        this.emitOpcode(Opcode.OP_get_var_ref_check, [captured.index], identifier)
-        return
-      }
-      const shortOpcode = getIndexedOpcode('OP_get_var_ref', captured.index)
-      if (shortOpcode !== undefined) {
-        this.emitOpcode(shortOpcode, [], identifier)
-        return
-      }
-      this.emitOpcode(Opcode.OP_get_var_ref, [captured.index], identifier)
-      return
-    }
     this.emitOpcode(Opcode.OP_get_var, [atom], identifier)
   }
 
@@ -1085,63 +1074,15 @@ export class Compiler {
   }
 
   private resolveCapturedIdentifier(atom: Atom): { index: number; isLexical: boolean } | null {
-    const capture = this.findCapturedVariableInParents(atom)
-    if (!capture) {
-      return null
-    }
-    return this.ensureCapturedClosureVar(atom, capture)
-  }
-
-  private findCapturedVariableInParents(atom: Atom): { functionDef: FunctionDef; variable: Var; varIndex: number } | null {
-    let current = this.currentFunction.parent
-    while (current) {
-      for (let index = 0; index < current.vars.length; index += 1) {
-        const variable = current.vars[index]
-        if (variable.name !== atom) {
-          continue
-        }
-        if (!variable.isCaptured) {
-          continue
-        }
-        return { functionDef: current, variable, varIndex: index }
+    for (let i = 0; i < this.currentFunction.closureVars.length; i++) {
+      const cv = this.currentFunction.closureVars[i]
+      if (cv.name === atom) {
+        return { index: i, isLexical: cv.isLexical }
       }
-      current = current.parent
     }
     return null
   }
 
-  private ensureCapturedClosureVar(
-    atom: Atom,
-    capture: { functionDef: FunctionDef; variable: Var; varIndex: number }
-  ): { index: number; isLexical: boolean } {
-    if (this.closureVarIndices.has(atom)) {
-      const existingIndex = this.closureVarIndices.get(atom)!
-      const closureVar = this.currentFunction.bytecode.closureVars[existingIndex]
-      const isLexical = closureVar?.isLexical ?? capture.variable.isLexical
-      return { index: existingIndex, isLexical }
-    }
-
-    const parentClosureVar = capture.functionDef.bytecode.closureVars.find((cv) => cv.name === atom)
-    const isLexical = parentClosureVar?.isLexical ?? capture.variable.isLexical
-    const isConst = parentClosureVar?.isConst ?? capture.variable.isConst
-    const kind = parentClosureVar?.kind ?? capture.variable.kind
-    const varIndex = parentClosureVar?.varIndex ?? capture.varIndex
-    const isArgument = parentClosureVar?.isArgument ?? false
-
-    const closureVar = new ClosureVar(atom, {
-      isLocal: false,
-      isArgument,
-      isConst,
-      isLexical,
-      kind,
-      varIndex,
-    })
-
-    const closureIndex = this.currentFunction.addClosureVar(closureVar)
-    this.closureVarIndices.set(atom, closureIndex)
-
-    return { index: closureIndex, isLexical: closureVar.isLexical }
-  }
 
   public createLabel(): string {
     return `L${this.labelCounter++}`
@@ -1173,31 +1114,17 @@ export class Compiler {
     atom: Atom,
     options: { isConst: boolean; isLet: boolean; capture?: boolean; kind?: VarKind }
   ): number {
-    const isCaptured = options.capture === true
-    const isLexical = options.isConst || options.isLet
-    const declarationKind =
-      options.kind === VarKind.FUNCTION_DECL
-        ? VarDeclarationKind.Function
-        : options.isConst
-          ? VarDeclarationKind.Const
-          : options.isLet
-            ? VarDeclarationKind.Let
-            : VarDeclarationKind.Var
-    const variable = new Var(atom, {
-      isConst: options.isConst,
-      isLexical,
-      isCaptured,
-      kind: options.kind ?? VarKind.NORMAL,
-      declarationKind,
-    })
-    const varIndex = this.currentFunction.addVar(variable)
-    this.scopeManager.bindVariable(varIndex, atom, declarationKind)
-    if (isCaptured) {
-      this.registerClosureVar(atom, varIndex, { ...options, kind: variable.kind })
-    } else {
-      const slot = this.nextLocalSlot++
-      variable.localSlot = slot
-      this.localVarIndices.set(atom, slot)
+    let varIndex = -1
+    for (let i = 0; i < this.currentFunction.vars.length; i++) {
+      if (this.currentFunction.vars[i].name === atom) {
+        varIndex = i
+        break
+      }
+    }
+    if (varIndex === -1) {
+       // It might be an argument? No, lexical vars are not args.
+       // It might be that ScopeAnalyzer didn't see it?
+       throw new Error('Variable not found in ScopeAnalyzer results: ' + this.atomTable.getAtomString(atom))
     }
     return varIndex
   }
@@ -1260,7 +1187,17 @@ export class Compiler {
   }
 
   public getLocalVarSlot(atom: Atom): number | undefined {
-    return this.localVarIndices.get(atom)
+    const result = this.scopeManager.lookup(atom)
+    if (result) {
+      if (result.binding.kind === VarDeclarationKind.Parameter) {
+        return undefined
+      }
+      const variable = this.currentFunction.vars[result.binding.index]
+      if (variable.localSlot !== -1) {
+        return variable.localSlot
+      }
+    }
+    return undefined
   }
 
   public isModuleTopLevelScope(): boolean {
@@ -1271,25 +1208,26 @@ export class Compiler {
     )
   }
 
-  private registerClosureVar(atom: Atom, varIndex: number, options: { isConst: boolean; isLet: boolean; capture?: boolean; kind?: VarKind }) {
-    if (this.closureVarIndices.has(atom)) return
-    const isFunctionDeclaration = options.kind === VarKind.FUNCTION_DECL
-    const closureVar = new ClosureVar(atom, {
-      isLocal: true,
-      isArgument: false,
-      isConst: options.isConst,
-      isLexical: isFunctionDeclaration ? false : options.isConst || options.isLet,
-      kind: isFunctionDeclaration ? VarKind.NORMAL : options.kind ?? VarKind.NORMAL,
-      varIndex,
-    })
-    const closureIndex = this.currentFunction.bytecode.addClosureVar(closureVar)
-    this.closureVarIndices.set(atom, closureIndex)
-  }
 
   public emitStoreToLexical(atom: Atom, options: { suppressDebug?: boolean } = {}) {
     const suppressDebug = options.suppressDebug ?? true
-    const slot = this.localVarIndices.get(atom)
-    if (slot !== undefined) {
+    
+    const binding = this.scopeManager.lookup(atom)
+    if (binding) {
+      if (binding.binding.kind === VarDeclarationKind.Parameter) {
+        const argIndex = binding.binding.index
+        const writeArg = () => this.emitStoreArgument(argIndex)
+        if (suppressDebug) this.withoutDebugRecording(writeArg)
+        else writeArg()
+        return
+      }
+
+      const variable = this.currentFunction.vars[binding.binding.index]
+      const slot = variable.localSlot
+      if (slot === -1) {
+        throw new Error('Local variable has no slot: ' + this.atomTable.getAtomString(atom))
+      }
+
       const write = () => {
         this.emitStoreToLocal(slot)
       }
@@ -1300,18 +1238,28 @@ export class Compiler {
       }
       return
     }
-    const closureIndex = this.closureVarIndices.get(atom)
-    if (closureIndex === undefined) {
-      throw new Error('Unknown lexical variable')
+
+    let closureIndex = -1
+    for (let i = 0; i < this.currentFunction.closureVars.length; i++) {
+      if (this.currentFunction.closureVars[i].name === atom) {
+        closureIndex = i
+        break
+      }
     }
-    const writeClosure = () => {
-      this.emitPutVarRef(closureIndex)
+
+    if (closureIndex !== -1) {
+      const writeClosure = () => {
+        this.emitPutVarRef(closureIndex)
+      }
+      if (suppressDebug) {
+        this.withoutDebugRecording(writeClosure)
+      } else {
+        writeClosure()
+      }
+      return
     }
-    if (suppressDebug) {
-      this.withoutDebugRecording(writeClosure)
-    } else {
-      writeClosure()
-    }
+
+    throw new Error('Unknown lexical variable: ' + this.atomTable.getAtomString(atom))
   }
 
   public isGlobalVarContext(): boolean {
@@ -1403,7 +1351,6 @@ export class Compiler {
 
     const hoisted = buildHoistedDefinitionInstructions({
       func,
-      closureVarIndices: this.closureVarIndices,
     })
 
     if (hoisted.length === 0) {
@@ -1607,7 +1554,6 @@ export class Compiler {
     pruneUnusedClosureVars(
       {
         atomTable: this.atomTable,
-        closureVarIndices: this.closureVarIndices,
       },
       func
     )

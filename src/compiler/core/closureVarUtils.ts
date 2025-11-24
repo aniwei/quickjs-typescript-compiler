@@ -9,7 +9,6 @@ type ClosureVarIndices = Map<Atom, number>
 
 export interface ClosureVarPruneContext {
   atomTable: AtomTable
-  closureVarIndices: ClosureVarIndices
 }
 
 export function pruneUnusedClosureVars(context: ClosureVarPruneContext, func: FunctionDef) {
@@ -50,7 +49,6 @@ export function pruneUnusedClosureVars(context: ClosureVarPruneContext, func: Fu
   if (remap.size === 0) {
     func.bytecode.closureVars = []
     func.closureVars = []
-    context.closureVarIndices.clear()
     return
   }
 
@@ -58,11 +56,6 @@ export function pruneUnusedClosureVars(context: ClosureVarPruneContext, func: Fu
 
   func.bytecode.closureVars = filtered
   func.closureVars = [...filtered]
-
-  context.closureVarIndices.clear()
-  for (let newIndex = 0; newIndex < filtered.length; newIndex++) {
-    context.closureVarIndices.set(filtered[newIndex].name, newIndex)
-  }
 }
 
 function collectClosureVarUsage(func: FunctionDef): Set<number> {

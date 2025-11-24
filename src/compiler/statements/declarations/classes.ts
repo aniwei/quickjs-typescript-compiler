@@ -1,6 +1,7 @@
 import * as ts from 'typescript'
 import { Opcode } from '../../../env'
 import type { Compiler } from '../../../compiler'
+import { FunctionDef } from '../../../functionDef'
 import { VarKind } from '../../../vars'
 import { getInstructionSize } from '../../analysis/opcodeInfo'
 import {
@@ -127,16 +128,25 @@ function compileConstructorFunction(
   hasHeritage: boolean,
 ) {
   const constructorDecl = classNode.members.find((member): member is ts.ConstructorDeclaration => ts.isConstructorDeclaration(member))
-  let ctorExpression = createConstructorFunctionExpression(classNode, classIdentifier, constructorDecl, hasHeritage)
-
+  
   if (hasHeritage) {
     compiler.scheduleChildSetup((childCompiler: Compiler) => {
       childCompiler.beginDerivedConstructorContext()
     })
   }
-  const constructorFunction = compiler.compileChildFunction(ctorExpression, compiler.getAtomId(classIdentifier.text), {
-    isExpression: true,
-  })
+
+  let constructorFunction: FunctionDef
+  if (constructorDecl) {
+    constructorFunction = compiler.compileChildFunction(constructorDecl, compiler.getAtomId(classIdentifier.text), {
+      isExpression: true,
+    })
+  } else {
+    let ctorExpression = createConstructorFunctionExpression(classNode, classIdentifier, constructorDecl, hasHeritage)
+    constructorFunction = compiler.compileChildFunction(ctorExpression, compiler.getAtomId(classIdentifier.text), {
+      isExpression: true,
+    })
+  }
+
   constructorFunction.bytecode.hasPrototype = false
   constructorFunction.bytecode.newTargetAllowed = true
   constructorFunction.bytecode.superAllowed = true
@@ -180,9 +190,8 @@ function compileMethods(
     const isStatic = modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.StaticKeyword) ?? false
 
     if (ts.isMethodDeclaration(member) || ts.isGetAccessorDeclaration(member) || ts.isSetAccessorDeclaration(member)) {
-      const methodExpr = createMethodFunctionExpression(member)
       const methodName = ts.isIdentifier(member.name) ? member.name.text : ''
-      const methodFunc = compiler.compileChildFunction(methodExpr, compiler.getAtomId(methodName), { isExpression: true })
+      const methodFunc = compiler.compileChildFunction(member, compiler.getAtomId(methodName), { isExpression: true })
       methodFunc.bytecode.hasPrototype = false
       methodFunc.bytecode.newTargetAllowed = false
       methodFunc.bytecode.needHomeObject = !isStatic

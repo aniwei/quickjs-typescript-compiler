@@ -22,7 +22,7 @@
 - [x] 精读 QuickJS `instantiate_hoisted_definitions`，梳理 hoisted 函数/变量插入的指令序列与短/长跳用法。
 - [x] 在 `compiler` 中实现等价的 hoisted 定义注入逻辑，联动 `supportsShortOpcodes` 选择短/长指令。
 - [x] 记录 hoist 行为文档，沉淀 `instantiate_hoisted_definitions` 步骤与指令参数（`docs/hoist-behavior.md`）。
-- [ ] 在编译阶段补足 module/global hoist 元数据（模拟 `global_vars`），生成 `define_func`/`define_var`/`put_var` 流水并处理 `_var_`/`_arg_var_` 闭包。
+- [x] 在编译阶段补足 module/global hoist 元数据（模拟 `global_vars`），生成 `define_func`/`define_var`/`put_var` 流水并处理 `_var_`/`_arg_var_` 闭包。
 - [x] 覆盖 hoisted 定义在闭包捕获、块级作用域及全局变量上的残余差异，确保与 QuickJS 完全一致。
 - [x] 更新 fixtures 与 `compareWithWasm` 脚本验证，确保新增 hoisted 流水与 QuickJS 字节码完全对齐。（新增 `scripts/compareAllFixtures.ts` 批量对比工具，并补充 `pnpm compare:fixtures` 命令）
 - [ ] 对 `function-add.ts`/`compute.ts` 等基准进行二进制 diff，确认模块 guard 与 hoist 序列 100% 匹配。

@@ -10,11 +10,10 @@ const DEFINE_GLOBAL_LEX_VAR = 1 << 7
 
 export interface ModuleHoistContext {
   func: FunctionDef
-  closureVarIndices: Map<Atom, number>
 }
 
 export function buildHoistedDefinitionInstructions(context: ModuleHoistContext): Instruction[] {
-  const { func, closureVarIndices } = context
+  const { func } = context
   const instructions: Instruction[] = []
 
   for (let index = 0; index < func.args.length; index++) {
@@ -35,38 +34,29 @@ export function buildHoistedDefinitionInstructions(context: ModuleHoistContext):
       continue
     }
     instructions.push(buildFclosureInstruction(variable.funcPoolIndex))
-    if (variable.isCaptured) {
-      const closureIndex = closureVarIndices.get(variable.name)
-      if (closureIndex === undefined) {
-        throw new Error(`Hoisted captured variable missing closure index for ${varIndex}`)
-      }
-      instructions.push(buildPutClosureInstruction(closureIndex))
-    } else {
-      if (variable.localSlot < 0) {
-        throw new Error(`Hoisted variable missing local slot for index ${varIndex}`)
-      }
-      instructions.push(buildStoreToLocalInstruction(variable.localSlot))
+    
+    if (variable.localSlot < 0) {
+      throw new Error(`Hoisted variable missing local slot for index ${varIndex}`)
     }
+    instructions.push(buildStoreToLocalInstruction(variable.localSlot))
   }
 
-  instructions.push(...buildGlobalHoistInstructions(func, closureVarIndices))
+  instructions.push(...buildGlobalHoistInstructions(func))
 
   return instructions
 }
 
 function buildGlobalHoistInstructions(
-  func: FunctionDef,
-  closureVarIndices: Map<Atom, number>
+  func: FunctionDef
 ): Instruction[] {
   if (func.globalVars.length === 0) {
     return []
   }
 
   const instructions: Instruction[] = []
-  const closureIndexByAtom = closureVarIndices
 
-  const varEnvIndex = closureIndexByAtom.get(JSAtom.JS_ATOM__var_)
-  const argVarEnvIndex = closureIndexByAtom.get(JSAtom.JS_ATOM__arg_var_)
+  const varEnvIndex = func.closureVars.findIndex(cv => cv.name === JSAtom.JS_ATOM__var_)
+  const argVarEnvIndex = func.closureVars.findIndex(cv => cv.name === JSAtom.JS_ATOM__arg_var_)
   const isModule = Boolean(func.module)
 
   for (const globalVar of func.globalVars) {
@@ -75,15 +65,17 @@ function buildGlobalHoistInstructions(
     let envIndex: number | undefined
     let forceInit = globalVar.forceInit
 
-    if (closureIndexByAtom.has(globalVar.name)) {
+    const foundClosureIndex = func.closureVars.findIndex(cv => cv.name === globalVar.name)
+    
+    if (foundClosureIndex >= 0) {
       hasClosure = 2
-      closureIndex = closureIndexByAtom.get(globalVar.name)
+      closureIndex = foundClosureIndex
       forceInit = false
-    } else if (varEnvIndex !== undefined) {
+    } else if (varEnvIndex >= 0) {
       hasClosure = 1
       envIndex = varEnvIndex
       forceInit = true
-    } else if (argVarEnvIndex !== undefined) {
+    } else if (argVarEnvIndex >= 0) {
       hasClosure = 1
       envIndex = argVarEnvIndex
       forceInit = true
