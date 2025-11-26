@@ -184,7 +184,17 @@ class Parser {
         return
       }
       case BytecodeTag.TC_TAG_FUNCTION_BYTECODE:
-        this.readFunction()
+        this.offset--
+        const func = this.readFunction()
+        if (func.pc2line) {
+            console.log(`\n--- Nested Function ---`)
+            console.log(`🔢 pc2line 长度: ${func.pc2line.length} 字节`)
+            console.log('原始字节:', [...func.pc2line].map((b) => `0x${b.toString(16).padStart(2, '0')}`).join(' '))
+            const entries = decodePc2line(func.pc2line)
+            for (const entry of entries) {
+                console.log(`┃ ${entry.pc} → ${entry.line+1} : ${entry.column+1} ...`)
+            }
+        }
         return
       default:
         throw new Error(`暂不支持跳过常量标记 ${tag}`)

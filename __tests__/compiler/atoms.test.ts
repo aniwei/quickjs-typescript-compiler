@@ -1,5 +1,5 @@
-import { AtomTable, JSAtom } from '../src/atoms'
-import { env } from '../src/env'
+import { AtomTable, JSAtom } from '../../src/atoms'
+import { env } from '../../src/env'
 
 describe('AtomTable', () => {
   let atomTable: AtomTable

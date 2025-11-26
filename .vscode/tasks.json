@@ -42,6 +42,13 @@
 			"command": "pnpm -s gen:env && pnpm -s start __tests__/compiler/fixtures/compute.ts --disasm --cfg --pc2line --debug",
 			"isBackground": false,
 			"group": "build"
+		},
+		{
+			"label": "compare console-log",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/console-log.ts --input-js __tests__/compiler/fixtures/console-log.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts --show-diff",
+			"args": [],
+			"group": "build"
 		}
 	]
 }

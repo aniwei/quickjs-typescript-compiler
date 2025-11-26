@@ -7,14 +7,14 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { QuickJSLib } from '../scripts/QuickJSLib'
-import { TypeScriptCompiler, CompileFlags } from './index'
+import { TypeScriptCompiler, CompileFlags, CompilerOptions } from './index'
 import { PC2Line } from './env'
 
 const PC2LINE_BASE = PC2Line.PC2LINE_BASE
 const PC2LINE_RANGE = PC2Line.PC2LINE_RANGE
 const PC2LINE_OP_FIRST = PC2Line.PC2LINE_OP_FIRST
 
-interface CLIOptions extends CompileFlags {
+interface CLIOptions extends CompilerOptions {
   output?: string
   disasm?: boolean
   cfg?: boolean
@@ -44,7 +44,12 @@ async function main() {
   }
   
   const inputFile = args[0]
-  const options: CLIOptions = {}
+  const options: CLIOptions = {
+    debug: !!process.env.DEBUG,
+    dump: !!process.env.DUMP,
+    disasm: !!process.env.DISASM,
+    verbose: !!process.env.VERBOSE,
+  }
   
   // Parse arguments
   for (let i = 1; i < args.length; i++) {
@@ -122,7 +127,7 @@ async function compileTsFile(inputFile: string, options: CLIOptions) {
   }
   
   // Create compiler with options
-  const compilerOptions: CompileFlags = {
+  const compilerOptions: CompilerOptions = {
     bigInt: options.bigInt,
     dump: options.dump,
     shortCode: options.shortCode !== false, // Default to true unless explicitly disabled
@@ -168,7 +173,7 @@ async function compileTsFile(inputFile: string, options: CLIOptions) {
   }
   
   if (options.pc2line) {
-    const table = functionDef.bytecode.pc2line
+    const table = functionDef.pc2line.toArray()
     if (!table || table.length === 0) {
       console.log('⚠️  pc2line 表为空')
     } else {

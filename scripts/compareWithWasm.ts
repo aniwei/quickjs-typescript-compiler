@@ -116,7 +116,9 @@ class BytecodeComparator {
       ...(flags as any),
       referenceJsSource: reference?.code,
     })
-    const bytecode = await compiler.compileFile(this.options.inputTs);
+    // Use JS filename to match WASM output
+    const filename = reference ? reference.path : this.options.inputTs;
+    const bytecode = await compiler.compile(sourceCode, filename);
 
     let disassembly: string | undefined
     if (this.options.disasm) {
