@@ -85,7 +85,7 @@ export class AtomManager {
 
   add(name: string): JSAtom {
     if (this.nameToAtom.has(name)) {
-      return this.nameToAtom.get(name)!;
+      return this.nameToAtom.get(name) as JSAtom
     }
     const id = this.atomToName.length;
     // console.log(`AtomManager: adding ${name} at ${id}`);
@@ -95,7 +95,7 @@ export class AtomManager {
   }
 
   get(name: string): JSAtom {
-    return this.nameToAtom.get(name) || JS_ATOM_NULL;
+    return this.nameToAtom.get(name) as JSAtom || JS_ATOM_NULL;
   }
 
   getString(atom: JSAtom): string {

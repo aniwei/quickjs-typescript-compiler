@@ -22,14 +22,26 @@ interface Label {
   jumps8: number[];
 }
 
+interface LoopContext {
+  breakLabel: Label;
+  continueLabel: Label;
+  labelName?: string;
+}
+
 export class TypeScriptCompiler {
   ctx: any; // Placeholder for JSContext
   atomManager: AtomManager;
   cur_func: JSFunctionDef | null = null;
   sourceFile: ts.SourceFile | null = null;
   options: CompilerOptions;
+  loopStack: LoopContext[] = [];
+  scopeLevel: number = 1;
+
+  suppressLineInfo: boolean = false;
+  inArgument: boolean = false;
 
   constructor(options: CompilerOptions = {}) {
+    console.log('Compiler ID:', Math.random());
     this.atomManager = new AtomManager();
     this.ctx = { atomManager: this.atomManager };
     this.options = options;
@@ -63,6 +75,9 @@ export class TypeScriptCompiler {
     globalFunc.filename = this.atomManager.add(filename);
     this.cur_func = globalFunc;
 
+    // Pre-pass to register atoms in correct order (locals then closures)
+    this.prePass(this.sourceFile);
+
     // Compile program
     this.compileProgram(this.sourceFile);
 
@@ -71,35 +86,68 @@ export class TypeScriptCompiler {
     return serializer.serialize(this.cur_func!);
   }
 
+  private prePass(sourceFile: ts.SourceFile) {
+    const locals: string[] = [];
+    const closures: string[] = [];
+
+    const visit = (node: ts.Node, isTopLevel: boolean) => {
+      if (ts.isVariableStatement(node)) {
+        node.declarationList.declarations.forEach(decl => {
+          if (ts.isIdentifier(decl.name)) {
+            if (isTopLevel) closures.push(decl.name.text);
+            else locals.push(decl.name.text);
+          }
+        });
+      } else if (ts.isForOfStatement(node)) {
+        if (ts.isVariableDeclarationList(node.initializer)) {
+          node.initializer.declarations.forEach(decl => {
+            if (ts.isIdentifier(decl.name)) {
+              locals.push(decl.name.text);
+            }
+          });
+        }
+      }
+
+      if (!ts.isFunctionDeclaration(node) && !ts.isFunctionExpression(node) && !ts.isArrowFunction(node)) {
+        node.forEachChild(child => visit(child, false));
+      }
+    };
+
+    sourceFile.statements.forEach(stmt => visit(stmt, true));
+
+    [...new Set(locals)].forEach(name => this.atomManager.add(name));
+    [...new Set(closures)].forEach(name => this.atomManager.add(name));
+  }
+
   compileProgram(node: ts.SourceFile) {
     // Module boilerplate (simplified)
     if (this.cur_func?.isGlobalVar) {
-       this.emitLineCol(0);
-       this.emitOp(Opcode.OP_push_this);
-       const label = this.newLabel();
-       this.emitJump8(Opcode.OP_if_false8, label);
-       
-       // Script Path: Function Declarations
-       ts.forEachChild(node, n => {
-           if (ts.isFunctionDeclaration(n)) {
-               this.compileStatement(n);
-           }
-       });
+      this.emitLineCol(0);
+      this.emitOp(Opcode.OP_push_this);
+      const label = this.newLabel();
+      this.emitJump8(Opcode.OP_if_false8, label);
+      
+      // Script Path: Function Declarations
+      ts.forEachChild(node, n => {
+        if (ts.isFunctionDeclaration(n)) {
+          this.compileStatement(n);
+        }
+      });
 
-       this.emitOp(Opcode.OP_return_undef);
-       this.emitLabel(label);
+      this.emitOp(Opcode.OP_return_undef);
+      this.emitLabel(label);
 
-       // Module Path: Statements
-       ts.forEachChild(node, n => {
-           if (!ts.isFunctionDeclaration(n) && n.kind !== ts.SyntaxKind.EndOfFileToken) {
-               this.compileStatement(n);
-           }
-       });
+      // Module Path: Statements
+      ts.forEachChild(node, n => {
+        if (!ts.isFunctionDeclaration(n) && n.kind !== ts.SyntaxKind.EndOfFileToken) {
+          this.compileStatement(n);
+        }
+      });
 
-       this.emitOp(Opcode.OP_undefined);
-       this.emitOp(Opcode.OP_return_async);
+      this.emitOp(Opcode.OP_undefined);
+      this.emitOp(Opcode.OP_return_async);
     } else {
-        ts.forEachChild(node, n => this.compileStatement(n));
+      ts.forEachChild(node, n => this.compileStatement(n));
     }
   }
 
@@ -132,6 +180,15 @@ export class TypeScriptCompiler {
       case ts.SyntaxKind.SwitchStatement:
         this.compileSwitchStatement(node as ts.SwitchStatement);
         break;
+      case ts.SyntaxKind.WhileStatement:
+        this.compileWhileStatement(node as ts.WhileStatement);
+        break;
+      case ts.SyntaxKind.BreakStatement:
+        this.compileBreakStatement(node as ts.BreakStatement);
+        break;
+      case ts.SyntaxKind.ContinueStatement:
+        this.compileContinueStatement(node as ts.ContinueStatement);
+        break;
       default:
         console.warn(`Unsupported statement kind: ${ts.SyntaxKind[node.kind]}`);
     }
@@ -144,8 +201,8 @@ export class TypeScriptCompiler {
     // 1. Define variable in current scope (if global)
     let varIdx = -1;
     if (this.cur_func?.isGlobalVar) {
-         // Function declarations in global scope are not lexical (var-like)
-         varIdx = this.addClosureVar(name, false, false);
+      // Function declarations in global scope are not lexical (var-like)
+      varIdx = this.addClosureVar(name, false, false);
     }
 
     // 2. Create new function definition
@@ -161,20 +218,20 @@ export class TypeScriptCompiler {
     
     // Set args
     node.parameters.forEach(param => {
-        if (ts.isIdentifier(param.name)) {
-            const paramName = param.name.text;
-            const paramAtom = this.atomManager.add(paramName);
-            funcDef.args.push({
-                varName: paramAtom,
-                scopeLevel: 0,
-                scopeNext: 1, // Match QuickJS behavior (1 seems to be default for args?)
-                isConst: false,
-                isLexical: false,
-                isCaptured: false,
-                varKind: JSVarKind.JS_VAR_NORMAL,
-                funcPoolIdx: -1
-            });
-        }
+      if (ts.isIdentifier(param.name)) {
+          const paramName = param.name.text;
+          const paramAtom = this.atomManager.add(paramName);
+          funcDef.args.push({
+              varName: paramAtom,
+              scopeLevel: 0,
+              scopeNext: 1, // Match QuickJS behavior (1 seems to be default for args?)
+              isConst: false,
+              isLexical: false,
+              isCaptured: false,
+              varKind: JSVarKind.JS_VAR_NORMAL,
+              funcPoolIdx: -1
+          });
+      }
     });
     
     // Switch context
@@ -280,7 +337,7 @@ export class TypeScriptCompiler {
     const atom = this.atomManager.add(name);
     const idx = this.cur_func.vars.push({
       varName: atom,
-      scopeLevel: 0,
+      scopeLevel: this.scopeLevel,
       scopeNext: -1,
       isConst: isConst,
       isLexical: true,
@@ -291,8 +348,14 @@ export class TypeScriptCompiler {
     return idx;
   }
 
-  emitPutVarRef(idx: number) {
+  emitPutVarRef(idx: number, check: boolean = false) {
     if (!this.cur_func) return;
+    if (check) {
+        this.emitOp(Opcode.OP_put_var_ref_check);
+        this.cur_func.byteCode.putU16(idx);
+        return;
+    }
+
     if (idx === 0) {
       this.emitOp(Opcode.OP_put_var_ref0);
     } else if (idx === 1) {
@@ -303,6 +366,22 @@ export class TypeScriptCompiler {
       this.emitOp(Opcode.OP_put_var_ref3);
     } else {
       this.emitOp(Opcode.OP_put_var_ref);
+      this.cur_func.byteCode.putU16(idx);
+    }
+  }
+
+  emitPutArg(idx: number) {
+    if (!this.cur_func) return;
+    if (idx === 0) {
+      this.emitOp(Opcode.OP_put_arg0);
+    } else if (idx === 1) {
+      this.emitOp(Opcode.OP_put_arg1);
+    } else if (idx === 2) {
+      this.emitOp(Opcode.OP_put_arg2);
+    } else if (idx === 3) {
+      this.emitOp(Opcode.OP_put_arg3);
+    } else {
+      this.emitOp(Opcode.OP_put_arg);
       this.cur_func.byteCode.putU16(idx);
     }
   }
@@ -345,7 +424,9 @@ export class TypeScriptCompiler {
   }
 
   compileBlock(node: ts.Block) {
+    this.scopeLevel++;
     node.statements.forEach(stmt => this.compileStatement(stmt));
+    this.scopeLevel--;
   }
 
   compileReturnStatement(node: ts.ReturnStatement) {
@@ -360,6 +441,36 @@ export class TypeScriptCompiler {
   }
 
   compileIfStatement(node: ts.IfStatement) {
+    // Optimization: if (cond) break/continue;
+    if (!node.elseStatement) {
+      let stmt = node.thenStatement;
+      if (ts.isBlock(stmt)) {
+        if (stmt.statements.length === 1) {
+          stmt = stmt.statements[0];
+        }
+      }
+        
+      if (ts.isBreakStatement(stmt) || ts.isContinueStatement(stmt)) {
+        this.compileExpression(node.expression);
+        
+        let targetLabel: Label | undefined;
+        if (ts.isBreakStatement(stmt)) {
+          if (this.loopStack.length > 0) {
+            targetLabel = this.loopStack[this.loopStack.length - 1].breakLabel;
+          }
+        } else {
+          if (this.loopStack.length > 0) {
+            targetLabel = this.loopStack[this.loopStack.length - 1].continueLabel;
+          }
+        }
+        
+        if (targetLabel) {
+          this.emitJump8(Opcode.OP_if_true8, targetLabel);
+          return;
+        }
+      }
+    }
+
     // if (expr) stmt else stmt
     // expr
     // if_false else_label
@@ -390,6 +501,44 @@ export class TypeScriptCompiler {
     }
   }
 
+  compileWhileStatement(node: ts.WhileStatement) {
+    const startLabel = this.newLabel();
+    const endLabel = this.newLabel();
+
+    this.loopStack.push({ breakLabel: endLabel, continueLabel: startLabel });
+
+    this.emitLabel(startLabel);
+    this.compileExpression(node.expression);
+    this.emitJump8(Opcode.OP_if_false8, endLabel);
+
+    this.compileStatement(node.statement);
+
+    this.emitJump8(Opcode.OP_goto8, startLabel);
+    this.emitLabel(endLabel);
+
+    this.loopStack.pop();
+  }
+
+  compileBreakStatement(node: ts.BreakStatement) {
+    if (this.loopStack.length === 0) {
+      // TODO: Error handling
+      return;
+    }
+    // TODO: Handle labels
+    const ctx = this.loopStack[this.loopStack.length - 1];
+    this.emitJump8(Opcode.OP_goto8, ctx.breakLabel);
+  }
+
+  compileContinueStatement(node: ts.ContinueStatement) {
+    if (this.loopStack.length === 0) {
+      // TODO: Error handling
+      return;
+    }
+    // TODO: Handle labels
+    const ctx = this.loopStack[this.loopStack.length - 1];
+    this.emitJump8(Opcode.OP_goto8, ctx.continueLabel);
+  }
+
   private isReturnOp(op: number): boolean {
     return op === Opcode.OP_return || 
            op === Opcode.OP_return_undef || 
@@ -410,75 +559,75 @@ export class TypeScriptCompiler {
     
     let defaultIndex = -1;
     for (let i = 0; i < clauses.length; i++) {
-        if (clauses[i].kind === ts.SyntaxKind.DefaultClause) {
-            defaultIndex = i;
-        }
+      if (clauses[i].kind === ts.SyntaxKind.DefaultClause) {
+        defaultIndex = i;
+      }
     }
     
     // Interleaved compilation
     for (let i = 0; i < clauses.length; i++) {
-        const clause = clauses[i];
+      const clause = clauses[i];
         
-        if (clause.kind === ts.SyntaxKind.CaseClause) {
-            const caseClause = clause as ts.CaseClause;
-            
-            // Check label
-            this.emitLabel(checkLabels[i]);
-            
-            // Comparison
-            this.emitOp(Opcode.OP_dup);
-            this.compileExpression(caseClause.expression);
-            this.emitOp(Opcode.OP_strict_eq);
-            
-            // Jump to next check if false
-            let nextCheckLabel = endLabel; // Default fallback
-            if (defaultIndex !== -1) {
-                nextCheckLabel = bodyLabels[defaultIndex]; // Fallback to default body
-            }
-            
-            // Find next case check
-            for (let j = i + 1; j < clauses.length; j++) {
-                if (clauses[j].kind === ts.SyntaxKind.CaseClause) {
-                    nextCheckLabel = checkLabels[j];
-                    break;
-                }
-            }
-            
-            this.emitJump8(Opcode.OP_if_false8, nextCheckLabel);
-            
-            // Body
-            this.emitLabel(bodyLabels[i]);
-            clause.statements.forEach(stmt => this.compileStatement(stmt));
-            
-            // Fallthrough to next body
-            if (!this.isReturnOp(this.cur_func!.byteCode.lastByte ?? 0)) {
-                if (i + 1 < clauses.length) {
-                    if (clauses[i+1].kind === ts.SyntaxKind.CaseClause) {
-                        this.emitJump8(Opcode.OP_goto8, bodyLabels[i+1]);
-                    }
-                    // If next is Default, fall through (no check to skip)
-                } else {
-                    this.emitJump8(Opcode.OP_goto8, endLabel);
-                }
-            }
-            
-        } else {
-            // Default clause
-            // Body
-            this.emitLabel(bodyLabels[i]);
-            clause.statements.forEach(stmt => this.compileStatement(stmt));
-            
-            // Fallthrough
-            if (!this.isReturnOp(this.cur_func!.byteCode.lastByte ?? 0)) {
-                if (i + 1 < clauses.length) {
-                    if (clauses[i+1].kind === ts.SyntaxKind.CaseClause) {
-                        this.emitJump8(Opcode.OP_goto8, bodyLabels[i+1]);
-                    }
-                } else {
-                    this.emitJump8(Opcode.OP_goto8, endLabel);
-                }
-            }
+      if (clause.kind === ts.SyntaxKind.CaseClause) {
+        const caseClause = clause as ts.CaseClause;
+        
+        // Check label
+        this.emitLabel(checkLabels[i]);
+          
+        // Comparison
+        this.emitOp(Opcode.OP_dup);
+        this.compileExpression(caseClause.expression);
+        this.emitOp(Opcode.OP_strict_eq);
+          
+        // Jump to next check if false
+        let nextCheckLabel = endLabel; // Default fallback
+        if (defaultIndex !== -1) {
+            nextCheckLabel = bodyLabels[defaultIndex]; // Fallback to default body
         }
+          
+        // Find next case check
+        for (let j = i + 1; j < clauses.length; j++) {
+          if (clauses[j].kind === ts.SyntaxKind.CaseClause) {
+            nextCheckLabel = checkLabels[j];
+            break;
+          }
+        }
+          
+        this.emitJump8(Opcode.OP_if_false8, nextCheckLabel);
+          
+        // Body
+        this.emitLabel(bodyLabels[i]);
+        clause.statements.forEach(stmt => this.compileStatement(stmt));
+          
+        // Fallthrough to next body
+        if (!this.isReturnOp(this.cur_func!.byteCode.lastByte ?? 0)) {
+          if (i + 1 < clauses.length) {
+            if (clauses[i+1].kind === ts.SyntaxKind.CaseClause) {
+              this.emitJump8(Opcode.OP_goto8, bodyLabels[i+1]);
+            }
+            // If next is Default, fall through (no check to skip)
+          } else {
+            this.emitJump8(Opcode.OP_goto8, endLabel);
+          }
+        }
+        
+      } else {
+        // Default clause
+        // Body
+        this.emitLabel(bodyLabels[i]);
+        clause.statements.forEach(stmt => this.compileStatement(stmt));
+        
+        // Fallthrough
+        if (!this.isReturnOp(this.cur_func!.byteCode.lastByte ?? 0)) {
+          if (i + 1 < clauses.length) {
+            if (clauses[i+1].kind === ts.SyntaxKind.CaseClause) {
+              this.emitJump8(Opcode.OP_goto8, bodyLabels[i+1]);
+            }
+          } else {
+            this.emitJump8(Opcode.OP_goto8, endLabel);
+          }
+        }
+      }
     }
     
     const lastClauseReturns = this.isReturnOp(this.cur_func!.byteCode.lastByte ?? 0);
@@ -486,7 +635,7 @@ export class TypeScriptCompiler {
 
     this.emitLabel(endLabel);
     if (!lastClauseReturns || endLabelTargeted) {
-        this.emitOp(Opcode.OP_drop); // Drop the switch value
+      this.emitOp(Opcode.OP_drop); // Drop the switch value
     }
     // this.breakTargets.pop();
   }
@@ -529,9 +678,9 @@ export class TypeScriptCompiler {
   compileNumericLiteral(node: ts.NumericLiteral) {
     const val = Number(node.text);
     if (Number.isInteger(val)) {
-        this.emitPushI32(val);
+      this.emitPushI32(val);
     } else {
-        this.emitPushConst({ type: 'number', value: val });
+      this.emitPushConst({ type: 'number', value: val });
     }
   }
 
@@ -598,35 +747,159 @@ export class TypeScriptCompiler {
 
   compileCallExpression(node: ts.CallExpression) {
     if (ts.isPropertyAccessExpression(node.expression)) {
-        // Method call: obj.method(args)
-        const propAccess = node.expression;
-        this.compileExpression(propAccess.expression); // obj
-        const name = propAccess.name.text;
-        const atom = this.atomManager.add(name);
-        this.emitLineCol(propAccess.expression.end);
-        this.emitOp(Opcode.OP_get_field2);
-        this.cur_func!.byteCode.putU32(atom);
-        
-        node.arguments.forEach(arg => this.compileExpression(arg));
-        this.emitLineCol(propAccess.end);
-        this.emitOp(Opcode.OP_call_method);
-        this.cur_func!.byteCode.putU16(node.arguments.length);
+      // Method call: obj.method(args)
+      const propAccess = node.expression;
+      this.compileExpression(propAccess.expression); // obj
+      const name = propAccess.name.text;
+      const atom = this.atomManager.add(name);
+      this.emitLineCol(propAccess.expression.end, 2);
+      this.emitOp(Opcode.OP_get_field2);
+      this.cur_func!.byteCode.putU32(atom);
+      
+      node.arguments.forEach(arg => {
+        const oldInArg = this.inArgument;
+        this.inArgument = true;
+        this.compileExpression(arg);
+        this.inArgument = oldInArg;
+      });
+      this.emitLineCol(propAccess.end, 2);
+      this.emitOp(Opcode.OP_call_method);
+      this.cur_func!.byteCode.putU16(node.arguments.length);
     } else {
-        this.compileExpression(node.expression);
-        node.arguments.forEach(arg => this.compileExpression(arg));
-        this.emitLineCol(node.expression.end);
+      this.compileExpression(node.expression);
+      node.arguments.forEach(arg => {
+        const oldInArg = this.inArgument;
+        this.inArgument = true;
+        this.compileExpression(arg);
+        this.inArgument = oldInArg;
+      });
+      this.emitLineCol(node.expression.end);
+      
+      const argc = node.arguments.length;
+      if (argc === 0) {
+        this.emitOp(Opcode.OP_call0);
+      } else if (argc === 1) {
+        this.emitOp(Opcode.OP_call1);
+      } else if (argc === 2) {
+        this.emitOp(Opcode.OP_call2);
+      } else if (argc === 3) {
+        this.emitOp(Opcode.OP_call3);
+      } else {
         this.emitOp(Opcode.OP_call);
         if (this.cur_func) {
-            this.cur_func.byteCode.putU16(node.arguments.length);
+          this.cur_func.byteCode.putU16(argc);
         }
+      }
+    }
+  }
+
+  compileAssignment(left: ts.Expression, right: ts.Expression) {
+    if (ts.isIdentifier(left)) {
+        this.compileExpression(right);
+      this.emitOp(Opcode.OP_dup);
+      const name = left.text;
+        
+      if (this.cur_func) {
+        // Check args
+        const atom = this.atomManager.get(name);
+        if (atom !== JS_ATOM_NULL) {
+          const argIdx = this.cur_func.args.findIndex(arg => arg.varName === atom);
+          if (argIdx !== -1) {
+            this.emitPutArg(argIdx);
+            return;
+          }
+        }
+        // Check locals
+        const localIdx = this.findLocalVar(name);
+        if (localIdx !== -1) {
+          this.emitPutLoc(localIdx);
+          return;
+        }
+      }
+        
+      const idx = this.findClosureVar(name);
+      if (idx !== -1) {
+        const cv = this.cur_func!.closureVar[idx];
+        this.emitPutVarRef(idx, cv.isLexical);
+      } else {
+        // Global
+        const atom = this.atomManager.add(name);
+        this.emitOp(Opcode.OP_put_var);
+        this.cur_func!.byteCode.putU32(atom);
+      }
+    } else if (ts.isPropertyAccessExpression(left)) {
+      this.compileExpression(left.expression);
+      this.compileExpression(right);
+      this.emitOp(Opcode.OP_dup);
+      this.emitOp(Opcode.OP_perm3);
+      const name = left.name.text;
+      const atom = this.atomManager.add(name);
+      this.emitOp(Opcode.OP_put_field);
+      this.cur_func!.byteCode.putU32(atom);
+    } else {
+      console.warn("Unsupported assignment target");
     }
   }
 
   compileBinaryExpression(node: ts.BinaryExpression) {
-    this.compileExpression(node.left);
-    this.compileExpression(node.right);
+    if (node.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
+      this.compileAssignment(node.left, node.right);
+      return;
+    }
 
-    this.emitLineCol(node.operatorToken.getStart());
+    const isArithmetic = [
+      ts.SyntaxKind.PlusToken,
+      ts.SyntaxKind.MinusToken,
+      ts.SyntaxKind.AsteriskToken,
+      ts.SyntaxKind.SlashToken,
+      ts.SyntaxKind.PercentToken,
+      ts.SyntaxKind.AsteriskAsteriskToken,
+      ts.SyntaxKind.AmpersandToken,
+      ts.SyntaxKind.BarToken,
+      ts.SyntaxKind.CaretToken,
+      ts.SyntaxKind.LessThanLessThanToken,
+      ts.SyntaxKind.GreaterThanGreaterThanToken,
+      ts.SyntaxKind.GreaterThanGreaterThanGreaterThanToken
+    ].includes(node.operatorToken.kind);
+
+    const isComparison = [
+      ts.SyntaxKind.LessThanToken,
+      ts.SyntaxKind.GreaterThanToken,
+      ts.SyntaxKind.LessThanEqualsToken,
+      ts.SyntaxKind.GreaterThanEqualsToken,
+      ts.SyntaxKind.EqualsEqualsToken,
+      ts.SyntaxKind.ExclamationEqualsToken,
+      ts.SyntaxKind.EqualsEqualsEqualsToken,
+      ts.SyntaxKind.ExclamationEqualsEqualsToken
+    ].includes(node.operatorToken.kind);
+
+    let useArithmeticLogic = isArithmetic;
+    if (isComparison) {
+       // QuickJS quirk: comparison in while/for loop condition behaves differently
+       if (node.parent && (ts.isWhileStatement(node.parent) || ts.isForStatement(node.parent))) {
+         useArithmeticLogic = false;
+       } else {
+         useArithmeticLogic = true;
+       }
+    }
+
+    if (useArithmeticLogic) {
+      // console.log('Arithmetic op:', ts.SyntaxKind[node.operatorToken.kind], 'suppress:', this.suppressLineInfo);
+      this.emitLineCol(node.operatorToken.getStart());
+      const oldSuppress = this.suppressLineInfo;
+      this.suppressLineInfo = true;
+      this.compileExpression(node.left);
+      this.suppressLineInfo = oldSuppress;
+      
+      this.compileExpression(node.right);
+      // console.log('Right start:', node.right.getStart(), 'Text:', node.right.getText());
+      this.emitLineCol(node.right.getStart());
+    } else {
+      this.compileExpression(node.left);
+      this.compileExpression(node.right);
+      this.emitLineCol(node.operatorToken.getStart());
+    }
+
     switch (node.operatorToken.kind) {
       case ts.SyntaxKind.PlusToken:
         this.emitOp(Opcode.OP_add);
@@ -693,36 +966,47 @@ export class TypeScriptCompiler {
 
   compileIdentifier(node: ts.Identifier, emitLineInfo: boolean = true) {
     const name = node.text;
-    if (emitLineInfo) {
-        this.emitLineCol(node.getStart());
-    }
     
     if (this.cur_func) {
-        // Check args
-        const atom = this.atomManager.get(name);
-        if (atom !== JS_ATOM_NULL) {
-            const argIdx = this.cur_func.args.findIndex(arg => arg.varName === atom);
-            if (argIdx !== -1) {
-                this.emitGetArg(argIdx);
-                return;
-            }
+      // Check args
+      const atom = this.atomManager.get(name);
+      if (atom !== JS_ATOM_NULL) {
+        const argIdx = this.cur_func.args.findIndex(arg => arg.varName === atom);
+        if (argIdx !== -1) {
+          if (emitLineInfo && !this.suppressLineInfo) {
+            this.emitLineCol(node.getStart(), this.inArgument ? 2 : 0);
+          }
+          this.emitGetArg(argIdx);
+          return;
         }
+      }
 
-        // Check locals
-        const localIdx = this.findLocalVar(name);
-        if (localIdx !== -1) {
-            const v = this.cur_func.vars[localIdx];
-            this.emitGetLoc(localIdx, v.isConst);
-            return;
+      // Check locals
+      const localIdx = this.findLocalVar(name);
+      if (localIdx !== -1) {
+        if (emitLineInfo && !this.suppressLineInfo) {
+          this.emitLineCol(node.getStart(), this.inArgument ? 2 : 0);
         }
+        const v = this.cur_func.vars[localIdx];
+        this.emitGetLoc(localIdx, v.isConst);
+        return;
+      }
     }
 
     const idx = this.findClosureVar(name);
+    console.log(`compileIdentifier: ${name} idx=${idx} inArg=${this.inArgument}`);
     if (idx !== -1) {
+      if (emitLineInfo && !this.suppressLineInfo) {
+        this.emitLineCol(node.getStart(), this.inArgument ? 2 : 0);
+      }
       const cv = this.cur_func!.closureVar[idx];
       this.emitGetVarRef(idx, cv.isLexical);
     } else {
       // Assume global variable
+      if (emitLineInfo && !this.suppressLineInfo) {
+        // QuickJS seems to add 2 to the column for global variables?
+        this.emitLineCol(node.getStart(), 2);
+      }
       const atom = this.atomManager.add(name);
       this.emitOp(Opcode.OP_get_var);
       if (this.cur_func) {
@@ -733,6 +1017,7 @@ export class TypeScriptCompiler {
 
   emitGetArg(idx: number) {
     if (!this.cur_func) return;
+    
     if (idx === 0) {
       this.emitOp(Opcode.OP_get_arg0);
     } else if (idx === 1) {
@@ -763,11 +1048,13 @@ export class TypeScriptCompiler {
 
   emitGetVarRef(idx: number, check: boolean = false) {
     if (!this.cur_func) return;
+    console.log(`emitGetVarRef: idx=${idx} check=${check}`);
     if (check) {
-        this.emitOp(Opcode.OP_get_var_ref_check);
-        this.cur_func.byteCode.putU16(idx);
-        return;
+      this.emitOp(Opcode.OP_get_var_ref_check);
+      this.cur_func.byteCode.putU16(idx);
+      return;
     }
+
     if (idx === 0) {
       this.emitOp(Opcode.OP_get_var_ref0);
     } else if (idx === 1) {
@@ -879,26 +1166,12 @@ export class TypeScriptCompiler {
     }
   }
 
-  private emitLineCol(pos: number) {
-    if (pos < 0 || !this.sourceFile || !this.cur_func) return;
+  private emitLineCol(pos: number, colOffset: number = 0) {
+    if (!this.cur_func || !this.sourceFile) return;
     const { line, character } = this.sourceFile.getLineAndCharacterOfPosition(pos);
-    
-    // Calculate indentation to match QuickJS behavior (col + indent)
-    const lineStart = this.sourceFile.getPositionOfLineAndCharacter(line, 0);
-    // We only need to check indentation up to the character position or end of line
-    // But typically indentation is at the start of the line.
-    // QuickJS seems to add the indentation length to the column index.
-    // Let's get the full line text to find indentation.
-    const lineEnd = this.sourceFile.getLineEndOfPosition(pos);
-    const lineText = this.sourceFile.text.substring(lineStart, lineEnd);
-    const indentMatch = lineText.match(/^\s*/);
-    const indent = indentMatch ? indentMatch[0].length : 0;
-    
-    const adjustedCol = character + indent;
-
-    // console.log(\`emitLineCol: pos=\${pos} line=\${line} col=\${adjustedCol} (orig=\${character}, indent=\${indent})\`);
+    // QuickJS uses 0-based line and column numbers in the binary
     this.cur_func.pendingLineNum = line;
-    this.cur_func.pendingColumnNum = adjustedCol;
+    this.cur_func.pendingColumnNum = character + colOffset;
     this.cur_func.hasPendingLineInfo = true;
   }
 
@@ -906,71 +1179,72 @@ export class TypeScriptCompiler {
     const func = this.cur_func;
     if (!func || !func.hasPendingLineInfo) return;
     
-    const lineNum = func.pendingLineNum;
-    const colNum = func.pendingColumnNum;
     const pc = func.byteCode.size;
-    // console.log(\`flushLineCol: pc=\${pc} line=\${lineNum} col=\${colNum}\`);
+    const lineNum = func.pendingLineNum;
+    const columnNum = func.pendingColumnNum;
     
+    func.hasPendingLineInfo = false;
+
     if (func.pc2line.size === 0) {
-        // Initialize state to 0,0 as per QuickJS behavior
-        func.pc2line.writeULEB128(0);
-        func.pc2line.writeULEB128(0);
-        func.lastLineNum = 0;
-        func.lastColumnNum = 0;
-        func.pc2lineLastPc = 0;
+      func.pc2line.writeULEB128(0);
+      func.pc2line.writeULEB128(0);
+      func.pc2lineLastPc = 0;
+      func.lastLineNum = 0;
+      func.lastColumnNum = 0;
     }
 
     if (lineNum !== func.lastLineNum || pc !== func.pc2lineLastPc) {
-        let diffPc = pc - func.pc2lineLastPc;
-        let diffLine = lineNum - func.lastLineNum;
-        const diffCol = colNum - func.lastColumnNum;
+      let diffPc = pc - func.pc2lineLastPc;
+      let diffLine = lineNum - func.lastLineNum;
+      let diffCol = columnNum - func.lastColumnNum;
 
-        if (diffLine === 0 && diffCol === 0) {
-            func.hasPendingLineInfo = false;
-            return;
-        }
+      if (diffLine === 0 && diffCol === 0) {
+        func.hasPendingLineInfo = false;
+        return;
+      }
         
-        let op = 0;
-        const BASE = PC2Line.PC2LINE_BASE;
-        if (diffLine >= BASE && 
-            diffLine < BASE + PC2Line.PC2LINE_RANGE &&
-            diffPc <= PC2Line.PC2LINE_DIFF_PC_MAX) {
-              op = PC2Line.PC2LINE_OP_FIRST + diffPc * PC2Line.PC2LINE_RANGE + (diffLine - BASE);
-              if (op > 255) op = 0; 
-        }
-        // console.log(\`flushLineCol: diffPc=\${diffPc} diffLine=\${diffLine} diffCol=\${diffCol} op=\${op}\`);
+      let op = 0;
+      const BASE = PC2Line.PC2LINE_BASE;
+      if (diffLine >= BASE && 
+        diffLine < BASE + PC2Line.PC2LINE_RANGE &&
+        diffPc <= PC2Line.PC2LINE_DIFF_PC_MAX) {
+        op = PC2Line.PC2LINE_OP_FIRST + diffPc * PC2Line.PC2LINE_RANGE + (diffLine - BASE);
+        if (op > 255) op = 0; 
+      }
+      console.log(`flushLineCol: diffPc=${diffPc} diffLine=${diffLine} diffCol=${diffCol} op=${op}`);
         
-        if (op !== 0) {
-            func.pc2line.putU8(op);
-            func.pc2line.writeZigZag(diffCol);
-        } else {
-            // Long encoding
-            func.pc2line.putU8(0);
-            func.pc2line.writeULEB128(diffPc);
-            func.pc2line.writeZigZag(diffLine);
-            func.pc2line.writeZigZag(diffCol);
-        }
-        
-        func.lastLineNum = lineNum;
-        func.lastColumnNum = colNum;
-        func.pc2lineLastPc = pc;
+      if (op !== 0) {
+        func.pc2line.putU8(op);
+        func.pc2line.writeZigZag(diffCol);
+      } else {
+        // Long encoding
+        func.pc2line.putU8(0);
+        func.pc2line.writeULEB128(diffPc);
+        func.pc2line.writeZigZag(diffLine);
+        func.pc2line.writeZigZag(diffCol);
+      }
+      
+      func.lastLineNum = lineNum;
+      func.lastColumnNum = columnNum;
+      func.pc2lineLastPc = pc;
     }
     func.hasPendingLineInfo = false;
   }
 
   compileForOfStatement(node: ts.ForOfStatement) {
+    this.scopeLevel++;
     // Declare variable if needed
     if (ts.isVariableDeclarationList(node.initializer)) {
         const decl = node.initializer.declarations[0];
-        if (ts.isIdentifier(decl.name)) {
-            const name = decl.name.text;
-            let idx = this.findLocalVar(name);
-            if (idx === -1) {
-                 idx = this.addLocalVar(name, (node.initializer.flags & ts.NodeFlags.Const) !== 0);
-            }
-            this.emitOp(Opcode.OP_set_loc_uninitialized);
-            this.cur_func!.byteCode.putU16(idx);
+      if (ts.isIdentifier(decl.name)) {
+        const name = decl.name.text;
+        let idx = this.findLocalVar(name);
+        if (idx === -1) {
+          idx = this.addLocalVar(name, (node.initializer.flags & ts.NodeFlags.Const) !== 0);
         }
+        this.emitOp(Opcode.OP_set_loc_uninitialized);
+        this.cur_func!.byteCode.putU16(idx);
+      }
     }
 
     // 1. Compile expression
@@ -990,16 +1264,16 @@ export class TypeScriptCompiler {
     
     // Assign to variable
     if (ts.isVariableDeclarationList(node.initializer)) {
-        const decl = node.initializer.declarations[0];
-        if (ts.isIdentifier(decl.name)) {
-            const name = decl.name.text;
-            const idx = this.findLocalVar(name);
-            this.emitPutLoc(idx);
-        }
+      const decl = node.initializer.declarations[0];
+      if (ts.isIdentifier(decl.name)) {
+        const name = decl.name.text;
+        const idx = this.findLocalVar(name);
+        this.emitPutLoc(idx);
+      }
     } else {
-        // Expression assignment
-        console.warn('ForOf expression assignment not implemented');
-        this.emitOp(Opcode.OP_drop);
+      // Expression assignment
+      console.warn('ForOf expression assignment not implemented');
+      this.emitOp(Opcode.OP_drop);
     }
     
     this.compileStatement(node.statement);
@@ -1016,6 +1290,7 @@ export class TypeScriptCompiler {
     this.emitOp(Opcode.OP_iterator_close);
     
     this.emitLabel(labelBreak);
+    this.scopeLevel--;
   }
 }
 

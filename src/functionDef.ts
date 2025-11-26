@@ -125,7 +125,7 @@ export class JSFunctionDef {
   // Debug info
   pc2line: BytecodeWriter = new BytecodeWriter();
   pc2column: BytecodeWriter = new BytecodeWriter();
-  source: string = "";
+  source: string = '';
   filename: JSAtom = JS_ATOM_NULL;
   lastLineNum: number = 0;
   lastColumnNum: number = 0;
@@ -137,7 +137,7 @@ export class JSFunctionDef {
   hasPendingLineInfo: boolean = false;
 
   constructor(ctx: any, parent: JSFunctionDef | null) {
-      this.ctx = ctx;
-      this.parent = parent;
+    this.ctx = ctx;
+    this.parent = parent;
   }
 }

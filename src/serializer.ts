@@ -19,7 +19,6 @@ export class BytecodeSerializer {
     // and indices match.
     const atomManager = func.ctx.atomManager as AtomManager;
     const allAtoms = atomManager.dump();
-    // console.log('All atoms:', allAtoms.slice(env.firstAtomId));
     // User atoms start at env.firstAtomId
     // atomToName array index is the atom ID.
     // We need to add atoms with ID >= env.firstAtomId to atomList.
@@ -81,53 +80,103 @@ export class BytecodeSerializer {
     const codeToDef: Record<number, any> = {};
     for (const [name, def] of Object.entries(OPCODE_DEFS)) {
       const code = (OPCODE_NAME_TO_CODE as Record<string, number>)[name.replace(/OP_/, '')] ?? (OPCODE_NAME_TO_CODE as Record<string, number>)[name];
-      // The mapping in OPCODE_NAME_TO_CODE uses names without OP_ prefix for some entries,
-      // but OPCODE_DEFS keys are the enum names (OP_xxx). Try both.
       if (typeof code === 'number') {
         codeToDef[code] = def;
       } else {
-        // fallback: try using the key directly
         const alt = (OPCODE_NAME_TO_CODE as Record<string, number>)[name];
         if (typeof alt === 'number') codeToDef[alt] = def;
       }
     }
 
-    let pos = 0;
-    let cur = 0;
+    const depths = new Map<number, number>();
+    const queue: number[] = [0];
+    depths.set(0, 0);
+    
     let max = 0;
     const len = buf.length;
-    while (pos < len) {
-      const op = buf[pos++];
-      const def = codeToDef[op];
-      if (!def) {
-        // Unknown opcode: stop parsing to avoid infinite loop
-        break;
+
+    while (queue.length > 0) {
+      let pos = queue.shift()!;
+      let cur = depths.get(pos)!;
+
+      while (pos < len) {
+        const op = buf[pos];
+        const def = codeToDef[op];
+        if (!def) break;
+
+        let nPop = def.nPop;
+        const nPush = def.nPush;
+        const startPos = pos;
+        pos++; // skip op
+
+        // Handle special formats
+        if (def.format === OpFormat.npop) {
+          if (pos + 1 >= len) break;
+          const imm = buf[pos] | (buf[pos + 1] << 8);
+          pos += 2;
+          nPop = imm;
+          switch (def.id) {
+            case 'call':
+            case 'tail_call':
+            case 'call_constructor':
+            case 'eval':
+              nPop += 1;
+              break;
+            case 'call_method':
+            case 'tail_call_method':
+              nPop += 2;
+              break;
+          }
+        } else if (def.format === OpFormat.npopx) {
+          if (def.id === 'call1') nPop += 1;
+          else if (def.id === 'call2') nPop += 2;
+          else if (def.id === 'call3') nPop += 3;
+        } else if (def.format === OpFormat.npop_u16) {
+          if (pos + 3 >= len) break;
+          const argc = buf[pos] | (buf[pos + 1] << 8);
+          pos += 4;
+          nPop = argc + 1;
+        } else if (def.id === 'call' || def.id === 'call_method' || def.id === 'tail_call' || def.id === 'tail_call_method' || def.id === 'call_constructor') {
+          if (pos + 1 >= len) break;
+          const argc = buf[pos] | (buf[pos + 1] << 8);
+          pos += 2;
+          nPop = argc;
+          if (def.id === 'call' || def.id === 'tail_call' || def.id === 'call_constructor') nPop += 1;
+          if (def.id === 'call_method' || def.id === 'tail_call_method') nPop += 2;
+        } else {
+          const extra = Math.max(0, def.size - 1);
+          pos += extra;
+        }
+
+        cur = cur - nPop + nPush;
+        if (cur > max) max = cur;
+
+        // Handle branches
+        if (def.id === 'goto8' || def.id === 'if_false8' || def.id === 'if_true8') {
+            const offset = (buf[startPos + 1] << 24) >> 24; // signed i8
+            const target = startPos + 1 + offset;
+            if (!depths.has(target)) {
+                depths.set(target, cur);
+                queue.push(target);
+            }
+        }
+        
+        // Stop if unconditional jump
+        if (def.id === 'goto8' || def.id === 'return' || def.id === 'return_undef' || def.id === 'return_async' || def.id === 'throw' || def.id === 'tail_call' || def.id === 'tail_call_method') {
+            break;
+        }
+        
+        // Continue to next instruction
+        if (depths.has(pos)) {
+            // Merge? For now assume consistent stack
+            break;
+        }
+        depths.set(pos, cur);
       }
-
-      let nPop = def.nPop;
-      const nPush = def.nPush;
-
-      // Handle special formats
-      if (def.format === OpFormat.npop) {
-        // read u16 immediate (little-endian)
-        if (pos + 1 >= len) break;
-        const imm = buf[pos] | (buf[pos + 1] << 8);
-        pos += 2;
-        nPop = imm;
-      } else {
-        // Skip the remaining bytes of the opcode according to def.size
-        const extra = Math.max(0, def.size - 1);
-        pos += extra;
-      }
-
-      cur = cur - nPop + nPush;
-      if (cur > max) max = cur;
     }
 
     return max;
-  }
-
-  private getAtomIndex(atom: JSAtom, atomManager?: AtomManager): number {
+  }  private getAtomIndex(atom: JSAtom, atomManager?: AtomManager): number {
     if (atom === 0) return 0; // JS_ATOM_NULL
     
     // If we pre-populated, the atom should be in the map if it's a user atom.
@@ -168,7 +217,7 @@ export class BytecodeSerializer {
   private writeFunction(out: BytecodeWriter, func: JSFunctionDef) {
     // Ensure stack size is computed
     func.stackSize = this.computeMaxStack(func.byteCode.buffer);
-
+    
     out.putU8(BytecodeTag.TC_TAG_FUNCTION_BYTECODE);
     
     // Flags
@@ -260,7 +309,12 @@ export class BytecodeSerializer {
     // If -1, write 0 to save space and match behavior (assuming no collision)
     const next = v.scopeNext === -1 ? 0 : v.scopeNext;
     this.writeLEB128(out, next);
-    out.putU8(v.varKind);
+    
+    let flags = v.varKind;
+    if (v.isConst) flags |= 0x10;
+    if (v.isLexical) flags |= 0x20;
+    if (v.isCaptured) flags |= 0x40;
+    out.putU8(flags);
   }
 
   private writeClosureVar(out: BytecodeWriter, cv: JSClosureVar) {
@@ -305,15 +359,14 @@ export class BytecodeSerializer {
 
   private writeAtom(out: BytecodeWriter, atom: JSAtom, atomManager: AtomManager) {
     const str = atomManager.getString(atom);
-    // out.putU8(JS_TAG_STRING); // Atoms in table don't have tag prefix in QuickJS 2021+?
-    // Wait, JS_WriteObjectAtoms calls JS_WriteString.
-    // JS_WriteString writes tag if it's a value, but here it's just string content?
-    // No, JS_WriteString writes: len << 1 | is_wide, then data.
-    
+    // QuickJS bytecode atom table does not include the tag for strings, and shifts length
+    // out.putU8(BytecodeTag.TC_TAG_STRING);
     const buf = Buffer.from(str, 'utf8');
-    // Assume 8-bit string (is_wide = 0)
-    const lenField = (buf.length << 1) | 0;
-    this.writeLEB128(out, lenField);
+    
+    // Check if we need wide characters (not implemented yet, assuming 8-bit)
+    // QuickJS stores length as (len << 1) | is_wide
+    const isWide = 0;
+    this.writeLEB128(out, (buf.length << 1) | isWide);
     out.write(buf);
   }
 
