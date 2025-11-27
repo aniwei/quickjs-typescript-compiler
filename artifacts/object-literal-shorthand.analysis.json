@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-11-26T03:12:05.491Z",
+  "timestamp": "2025-11-27T11:37:31.025Z",
   "inputFile": "__tests__/compiler/fixtures/object-literal-shorthand.ts",
   "compilation": {
     "typescript": {

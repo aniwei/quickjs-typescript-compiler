@@ -51,8 +51,8 @@ export interface LabelSlot {
 }
 
 export interface JSValue {
-    type: 'string' | 'number' | 'bigint' | 'null' | 'undefined' | 'boolean' | 'object' | 'function';
-    value: any;
+  type: 'string' | 'number' | 'bigint' | 'null' | 'undefined' | 'boolean' | 'object' | 'function';
+  value: any;
 }
 
 export interface JSVarScope {
@@ -108,6 +108,7 @@ export class JSFunctionDef {
   scopes: JSVarScope[] = [];
   
   byteCode: BytecodeWriter = new BytecodeWriter();
+  lastOp: number = 0;
   
   // Labels
   labelSlots: LabelSlot[] = [];

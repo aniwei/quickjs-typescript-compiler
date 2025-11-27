@@ -153,23 +153,23 @@ export class BytecodeSerializer {
 
         // Handle branches
         if (def.id === 'goto8' || def.id === 'if_false8' || def.id === 'if_true8') {
-            const offset = (buf[startPos + 1] << 24) >> 24; // signed i8
-            const target = startPos + 1 + offset;
-            if (!depths.has(target)) {
-                depths.set(target, cur);
-                queue.push(target);
-            }
+          const offset = (buf[startPos + 1] << 24) >> 24; // signed i8
+          const target = startPos + 1 + offset;
+          if (!depths.has(target)) {
+            depths.set(target, cur);
+            queue.push(target);
+          }
         }
         
         // Stop if unconditional jump
         if (def.id === 'goto8' || def.id === 'return' || def.id === 'return_undef' || def.id === 'return_async' || def.id === 'throw' || def.id === 'tail_call' || def.id === 'tail_call_method') {
-            break;
+          break;
         }
         
         // Continue to next instruction
         if (depths.has(pos)) {
-            // Merge? For now assume consistent stack
-            break;
+          // Merge? For now assume consistent stack
+          break;
         }
         depths.set(pos, cur);
       }
@@ -187,18 +187,18 @@ export class BytecodeSerializer {
     // Check for built-in atoms (hack for <eval>)
     // We need atomManager to check the string value
     if (atomManager) {
-        const str = atomManager.getString(atom);
-        if (str === '<eval>') {
-            // JS_ATOM_eval_ (built-in)
-            // Index 82 (shifted 164) observed in WASM output
-            return 82;
-        }
+      const str = atomManager.getString(atom);
+      if (str === '<eval>') {
+        // JS_ATOM_eval_ (built-in)
+        // Index 82 (shifted 164) observed in WASM output
+        return 82;
+      }
     }
     
     // If it's not in map and not built-in, it might be a standard atom (ID < env.firstAtomId)
     // In that case, return the ID directly.
     if (atom < env.firstAtomId) {
-        return atom;
+      return atom;
     }
 
     // Should not happen if we pre-populated correctly
@@ -210,13 +210,14 @@ export class BytecodeSerializer {
   }
 
   private writeAtomRef(out: BytecodeWriter, atomIdx: number) {
-      // QuickJS shifts atom index left by 1 for untagged atoms
-      this.writeLEB128(out, atomIdx << 1);
+    // QuickJS shifts atom index left by 1 for untagged atoms
+    this.writeLEB128(out, atomIdx << 1);
   }
 
   private writeFunction(out: BytecodeWriter, func: JSFunctionDef) {
     // Ensure stack size is computed
     func.stackSize = this.computeMaxStack(func.byteCode.buffer);
+    console.log(`writeFunction: ${func.funcName} stackSize=${func.stackSize}`);
     
     out.putU8(BytecodeTag.TC_TAG_FUNCTION_BYTECODE);
     
@@ -283,16 +284,16 @@ export class BytecodeSerializer {
     // Debug info
     if (hasDebug) {
         const filenameIdx = this.getAtomIndex(func.filename, func.ctx.atomManager);
-        this.writeAtomRef(out, filenameIdx);
-        
-        // pc2line
-        const pc2lineBuf = func.pc2line.buffer;
-        this.writeLEB128(out, pc2lineBuf.length);
-        out.write(pc2lineBuf);
-        
-        // source
-        this.writeLEB128(out, 0); // len
-        // buf (empty)
+      this.writeAtomRef(out, filenameIdx);
+      
+      // pc2line
+      const pc2lineBuf = func.pc2line.buffer;
+      this.writeLEB128(out, pc2lineBuf.length);
+      out.write(pc2lineBuf);
+      
+      // source
+      this.writeLEB128(out, 0); // len
+      // buf (empty)
     }
 
     // CPool

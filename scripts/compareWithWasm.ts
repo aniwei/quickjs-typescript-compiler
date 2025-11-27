@@ -92,7 +92,7 @@ class BytecodeComparator {
 
     const reference = await this.resolveReferenceJavaScript({ tolerateErrors: true })
     
-    // 从 WASM 查询 firstAtomId（JS_ATOM_END），用于对齐用户原子阈值
+    // 从 WASM 查询 firstAtomId（JS_ATOM_END），用于对齐 用户原子阈值
     let firstAtomId: number | undefined
     try {
       firstAtomId = await QuickJSLib.getFirstAtomId()

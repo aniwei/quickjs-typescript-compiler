@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: __tests__/compiler/fixtures/module-exports.ts
-**生成时间**: 2025-11-26T03:12:05.487Z
+**生成时间**: 2025-11-27T11:37:31.023Z
 
 ## 大小对比
 
@@ -28,10 +28,10 @@
     },
     {
       "index": 1,
-      "rawLength": 12,
-      "actualLength": 6,
+      "rawLength": 10,
+      "actualLength": 5,
       "isWideChar": 0,
-      "string": "helper",
+      "string": "alpha",
       "offset": 48
     },
     {
@@ -40,31 +40,31 @@
       "actualLength": 4,
       "isWideChar": 0,
       "string": "beta",
-      "offset": 55
+      "offset": 54
     },
     {
       "index": 3,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "helper",
+      "offset": 59
+    },
+    {
+      "index": 4,
       "rawLength": 10,
       "actualLength": 5,
       "isWideChar": 0,
       "string": "delta",
-      "offset": 60
-    },
-    {
-      "index": 4,
-      "rawLength": 12,
-      "actualLength": 6,
-      "isWideChar": 0,
-      "string": "offset",
       "offset": 66
     },
     {
       "index": 5,
-      "rawLength": 10,
-      "actualLength": 5,
+      "rawLength": 12,
+      "actualLength": 6,
       "isWideChar": 0,
-      "string": "alpha",
-      "offset": 73
+      "string": "offset",
+      "offset": 72
     }
   ],
   "functionHeader": {
@@ -152,25 +152,25 @@
 共发现 206 个字节差异:
 
 - 偏移量 0x1: TS=0x06 vs WASM=0x07
-- 偏移量 0x30: TS=0x0c vs WASM=0x0a
-- 偏移量 0x31: TS=0x68 vs WASM=0x61
-- 偏移量 0x32: TS=0x65 vs WASM=0x6c
-- 偏移量 0x33: TS=0x6c vs WASM=0x70
-- 偏移量 0x34: TS=0x70 vs WASM=0x68
-- 偏移量 0x35: TS=0x65 vs WASM=0x61
-- 偏移量 0x36: TS=0x72 vs WASM=0x0a
-- 偏移量 0x37: TS=0x08 vs WASM=0x67
-- 偏移量 0x38: TS=0x62 vs WASM=0x61
-- 偏移量 0x39: TS=0x65 vs WASM=0x6d
-- 偏移量 0x3a: TS=0x74 vs WASM=0x6d
-- 偏移量 0x42: TS=0x0c vs WASM=0x08
-- 偏移量 0x43: TS=0x6f vs WASM=0x62
-- 偏移量 0x44: TS=0x66 vs WASM=0x65
-- 偏移量 0x45: TS=0x66 vs WASM=0x74
-- 偏移量 0x46: TS=0x73 vs WASM=0x61
-- 偏移量 0x47: TS=0x65 vs WASM=0x0c
-- 偏移量 0x48: TS=0x74 vs WASM=0x68
-- 偏移量 0x49: TS=0x0a vs WASM=0x65
+- 偏移量 0x36: TS=0x08 vs WASM=0x0a
+- 偏移量 0x37: TS=0x62 vs WASM=0x67
+- 偏移量 0x38: TS=0x65 vs WASM=0x61
+- 偏移量 0x39: TS=0x74 vs WASM=0x6d
+- 偏移量 0x3a: TS=0x61 vs WASM=0x6d
+- 偏移量 0x3b: TS=0x0c vs WASM=0x61
+- 偏移量 0x3c: TS=0x68 vs WASM=0x0a
+- 偏移量 0x3d: TS=0x65 vs WASM=0x64
+- 偏移量 0x3e: TS=0x6c vs WASM=0x65
+- 偏移量 0x3f: TS=0x70 vs WASM=0x6c
+- 偏移量 0x40: TS=0x65 vs WASM=0x74
+- 偏移量 0x41: TS=0x72 vs WASM=0x61
+- 偏移量 0x42: TS=0x0a vs WASM=0x08
+- 偏移量 0x43: TS=0x64 vs WASM=0x62
+- 偏移量 0x45: TS=0x6c vs WASM=0x74
+- 偏移量 0x46: TS=0x74 vs WASM=0x61
+- 偏移量 0x47: TS=0x61 vs WASM=0x0c
+- 偏移量 0x48: TS=0x0c vs WASM=0x68
+- 偏移量 0x49: TS=0x6f vs WASM=0x65
 - ... (显示前20个差异，总共206个)
 
 ## 十六进制转储对比
@@ -180,17 +180,17 @@
 00000000: 05 06 5a 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..Z__tests__/com|
 00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 6d |piler/fixtures/m|
 00000020: 6f 64 75 6c 65 2d 65 78 70 6f 72 74 73 2e 6a 73 |odule-exports.js|
-00000030: 0c 68 65 6c 70 65 72 08 62 65 74 61 0a 64 65 6c |.helper.beta.del|
-00000040: 74 61 0c 6f 66 66 73 65 74 0a 61 6c 70 68 61 0d |ta.offset.alpha.|
+00000030: 0a 61 6c 70 68 61 08 62 65 74 61 0c 68 65 6c 70 |.alpha.beta.help|
+00000040: 65 72 0a 64 65 6c 74 61 0c 6f 66 66 73 65 74 0d |er.delta.offset.|
 00000050: c8 03 00 00 00 00 00 0c 20 06 01 a4 01 00 00 00 |........ .......|
-00000060: 01 04 02 10 00 ca 03 00 01 ce 03 01 01 d2 03 02 |................|
+00000060: 01 04 02 10 00 ce 03 00 01 d0 03 01 01 ca 03 02 |................|
 00000070: 0d cc 03 03 0d 08 ec 08 c2 00 e3 c2 01 e4 29 b8 |..............).|
-00000080: e5 b9 e6 06 2f c8 03 02 00 00 00 0c 43 06 01 ca |..../.......C...|
+00000080: e5 b9 e6 06 2f c8 03 02 00 00 00 0c 43 06 01 ce |..../.......C...|
 00000090: 03 00 00 00 01 00 00 06 00 39 e6 00 00 00 28 c8 |.........9....(.|
-000000a0: 03 08 00 00 00 00 08 12 1b 0d 00 0c 43 06 01 ce |............C...|
-000000b0: 03 01 00 01 02 00 00 09 01 d0 03 00 01 00 39 e5 |..............9.|
-000000c0: 00 00 00 f0 d3 9f 28 c8 03 0e 00 00 00 00 16 12 |......(.........|
-000000d0: 1b 0c 07 0a 07 03 07 1f 00                      |.........|
+000000a0: 03 08 00 00 00 00 08 16 1b 11 00 0c 43 06 01 d0 |............C...|
+000000b0: 03 01 00 01 02 00 00 09 01 d2 03 00 01 00 39 e7 |..............9.|
+000000c0: 00 00 00 f0 d3 9f 28 c8 03 0e 00 00 00 00 16 16 |......(.........|
+000000d0: 1b 08 07 0a 07 03 07 1f 00                      |.........|
 ```
 
 ### WASM

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-11-26T03:12:05.511Z",
+  "timestamp": "2025-11-27T11:37:31.047Z",
   "inputFile": "__tests__/compiler/fixtures/simple-sync.ts",
   "compilation": {
     "typescript": {

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-11-26T08:19:32.575Z",
+  "timestamp": "2025-11-27T11:37:31.009Z",
   "inputFile": "__tests__/compiler/fixtures/loop-control.ts",
   "compilation": {
     "typescript": {
@@ -160,7 +160,7 @@
         "0x1b",
         "0x04",
         "0x12",
-        "0x01",
+        "0x05",
         "0x16",
         "0x04",
         "0x21",
@@ -168,15 +168,15 @@
         "0x16",
         "0x04",
         "0x14",
-        "0x0b",
+        "0x07",
+        "0x1b",
+        "0x0e",
         "0x1b",
         "0x0a",
-        "0x1b",
-        "0x12",
         "0x11",
-        "0x0a",
+        "0x01",
         "0x17",
-        "0x1d",
+        "0x11",
         "0x16",
         "0x04",
         "0x00"
@@ -191,8 +191,8 @@
         "00000060: 0a a5 ec 2c 68 00 00 b8 9f 11 69 00 00 0e 68 00 |...,h.....i...h.|",
         "00000070: 00 bc a5 ed e8 39 e6 00 00 00 43 e7 00 00 00 68 |.....9....C....h|",
         "00000080: 00 00 24 01 00 0e 68 00 00 be a7 ed 03 ee ce 06 |..$...h.........|",
-        "00000090: 2f c8 03 1a 00 00 21 0e 1b 04 12 01 16 04 21 03 |/.....!.......!.|",
-        "000000a0: 16 04 14 0b 1b 0a 1b 12 11 0a 17 1d 16 04 00    |...............|"
+        "00000090: 2f c8 03 1a 00 00 21 0e 1b 04 12 05 16 04 21 03 |/.....!.......!.|",
+        "000000a0: 16 04 14 07 1b 0e 1b 0a 11 01 17 11 16 04 00    |...............|"
       ],
       "structure": {
         "source": "TypeScript",
@@ -479,35 +479,27 @@
   },
   "differences": [
     {
-      "offset": 165,
-      "offsetHex": "0xa5",
-      "typescript": "0x0a",
-      "wasm": "0x0e",
-      "typescriptDecimal": 10,
-      "wasmDecimal": 14
-    },
-    {
-      "offset": 167,
-      "offsetHex": "0xa7",
-      "typescript": "0x12",
-      "wasm": "0x0a",
-      "typescriptDecimal": 18,
-      "wasmDecimal": 10
-    },
-    {
-      "offset": 169,
-      "offsetHex": "0xa9",
-      "typescript": "0x0a",
+      "offset": 155,
+      "offsetHex": "0x9b",
+      "typescript": "0x05",
       "wasm": "0x01",
-      "typescriptDecimal": 10,
+      "typescriptDecimal": 5,
       "wasmDecimal": 1
+    },
+    {
+      "offset": 163,
+      "offsetHex": "0xa3",
+      "typescript": "0x07",
+      "wasm": "0x0b",
+      "typescriptDecimal": 7,
+      "wasmDecimal": 11
     },
     {
       "offset": 171,
       "offsetHex": "0xab",
-      "typescript": "0x1d",
+      "typescript": "0x11",
       "wasm": "0x0d",
-      "typescriptDecimal": 29,
+      "typescriptDecimal": 17,
       "wasmDecimal": 13
     }
   ],

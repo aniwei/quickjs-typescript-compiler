@@ -1,0 +1,147 @@
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+🌐 Compiling with QuickJS WASM...
+[pc2line] trace init env=<unset> enabled=1
+[pc2line] start func=0x475e8 source_pos=15 line=0 col=15
+[pc2line] slot i=0 pc=0 source_pos=25 diff_pc=0 diff_line=0 diff_col=10 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=2 short_op=1 new_pc=0 new_line=0 new_col=25
+[pc2line] slot i=1 pc=1 source_pos=29 diff_pc=1 diff_line=0 diff_col=4 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=7 short_op=6 new_pc=1 new_line=0 new_col=29
+[pc2line] slot i=2 pc=2 source_pos=27 diff_pc=1 diff_line=0 diff_col=-2 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=7 short_op=6 new_pc=2 new_line=0 new_col=27
+__tests__/compiler/fixtures/arrow-fn-basic.js:1:16: function: <null>
+  mode: strict
+  args: a b
+  stack_size: 2
+  opcodes:
+        get_arg0 0: a
+        get_arg1 1: b
+        add
+        return
+
+[pc2line] start func=0x40bd0 source_pos=56 line=1 col=17
+[pc2line] slot i=0 pc=0 source_pos=67 diff_pc=0 diff_line=0 diff_col=11 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=2 short_op=1 new_pc=0 new_line=1 new_col=28
+[pc2line] slot i=1 pc=2 source_pos=73 diff_pc=2 diff_line=0 diff_col=6 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=12 short_op=11 new_pc=2 new_line=1 new_col=34
+__tests__/compiler/fixtures/arrow-fn-basic.js:2:18: function: <null>
+  mode: strict
+  args: value
+  stack_size: 2
+  opcodes:
+        get_arg0 0: value
+        push_2 2
+        mul
+        return
+
+[pc2line] start func=0x48390 source_pos=116 line=2 col=30
+[pc2line] slot i=0 pc=0 source_pos=127 diff_pc=0 diff_line=0 diff_col=11 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=2 short_op=1 new_pc=0 new_line=2 new_col=41
+[pc2line] slot i=1 pc=1 source_pos=135 diff_pc=1 diff_line=0 diff_col=8 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=7 short_op=6 new_pc=1 new_line=2 new_col=49
+[pc2line] slot i=2 pc=2 source_pos=133 diff_pc=1 diff_line=0 diff_col=-2 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=7 short_op=6 new_pc=2 new_line=2 new_col=47
+__tests__/compiler/fixtures/arrow-fn-basic.js:3:31: function: <null>
+  mode: strict
+  args: extra
+  closure vars:
+    0: value local:arg0 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: value
+        get_arg0 0: extra
+        add
+        return
+
+[pc2line] start func=0x40ee8 source_pos=104 line=2 col=18
+[pc2line] slot i=0 pc=3 source_pos=141 diff_pc=3 diff_line=0 diff_col=37 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=17 short_op=16 new_pc=3 new_line=2 new_col=55
+__tests__/compiler/fixtures/arrow-fn-basic.js:3:19: function: <null>
+  mode: strict
+  args: value
+  stack_size: 2
+  opcodes:
+        fclosure8 0: [bytecode <null>]
+        push_4 4
+        tail_call 1
+
+[pc2line] start func=0x473f0 source_pos=0 line=0 col=0
+[pc2line] slot i=0 pc=8 source_pos=31 diff_pc=8 diff_line=0 diff_col=31 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=42 short_op=41 new_pc=8 new_line=0 new_col=31
+[pc2line] slot i=1 pc=12 source_pos=78 diff_pc=4 diff_line=1 diff_col=8 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=23 short_op=22 new_pc=12 new_line=1 new_col=39
+[pc2line] slot i=2 pc=15 source_pos=77 diff_pc=3 diff_line=0 diff_col=-1 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=17 short_op=16 new_pc=15 new_line=1 new_col=38
+[pc2line] slot i=3 pc=19 source_pos=146 diff_pc=4 diff_line=1 diff_col=22 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=23 short_op=22 new_pc=19 new_line=2 new_col=60
+[pc2line] slot i=4 pc=22 source_pos=145 diff_pc=3 diff_line=0 diff_col=-1 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=17 short_op=16 new_pc=22 new_line=2 new_col=59
+[pc2line] slot i=5 pc=24 source_pos=161 diff_pc=2 diff_line=1 diff_col=-54 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=13 short_op=12 new_pc=24 new_line=3 new_col=5
+[pc2line] slot i=6 pc=28 source_pos=173 diff_pc=4 diff_line=1 diff_col=0 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=23 short_op=22 new_pc=28 new_line=4 new_col=5
+[pc2line] slot i=7 pc=32 source_pos=187 diff_pc=4 diff_line=1 diff_col=0 [DEBUG] BASE=-1 RANGE=5 MAX_PC=50 OP_FIRST=1 calc=23 short_op=22 new_pc=32 new_line=5 new_col=5
+__tests__/compiler/fixtures/arrow-fn-basic.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: total local:loc0 const
+    1: doubled local:loc1 const
+    2: combined local:loc2 const
+  stack_size: 3
+  opcodes:
+        push_this
+        if_false8 4
+        return_undef
+    4:  fclosure8 0: [bytecode <null>]
+        push_1 1
+        push_2 2
+        call2 2
+        put_var_ref0 0: total
+        fclosure8 1: [bytecode <null>]
+        get_var_ref_check 0: total
+        call1 1
+        put_var_ref1 1: doubled
+        fclosure8 2: [bytecode <null>]
+        get_var_ref_check 1: doubled
+        call1 1
+        put_var_ref2 2: combined
+        get_var_ref_check 0: total
+        drop
+        get_var_ref_check 1: doubled
+        drop
+        get_var_ref_check 2: combined
+        drop
+        undefined
+        return_async
+
+💾 Artifacts saved to artifacts/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 325 bytes
+WASM compiler:       316 bytes
+Size difference:     +9 bytes (+2.8%)
+Bytecode identical:  ❌ No
+
+🔍 Byte-level differences:
+  Position 186: TS=06 vs WASM=04
+  Position 202: TS=06 vs WASM=c8
+  Position 203: TS=28 vs WASM=03
+  Position 204: TS=c8 vs WASM=08
+  Position 205: TS=03 vs WASM=00
+  Position 206: TS=08 vs WASM=0f
+  Position 207: TS=00 vs WASM=02
+  Position 208: TS=0f vs WASM=14
+  Position 209: TS=02 vs WASM=07
+  Position 210: TS=14 vs WASM=08
+  ... (showing first 10 differences)
+
+📋 Side-by-side disassembly:
+────────────────────────────────────────────────────────────────────────────────────────────────────
+--- TS Disassembly ---                           | --- WASM Disassembly ---
+Bytecode size: 325 bytes                         | Bytecode size: 316 bytes
+                                                 | 
+00000000: 05 07 5a 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..Z__tests__/com| | 00000000: 05 07 5a 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..Z__tests__/com|
+00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 61 |piler/fixtures/a| | 00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 61 |piler/fixtures/a|
+00000020: 72 72 6f 77 2d 66 6e 2d 62 61 73 69 63 2e 6a 73 |rrow-fn-basic.js| | 00000020: 72 72 6f 77 2d 66 6e 2d 62 61 73 69 63 2e 6a 73 |rrow-fn-basic.js|
+00000030: 0a 74 6f 74 61 6c 0e 64 6f 75 62 6c 65 64 10 63 |.total.doubled.c| | 00000030: 0a 74 6f 74 61 6c 0e 64 6f 75 62 6c 65 64 10 63 |.total.doubled.c|
+00000040: 6f 6d 62 69 6e 65 64 02 61 02 62 0a 65 78 74 72 |ombined.a.b.extr| | 00000040: 6f 6d 62 69 6e 65 64 02 61 02 62 0a 65 78 74 72 |ombined.a.b.extr|
+00000050: 61 0d c8 03 00 00 00 00 00 0c 20 06 01 a4 01 00 |a......... .....| | 00000050: 61 0d c8 03 00 00 00 00 00 0c 20 06 01 a4 01 00 |a......... .....|
+00000060: 00 00 03 03 03 26 00 ca 03 00 0d cc 03 01 0d ce |.....&..........| | 00000060: 00 00 03 03 03 26 00 ca 03 00 0d cc 03 01 0d ce |.....&..........|
+00000070: 03 02 0d 08 ec 02 29 c2 00 b8 b9 f2 e3 c2 01 68 |......)........h| | 00000070: 03 02 0d 08 ec 02 29 c2 00 b8 b9 f2 e3 c2 01 68 |......)........h|
+00000080: 00 00 f1 e4 c2 02 68 01 00 f1 e5 68 00 00 0e 68 |......h....h...h| | 00000080: 00 00 f1 e4 c2 02 68 01 00 f1 e5 68 00 00 0e 68 |......h....h...h|
+00000090: 01 00 0e 68 02 00 0e 06 2f c8 03 12 00 00 2a 3e |...h..../.....*>| | 00000090: 01 00 0e 68 02 00 0e 06 2f c8 03 12 00 00 2a 3e |...h..../.....*>|
+000000a0: 17 10 11 01 17 2c 11 01 0d 6b 17 00 17 00 00 0c |.....,...k......| | 000000a0: 17 10 11 01 17 2c 11 01 0d 6b 17 00 17 00 00 0c |.....,...k......|
+000000b0: 02 06 01 00 02 00 02 02 00 00 06 02 d0 03 00 01 |................| | 000000b0: 02 06 01 00 02 00 02 02 00 00 04 02 d0 03 00 01 |................|
+000000c0: 00 d2 03 00 01 00 d3 d4 9f 28 06 28 c8 03 08 00 |.........(.(....| | 000000c0: 00 d2 03 00 01 00 d3 d4 9f 28 c8 03 08 00 0f 02 |.........(......|
+000000d0: 0f 02 14 07 08 07 03 00 0c 02 06 01 00 01 00 01 |................| | 000000d0: 14 07 08 07 03 00 0c 02 06 01 00 01 00 01 02 00 |................|
+000000e0: 02 00 00 06 01 84 01 00 01 00 d3 b9 9c 28 06 28 |.............(.(| | 000000e0: 00 04 01 84 01 00 01 00 d3 b9 9c 28 c8 03 06 01 |...........(....|
+000000f0: c8 03 06 01 11 02 16 0c 0c 00 0c 02 06 01 00 01 |................| | 000000f0: 11 02 16 0c 0c 00 0c 02 06 01 00 01 00 01 02 00 |................|
+00000100: 00 01 02 00 01 09 01 84 01 00 01 00 c2 00 bb 23 |...............#| | 00000100: 01 06 01 84 01 00 01 40 c2 00 bb 23 01 00 c8 03 |.......@...#....|
+... (truncated, see artifacts for full disassembly)
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.

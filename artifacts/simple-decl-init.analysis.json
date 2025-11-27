@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-11-26T03:12:05.509Z",
+  "timestamp": "2025-11-27T11:37:31.045Z",
   "inputFile": "__tests__/compiler/fixtures/simple-decl-init.ts",
   "compilation": {
     "typescript": {

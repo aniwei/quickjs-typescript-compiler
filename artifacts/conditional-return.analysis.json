@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-11-26T03:12:05.459Z",
+  "timestamp": "2025-11-27T11:37:30.984Z",
   "inputFile": "__tests__/compiler/fixtures/conditional-return.ts",
   "compilation": {
     "typescript": {

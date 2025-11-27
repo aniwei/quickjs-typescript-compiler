@@ -25,6 +25,7 @@ interface FixtureResult {
 
 async function main() {
   const options = parseArgs(process.argv.slice(2))
+  console.log('Looking for fixtures in:', options.fixturesDir)
   const fixtureFiles = await collectFixtureFiles(options.fixturesDir, options.filter)
 
   if (fixtureFiles.length === 0) {
@@ -44,7 +45,8 @@ async function main() {
     console.log(`\n=== ${relativeName} ===`)
 
     const comparatorOptions: ComparisonOptions = {
-      inputTs: fixturePath,
+      inputTs: relativeName,
+      // inputJs: relativeName,
       disasm: options.disasm,
       asm: options.asm,
       sideBySide: options.sideBySide,
@@ -165,13 +167,19 @@ function parseArgs(args: string[]): RunnerOptions {
 }
 
 async function collectFixtureFiles(fixturesDir: string, filter?: string): Promise<string[]> {
-  const entries = await fs.readdir(fixturesDir)
-  const files = entries
-    .filter((entry) => entry.endsWith('.ts') && !entry.endsWith('.d.ts'))
-    .filter((entry) => (filter ? entry.includes(filter) : true))
-    .map((entry) => path.join(fixturesDir, entry))
-    .sort((a, b) => a.localeCompare(b))
-  return files
+  try {
+    const entries = await fs.readdir(fixturesDir)
+    console.log(`Found ${entries.length} entries in ${fixturesDir}`)
+    const files = entries
+      .filter((entry) => entry.endsWith('.ts') && !entry.endsWith('.d.ts'))
+      .filter((entry) => (filter ? entry.includes(filter) : true))
+      .map((entry) => path.join(fixturesDir, entry))
+      .sort((a, b) => a.localeCompare(b))
+    return files
+  } catch (err) {
+    console.error('Error reading fixtures dir:', err)
+    return []
+  }
 }
 
 function reportSummary(results: FixtureResult[]) {

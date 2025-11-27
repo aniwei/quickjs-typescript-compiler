@@ -8,5 +8,4 @@ function mix(value) {
       return 3
   }
 }
-
 mix(1)

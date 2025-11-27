@@ -1789,6 +1789,10 @@ static void emit_op(JSParseState* s, uint8_t val) {
   JSFunctionDef* fd = s->cur_func;
   DynBuf* bc = &fd->byte_code;
 
+  if (val == OP_iterator_close || val == OP_put_loc) {
+      printf("[emit_op] val=%d (0x%x) pos=%d source_pos=%d\n", val, val, bc->size, fd->last_opcode_source_ptr - s->buf_start);
+  }
+
   fd->last_opcode_pos = bc->size;
   dbuf_putc(bc, val);
 }
@@ -6663,6 +6667,7 @@ static int is_let(JSParseState* s, int decl_mask) {
    enumeration is done */
 static __exception int
 js_parse_for_in_of(JSParseState* s, int label_name, BOOL is_async) {
+  printf("[parser] js_parse_for_in_of start label_name=%d is_async=%d\n", label_name, is_async);
   JSContext* ctx = s->ctx;
   JSFunctionDef* fd = s->cur_func;
   JSAtom var_name;
@@ -10842,6 +10847,8 @@ fail:
 /* the pc2line table gives a source position for each PC value */
 static void
 add_pc2line_info(JSFunctionDef* s, uint32_t pc, uint32_t source_pos) {
+  printf("[add_pc2line_info] pc=%u source_pos=%u\n", pc, source_pos);
+  fflush(stdout);
   if (s->line_number_slots != NULL &&
       s->line_number_count < s->line_number_size &&
       pc >= s->line_number_last_pc && source_pos != s->line_number_last) {
@@ -10924,6 +10931,10 @@ static void compute_pc2line_info(JSFunctionDef* s) {
             diff_pc,
             diff_line,
             diff_col);
+        printf(" [DEBUG] BASE=%d RANGE=%d MAX_PC=%d OP_FIRST=%d calc=%d", 
+            PC2LINE_BASE, PC2LINE_RANGE, PC2LINE_DIFF_PC_MAX, PC2LINE_OP_FIRST,
+            (diff_line - PC2LINE_BASE) + diff_pc * PC2LINE_RANGE + PC2LINE_OP_FIRST);
+        fflush(stdout);
       }
 
       if (diff_line >= PC2LINE_BASE &&
@@ -10934,7 +10945,7 @@ static void compute_pc2line_info(JSFunctionDef* s) {
             (diff_line - PC2LINE_BASE) + diff_pc * PC2LINE_RANGE +
                 PC2LINE_OP_FIRST);
         if (trace_enabled) {
-          printf(" short_op=%d", (diff_line - PC2LINE_BASE) + diff_pc * PC2LINE_RANGE);
+          printf(" short_op=0x%x", (diff_line - PC2LINE_BASE) + diff_pc * PC2LINE_RANGE + PC2LINE_OP_FIRST);
         }
       } else {
         /* longer encoding */
@@ -10954,6 +10965,15 @@ static void compute_pc2line_info(JSFunctionDef* s) {
       last_pc = pc;
       last_line_num = line_num;
       last_col_num = col_num;
+    }
+    
+    if (trace_enabled) {
+        printf("[pc2line] final buffer size=%d\n", s->pc2line.size);
+        for(int k=0; k<s->pc2line.size; k++) {
+            printf("%02x ", s->pc2line.buf[k]);
+        }
+        printf("\n");
+        fflush(stdout);
     }
   }
 }
@@ -11239,6 +11259,7 @@ static __exception int resolve_labels(JSContext* ctx, JSFunctionDef* s) {
            compressed table to reduce memory usage and get better
            performance */
         line_num = get_u32(bc_buf + pos + 1);
+        printf("[resolve] OP_line_num pos=%u line=%u\n", pos, line_num);
         break;
       case OP_label: {
         label = get_u32(bc_buf + pos + 1);
