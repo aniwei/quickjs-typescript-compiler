@@ -1789,10 +1789,6 @@ static void emit_op(JSParseState* s, uint8_t val) {
   JSFunctionDef* fd = s->cur_func;
   DynBuf* bc = &fd->byte_code;
 
-  if (val == OP_iterator_close || val == OP_put_loc) {
-      printf("[emit_op] val=%d (0x%x) pos=%d source_pos=%d\n", val, val, bc->size, fd->last_opcode_source_ptr - s->buf_start);
-  }
-
   fd->last_opcode_pos = bc->size;
   dbuf_putc(bc, val);
 }
@@ -6667,7 +6663,6 @@ static int is_let(JSParseState* s, int decl_mask) {
    enumeration is done */
 static __exception int
 js_parse_for_in_of(JSParseState* s, int label_name, BOOL is_async) {
-  printf("[parser] js_parse_for_in_of start label_name=%d is_async=%d\n", label_name, is_async);
   JSContext* ctx = s->ctx;
   JSFunctionDef* fd = s->cur_func;
   JSAtom var_name;
@@ -10847,8 +10842,6 @@ fail:
 /* the pc2line table gives a source position for each PC value */
 static void
 add_pc2line_info(JSFunctionDef* s, uint32_t pc, uint32_t source_pos) {
-  printf("[add_pc2line_info] pc=%u source_pos=%u\n", pc, source_pos);
-  fflush(stdout);
   if (s->line_number_slots != NULL &&
       s->line_number_count < s->line_number_size &&
       pc >= s->line_number_last_pc && source_pos != s->line_number_last) {
@@ -10867,22 +10860,6 @@ add_pc2line_info(JSFunctionDef* s, uint32_t pc, uint32_t source_pos) {
    emit_source_pos() so that the deltas are more likely to be
    small. */
 static void compute_pc2line_info(JSFunctionDef* s) {
-  static int trace_init = 0;
-  static int trace_enabled = 0;
-  if (!trace_init) {
-    const char* env = getenv("QJS_TRACE_PC2LINE");
-    trace_enabled = (env != NULL && env[0] != '\0');
-    if (!trace_enabled) {
-      trace_enabled = 1; /* fallback for wasm debugging */
-    }
-    printf(
-        "[pc2line] trace init env=%s enabled=%d\n",
-        env ? env : "<unset>",
-        trace_enabled);
-    fflush(stdout);
-    trace_init = 1;
-  }
-
   if (!s->strip_debug) {
     int last_line_num, last_col_num;
     uint32_t last_pc = 0;
@@ -10894,15 +10871,6 @@ static void compute_pc2line_info(JSFunctionDef* s) {
         s->get_line_col_cache, &last_col_num, buf_start + s->source_pos);
     dbuf_put_leb128(&s->pc2line, last_line_num); /* line number minus 1 */
     dbuf_put_leb128(&s->pc2line, last_col_num); /* column number minus 1 */
-
-    if (trace_enabled) {
-      printf(
-          "[pc2line] start func=%p source_pos=%u line=%d col=%d\n",
-          s,
-          s->source_pos,
-          last_line_num,
-          last_col_num);
-    }
 
     for (i = 0; i < s->line_number_count; i++) {
       uint32_t pc = s->line_number_slots[i].pc;
@@ -10922,21 +10890,6 @@ static void compute_pc2line_info(JSFunctionDef* s) {
       if (diff_line == 0 && diff_col == 0)
         continue;
 
-      if (trace_enabled) {
-        printf(
-            "[pc2line] slot i=%d pc=%u source_pos=%u diff_pc=%d diff_line=%d diff_col=%d",
-            i,
-            pc,
-            source_pos,
-            diff_pc,
-            diff_line,
-            diff_col);
-        printf(" [DEBUG] BASE=%d RANGE=%d MAX_PC=%d OP_FIRST=%d calc=%d", 
-            PC2LINE_BASE, PC2LINE_RANGE, PC2LINE_DIFF_PC_MAX, PC2LINE_OP_FIRST,
-            (diff_line - PC2LINE_BASE) + diff_pc * PC2LINE_RANGE + PC2LINE_OP_FIRST);
-        fflush(stdout);
-      }
-
       if (diff_line >= PC2LINE_BASE &&
           diff_line < PC2LINE_BASE + PC2LINE_RANGE &&
           diff_pc <= PC2LINE_DIFF_PC_MAX) {
@@ -10944,36 +10897,17 @@ static void compute_pc2line_info(JSFunctionDef* s) {
             &s->pc2line,
             (diff_line - PC2LINE_BASE) + diff_pc * PC2LINE_RANGE +
                 PC2LINE_OP_FIRST);
-        if (trace_enabled) {
-          printf(" short_op=0x%x", (diff_line - PC2LINE_BASE) + diff_pc * PC2LINE_RANGE + PC2LINE_OP_FIRST);
-        }
       } else {
         /* longer encoding */
         dbuf_putc(&s->pc2line, 0);
         dbuf_put_leb128(&s->pc2line, diff_pc);
         dbuf_put_sleb128(&s->pc2line, diff_line);
-        if (trace_enabled) {
-          printf(" long_op");
-        }
       }
       dbuf_put_sleb128(&s->pc2line, diff_col);
-      if (trace_enabled) {
-        printf(" new_pc=%u new_line=%d new_col=%d\n", pc, line_num, col_num);
-        fflush(stdout);
-      }
 
       last_pc = pc;
       last_line_num = line_num;
       last_col_num = col_num;
-    }
-    
-    if (trace_enabled) {
-        printf("[pc2line] final buffer size=%d\n", s->pc2line.size);
-        for(int k=0; k<s->pc2line.size; k++) {
-            printf("%02x ", s->pc2line.buf[k]);
-        }
-        printf("\n");
-        fflush(stdout);
     }
   }
 }
@@ -11259,7 +11193,6 @@ static __exception int resolve_labels(JSContext* ctx, JSFunctionDef* s) {
            compressed table to reduce memory usage and get better
            performance */
         line_num = get_u32(bc_buf + pos + 1);
-        printf("[resolve] OP_line_num pos=%u line=%u\n", pos, line_num);
         break;
       case OP_label: {
         label = get_u32(bc_buf + pos + 1);

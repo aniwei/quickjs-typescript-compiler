@@ -72,13 +72,14 @@ export class TypeScriptCompiler {
     globalFunc.hasSimpleParameterList = false;
     globalFunc.argumentsAllowed = true;
     // globalFunc.stackSize = 1; // Manually set for now
+    // globalFunc.argCount = 1; // <eval> receives 'this'
     globalFunc.filename = this.atomManager.add(filename);
     
     // Initialize line info
     globalFunc.lastLineNum = 0;
     globalFunc.lastColumnNum = 0;
-    globalFunc.pc2line.writeULEB128(0);
-    globalFunc.pc2line.writeULEB128(0);
+    // globalFunc.pc2line.writeULEB128(0);
+    // globalFunc.pc2line.writeULEB128(0);
 
     this.currentFunc = globalFunc;
 
@@ -144,6 +145,37 @@ export class TypeScriptCompiler {
       this.emitOp(Opcode.OP_return_undef);
       this.emitLabel(label);
 
+      // Register and uninitialize top-level block-scoped variables
+      const blockScopedVars: { name: string, isConst: boolean }[] = [];
+      ts.forEachChild(node, n => {
+        if (ts.isVariableStatement(n)) {
+           const isConst = (n.declarationList.flags & ts.NodeFlags.Const) !== 0;
+           const isLet = (n.declarationList.flags & ts.NodeFlags.Let) !== 0;
+           if (isConst || isLet) {
+             n.declarationList.declarations.forEach(decl => {
+               if (ts.isIdentifier(decl.name)) {
+                 blockScopedVars.push({ name: decl.name.text, isConst });
+               }
+             });
+           }
+        }
+      });
+
+      // Register them
+      blockScopedVars.forEach(v => {
+         if (this.findLocalVar(v.name) === -1) {
+           this.addLocalVar(v.name, v.isConst);
+         }
+      });
+
+      // Emit uninitialization (reverse order to match WASM)
+      for (let i = blockScopedVars.length - 1; i >= 0; i--) {
+         const v = blockScopedVars[i];
+         const idx = this.findLocalVar(v.name);
+         this.emitOp(Opcode.OP_set_loc_uninitialized);
+         this.currentFunc!.byteCode.putU16(idx);
+      }
+
       // Module Path: Statements
       ts.forEachChild(node, n => {
         if (!ts.isFunctionDeclaration(n) && n.kind !== ts.SyntaxKind.EndOfFileToken) {
@@ -184,7 +216,7 @@ export class TypeScriptCompiler {
         const expr = (node as ts.ExpressionStatement).expression;
         this.compileExpression(expr);
         if (!ts.isVoidExpression(expr)) {
-            this.emitOp(Opcode.OP_drop);
+          this.emitOp(Opcode.OP_drop);
         }
         break;
       case ts.SyntaxKind.SwitchStatement:
@@ -226,26 +258,22 @@ export class TypeScriptCompiler {
     funcDef.newTargetAllowed = true;
     funcDef.argumentsAllowed = true;
     
+    // Switch context
+    this.currentFunc = funcDef;
+
     // Set args
     node.parameters.forEach(param => {
       if (ts.isIdentifier(param.name)) {
-        const paramName = param.name.text;
-        const paramAtom = this.atomManager.add(paramName);
-        funcDef.args.push({
-          varName: paramAtom,
-          scopeLevel: 0,
-          scopeNext: 1, // Match QuickJS behavior (1 seems to be default for args?)
-          isConst: false,
-          isLexical: false,
-          isCaptured: false,
-          varKind: JSVarKind.JS_VAR_NORMAL,
-          funcPoolIdx: -1
-        });
+        this.addArg(param.name.text);
       }
     });
     
-    // Switch context
-    this.currentFunc = funcDef;
+    // Initialize line info from node start
+    const { line, character } = this.sourceFile!.getLineAndCharacterOfPosition(node.getStart());
+    funcDef.lastLineNum = line;
+    funcDef.lastColumnNum = character;
+    funcDef.pc2line.writeULEB128(line);
+    funcDef.pc2line.writeULEB128(character);
     // this.emitLineCol(0); // Removed to avoid redundant pc2line entry at pc=0
     
     // Compile body
@@ -283,6 +311,8 @@ export class TypeScriptCompiler {
 
   compileVariableStatement(node: ts.VariableStatement) {
     const isConst = (node.declarationList.flags & ts.NodeFlags.Const) !== 0;
+    const isLet = (node.declarationList.flags & ts.NodeFlags.Let) !== 0;
+    const isBlockScoped = isConst || isLet;
     
     node.declarationList.declarations.forEach(decl => {
       if (ts.isIdentifier(decl.name)) {
@@ -290,25 +320,31 @@ export class TypeScriptCompiler {
         
         // Register variable first to ensure atom order matches QuickJS
         let varIdx = -1;
-        if (this.currentFunc?.isGlobalVar) {
+        if (this.currentFunc?.isGlobalVar && !isBlockScoped) {
           varIdx = this.addClosureVar(name, isConst);
         } else {
-          varIdx = this.addLocalVar(name, isConst);
+          varIdx = this.findLocalVar(name);
+          if (varIdx === -1) {
+            varIdx = this.addLocalVar(name, isConst);
+          }
         }
 
         if (decl.initializer) {
           this.compileExpression(decl.initializer, false, name);
         } else {
-          if (this.currentFunc?.isGlobalVar) {
+          if (this.currentFunc?.isGlobalVar && !isBlockScoped) {
             this.emitOp(Opcode.OP_undefined);
           } else {
-            this.emitOp(Opcode.OP_set_loc_uninitialized);
-            this.currentFunc!.byteCode.putU16(varIdx);
-            return; // Skip put_var_ref/put_loc
+            if (!isConst) {
+               this.emitOp(Opcode.OP_undefined);
+            } else {
+               // Const without initializer is error, but we skip emission
+               return;
+            }
           }
         }
 
-        if (this.currentFunc?.isGlobalVar) {
+        if (this.currentFunc?.isGlobalVar && !isBlockScoped) {
           this.emitPutVarRef(varIdx);
         } else {
           this.emitPutLoc(varIdx);
@@ -342,13 +378,50 @@ export class TypeScriptCompiler {
     return idx;
   }
 
-  addLocalVar(name: string, isConst: boolean = false): number {
+  addArg(name: string): number {
     if (!this.currentFunc) return -1;
     const atom = this.atomManager.add(name);
+    
+    // Link to previous arg
+    let prevIdx = 0;
+    if (this.currentFunc.args.length > 0) {
+        prevIdx = this.currentFunc.args.length - 1;
+    }
+
+    const varIdx = this.currentFunc.args.length;
+    const idx = this.currentFunc.args.push({
+      varName: atom,
+      scopeLevel: 0,
+      scopeNext: prevIdx,
+      varIdx: varIdx,
+      isConst: false,
+      isLexical: false,
+      isCaptured: false,
+      varKind: JSVarKind.JS_VAR_NORMAL,
+      funcPoolIdx: -1
+    }) - 1;
+    return idx;
+  }
+
+  addLocalVar(name: string, isConst: boolean = false): number {
+    if (!this.currentFunc) return -1;
+
+    // Find previous var in same scope
+    let prevIdx = -1;
+    for (let i = this.currentFunc.vars.length - 1; i >= 0; i--) {
+      if (this.currentFunc.vars[i].scopeLevel === this.scopeLevel) {
+        prevIdx = i;
+        break;
+      }
+    }
+
+    const atom = this.atomManager.add(name);
+    const varIdx = this.currentFunc.vars.length;
     const idx = this.currentFunc.vars.push({
       varName: atom,
       scopeLevel: this.scopeLevel,
-      scopeNext: -1,
+      scopeNext: prevIdx,
+      varIdx: varIdx,
       isConst: isConst,
       isLexical: true,
       isCaptured: false,
@@ -435,6 +508,38 @@ export class TypeScriptCompiler {
 
   compileBlock(node: ts.Block) {
     this.scopeLevel++;
+
+    // Register and uninitialize block-scoped variables
+    const blockScopedVars: { name: string, isConst: boolean }[] = [];
+    node.statements.forEach(stmt => {
+      if (ts.isVariableStatement(stmt)) {
+         const isConst = (stmt.declarationList.flags & ts.NodeFlags.Const) !== 0;
+         const isLet = (stmt.declarationList.flags & ts.NodeFlags.Let) !== 0;
+         if (isConst || isLet) {
+           stmt.declarationList.declarations.forEach(decl => {
+             if (ts.isIdentifier(decl.name)) {
+               blockScopedVars.push({ name: decl.name.text, isConst });
+             }
+           });
+         }
+      }
+    });
+
+    // Register them
+    blockScopedVars.forEach(v => {
+       if (this.findLocalVar(v.name) === -1) {
+         this.addLocalVar(v.name, v.isConst);
+       }
+    });
+
+    // Emit uninitialization (reverse order)
+    for (let i = blockScopedVars.length - 1; i >= 0; i--) {
+       const v = blockScopedVars[i];
+       const idx = this.findLocalVar(v.name);
+       this.emitOp(Opcode.OP_set_loc_uninitialized);
+       this.currentFunc!.byteCode.putU16(idx);
+    }
+
     node.statements.forEach(stmt => this.compileStatement(stmt));
     this.scopeLevel--;
   }
@@ -592,7 +697,7 @@ export class TypeScriptCompiler {
         // Jump to next check if false
         let nextCheckLabel = endLabel; // Default fallback
         if (defaultIndex !== -1) {
-            nextCheckLabel = bodyLabels[defaultIndex]; // Fallback to default body
+          nextCheckLabel = bodyLabels[defaultIndex]; // Fallback to default body
         }
           
         // Find next case check
@@ -771,7 +876,7 @@ export class TypeScriptCompiler {
       this.compileExpression(propAccess.expression); // obj
       const name = propAccess.name.text;
       const atom = this.atomManager.add(name);
-      this.emitLineCol(propAccess.expression.end, 2);
+      this.emitLineCol(propAccess.expression.end);
       this.emitOp(Opcode.OP_get_field2);
       this.currentFunc!.byteCode.putU32(atom);
       
@@ -781,7 +886,7 @@ export class TypeScriptCompiler {
         this.compileExpression(arg);
         this.inArgument = oldInArg;
       });
-      this.emitLineCol(propAccess.end, 2);
+      this.emitLineCol(propAccess.end - 1, 1);
       if (isTail) {
         this.emitOp(Opcode.OP_tail_call_method);
       } else {
@@ -1086,7 +1191,7 @@ export class TypeScriptCompiler {
 
     // Try to resolve in parent scopes
     if (this.currentFunc) {
-        this.resolveVarInFunc(this.currentFunc, name);
+      this.resolveVarInFunc(this.currentFunc, name);
     }
 
     const idx = this.findClosureVar(name);
@@ -1099,8 +1204,7 @@ export class TypeScriptCompiler {
     } else {
       // Assume global variable
       if (emitLineInfo && !this.suppressLineInfo) {
-        // QuickJS seems to add 2 to the column for global variables?
-        this.emitLineCol(node.getStart(), 2);
+        this.emitLineCol(node.getStart());
       }
       const atom = this.atomManager.add(name);
       this.emitOp(Opcode.OP_get_var);
@@ -1360,6 +1464,8 @@ export class TypeScriptCompiler {
       if (ts.isIdentifier(decl.name)) {
         const name = decl.name.text;
         const idx = this.findLocalVar(name);
+        // Match QuickJS: Attribute put_loc to the iterable expression (e.g. 'arr')
+        this.emitLineCol(node.expression.getStart());
         this.emitPutLoc(idx);
       }
     } else {
@@ -1372,6 +1478,7 @@ export class TypeScriptCompiler {
     
     // 4. Next
     this.emitLabel(labelNext);
+    // this.emitLineCol(node.statement.end - 1);
     this.emitOp(Opcode.OP_for_of_next);
     this.currentFunc!.byteCode.putU8(0);
     
@@ -1410,33 +1517,22 @@ export class TypeScriptCompiler {
     funcDef.newTargetAllowed = false;
     funcDef.argumentsAllowed = true;
     
+    // Switch context
+    this.currentFunc = funcDef;
+
+    // Set args
+    node.parameters.forEach((param, index) => {
+      if (ts.isIdentifier(param.name)) {
+        this.addArg(param.name.text);
+      }
+    });
+    
     // Initialize line info from node start
     const { line, character } = this.sourceFile!.getLineAndCharacterOfPosition(node.getStart());
     funcDef.lastLineNum = line;
     funcDef.lastColumnNum = character;
     funcDef.pc2line.writeULEB128(line);
     funcDef.pc2line.writeULEB128(character);
-
-    // Set args
-    node.parameters.forEach((param, index) => {
-      if (ts.isIdentifier(param.name)) {
-        const paramName = param.name.text;
-        const paramAtom = this.atomManager.add(paramName);
-        funcDef.args.push({
-          varName: paramAtom,
-          scopeLevel: 0,
-          scopeNext: 1,
-          isConst: false,
-          isLexical: false,
-          isCaptured: false,
-          varKind: JSVarKind.JS_VAR_NORMAL,
-          funcPoolIdx: -1
-        });
-      }
-    });
-    
-    // Switch context
-    this.currentFunc = funcDef;
     
     // Compile body
     if (ts.isBlock(node.body)) {
@@ -1484,42 +1580,31 @@ export class TypeScriptCompiler {
     funcDef.newTargetAllowed = true;
     funcDef.argumentsAllowed = true;
     
+    // Switch context
+    this.currentFunc = funcDef;
+    
+    // Set args
+    node.parameters.forEach((param, index) => {
+      if (ts.isIdentifier(param.name)) {
+        this.addArg(param.name.text);
+      }
+    });
+    
     // Initialize line info from node
     const { line, character } = this.sourceFile!.getLineAndCharacterOfPosition(node.getStart());
     funcDef.lastLineNum = line;
     funcDef.lastColumnNum = character;
     funcDef.pc2line.writeULEB128(line);
     funcDef.pc2line.writeULEB128(character);
-
-    // Set args
-    node.parameters.forEach((param, index) => {
-      if (ts.isIdentifier(param.name)) {
-        const paramName = param.name.text;
-        const paramAtom = this.atomManager.add(paramName);
-        funcDef.args.push({
-          varName: paramAtom,
-          scopeLevel: 0,
-          scopeNext: 1,
-          isConst: false,
-          isLexical: false,
-          isCaptured: false,
-          varKind: JSVarKind.JS_VAR_NORMAL,
-          funcPoolIdx: -1
-        });
-      }
-    });
-    
-    // Switch context
-    this.currentFunc = funcDef;
     
     // Compile body
-    this.compileBlock(node.body);
+    this.compileBlock(node.body)
     
     // Add implicit return if needed
-    const lastOp = this.currentFunc.lastOp;
+    const lastOp = this.currentFunc.lastOp
     if (!this.isReturnOp(lastOp)) {
-      this.emitOp(Opcode.OP_undefined);
-      this.emitOp(Opcode.OP_return);
+      this.emitOp(Opcode.OP_undefined)
+      this.emitOp(Opcode.OP_return)
     }
     
     // Restore context
@@ -1529,10 +1614,10 @@ export class TypeScriptCompiler {
     const funcIdx = parentFunc!.cpool.push({
       type: 'function',
       value: funcDef
-    }) - 1;
+    }) - 1
     
-    this.emitOp(Opcode.OP_fclosure8);
-    this.currentFunc!.byteCode.putU8(funcIdx);
+    this.emitOp(Opcode.OP_fclosure8)
+    this.currentFunc!.byteCode.putU8(funcIdx)
   }
 }
 

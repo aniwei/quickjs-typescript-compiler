@@ -1,37 +1,35 @@
-import { JSFunctionDef, JSVarDef, JSClosureVar, JSValue, JSVarKind } from './functionDef';
-import { BytecodeWriter } from './bytecode';
-import { AtomManager, JSAtom } from './atom';
-import { BytecodeTag, env, OPCODE_DEFS, OPCODE_NAME_TO_CODE, OpFormat } from './env';
-
-const JS_TAG_STRING = 7;
+import { JSFunctionDef, JSVarDef, JSClosureVar, JSValue, JSVarKind } from './functionDef'
+import { BytecodeWriter } from './bytecode'
+import { AtomManager, JSAtom } from './atom'
+import { BytecodeTag, env, OPCODE_DEFS, OPCODE_NAME_TO_CODE, OpFormat } from './env'
 
 export class BytecodeSerializer {
-  private writer: BytecodeWriter;
-  private atomList: JSAtom[] = [];
-  private atomMap: Map<JSAtom, number> = new Map();
+  private writer: BytecodeWriter
+  private atoms: JSAtom[] = []
+  private atomById: Map<JSAtom, number> = new Map()
 
   constructor() {
-    this.writer = new BytecodeWriter();
+    this.writer = new BytecodeWriter()
   }
 
   serialize(func: JSFunctionDef): Uint8Array {
-    // Pre-populate atomList from AtomManager to ensure all atoms (including those in bytecode) are included
+    // Pre-populate atoms from AtomManager to ensure all atoms (including those in bytecode) are included
     // and indices match.
-    const atomManager = func.ctx.atomManager as AtomManager;
-    const allAtoms = atomManager.dump();
+    const atomManager = func.ctx.atomManager as AtomManager
+    const allAtoms = atomManager.dump()
     // User atoms start at env.firstAtomId
     // atomToName array index is the atom ID.
-    // We need to add atoms with ID >= env.firstAtomId to atomList.
+    // We need to add atoms with ID >= env.firstAtomId to atoms.
     for (let i = env.firstAtomId; i < allAtoms.length; i++) {
-        this.atomList.push(i);
-        this.atomMap.set(i, i);
+      this.atoms.push(i)
+      this.atomById.set(i, i)
     }
 
     // 1. Serialize object (function/module) to temporary buffer
-    const objWriter = new BytecodeWriter();
+    const objWriter = new BytecodeWriter()
     
     // Ensure filename is in atoms (must be first for main module?)
-    // It should already be in atomList if it was added to AtomManager.
+    // It should already be in atoms if it was added to AtomManager.
     // if (func.filename !== 0) { // JS_ATOM_NULL
     //    this.getAtomIndex(func.filename);
     // }
@@ -39,13 +37,13 @@ export class BytecodeSerializer {
     // Check if it's a module (global var + strict mode usually implies module in our context?)
     // Or we can just always wrap in module if we want to match WASM which seems to output module.
     // For now, let's try to output Module.
-    this.writeModule(objWriter, func);
+    this.writeModule(objWriter, func)
 
     // 2. Write header and atoms
-    this.writer.putU8(env.bytecodeVersion);
-    this.writeLEB128(this.writer, this.atomList.length);
+    this.writer.putU8(env.bytecodeVersion)
+    this.writeLEB128(this.writer, this.atoms.length)
     
-    for (const atom of this.atomList) {
+    for (const atom of this.atoms) {
       this.writeAtom(this.writer, atom, func.ctx.atomManager);
     }
 
@@ -180,8 +178,8 @@ export class BytecodeSerializer {
     if (atom === 0) return 0; // JS_ATOM_NULL
     
     // If we pre-populated, the atom should be in the map if it's a user atom.
-    if (this.atomMap.has(atom)) {
-      return this.atomMap.get(atom)!;
+    if (this.atomById.has(atom)) {
+      return this.atomById.get(atom)!;
     }
     
     // Check for built-in atoms (hack for <eval>)
@@ -203,9 +201,9 @@ export class BytecodeSerializer {
 
     // Should not happen if we pre-populated correctly
     // But if it does, add it.
-    const idx = this.atomList.length + env.firstAtomId;
-    this.atomList.push(atom);
-    this.atomMap.set(atom, idx);
+    const idx = this.atoms.length + env.firstAtomId;
+    this.atoms.push(atom);
+    this.atomById.set(atom, idx);
     return idx;
   }
 
@@ -250,7 +248,8 @@ export class BytecodeSerializer {
     const nameIdx = this.getAtomIndex(func.funcName, func.ctx.atomManager);
     this.writeAtomRef(out, nameIdx);
     
-    this.writeLEB128(out, func.args.length); // arg_count
+    const argCount = func.argCount !== -1 ? func.argCount : func.args.length;
+    this.writeLEB128(out, argCount); // arg_count
     this.writeLEB128(out, func.vars.length); // var_count
     this.writeLEB128(out, func.args.length); // defined_arg_count
     this.writeLEB128(out, func.stackSize);
@@ -283,7 +282,7 @@ export class BytecodeSerializer {
     
     // Debug info
     if (hasDebug) {
-        const filenameIdx = this.getAtomIndex(func.filename, func.ctx.atomManager);
+      const filenameIdx = this.getAtomIndex(func.filename, func.ctx.atomManager);
       this.writeAtomRef(out, filenameIdx);
       
       // pc2line
@@ -303,19 +302,21 @@ export class BytecodeSerializer {
   }
 
   private writeVarDef(out: BytecodeWriter, v: JSVarDef) {
-    const nameIdx = this.getAtomIndex(v.varName);
-    this.writeAtomRef(out, nameIdx);
+    // Force recompile
+    this.writeAtomRef(out, v.varName);
     this.writeLEB128(out, v.scopeLevel);
-    // QuickJS uses 0 for end of chain, but we initialized to -1.
-    // If -1, write 0 to save space and match behavior (assuming no collision)
-    const next = v.scopeNext === -1 ? 0 : v.scopeNext;
-    this.writeLEB128(out, next);
+    this.writeLEB128(out, v.scopeNext + 1);
     
-    let flags = v.varKind;
-    if (v.isConst) flags |= 0x10;
-    if (v.isLexical) flags |= 0x20;
-    if (v.isCaptured) flags |= 0x40;
-    out.putU8(flags);
+    const JS_VAR_DEF_CONST = 0x10;
+    const JS_VAR_DEF_LEXICAL = 0x20;
+    const JS_VAR_DEF_CAPTURED = 0x40;
+
+    let kind = v.varKind;
+    if (v.isConst) kind |= JS_VAR_DEF_CONST;
+    if (v.isLexical) kind |= JS_VAR_DEF_LEXICAL;
+    if (v.isCaptured) kind |= JS_VAR_DEF_CAPTURED;
+    
+    out.putU8(kind);
   }
 
   private writeClosureVar(out: BytecodeWriter, cv: JSClosureVar) {
@@ -337,24 +338,24 @@ export class BytecodeSerializer {
     // TODO: Implement value serialization
     // For now, assume string or int
     if (val.type === 'string') {
-        out.putU8(BytecodeTag.TC_TAG_STRING);
-        const buf = Buffer.from(val.value, 'utf8');
-        this.writeLEB128(out, buf.length);
-        out.write(buf);
+      out.putU8(BytecodeTag.TC_TAG_STRING);
+      const buf = Buffer.from(val.value, 'utf8');
+      this.writeLEB128(out, buf.length);
+      out.write(buf);
     } else if (val.type === 'number') {
-        if (Number.isInteger(val.value)) {
-            out.putU8(BytecodeTag.TC_TAG_INT32);
-            out.putU32(val.value);
-        } else {
-            out.putU8(BytecodeTag.TC_TAG_FLOAT64);
-            const buf = Buffer.alloc(8);
-            buf.writeDoubleLE(val.value);
-            out.write(buf);
-        }
+      if (Number.isInteger(val.value)) {
+        out.putU8(BytecodeTag.TC_TAG_INT32);
+        out.putU32(val.value);
+      } else {
+        out.putU8(BytecodeTag.TC_TAG_FLOAT64);
+        const buf = Buffer.alloc(8);
+        buf.writeDoubleLE(val.value);
+        out.write(buf);
+      }
     } else if (val.type === 'function') {
-        this.writeFunction(out, val.value as JSFunctionDef);
+      this.writeFunction(out, val.value as JSFunctionDef);
     } else {
-        out.putU8(BytecodeTag.TC_TAG_NULL);
+      out.putU8(BytecodeTag.TC_TAG_NULL);
     }
   }
 

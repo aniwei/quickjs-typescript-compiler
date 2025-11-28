@@ -49,6 +49,22 @@
 			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/console-log.ts --input-js __tests__/compiler/fixtures/console-log.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts --show-diff",
 			"args": [],
 			"group": "build"
+		},
+		{
+			"label": "compare-arrow-fn-basic",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/arrow-fn-basic.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Log remaining difference",
+			"type": "shell",
+			"command": "echo \"Remaining difference in compute.ts: 1 byte at start of pc2line table. Likely due to push_1 encoding or similar.\" >> TODO.md",
+			"args": [],
+			"group": "build"
 		}
 	]
 }

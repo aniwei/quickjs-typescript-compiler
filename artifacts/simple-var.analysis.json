@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-11-27T11:37:31.051Z",
+  "timestamp": "2025-11-28T03:57:00.792Z",
   "inputFile": "__tests__/compiler/fixtures/simple-var.ts",
   "compilation": {
     "typescript": {

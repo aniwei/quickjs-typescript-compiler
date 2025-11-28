@@ -1,6 +1,6 @@
-import { BytecodeWriter } from './bytecode';
-import { JSAtom, JS_ATOM_NULL } from './atom';
-import { FunctionKind } from './env';
+import { BytecodeWriter } from './bytecode'
+import { JSAtom, JS_ATOM_NULL } from './atom'
+import { FunctionKind } from './env'
 
 export enum JSVarKind {
   JS_VAR_NORMAL,
@@ -19,6 +19,7 @@ export interface JSVarDef {
   varName: JSAtom;
   scopeLevel: number;
   scopeNext: number;
+  varIdx: number;
   isConst: boolean;
   isLexical: boolean;
   isCaptured: boolean;
@@ -122,6 +123,9 @@ export class JSFunctionDef {
   // Stack
   stackSize: number = 0;
   stackLevel: number = 0;
+  
+  // Argument count override (for <eval> etc)
+  argCount: number = -1;
 
   // Debug info
   pc2line: BytecodeWriter = new BytecodeWriter();

@@ -141,3 +141,7 @@ C 源码使用 `LabelSlot` 结构体和 `emit_goto` / `emit_label` 函数。
 *   `src/bytecode.ts`: `BytecodeWriter` 类。
 *   `src/atom.ts`: Atom 管理。
 *   `src/env.ts`: Opcode 定义 (已存在)。
+
+
+
+通读 third_party/QuickJS 源码，给 third_party/QuickJS 源码 核心实现函数增加更多调试日志编译为 wasm 追踪问题，专注完全消除 compute.ts 中最后的字节码差异。
