@@ -1,50 +1,71 @@
+import { DynBuf } from './core/dynBuf';
 import { Opcode } from './env';
+import { opcodeInfo } from './opcodeInfo';
+
+export interface BytecodeWriterOptions {
+  label?: string;
+  initialCapacity?: number;
+  trackStack?: boolean;
+}
 
 export class BytecodeWriter {
-  private buf: number[] = [];
+  private readonly buf: DynBuf;
+  public readonly name: string;
+  private readonly trackStack: boolean;
+  stackLevel = 0;
+  stackMax = 0;
 
-  constructor() {}
+  constructor(nameOrOptions: string | BytecodeWriterOptions = '', maybeOptions?: BytecodeWriterOptions) {
+    let opts: BytecodeWriterOptions = {};
+    let label = '';
+    if (typeof nameOrOptions === 'string') {
+      label = nameOrOptions;
+      opts = maybeOptions ?? {};
+    } else {
+      opts = nameOrOptions;
+      label = nameOrOptions.label ?? '';
+    }
+    this.name = label;
+    this.trackStack = opts.trackStack ?? true;
+    this.buf = new DynBuf({ label, initialCapacity: opts.initialCapacity });
+  }
 
   get size(): number {
-    return this.buf.length;
+    return this.buf.size;
   }
 
   get buffer(): Uint8Array {
-    return new Uint8Array(this.buf);
+    return this.buf.toUint8Array();
   }
 
   toArray(): number[] {
-    return [...this.buf];
+    return Array.from(this.buf.view);
   }
 
   reset() {
-    this.buf = [];
+    this.buf.clear();
+    this.stackLevel = 0;
+    this.stackMax = 0;
   }
 
   // dbuf_put
   write(data: Uint8Array | number[]) {
-    for (let i = 0; i < data.length; i++) {
-      this.buf.push(data[i]);
-    }
+    this.buf.putBytes(data);
   }
 
   // dbuf_putc
   putU8(val: number) {
-    this.buf.push(val & 0xff);
+    this.buf.putU8(val);
   }
 
   // dbuf_put_u16
   putU16(val: number) {
-    this.buf.push(val & 0xff);
-    this.buf.push((val >> 8) & 0xff);
+    this.buf.putU16(val);
   }
 
   // dbuf_put_u32
   putU32(val: number) {
-    this.buf.push(val & 0xff);
-    this.buf.push((val >> 8) & 0xff);
-    this.buf.push((val >> 16) & 0xff);
-    this.buf.push((val >> 24) & 0xff);
+    this.buf.putU32(val);
   }
 
   putU64(val: bigint) {
@@ -56,60 +77,30 @@ export class BytecodeWriter {
 
   // Helper for patching
   patchU32(offset: number, val: number) {
-    if (offset + 4 > this.buf.length) {
-      throw new Error('Patch offset out of bounds');
-    }
-    this.buf[offset] = val & 0xff;
-    this.buf[offset + 1] = (val >> 8) & 0xff;
-    this.buf[offset + 2] = (val >> 16) & 0xff;
-    this.buf[offset + 3] = (val >> 24) & 0xff;
+    this.buf.patchU32(offset, val);
   }
 
   // Helper for patching
   patchU16(offset: number, val: number) {
-    if (offset + 2 > this.buf.length) {
-      throw new Error('Patch offset out of bounds');
-    }
-    this.buf[offset] = val & 0xff;
-    this.buf[offset + 1] = (val >> 8) & 0xff;
+    this.buf.patchU16(offset, val);
   }
 
   patchU8(offset: number, val: number) {
-    if (offset + 1 > this.buf.length) {
-      throw new Error('Patch offset out of bounds');
-    }
-    this.buf[offset] = val & 0xff;
+    this.buf.patchU8(offset, val);
   }
 
   emitOp(op: Opcode) {
     this.putU8(op);
+    if (this.trackStack)
+      this.applyStackEffect(op);
   }
 
   writeULEB128(val: number) {
-    let v = val;
-    do {
-      let byte = v & 0x7f;
-      v >>>= 7;
-      if (v !== 0) {
-        byte |= 0x80;
-      }
-      this.putU8(byte);
-    } while (v !== 0);
+    this.buf.writeULEB128(val);
   }
 
   writeSLEB128(val: number) {
-    let v = val;
-    let more = true;
-    while (more) {
-      let byte = v & 0x7f;
-      v >>= 7;
-      if ((v === 0 && (byte & 0x40) === 0) || (v === -1 && (byte & 0x40) !== 0)) {
-        more = false;
-      } else {
-        byte |= 0x80;
-      }
-      this.putU8(byte);
-    }
+    this.buf.writeSLEB128(val);
   }
 
   // QuickJS uses ZigZag encoding for some signed values (like pc2line diffs)
@@ -119,6 +110,23 @@ export class BytecodeWriter {
   }
 
   get lastByte(): number | undefined {
-    return this.buf.length > 0 ? this.buf[this.buf.length - 1] : undefined;
+    return this.size > 0 ? this.buf.view[this.size - 1] : undefined;
+  }
+
+  setSize(size: number) {
+    this.buf.truncate(size);
+  }
+
+  private applyStackEffect(op: Opcode) {
+    const info = opcodeInfo[op];
+    if (!info)
+      return;
+    this.stackLevel -= info.nPop;
+    if (this.stackLevel < 0) {
+      this.stackLevel = 0;
+    }
+    this.stackLevel += info.nPush;
+    if (this.stackLevel > this.stackMax)
+      this.stackMax = this.stackLevel;
   }
 }

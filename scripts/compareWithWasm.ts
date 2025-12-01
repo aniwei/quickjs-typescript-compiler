@@ -288,6 +288,10 @@ class BytecodeComparator {
         throw new Error('Empty transpile output')
       }
 
+      console.log('--- Transpiled Code ---');
+      console.log(transpiled.outputText);
+      console.log('-----------------------');
+
       return transpiled.outputText
     } catch (error) {
       const context = fileName ? ` for ${fileName}` : ''

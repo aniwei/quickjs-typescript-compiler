@@ -93,23 +93,30 @@ class Parser {
     }
 
     const flags = this.readU16()
-    this.readU8() // js_mode
-    this.readULEB() // name atom
+    const jsMode = this.readU8() // js_mode
+    const nameAtom = this.readULEB() // name atom
 
-    this.readULEB() // arg_count
-    this.readULEB() // var_count
-    this.readULEB() // defined_arg_count
-    this.readULEB() // stack_size
+    const argCount = this.readULEB() // arg_count
+    const varCount = this.readULEB() // var_count
+    const definedArgCount = this.readULEB() // defined_arg_count
+    const stackSize = this.readULEB() // stack_size
     const closureVarCount = this.readULEB()
     const constantPoolCount = this.readULEB()
     const bytecodeLen = this.readULEB()
 
+    console.log(`\n--- Function (Atom ${nameAtom}) ---`)
+    console.log(`Flags: 0x${flags.toString(16)}`)
+    console.log(`Args: ${argCount}, Vars: ${varCount}, Stack: ${stackSize}`)
+    console.log(`Closure Vars: ${closureVarCount}, Constants: ${constantPoolCount}, Bytecode: ${bytecodeLen}`)
+
     const varDefCount = this.readULEB()
+    console.log(`Var Defs: ${varDefCount}`)
     for (let i = 0; i < varDefCount; i++) {
-      this.readULEB() // name atom
-      this.readULEB() // scope level
-      this.readULEB() // scope next + 1
-      this.readU8() // flags
+      const name = this.readULEB() // name atom
+      const scopeLevel = this.readULEB() // scope level
+      const scopeNext = this.readULEB() // scope next + 1
+      const flags = this.readU8() // flags
+      console.log(`  Var ${i}: Atom ${name}, Scope ${scopeLevel}, Next ${scopeNext}, Flags 0x${flags.toString(16)}`)
     }
 
     for (let i = 0; i < closureVarCount; i++) {

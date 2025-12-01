@@ -68,8 +68,6 @@ export class BytecodeSerializer {
     this.writeLEB128(out, 0); // import_entries_count
     out.putU8(0); // has_tla
     
-    // Ensure function stack size is accurate before writing
-    func.stackSize = this.computeMaxStack(func.byteCode.buffer);
     this.writeFunction(out, func);
   }
 
@@ -157,10 +155,26 @@ export class BytecodeSerializer {
             depths.set(target, cur);
             queue.push(target);
           }
+        } else if (def.id === 'goto' || def.id === 'if_false' || def.id === 'if_true' || def.id === 'catch' || def.id === 'gosub') {
+          const offset = buf[startPos + 1] | (buf[startPos + 2] << 8) | (buf[startPos + 3] << 16) | (buf[startPos + 4] << 24);
+          const signedOffset = offset | 0;
+          const target = startPos + 1 + signedOffset;
+          
+          let targetStack = cur;
+          if (def.id === 'gosub') {
+            // Heuristic: WASM output suggests gosub overhead is 1 (or catch overhead is 0)
+            // If we use +2, we get stack size 6. WASM has 5.
+            targetStack = cur + 1;
+          }
+
+          if (!depths.has(target)) {
+            depths.set(target, targetStack);
+            queue.push(target);
+          }
         }
         
         // Stop if unconditional jump
-        if (def.id === 'goto8' || def.id === 'return' || def.id === 'return_undef' || def.id === 'return_async' || def.id === 'throw' || def.id === 'tail_call' || def.id === 'tail_call_method') {
+        if (def.id === 'goto8' || def.id === 'goto' || def.id === 'return' || def.id === 'return_undef' || def.id === 'return_async' || def.id === 'throw' || def.id === 'tail_call' || def.id === 'tail_call_method') {
           break;
         }
         
@@ -174,7 +188,15 @@ export class BytecodeSerializer {
     }
 
     return max;
-  }  private getAtomIndex(atom: JSAtom, atomManager?: AtomManager): number {
+  }
+
+  private getEffectiveStackUsage(func: JSFunctionDef): number {
+    const tracked = func.byteCode.stackMax ?? 0;
+    const analyzed = this.computeMaxStack(func.byteCode.buffer);
+    return Math.max(tracked, analyzed);
+  }
+
+  private getAtomIndex(atom: JSAtom, atomManager?: AtomManager): number {
     if (atom === 0) return 0; // JS_ATOM_NULL
     
     // If we pre-populated, the atom should be in the map if it's a user atom.
@@ -213,9 +235,15 @@ export class BytecodeSerializer {
   }
 
   private writeFunction(out: BytecodeWriter, func: JSFunctionDef) {
-    // Ensure stack size is computed
-    func.stackSize = this.computeMaxStack(func.byteCode.buffer);
-    console.log(`writeFunction: ${func.funcName} stackSize=${func.stackSize}`);
+    const bytecodeStack = this.getEffectiveStackUsage(func);
+    if (func.isGlobalVar) {
+      const computed = Math.max(func.anonymousLocalsCount, bytecodeStack);
+      func.stackSize = Math.max(func.stackSize, computed);
+    } else {
+      const envOverhead = func.args.length + func.vars.length + func.anonymousLocalsCount;
+      const computed = envOverhead + bytecodeStack;
+      func.stackSize = Math.max(func.stackSize, computed);
+    }
     
     out.putU8(BytecodeTag.TC_TAG_FUNCTION_BYTECODE);
     

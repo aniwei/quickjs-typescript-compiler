@@ -62,7 +62,10 @@ export class QuickJSLib {
     if (!path) throw new Error('QuickJS wasm binding not available')
 
     const WasmModule: any = await import(path)
-    QuickJSLib.WasmInstance = await WasmModule.default()
+    QuickJSLib.WasmInstance = await WasmModule.default({
+      print: (text: string) => console.log(text),
+      printErr: (text: string) => console.error(text)
+    })
     return QuickJSLib.WasmInstance as WasmInstance
   }
 
