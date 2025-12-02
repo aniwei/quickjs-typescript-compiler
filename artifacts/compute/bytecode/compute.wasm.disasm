@@ -1,4 +1,4 @@
---- TS Disassembly ---
+--- WASM Disassembly ---
 Bytecode size: 155 bytes
 
 00000000: 05 05 4c 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..L__tests__/com|

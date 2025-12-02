@@ -22,6 +22,7 @@ export interface StatementEmitterHost {
   compileWhileStatement(node: ts.WhileStatement, labelName?: string): void;
   compileForStatement(node: ts.ForStatement, labelName?: string): void;
   compileForOfStatement(node: ts.ForOfStatement, labelName?: string): void;
+  compileClassDeclaration(node: ts.ClassDeclaration): void;
   compileExpression(node: ts.Expression, isTail?: boolean, nameHint?: string, dropResult?: boolean): void;
   emitLineCol(pos: number, columnOffset?: number): void;
   emitOp(op: Opcode): void;
@@ -134,6 +135,12 @@ export class StatementEmitter {
           return true;
         }
         break;
+      case TokenValue.TOK_CLASS:
+        if (!ts.isClassDeclaration(record.node)) {
+          throw new Error('TokenValue.TOK_CLASS must map to a ClassDeclaration node.');
+        }
+        this.emitClassDeclaration(record.node);
+        return true;
       default:
         if (record.tokenValue === openBrace && ts.isBlock(record.node)) {
           this.host.compileBlock(record.node);
@@ -146,6 +153,10 @@ export class StatementEmitter {
       return true;
     }
     return false;
+  }
+
+  emitClassDeclaration(node: ts.ClassDeclaration) {
+    this.host.compileClassDeclaration(node);
   }
 
   emitReturnStatement(node: ts.ReturnStatement) {

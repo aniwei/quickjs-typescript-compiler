@@ -11,6 +11,8 @@ export interface ExpressionEmitterHost {
   compileCallExpression(node: ts.CallExpression, isTail?: boolean): void;
   compilePropertyAccessExpression(node: ts.PropertyAccessExpression): void;
   compileElementAccessExpression(node: ts.ElementAccessExpression): void;
+  compilePrefixUnaryExpression(node: ts.PrefixUnaryExpression): void;
+  compilePostfixUnaryExpression(node: ts.PostfixUnaryExpression): void;
   compileIdentifier(node: ts.Identifier, emitLineInfo?: boolean): void;
   compileNumericLiteral(node: ts.NumericLiteral): void;
   compileStringLiteral(node: ts.StringLiteral): void;
@@ -46,6 +48,12 @@ export class ExpressionEmitter {
         return true;
       case ts.SyntaxKind.ElementAccessExpression:
         this.host.compileElementAccessExpression(node as ts.ElementAccessExpression);
+        return true;
+      case ts.SyntaxKind.PrefixUnaryExpression:
+        this.host.compilePrefixUnaryExpression(node as ts.PrefixUnaryExpression);
+        return true;
+      case ts.SyntaxKind.PostfixUnaryExpression:
+        this.host.compilePostfixUnaryExpression(node as ts.PostfixUnaryExpression);
         return true;
       case ts.SyntaxKind.Identifier:
         this.host.compileIdentifier(node as ts.Identifier);

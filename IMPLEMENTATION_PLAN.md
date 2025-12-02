@@ -135,12 +135,22 @@
 - Phase 3 迭代（新增）：`expressionEmitter` 进一步接管 `this`/`null`/`true`/`false` 字面量访问，宿主暴露 `compileThisExpression`/`compileNullLiteral`/`compileBooleanLiteral`，让基础字面量与成员访问一样在 emitter 层统一调度，为拆分一元/更新表达式打前站。
 - Phase 3 迭代（新增）：`expressionEmitter` 继续扩展到模板字面量与条件表达式，`TemplateExpression`/`NoSubstitutionTemplateLiteral`/`ConditionalExpression` 现在都由 emitter 劫持并复用宿主 `compileTemplateExpression`/`compileConditionalExpression` helper，`compileExpression` 的大 switch 进一步收缩。
 - Phase 3 迭代（新增）：`expressionEmitter` 已接管 `TypeOfExpression` 与 `VoidExpression`，宿主沿 QuickJS helper 发射 `OP_typeof` 与 `OP_drop`+`OP_undefined`，开始迁移 QuickJS 一元控制流节点。
+- Phase 3 迭代（新增）：`expressionEmitter` 继续覆盖 `PrefixUnaryExpression`/`PostfixUnaryExpression` 与 `++/--` 更新表达式，直接委托宿主 `compilePrefixUnaryExpression`/`compilePostfixUnaryExpression`，并在 `dropResult` 场景提前处理 `++/--`，为完全迁移 `js_parse_unary_expr` 铺路。
+- Phase 3 迭代（新增）：`TypeScriptCompiler` 新增 `JS_DEFINE_CLASS_HAS_HERITAGE`/`DefineMethodKind` 常量与 `compileClassDeclaration`/`compileClassExpression`/`compileMethodFunction` 等 helper，支持 constructor/method/accessor 以 QuickJS `define_class` 流程发射；`statementEmitter` 增加 `TOK_CLASS` 宿主钩子后即可直连这些 helper，并通过 `pnpm -s tsc --noEmit` 与 `pnpm -s start __tests__/compiler/fixtures/compute.ts --disasm --cfg --pc2line --debug` 双验证确认 CLI 回归。
+- Phase 3 迭代（新增）：类声明现在默认以 `OP_set_loc_uninitialized` 预热 TDZ，并将 `statementEmitter` 的 `TOK_CLASS` case 直接绑定到宿主 helper；同步落地静态字段初始化（按 QuickJS 栈约定 swap constructor，再以 `OP_define_field` 写入，缺省值补 `undefined`），为后续下沉派生类 BlockEnv cleanup 与实例字段初始化打前站。
+- Phase 3 迭代（新增）：类 helper 会在生成 constructor 之前先行扫描实例字段并缓存初始化 AST，随后将初始化序列注入 constructor block prelude，保证基础 `class_fields_init` 语义真正执行，为下一步 BlockEnv cleanup / `super()` 校验提供依托。
+- Phase 3 迭代（新增）：实例字段初始化已提升为独立 `<class_fields_init>` 闭包：先将字段列表编译成专属 JSFunctionDef 并缓存到常量池，constructor 通过 `call_method` 触发该闭包，彻底摆脱内联初始化，为后续品牌注入与派生类路径复用打基础。
+- Phase 3 迭代（新增）：类声明现拥有独立 BlockEnv，用于存储 `<class_fields_init>` 闭包并由 constructor 通过闭包变量驱动调用；同时在 constructor 入口发射 `OP_check_ctor`/`OP_init_ctor` 并强制派生类显式 `super()`，让 `new.target`/`super()` 约束与 QuickJS 行为保持一致。
+- Phase 3 迭代（新增）：完成私有字段 brand 链路：`ClassCompilationContext` 记录实例/静态 `#` 成员，`<class_fields_init>` 即使仅负责品牌也会生成且在入口发射 `OP_add_brand`，prototype/class 两侧分别插入 `OP_dup` + `OP_null`/`OP_dup` 序列触发 `OP_add_brand`，并在存储闭包前补上 `OP_set_home_object`，确保 brand 注入依照 QuickJS 栈约定执行；`pnpm -s tsc --noEmit` 与 compute fixture 双验证通过。
+- Phase 3 迭代（新增）：补齐私有符号与访问语义：类声明阶段为每个 `#` 成员发射 `OP_private_symbol` 并把符号存入私有 scope，私有方法/访问器以 `OP_scope_put_var_init` 绑定闭包，实例/静态字段分别在 `<class_fields_init>` 与构造函数上使用 `OP_define_private_field`；表达式侧新增 `OP_scope_get/put_private_field(2)` 与 `OP_scope_in_private_field`，让 `obj.#x`、`obj.#x()`、`obj.#x = v` 与 `#x in obj` 的字节码与 QuickJS 对齐。
+- Serializer/Trace Guardrail（新增）：`__tests__/compiler/serializer.guardrail.test.ts` 与 `trace.guardrail.test.ts` 通过 `BytecodeComparator`、`compareModuleTrace.ts` 验证 `trace-smoke` fixture，确保 `.qbc` 与 trace JSONL 工件始终生成，并将 TS/wasm trace 结构归档至 `artifacts/<fixture>.*trace.*` 以支撑后续差异定位。
+- Serializer/Trace 差异验证（新增）：新增 `empty-program` fixture，并让 serializer/trace guardrail 覆盖 `trace-smoke` 与空程序两种输入，`compareWithWasm`/`compareModuleTrace` 现在会对两个样例生成 `.qbc`/trace/报告，从 smoke test 扩展到“空程序”场景，验证完全无语句时的序列化/Trace 行为。
+- Compute 差异归档（新增）：新增 `scripts/runComputeGuardrail.ts`，串联 CLI 编译（写入 `.qbc`/disasm/pc2line）、`BytecodeComparator` 以及 `compareModuleTrace`，并以 `__tests__/compiler/compute.guardrail.test.ts` 固化管线，可一键生成并校验 `compute.ts` 的 CLI/字节码/trace 全量工件。
+- Compute 差异定位（新增）：利用 `runComputeGuardrail` 落盘的 disasm/pc2line 确认 PC4 首个偏差来自顶层 `const arr`，TS 侧发射 `OP_set_loc_uninitialized` + `OP_put_loc0/OP_get_loc_check`，而 QuickJS 按 `parser.c/js_parse_var` → `resolve_scope` 折叠到 `OP_scope_put_var_init` → `OP_put_var_ref0/OP_get_var_ref_check`，导致整个 for-of 前缀与 wasm 不对齐。
 
 **进行中 / 下一步**
 
-1. **StatementEmitter 深度迁移**：在完成 `switch`/`try`+`debugger`、`with` 与 label 语句迁移后，继续补齐 `TOK_CLASS` 等剩余 case（依赖 TypeScriptCompiler 先提供 class 声明/表达式的底层 helper），并将 BlockEnv cleanup/作用域开闭全交由 emitter 驱动，彻底把 legacy `compileStatement` 压缩成 fallback。
-2. **ExpressionEmitter 扩展**：在接入成员访问、基础字面量、模板/条件 与 `typeof`/`void` 之后，继续劫持 `PrefixUnaryExpression`、`PostfixUnaryExpression` 以及 `++/--` 更新表达式，为后续完整迁移 `js_parse_unary_expr`/`js_parse_assign_expr` 奠基。
-3. **Serializer/Trace 差异验证**：基于 smoke test 扩展空程序 `.qbc` 对照，并准备接入 trace logger（Phase 4 前置），同时对 `compute.ts` 快速验证结果持续归档。
+1. **Scope 临时 opcode 清理**：移除当前字节码中仍然保留的 `OP_enter_scope`/`OP_leave_scope`（临时指令在 QuickJS 最终输出中不会出现），改为只在 ScopeManager 内部追踪作用域，然后在 emit 阶段直接生成最终 opcodes。完成后 `compute.ts` 末段剩余 11 字节差异（全部来自这些临时指令）即可抹平，为后续 `compareAllFixtures` 扩容扫清阻碍。
 
 **未来 48h 行动项**
 
@@ -153,6 +163,15 @@
 - [x] 将 `break`/`continue` 控制流改造为 `ScopeManager.findBreakTarget`，在 `for`/`while`/`for-of` 推送 BlockEnv 并移除遗留 `loopStack`。
 - [x] 将 QuickJS `push_break_entry`/`label_identifiers` 对应的 BlockEnv dropCount、label 解析迁移到 `ScopeManager`，并补上 `switch`/`try/finally` 可跳出块的 drop 逻辑（ScopeManager cleanup 已完成，for-of/switch/try/catch/finally 的 dropCount/iterator/finallyLabel 与 C 源一致）。
 - [x] 收尾 `label_identifiers`：实现带 label 的常规语句与 `close_scopes`/`OP_leave_scope` 发射，确保 `break`/`continue` 穿越嵌套 block 时作用域释放与 QuickJS 100% 对齐。
+- [x] 让 `statementEmitter` 的 `TOK_CLASS` case 成为唯一入口并为类声明绑定 TDZ + 静态字段 helper（含 `OP_set_loc_uninitialized` 与 `OP_define_field` swap 序列），验证 `pnpm -s tsc --noEmit` / CLI compute 通过。
+- [x] 下沉 QuickJS `TOK_CLASS` 的实例字段初始化路径：类 helper 现会收集实例字段并在 constructor 中注入初始化前奏，行为对齐 `class_fields_init` 基础逻辑；`pnpm -s tsc --noEmit` / CLI compute 均回归。
+- [x] 接入私有字段 brand：当类声明含 `#` 成员时，在 `<class_fields_init>` 闭包与 prototype/class 上发射 `OP_add_brand`，并为闭包补齐 `OP_set_home_object`，确保 brand 检查与 QuickJS 行为一致。
+- [x] 私有符号与访问语义：实现 `OP_private_symbol`/`OP_define_private_field` 路径并将 `#` 成员引用挂到 Scope/Atom 表，打通私有字段读写与 `#x in obj` 判定。
+- [x] Serializer/Trace guardrail：扩展 smoke test 覆盖空程序 `.qbc` 与 trace 生成，对接 `scripts/compareWithWasm.ts` / `compareModuleTrace.ts` 自动归档差异。
+- [x] compute 差异归档：将 `pnpm -s start __tests__/compiler/fixtures/compute.ts --disasm --cfg --pc2line --debug` 的等价流程移入 `scripts/runComputeGuardrail.ts`，并新增 guardrail 测试保证 CLI/Bytecode/Trace 工件可重复生成。
+- [x] compute 差异定位：利用 `runComputeGuardrail` 的 disasm/pc2line 找到 PC4 首差（顶层 `const arr` 被当作局部变量），并圈定 QuickJS 参考路径（`js_parse_var` → `OP_scope_put_var_init` → `OP_put_var_ref0`）。
+- [x] compute 模块 lexical → var_ref 修复：模块级 `const/let` 现在会分配专属匿名 local slot 并将闭包变量标记为 `isLocal`，TS 端 `put_var_ref0/get_var_ref_check` 与 QuickJS 完全一致，`closure` 元数据从 `parent loc65535` 修正为 `local loc0`，`compute` guardrail 字节码差异缩小到 11 字节（仅剩 scope 临时 opcode），为后续 scope 清理打下基础。
+- [x] compute pc2line 1 字节差异：重构 `emitLineCol`/`flushLineCol`，改为收集 `LineNumberSlot` 并在 serializer 内复刻 QuickJS `add_pc2line_info`→`compute_pc2line_info` 两阶段编码；`pc2line` 缓冲不再即时写入，待 bytecode 完全对齐即可复用 QuickJS 差分表，无需额外补丁（原 `Remaining difference in compute.ts: 1 byte at start of pc2line table` 已清除）。
 
 **风控 / 依赖**
 

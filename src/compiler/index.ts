@@ -1,9 +1,10 @@
 import * as ts from 'typescript';
 import * as fs from 'fs/promises';
+import path from 'path';
 import { AtomManager, JSAtom, JS_ATOM_NULL } from '../atom';
 import { JSFunctionDef, JSValue, JSVarKind } from '../functionDef';
 import { BytecodeWriter } from '../bytecode';
-import { Opcode, JSMode, PC2Line, FunctionKind } from '../env';
+import { Opcode, JSMode, FunctionKind } from '../env';
 import { ParseState } from './parseState';
 import { ProgramBuilder, SourceElementRecord } from './programBuilder';
 import { LabelManager, PendingLabel } from './labelManager';
@@ -12,6 +13,60 @@ import { StatementEmitter } from './statementEmitter';
 import { ExpressionEmitter } from './expressionEmitter';
 
 import { BytecodeSerializer } from '../serializer';
+import { TraceRecorder, ModuleTraceEventName } from '../trace';
+
+const JS_DEFINE_CLASS_HAS_HERITAGE = 1 << 0;
+const CLASS_FIELDS_INIT_NAME = '<class_fields_init>';
+
+enum DefineMethodKind {
+  METHOD = 0,
+  GETTER = 1,
+  SETTER = 2,
+}
+
+interface InstanceFieldRecord {
+  nameAtom: number;
+  initializer: ts.Expression | null;
+  isPrivate: boolean;
+}
+
+interface PrivateStorageEntry {
+  atom: number;
+  varIdx: number;
+  kind: JSVarKind;
+  isStatic: boolean;
+}
+
+type PrivateBaseKind = 'field' | 'method' | 'accessor';
+
+interface PrivateBaseSlot {
+  atom: number;
+  storage: PrivateStorageEntry;
+  type: PrivateBaseKind;
+  hasGetter: boolean;
+  hasSetter: boolean;
+}
+
+interface ClassCompilationContext {
+  hasHeritage: boolean;
+  instanceFields: InstanceFieldRecord[];
+  fieldsInitFuncIdx: number | null;
+  fieldsInitVarName: string;
+  fieldsInitVarIdx: number;
+  needsInstanceBrand: boolean;
+  needsStaticBrand: boolean;
+  privateScopeLevel: number;
+  privateBases: Map<string, PrivateBaseSlot>;
+  privateStorage: Map<string, PrivateStorageEntry>;
+}
+
+interface MethodFunctionOptions {
+  kind: 'constructor' | 'method' | 'getter' | 'setter';
+  nameHint?: string;
+  isStatic?: boolean;
+  hasHeritage?: boolean;
+  fieldsInitBindingName?: string;
+}
 
 export interface CompilerOptions {
   bigInt?: boolean;
@@ -20,6 +75,7 @@ export interface CompilerOptions {
   debug?: boolean;
   strictMode?: boolean;
   referenceJsSource?: string;
+  traceRecorder?: TraceRecorder;
 }
 
 export class TypeScriptCompiler {
@@ -36,6 +92,8 @@ export class TypeScriptCompiler {
   scopeLevel: number = 1;
   private statementEmitter: StatementEmitter | null = null;
   private expressionEmitter: ExpressionEmitter | null = null;
+  private traceRecorder?: TraceRecorder;
+  private moduleTopLevelSlots: Map<string, number> | null = null;
 
   suppressLineInfo: boolean = false;
   inArgument: boolean = false;
@@ -47,6 +105,11 @@ export class TypeScriptCompiler {
     this.options = options;
     this.labelManager = new LabelManager(() => this.currentFunc);
     this.scopeManager = new ScopeManager(() => this.currentFunc);
+    this.traceRecorder = options.traceRecorder;
+  }
+
+  private recordTrace(event: ModuleTraceEventName, payload: Record<string, unknown> = {}) {
+    this.traceRecorder?.record(event, payload);
   }
 
   private getExpressionEmitter(): ExpressionEmitter {
@@ -63,17 +126,85 @@ export class TypeScriptCompiler {
     return this.statementEmitter;
   }
 
+  private isModuleTopLevel(): boolean {
+    if (!this.currentFunc)
+      return false;
+    return this.currentFunc.parent === null;
+  }
+
+  private isTopLevelStatement(node: ts.Node | undefined): boolean {
+    if (!node)
+      return false;
+    if (!this.isModuleTopLevel())
+      return false;
+    return node.parent !== undefined && node.parent.kind === ts.SyntaxKind.SourceFile;
+  }
+
+  private isTopLevelVariableList(node: ts.VariableDeclarationList): boolean {
+    return this.isTopLevelStatement(node.parent);
+  }
+
+  private ensureModuleTopLevelSlot(name: string): number {
+    if (!this.moduleTopLevelSlots) return -1;
+    if (this.moduleTopLevelSlots.has(name)) {
+      return this.moduleTopLevelSlots.get(name)!;
+    }
+    const slotIdx = this.moduleTopLevelSlots.size;
+    this.moduleTopLevelSlots.set(name, slotIdx);
+    if (this.currentFunc) {
+      this.currentFunc.anonymousLocalsCount = Math.max(
+        this.currentFunc.anonymousLocalsCount,
+        slotIdx + 1,
+      );
+    }
+    return slotIdx;
+  }
+
+  private getModuleTopLevelSlot(name: string): number {
+    if (!this.moduleTopLevelSlots) return -1;
+    const idx = this.moduleTopLevelSlots.get(name);
+    return idx ?? -1;
+  }
+
+  private normalizeFilename(filename: string): string {
+    const cwd = process.cwd();
+    const absolute = path.isAbsolute(filename) ? filename : path.resolve(cwd, filename);
+    const relativePath = path.relative(cwd, absolute);
+    return relativePath || path.basename(absolute);
+  }
+
+  private initializeFunctionDebugInfo(func: JSFunctionDef, startPos: number) {
+    const sourcePos = Math.max(0, startPos);
+    func.initialSourcePos = sourcePos;
+    if (this.sourceFile) {
+      const { line, character } = this.sourceFile.getLineAndCharacterOfPosition(sourcePos);
+      func.initialLineNum = line + 1;
+      func.initialColumnNum = character + 1;
+    } else {
+      func.initialLineNum = 1;
+      func.initialColumnNum = 1;
+    }
+    func.lastLineNum = func.initialLineNum;
+    func.lastColumnNum = func.initialColumnNum;
+    func.pendingLineNum = func.initialLineNum;
+    func.pendingColumnNum = func.initialColumnNum;
+    func.pendingSourcePos = sourcePos;
+    func.pc2lineLastPc = 0;
+    func.lineNumberSlots = [];
+    func.pc2lineFinalized = false;
+  }
+
   private syncScopeLevel() {
     if (this.currentFunc) {
       this.scopeLevel = this.currentFunc.scopeLevel;
     }
   }
 
+
   enterScope(): number {
     const newLevel = this.scopeManager.enterScope();
     if (newLevel >= 0) {
       this.scopeLevel = newLevel;
-      this.emitEnterScopeOpcode(newLevel);
       return newLevel;
     }
     this.scopeLevel++;
@@ -81,31 +212,13 @@ export class TypeScriptCompiler {
   }
 
   leaveScope(): number {
-    const previousScope = this.scopeLevel;
     const newLevel = this.scopeManager.leaveScope();
-    if (this.currentFunc && previousScope >= 0) {
-      this.emitLeaveScopeOpcode(previousScope);
-    }
     if (newLevel >= 0) {
       this.scopeLevel = newLevel;
       return newLevel;
     }
     this.scopeLevel = Math.max(-1, this.scopeLevel - 1);
     return this.scopeLevel;
-  }
-
-  private emitEnterScopeOpcode(scopeIndex: number) {
-    if (!this.currentFunc || scopeIndex < 0)
-      return;
-    this.emitOp(Opcode.OP_enter_scope);
-    this.currentFunc.byteCode.putU16(scopeIndex);
-  }
-
-  private emitLeaveScopeOpcode(scopeIndex: number) {
-    if (!this.currentFunc || scopeIndex < 0)
-      return;
-    this.emitOp(Opcode.OP_leave_scope);
-    this.currentFunc.byteCode.putU16(scopeIndex);
   }
 
   pushBreakableBlock(kind: BlockKind, options: {
@@ -165,14 +278,12 @@ export class TypeScriptCompiler {
   }
 
   private emitCloseScopes(currentScope: number, stopScope: number): number {
-    if (!this.currentFunc)
-      return currentScope;
-    const func = this.currentFunc;
     let scope = currentScope;
     const target = stopScope ?? -1;
     while (scope >= 0 && (target < 0 || scope > target)) {
-      this.emitLeaveScopeOpcode(scope);
-      const parent = func.scopes[scope]?.parent ?? -1;
+      if (!this.currentFunc)
+        break;
+      const parent = this.currentFunc.scopes[scope]?.parent ?? -1;
       scope = parent;
     }
     return scope;
@@ -232,19 +343,22 @@ export class TypeScriptCompiler {
   }
 
   async compileFile(filePath: string): Promise<Uint8Array> {
+    this.recordTrace('resolve-start', { reqCount: 0 });
     const source = await fs.readFile(filePath, 'utf-8');
+    this.recordTrace('resolve-done');
     return this.compile(source, filePath);
   }
 
   async compileFileWithArtifacts(filePath: string): Promise<{ bytecode: Uint8Array, functionDef: JSFunctionDef }> {
-    const source = await fs.readFile(filePath, 'utf-8');
-    const bytecode = this.compile(source, filePath);
+    const bytecode = await this.compileFile(filePath);
     return { bytecode, functionDef: this.currentFunc! };
   }
 
   compile(source: string, filename: string = 'input.ts'): Uint8Array {
-    this.sourceFile = ts.createSourceFile(filename, source, ts.ScriptTarget.Latest, true);
-    this.parseState = new ParseState(this.ctx, source, filename, this.sourceFile);
+    const normalizedFilename = this.normalizeFilename(filename);
+    this.recordTrace('link-start', { status: 0 });
+    this.sourceFile = ts.createSourceFile(normalizedFilename, source, ts.ScriptTarget.Latest, true);
+    this.parseState = new ParseState(this.ctx, source, normalizedFilename, this.sourceFile);
     this.programBuilder = null;
     this.programPlan = null;
     
@@ -260,13 +374,9 @@ export class TypeScriptCompiler {
     globalFunc.argumentsAllowed = true;
     // globalFunc.stackSize = 1; // Manually set for now
     // globalFunc.argCount = 1; // <eval> receives 'this'
-    globalFunc.filename = this.atomManager.add(filename);
+  globalFunc.filename = this.atomManager.add(normalizedFilename);
     
-    // Initialize line info
-    globalFunc.lastLineNum = 1;
-    globalFunc.lastColumnNum = 1;
-    globalFunc.pc2line.writeULEB128(0);
-    globalFunc.pc2line.writeULEB128(0);
+    this.initializeFunctionDebugInfo(globalFunc, 0);
 
   this.currentFunc = globalFunc;
   this.syncScopeLevel();
@@ -280,10 +390,14 @@ export class TypeScriptCompiler {
 
     // Compile program
     this.compileProgram(this.sourceFile);
+    this.recordTrace('link-done', { status: 2 });
 
     // Serialize
+    this.recordTrace('eval-start', { status: 2, isAsync: false, hasTLA: false });
     const serializer = new BytecodeSerializer();
-    return serializer.serialize(this.currentFunc!);
+    const bytecode = serializer.serialize(this.currentFunc!);
+    this.recordTrace('eval-done', { status: 5, bytecodeSize: bytecode.length });
+    return bytecode;
   }
 
   private prePass(sourceFile: ts.SourceFile) {
@@ -331,10 +445,21 @@ export class TypeScriptCompiler {
     block.statements.forEach(stmt => visit(stmt));
   }
 
+  private enterBodyScope(): number {
+    const level = this.enterScope();
+    if (this.currentFunc && this.currentFunc.bodyScope < 0 && level >= 0) {
+      this.currentFunc.bodyScope = level;
+    }
+    return level;
+  }
+
   compileProgram(node: ts.SourceFile) {
-    const programPlan = this.currentFunc?.isGlobalVar ? this.getProgramPlan() : null;
+    const bodyScopeLevel = this.currentFunc ? this.enterBodyScope() : -1;
+    const moduleTopLevel = this.isModuleTopLevel();
+    this.moduleTopLevelSlots = moduleTopLevel ? new Map<string, number>() : null;
+    const programPlan = moduleTopLevel ? this.getProgramPlan() : null;
     // Module boilerplate (simplified)
-    if (this.currentFunc?.isGlobalVar) {
+    if (moduleTopLevel) {
       // this.emitLineCol(0);
       this.emitOp(Opcode.OP_push_this);
       const label = this.newLabel();
@@ -360,6 +485,7 @@ export class TypeScriptCompiler {
 
       // Register and uninitialize top-level block-scoped variables
       const blockScopedVars: { name: string, isConst: boolean }[] = [];
+      const seenBlockScoped = new Set<string>();
       ts.forEachChild(node, n => {
         if (ts.isVariableStatement(n)) {
            const isConst = (n.declarationList.flags & ts.NodeFlags.Const) !== 0;
@@ -368,7 +494,13 @@ export class TypeScriptCompiler {
            if (isConst || isLet) {
              n.declarationList.declarations.forEach(decl => {
                if (ts.isIdentifier(decl.name)) {
-                 blockScopedVars.push({ name: decl.name.text, isConst });
+                 if (!seenBlockScoped.has(decl.name.text)) {
+                   seenBlockScoped.add(decl.name.text);
+                   if (moduleTopLevel) {
+                     this.ensureModuleTopLevelSlot(decl.name.text);
+                   }
+                   blockScopedVars.push({ name: decl.name.text, isConst });
+                 }
                }
              });
            }
@@ -376,23 +508,25 @@ export class TypeScriptCompiler {
       });
 
       // Register them
-      let globalVarIdx = 0;
       blockScopedVars.forEach(v => {
-        if (this.currentFunc?.isGlobalVar) {
-          let localIdx = globalVarIdx++;
-          this.addClosureVar(v.name, v.isConst, true, localIdx);
+        if (moduleTopLevel) {
+          const slotIdx = this.ensureModuleTopLevelSlot(v.name);
+          this.addClosureVar(v.name, v.isConst, true, slotIdx);
         } else {
           if (this.findLocalVar(v.name) === -1) {
             this.addLocalVar(v.name, v.isConst);
           }
         }
       });
-      if (this.currentFunc?.isGlobalVar) {
-        this.currentFunc.anonymousLocalsCount = globalVarIdx;
+      if (moduleTopLevel && this.currentFunc) {
+        this.currentFunc.anonymousLocalsCount = Math.max(
+          this.currentFunc.anonymousLocalsCount,
+          this.moduleTopLevelSlots?.size ?? 0,
+        );
       }
 
       // Emit uninitialization (reverse order to match WASM)
-      if (!this.currentFunc?.isGlobalVar) {
+      if (!moduleTopLevel) {
         for (let i = blockScopedVars.length - 1; i >= 0; i--) {
            const v = blockScopedVars[i];
            const idx = this.findLocalVar(v.name);
@@ -421,6 +555,10 @@ export class TypeScriptCompiler {
       this.emitOp(Opcode.OP_return_async);
     } else {
       ts.forEachChild(node, n => this.compileStatement(n));
+    }
+
+    if (bodyScopeLevel >= 0) {
+      this.leaveScope();
     }
   }
 
@@ -461,6 +599,9 @@ export class TypeScriptCompiler {
         break;
       case ts.SyntaxKind.VariableStatement:
         this.compileVariableStatement(node as ts.VariableStatement);
+        break;
+      case ts.SyntaxKind.ClassDeclaration:
+        this.compileClassDeclaration(node as ts.ClassDeclaration);
         break;
       case ts.SyntaxKind.ExpressionStatement:
         const expr = (node as ts.ExpressionStatement).expression;
@@ -508,10 +649,11 @@ export class TypeScriptCompiler {
   compileFunctionDeclaration(node: ts.FunctionDeclaration) {
     if (!node.name) return;
     const name = node.name.text;
+    const isTopLevel = this.isTopLevelStatement(node);
     
     // 1. Define variable in current scope (if global)
     let varIdx = -1;
-    if (this.currentFunc?.isGlobalVar) {
+    if (isTopLevel) {
       // Function declarations in global scope are not lexical (var-like)
       varIdx = this.addClosureVar(name, false, false);
     }
@@ -526,6 +668,7 @@ export class TypeScriptCompiler {
     funcDef.hasSimpleParameterList = true;
     funcDef.newTargetAllowed = true;
     funcDef.argumentsAllowed = true;
+  this.initializeFunctionDebugInfo(funcDef, node.getStart(this.sourceFile ?? undefined));
     
     // Switch context
     this.currentFunc = funcDef;
@@ -537,14 +680,6 @@ export class TypeScriptCompiler {
         this.addArg(param.name.text);
       }
     });
-    
-    // Initialize line info from node start
-    const { line, character } = this.sourceFile!.getLineAndCharacterOfPosition(node.getStart());
-    funcDef.lastLineNum = line;
-    funcDef.lastColumnNum = character;
-    funcDef.pc2line.writeULEB128(line);
-    funcDef.pc2line.writeULEB128(character);
-    // this.emitLineCol(0); // Removed to avoid redundant pc2line entry at pc=0
     
     // Pre-scan for all variable declarations to ensure atoms are added in correct order
     if (node.body) {
@@ -610,7 +745,7 @@ export class TypeScriptCompiler {
     this.currentFunc!.byteCode.putU8(funcIdx);
     
     // 4. Assign to variable
-    if (this.currentFunc?.isGlobalVar) {
+    if (isTopLevel) {
       this.emitPutVarRef(varIdx);
     } else {
       console.warn('Local function declaration not implemented');
@@ -756,7 +891,7 @@ export class TypeScriptCompiler {
     }
   }
 
-  compileBlock(node: ts.Block) {
+  compileBlock(node: ts.Block, options?: { prelude?: () => void }) {
     this.enterScope();
     const blockScopedVars: { name: string, isConst: boolean }[] = [];
     node.statements.forEach(stmt => {
@@ -783,6 +918,7 @@ export class TypeScriptCompiler {
        this.emitOp(Opcode.OP_set_loc_uninitialized);
        this.currentFunc!.byteCode.putU16(idx);
     }
+   options?.prelude?.();
     node.statements.forEach(stmt => this.compileStatement(stmt));
     this.leaveScope();
   }
@@ -790,7 +926,8 @@ export class TypeScriptCompiler {
   compileVariableDeclarationList(node: ts.VariableDeclarationList) {
     const isConst = (node.flags & ts.NodeFlags.Const) !== 0;
     const isLet = (node.flags & ts.NodeFlags.Let) !== 0;
-    const isBlockScoped = isConst || isLet;
+  const isBlockScoped = isConst || isLet;
+  const isTopLevel = this.isTopLevelVariableList(node);
     
     node.declarations.forEach(decl => {
       if (ts.isIdentifier(decl.name)) {
@@ -798,8 +935,9 @@ export class TypeScriptCompiler {
         
         // Register variable first to ensure atom order matches QuickJS
         let varIdx = -1;
-        if (this.currentFunc?.isGlobalVar) {
-          varIdx = this.addClosureVar(name, isConst, isBlockScoped);
+        if (isTopLevel) {
+          const slotIdx = this.ensureModuleTopLevelSlot(name);
+          varIdx = this.addClosureVar(name, isConst, isBlockScoped, slotIdx);
         } else {
           varIdx = this.findLocalVar(name);
           if (varIdx === -1) {
@@ -810,7 +948,7 @@ export class TypeScriptCompiler {
         if (decl.initializer) {
           this.compileExpression(decl.initializer, false, name);
         } else {
-          if (this.currentFunc?.isGlobalVar) {
+          if (isTopLevel) {
             this.emitOp(Opcode.OP_undefined);
           } else {
             if (!isConst) {
@@ -822,7 +960,7 @@ export class TypeScriptCompiler {
           }
         }
 
-        if (this.currentFunc?.isGlobalVar) {
+        if (isTopLevel) {
           this.emitPutVarRef(varIdx);
         } else {
           this.emitPutLoc(varIdx);
@@ -833,6 +971,789 @@ export class TypeScriptCompiler {
 
   compileVariableStatement(node: ts.VariableStatement) {
     this.compileVariableDeclarationList(node.declarationList);
+  }
+
+  compileClassDeclaration(node: ts.ClassDeclaration) {
+    if (!node.name) {
+      throw new Error('Class declarations must have a name. Anonymous class declarations are not supported yet.');
+    }
+    const bindingIdx = this.ensureClassBinding(node.name.text);
+    this.compileClassExpression(node);
+    this.emitPutLoc(bindingIdx);
+  }
+
+  private compileClassExpression(node: ts.ClassLikeDeclarationBase) {
+    const heritageExpression = this.getHeritageExpression(node);
+    const hasHeritage = !!heritageExpression;
+    const classContext = this.collectClassContext(node, hasHeritage);
+
+    this.enterScope();
+    const privateScopeLevel = this.enterScope();
+    classContext.privateScopeLevel = privateScopeLevel;
+    if (this.currentFunc) {
+      const idx = this.addLocalVar(classContext.fieldsInitVarName, true);
+      classContext.fieldsInitVarIdx = idx;
+      if (idx >= 0) {
+        this.emitOp(Opcode.OP_set_loc_uninitialized);
+        this.currentFunc.byteCode.putU16(idx);
+      }
+    }
+
+    try {
+      this.registerInstancePrivateFields(classContext);
+      classContext.fieldsInitFuncIdx = this.createClassFieldsInitFunction(
+        classContext.instanceFields,
+        { needsInstanceBrand: classContext.needsInstanceBrand },
+        classContext,
+      );
+
+      if (heritageExpression) {
+        this.compileExpression(heritageExpression);
+      } else {
+        this.emitOp(Opcode.OP_undefined);
+      }
+
+      const ctorIdx = this.compileClassConstructor(node, hasHeritage, classContext);
+      this.emitFClosure(ctorIdx);
+
+      const classNameAtom = this.atomManager.add(node.name?.getText() ?? '<anonymous>');
+      const classFlags = hasHeritage ? JS_DEFINE_CLASS_HAS_HERITAGE : 0;
+
+      this.emitOp(Opcode.OP_define_class);
+      this.currentFunc!.byteCode.putU32(classNameAtom);
+      this.currentFunc!.byteCode.putU8(classFlags);
+
+      this.compileClassMembers(node, classContext);
+      this.emitPrototypeBrandingIfNeeded(classContext);
+      this.storeClassFieldsInitBinding(classContext);
+
+      // Drop prototype, leave class constructor on stack for caller.
+      this.emitOp(Opcode.OP_drop);
+      this.emitStaticBrandingIfNeeded(classContext);
+    } finally {
+      this.leaveScope();
+      this.leaveScope();
+    }
+  }
+
+  private collectClassContext(
+    node: ts.ClassLikeDeclarationBase,
+    hasHeritage: boolean,
+  ): ClassCompilationContext {
+    const context: ClassCompilationContext = {
+      hasHeritage,
+      instanceFields: [],
+      fieldsInitFuncIdx: null,
+      fieldsInitVarName: CLASS_FIELDS_INIT_NAME,
+      fieldsInitVarIdx: -1,
+      needsInstanceBrand: false,
+      needsStaticBrand: false,
+      privateScopeLevel: -1,
+      privateBases: new Map(),
+      privateStorage: new Map(),
+    };
+
+    for (const member of node.members) {
+      this.recordPrivateMemberUsage(member, context);
+      if (ts.isPropertyDeclaration(member) && !this.hasStaticModifier(member)) {
+        if (hasHeritage) {
+          throw new Error('Derived class instance fields are not supported yet.');
+        }
+        const nameAtom = this.getPropertyNameAtom(member.name);
+        context.instanceFields.push({
+          nameAtom,
+          initializer: member.initializer ?? null,
+          isPrivate: ts.isPrivateIdentifier(member.name),
+        });
+      }
+    }
+
+    return context;
+  }
+
+  private recordPrivateMemberUsage(member: ts.ClassElement, context: ClassCompilationContext) {
+    const named = member as ts.ClassElement & { name?: ts.PropertyName };
+    const name = named.name;
+    if (!name || !ts.isPrivateIdentifier(name))
+      return;
+    if (this.hasStaticModifier(member)) {
+      context.needsStaticBrand = true;
+    } else {
+      context.needsInstanceBrand = true;
+    }
+  }
+
+  private registerInstancePrivateFields(context: ClassCompilationContext) {
+    for (const field of context.instanceFields) {
+      if (field.isPrivate) {
+        this.registerPrivateField(context, field.nameAtom, false);
+      }
+    }
+  }
+
+  private getPrivateIdentifierAtom(name: ts.PrivateIdentifier): number {
+    return this.atomManager.add(`#${name.text}`);
+  }
+
+  private getPrivateSetterAtom(baseAtom: number): number {
+    const baseName = this.atomManager.getString(baseAtom);
+    return this.atomManager.add(`${baseName}<set>`);
+  }
+
+  private getPrivateStorageKey(atom: number, isStatic: boolean): string {
+    return `${isStatic ? 'S' : 'I'}:${atom}`;
+  }
+
+  private ensurePrivateStorage(
+    context: ClassCompilationContext,
+    atom: number,
+    kind: JSVarKind,
+    isStatic: boolean,
+  ): PrivateStorageEntry {
+    const key = this.getPrivateStorageKey(atom, isStatic);
+    const existing = context.privateStorage.get(key);
+    if (existing) {
+      if (existing.kind !== kind) {
+        this.updatePrivateVarKind(existing.varIdx, kind);
+        existing.kind = kind;
+      }
+      return existing;
+    }
+    const varIdx = this.currentFunc!.addScopeVar(atom, kind, {
+      scopeLevel: context.privateScopeLevel,
+      isConst: true,
+      isLexical: true,
+      isStaticPrivate: isStatic,
+      varKind: kind,
+    });
+    const entry: PrivateStorageEntry = { atom, varIdx, kind, isStatic };
+    context.privateStorage.set(key, entry);
+    return entry;
+  }
+
+  private updatePrivateVarKind(varIdx: number, kind: JSVarKind) {
+    if (!this.currentFunc)
+      return;
+    const def = this.currentFunc.vars[varIdx];
+    if (def) {
+      def.varKind = kind;
+    }
+  }
+
+  private registerPrivateField(
+    context: ClassCompilationContext,
+    atom: number,
+    isStatic: boolean,
+  ) {
+    const key = this.getPrivateStorageKey(atom, isStatic);
+    if (context.privateBases.has(key)) {
+      throw new Error(`Private member '${this.atomManager.getString(atom)}' already defined.`);
+    }
+    const storage = this.ensurePrivateStorage(
+      context,
+      atom,
+      JSVarKind.JS_VAR_PRIVATE_FIELD,
+      isStatic,
+    );
+    this.emitOp(Opcode.OP_private_symbol);
+    this.currentFunc!.byteCode.putU32(atom);
+    this.emitScopePutVarInit(atom, context.privateScopeLevel);
+    context.privateBases.set(key, {
+      atom,
+      storage,
+      type: 'field',
+      hasGetter: false,
+      hasSetter: false,
+    });
+  }
+
+  private registerPrivateMethod(
+    context: ClassCompilationContext,
+    atom: number,
+    isStatic: boolean,
+  ) {
+    const key = this.getPrivateStorageKey(atom, isStatic);
+    if (context.privateBases.has(key)) {
+      throw new Error(`Private member '${this.atomManager.getString(atom)}' already defined.`);
+    }
+    const storage = this.ensurePrivateStorage(
+      context,
+      atom,
+      JSVarKind.JS_VAR_PRIVATE_METHOD,
+      isStatic,
+    );
+    context.privateBases.set(key, {
+      atom,
+      storage,
+      type: 'method',
+      hasGetter: false,
+      hasSetter: false,
+    });
+  }
+
+  private registerPrivateAccessor(
+    context: ClassCompilationContext,
+    atom: number,
+    isStatic: boolean,
+    role: 'get' | 'set',
+  ): number {
+    const key = this.getPrivateStorageKey(atom, isStatic);
+    let slot = context.privateBases.get(key);
+    const initialKind =
+      role === 'get' ? JSVarKind.JS_VAR_PRIVATE_GETTER : JSVarKind.JS_VAR_PRIVATE_SETTER;
+    if (!slot) {
+      const storage = this.ensurePrivateStorage(context, atom, initialKind, isStatic);
+      slot = {
+        atom,
+        storage,
+        type: 'accessor',
+        hasGetter: role === 'get',
+        hasSetter: role === 'set',
+      };
+      context.privateBases.set(key, slot);
+    } else {
+      if (slot.type !== 'accessor') {
+        throw new Error(`Private member '${this.atomManager.getString(atom)}' already defined.`);
+      }
+      if (role === 'get') {
+        if (slot.hasGetter)
+          throw new Error(`Private member '${this.atomManager.getString(atom)}' already defined.`);
+        slot.hasGetter = true;
+      } else {
+        if (slot.hasSetter)
+          throw new Error(`Private member '${this.atomManager.getString(atom)}' already defined.`);
+        slot.hasSetter = true;
+      }
+      const newKind =
+        slot.hasGetter && slot.hasSetter
+          ? JSVarKind.JS_VAR_PRIVATE_GETTER_SETTER
+          : role === 'get'
+            ? JSVarKind.JS_VAR_PRIVATE_GETTER
+            : JSVarKind.JS_VAR_PRIVATE_SETTER;
+      if (slot.storage.kind !== newKind) {
+        this.updatePrivateVarKind(slot.storage.varIdx, newKind);
+        slot.storage.kind = newKind;
+      }
+    }
+    if (role === 'set') {
+      const setterAtom = this.getPrivateSetterAtom(atom);
+      this.ensurePrivateStorage(context, setterAtom, JSVarKind.JS_VAR_PRIVATE_SETTER, isStatic);
+      return setterAtom;
+    }
+    return atom;
+  }
+
+  private emitScopeGetVar(atom: number, scopeLevel: number) {
+    this.emitOp(Opcode.OP_scope_get_var);
+    this.currentFunc!.byteCode.putU32(atom);
+    this.currentFunc!.byteCode.putU16(scopeLevel);
+  }
+
+  private emitScopePutVarInit(atom: number, scopeLevel: number) {
+    this.emitOp(Opcode.OP_scope_put_var_init);
+    this.currentFunc!.byteCode.putU32(atom);
+    this.currentFunc!.byteCode.putU16(scopeLevel);
+  }
+
+  private getFunctionDefFromPool(idx: number): JSFunctionDef | null {
+    if (!this.currentFunc)
+      return null;
+    const entry = this.currentFunc.cpool[idx];
+    if (!entry || entry.type !== 'function')
+      return null;
+    return entry.value as JSFunctionDef;
+  }
+
+  private compileClassMembers(node: ts.ClassLikeDeclarationBase, context: ClassCompilationContext) {
+    for (const member of node.members) {
+      if (ts.isConstructorDeclaration(member)) {
+        continue;
+      }
+      if (ts.isMethodDeclaration(member)) {
+        this.emitClassMethod(member, context);
+        continue;
+      }
+      if (ts.isGetAccessor(member) || ts.isSetAccessor(member)) {
+        this.emitClassAccessor(member as ts.GetAccessorDeclaration | ts.SetAccessorDeclaration, context);
+        continue;
+      }
+      if (ts.isPropertyDeclaration(member)) {
+        const isStatic = this.hasStaticModifier(member);
+        if (isStatic) {
+          if (ts.isPrivateIdentifier(member.name)) {
+            this.emitClassPrivateStaticField(member, context);
+          } else {
+            this.emitClassStaticField(member);
+          }
+        }
+        continue;
+      }
+      if (ts.isSemicolonClassElement(member)) {
+        continue;
+      }
+      console.warn(`Unsupported class member: ${ts.SyntaxKind[member.kind]}`);
+    }
+  }
+
+  private storeClassFieldsInitBinding(context: ClassCompilationContext) {
+    if (!this.currentFunc)
+      return;
+    if (context.fieldsInitVarIdx < 0)
+      return;
+    if (context.fieldsInitFuncIdx != null) {
+      this.emitFClosure(context.fieldsInitFuncIdx);
+      this.emitOp(Opcode.OP_set_home_object);
+    } else {
+      this.emitOp(Opcode.OP_undefined);
+    }
+    this.emitPutLoc(context.fieldsInitVarIdx);
+  }
+
+  private emitInstanceFieldInitializers(
+    instanceFields: InstanceFieldRecord[],
+    context: ClassCompilationContext,
+  ) {
+    if (instanceFields.length === 0)
+      return;
+    this.emitOp(Opcode.OP_push_this);
+    for (const field of instanceFields) {
+      if (field.initializer) {
+        this.compileExpression(field.initializer);
+      } else {
+        this.emitOp(Opcode.OP_undefined);
+      }
+      if (field.isPrivate) {
+        this.emitScopeGetVar(field.nameAtom, context.privateScopeLevel);
+        this.emitOp(Opcode.OP_swap);
+        this.emitOp(Opcode.OP_define_private_field);
+      } else {
+        this.emitOp(Opcode.OP_define_field);
+        this.currentFunc!.byteCode.putU32(field.nameAtom);
+      }
+    }
+    this.emitOp(Opcode.OP_drop);
+  }
+
+  private emitClassFieldsInitCall(bindingName: string) {
+    if (!this.currentFunc)
+      return;
+    const closureIdx = this.findClosureVar(bindingName);
+    if (closureIdx === -1)
+      return;
+    this.emitGetVarRef(closureIdx);
+    this.emitOp(Opcode.OP_dup);
+    const skipLabel = this.newLabel();
+    this.emitJump8(Opcode.OP_if_false8, skipLabel);
+    const thisAtom = this.atomManager.add('this');
+    this.emitOp(Opcode.OP_scope_get_var);
+    this.currentFunc.byteCode.putU32(thisAtom);
+    this.currentFunc.byteCode.putU16(0);
+    this.emitOp(Opcode.OP_swap);
+    this.emitOp(Opcode.OP_call_method);
+    this.currentFunc.byteCode.putU16(0);
+    this.emitLabel(skipLabel);
+    this.emitOp(Opcode.OP_drop);
+  }
+
+  private emitInstanceBrandPrelude() {
+    if (!this.currentFunc)
+      return;
+    const thisAtom = this.atomManager.add('this');
+    this.emitOp(Opcode.OP_scope_get_var);
+    this.currentFunc.byteCode.putU32(thisAtom);
+    this.currentFunc.byteCode.putU16(0);
+
+    const homeObjectAtom = this.atomManager.add('<home_object>');
+    this.emitOp(Opcode.OP_scope_get_var);
+    this.currentFunc.byteCode.putU32(homeObjectAtom);
+    this.currentFunc.byteCode.putU16(0);
+
+    this.emitOp(Opcode.OP_add_brand);
+  }
+
+  private emitPrototypeBrandingIfNeeded(context: ClassCompilationContext) {
+    if (!this.currentFunc)
+      return;
+    if (!context.needsInstanceBrand)
+      return;
+    this.emitOp(Opcode.OP_dup);
+    this.emitOp(Opcode.OP_null);
+    this.emitOp(Opcode.OP_swap);
+    this.emitOp(Opcode.OP_add_brand);
+  }
+
+  private emitStaticBrandingIfNeeded(context: ClassCompilationContext) {
+    if (!this.currentFunc)
+      return;
+    if (!context.needsStaticBrand)
+      return;
+    this.emitOp(Opcode.OP_dup);
+    this.emitOp(Opcode.OP_dup);
+    this.emitOp(Opcode.OP_add_brand);
+  }
+
+  private emitClassMethod(member: ts.MethodDeclaration, context: ClassCompilationContext) {
+    const isStatic = this.hasStaticModifier(member);
+    if (ts.isPrivateIdentifier(member.name)) {
+      this.emitClassPrivateMethod(member, context, isStatic);
+      return;
+    }
+    const methodNameAtom = this.getPropertyNameAtom(member.name);
+    const nameHint = ts.isIdentifier(member.name) ? member.name.text : undefined;
+    const funcIdx = this.compileMethodFunction(member, {
+      kind: 'method',
+      nameHint,
+      isStatic,
+    });
+    this.emitFClosure(funcIdx);
+    if (isStatic)
+      this.emitOp(Opcode.OP_swap);
+    this.emitOp(Opcode.OP_define_method);
+    this.currentFunc!.byteCode.putU32(methodNameAtom);
+    this.currentFunc!.byteCode.putU8(DefineMethodKind.METHOD);
+    if (isStatic)
+      this.emitOp(Opcode.OP_swap);
+  }
+
+  private emitClassAccessor(
+    member: ts.GetAccessorDeclaration | ts.SetAccessorDeclaration,
+    context: ClassCompilationContext,
+  ) {
+    const isStatic = this.hasStaticModifier(member);
+    if (ts.isPrivateIdentifier(member.name)) {
+      this.emitClassPrivateAccessor(member, context, isStatic);
+      return;
+    }
+    const methodNameAtom = this.getPropertyNameAtom(member.name);
+    const kind = ts.isGetAccessorDeclaration(member) ? DefineMethodKind.GETTER : DefineMethodKind.SETTER;
+    const nameHint = ts.isIdentifier(member.name) ? member.name.text : undefined;
+    const funcIdx = this.compileMethodFunction(member, {
+      kind: kind === DefineMethodKind.GETTER ? 'getter' : 'setter',
+      nameHint,
+      isStatic,
+    });
+    this.emitFClosure(funcIdx);
+    if (isStatic)
+      this.emitOp(Opcode.OP_swap);
+    this.emitOp(Opcode.OP_define_method);
+    this.currentFunc!.byteCode.putU32(methodNameAtom);
+    this.currentFunc!.byteCode.putU8(kind);
+    if (isStatic)
+      this.emitOp(Opcode.OP_swap);
+  }
+
+  private emitClassStaticField(member: ts.PropertyDeclaration) {
+    if (!this.hasStaticModifier(member)) {
+      throw new Error('emitClassStaticField requires a static member.');
+    }
+    const fieldNameAtom = this.getPropertyNameAtom(member.name);
+    this.emitOp(Opcode.OP_swap);
+    if (member.initializer) {
+      this.compileExpression(member.initializer);
+    } else {
+      this.emitOp(Opcode.OP_undefined);
+    }
+    this.emitOp(Opcode.OP_define_field);
+    this.currentFunc!.byteCode.putU32(fieldNameAtom);
+    this.emitOp(Opcode.OP_swap);
+  }
+
+  private emitClassPrivateMethod(
+    member: ts.MethodDeclaration,
+    context: ClassCompilationContext,
+    isStatic: boolean,
+  ) {
+    if (!ts.isPrivateIdentifier(member.name))
+      throw new Error('emitClassPrivateMethod requires a private identifier name.');
+    const nameAtom = this.getPrivateIdentifierAtom(member.name);
+    this.registerPrivateMethod(context, nameAtom, isStatic);
+    const funcIdx = this.compileMethodFunction(member, {
+      kind: 'method',
+      isStatic,
+    });
+    this.emitFClosure(funcIdx);
+    const funcDef = this.getFunctionDefFromPool(funcIdx);
+    if (funcDef) {
+      funcDef.needHomeObject = true;
+    }
+    this.emitOp(Opcode.OP_set_home_object);
+    this.emitOp(Opcode.OP_set_name);
+    this.currentFunc!.byteCode.putU32(nameAtom);
+    this.emitScopePutVarInit(nameAtom, context.privateScopeLevel);
+  }
+
+  private emitClassPrivateAccessor(
+    member: ts.GetAccessorDeclaration | ts.SetAccessorDeclaration,
+    context: ClassCompilationContext,
+    isStatic: boolean,
+  ) {
+    if (!ts.isPrivateIdentifier(member.name))
+      throw new Error('emitClassPrivateAccessor requires a private identifier name.');
+    const baseAtom = this.getPrivateIdentifierAtom(member.name);
+    const role = ts.isSetAccessorDeclaration(member) ? 'set' : 'get';
+    const targetAtom = this.registerPrivateAccessor(context, baseAtom, isStatic, role);
+    const funcIdx = this.compileMethodFunction(member, {
+      kind: role === 'set' ? 'setter' : 'getter',
+      isStatic,
+    });
+    this.emitFClosure(funcIdx);
+    const funcDef = this.getFunctionDefFromPool(funcIdx);
+    if (funcDef) {
+      funcDef.needHomeObject = true;
+    }
+    this.emitOp(Opcode.OP_set_home_object);
+    this.emitScopePutVarInit(targetAtom, context.privateScopeLevel);
+  }
+
+  private emitClassPrivateStaticField(
+    member: ts.PropertyDeclaration,
+    context: ClassCompilationContext,
+  ) {
+    if (!this.hasStaticModifier(member) || !ts.isPrivateIdentifier(member.name)) {
+      throw new Error('emitClassPrivateStaticField requires a static private member.');
+    }
+    const fieldNameAtom = this.getPrivateIdentifierAtom(member.name);
+    this.registerPrivateField(context, fieldNameAtom, true);
+    this.emitOp(Opcode.OP_swap);
+    this.emitScopeGetVar(fieldNameAtom, context.privateScopeLevel);
+    if (member.initializer) {
+      this.compileExpression(member.initializer);
+    } else {
+      this.emitOp(Opcode.OP_undefined);
+    }
+    this.emitOp(Opcode.OP_define_private_field);
+    this.emitOp(Opcode.OP_swap);
+  }
+
+  private createClassFieldsInitFunction(
+    instanceFields: InstanceFieldRecord[],
+    options: { needsInstanceBrand?: boolean } = {},
+    context: ClassCompilationContext,
+  ): number | null {
+    const needsBrand = options.needsInstanceBrand ?? false;
+    if (instanceFields.length === 0 && !needsBrand)
+      return null;
+    const parentFunc = this.currentFunc;
+    if (!parentFunc)
+      throw new Error('No active function context');
+
+    const funcDef = new JSFunctionDef(this.ctx, parentFunc);
+    funcDef.funcName = this.atomManager.add('<class_fields_init>');
+    funcDef.filename = parentFunc.filename;
+    funcDef.jsMode = JSMode.JS_MODE_STRICT;
+    funcDef.hasPrototype = false;
+    funcDef.hasSimpleParameterList = true;
+    funcDef.hasThisBinding = true;
+    funcDef.hasHomeObject = true;
+    funcDef.needHomeObject = true;
+    funcDef.newTargetAllowed = false;
+    funcDef.argumentsAllowed = false;
+
+  const startPos = parentFunc.initialSourcePos ?? parentFunc.sourcePos ?? 0;
+  this.initializeFunctionDebugInfo(funcDef, startPos);
+
+    this.currentFunc = funcDef;
+    this.syncScopeLevel();
+
+    if (needsBrand) {
+      this.emitInstanceBrandPrelude();
+    }
+
+  this.emitInstanceFieldInitializers(instanceFields, context);
+    this.emitOp(Opcode.OP_return_undef);
+
+    const childFunc = this.currentFunc;
+    this.currentFunc = parentFunc;
+    this.syncScopeLevel();
+
+    const idx = parentFunc.cpool.push({ type: 'function', value: childFunc! }) - 1;
+    return idx;
+  }
+
+  private compileClassConstructor(
+    node: ts.ClassLikeDeclarationBase,
+    hasHeritage: boolean,
+    context: ClassCompilationContext,
+  ): number {
+    const ctor = node.members.find((m): m is ts.ConstructorDeclaration => ts.isConstructorDeclaration(m));
+    if (!ctor) {
+      throw new Error('Classes without explicit constructor are not supported yet.');
+    }
+    if (hasHeritage) {
+      this.ensureDerivedConstructorHasSuperCall(ctor);
+    }
+    const bindingName = context.fieldsInitVarIdx >= 0 ? context.fieldsInitVarName : undefined;
+    return this.compileMethodFunction(ctor, {
+      kind: 'constructor',
+      nameHint: node.name?.text,
+      hasHeritage,
+      fieldsInitBindingName: bindingName,
+    });
+  }
+
+  private ensureDerivedConstructorHasSuperCall(ctor: ts.ConstructorDeclaration) {
+    if (!ctor.body) {
+      throw new Error('Derived class constructors must call super().');
+    }
+    let found = false;
+    const visit = (node: ts.Node) => {
+      if (found)
+        return;
+      if (ts.isFunctionLike(node) && node !== ctor)
+        return;
+      if (ts.isCallExpression(node) && node.expression.kind === ts.SyntaxKind.SuperKeyword) {
+        found = true;
+        return;
+      }
+      node.forEachChild(visit);
+    };
+    ctor.body.statements.forEach(stmt => stmt.forEachChild(visit));
+    if (!found) {
+      throw new Error('Derived class constructors must call super().');
+    }
+  }
+
+  private compileMethodFunction(
+    node: ts.SignatureDeclarationBase & { body?: ts.Block | ts.Expression },
+    options: MethodFunctionOptions,
+  ): number {
+    const parentFunc = this.currentFunc;
+    if (!parentFunc)
+      throw new Error('No active function context');
+
+    const funcDef = new JSFunctionDef(this.ctx, parentFunc);
+    if (options.nameHint) {
+      funcDef.funcName = this.atomManager.add(options.nameHint);
+    }
+    funcDef.filename = parentFunc.filename;
+    funcDef.jsMode = JSMode.JS_MODE_STRICT;
+    funcDef.hasPrototype = false;
+    funcDef.hasSimpleParameterList = true;
+    funcDef.hasThisBinding = true;
+    funcDef.hasHomeObject = true;
+    funcDef.needHomeObject = !options.isStatic;
+    funcDef.newTargetAllowed = options.kind === 'constructor';
+    funcDef.argumentsAllowed = true;
+
+    if (options.kind === 'constructor') {
+      funcDef.superCallAllowed = !!options.hasHeritage;
+      funcDef.isDerivedClassConstructor = !!options.hasHeritage;
+    } else {
+      funcDef.superAllowed = true;
+    }
+
+    const sourceFile = this.sourceFile ?? undefined;
+    const sourcePos = node.getStart(sourceFile);
+    this.initializeFunctionDebugInfo(funcDef, sourcePos);
+
+    this.currentFunc = funcDef;
+    this.syncScopeLevel();
+
+    node.parameters.forEach(param => {
+      if (!ts.isIdentifier(param.name)) {
+        throw new Error('Only simple identifier parameters are supported in class methods for now.');
+      }
+      this.addArg(param.name.text);
+    });
+
+    if (options.kind === 'constructor') {
+      if (options.hasHeritage) {
+        this.emitOp(Opcode.OP_init_ctor);
+      } else {
+        this.emitOp(Opcode.OP_check_ctor);
+      }
+    }
+
+    const needsClassFieldInitCall =
+      options.kind === 'constructor' && !!options.fieldsInitBindingName;
+    let emitFieldPrelude: (() => void) | undefined;
+    if (needsClassFieldInitCall && options.fieldsInitBindingName) {
+      const bindingName = options.fieldsInitBindingName;
+      this.resolveVarInFunc(funcDef, bindingName);
+      emitFieldPrelude = () => this.emitClassFieldsInitCall(bindingName);
+    }
+
+    if (node.body) {
+      if (ts.isBlock(node.body)) {
+        this.compileBlock(node.body, emitFieldPrelude ? { prelude: emitFieldPrelude } : undefined);
+      } else {
+        emitFieldPrelude?.();
+        this.compileExpression(node.body, true);
+        if (!this.isReturnOp(this.currentFunc!.lastOp)) {
+          this.emitOp(Opcode.OP_return);
+        }
+      }
+    } else if (emitFieldPrelude) {
+      emitFieldPrelude();
+    }
+
+    const lastOp = this.currentFunc!.byteCode.lastByte;
+    if (!this.isReturnOp(lastOp)) {
+      if (options.kind === 'constructor') {
+        this.emitOp(Opcode.OP_undefined);
+        this.emitOp(Opcode.OP_return);
+      } else {
+        this.emitOp(Opcode.OP_return_undef);
+      }
+    }
+
+    const childFunc = this.currentFunc;
+    this.currentFunc = parentFunc;
+    this.syncScopeLevel();
+
+    const idx = parentFunc.cpool.push({ type: 'function', value: childFunc! }) - 1;
+    return idx;
+  }
+
+  private emitFClosure(idx: number) {
+    if (idx < 256) {
+      this.emitOp(Opcode.OP_fclosure8);
+      this.currentFunc!.byteCode.putU8(idx);
+    } else {
+      this.emitOp(Opcode.OP_fclosure);
+      this.currentFunc!.byteCode.putU32(idx);
+    }
+  }
+
+  private hasStaticModifier(node: ts.Node): boolean {
+    const modifiers = (node as ts.Node & { modifiers?: ts.NodeArray<ts.Modifier> }).modifiers;
+    return !!modifiers?.some((mod: ts.Modifier) => mod.kind === ts.SyntaxKind.StaticKeyword);
+  }
+
+  private getPropertyNameAtom(name: ts.PropertyName): number {
+    if (ts.isIdentifier(name)) {
+      return this.atomManager.add(name.text);
+    }
+    if (ts.isStringLiteral(name)) {
+      return this.atomManager.add(name.text);
+    }
+    if (ts.isPrivateIdentifier(name)) {
+      return this.getPrivateIdentifierAtom(name);
+    }
+    throw new Error('Only identifier and string literal property names are supported for class members.');
+  }
+
+  private getHeritageExpression(node: ts.ClassLikeDeclarationBase): ts.Expression | null {
+    if (!node.heritageClauses)
+      return null;
+    for (const clause of node.heritageClauses) {
+      if (clause.token === ts.SyntaxKind.ExtendsKeyword && clause.types.length > 0) {
+        return clause.types[0].expression;
+      }
+    }
+    return null;
+  }
+
+  private ensureClassBinding(name: string): number {
+    const existing = this.findLocalVar(name);
+    if (existing !== -1)
+      return existing;
+    const idx = this.addLocalVar(name, true);
+    if (this.currentFunc) {
+      this.emitOp(Opcode.OP_set_loc_uninitialized);
+      this.currentFunc.byteCode.putU16(idx);
+    }
+    return idx;
   }
 
   compileForStatement(node: ts.ForStatement, labelName?: string) {
@@ -909,10 +1830,12 @@ export class TypeScriptCompiler {
   }
 
 
-  private isReturnOp(op: number): boolean {
-    return op === Opcode.OP_return || 
-           op === Opcode.OP_return_undef || 
-           op === Opcode.OP_return_async || 
+  private isReturnOp(op?: number): boolean {
+    if (op === undefined)
+      return false;
+    return op === Opcode.OP_return ||
+           op === Opcode.OP_return_undef ||
+           op === Opcode.OP_return_async ||
            op === Opcode.OP_throw ||
            op === Opcode.OP_tail_call;
   }
@@ -922,20 +1845,20 @@ export class TypeScriptCompiler {
   }
 
   compileExpression(node: ts.Expression, isTail: boolean = false, nameHint?: string, dropResult: boolean = false) {
+    const isIncDecUpdate =
+      (ts.isPrefixUnaryExpression(node) || ts.isPostfixUnaryExpression(node)) &&
+      (node.operator === ts.SyntaxKind.PlusPlusToken || node.operator === ts.SyntaxKind.MinusMinusToken);
+
+    if (dropResult && isIncDecUpdate) {
+      this.compileUpdateExpression(node as ts.PrefixUnaryExpression | ts.PostfixUnaryExpression, true);
+      return;
+    }
+
     if (this.getExpressionEmitter().emit(node, { isTail, nameHint, dropResult })) {
       if (dropResult) {
         this.emitOp(Opcode.OP_drop);
       }
       return;
-    }
-
-    if (dropResult) {
-        if (ts.isPrefixUnaryExpression(node) || ts.isPostfixUnaryExpression(node)) {
-             if (node.operator === ts.SyntaxKind.PlusPlusToken || node.operator === ts.SyntaxKind.MinusMinusToken) {
-                 this.compileUpdateExpression(node, true);
-                 return;
-             }
-        }
     }
 
     // this.emitLineCol(node.getStart()); // Removed to match QuickJS behavior (only specific expressions emit line info)
@@ -1308,6 +2231,14 @@ export class TypeScriptCompiler {
 
   compilePropertyAccessExpression(node: ts.PropertyAccessExpression) {
     this.compileExpression(node.expression);
+    if (ts.isPrivateIdentifier(node.name)) {
+      const atom = this.getPrivateIdentifierAtom(node.name);
+      this.emitLineCol(node.expression.end);
+      this.emitOp(Opcode.OP_scope_get_private_field);
+      this.currentFunc!.byteCode.putU32(atom);
+      this.currentFunc!.byteCode.putU16(this.scopeLevel);
+      return;
+    }
     const name = node.name.text;
     const atom = this.atomManager.add(name);
     this.emitLineCol(node.expression.end);
@@ -1327,15 +2258,27 @@ export class TypeScriptCompiler {
   }
 
   compileCallExpression(node: ts.CallExpression, isTail: boolean = false) {
+    if (node.expression.kind === ts.SyntaxKind.SuperKeyword) {
+      this.compileSuperCall(node);
+      return;
+    }
     if (ts.isPropertyAccessExpression(node.expression)) {
       // Method call: obj.method(args)
       const propAccess = node.expression;
       this.compileExpression(propAccess.expression); // obj
-      const name = propAccess.name.text;
-      const atom = this.atomManager.add(name);
-      this.emitLineCol(propAccess.expression.end);
-      this.emitOp(Opcode.OP_get_field2);
-      this.currentFunc!.byteCode.putU32(atom);
+      if (ts.isPrivateIdentifier(propAccess.name)) {
+        const atom = this.getPrivateIdentifierAtom(propAccess.name);
+        this.emitLineCol(propAccess.expression.end);
+        this.emitOp(Opcode.OP_scope_get_private_field2);
+        this.currentFunc!.byteCode.putU32(atom);
+        this.currentFunc!.byteCode.putU16(this.scopeLevel);
+      } else {
+        const name = propAccess.name.text;
+        const atom = this.atomManager.add(name);
+        this.emitLineCol(propAccess.expression.end);
+        this.emitOp(Opcode.OP_get_field2);
+        this.currentFunc!.byteCode.putU32(atom);
+      }
       
       node.arguments.forEach(arg => {
         const oldInArg = this.inArgument;
@@ -1381,6 +2324,31 @@ export class TypeScriptCompiler {
     }
   }
 
+  private compileSuperCall(node: ts.CallExpression) {
+    const thisActiveAtom = this.atomManager.add('this.active_func');
+    this.emitOp(Opcode.OP_scope_get_var);
+    this.currentFunc!.byteCode.putU32(thisActiveAtom);
+    this.currentFunc!.byteCode.putU16(0);
+
+    this.emitOp(Opcode.OP_get_super);
+
+    const newTargetAtom = this.atomManager.add('new.target');
+    this.emitOp(Opcode.OP_scope_get_var);
+    this.currentFunc!.byteCode.putU32(newTargetAtom);
+    this.currentFunc!.byteCode.putU16(0);
+
+    node.arguments.forEach(arg => this.compileExpression(arg));
+
+    this.emitOp(Opcode.OP_call_constructor);
+    this.currentFunc!.byteCode.putU16(node.arguments.length);
+
+    const thisAtom = this.atomManager.add('this');
+    this.emitOp(Opcode.OP_dup);
+    this.emitOp(Opcode.OP_scope_put_var_init);
+    this.currentFunc!.byteCode.putU32(thisAtom);
+    this.currentFunc!.byteCode.putU16(0);
+  }
+
   compileAssignment(left: ts.Expression, right: ts.Expression) {
     if (ts.isIdentifier(left)) {
       const name = left.text;
@@ -1420,10 +2388,17 @@ export class TypeScriptCompiler {
       this.compileExpression(right);
       this.emitOp(Opcode.OP_dup);
       this.emitOp(Opcode.OP_perm3);
-      const name = left.name.text;
-      const atom = this.atomManager.add(name);
-      this.emitOp(Opcode.OP_put_field);
-      this.currentFunc!.byteCode.putU32(atom);
+      if (ts.isPrivateIdentifier(left.name)) {
+        const atom = this.getPrivateIdentifierAtom(left.name);
+        this.emitOp(Opcode.OP_scope_put_private_field);
+        this.currentFunc!.byteCode.putU32(atom);
+        this.currentFunc!.byteCode.putU16(this.scopeLevel);
+      } else {
+        const name = left.name.text;
+        const atom = this.atomManager.add(name);
+        this.emitOp(Opcode.OP_put_field);
+        this.currentFunc!.byteCode.putU32(atom);
+      }
     } else {
       console.warn("Unsupported assignment target");
     }
@@ -1432,6 +2407,19 @@ export class TypeScriptCompiler {
   compileBinaryExpression(node: ts.BinaryExpression) {
     if (node.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
       this.compileAssignment(node.left, node.right);
+      return;
+    }
+
+    if (
+      node.operatorToken.kind === ts.SyntaxKind.InKeyword &&
+      ts.isPrivateIdentifier(node.left)
+    ) {
+      this.compileExpression(node.right);
+      const atom = this.getPrivateIdentifierAtom(node.left as ts.PrivateIdentifier);
+      this.emitLineCol(node.operatorToken.getStart());
+      this.emitOp(Opcode.OP_scope_in_private_field);
+      this.currentFunc!.byteCode.putU32(atom);
+      this.currentFunc!.byteCode.putU16(this.scopeLevel);
       return;
     }
 
@@ -1880,9 +2868,9 @@ export class TypeScriptCompiler {
     if (this.suppressLineInfo) return;
     if (this.sourceFile && this.currentFunc) {
       const { line, character } = this.sourceFile.getLineAndCharacterOfPosition(pos);
-      // console.log(`emitLineCol: pos=${pos} -> ${line + 1}:${character + 1}`);
       this.currentFunc.pendingLineNum = line + 1;
-      this.currentFunc.pendingColumnNum = character + 1;
+      this.currentFunc.pendingColumnNum = Math.max(1, character + 1 + colOffset);
+      this.currentFunc.pendingSourcePos = pos;
       this.currentFunc.hasPendingLineInfo = true;
     }
   }
@@ -1901,56 +2889,26 @@ export class TypeScriptCompiler {
   private flushLineCol() {
     const func = this.currentFunc;
     if (!func || !func.hasPendingLineInfo) return;
-    
     const pc = func.byteCode.size;
     const lineNum = func.pendingLineNum;
     const columnNum = func.pendingColumnNum;
-    
+    const sourcePos = func.pendingSourcePos;
     func.hasPendingLineInfo = false;
 
-    if (func.pc2line.size === 0) {
-      func.pc2line.writeULEB128(0);
-      func.pc2line.writeULEB128(0);
-      func.pc2lineLastPc = 0;
-      func.lastLineNum = 0;
-      func.lastColumnNum = 0;
+    if (!func.lineNumberSlots) {
+      func.lineNumberSlots = [];
     }
 
-    if (lineNum !== func.lastLineNum || pc !== func.pc2lineLastPc || columnNum !== func.lastColumnNum) {
-      let diffPc = pc - func.pc2lineLastPc;
-      let diffLine = lineNum - func.lastLineNum;
-      let diffCol = columnNum - func.lastColumnNum;
-
-      if (diffLine === 0 && diffCol === 0) {
-        func.hasPendingLineInfo = false;
-        return;
-      }
-        
-      let op = 0;
-      const BASE = PC2Line.PC2LINE_BASE;
-      if (diffLine >= BASE && 
-        diffLine < BASE + PC2Line.PC2LINE_RANGE &&
-        diffPc <= PC2Line.PC2LINE_DIFF_PC_MAX) {
-        op = PC2Line.PC2LINE_OP_FIRST + diffPc * PC2Line.PC2LINE_RANGE + (diffLine - BASE);
-        if (op > 255) op = 0; 
-      }
-        
-      if (op !== 0) {
-        func.pc2line.putU8(op);
-        func.pc2line.writeZigZag(diffCol);
-      } else {
-        // Long encoding
-        func.pc2line.putU8(0);
-        func.pc2line.writeULEB128(diffPc);
-        func.pc2line.writeZigZag(diffLine);
-        func.pc2line.writeZigZag(diffCol);
-      }
-      
-      func.lastLineNum = lineNum;
-      func.lastColumnNum = columnNum;
-      func.pc2lineLastPc = pc;
+    const slots = func.lineNumberSlots;
+    const lastSlot = slots[slots.length - 1];
+    if (lastSlot && lastSlot.pc === pc) {
+      lastSlot.sourcePos = sourcePos;
+      lastSlot.line = lineNum;
+      lastSlot.column = columnNum;
+      return;
     }
-    func.hasPendingLineInfo = false;
+
+    slots.push({ pc, sourcePos, line: lineNum, column: columnNum });
   }
 
   compileForOfStatement(node: ts.ForOfStatement, labelName?: string) {
@@ -2011,6 +2969,9 @@ export class TypeScriptCompiler {
     this.currentFunc!.byteCode.putU8(0);
     
     this.emitJump8(Opcode.OP_if_false8, labelBody);
+    // QuickJS drops the undefined value that remains on the stack when
+    // for_of_next indicates completion before closing the iterator.
+    this.emitOp(Opcode.OP_drop);
     
     // 5. Exit
   this.emitOp(Opcode.OP_iterator_close);
@@ -2045,23 +3006,19 @@ export class TypeScriptCompiler {
     funcDef.newTargetAllowed = false;
     funcDef.argumentsAllowed = true;
     
+    const startPos = node.getStart(this.sourceFile ?? undefined);
+    this.initializeFunctionDebugInfo(funcDef, startPos);
+
     // Switch context
     this.currentFunc = funcDef;
     this.syncScopeLevel();
 
     // Set args
-    node.parameters.forEach((param, index) => {
+    node.parameters.forEach((param) => {
       if (ts.isIdentifier(param.name)) {
         this.addArg(param.name.text);
       }
     });
-    
-    // Initialize line info from node start
-    const { line, character } = this.sourceFile!.getLineAndCharacterOfPosition(node.getStart());
-    funcDef.lastLineNum = line;
-    funcDef.lastColumnNum = character;
-    funcDef.pc2line.writeULEB128(line);
-    funcDef.pc2line.writeULEB128(character);
     
     // Compile body
     if (ts.isBlock(node.body)) {
@@ -2110,23 +3067,18 @@ export class TypeScriptCompiler {
     funcDef.newTargetAllowed = true;
     funcDef.argumentsAllowed = true;
     
+    this.initializeFunctionDebugInfo(funcDef, node.getStart(this.sourceFile ?? undefined));
+
     // Switch context
     this.currentFunc = funcDef;
     this.syncScopeLevel();
     
     // Set args
-    node.parameters.forEach((param, index) => {
+    node.parameters.forEach((param) => {
       if (ts.isIdentifier(param.name)) {
         this.addArg(param.name.text);
       }
     });
-    
-    // Initialize line info from node
-    const { line, character } = this.sourceFile!.getLineAndCharacterOfPosition(node.getStart());
-    funcDef.lastLineNum = line;
-    funcDef.lastColumnNum = character;
-    funcDef.pc2line.writeULEB128(line);
-    funcDef.pc2line.writeULEB128(character);
     
     // Compile body
     this.compileBlock(node.body)

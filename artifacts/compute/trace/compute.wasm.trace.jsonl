@@ -1,0 +1,6 @@
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/compute.js","event":"resolve-start","timestamp":"2025-12-02T08:29:18.557Z","reqCount":0}
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/compute.js","event":"resolve-done","timestamp":"2025-12-02T08:29:18.558Z"}
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/compute.js","event":"link-start","timestamp":"2025-12-02T08:29:18.558Z","status":0}
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/compute.js","event":"link-done","timestamp":"2025-12-02T08:29:18.573Z","status":2}
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/compute.js","event":"eval-start","timestamp":"2025-12-02T08:29:18.573Z","status":2,"isAsync":false,"hasTLA":false}
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/compute.js","event":"eval-done","timestamp":"2025-12-02T08:29:18.573Z","status":5,"bytecodeSize":155}

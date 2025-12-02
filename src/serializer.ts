@@ -1,7 +1,55 @@
 import { JSFunctionDef, JSVarDef, JSClosureVar, JSValue, JSVarKind } from './functionDef'
 import { BytecodeWriter } from './bytecode'
 import { AtomManager, JSAtom } from './atom'
-import { BytecodeTag, env, OPCODE_DEFS, OPCODE_NAME_TO_CODE, OpFormat } from './env'
+import {
+  BytecodeTag,
+  env,
+  OPCODE_DEFS,
+  Opcode,
+  OpFormat,
+  PC2Line,
+  SHORT_OPCODE_DEFS,
+} from './env'
+
+type OpcodeDefinitionByCode = Array<typeof OPCODE_DEFS[string] | undefined>
+
+const opcodeDefsByCode: OpcodeDefinitionByCode = (() => {
+  const table: OpcodeDefinitionByCode = []
+  const opcodeMap = Opcode as unknown as Record<string, number>
+
+  for (const [name, def] of Object.entries(OPCODE_DEFS)) {
+    const code = opcodeMap[name]
+    if (typeof code === 'number') {
+      table[code] = def
+    }
+  }
+
+  for (const [name, def] of Object.entries(SHORT_OPCODE_DEFS)) {
+    const code = opcodeMap[name]
+    if (typeof code === 'number') {
+      table[code] = def
+    }
+  }
+
+  return table
+})()
+
+const readU16 = (buf: Uint8Array, offset: number): number =>
+  buf[offset] | (buf[offset + 1] << 8)
+
+const readI16 = (value: number): number => (value << 16) >> 16
+
+const readI8 = (value: number): number => (value << 24) >> 24
+
+const readI32 = (buf: Uint8Array, offset: number): number =>
+  (buf[offset] |
+    (buf[offset + 1] << 8) |
+    (buf[offset + 2] << 16) |
+    (buf[offset + 3] << 24))
+
+const opcodeNamesByCode = Opcode as unknown as Record<number, string>
+
+const getOpcodeName = (op: number): string => opcodeNamesByCode[op] ?? `op_${op}`
 
 export class BytecodeSerializer {
   private writer: BytecodeWriter
@@ -71,123 +119,277 @@ export class BytecodeSerializer {
     this.writeFunction(out, func);
   }
 
-  private computeMaxStack(buf: Uint8Array): number {
-    // Build code->def map once
-    const codeToDef: Record<number, any> = {};
-    for (const [name, def] of Object.entries(OPCODE_DEFS)) {
-      const code = (OPCODE_NAME_TO_CODE as Record<string, number>)[name.replace(/OP_/, '')] ?? (OPCODE_NAME_TO_CODE as Record<string, number>)[name];
-      if (typeof code === 'number') {
-        codeToDef[code] = def;
+  private finalizePc2Line(func: JSFunctionDef) {
+    if (func.pc2lineFinalized)
+      return;
+
+    if (func.hasPendingLineInfo) {
+      const pc = func.byteCode.size;
+      func.lineNumberSlots.push({
+        pc,
+        sourcePos: func.pendingSourcePos,
+        line: func.pendingLineNum,
+        column: func.pendingColumnNum,
+      });
+      func.hasPendingLineInfo = false;
+    }
+
+    const slots = func.lineNumberSlots ?? [];
+    func.pc2line.reset();
+
+    const initialLine = Math.max(0, func.initialLineNum - 1);
+    const initialCol = Math.max(0, func.initialColumnNum - 1);
+    func.pc2line.writeULEB128(initialLine);
+    func.pc2line.writeULEB128(initialCol);
+
+    let lastPc = 0;
+    let lastLine = initialLine;
+    let lastCol = initialCol;
+
+    for (const slot of slots) {
+      const diffPc = slot.pc - lastPc;
+      if (diffPc < 0)
+        continue;
+
+      const slotLine = Math.max(0, slot.line - 1);
+      const slotCol = Math.max(0, slot.column - 1);
+      const diffLine = slotLine - lastLine;
+      const diffCol = slotCol - lastCol;
+
+      if (diffLine === 0 && diffCol === 0)
+        continue;
+
+      let op = 0;
+      if (
+        diffLine >= PC2Line.PC2LINE_BASE &&
+        diffLine < PC2Line.PC2LINE_BASE + PC2Line.PC2LINE_RANGE &&
+        diffPc <= PC2Line.PC2LINE_DIFF_PC_MAX
+      ) {
+        op =
+          PC2Line.PC2LINE_OP_FIRST +
+          diffPc * PC2Line.PC2LINE_RANGE +
+          (diffLine - PC2Line.PC2LINE_BASE);
+      }
+
+      if (op > 0 && op <= 0xff) {
+        func.pc2line.putU8(op);
       } else {
-        const alt = (OPCODE_NAME_TO_CODE as Record<string, number>)[name];
-        if (typeof alt === 'number') codeToDef[alt] = def;
+        func.pc2line.putU8(0);
+        func.pc2line.writeULEB128(diffPc);
+        func.pc2line.writeZigZag(diffLine);
+      }
+      func.pc2line.writeZigZag(diffCol);
+
+      lastPc = slot.pc;
+      lastLine = slotLine;
+      lastCol = slotCol;
+    }
+
+    func.pc2lineFinalized = true;
+  }
+
+  private computeMaxStack(buf: Uint8Array): number {
+  const debugStack = process.env.DEBUG_STACK === '1'
+  const verboseStack = process.env.DEBUG_STACK_VERBOSE === '1'
+    const len = buf.length
+    if (len === 0) return 0
+
+    const stackLevels = new Map<number, number>()
+    const catchPositions = new Map<number, number>()
+    const queue: number[] = []
+    let max = 0
+
+    const trackMax = (depth: number, pos: number, opLabel: string) => {
+      if (depth > max) {
+        max = depth
+        if (debugStack) {
+          console.debug('[stack]', { pos, op: opLabel, depth })
+        }
       }
     }
 
-    const depths = new Map<number, number>();
-    const queue: number[] = [0];
-    depths.set(0, 0);
-    
-    let max = 0;
-    const len = buf.length;
+    const enqueue = (pos: number, depth: number, catchPos: number, sourceOp: number) => {
+      if (pos < 0 || pos > len) {
+        throw new Error(
+          `bytecode jump out of range (op=${getOpcodeName(sourceOp)}, target=${pos})`,
+        )
+      }
+      if (pos === len) {
+        return
+      }
+      const existingDepth = stackLevels.get(pos)
+      if (existingDepth !== undefined) {
+        const existingCatch = catchPositions.get(pos) ?? -1
+        if (existingDepth !== depth || existingCatch !== catchPos) {
+          throw new Error(`inconsistent stack state at pc=${pos}`)
+        }
+        return
+      }
+      stackLevels.set(pos, depth)
+      catchPositions.set(pos, catchPos)
+      queue.push(pos)
+      trackMax(depth, pos, getOpcodeName(sourceOp))
+    }
+
+    enqueue(0, 0, -1, Opcode.OP_invalid)
 
     while (queue.length > 0) {
-      let pos = queue.shift()!;
-      let cur = depths.get(pos)!;
+      const pos = queue.pop()!
+      let stackLen = stackLevels.get(pos) ?? 0
+      let catchPos = catchPositions.get(pos) ?? -1
 
-      while (pos < len) {
-        const op = buf[pos];
-        const def = codeToDef[op];
-        if (!def) break;
+      if (pos >= len)
+        continue
 
-        let nPop = def.nPop;
-        const nPush = def.nPush;
-        const startPos = pos;
-        pos++; // skip op
+      const op = buf[pos]
+      const def = opcodeDefsByCode[op]
+      if (!def)
+        throw new Error(`unknown opcode ${op} at pc=${pos}`)
 
-        // Handle special formats
-        if (def.format === OpFormat.npop) {
-          if (pos + 1 >= len) break;
-          const imm = buf[pos] | (buf[pos + 1] << 8);
-          pos += 2;
-          nPop = imm;
-          switch (def.id) {
-            case 'call':
-            case 'tail_call':
-            case 'call_constructor':
-            case 'eval':
-              nPop += 1;
-              break;
-            case 'call_method':
-            case 'tail_call_method':
-              nPop += 2;
-              break;
-          }
-        } else if (def.format === OpFormat.npopx) {
-          if (def.id === 'call1') nPop += 1;
-          else if (def.id === 'call2') nPop += 2;
-          else if (def.id === 'call3') nPop += 3;
-        } else if (def.format === OpFormat.npop_u16) {
-          if (pos + 3 >= len) break;
-          const argc = buf[pos] | (buf[pos + 1] << 8);
-          pos += 4;
-          nPop = argc + 1;
-        } else if (def.id === 'call' || def.id === 'call_method' || def.id === 'tail_call' || def.id === 'tail_call_method' || def.id === 'call_constructor') {
-          if (pos + 1 >= len) break;
-          const argc = buf[pos] | (buf[pos + 1] << 8);
-          pos += 2;
-          nPop = argc;
-          if (def.id === 'call' || def.id === 'tail_call' || def.id === 'call_constructor') nPop += 1;
-          if (def.id === 'call_method' || def.id === 'tail_call_method') nPop += 2;
-        } else {
-          const extra = Math.max(0, def.size - 1);
-          pos += extra;
+      const opName = def.id ?? getOpcodeName(op)
+      let posNext = pos + def.size
+      if (posNext > len)
+        throw new Error(`bytecode overflow for ${opName} at pc=${pos}`)
+
+      let nPop = def.nPop
+      switch (def.format) {
+        case OpFormat.npop:
+        case OpFormat.npop_u16: {
+          if (pos + 2 >= len)
+            throw new Error(`truncated bytecode for ${opName} at pc=${pos}`)
+          const imm = readU16(buf, pos + 1)
+          nPop += imm
+          break
         }
-
-        cur = cur - nPop + nPush;
-        if (cur > max) max = cur;
-
-        // Handle branches
-        if (def.id === 'goto8' || def.id === 'if_false8' || def.id === 'if_true8') {
-          const offset = (buf[startPos + 1] << 24) >> 24; // signed i8
-          const target = startPos + 1 + offset;
-          if (!depths.has(target)) {
-            depths.set(target, cur);
-            queue.push(target);
-          }
-        } else if (def.id === 'goto' || def.id === 'if_false' || def.id === 'if_true' || def.id === 'catch' || def.id === 'gosub') {
-          const offset = buf[startPos + 1] | (buf[startPos + 2] << 8) | (buf[startPos + 3] << 16) | (buf[startPos + 4] << 24);
-          const signedOffset = offset | 0;
-          const target = startPos + 1 + signedOffset;
-          
-          let targetStack = cur;
-          if (def.id === 'gosub') {
-            // Heuristic: WASM output suggests gosub overhead is 1 (or catch overhead is 0)
-            // If we use +2, we get stack size 6. WASM has 5.
-            targetStack = cur + 1;
-          }
-
-          if (!depths.has(target)) {
-            depths.set(target, targetStack);
-            queue.push(target);
-          }
-        }
-        
-        // Stop if unconditional jump
-        if (def.id === 'goto8' || def.id === 'goto' || def.id === 'return' || def.id === 'return_undef' || def.id === 'return_async' || def.id === 'throw' || def.id === 'tail_call' || def.id === 'tail_call_method') {
-          break;
-        }
-        
-        // Continue to next instruction
-        if (depths.has(pos)) {
-          // Merge? For now assume consistent stack
-          break;
-        }
-        depths.set(pos, cur);
+        case OpFormat.npopx:
+          nPop += op - Opcode.OP_call0
+          break
       }
+
+      stackLen -= nPop
+      if (stackLen < 0)
+        throw new Error(`stack underflow near ${opName} at pc=${pos}`)
+      stackLen += def.nPush
+      if (verboseStack) {
+        console.debug('[stack:trace]', {
+          pos,
+          op: opName,
+          nPop,
+          nPush: def.nPush,
+          depth: stackLen,
+          catchPos,
+        })
+      }
+      trackMax(stackLen, pos, opName)
+
+      let fallthrough = true
+
+      switch (op) {
+        case Opcode.OP_tail_call:
+        case Opcode.OP_tail_call_method:
+        case Opcode.OP_return:
+        case Opcode.OP_return_undef:
+        case Opcode.OP_return_async:
+        case Opcode.OP_throw:
+        case Opcode.OP_throw_error:
+        case Opcode.OP_ret:
+          fallthrough = false
+          break
+        case Opcode.OP_goto: {
+          const diff = readI32(buf, pos + 1)
+          posNext = pos + 1 + diff
+          break
+        }
+        case Opcode.OP_goto16: {
+          const diff = readI16(readU16(buf, pos + 1))
+          posNext = pos + 1 + diff
+          break
+        }
+        case Opcode.OP_goto8: {
+          const diff = readI8(buf[pos + 1])
+          posNext = pos + 1 + diff
+          break
+        }
+        case Opcode.OP_if_true:
+        case Opcode.OP_if_false: {
+          const diff = readI32(buf, pos + 1)
+          enqueue(pos + 1 + diff, stackLen, catchPos, op)
+          break
+        }
+        case Opcode.OP_if_true8:
+        case Opcode.OP_if_false8: {
+          const diff = readI8(buf[pos + 1])
+          enqueue(pos + 1 + diff, stackLen, catchPos, op)
+          break
+        }
+        case Opcode.OP_gosub: {
+          const diff = readI32(buf, pos + 1)
+          enqueue(pos + 1 + diff, stackLen + 1, catchPos, op)
+          break
+        }
+        case Opcode.OP_with_get_var:
+        case Opcode.OP_with_delete_var: {
+          const diff = readI32(buf, pos + 5)
+          enqueue(pos + 5 + diff, stackLen + 1, catchPos, op)
+          break
+        }
+        case Opcode.OP_with_make_ref:
+        case Opcode.OP_with_get_ref: {
+          const diff = readI32(buf, pos + 5)
+          enqueue(pos + 5 + diff, stackLen + 2, catchPos, op)
+          break
+        }
+        case Opcode.OP_with_put_var: {
+          const diff = readI32(buf, pos + 5)
+          enqueue(pos + 5 + diff, stackLen - 1, catchPos, op)
+          break
+        }
+        case Opcode.OP_catch: {
+          const diff = readI32(buf, pos + 1)
+          enqueue(pos + 1 + diff, stackLen, catchPos, op)
+          catchPos = pos
+          break
+        }
+        case Opcode.OP_for_of_start:
+        case Opcode.OP_for_await_of_start:
+          catchPos = pos
+          break
+        case Opcode.OP_drop:
+        case Opcode.OP_nip:
+        case Opcode.OP_nip1:
+        case Opcode.OP_iterator_close: {
+          let catchLevel = stackLen
+          if (op === Opcode.OP_nip || op === Opcode.OP_nip1)
+            catchLevel = stackLen - 1
+          else if (op === Opcode.OP_iterator_close)
+            catchLevel = stackLen + 2
+          if (catchPos >= 0) {
+            let level = stackLevels.get(catchPos) ?? 0
+            if (buf[catchPos] !== Opcode.OP_catch)
+              level++
+            if (catchLevel === level)
+              catchPos = catchPositions.get(catchPos) ?? -1
+          }
+          break
+        }
+        case Opcode.OP_nip_catch: {
+          if (catchPos < 0)
+            throw new Error(`nip_catch without active catch at pc=${pos}`)
+          stackLen = stackLevels.get(catchPos) ?? 0
+          if (buf[catchPos] !== Opcode.OP_catch)
+            stackLen++
+          stackLen++
+          trackMax(stackLen, pos, opName)
+          catchPos = catchPositions.get(catchPos) ?? -1
+          break
+        }
+      }
+
+      if (fallthrough)
+        enqueue(posNext, stackLen, catchPos, op)
     }
 
-    return max;
+    return max
   }
 
   private getEffectiveStackUsage(func: JSFunctionDef): number {
@@ -236,14 +438,8 @@ export class BytecodeSerializer {
 
   private writeFunction(out: BytecodeWriter, func: JSFunctionDef) {
     const bytecodeStack = this.getEffectiveStackUsage(func);
-    if (func.isGlobalVar) {
-      const computed = Math.max(func.anonymousLocalsCount, bytecodeStack);
-      func.stackSize = Math.max(func.stackSize, computed);
-    } else {
-      const envOverhead = func.args.length + func.vars.length + func.anonymousLocalsCount;
-      const computed = envOverhead + bytecodeStack;
-      func.stackSize = Math.max(func.stackSize, computed);
-    }
+    const requiredStack = Math.max(bytecodeStack, func.anonymousLocalsCount);
+    func.stackSize = Math.max(func.stackSize, requiredStack);
     
     out.putU8(BytecodeTag.TC_TAG_FUNCTION_BYTECODE);
     
@@ -310,6 +506,7 @@ export class BytecodeSerializer {
     
     // Debug info
     if (hasDebug) {
+      this.finalizePc2Line(func);
       const filenameIdx = this.getAtomIndex(func.filename, func.ctx.atomManager);
       this.writeAtomRef(out, filenameIdx);
       

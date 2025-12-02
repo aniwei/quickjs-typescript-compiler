@@ -69,6 +69,8 @@ export interface JSValue {
 export interface LineNumberSlot {
   pc: number;
   sourcePos: number;
+  line: number;
+  column: number;
 }
 
 export interface ColumnNumberSlot {
@@ -201,7 +203,7 @@ export class JSFunctionDef {
   jumpSlots: JumpSlot[] = [];
   lineNumberSlots: LineNumberSlot[] = [];
   columnNumberSlots: ColumnNumberSlot[] = [];
-  lineNumberLast = 0;
+  lineNumberLastSourcePos = 0;
   lineNumberLastPc = 0;
   columnNumberLast = 0;
   columnNumberLastPc = 0;
@@ -213,9 +215,13 @@ export class JSFunctionDef {
   getLineColCache: GetLineColCache = { ptr: 0, lineNum: 0, colNum: 0, bufStart: 0 };
   pc2line: BytecodeWriter;
   pc2column: BytecodeWriter;
-  lastLineNum = 0;
-  lastColumnNum = 0;
+  initialLineNum = 1;
+  initialColumnNum = 1;
+  initialSourcePos = 0;
+  lastLineNum = 1;
+  lastColumnNum = 1;
   pc2lineLastPc = 0;
+  pc2lineFinalized = false;
 
   source: string | null = null;
   sourceLen = 0;
@@ -231,6 +237,7 @@ export class JSFunctionDef {
   argCount = -1;
   pendingLineNum = 0;
   pendingColumnNum = 0;
+  pendingSourcePos = 0;
   hasPendingLineInfo = false;
 
   constructor(ctx: any, parent: JSFunctionDef | null, init: JSFunctionDefInit = {}) {
