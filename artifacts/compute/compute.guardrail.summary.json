@@ -8,10 +8,16 @@
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/compute/cli/compute.pc2line.txt",
     "bytecodeSize": 155,
     "pc2lineLength": 12,
-    "stackMax": 0
+    "stackMax": 0,
+    "temporaryScopeAnalysis": {
+      "hasTemporaryScopeOpcodes": false,
+      "totalCount": 0,
+      "uniqueOpcodes": [],
+      "occurrences": []
+    }
   },
   "bytecode": {
-    "identical": false,
+    "identical": true,
     "tsSize": 155,
     "wasmSize": 155,
     "sizeDiff": 0,

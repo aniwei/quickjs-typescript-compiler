@@ -2,7 +2,7 @@ import * as ts from 'typescript';
 import * as fs from 'fs/promises';
 import path from 'path';
 import { AtomManager, JSAtom, JS_ATOM_NULL } from '../atom';
-import { JSFunctionDef, JSValue, JSVarKind } from '../functionDef';
+import { JSFunctionDef, JSValue, JSVarKind, ModuleExportType, ModuleRecord } from '../functionDef';
 import { BytecodeWriter } from '../bytecode';
 import { Opcode, JSMode, FunctionKind } from '../env';
 import { ParseState } from './parseState';
@@ -13,6 +13,7 @@ import { StatementEmitter } from './statementEmitter';
 import { ExpressionEmitter } from './expressionEmitter';
 
 import { BytecodeSerializer } from '../serializer';
+import { ScopeResolver } from '../scopeResolver';
 import { TraceRecorder, ModuleTraceEventName } from '../trace';
 
 const JS_DEFINE_CLASS_HAS_HERITAGE = 1 << 0;
@@ -47,12 +48,55 @@ interface PrivateBaseSlot {
   hasSetter: boolean;
 }
 
+type PendingStoreKind = 'arg' | 'loc' | 'varRef';
+
+interface PendingStoreRecord {
+  kind: PendingStoreKind;
+  index: number;
+  opcodeOffset: number;
+  setOpcode: Opcode;
+}
+
+interface PendingLineEntry {
+  line: number;
+  column: number;
+  sourcePos: number;
+  pcOverride: number | null;
+  deferUntilStore: boolean;
+}
+
+type TopLevelLexicalEntry =
+  | { kind: 'class'; name: string }
+  | { kind: 'binding'; name: string; isConst: boolean }
+  | { kind: 'function'; name: string };
+
+const PUT_TO_SET_OPCODE: Partial<Record<Opcode, Opcode>> = {
+  [Opcode.OP_put_arg0]: Opcode.OP_set_arg0,
+  [Opcode.OP_put_arg1]: Opcode.OP_set_arg1,
+  [Opcode.OP_put_arg2]: Opcode.OP_set_arg2,
+  [Opcode.OP_put_arg3]: Opcode.OP_set_arg3,
+  [Opcode.OP_put_arg]: Opcode.OP_set_arg,
+  [Opcode.OP_put_loc0]: Opcode.OP_set_loc0,
+  [Opcode.OP_put_loc1]: Opcode.OP_set_loc1,
+  [Opcode.OP_put_loc2]: Opcode.OP_set_loc2,
+  [Opcode.OP_put_loc3]: Opcode.OP_set_loc3,
+  [Opcode.OP_put_loc8]: Opcode.OP_set_loc8,
+  [Opcode.OP_put_loc]: Opcode.OP_set_loc,
+  [Opcode.OP_put_var_ref0]: Opcode.OP_set_var_ref0,
+  [Opcode.OP_put_var_ref1]: Opcode.OP_set_var_ref1,
+  [Opcode.OP_put_var_ref2]: Opcode.OP_set_var_ref2,
+  [Opcode.OP_put_var_ref3]: Opcode.OP_set_var_ref3,
+  [Opcode.OP_put_var_ref]: Opcode.OP_set_var_ref,
+};
+
 interface ClassCompilationContext {
   hasHeritage: boolean;
   instanceFields: InstanceFieldRecord[];
   fieldsInitFuncIdx: number | null;
   fieldsInitVarName: string;
   fieldsInitVarIdx: number;
+  fieldsInitVarAtom: number;
+  fieldsInitScopeLevel: number;
   needsInstanceBrand: boolean;
   needsStaticBrand: boolean;
   privateScopeLevel: number;
@@ -60,12 +104,21 @@ interface ClassCompilationContext {
   privateStorage: Map<string, PrivateStorageEntry>;
 }
 
+interface FieldsInitBinding {
+  atom: number;
+  scopeLevel: number;
+  closure?: {
+    index: number;
+    isLexical: boolean;
+  };
+}
+
 interface MethodFunctionOptions {
   kind: 'constructor' | 'method' | 'getter' | 'setter';
   nameHint?: string;
   isStatic?: boolean;
   hasHeritage?: boolean;
-  fieldsInitBindingName?: string;
+  fieldsInitBinding?: FieldsInitBinding;
 }
 
 export interface CompilerOptions {
@@ -94,6 +147,10 @@ export class TypeScriptCompiler {
   private expressionEmitter: ExpressionEmitter | null = null;
   private traceRecorder?: TraceRecorder;
   private moduleTopLevelSlots: Map<string, number> | null = null;
+  private moduleRecord: ModuleRecord | null = null;
+  private expressionContextStack: { dropRequested: boolean; shouldDrop: boolean }[] = [];
+  private pendingStore: PendingStoreRecord | null = null;
+  private pendingLineQueues = new WeakMap<JSFunctionDef, PendingLineEntry[]>();
 
   suppressLineInfo: boolean = false;
   inArgument: boolean = false;
@@ -126,6 +183,26 @@ export class TypeScriptCompiler {
     return this.statementEmitter;
   }
 
+  private getCurrentExpressionContext() {
+    if (this.expressionContextStack.length === 0) {
+      return null;
+    }
+    return this.expressionContextStack[this.expressionContextStack.length - 1];
+  }
+
+  private shouldPreserveExpressionResult(): boolean {
+    const ctx = this.getCurrentExpressionContext();
+    if (!ctx) return true;
+    return !ctx.dropRequested;
+  }
+
+  private suppressCurrentExpressionDrop() {
+    const ctx = this.getCurrentExpressionContext();
+    if (ctx) {
+      ctx.shouldDrop = false;
+    }
+  }
+
   private isModuleTopLevel(): boolean {
     if (!this.currentFunc)
       return false;
@@ -144,26 +221,79 @@ export class TypeScriptCompiler {
     return this.isTopLevelStatement(node.parent);
   }
 
-  private ensureModuleTopLevelSlot(name: string): number {
+  private ensureModuleTopLevelSlot(
+    name: string,
+    options: { isConst?: boolean } = {},
+  ): number {
     if (!this.moduleTopLevelSlots) return -1;
     if (this.moduleTopLevelSlots.has(name)) {
       return this.moduleTopLevelSlots.get(name)!;
     }
-    const slotIdx = this.moduleTopLevelSlots.size;
-    this.moduleTopLevelSlots.set(name, slotIdx);
+    const existing = this.findLocalVar(name);
+    if (existing !== -1) {
+      this.moduleTopLevelSlots.set(name, existing);
+      return existing;
+    }
+    const varIdx = this.addLocalVar(name, options.isConst ?? true);
+    this.moduleTopLevelSlots.set(name, varIdx);
     if (this.currentFunc) {
       this.currentFunc.anonymousLocalsCount = Math.max(
         this.currentFunc.anonymousLocalsCount,
-        slotIdx + 1,
+        varIdx + 1,
       );
     }
-    return slotIdx;
+    return varIdx;
   }
 
   private getModuleTopLevelSlot(name: string): number {
     if (!this.moduleTopLevelSlots) return -1;
     const idx = this.moduleTopLevelSlots.get(name);
     return idx ?? -1;
+  }
+
+  private ensureModuleExportClosure(
+    name: string,
+    options: { localIdx?: number; isConst?: boolean; isLexical?: boolean } = {},
+  ): number {
+    if (!this.currentFunc)
+      return -1;
+    const existing = this.findClosureVar(name);
+    if (existing !== -1) {
+      return existing;
+    }
+    const { localIdx = -1, isConst = true, isLexical = true } = options;
+    let captureIdx = localIdx;
+    if (captureIdx === -1) {
+      if (!this.moduleTopLevelSlots)
+        return -1;
+      captureIdx = this.ensureModuleTopLevelSlot(name, { isConst });
+    }
+    if (captureIdx === -1)
+      return -1;
+    return this.addClosureVar(name, isConst, isLexical, captureIdx);
+  }
+
+  private getModuleRecord(): ModuleRecord | null {
+    return this.moduleRecord;
+  }
+
+  private registerModuleLocalExport(
+    exportNameAtom: JSAtom,
+    closureVarIndex: number,
+    localNameAtom?: JSAtom,
+    order?: number | undefined,
+  ) {
+    if (!this.moduleRecord)
+      return;
+    if (closureVarIndex < 0)
+      return;
+    this.moduleRecord.exportEntries.push({
+      type: ModuleExportType.Local,
+      exportedName: exportNameAtom,
+      localVarIndex: closureVarIndex,
+      localName: localNameAtom ?? exportNameAtom,
+      order: order ?? undefined,
+    });
   }
 
   private normalizeFilename(filename: string): string {
@@ -361,6 +491,7 @@ export class TypeScriptCompiler {
     this.parseState = new ParseState(this.ctx, source, normalizedFilename, this.sourceFile);
     this.programBuilder = null;
     this.programPlan = null;
+    this.moduleRecord = null;
     
     // Create global function (module or script)
     const globalFunc = new JSFunctionDef(this.ctx, null);
@@ -374,7 +505,7 @@ export class TypeScriptCompiler {
     globalFunc.argumentsAllowed = true;
     // globalFunc.stackSize = 1; // Manually set for now
     // globalFunc.argCount = 1; // <eval> receives 'this'
-  globalFunc.filename = this.atomManager.add(normalizedFilename);
+    globalFunc.filename = this.atomManager.add(normalizedFilename);
     
     this.initializeFunctionDebugInfo(globalFunc, 0);
 
@@ -392,7 +523,11 @@ export class TypeScriptCompiler {
     this.compileProgram(this.sourceFile);
     this.recordTrace('link-done', { status: 2 });
 
-    // Serialize
+  // Resolve scopes to eliminate temporary opcodes
+  const scopeResolver = new ScopeResolver(this.atomManager);
+  scopeResolver.resolveAll(this.currentFunc!);
+
+  // Serialize
     this.recordTrace('eval-start', { status: 2, isAsync: false, hasTLA: false });
     const serializer = new BytecodeSerializer();
     const bytecode = serializer.serialize(this.currentFunc!);
@@ -402,21 +537,23 @@ export class TypeScriptCompiler {
 
   private prePass(sourceFile: ts.SourceFile) {
     const locals: string[] = [];
-    const closures: string[] = [];
 
     const visit = (node: ts.Node, isTopLevel: boolean) => {
       if (ts.isVariableStatement(node)) {
         node.declarationList.declarations.forEach(decl => {
           if (ts.isIdentifier(decl.name)) {
-            if (isTopLevel) closures.push(decl.name.text);
-            else locals.push(decl.name.text);
+            if (!isTopLevel) {
+              locals.push(decl.name.text);
+            }
           }
         });
       } else if (ts.isForOfStatement(node)) {
         if (ts.isVariableDeclarationList(node.initializer)) {
           node.initializer.declarations.forEach(decl => {
             if (ts.isIdentifier(decl.name)) {
-              locals.push(decl.name.text);
+              if (!isTopLevel) {
+                locals.push(decl.name.text);
+              }
             }
           });
         }
@@ -430,7 +567,6 @@ export class TypeScriptCompiler {
     sourceFile.statements.forEach(stmt => visit(stmt, true));
 
     [...new Set(locals)].forEach(name => this.atomManager.add(name));
-    [...new Set(closures)].forEach(name => this.atomManager.add(name));
   }
 
   private preScanLocals(block: ts.Block) {
@@ -453,11 +589,90 @@ export class TypeScriptCompiler {
     return level;
   }
 
+  private collectTopLevelLexicalEntries(node: ts.SourceFile): TopLevelLexicalEntry[] {
+    const entries: TopLevelLexicalEntry[] = [];
+    const seenBindings = new Set<string>();
+    node.statements.forEach(stmt => {
+      if (ts.isClassDeclaration(stmt) && stmt.name) {
+        entries.push({ kind: 'class', name: stmt.name.text });
+        return;
+      }
+      if (ts.isFunctionDeclaration(stmt) && stmt.name) {
+        entries.push({ kind: 'function', name: stmt.name.text });
+        return;
+      }
+      if (!ts.isVariableStatement(stmt))
+        return;
+      const declFlags = stmt.declarationList.flags;
+      const isConst = (declFlags & ts.NodeFlags.Const) !== 0;
+      const isLet = (declFlags & ts.NodeFlags.Let) !== 0;
+      if (!isConst && !isLet)
+        return;
+      stmt.declarationList.declarations.forEach(decl => {
+        if (!ts.isIdentifier(decl.name))
+          return;
+        if (seenBindings.has(decl.name.text))
+          return;
+        seenBindings.add(decl.name.text);
+        entries.push({ kind: 'binding', name: decl.name.text, isConst });
+      });
+    });
+    return entries;
+  }
+
+  private registerModuleTopLevelLexicals(entries: TopLevelLexicalEntry[]) {
+    for (const entry of entries) {
+      if (entry.kind === 'class') {
+        this.atomManager.add(entry.name);
+        const slotIdx = this.ensureModuleTopLevelSlot(entry.name, { isConst: true });
+        this.addClosureVar(entry.name, true, true, slotIdx);
+        continue;
+      }
+      if (entry.kind === 'function') {
+        const slotIdx = this.ensureModuleTopLevelSlot(entry.name, { isConst: false });
+        this.addClosureVar(entry.name, false, false, slotIdx);
+        continue;
+      }
+      const slotIdx = this.ensureModuleTopLevelSlot(entry.name, { isConst: entry.isConst });
+      this.addClosureVar(entry.name, entry.isConst, true, slotIdx);
+    }
+    if (this.currentFunc) {
+      let maxIdx = -1;
+      if (this.moduleTopLevelSlots) {
+        for (const idx of this.moduleTopLevelSlots.values()) {
+          maxIdx = Math.max(maxIdx, idx);
+        }
+      }
+      if (maxIdx >= 0) {
+        this.currentFunc.anonymousLocalsCount = Math.max(
+          this.currentFunc.anonymousLocalsCount,
+          maxIdx + 1,
+        );
+      }
+    }
+  }
+
   compileProgram(node: ts.SourceFile) {
     const bodyScopeLevel = this.currentFunc ? this.enterBodyScope() : -1;
     const moduleTopLevel = this.isModuleTopLevel();
+    if (moduleTopLevel && this.currentFunc && !this.moduleRecord) {
+      this.moduleRecord = {
+        moduleName: this.currentFunc.filename,
+        exportEntries: [],
+        importEntries: [],
+        starExportEntries: [],
+        requireEntries: [],
+        hasTopLevelAwait: false,
+      };
+      this.currentFunc.module = this.moduleRecord;
+    }
     this.moduleTopLevelSlots = moduleTopLevel ? new Map<string, number>() : null;
     const programPlan = moduleTopLevel ? this.getProgramPlan() : null;
+    const topLevelLexicals = moduleTopLevel ? this.collectTopLevelLexicalEntries(node) : [];
+    if (moduleTopLevel) {
+      this.registerModuleTopLevelLexicals(topLevelLexicals);
+      this.preRegisterModuleAtomOrder(programPlan, node);
+    }
     // Module boilerplate (simplified)
     if (moduleTopLevel) {
       // this.emitLineCol(0);
@@ -482,58 +697,6 @@ export class TypeScriptCompiler {
 
       this.emitOp(Opcode.OP_return_undef);
       this.emitLabel(label);
-
-      // Register and uninitialize top-level block-scoped variables
-      const blockScopedVars: { name: string, isConst: boolean }[] = [];
-      const seenBlockScoped = new Set<string>();
-      ts.forEachChild(node, n => {
-        if (ts.isVariableStatement(n)) {
-           const isConst = (n.declarationList.flags & ts.NodeFlags.Const) !== 0;
-           // console.log(`Variable statement: isConst=${isConst}`);
-           const isLet = (n.declarationList.flags & ts.NodeFlags.Let) !== 0;
-           if (isConst || isLet) {
-             n.declarationList.declarations.forEach(decl => {
-               if (ts.isIdentifier(decl.name)) {
-                 if (!seenBlockScoped.has(decl.name.text)) {
-                   seenBlockScoped.add(decl.name.text);
-                   if (moduleTopLevel) {
-                     this.ensureModuleTopLevelSlot(decl.name.text);
-                   }
-                   blockScopedVars.push({ name: decl.name.text, isConst });
-                 }
-               }
-             });
-           }
-        }
-      });
-
-      // Register them
-      blockScopedVars.forEach(v => {
-        if (moduleTopLevel) {
-          const slotIdx = this.ensureModuleTopLevelSlot(v.name);
-          this.addClosureVar(v.name, v.isConst, true, slotIdx);
-        } else {
-          if (this.findLocalVar(v.name) === -1) {
-            this.addLocalVar(v.name, v.isConst);
-          }
-        }
-      });
-      if (moduleTopLevel && this.currentFunc) {
-        this.currentFunc.anonymousLocalsCount = Math.max(
-          this.currentFunc.anonymousLocalsCount,
-          this.moduleTopLevelSlots?.size ?? 0,
-        );
-      }
-
-      // Emit uninitialization (reverse order to match WASM)
-      if (!moduleTopLevel) {
-        for (let i = blockScopedVars.length - 1; i >= 0; i--) {
-           const v = blockScopedVars[i];
-           const idx = this.findLocalVar(v.name);
-           this.emitOp(Opcode.OP_set_loc_uninitialized);
-           this.currentFunc!.byteCode.putU16(idx);
-        }
-      }
 
       // Module Path: Statements
       if (programPlan) {
@@ -566,6 +729,29 @@ export class TypeScriptCompiler {
     const handled = this.getStatementEmitter().emit(record);
     if (!handled) {
       this.compileStatement(record.node);
+    }
+  }
+
+  private preRegisterModuleAtomOrder(
+    plan: SourceElementRecord[] | null,
+    source: ts.SourceFile,
+  ) {
+    const collectClassDecls = (): ts.ClassDeclaration[] => {
+      if (plan) {
+        return plan
+          .map(record => record.node)
+          .filter((node): node is ts.ClassDeclaration => ts.isClassDeclaration(node));
+      }
+      return source.statements.filter((stmt): stmt is ts.ClassDeclaration => ts.isClassDeclaration(stmt));
+    };
+    const classes = collectClassDecls();
+    for (const cls of classes) {
+      if (cls.name) {
+        this.atomManager.add(cls.name.text);
+      }
+    }
+    for (const cls of classes) {
+      this.registerClassMemberNameAtoms(cls);
     }
   }
 
@@ -603,14 +789,25 @@ export class TypeScriptCompiler {
       case ts.SyntaxKind.ClassDeclaration:
         this.compileClassDeclaration(node as ts.ClassDeclaration);
         break;
-      case ts.SyntaxKind.ExpressionStatement:
+      case ts.SyntaxKind.ExpressionStatement: {
         const expr = (node as ts.ExpressionStatement).expression;
+        const startPos = node.getStart(this.sourceFile ?? undefined);
+        if (!this.suppressLineInfo) {
+          const shouldAlignToLastOp =
+            this.pendingStore !== null && this.isAssignmentLikeExpression(expr);
+          this.emitLineCol(
+            startPos,
+            0,
+            shouldAlignToLastOp ? { alignToLastOp: true } : undefined,
+          );
+        }
         if (ts.isVoidExpression(expr)) {
           this.compileExpression(expr);
         } else {
           this.compileExpression(expr, false, undefined, true);
         }
         break;
+      }
       case ts.SyntaxKind.SwitchStatement:
         this.compileSwitchStatement(node as ts.SwitchStatement);
         break;
@@ -650,12 +847,18 @@ export class TypeScriptCompiler {
     if (!node.name) return;
     const name = node.name.text;
     const isTopLevel = this.isTopLevelStatement(node);
+    const isExported = isTopLevel && this.hasExportModifier(node);
+    const isDefaultExport = isExported && this.hasDefaultModifier(node);
     
     // 1. Define variable in current scope (if global)
     let varIdx = -1;
+    let exportClosureIdx = -1;
     if (isTopLevel) {
       // Function declarations in global scope are not lexical (var-like)
       varIdx = this.addClosureVar(name, false, false);
+      if (isExported) {
+        exportClosureIdx = varIdx;
+      }
     }
 
     // 2. Create new function definition
@@ -751,20 +954,24 @@ export class TypeScriptCompiler {
       console.warn('Local function declaration not implemented');
       this.emitOp(Opcode.OP_drop);
     }
+
+    if (exportClosureIdx !== -1) {
+      const exportAtom = this.atomManager.add(isDefaultExport ? 'default' : name);
+      const localAtom = this.atomManager.add(name);
+      const order = node.getStart(this.sourceFile ?? undefined);
+      this.registerModuleLocalExport(exportAtom, exportClosureIdx, localAtom, order);
+    }
   }
 
   addArg(name: string): number {
     if (!this.currentFunc) return -1;
     const atom = this.atomManager.add(name);
-    let prevIdx = -1;
-    if (this.currentFunc.args.length > 0) {
-        prevIdx = this.currentFunc.args.length - 1;
-    }
     const varIdx = this.currentFunc.args.length;
     const idx = this.currentFunc.args.push({
       varName: atom,
       scopeLevel: 0,
-      scopeNext: prevIdx,
+      // QuickJS leaves argument scope chains unused, so keep scopeNext at 0
+      scopeNext: 0,
       varIdx: varIdx,
       isConst: false,
       isLexical: false,
@@ -828,12 +1035,34 @@ export class TypeScriptCompiler {
       this.currentFunc.lastOpArgs = [idx];
       return;
     }
-    if (idx === 0) this.emitOp(Opcode.OP_put_var_ref0);
-    else if (idx === 1) this.emitOp(Opcode.OP_put_var_ref1);
-    else if (idx === 2) this.emitOp(Opcode.OP_put_var_ref2);
-    else if (idx === 3) this.emitOp(Opcode.OP_put_var_ref3);
-    else {
+    if (idx === 0) {
+      this.emitOp(Opcode.OP_put_var_ref0);
+      this.recordPendingStore('varRef', idx, Opcode.OP_put_var_ref0, 0);
+    } else if (idx === 1) {
+      this.emitOp(Opcode.OP_put_var_ref1);
+      this.recordPendingStore('varRef', idx, Opcode.OP_put_var_ref1, 0);
+    } else if (idx === 2) {
+      this.emitOp(Opcode.OP_put_var_ref2);
+      this.recordPendingStore('varRef', idx, Opcode.OP_put_var_ref2, 0);
+    } else if (idx === 3) {
+      this.emitOp(Opcode.OP_put_var_ref3);
+      this.recordPendingStore('varRef', idx, Opcode.OP_put_var_ref3, 0);
+    } else {
       this.emitOp(Opcode.OP_put_var_ref);
+      this.currentFunc.byteCode.putU16(idx);
+      this.recordPendingStore('varRef', idx, Opcode.OP_put_var_ref, 2);
+    }
+    this.currentFunc.lastOpArgs = [idx];
+  }
+
+  emitSetVarRef(idx: number) {
+    if (!this.currentFunc) return;
+    if (idx === 0) this.emitOp(Opcode.OP_set_var_ref0);
+    else if (idx === 1) this.emitOp(Opcode.OP_set_var_ref1);
+    else if (idx === 2) this.emitOp(Opcode.OP_set_var_ref2);
+    else if (idx === 3) this.emitOp(Opcode.OP_set_var_ref3);
+    else {
+      this.emitOp(Opcode.OP_set_var_ref);
       this.currentFunc.byteCode.putU16(idx);
     }
     this.currentFunc.lastOpArgs = [idx];
@@ -841,12 +1070,33 @@ export class TypeScriptCompiler {
 
   emitPutArg(idx: number) {
     if (!this.currentFunc) return;
-    if (idx === 0) this.emitOp(Opcode.OP_put_arg0);
-    else if (idx === 1) this.emitOp(Opcode.OP_put_arg1);
-    else if (idx === 2) this.emitOp(Opcode.OP_put_arg2);
-    else if (idx === 3) this.emitOp(Opcode.OP_put_arg3);
-    else {
+    if (idx === 0) {
+      this.emitOp(Opcode.OP_put_arg0);
+      this.recordPendingStore('arg', idx, Opcode.OP_put_arg0, 0);
+    } else if (idx === 1) {
+      this.emitOp(Opcode.OP_put_arg1);
+      this.recordPendingStore('arg', idx, Opcode.OP_put_arg1, 0);
+    } else if (idx === 2) {
+      this.emitOp(Opcode.OP_put_arg2);
+      this.recordPendingStore('arg', idx, Opcode.OP_put_arg2, 0);
+    } else if (idx === 3) {
+      this.emitOp(Opcode.OP_put_arg3);
+      this.recordPendingStore('arg', idx, Opcode.OP_put_arg3, 0);
+    } else {
       this.emitOp(Opcode.OP_put_arg);
+      this.currentFunc.byteCode.putU16(idx);
+      this.recordPendingStore('arg', idx, Opcode.OP_put_arg, 2);
+    }
+  }
+
+  emitSetArg(idx: number) {
+    if (!this.currentFunc) return;
+    if (idx === 0) this.emitOp(Opcode.OP_set_arg0);
+    else if (idx === 1) this.emitOp(Opcode.OP_set_arg1);
+    else if (idx === 2) this.emitOp(Opcode.OP_set_arg2);
+    else if (idx === 3) this.emitOp(Opcode.OP_set_arg3);
+    else {
+      this.emitOp(Opcode.OP_set_arg);
       this.currentFunc.byteCode.putU16(idx);
     }
   }
@@ -878,15 +1128,40 @@ export class TypeScriptCompiler {
 
   emitPutLoc(idx: number) {
     if (!this.currentFunc) return;
-    if (idx === 0) this.emitOp(Opcode.OP_put_loc0);
-    else if (idx === 1) this.emitOp(Opcode.OP_put_loc1);
-    else if (idx === 2) this.emitOp(Opcode.OP_put_loc2);
-    else if (idx === 3) this.emitOp(Opcode.OP_put_loc3);
-    else if (idx < 256) {
+    if (idx === 0) {
+      this.emitOp(Opcode.OP_put_loc0);
+      this.recordPendingStore('loc', idx, Opcode.OP_put_loc0, 0);
+    } else if (idx === 1) {
+      this.emitOp(Opcode.OP_put_loc1);
+      this.recordPendingStore('loc', idx, Opcode.OP_put_loc1, 0);
+    } else if (idx === 2) {
+      this.emitOp(Opcode.OP_put_loc2);
+      this.recordPendingStore('loc', idx, Opcode.OP_put_loc2, 0);
+    } else if (idx === 3) {
+      this.emitOp(Opcode.OP_put_loc3);
+      this.recordPendingStore('loc', idx, Opcode.OP_put_loc3, 0);
+    } else if (idx < 256) {
       this.emitOp(Opcode.OP_put_loc8);
       this.currentFunc.byteCode.putU8(idx);
+      this.recordPendingStore('loc', idx, Opcode.OP_put_loc8, 1);
     } else {
       this.emitOp(Opcode.OP_put_loc);
+      this.currentFunc.byteCode.putU16(idx);
+      this.recordPendingStore('loc', idx, Opcode.OP_put_loc, 2);
+    }
+  }
+
+  emitSetLoc(idx: number) {
+    if (!this.currentFunc) return;
+    if (idx === 0) this.emitOp(Opcode.OP_set_loc0);
+    else if (idx === 1) this.emitOp(Opcode.OP_set_loc1);
+    else if (idx === 2) this.emitOp(Opcode.OP_set_loc2);
+    else if (idx === 3) this.emitOp(Opcode.OP_set_loc3);
+    else if (idx < 256) {
+      this.emitOp(Opcode.OP_set_loc8);
+      this.currentFunc.byteCode.putU8(idx);
+    } else {
+      this.emitOp(Opcode.OP_set_loc);
       this.currentFunc.byteCode.putU16(idx);
     }
   }
@@ -918,81 +1193,117 @@ export class TypeScriptCompiler {
        this.emitOp(Opcode.OP_set_loc_uninitialized);
        this.currentFunc!.byteCode.putU16(idx);
     }
-   options?.prelude?.();
+    options?.prelude?.();
     node.statements.forEach(stmt => this.compileStatement(stmt));
     this.leaveScope();
   }
 
-  compileVariableDeclarationList(node: ts.VariableDeclarationList) {
+  compileVariableDeclarationList(
+    node: ts.VariableDeclarationList,
+    options: { isExport?: boolean } = {},
+  ) {
     const isConst = (node.flags & ts.NodeFlags.Const) !== 0;
     const isLet = (node.flags & ts.NodeFlags.Let) !== 0;
-  const isBlockScoped = isConst || isLet;
-  const isTopLevel = this.isTopLevelVariableList(node);
-    
+    const isBlockScoped = isConst || isLet;
+    const isTopLevel = this.isTopLevelVariableList(node);
+    const hoistsToModuleScope = !isBlockScoped && this.isModuleTopLevel();
+    const shouldUseModuleSlot = isTopLevel || hoistsToModuleScope;
+
     node.declarations.forEach(decl => {
-      if (ts.isIdentifier(decl.name)) {
-        const name = decl.name.text;
-        
-        // Register variable first to ensure atom order matches QuickJS
-        let varIdx = -1;
-        if (isTopLevel) {
-          const slotIdx = this.ensureModuleTopLevelSlot(name);
-          varIdx = this.addClosureVar(name, isConst, isBlockScoped, slotIdx);
-        } else {
-          varIdx = this.findLocalVar(name);
-          if (varIdx === -1) {
-            varIdx = this.addLocalVar(name, isConst);
-          }
-        }
+      if (!ts.isIdentifier(decl.name)) {
+        console.warn('Destructuring in variable declarations is not supported yet.');
+        return;
+      }
 
-        if (decl.initializer) {
-          this.compileExpression(decl.initializer, false, name);
-        } else {
-          if (isTopLevel) {
-            this.emitOp(Opcode.OP_undefined);
-          } else {
-            if (!isConst) {
-               this.emitOp(Opcode.OP_undefined);
-            } else {
-               // Const without initializer is error, but we skip emission
-               return;
-            }
-          }
+      const name = decl.name.text;
+      let targetIdx = -1;
+      if (shouldUseModuleSlot) {
+        const slotIdx = this.ensureModuleTopLevelSlot(name, { isConst });
+        targetIdx = this.addClosureVar(name, isConst, isBlockScoped, slotIdx);
+      } else {
+        targetIdx = this.findLocalVar(name);
+        if (targetIdx === -1) {
+          targetIdx = this.addLocalVar(name, isConst);
         }
+      }
 
-        if (isTopLevel) {
-          this.emitPutVarRef(varIdx);
+      if (decl.initializer) {
+        this.compileExpression(decl.initializer, false, name);
+      } else {
+        if (!isConst) {
+          this.emitOp(Opcode.OP_undefined);
         } else {
-          this.emitPutLoc(varIdx);
+          throw new Error('Const declarations must have an initializer.');
         }
+      }
+
+      if (shouldUseModuleSlot) {
+        this.emitPutVarRef(targetIdx);
+        if (options.isExport) {
+          const exportAtom = this.atomManager.add(name);
+          const order = decl.getStart(this.sourceFile ?? undefined);
+          this.registerModuleLocalExport(exportAtom, targetIdx, exportAtom, order);
+        }
+      } else {
+        this.emitPutLoc(targetIdx);
       }
     });
   }
 
   compileVariableStatement(node: ts.VariableStatement) {
-    this.compileVariableDeclarationList(node.declarationList);
+    const isTopLevel = this.isTopLevelStatement(node);
+    const isExport = isTopLevel && this.hasExportModifier(node);
+    this.compileVariableDeclarationList(node.declarationList, { isExport });
   }
 
   compileClassDeclaration(node: ts.ClassDeclaration) {
-    if (!node.name) {
+    const isTopLevel = this.isTopLevelStatement(node);
+    const isExported = isTopLevel && this.hasExportModifier(node);
+    const isDefaultExport = isExported && this.hasDefaultModifier(node);
+    if (!node.name && !isDefaultExport) {
       throw new Error('Class declarations must have a name. Anonymous class declarations are not supported yet.');
     }
-    const bindingIdx = this.ensureClassBinding(node.name.text);
+    const bindingName = node.name?.text ?? '*default*';
+    const bindingIdx = this.ensureClassBinding(bindingName);
+    const exportClosureIdx =
+      isExported && bindingIdx >= 0
+        ? this.ensureModuleExportClosure(bindingName, { localIdx: bindingIdx })
+        : -1;
+
     this.compileClassExpression(node);
-    this.emitPutLoc(bindingIdx);
+
+    if (exportClosureIdx !== -1) {
+      this.emitSetLoc(bindingIdx);
+      this.emitPutVarRef(exportClosureIdx);
+      const exportAtom = this.atomManager.add(isDefaultExport ? 'default' : bindingName);
+      const localAtom = this.atomManager.add(bindingName);
+      const order = node.getStart(this.sourceFile ?? undefined);
+      this.registerModuleLocalExport(exportAtom, exportClosureIdx, localAtom, order);
+    } else {
+      this.emitPutLoc(bindingIdx);
+    }
   }
 
   private compileClassExpression(node: ts.ClassLikeDeclarationBase) {
     const heritageExpression = this.getHeritageExpression(node);
     const hasHeritage = !!heritageExpression;
+    this.registerClassMemberNameAtoms(node);
     const classContext = this.collectClassContext(node, hasHeritage);
 
     this.enterScope();
     const privateScopeLevel = this.enterScope();
     classContext.privateScopeLevel = privateScopeLevel;
     if (this.currentFunc) {
-      const idx = this.addLocalVar(classContext.fieldsInitVarName, true);
+      const atom = this.atomManager.add(classContext.fieldsInitVarName);
+      const scopeLevel = this.currentFunc.scopeLevel;
+      const idx = this.currentFunc.addScopeVar(atom, JSVarKind.JS_VAR_NORMAL, {
+        isConst: true,
+        isLexical: true,
+        scopeLevel,
+      });
       classContext.fieldsInitVarIdx = idx;
+      classContext.fieldsInitVarAtom = atom;
+      classContext.fieldsInitScopeLevel = scopeLevel;
       if (idx >= 0) {
         this.emitOp(Opcode.OP_set_loc_uninitialized);
         this.currentFunc.byteCode.putU16(idx);
@@ -1046,6 +1357,8 @@ export class TypeScriptCompiler {
       fieldsInitFuncIdx: null,
       fieldsInitVarName: CLASS_FIELDS_INIT_NAME,
       fieldsInitVarIdx: -1,
+      fieldsInitVarAtom: JS_ATOM_NULL,
+      fieldsInitScopeLevel: -1,
       needsInstanceBrand: false,
       needsStaticBrand: false,
       privateScopeLevel: -1,
@@ -1056,6 +1369,9 @@ export class TypeScriptCompiler {
     for (const member of node.members) {
       this.recordPrivateMemberUsage(member, context);
       if (ts.isPropertyDeclaration(member) && !this.hasStaticModifier(member)) {
+        if (this.shouldSkipInstanceField(member)) {
+          continue;
+        }
         if (hasHeritage) {
           throw new Error('Derived class instance fields are not supported yet.');
         }
@@ -1069,6 +1385,20 @@ export class TypeScriptCompiler {
     }
 
     return context;
+  }
+
+  private registerClassMemberNameAtoms(node: ts.ClassLikeDeclarationBase) {
+    for (const member of node.members) {
+      if (!(ts.isMethodDeclaration(member) || ts.isGetAccessorDeclaration(member) || ts.isSetAccessorDeclaration(member))) {
+        continue;
+      }
+      const name = member.name;
+      if (!name)
+        continue;
+      if (!(ts.isIdentifier(name) || ts.isStringLiteral(name) || ts.isPrivateIdentifier(name)))
+        continue;
+      this.getPropertyNameAtom(name);
+    }
   }
 
   private recordPrivateMemberUsage(member: ts.ClassElement, context: ClassCompilationContext) {
@@ -1255,6 +1585,12 @@ export class TypeScriptCompiler {
     this.currentFunc!.byteCode.putU16(scopeLevel);
   }
 
+  private emitScopeDeleteVar(atom: number, scopeLevel: number) {
+    this.emitOp(Opcode.OP_scope_delete_var);
+    this.currentFunc!.byteCode.putU32(atom);
+    this.currentFunc!.byteCode.putU16(scopeLevel);
+  }
+
   private getFunctionDefFromPool(idx: number): JSFunctionDef | null {
     if (!this.currentFunc)
       return null;
@@ -1300,13 +1636,38 @@ export class TypeScriptCompiler {
       return;
     if (context.fieldsInitVarIdx < 0)
       return;
-    if (context.fieldsInitFuncIdx != null) {
-      this.emitFClosure(context.fieldsInitFuncIdx);
+    if (context.fieldsInitVarAtom === JS_ATOM_NULL || context.fieldsInitScopeLevel < 0)
+      return;
+    const funcIdx = context.fieldsInitFuncIdx;
+    if (funcIdx != null) {
+      this.emitFClosure(funcIdx);
       this.emitOp(Opcode.OP_set_home_object);
     } else {
       this.emitOp(Opcode.OP_undefined);
     }
-    this.emitPutLoc(context.fieldsInitVarIdx);
+    this.emitScopePutVarInit(context.fieldsInitVarAtom, context.fieldsInitScopeLevel);
+  }
+
+  private prepareFieldsInitBinding(binding: FieldsInitBinding): FieldsInitBinding {
+    if (!this.currentFunc)
+      return binding;
+    const name = this.atomManager.getString(binding.atom);
+    if (!name)
+      return binding;
+    this.resolveVarInFunc(this.currentFunc, name);
+    const closureIdx = this.findClosureVar(name);
+    if (closureIdx < 0)
+      return binding;
+    const closure = this.currentFunc.closureVar[closureIdx];
+    if (!closure)
+      return binding;
+    return {
+      ...binding,
+      closure: {
+        index: closureIdx,
+        isLexical: closure.isLexical,
+      },
+    };
   }
 
   private emitInstanceFieldInitializers(
@@ -1334,16 +1695,19 @@ export class TypeScriptCompiler {
     this.emitOp(Opcode.OP_drop);
   }
 
-  private emitClassFieldsInitCall(bindingName: string) {
+  private emitClassFieldsInitCall(binding: FieldsInitBinding) {
     if (!this.currentFunc)
       return;
-    const closureIdx = this.findClosureVar(bindingName);
-    if (closureIdx === -1)
-      return;
-    this.emitGetVarRef(closureIdx);
+    if (binding.closure) {
+      this.emitGetVarRef(binding.closure.index, binding.closure.isLexical);
+    } else {
+      this.emitOp(Opcode.OP_scope_get_var);
+      this.currentFunc.byteCode.putU32(binding.atom);
+      this.currentFunc.byteCode.putU16(binding.scopeLevel);
+    }
     this.emitOp(Opcode.OP_dup);
-    const skipLabel = this.newLabel();
-    this.emitJump8(Opcode.OP_if_false8, skipLabel);
+    const skipCall = this.newLabel();
+    this.emitJump8(Opcode.OP_if_false8, skipCall);
     const thisAtom = this.atomManager.add('this');
     this.emitOp(Opcode.OP_scope_get_var);
     this.currentFunc.byteCode.putU32(thisAtom);
@@ -1351,7 +1715,7 @@ export class TypeScriptCompiler {
     this.emitOp(Opcode.OP_swap);
     this.emitOp(Opcode.OP_call_method);
     this.currentFunc.byteCode.putU16(0);
-    this.emitLabel(skipLabel);
+    this.emitLabel(skipCall);
     this.emitOp(Opcode.OP_drop);
   }
 
@@ -1582,12 +1946,20 @@ export class TypeScriptCompiler {
     if (hasHeritage) {
       this.ensureDerivedConstructorHasSuperCall(ctor);
     }
-    const bindingName = context.fieldsInitVarIdx >= 0 ? context.fieldsInitVarName : undefined;
+    const bindingInfo =
+      context.fieldsInitVarIdx >= 0 &&
+      context.fieldsInitScopeLevel >= 0 &&
+      context.fieldsInitVarAtom !== JS_ATOM_NULL
+        ? {
+            atom: context.fieldsInitVarAtom,
+            scopeLevel: context.fieldsInitScopeLevel,
+          }
+        : undefined;
     return this.compileMethodFunction(ctor, {
       kind: 'constructor',
       nameHint: node.name?.text,
       hasHeritage,
-      fieldsInitBindingName: bindingName,
+      fieldsInitBinding: bindingInfo,
     });
   }
 
@@ -1664,13 +2036,14 @@ export class TypeScriptCompiler {
       }
     }
 
-    const needsClassFieldInitCall =
-      options.kind === 'constructor' && !!options.fieldsInitBindingName;
+    let bindingInfo = options.fieldsInitBinding;
+    if (bindingInfo && options.kind === 'constructor') {
+      bindingInfo = this.prepareFieldsInitBinding(bindingInfo);
+    }
+    const needsClassFieldInitCall = options.kind === 'constructor' && !!bindingInfo;
     let emitFieldPrelude: (() => void) | undefined;
-    if (needsClassFieldInitCall && options.fieldsInitBindingName) {
-      const bindingName = options.fieldsInitBindingName;
-      this.resolveVarInFunc(funcDef, bindingName);
-      emitFieldPrelude = () => this.emitClassFieldsInitCall(bindingName);
+    if (needsClassFieldInitCall && bindingInfo) {
+      emitFieldPrelude = () => this.emitClassFieldsInitCall(bindingInfo);
     }
 
     if (node.body) {
@@ -1715,9 +2088,45 @@ export class TypeScriptCompiler {
     }
   }
 
-  private hasStaticModifier(node: ts.Node): boolean {
+  private hasModifier(node: ts.Node, kind: ts.SyntaxKind): boolean {
     const modifiers = (node as ts.Node & { modifiers?: ts.NodeArray<ts.Modifier> }).modifiers;
-    return !!modifiers?.some((mod: ts.Modifier) => mod.kind === ts.SyntaxKind.StaticKeyword);
+    return !!modifiers?.some(mod => mod.kind === kind);
+  }
+
+  private hasStaticModifier(node: ts.Node): boolean {
+    return this.hasModifier(node, ts.SyntaxKind.StaticKeyword);
+  }
+
+  private hasExportModifier(node: ts.Node): boolean {
+    return this.hasModifier(node, ts.SyntaxKind.ExportKeyword);
+  }
+
+  private hasDefaultModifier(node: ts.Node): boolean {
+    return this.hasModifier(node, ts.SyntaxKind.DefaultKeyword);
+  }
+
+  private getModifierFlags(node: ts.Node): ts.ModifierFlags {
+    if (!ts.canHaveModifiers(node))
+      return ts.ModifierFlags.None;
+    return ts.getCombinedModifierFlags(node as ts.Declaration);
+  }
+
+  private hasTsAccessibilityModifier(node: ts.Node): boolean {
+    const flags = this.getModifierFlags(node);
+    return (flags & (ts.ModifierFlags.Private | ts.ModifierFlags.Protected)) !== 0;
+  }
+
+  private hasDeclareModifier(node: ts.Node): boolean {
+    const flags = this.getModifierFlags(node);
+    return (flags & ts.ModifierFlags.Ambient) !== 0;
+  }
+
+  private shouldSkipInstanceField(member: ts.PropertyDeclaration): boolean {
+    if (ts.isPrivateIdentifier(member.name))
+      return false;
+    if (this.hasDeclareModifier(member))
+      return true;
+    return this.hasTsAccessibilityModifier(member) && !member.initializer;
   }
 
   private getPropertyNameAtom(name: ts.PropertyName): number {
@@ -1845,100 +2254,107 @@ export class TypeScriptCompiler {
   }
 
   compileExpression(node: ts.Expression, isTail: boolean = false, nameHint?: string, dropResult: boolean = false) {
+    this.expressionContextStack.push({ dropRequested: dropResult, shouldDrop: dropResult });
+    const exprCtx = this.getCurrentExpressionContext();
+
+    try {
     const isIncDecUpdate =
       (ts.isPrefixUnaryExpression(node) || ts.isPostfixUnaryExpression(node)) &&
       (node.operator === ts.SyntaxKind.PlusPlusToken || node.operator === ts.SyntaxKind.MinusMinusToken);
 
-    if (dropResult && isIncDecUpdate) {
-      this.compileUpdateExpression(node as ts.PrefixUnaryExpression | ts.PostfixUnaryExpression, true);
-      return;
-    }
+      if (dropResult && isIncDecUpdate) {
+        this.compileUpdateExpression(node as ts.PrefixUnaryExpression | ts.PostfixUnaryExpression, true);
+        if (exprCtx) exprCtx.shouldDrop = false;
+        return;
+      }
 
-    if (this.getExpressionEmitter().emit(node, { isTail, nameHint, dropResult })) {
-      if (dropResult) {
+      if (this.getExpressionEmitter().emit(node, { isTail, nameHint, dropResult })) {
+        return;
+      }
+
+      // this.emitLineCol(node.getStart()); // Removed to match QuickJS behavior (only specific expressions emit line info)
+      switch (node.kind) {
+        case ts.SyntaxKind.BinaryExpression:
+          this.compileBinaryExpression(node as ts.BinaryExpression);
+          break;
+        case ts.SyntaxKind.CallExpression:
+          this.compileCallExpression(node as ts.CallExpression, isTail);
+          break;
+        case ts.SyntaxKind.Identifier:
+          this.compileIdentifier(node as ts.Identifier);
+          break;
+        case ts.SyntaxKind.NumericLiteral:
+          this.compileNumericLiteral(node as ts.NumericLiteral);
+          break;
+        case ts.SyntaxKind.StringLiteral:
+          this.compileStringLiteral(node as ts.StringLiteral);
+          break;
+        case ts.SyntaxKind.ParenthesizedExpression:
+          this.compileParenthesizedExpression(node as ts.ParenthesizedExpression, isTail);
+          break;
+        case ts.SyntaxKind.ArrowFunction:
+          this.compileArrowFunction(node as ts.ArrowFunction, nameHint);
+          break;
+        case ts.SyntaxKind.FunctionExpression:
+          this.compileFunctionExpression(node as ts.FunctionExpression, nameHint);
+          break;
+        case ts.SyntaxKind.VoidExpression:
+          this.compileVoidExpression(node as ts.VoidExpression);
+          break;
+        case ts.SyntaxKind.ArrayLiteralExpression:
+          this.compileArrayLiteral(node as ts.ArrayLiteralExpression);
+          break;
+        case ts.SyntaxKind.ObjectLiteralExpression:
+          this.compileObjectLiteral(node as ts.ObjectLiteralExpression);
+          break;
+        case ts.SyntaxKind.PropertyAccessExpression:
+          this.compilePropertyAccessExpression(node as ts.PropertyAccessExpression);
+          break;
+        case ts.SyntaxKind.TypeOfExpression:
+          this.compileTypeOfExpression(node as ts.TypeOfExpression);
+          break;
+        case ts.SyntaxKind.DeleteExpression:
+          this.compileDeleteExpression(node as ts.DeleteExpression);
+          break;
+        case ts.SyntaxKind.RegularExpressionLiteral:
+          this.compileRegularExpressionLiteral(node as ts.RegularExpressionLiteral);
+          break;
+        case ts.SyntaxKind.NoSubstitutionTemplateLiteral:
+        case ts.SyntaxKind.TemplateExpression:
+          this.emitTemplateExpression(node as (ts.TemplateExpression | ts.NoSubstitutionTemplateLiteral));
+          break;
+        case ts.SyntaxKind.ConditionalExpression:
+          this.emitConditionalExpression(node as ts.ConditionalExpression);
+          break;
+        case ts.SyntaxKind.TrueKeyword:
+          this.emitOp(Opcode.OP_push_true);
+          break;
+        case ts.SyntaxKind.FalseKeyword:
+          this.emitOp(Opcode.OP_push_false);
+          break;
+        case ts.SyntaxKind.NullKeyword:
+          this.emitOp(Opcode.OP_null);
+          break;
+        case ts.SyntaxKind.ThisKeyword:
+          this.emitOp(Opcode.OP_push_this);
+          break;
+        case ts.SyntaxKind.PrefixUnaryExpression:
+          this.compilePrefixUnaryExpression(node as ts.PrefixUnaryExpression);
+          break;
+        case ts.SyntaxKind.PostfixUnaryExpression:
+          this.compilePostfixUnaryExpression(node as ts.PostfixUnaryExpression);
+          break;
+        case ts.SyntaxKind.NewExpression:
+          this.compileNewExpression(node as ts.NewExpression);
+          break;
+        default:
+          console.warn(`Unsupported expression kind: ${ts.SyntaxKind[node.kind]}`);
+      }
+    } finally {
+      if (exprCtx?.shouldDrop) {
         this.emitOp(Opcode.OP_drop);
       }
-      return;
-    }
-
-    // this.emitLineCol(node.getStart()); // Removed to match QuickJS behavior (only specific expressions emit line info)
-    switch (node.kind) {
-      case ts.SyntaxKind.BinaryExpression:
-        this.compileBinaryExpression(node as ts.BinaryExpression);
-        break;
-      case ts.SyntaxKind.CallExpression:
-        this.compileCallExpression(node as ts.CallExpression, isTail);
-        break;
-      case ts.SyntaxKind.Identifier:
-        this.compileIdentifier(node as ts.Identifier);
-        break;
-      case ts.SyntaxKind.NumericLiteral:
-        this.compileNumericLiteral(node as ts.NumericLiteral);
-        break;
-      case ts.SyntaxKind.StringLiteral:
-        this.compileStringLiteral(node as ts.StringLiteral);
-        break;
-      case ts.SyntaxKind.ParenthesizedExpression:
-        this.compileParenthesizedExpression(node as ts.ParenthesizedExpression, isTail);
-        break;
-      case ts.SyntaxKind.ArrowFunction:
-        this.compileArrowFunction(node as ts.ArrowFunction, nameHint);
-        break;
-      case ts.SyntaxKind.FunctionExpression:
-        this.compileFunctionExpression(node as ts.FunctionExpression, nameHint);
-        break;
-      case ts.SyntaxKind.VoidExpression:
-        this.compileVoidExpression(node as ts.VoidExpression);
-        break;
-      case ts.SyntaxKind.ArrayLiteralExpression:
-        this.compileArrayLiteral(node as ts.ArrayLiteralExpression);
-        break;
-      case ts.SyntaxKind.ObjectLiteralExpression:
-        this.compileObjectLiteral(node as ts.ObjectLiteralExpression);
-        break;
-      case ts.SyntaxKind.PropertyAccessExpression:
-        this.compilePropertyAccessExpression(node as ts.PropertyAccessExpression);
-        break;
-      case ts.SyntaxKind.TypeOfExpression:
-        this.compileTypeOfExpression(node as ts.TypeOfExpression);
-        break;
-      case ts.SyntaxKind.RegularExpressionLiteral:
-        this.compileRegularExpressionLiteral(node as ts.RegularExpressionLiteral);
-        break;
-      case ts.SyntaxKind.NoSubstitutionTemplateLiteral:
-      case ts.SyntaxKind.TemplateExpression:
-        this.emitTemplateExpression(node as (ts.TemplateExpression | ts.NoSubstitutionTemplateLiteral));
-        break;
-      case ts.SyntaxKind.ConditionalExpression:
-        this.emitConditionalExpression(node as ts.ConditionalExpression);
-        break;
-      case ts.SyntaxKind.TrueKeyword:
-        this.emitOp(Opcode.OP_push_true);
-        break;
-      case ts.SyntaxKind.FalseKeyword:
-        this.emitOp(Opcode.OP_push_false);
-        break;
-      case ts.SyntaxKind.NullKeyword:
-        this.emitOp(Opcode.OP_null);
-        break;
-      case ts.SyntaxKind.ThisKeyword:
-        this.emitOp(Opcode.OP_push_this);
-        break;
-      case ts.SyntaxKind.PrefixUnaryExpression:
-        this.compilePrefixUnaryExpression(node as ts.PrefixUnaryExpression);
-        break;
-      case ts.SyntaxKind.PostfixUnaryExpression:
-        this.compilePostfixUnaryExpression(node as ts.PostfixUnaryExpression);
-        break;
-      case ts.SyntaxKind.NewExpression:
-        this.compileNewExpression(node as ts.NewExpression);
-        break;
-      default:
-        console.warn(`Unsupported expression kind: ${ts.SyntaxKind[node.kind]}`);
-    }
-
-    if (dropResult) {
-        this.emitOp(Opcode.OP_drop);
+      this.expressionContextStack.pop();
     }
   }
 
@@ -2028,14 +2444,60 @@ export class TypeScriptCompiler {
         this.emitOp(Opcode.OP_drop);
         this.emitOp(Opcode.OP_undefined);
         break;
-      case ts.SyntaxKind.DeleteKeyword:
-        console.warn('Delete operator not fully implemented');
-        this.emitOp(Opcode.OP_drop);
-        this.emitOp(Opcode.OP_push_true);
-        break;
       default:
         console.warn(`Unsupported prefix unary operator: ${ts.SyntaxKind[node.operator]}`);
     }
+  }
+
+  compileDeleteExpression(node: ts.DeleteExpression) {
+    const operand = node.expression;
+    const operatorPos = node.getStart();
+
+    if (ts.isPropertyAccessExpression(operand)) {
+      if (ts.isPrivateIdentifier(operand.name)) {
+        throw new Error('cannot delete a private class field');
+      }
+      this.compileExpression(operand.expression);
+      this.emitPushConst({ type: 'string', value: operand.name.text });
+      this.emitLineCol(operatorPos);
+      this.emitOp(Opcode.OP_delete);
+      return;
+    }
+
+    if (ts.isElementAccessExpression(operand)) {
+      this.compileExpression(operand.expression);
+      if (operand.argumentExpression) {
+        this.compileExpression(operand.argumentExpression);
+      } else {
+        this.emitOp(Opcode.OP_undefined);
+      }
+      this.emitLineCol(operatorPos);
+      this.emitOp(Opcode.OP_delete);
+      return;
+    }
+
+    if (ts.isIdentifier(operand)) {
+      this.compileDeleteIdentifier(operand, operatorPos);
+      return;
+    }
+
+    this.compileExpression(operand);
+    this.emitLineCol(operatorPos);
+    this.emitOp(Opcode.OP_drop);
+    this.emitOp(Opcode.OP_push_true);
+  }
+
+  private compileDeleteIdentifier(node: ts.Identifier, operatorPos: number) {
+    if (this.isStrictMode()) {
+      throw new Error('cannot delete a direct reference in strict mode');
+    }
+    const name = node.text;
+    if (this.currentFunc) {
+      this.resolveVarInFunc(this.currentFunc, name);
+    }
+    const atom = this.atomManager.add(name);
+    this.emitLineCol(operatorPos);
+    this.emitScopeDeleteVar(atom, this.scopeLevel);
   }
 
   compilePostfixUnaryExpression(node: ts.PostfixUnaryExpression) {
@@ -2046,77 +2508,66 @@ export class TypeScriptCompiler {
     }
   }
 
-  compileUpdateExpression(node: ts.PrefixUnaryExpression | ts.PostfixUnaryExpression, dropResult: boolean = false) {
+  compileUpdateExpression(
+    node: ts.PrefixUnaryExpression | ts.PostfixUnaryExpression,
+    dropResult: boolean = false,
+  ) {
     const operand = node.operand;
     const operator = node.operator;
     const isPrefix = ts.isPrefixUnaryExpression(node);
 
-    if (ts.isIdentifier(operand)) {
-      const name = operand.text;
-      
-      let idx = this.findLocalVar(name);
-      let isClosure = false;
-      let isLexical = false;
-
-      if (idx === -1) {
-          idx = this.findClosureVar(name);
-          if (idx !== -1) {
-              isClosure = true;
-              isLexical = this.currentFunc!.closureVar[idx].isLexical;
-          } else {
-              // Global
-              idx = -1;
-          }
-      }
-
-      // Emit Get
-      this.emitLineCol(operand.getStart());
-      if (idx === -1) { // Global
-         const atom = this.atomManager.add(name);
-         this.emitOp(Opcode.OP_get_var);
-         this.currentFunc!.byteCode.putU32(atom);
-      } else if (isClosure) {
-         this.emitGetVarRef(idx, isLexical);
-      } else {
-         this.emitGetLoc(idx);
-      }
-
-      // Emit Update
-      // Calculate operator position
-      let operatorPos = -1;
-      if (isPrefix) {
-          operatorPos = node.getStart();
-      } else {
-          operatorPos = node.getEnd() - 2; // Assumes ++ or -- is 2 chars
-      }
-      if (operatorPos !== -1) {
-          this.emitLineCol(operatorPos);
-      }
-
-      if (operator === ts.SyntaxKind.PlusPlusToken) {
-          if (!isPrefix && !dropResult) this.emitOp(Opcode.OP_dup);
-          this.emitOp(Opcode.OP_inc);
-          if (isPrefix && !dropResult) this.emitOp(Opcode.OP_dup);
-      } else {
-          if (!isPrefix && !dropResult) this.emitOp(Opcode.OP_dup);
-          this.emitOp(Opcode.OP_dec);
-          if (isPrefix && !dropResult) this.emitOp(Opcode.OP_dup);
-      }
-
-      // Emit Put
-      if (idx === -1) { // Global
-         const atom = this.atomManager.add(name);
-         this.emitOp(Opcode.OP_put_var);
-         this.currentFunc!.byteCode.putU32(atom);
-      } else if (isClosure) {
-         this.emitPutVarRef(idx, isLexical);
-      } else {
-         this.emitPutLoc(idx);
-      }
+    if (!ts.isIdentifier(operand)) {
+      console.warn('Update expression only supported for simple identifiers.');
+      this.emitOp(Opcode.OP_push_0);
       return;
     }
-    console.warn('Update expression only supported for variables');
-    this.emitOp(Opcode.OP_push_0);
+
+    const name = operand.text;
+    let idx = this.findLocalVar(name);
+    let isClosure = false;
+    let isLexical = false;
+
+    if (idx === -1) {
+      idx = this.findClosureVar(name);
+      if (idx !== -1) {
+        isClosure = true;
+        isLexical = this.currentFunc!.closureVar[idx].isLexical;
+      }
+    }
+
+    const atom = idx === -1 ? this.atomManager.add(name) : null;
+    this.emitLineCol(operand.getStart());
+    if (idx === -1) {
+      this.emitOp(Opcode.OP_get_var);
+      this.currentFunc!.byteCode.putU32(atom!);
+    } else if (isClosure) {
+      this.emitGetVarRef(idx, isLexical);
+    } else {
+      this.emitGetLoc(idx);
+    }
+
+    const operatorPos = isPrefix ? node.getStart() : node.getEnd() - 2;
+    if (operatorPos !== -1) {
+      this.emitLineCol(operatorPos);
+    }
+
+    const isIncrement = operator === ts.SyntaxKind.PlusPlusToken;
+    if (!isPrefix && !dropResult) {
+      this.emitOp(Opcode.OP_dup);
+    }
+    this.emitOp(isIncrement ? Opcode.OP_inc : Opcode.OP_dec);
+    if (isPrefix && !dropResult) {
+      this.emitOp(Opcode.OP_dup);
+    }
+
+    if (idx === -1) {
+      this.emitOp(Opcode.OP_put_var);
+      this.currentFunc!.byteCode.putU32(atom!);
+    } else if (isClosure) {
+      this.emitPutVarRef(idx, isLexical);
+    } else {
+      this.emitPutLoc(idx);
+    }
   }
 
   compileThrowStatement(node: ts.ThrowStatement) {
@@ -2350,39 +2801,15 @@ export class TypeScriptCompiler {
   }
 
   compileAssignment(left: ts.Expression, right: ts.Expression) {
+    const keepValue = this.shouldPreserveExpressionResult();
     if (ts.isIdentifier(left)) {
       const name = left.text;
       this.compileExpression(right, false, name);
-      this.emitOp(Opcode.OP_dup);
-        
-      if (this.currentFunc) {
-        // Check args
-        const atom = this.atomManager.get(name);
-        if (atom !== JS_ATOM_NULL) {
-          const argIdx = this.currentFunc.args.findIndex(arg => arg.varName === atom);
-          if (argIdx !== -1) {
-            this.emitPutArg(argIdx);
-            return;
-          }
-        }
-        // Check locals
-        const localIdx = this.findLocalVar(name);
-        if (localIdx !== -1) {
-          this.emitPutLoc(localIdx);
-          return;
-        }
+      this.storeIdentifierValue(name, keepValue);
+      if (!keepValue) {
+        this.suppressCurrentExpressionDrop();
       }
-        
-      const idx = this.findClosureVar(name);
-      if (idx !== -1) {
-        const cv = this.currentFunc!.closureVar[idx];
-        this.emitPutVarRef(idx, cv.isLexical);
-      } else {
-        // Global
-        const atom = this.atomManager.add(name);
-        this.emitOp(Opcode.OP_put_var);
-        this.currentFunc!.byteCode.putU32(atom);
-      }
+      return;
     } else if (ts.isPropertyAccessExpression(left)) {
       this.compileExpression(left.expression);
       this.compileExpression(right);
@@ -2404,9 +2831,174 @@ export class TypeScriptCompiler {
     }
   }
 
+  private compilePropertyCompoundAssignment(
+    node: ts.BinaryExpression,
+    left: ts.PropertyAccessExpression,
+    opcode: Opcode,
+    keepValue: boolean,
+  ) {
+    const debugCompound = process.env.DEBUG_COMPOUND === '1';
+    if (debugCompound) {
+      console.warn('[compound] property target:', ts.SyntaxKind[left.expression.kind]);
+    }
+    const operatorPos = node.operatorToken.getStart();
+    const receiver = left.expression;
+    const isPrivate = ts.isPrivateIdentifier(left.name);
+    const atom = isPrivate
+      ? this.getPrivateIdentifierAtom(left.name as ts.PrivateIdentifier)
+      : this.atomManager.add(left.name.text);
+
+    this.compileExpression(receiver);
+    if (debugCompound) {
+      console.warn('[compound] emitted receiver expression');
+    }
+    this.emitOp(Opcode.OP_dup);
+    if (debugCompound) {
+      console.warn('[compound] dup receiver');
+    }
+
+    this.emitLineCol(receiver.end);
+    if (isPrivate) {
+      this.emitOp(Opcode.OP_scope_get_private_field);
+      this.currentFunc!.byteCode.putU32(atom);
+      this.currentFunc!.byteCode.putU16(this.scopeLevel);
+    } else {
+      this.emitOp(Opcode.OP_get_field);
+      this.currentFunc!.byteCode.putU32(atom);
+    }
+    if (debugCompound) {
+      console.warn('[compound] loaded current property value');
+    }
+
+    this.compileExpression(node.right);
+    if (debugCompound) {
+      console.warn('[compound] compiled RHS expression');
+    }
+    this.emitLineCol(operatorPos);
+    this.emitOp(opcode);
+    if (debugCompound) {
+      console.warn('[compound] applied opcode', Opcode[opcode]);
+    }
+
+    if (keepValue) {
+      this.emitOp(Opcode.OP_dup);
+      this.emitOp(Opcode.OP_perm3);
+      if (debugCompound) {
+        console.warn('[compound] preserved result for expression value');
+      }
+    } else {
+      this.suppressCurrentExpressionDrop();
+      if (debugCompound) {
+        console.warn('[compound] result drop suppressed');
+      }
+    }
+
+    if (isPrivate) {
+      this.emitOp(Opcode.OP_scope_put_private_field);
+      this.currentFunc!.byteCode.putU32(atom);
+      this.currentFunc!.byteCode.putU16(this.scopeLevel);
+    } else {
+      this.emitOp(Opcode.OP_put_field);
+      this.currentFunc!.byteCode.putU32(atom);
+    }
+    if (debugCompound) {
+      console.warn('[compound] stored result back to property');
+    }
+  }
+
+  private compileElementCompoundAssignment(
+    node: ts.BinaryExpression,
+    left: ts.ElementAccessExpression,
+    opcode: Opcode,
+    keepValue: boolean,
+  ) {
+    this.compileExpression(left.expression);
+    if (left.argumentExpression) {
+      this.compileExpression(left.argumentExpression);
+    } else {
+      this.emitOp(Opcode.OP_undefined);
+    }
+
+    this.emitOp(Opcode.OP_dup2);
+    this.emitLineCol(left.expression.end);
+    this.emitOp(Opcode.OP_get_array_el);
+
+    this.compileExpression(node.right);
+    this.emitLineCol(node.operatorToken.getStart());
+    this.emitOp(opcode);
+
+    if (keepValue) {
+      this.emitOp(Opcode.OP_insert3);
+    } else {
+      this.suppressCurrentExpressionDrop();
+    }
+
+    this.emitOp(Opcode.OP_put_array_el);
+  }
+
+  private storeIdentifierValue(name: string, keepValue: boolean = true) {
+    const duplicateIfNeeded = () => {
+      if (keepValue) {
+        this.emitOp(Opcode.OP_dup);
+      }
+    };
+
+    if (this.currentFunc) {
+      const atom = this.atomManager.get(name);
+      if (atom !== JS_ATOM_NULL) {
+        const argIdx = this.currentFunc.args.findIndex(arg => arg.varName === atom);
+        if (argIdx !== -1) {
+          if (keepValue) {
+            this.emitSetArg(argIdx);
+          } else {
+            this.emitPutArg(argIdx);
+          }
+          return;
+        }
+      }
+
+      const localIdx = this.findLocalVar(name);
+      if (localIdx !== -1) {
+        if (keepValue) {
+          this.emitSetLoc(localIdx);
+        } else {
+          this.emitPutLoc(localIdx);
+        }
+        return;
+      }
+    }
+
+    const closureIdx = this.findClosureVar(name);
+    if (closureIdx !== -1) {
+      const cv = this.currentFunc!.closureVar[closureIdx];
+      if (!cv.isLexical) {
+        if (keepValue) {
+          this.emitSetVarRef(closureIdx);
+        } else {
+          this.emitPutVarRef(closureIdx);
+        }
+        return;
+      }
+      duplicateIfNeeded();
+      this.emitPutVarRef(closureIdx, true);
+      return;
+    }
+
+    duplicateIfNeeded();
+    const atom = this.atomManager.add(name);
+    this.emitOp(Opcode.OP_put_var);
+    this.currentFunc!.byteCode.putU32(atom);
+  }
+
   compileBinaryExpression(node: ts.BinaryExpression) {
     if (node.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
       this.compileAssignment(node.left, node.right);
+      return;
+    }
+
+    const compoundOpcode = this.getCompoundAssignmentOpcode(node.operatorToken.kind);
+    if (compoundOpcode !== null) {
+      this.compileCompoundAssignment(node, compoundOpcode);
       return;
     }
 
@@ -2565,6 +3157,63 @@ export class TypeScriptCompiler {
     }
   }
 
+  private getCompoundAssignmentOpcode(kind: ts.SyntaxKind): Opcode | null {
+    switch (kind) {
+      case ts.SyntaxKind.PlusEqualsToken:
+        return Opcode.OP_add;
+      case ts.SyntaxKind.MinusEqualsToken:
+        return Opcode.OP_sub;
+      case ts.SyntaxKind.AsteriskEqualsToken:
+        return Opcode.OP_mul;
+      case ts.SyntaxKind.SlashEqualsToken:
+        return Opcode.OP_div;
+      case ts.SyntaxKind.PercentEqualsToken:
+        return Opcode.OP_mod;
+      case ts.SyntaxKind.LessThanLessThanEqualsToken:
+        return Opcode.OP_shl;
+      case ts.SyntaxKind.GreaterThanGreaterThanEqualsToken:
+        return Opcode.OP_sar;
+      case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken:
+        return Opcode.OP_shr;
+      case ts.SyntaxKind.AmpersandEqualsToken:
+        return Opcode.OP_and;
+      case ts.SyntaxKind.BarEqualsToken:
+        return Opcode.OP_or;
+      case ts.SyntaxKind.CaretEqualsToken:
+        return Opcode.OP_xor;
+      default:
+        return null;
+    }
+  }
+
+  private compileCompoundAssignment(node: ts.BinaryExpression, opcode: Opcode) {
+    const keepValue = this.shouldPreserveExpressionResult();
+    const left = node.left;
+    if (ts.isIdentifier(left)) {
+      this.compileIdentifier(left);
+      this.compileExpression(node.right);
+      this.emitLineCol(node.operatorToken.getStart());
+      this.emitOp(opcode);
+      this.storeIdentifierValue(left.text, keepValue);
+      if (!keepValue) {
+        this.suppressCurrentExpressionDrop();
+      }
+      return;
+    }
+
+    if (ts.isPropertyAccessExpression(left)) {
+      this.compilePropertyCompoundAssignment(node, left, opcode, keepValue);
+      return;
+    }
+
+    if (ts.isElementAccessExpression(left)) {
+      this.compileElementCompoundAssignment(node, left, opcode, keepValue);
+      return;
+    }
+
+    console.warn(`Unsupported compound assignment target: ${ts.SyntaxKind[left.kind]}`);
+  }
+
   findVarInFunction(func: JSFunctionDef, name: string): { type: 'local' | 'arg' | 'closure', idx: number } | null {
     const atom = this.atomManager.get(name);
     if (atom === JS_ATOM_NULL) return null;
@@ -2646,6 +3295,9 @@ export class TypeScriptCompiler {
       if (atom !== JS_ATOM_NULL) {
         const argIdx = this.currentFunc.args.findIndex(arg => arg.varName === atom);
         if (argIdx !== -1) {
+          if (this.tryReusePendingStore('arg', argIdx)) {
+            return;
+          }
           if (emitLineInfo && !this.suppressLineInfo) {
             this.emitLineCol(node.getStart());
           }
@@ -2657,10 +3309,21 @@ export class TypeScriptCompiler {
       // Check locals
       const localIdx = this.findLocalVar(name);
       if (localIdx !== -1) {
+        const moduleSlotIdx = this.moduleTopLevelSlots?.get(name);
+        const existingClosureIdx = this.findClosureVar(name);
+        const preferClosure =
+          moduleSlotIdx !== undefined && moduleSlotIdx === localIdx && existingClosureIdx !== -1;
+        if (preferClosure) {
+          this.emitClosureLoad(existingClosureIdx, node, emitLineInfo);
+          return;
+        }
+        const v = this.currentFunc.vars[localIdx];
+        if (!v.isConst && this.tryReusePendingStore('loc', localIdx)) {
+          return;
+        }
         if (emitLineInfo && !this.suppressLineInfo) {
           this.emitLineCol(node.getStart());
         }
-        const v = this.currentFunc.vars[localIdx];
         this.emitGetLoc(localIdx, v.isConst);
         return;
       }
@@ -2673,11 +3336,7 @@ export class TypeScriptCompiler {
 
     const idx = this.findClosureVar(name);
     if (idx !== -1) {
-      if (emitLineInfo && !this.suppressLineInfo) {
-        this.emitLineCol(node.getStart());
-      }
-      const cv = this.currentFunc!.closureVar[idx];
-      this.emitGetVarRef(idx, cv.isLexical);
+      this.emitClosureLoad(idx, node, emitLineInfo);
     } else {
       // Assume global variable
       if (emitLineInfo && !this.suppressLineInfo) {
@@ -2689,6 +3348,19 @@ export class TypeScriptCompiler {
         this.currentFunc.byteCode.putU32(atom);
       }
     }
+  }
+
+  private emitClosureLoad(idx: number, node: ts.Identifier, emitLineInfo: boolean) {
+    if (!this.currentFunc)
+      return;
+    const cv = this.currentFunc.closureVar[idx];
+    if (!cv.isLexical && this.tryReusePendingStore('varRef', idx)) {
+      return;
+    }
+    if (emitLineInfo && !this.suppressLineInfo) {
+      this.emitLineCol(node.getStart());
+    }
+    this.emitGetVarRef(idx, cv.isLexical);
   }
 
   emitGetArg(idx: number) {
@@ -2726,36 +3398,6 @@ export class TypeScriptCompiler {
   emitGetVarRef(idx: number, check: boolean = false) {
     if (!this.currentFunc) return;
     
-    // Peephole optimization: put_var_ref X + get_var_ref X -> set_var_ref X
-    if (!check && this.currentFunc.lastOpArgs.length > 0 && this.currentFunc.lastOpArgs[0] === idx) {
-      let isPut = false;
-      
-      if (idx === 0 && this.currentFunc.lastOp === Opcode.OP_put_var_ref0) isPut = true;
-      else if (idx === 1 && this.currentFunc.lastOp === Opcode.OP_put_var_ref1) isPut = true;
-      else if (idx === 2 && this.currentFunc.lastOp === Opcode.OP_put_var_ref2) isPut = true;
-      else if (idx === 3 && this.currentFunc.lastOp === Opcode.OP_put_var_ref3) isPut = true;
-      else if (this.currentFunc.lastOp === Opcode.OP_put_var_ref) isPut = true;
-      
-      if (isPut) {
-        // Rollback
-        this.currentFunc.byteCode.setSize(this.currentFunc.lastOpPos);
-        
-        // Emit set_var_ref
-        if (idx === 0) this.emitOp(Opcode.OP_set_var_ref0);
-        else if (idx === 1) this.emitOp(Opcode.OP_set_var_ref1);
-        else if (idx === 2) this.emitOp(Opcode.OP_set_var_ref2);
-        else if (idx === 3) this.emitOp(Opcode.OP_set_var_ref3);
-        else {
-          this.emitOp(Opcode.OP_set_var_ref);
-          this.currentFunc.byteCode.putU16(idx);
-        }
-        
-        // Update lastOpArgs because set_var_ref also uses idx
-        this.currentFunc.lastOpArgs = [idx];
-        return;
-      }
-    }
-
     if (check) {
       this.emitOp(Opcode.OP_get_var_ref_check);
       this.currentFunc.byteCode.putU16(idx);
@@ -2826,12 +3468,56 @@ export class TypeScriptCompiler {
   // Emit helpers
   emitOp(op: Opcode) {
     if (!this.currentFunc) return;
-    if (this.currentFunc.hasPendingLineInfo) {
-      this.flushLineCol();
-    }
+    this.pendingStore = null;
+    const isStoreOpcode = this.isStoreLikeOpcode(op);
+    const flushPendingLineInfo = () => {
+      while (this.currentFunc && this.currentFunc.hasPendingLineInfo) {
+        if (this.currentFunc.pendingLineNeedsStorePc && !isStoreOpcode) {
+          // Defer until we see the matching store opcode.
+          break;
+        }
+        if (this.currentFunc.pendingLineNeedsStorePc && isStoreOpcode) {
+          this.currentFunc.pendingLinePcOverride = this.currentFunc.byteCode.size;
+        }
+        this.flushLineCol();
+      }
+    };
+
+    flushPendingLineInfo();
+    const nextPc = this.currentFunc.byteCode.size;
+    this.currentFunc.lastOpPc = nextPc;
     this.currentFunc.byteCode.putU8(op);
     this.currentFunc.lastOp = op;
     this.currentFunc.lastOpArgs = [];
+    if (isStoreOpcode) {
+      this.currentFunc.lastStorePc = nextPc;
+    }
+  }
+
+  private recordPendingStore(kind: PendingStoreKind, index: number, opcode: Opcode, operandSize: number) {
+    if (!this.currentFunc) return;
+    const setOpcode = PUT_TO_SET_OPCODE[opcode];
+    if (!setOpcode) {
+      this.pendingStore = null;
+      return;
+    }
+    const writer = this.currentFunc.byteCode;
+    const opcodeOffset = writer.size - (operandSize + 1);
+    this.pendingStore = { kind, index, opcodeOffset, setOpcode };
+  }
+
+  private tryReusePendingStore(kind: PendingStoreKind, index: number): boolean {
+    if (!this.currentFunc || !this.pendingStore) {
+      return false;
+    }
+    const pending = this.pendingStore;
+    if (pending.kind !== kind || pending.index !== index) {
+      return false;
+    }
+    this.currentFunc.byteCode.patchU8(pending.opcodeOffset, pending.setOpcode);
+    this.currentFunc.lastOp = pending.setOpcode;
+    this.pendingStore = null;
+    return true;
   }
 
   emitPushI32(val: number) {
@@ -2864,14 +3550,166 @@ export class TypeScriptCompiler {
     }
   }
 
-  emitLineCol(pos: number, colOffset: number = 0) {
+  private getPendingLineQueue(func: JSFunctionDef): PendingLineEntry[] {
+    let queue = this.pendingLineQueues.get(func);
+    if (!queue) {
+      queue = [];
+      this.pendingLineQueues.set(func, queue);
+    }
+    return queue;
+  }
+
+  private applyPendingLineEntry(func: JSFunctionDef, entry: PendingLineEntry) {
+    func.pendingLineNum = entry.line;
+    func.pendingColumnNum = entry.column;
+    func.pendingSourcePos = entry.sourcePos;
+    func.pendingLinePcOverride = entry.pcOverride;
+    func.pendingLineNeedsStorePc = entry.deferUntilStore;
+    func.hasPendingLineInfo = true;
+  }
+
+  private enqueuePendingLineInfo(func: JSFunctionDef, entry: PendingLineEntry) {
+    if (!func.hasPendingLineInfo) {
+      this.applyPendingLineEntry(func, entry);
+    } else {
+      this.getPendingLineQueue(func).push(entry);
+    }
+  }
+
+  private promoteNextPendingLine(func: JSFunctionDef) {
+    const queue = this.pendingLineQueues.get(func);
+    if (!queue || queue.length === 0) {
+      func.pendingLineNeedsStorePc = false;
+      func.pendingLinePcOverride = null;
+      func.hasPendingLineInfo = false;
+      if (queue) {
+        this.pendingLineQueues.delete(func);
+      }
+      return;
+    }
+    const next = queue.shift()!;
+    if (queue.length === 0) {
+      this.pendingLineQueues.delete(func);
+    }
+    this.applyPendingLineEntry(func, next);
+  }
+
+  emitLineCol(
+    pos: number,
+    colOffset: number = 0,
+    options?: { alignToLastOp?: boolean; deferUntilStore?: boolean },
+  ) {
     if (this.suppressLineInfo) return;
     if (this.sourceFile && this.currentFunc) {
+      const info = this.getSourcePositionInfo(pos, colOffset);
+      const pcOverride =
+        options?.alignToLastOp && this.currentFunc.lastOpPc >= 0
+          ? this.currentFunc.lastOpPc
+          : null;
+      const entry: PendingLineEntry = {
+        line: info.line,
+        column: info.column,
+        sourcePos: info.sourcePos,
+        pcOverride,
+        deferUntilStore: options?.deferUntilStore ?? false,
+      };
+      this.enqueuePendingLineInfo(this.currentFunc, entry);
+    }
+  }
+
+  private getSourcePositionInfo(pos: number, colOffset: number = 0) {
+    if (this.sourceFile) {
       const { line, character } = this.sourceFile.getLineAndCharacterOfPosition(pos);
-      this.currentFunc.pendingLineNum = line + 1;
-      this.currentFunc.pendingColumnNum = Math.max(1, character + 1 + colOffset);
-      this.currentFunc.pendingSourcePos = pos;
-      this.currentFunc.hasPendingLineInfo = true;
+      return {
+        line: line + 1,
+        column: Math.max(1, character + 1 + colOffset),
+        sourcePos: pos,
+      };
+    }
+    return {
+      line: 1,
+      column: Math.max(1, 1 + colOffset),
+      sourcePos: pos,
+    };
+  }
+
+
+  private isStoreLikeOpcode(op?: Opcode): boolean {
+    switch (op) {
+      case Opcode.OP_put_arg0:
+      case Opcode.OP_put_arg1:
+      case Opcode.OP_put_arg2:
+      case Opcode.OP_put_arg3:
+      case Opcode.OP_put_arg:
+      case Opcode.OP_set_arg0:
+      case Opcode.OP_set_arg1:
+      case Opcode.OP_set_arg2:
+      case Opcode.OP_set_arg3:
+      case Opcode.OP_set_arg:
+      case Opcode.OP_put_loc0:
+      case Opcode.OP_put_loc1:
+      case Opcode.OP_put_loc2:
+      case Opcode.OP_put_loc3:
+      case Opcode.OP_put_loc8:
+      case Opcode.OP_put_loc:
+      case Opcode.OP_set_loc0:
+      case Opcode.OP_set_loc1:
+      case Opcode.OP_set_loc2:
+      case Opcode.OP_set_loc3:
+      case Opcode.OP_set_loc8:
+      case Opcode.OP_set_loc:
+      case Opcode.OP_put_var_ref0:
+      case Opcode.OP_put_var_ref1:
+      case Opcode.OP_put_var_ref2:
+      case Opcode.OP_put_var_ref3:
+      case Opcode.OP_put_var_ref:
+      case Opcode.OP_set_var_ref0:
+      case Opcode.OP_set_var_ref1:
+      case Opcode.OP_set_var_ref2:
+      case Opcode.OP_set_var_ref3:
+      case Opcode.OP_set_var_ref:
+      case Opcode.OP_put_var:
+      case Opcode.OP_put_field:
+      case Opcode.OP_put_array_el:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  private isAssignmentLikeExpression(node: ts.Expression): boolean {
+    if (ts.isBinaryExpression(node)) {
+      return this.isAssignmentOperator(node.operatorToken.kind);
+    }
+    if (ts.isPrefixUnaryExpression(node) || ts.isPostfixUnaryExpression(node)) {
+      return (
+        node.operator === ts.SyntaxKind.PlusPlusToken || node.operator === ts.SyntaxKind.MinusMinusToken
+      );
+    }
+    return false;
+  }
+
+  private isAssignmentOperator(kind: ts.SyntaxKind): boolean {
+    switch (kind) {
+      case ts.SyntaxKind.EqualsToken:
+      case ts.SyntaxKind.PlusEqualsToken:
+      case ts.SyntaxKind.MinusEqualsToken:
+      case ts.SyntaxKind.AsteriskEqualsToken:
+      case ts.SyntaxKind.AsteriskAsteriskEqualsToken:
+      case ts.SyntaxKind.SlashEqualsToken:
+      case ts.SyntaxKind.PercentEqualsToken:
+      case ts.SyntaxKind.LessThanLessThanEqualsToken:
+      case ts.SyntaxKind.GreaterThanGreaterThanEqualsToken:
+      case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken:
+      case ts.SyntaxKind.AmpersandEqualsToken:
+      case ts.SyntaxKind.BarEqualsToken:
+      case ts.SyntaxKind.CaretEqualsToken:
+      case ts.SyntaxKind.BarBarEqualsToken:
+      case ts.SyntaxKind.AmpersandAmpersandEqualsToken:
+      case ts.SyntaxKind.QuestionQuestionEqualsToken:
+        return true;
+      default:
+        return false;
     }
   }
 
@@ -2889,11 +3727,10 @@ export class TypeScriptCompiler {
   private flushLineCol() {
     const func = this.currentFunc;
     if (!func || !func.hasPendingLineInfo) return;
-    const pc = func.byteCode.size;
+    const pc = func.pendingLinePcOverride ?? func.byteCode.size;
     const lineNum = func.pendingLineNum;
     const columnNum = func.pendingColumnNum;
     const sourcePos = func.pendingSourcePos;
-    func.hasPendingLineInfo = false;
 
     if (!func.lineNumberSlots) {
       func.lineNumberSlots = [];
@@ -2905,10 +3742,12 @@ export class TypeScriptCompiler {
       lastSlot.sourcePos = sourcePos;
       lastSlot.line = lineNum;
       lastSlot.column = columnNum;
+      this.promoteNextPendingLine(func);
       return;
     }
 
     slots.push({ pc, sourcePos, line: lineNum, column: columnNum });
+    this.promoteNextPendingLine(func);
   }
 
   compileForOfStatement(node: ts.ForOfStatement, labelName?: string) {
@@ -3106,6 +3945,9 @@ export class TypeScriptCompiler {
 
   compileNewExpression(node: ts.NewExpression) {
     this.compileExpression(node.expression);
+    // QuickJS duplicates the constructor before evaluating arguments so the
+    // duplicated value serves as new.target for OP_call_constructor.
+    this.emitOp(Opcode.OP_dup);
     
     const args = node.arguments || [];
     args.forEach(arg => this.compileExpression(arg));

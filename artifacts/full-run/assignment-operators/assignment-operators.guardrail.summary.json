@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/assignment-operators.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/assignment-operators",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/assignment-operators/cli/assignment-operators.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/assignment-operators/cli/assignment-operators.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/assignment-operators/cli/assignment-operators.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/assignment-operators/cli/assignment-operators.pc2line.txt",
+    "bytecodeSize": 492,
+    "pc2lineLength": 134,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": false,
+    "tsSize": 536,
+    "wasmSize": 474,
+    "sizeDiff": 62,
+    "sizeDiffPercent": 13.080168776371309
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 6,
+    "wasmEventCount": 6,
+    "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/assignment-operators/trace/assignment-operators.trace.summary.json"
+  }
+}

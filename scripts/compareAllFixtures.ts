@@ -2,6 +2,10 @@
 
 import fs from 'fs/promises'
 import path from 'path'
+import { TypeScriptCompiler } from '../src'
+import { createAdvancedDisassembly } from '../src/disasm'
+import { PC2Line } from '../src/env'
+import { compareModuleTrace } from './compareModuleTrace'
 import { BytecodeComparator, type ComparisonOptions, type ComparisonSummary } from './compareWithWasm'
 
 interface RunnerOptions {
@@ -12,14 +16,46 @@ interface RunnerOptions {
   sideBySide: boolean
   showDiff: boolean
   normalizeShort: boolean
-  artifactsDir?: string
+  artifactsDir: string
   bail: boolean
   failOnMismatch: boolean
 }
 
+interface CliStageSummary {
+  bytecodePath: string
+  disassemblyPath: string
+  pc2lineBinaryPath: string
+  pc2lineTablePath: string
+  bytecodeSize: number
+  pc2lineLength: number
+  stackMax: number
+}
+
+interface BytecodeStageSummary {
+  artifactsDir: string
+  summary: ComparisonSummary
+}
+
+interface TraceStageSummary {
+  artifactsDir: string
+  summaryPath: string
+  tsTracePath: string
+  wasmTracePath: string
+  differenceCount: number
+  tsEventCount: number
+  wasmEventCount: number
+}
+
+interface FixtureGuardrailSummary {
+  cli: CliStageSummary
+  bytecode: BytecodeStageSummary
+  trace: TraceStageSummary
+  summaryPath: string
+}
+
 interface FixtureResult {
   fixturePath: string
-  summary?: ComparisonSummary
+  guardrail?: FixtureGuardrailSummary
   error?: Error
 }
 
@@ -44,23 +80,23 @@ async function main() {
     const relativeName = path.relative(process.cwd(), fixturePath)
     console.log(`\n=== ${relativeName} ===`)
 
+    const baseName = path.basename(fixturePath, path.extname(fixturePath))
+    const fixtureArtifactsDir = path.join(options.artifactsDir, baseName)
+
     const comparatorOptions: ComparisonOptions = {
-      inputTs: relativeName,
-      // inputJs: relativeName,
+      inputTs: fixturePath,
       disasm: options.disasm,
       asm: options.asm,
       sideBySide: options.sideBySide,
       showDiff: options.showDiff,
       normalizeShort: options.normalizeShort,
-      artifactsDir: options.artifactsDir,
+      artifactsDir: path.join(fixtureArtifactsDir, 'bytecode'),
     }
 
-    const comparator = new BytecodeComparator(comparatorOptions)
-
     try {
-      const summary = await comparator.compare()
-      results.push({ fixturePath, summary })
-      if (!summary.identical) {
+      const guardrail = await runFixtureGuardrail(fixturePath, fixtureArtifactsDir, comparatorOptions)
+      results.push({ fixturePath, guardrail })
+      if (!guardrail.bytecode.summary.identical || guardrail.trace.differenceCount > 0) {
         hasMismatch = true
         if (options.bail) {
           console.log('🚫 Mismatch detected, exiting early due to --bail flag.')
@@ -94,6 +130,7 @@ function parseArgs(args: string[]): RunnerOptions {
     sideBySide: false,
     showDiff: false,
     normalizeShort: false,
+    artifactsDir: path.resolve('artifacts'),
     bail: false,
     failOnMismatch: true,
   }
@@ -201,20 +238,186 @@ function reportSummary(results: FixtureResult[]) {
       continue
     }
 
-    if (result.summary?.identical) {
-      lines.push(`✅ ${name} — identical (${result.summary.tsSize} bytes)`) 
-      identicalCount += 1
-    } else if (result.summary) {
-      const diff = result.summary.sizeDiff
-      const percent = result.summary.sizeDiffPercent
-      const percentText = percent === null ? 'N/A' : `${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%`
-      lines.push(`⚠️  ${name} — differs by ${diff > 0 ? '+' : ''}${diff} bytes (${percentText})`)
-      mismatchCount += 1
+    if (result.guardrail) {
+      const { bytecode, trace } = result.guardrail
+      if (bytecode.summary.identical && trace.differenceCount === 0) {
+        lines.push(`✅ ${name} — bytecode ${bytecode.summary.tsSize} bytes, trace OK`)
+        identicalCount += 1
+      } else {
+        const diff = bytecode.summary.sizeDiff
+        const percent = bytecode.summary.sizeDiffPercent
+        const percentText = percent === null ? 'N/A' : `${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%`
+        const traceText = trace.differenceCount === 0 ? 'trace OK' : `${trace.differenceCount} trace diff`
+        lines.push(`⚠️  ${name} — Δ${diff > 0 ? '+' : ''}${diff} bytes (${percentText}), ${traceText}`)
+        mismatchCount += 1
+      }
     }
   }
 
   lines.push('\nTotals:', `  ✅ Identical : ${identicalCount}`, `  ⚠️  Mismatched: ${mismatchCount}`, `  ✖ Errors   : ${errorCount}`)
   console.log(lines.join('\n'))
+}
+
+async function runFixtureGuardrail(
+  fixturePath: string,
+  artifactsDir: string,
+  comparatorOptions: ComparisonOptions,
+): Promise<FixtureGuardrailSummary> {
+  await fs.mkdir(artifactsDir, { recursive: true })
+  const cli = await runCliStage(fixturePath, path.join(artifactsDir, 'cli'))
+  const bytecode = await runBytecodeStage(fixturePath, path.join(artifactsDir, 'bytecode'), comparatorOptions)
+  const trace = await runTraceStage(fixturePath, path.join(artifactsDir, 'trace'))
+  const baseName = path.basename(fixturePath, path.extname(fixturePath))
+  const summaryPath = path.join(artifactsDir, `${baseName}.guardrail.summary.json`)
+  await fs.writeFile(summaryPath, JSON.stringify({
+    fixturePath,
+    artifactsDir,
+    cli,
+    bytecode: bytecode.summary,
+    trace: {
+      differenceCount: trace.differenceCount,
+      tsEventCount: trace.tsEventCount,
+      wasmEventCount: trace.wasmEventCount,
+      summaryPath: trace.summaryPath,
+    },
+  }, null, 2), 'utf8')
+  return { cli, bytecode, trace, summaryPath }
+}
+
+async function runCliStage(fixturePath: string, outDir: string): Promise<CliStageSummary> {
+  await fs.mkdir(outDir, { recursive: true })
+  const compiler = new TypeScriptCompiler({ debug: true })
+  const { bytecode, functionDef } = await compiler.compileFileWithArtifacts(fixturePath)
+  const baseName = path.basename(fixturePath, path.extname(fixturePath))
+
+  const bytecodePath = path.join(outDir, `${baseName}.ts.qbc`)
+  await fs.writeFile(bytecodePath, bytecode)
+
+  const disassemblyPath = path.join(outDir, `${baseName}.ts.disasm`)
+  await fs.writeFile(disassemblyPath, createAdvancedDisassembly(bytecode), 'utf8')
+
+  const pc2lineBytes = functionDef.pc2line?.toArray?.() ?? []
+  const pc2lineBinary = Uint8Array.from(pc2lineBytes)
+  const pc2lineBinaryPath = path.join(outDir, `${baseName}.pc2line.bin`)
+  await fs.writeFile(pc2lineBinaryPath, pc2lineBinary)
+
+  const pc2lineTablePath = path.join(outDir, `${baseName}.pc2line.txt`)
+  await fs.writeFile(pc2lineTablePath, formatPc2lineTable(pc2lineBytes), 'utf8')
+
+  return {
+    bytecodePath,
+    disassemblyPath,
+    pc2lineBinaryPath,
+    pc2lineTablePath,
+    bytecodeSize: bytecode.length,
+    pc2lineLength: pc2lineBytes.length,
+    stackMax: functionDef.byteCode.stackMax,
+  }
+}
+
+async function runBytecodeStage(
+  fixturePath: string,
+  artifactsDir: string,
+  comparatorOptions: ComparisonOptions,
+): Promise<BytecodeStageSummary> {
+  await fs.mkdir(artifactsDir, { recursive: true })
+  const comparator = new BytecodeComparator({ ...comparatorOptions, inputTs: fixturePath, artifactsDir })
+  const summary = await comparator.compare()
+  return { artifactsDir, summary }
+}
+
+async function runTraceStage(fixturePath: string, artifactsDir: string): Promise<TraceStageSummary> {
+  await fs.mkdir(artifactsDir, { recursive: true })
+  const result = await compareModuleTrace({ inputTs: fixturePath, artifactsDir })
+  return {
+    artifactsDir,
+    summaryPath: result.summaryPath,
+    tsTracePath: result.tsTracePath,
+    wasmTracePath: result.wasmTracePath,
+    differenceCount: result.differences.length,
+    tsEventCount: result.tsEvents.length,
+    wasmEventCount: result.wasmEvents.length,
+  }
+}
+
+function formatPc2lineTable(bytes: number[]): string {
+  if (!bytes.length)
+    return 'pc2line: <empty>'
+  const entries = decodePc2line(bytes)
+  const lines = ['┏━━╸PC ╺━━╸行 ╺━━╸列 ╺━━╸ΔPC ╺━━╸Δ行 ╺━━╸Δ列']
+  for (const entry of entries) {
+    const pcText = entry.pc.toString().padStart(4, ' ')
+    const lineText = (entry.line + 1).toString().padStart(3, ' ')
+    const colText = (entry.column + 1).toString().padStart(3, ' ')
+    const deltaPc = entry.deltaPc.toString().padStart(3, ' ')
+    const deltaLine = entry.deltaLine.toString().padStart(3, ' ')
+    const deltaColumn = entry.deltaColumn.toString().padStart(3, ' ')
+    lines.push(`┃ ${pcText} → ${lineText} : ${colText}  [Δpc=${deltaPc} Δ行=${deltaLine} Δ列=${deltaColumn}]`)
+  }
+  return lines.join('\n')
+}
+
+interface Pc2lineEntry {
+  pc: number
+  line: number
+  column: number
+  deltaPc: number
+  deltaLine: number
+  deltaColumn: number
+}
+
+function decodePc2line(buffer: number[]): Pc2lineEntry[] {
+  const entries: Pc2lineEntry[] = []
+  let offset = 0
+  const readULEB = (): number => {
+    let result = 0
+    let shift = 0
+    while (offset < buffer.length) {
+      const byte = buffer[offset++]
+      result |= (byte & 0x7f) << shift
+      if ((byte & 0x80) === 0)
+        break
+      shift += 7
+    }
+    return result >>> 0
+  }
+  const readSLEB = (): number => {
+    const encoded = readULEB()
+    const value = (encoded >>> 1) ^ -(encoded & 1)
+    return value | 0
+  }
+
+  if (!buffer.length)
+    return entries
+
+  let pc = 0
+  let line = readULEB()
+  let column = readULEB()
+  entries.push({ pc, line, column, deltaPc: 0, deltaLine: 0, deltaColumn: 0 })
+
+  while (offset < buffer.length) {
+    const op = buffer[offset++]
+    let diffPc: number
+    let diffLine: number
+
+    if (op === 0) {
+      diffPc = readULEB()
+      diffLine = readSLEB()
+    } else {
+      const encoded = op - PC2Line.PC2LINE_OP_FIRST
+      diffPc = Math.floor(encoded / PC2Line.PC2LINE_RANGE)
+      diffLine = (encoded % PC2Line.PC2LINE_RANGE) + PC2Line.PC2LINE_BASE
+    }
+    const diffColumn = readSLEB()
+
+    pc += diffPc
+    line += diffLine
+    column += diffColumn
+
+    entries.push({ pc, line, column, deltaPc: diffPc, deltaLine: diffLine, deltaColumn: diffColumn })
+  }
+
+  return entries
 }
 
 main().catch((error) => {

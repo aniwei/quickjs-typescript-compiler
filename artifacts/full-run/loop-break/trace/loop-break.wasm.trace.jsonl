@@ -1,0 +1,6 @@
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/loop-break.js","event":"resolve-start","timestamp":"2025-12-04T06:33:08.370Z","reqCount":0}
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/loop-break.js","event":"resolve-done","timestamp":"2025-12-04T06:33:08.372Z"}
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/loop-break.js","event":"link-start","timestamp":"2025-12-04T06:33:08.372Z","status":0}
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/loop-break.js","event":"link-done","timestamp":"2025-12-04T06:33:08.376Z","status":2}
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/loop-break.js","event":"eval-start","timestamp":"2025-12-04T06:33:08.376Z","status":2,"isAsync":false,"hasTLA":false}
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/loop-break.js","event":"eval-done","timestamp":"2025-12-04T06:33:08.376Z","status":5,"bytecodeSize":156}

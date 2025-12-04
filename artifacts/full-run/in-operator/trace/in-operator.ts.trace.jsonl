@@ -1,0 +1,6 @@
+{"cat":"module","source":"ts","module":1,"moduleName":"__tests__/compiler/fixtures/in-operator.js","event":"resolve-start","timestamp":"2025-12-04T06:33:08.306Z","reqCount":0}
+{"cat":"module","source":"ts","module":1,"moduleName":"__tests__/compiler/fixtures/in-operator.js","event":"resolve-done","timestamp":"2025-12-04T06:33:08.307Z"}
+{"cat":"module","source":"ts","module":1,"moduleName":"__tests__/compiler/fixtures/in-operator.js","event":"link-start","timestamp":"2025-12-04T06:33:08.307Z","status":0}
+{"cat":"module","source":"ts","module":1,"moduleName":"__tests__/compiler/fixtures/in-operator.js","event":"link-done","timestamp":"2025-12-04T06:33:08.307Z","status":2}
+{"cat":"module","source":"ts","module":1,"moduleName":"__tests__/compiler/fixtures/in-operator.js","event":"eval-start","timestamp":"2025-12-04T06:33:08.307Z","status":2,"isAsync":false,"hasTLA":false}
+{"cat":"module","source":"ts","module":1,"moduleName":"__tests__/compiler/fixtures/in-operator.js","event":"eval-done","timestamp":"2025-12-04T06:33:08.308Z","status":5,"bytecodeSize":181}

@@ -1,0 +1,247 @@
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+[stack:trace] { pos: 0, op: 'push_this', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 1, op: 'if_false8', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 3, op: 'fclosure8', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] {
+  pos: 5,
+  op: 'put_var_ref1',
+  nPop: 1,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 6,
+  op: 'return_undef',
+  nPop: 0,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 7,
+  op: 'set_loc_uninitialized',
+  nPop: 0,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] { pos: 10, op: 'undefined', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 11, op: 'fclosure8', nPop: 0, nPush: 1, depth: 2, catchPos: -1 }
+[stack:trace] {
+  pos: 13,
+  op: 'define_class',
+  nPop: 2,
+  nPush: 2,
+  depth: 2,
+  catchPos: -1
+}
+[stack:trace] { pos: 19, op: 'fclosure8', nPop: 0, nPush: 1, depth: 3, catchPos: -1 }
+[stack:trace] {
+  pos: 21,
+  op: 'define_method',
+  nPop: 2,
+  nPush: 1,
+  depth: 2,
+  catchPos: -1
+}
+[stack:trace] { pos: 27, op: 'fclosure8', nPop: 0, nPush: 1, depth: 3, catchPos: -1 }
+[stack:trace] {
+  pos: 29,
+  op: 'define_method',
+  nPop: 2,
+  nPush: 1,
+  depth: 2,
+  catchPos: -1
+}
+[stack:trace] { pos: 35, op: 'undefined', nPop: 0, nPush: 1, depth: 3, catchPos: -1 }
+[stack:trace] { pos: 36, op: 'put_loc8', nPop: 1, nPush: 0, depth: 2, catchPos: -1 }
+[stack:trace] { pos: 38, op: 'drop', nPop: 1, nPush: 0, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 39, op: 'set_loc0', nPop: 1, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] {
+  pos: 40,
+  op: 'put_var_ref0',
+  nPop: 1,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 41,
+  op: 'get_loc_check',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 44, op: 'dup', nPop: 1, nPush: 2, depth: 2, catchPos: -1 }
+[stack:trace] { pos: 45, op: 'push_i8', nPop: 0, nPush: 1, depth: 3, catchPos: -1 }
+[stack:trace] {
+  pos: 47,
+  op: 'call_constructor',
+  nPop: 3,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 50,
+  op: 'put_var_ref2',
+  nPop: 1,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 51,
+  op: 'set_loc_uninitialized',
+  nPop: 0,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 54,
+  op: 'get_loc_check',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 57, op: 'fclosure8', nPop: 0, nPush: 1, depth: 2, catchPos: -1 }
+[stack:trace] {
+  pos: 59,
+  op: 'define_class',
+  nPop: 2,
+  nPush: 2,
+  depth: 2,
+  catchPos: -1
+}
+[stack:trace] { pos: 65, op: 'undefined', nPop: 0, nPush: 1, depth: 3, catchPos: -1 }
+[stack:trace] { pos: 66, op: 'put_loc8', nPop: 1, nPush: 0, depth: 2, catchPos: -1 }
+[stack:trace] { pos: 68, op: 'drop', nPop: 1, nPush: 0, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 69, op: 'set_loc3', nPop: 1, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] {
+  pos: 70,
+  op: 'put_var_ref3',
+  nPop: 1,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] { pos: 71, op: 'undefined', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] {
+  pos: 72,
+  op: 'return_async',
+  nPop: 1,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 0,
+  op: 'special_object',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 2, op: 'put_loc', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] {
+  pos: 5,
+  op: 'get_var_ref_check',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 8, op: 'dup', nPop: 1, nPush: 2, depth: 2, catchPos: -1 }
+[stack:trace] { pos: 9, op: 'get_arg0', nPop: 0, nPush: 1, depth: 3, catchPos: -1 }
+[stack:trace] {
+  pos: 10,
+  op: 'call_constructor',
+  nPop: 3,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 13, op: 'return', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] {
+  pos: 0,
+  op: 'special_object',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 2, op: 'put_loc', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] {
+  pos: 5,
+  op: 'special_object',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 7, op: 'put_loc', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] {
+  pos: 10,
+  op: 'special_object',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 12, op: 'put_loc', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 15, op: 'push_this', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 16, op: 'put_loc', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] {
+  pos: 19,
+  op: 'check_ctor',
+  nPop: 0,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 20,
+  op: 'get_var_ref0',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 21, op: 'dup', nPop: 1, nPush: 2, depth: 2, catchPos: -1 }
+[stack:trace] { pos: 22, op: 'if_false8', nPop: 1, nPush: 0, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 24, op: 'get_loc3', nPop: 0, nPush: 1, depth: 2, catchPos: -1 }
+[stack:trace] { pos: 25, op: 'swap', nPop: 2, nPush: 2, depth: 2, catchPos: -1 }
+[stack:trace] {
+  pos: 26,
+  op: 'call_method',
+  nPop: 2,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 29, op: 'drop', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 30, op: 'push_this', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 31, op: 'get_arg0', nPop: 0, nPush: 1, depth: 2, catchPos: -1 }
+[stack:trace] { pos: 32, op: 'dup', nPop: 1, nPush: 2, depth: 3, catchPos: -1 }
+[stack:trace] { pos: 33, op: 'perm3', nPop: 3, nPush: 3, depth: 3, catchPos: -1 }
+[stack:trace] { pos: 34, op: 'put_field', nPop: 2, nPush: 0, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 39, op: 'drop', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 40, op: 'undefined', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 41, op: 'return', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 35, op: 'get_field', nPop: 1, nPush: 1, depth: 1, catchPos: -1 }
+❌ Comparison failed: Error: inconsistent stack state at pc=40
+    at enqueue (/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/src/serializer.ts:367:17)
+    at BytecodeSerializer.computeMaxStack (/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/src/serializer.ts:532:9)
+    at BytecodeSerializer.getEffectiveStackUsage (/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/src/serializer.ts:540:27)
+    at BytecodeSerializer.writeFunction (/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/src/serializer.ts:597:32)
+    at BytecodeSerializer.writeValue (/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/src/serializer.ts:734:14)
+    at BytecodeSerializer.writeFunction (/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/src/serializer.ts:668:12)
+    at BytecodeSerializer.writeModule (/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/src/serializer.ts:252:10)
+    at BytecodeSerializer.serialize (/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/src/serializer.ts:110:10)
+    at TypeScriptCompiler.compile (/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/src/compiler/index.ts:522:33)
+    at BytecodeComparator.compileWithTypeScript (/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/scripts/compareWithWasm.ts:121:37)

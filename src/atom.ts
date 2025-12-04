@@ -105,4 +105,8 @@ export class AtomManager {
   dump(): string[] {
     return this.atomToName;
   }
+
+  hasAtom(atom: number): boolean {
+    return Number.isInteger(atom) && atom >= 0 && atom < this.atomToName.length;
+  }
 }

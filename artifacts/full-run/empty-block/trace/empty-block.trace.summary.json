@@ -1,0 +1,9 @@
+{
+  "input": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/empty-block.ts",
+  "moduleName": "__tests__/compiler/fixtures/empty-block.js",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/empty-block/trace",
+  "identical": true,
+  "tsEventCount": 6,
+  "wasmEventCount": 6,
+  "differences": []
+}

@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/conditional-return.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/conditional-return",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/conditional-return/cli/conditional-return.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/conditional-return/cli/conditional-return.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/conditional-return/cli/conditional-return.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/conditional-return/cli/conditional-return.pc2line.txt",
+    "bytecodeSize": 179,
+    "pc2lineLength": 8,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": false,
+    "tsSize": 181,
+    "wasmSize": 164,
+    "sizeDiff": 17,
+    "sizeDiffPercent": 10.365853658536585
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 6,
+    "wasmEventCount": 6,
+    "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/conditional-return/trace/conditional-return.trace.summary.json"
+  }
+}

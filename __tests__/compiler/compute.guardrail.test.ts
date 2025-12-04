@@ -41,6 +41,32 @@ describe('compute guardrail', () => {
       expect(await pathExists(result.trace.wasmTracePath)).toBe(true)
 
       expect(await pathExists(result.summaryPath)).toBe(true)
+
+      expect(result.cli.temporaryScopeAnalysis.totalCount).toBe(0)
+      expect(result.cli.temporaryScopeAnalysis.hasTemporaryScopeOpcodes).toBe(false)
+      expect(result.cli.temporaryScopeAnalysis.occurrences.length).toBe(0)
+    } finally {
+      await fs.rm(artifactsDir, { recursive: true, force: true })
+    }
+  })
+})
+
+const FIXTURE_DIR = path.resolve(__dirname, 'fixtures')
+
+const EXTRA_FIXTURES = [
+  { name: 'console-log', file: path.join(FIXTURE_DIR, 'console-log.ts') },
+  { name: 'arrow-fn-basic', file: path.join(FIXTURE_DIR, 'arrow-fn-basic.ts') },
+]
+
+describe.each(EXTRA_FIXTURES)('%s guardrail', ({ name, file }) => {
+  test('bytecode parity without temporary scope opcodes', async () => {
+    const artifactsDir = await fs.mkdtemp(path.join(os.tmpdir(), `${name}-guardrail-`))
+    try {
+      const result = await runComputeGuardrail({ inputTs: file, artifactsDir })
+      expect(result.cli.bytecodeSize).toBeGreaterThan(0)
+      expect(result.cli.temporaryScopeAnalysis.totalCount).toBe(0)
+      expect(result.bytecode.summary.sizeDiff).toBe(0)
+      expect(result.trace.differenceCount).toBe(0)
     } finally {
       await fs.rm(artifactsDir, { recursive: true, force: true })
     }

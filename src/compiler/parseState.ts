@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { AtomManager, JSAtom } from '../atom';
+import { AtomManager, JSAtom, JS_ATOM_NULL } from '../atom';
 import { GetLineColCache, JSFunctionDef } from '../functionDef';
 import { syntaxKindToToken, TokenValue } from './tokenMap';
 
@@ -116,7 +116,12 @@ export class ParseState {
     this.gotLineFeed = this.scanner.hasPrecedingLineBreak();
 
     if (mapping.classification === 'identifier' || mapping.classification === 'keyword') {
-      this.token.atom = this.atomManager ? this.atomManager.add(tokenText) : undefined;
+      if (this.atomManager) {
+        const existing = this.atomManager.get(tokenText);
+        this.token.atom = existing !== JS_ATOM_NULL ? existing : undefined;
+      } else {
+        this.token.atom = undefined;
+      }
     } else {
       this.token.atom = undefined;
     }

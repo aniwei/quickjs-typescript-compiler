@@ -2,15 +2,16 @@
 
 import fs from 'fs/promises'
 import path from 'path'
-import { TypeScriptCompiler } from '../src'
+import { TypeScriptCompiler, JSFunctionDef } from '../src'
 import { createAdvancedDisassembly } from '../src/disasm'
 import { BytecodeComparator, ComparisonSummary } from './compareWithWasm'
 import { compareModuleTrace, ModuleTraceComparisonResult } from './compareModuleTrace'
-import { PC2Line } from '../src/env'
+import { Opcode, OPCODE_DEFS, PC2Line, SHORT_OPCODE_DEFS, type OpcodeDefinition } from '../src/env'
 
 interface ComputeGuardrailOptions {
   inputTs?: string
   artifactsDir?: string
+  allowTemporaryScopeOpcodes?: boolean
 }
 
 interface CliStageSummary {
@@ -21,6 +22,7 @@ interface CliStageSummary {
   bytecodeSize: number
   pc2lineLength: number
   stackMax: number
+  temporaryScopeAnalysis: TemporaryScopeOpcodeAnalysis
 }
 
 interface BytecodeStageSummary {
@@ -49,12 +51,75 @@ export interface ComputeGuardrailResult {
 
 const DEFAULT_FIXTURE = path.resolve(__dirname, '../__tests__/compiler/fixtures/compute.ts')
 
+interface TemporaryScopeOpcodeOccurrence {
+  functionName: string
+  opcode: string
+  offset: number
+}
+
+export interface TemporaryScopeOpcodeAnalysis {
+  hasTemporaryScopeOpcodes: boolean
+  totalCount: number
+  uniqueOpcodes: string[]
+  occurrences: TemporaryScopeOpcodeOccurrence[]
+}
+
+class TemporaryScopeOpcodeError extends Error {
+  constructor(public readonly analysis: TemporaryScopeOpcodeAnalysis) {
+    super(
+      `Detected ${analysis.totalCount} temporary scope opcode${analysis.totalCount === 1 ? '' : 's'} (${analysis.uniqueOpcodes.join(', ') || 'unknown'})`,
+    )
+    this.name = 'TemporaryScopeOpcodeError'
+  }
+}
+
+const TEMPORARY_SCOPE_OPCODE_SET: ReadonlySet<Opcode> = new Set([
+  Opcode.OP_enter_scope,
+  Opcode.OP_leave_scope,
+  Opcode.OP_scope_get_var_undef,
+  Opcode.OP_scope_get_var,
+  Opcode.OP_scope_put_var,
+  Opcode.OP_scope_delete_var,
+  Opcode.OP_scope_make_ref,
+  Opcode.OP_scope_get_ref,
+  Opcode.OP_scope_put_var_init,
+  Opcode.OP_scope_get_var_checkthis,
+  Opcode.OP_scope_get_private_field,
+  Opcode.OP_scope_get_private_field2,
+  Opcode.OP_scope_put_private_field,
+  Opcode.OP_scope_in_private_field,
+])
+
+const TEMPORARY_SCOPE_OPCODE_SIZES: Partial<Record<Opcode, number>> = {
+  [Opcode.OP_enter_scope]: 3,
+  [Opcode.OP_leave_scope]: 3,
+  [Opcode.OP_scope_get_var_undef]: 7,
+  [Opcode.OP_scope_get_var]: 7,
+  [Opcode.OP_scope_put_var]: 7,
+  [Opcode.OP_scope_delete_var]: 7,
+  [Opcode.OP_scope_make_ref]: 11,
+  [Opcode.OP_scope_get_ref]: 7,
+  [Opcode.OP_scope_put_var_init]: 7,
+  [Opcode.OP_scope_get_var_checkthis]: 7,
+  [Opcode.OP_scope_get_private_field]: 7,
+  [Opcode.OP_scope_get_private_field2]: 7,
+  [Opcode.OP_scope_put_private_field]: 7,
+  [Opcode.OP_scope_in_private_field]: 7,
+};
+
+const opcodeDefsByCode: Array<OpcodeDefinition | undefined> = buildOpcodeDefinitionTable()
+const opcodeNamesByCode: Record<number, string> = buildOpcodeNameMap()
+
 export async function runComputeGuardrail(options: ComputeGuardrailOptions = {}): Promise<ComputeGuardrailResult> {
   const fixturePath = path.resolve(options.inputTs ?? DEFAULT_FIXTURE)
   const artifactsDir = path.resolve(options.artifactsDir ?? path.join(process.cwd(), 'artifacts', 'compute'))
   await fs.mkdir(artifactsDir, { recursive: true })
 
-  const cli = await runCliStage(fixturePath, path.join(artifactsDir, 'cli'))
+  const cli = await runCliStage(
+    fixturePath,
+    path.join(artifactsDir, 'cli'),
+    options.allowTemporaryScopeOpcodes === true,
+  )
   const bytecode = await runBytecodeStage(fixturePath, path.join(artifactsDir, 'bytecode'))
   const trace = await runTraceStage(fixturePath, path.join(artifactsDir, 'trace'))
 
@@ -82,7 +147,11 @@ export async function runComputeGuardrail(options: ComputeGuardrailOptions = {})
   }
 }
 
-async function runCliStage(fixturePath: string, outDir: string): Promise<CliStageSummary> {
+async function runCliStage(
+  fixturePath: string,
+  outDir: string,
+  allowTemporaryScopeOpcodes: boolean,
+): Promise<CliStageSummary> {
   await fs.mkdir(outDir, { recursive: true })
   const compiler = new TypeScriptCompiler({ debug: true })
   const { bytecode, functionDef } = await compiler.compileFileWithArtifacts(fixturePath)
@@ -103,6 +172,11 @@ async function runCliStage(fixturePath: string, outDir: string): Promise<CliStag
   const pc2lineTablePath = path.join(outDir, `${baseName}.pc2line.txt`)
   await fs.writeFile(pc2lineTablePath, formatPc2lineTable(pc2lineBytes), 'utf8')
 
+  const temporaryScopeAnalysis = analyzeTemporaryScopeOpcodes(functionDef)
+  if (temporaryScopeAnalysis.hasTemporaryScopeOpcodes && !allowTemporaryScopeOpcodes) {
+    throw new TemporaryScopeOpcodeError(temporaryScopeAnalysis)
+  }
+
   return {
     bytecodePath,
     disassemblyPath,
@@ -111,6 +185,7 @@ async function runCliStage(fixturePath: string, outDir: string): Promise<CliStag
     bytecodeSize: bytecode.length,
     pc2lineLength: pc2lineBytes.length,
     stackMax: functionDef.byteCode.stackMax,
+    temporaryScopeAnalysis,
   }
 }
 
@@ -220,10 +295,176 @@ function decodePc2line(buffer: number[]): Pc2lineEntry[] {
   return entries
 }
 
+function analyzeTemporaryScopeOpcodes(rootFunc: JSFunctionDef): TemporaryScopeOpcodeAnalysis {
+  const occurrences: TemporaryScopeOpcodeOccurrence[] = []
+  const pending: JSFunctionDef[] = [rootFunc]
+  const visited = new Set<JSFunctionDef>()
+
+  while (pending.length > 0) {
+    const func = pending.pop()!
+    if (visited.has(func))
+      continue
+    visited.add(func)
+
+    if (Array.isArray(func.children) && func.children.length > 0)
+      pending.push(...func.children)
+
+    const buffer = func.byteCode.buffer
+    const hasAtom = getAtomChecker(func)
+    let pc = 0
+    while (pc < buffer.length) {
+      const opcode = buffer[pc]
+      const def = opcodeDefsByCode[opcode]
+      if (!def)
+        throw new Error(`Unknown opcode ${opcode} at pc=${pc}`)
+
+      if (
+        TEMPORARY_SCOPE_OPCODE_SET.has(opcode as Opcode) &&
+        isLikelyTemporaryScopeOpcode(func, buffer, pc, opcode as Opcode, hasAtom)
+      ) {
+        occurrences.push({
+          functionName: describeFunctionName(func),
+          opcode: opcodeNamesByCode[opcode] ?? `opcode#${opcode}`,
+          offset: pc,
+        })
+        const skipSize = TEMPORARY_SCOPE_OPCODE_SIZES[opcode as Opcode] ?? def.size
+        pc += skipSize
+        continue
+      }
+
+      pc += def.size
+    }
+  }
+
+  const uniqueOpcodes = Array.from(new Set(occurrences.map((occ) => occ.opcode))).sort()
+  return {
+    hasTemporaryScopeOpcodes: occurrences.length > 0,
+    totalCount: occurrences.length,
+    uniqueOpcodes,
+    occurrences,
+  }
+}
+
+function describeFunctionName(func: JSFunctionDef): string {
+  const atomManager = func.ctx?.atomManager
+  const nameAtom = func.funcName
+  if (atomManager && typeof atomManager.getString === 'function' && typeof nameAtom === 'number') {
+    const maybeName = atomManager.getString(nameAtom)
+    if (maybeName)
+      return maybeName
+  }
+  return '<anonymous>'
+}
+
+function buildOpcodeDefinitionTable(): Array<OpcodeDefinition | undefined> {
+  const table: Array<OpcodeDefinition | undefined> = []
+  for (const [name, def] of Object.entries(OPCODE_DEFS)) {
+    const code = (Opcode as any)[name]
+    if (typeof code === 'number')
+      table[code] = def
+  }
+  for (const [name, def] of Object.entries(SHORT_OPCODE_DEFS)) {
+    const code = (Opcode as any)[name]
+    if (typeof code === 'number')
+      table[code] = def
+  }
+  return table
+}
+
+function buildOpcodeNameMap(): Record<number, string> {
+  const map: Record<number, string> = {}
+  for (const key of Object.keys(Opcode)) {
+    const value = (Opcode as any)[key]
+    if (typeof value === 'number')
+      map[value] = key
+  }
+  return map
+}
+
+type AtomChecker = (atom: number) => boolean
+
+function isLikelyTemporaryScopeOpcode(
+  func: JSFunctionDef,
+  buffer: Uint8Array,
+  pc: number,
+  opcode: Opcode,
+  hasAtom: AtomChecker,
+): boolean {
+  const scopeIsValid = (scopeIdx: number) => {
+    const scopeLimit = Array.isArray(func.scopes) && func.scopes.length > 0
+      ? func.scopes.length
+      : func.scopeCount > 0
+        ? func.scopeCount
+        : Math.max(func.scopeLevel + 1, 0)
+    return scopeIdx >= 0 && scopeIdx < scopeLimit
+  }
+
+  switch (opcode) {
+    case Opcode.OP_enter_scope:
+    case Opcode.OP_leave_scope: {
+      if (pc + 3 > buffer.length)
+        return false
+      const scope = readU16(buffer, pc + 1)
+      return scopeIsValid(scope)
+    }
+    case Opcode.OP_scope_get_var_undef:
+    case Opcode.OP_scope_get_var:
+    case Opcode.OP_scope_put_var:
+    case Opcode.OP_scope_delete_var:
+    case Opcode.OP_scope_get_ref:
+    case Opcode.OP_scope_put_var_init:
+    case Opcode.OP_scope_get_var_checkthis:
+    case Opcode.OP_scope_get_private_field:
+    case Opcode.OP_scope_get_private_field2:
+    case Opcode.OP_scope_put_private_field:
+    case Opcode.OP_scope_in_private_field: {
+      if (pc + 7 > buffer.length)
+        return false
+      const atom = readU32(buffer, pc + 1)
+      if (!hasAtom(atom))
+        return false
+      const scope = readU16(buffer, pc + 5)
+      return scopeIsValid(scope)
+    }
+    case Opcode.OP_scope_make_ref: {
+      if (pc + 11 > buffer.length)
+        return false
+      const atom = readU32(buffer, pc + 1)
+      if (!hasAtom(atom))
+        return false
+      const scope = readU16(buffer, pc + 9)
+      return scopeIsValid(scope)
+    }
+    default:
+      return true
+  }
+}
+
+function readU32(buffer: Uint8Array, offset: number): number {
+  return (
+    buffer[offset] |
+    (buffer[offset + 1] << 8) |
+    (buffer[offset + 2] << 16) |
+    (buffer[offset + 3] << 24)
+  ) >>> 0
+}
+
+function readU16(buffer: Uint8Array, offset: number): number {
+  return (buffer[offset] | (buffer[offset + 1] << 8)) & 0xffff
+}
+
+function getAtomChecker(func: JSFunctionDef): AtomChecker {
+  const atomManager = func.ctx?.atomManager
+  if (atomManager && typeof atomManager.hasAtom === 'function')
+    return (atom: number) => atomManager.hasAtom(atom)
+  return () => true
+}
+
 async function main() {
   const args = process.argv.slice(2)
   let inputTs: string | undefined
   let artifactsDir: string | undefined
+  let allowTemporaryScopeOpcodes = false
   for (let i = 0; i < args.length; i += 1) {
     const arg = args[i]
     if (!arg)
@@ -243,13 +484,18 @@ async function main() {
         inputTs = args[i + 1]
         i += 1
         break
+      case '--allow-temporary-scope-opcodes':
+      case '--allow-temp-scope-opcodes':
+      case '--allow-temp-scope':
+        allowTemporaryScopeOpcodes = true
+        break
       default:
         console.warn(`Unknown option: ${arg}`)
     }
   }
 
   try {
-    const result = await runComputeGuardrail({ inputTs, artifactsDir })
+    const result = await runComputeGuardrail({ inputTs, artifactsDir, allowTemporaryScopeOpcodes })
     console.log('Compute guardrail complete:')
     console.log(`  Fixture:    ${result.fixturePath}`)
     console.log(`  Artifacts:  ${result.artifactsDir}`)
@@ -257,8 +503,27 @@ async function main() {
     console.log(`  CLI bytes:  ${result.cli.bytecodeSize}`)
     console.log(`  Bytecode Δ: ${result.bytecode.summary.sizeDiff} bytes`)
     console.log(`  Trace diff: ${result.trace.differenceCount}`)
+    if (result.cli.temporaryScopeAnalysis.hasTemporaryScopeOpcodes) {
+      console.warn(
+        `⚠️  Temporary scope opcodes detected (${result.cli.temporaryScopeAnalysis.totalCount}).` +
+          ' Re-run without --allow-temp-scope to enforce failure.',
+      )
+    }
   } catch (error) {
-    console.error('Failed to run compute guardrail:', error)
+    if (error instanceof TemporaryScopeOpcodeError) {
+      console.error('Failed to run compute guardrail: temporary scope opcodes detected.')
+      console.error(`  Unique opcodes: ${error.analysis.uniqueOpcodes.join(', ') || '(unknown)'}`)
+      error.analysis.occurrences.slice(0, 10).forEach((occurrence, index) => {
+        console.error(
+          `  [${index + 1}] ${occurrence.opcode} at offset ${occurrence.offset} in ${occurrence.functionName}`,
+        )
+      })
+      if (error.analysis.totalCount > 10)
+        console.error(`  …and ${error.analysis.totalCount - 10} more occurrences.`)
+      console.error('  Pass --allow-temp-scope to collect artifacts without enforcing the guardrail.')
+    } else {
+      console.error('Failed to run compute guardrail:', error)
+    }
     process.exit(1)
   }
 }

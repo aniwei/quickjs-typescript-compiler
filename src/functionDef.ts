@@ -66,6 +66,41 @@ export interface JSValue {
   value: any;
 }
 
+export enum ModuleExportType {
+  Local = 0,
+  Indirect = 1,
+}
+
+export interface ModuleExportEntry {
+  type: ModuleExportType;
+  exportedName: JSAtom;
+  localVarIndex?: number;
+  localName?: JSAtom;
+  reqModuleIndex?: number;
+  order?: number;
+}
+
+export interface ModuleImportEntry {
+  varIdx: number;
+  isStar: boolean;
+  importName: JSAtom;
+  reqModuleIndex: number;
+}
+
+export interface ModuleRequireEntry {
+  moduleName: JSAtom;
+  attributes?: JSValue | null;
+}
+
+export interface ModuleRecord {
+  moduleName: JSAtom;
+  exportEntries: ModuleExportEntry[];
+  importEntries: ModuleImportEntry[];
+  starExportEntries: number[];
+  requireEntries: ModuleRequireEntry[];
+  hasTopLevelAwait: boolean;
+}
+
 export interface LineNumberSlot {
   pc: number;
   sourcePos: number;
@@ -192,6 +227,9 @@ export class JSFunctionDef {
   lastOp = 0;
   lastOpArgs: number[] = [];
   lastOpPos = 0;
+  lastOpPc = 0;
+  lastStorePc: number | null = null;
+  pendingLineNeedsStorePc = false;
   useShortOpcodes = false;
 
   labelSlots: LabelSlot[] = [];
@@ -226,7 +264,7 @@ export class JSFunctionDef {
   source: string | null = null;
   sourceLen = 0;
 
-  module: any = null;
+  module: ModuleRecord | null = null;
   hasAwait = false;
   ic: any = null;
 
@@ -239,6 +277,7 @@ export class JSFunctionDef {
   pendingColumnNum = 0;
   pendingSourcePos = 0;
   hasPendingLineInfo = false;
+  pendingLinePcOverride: number | null = null;
 
   constructor(ctx: any, parent: JSFunctionDef | null, init: JSFunctionDefInit = {}) {
     this.ctx = ctx;

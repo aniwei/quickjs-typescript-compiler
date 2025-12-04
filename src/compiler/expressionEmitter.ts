@@ -26,6 +26,7 @@ export interface ExpressionEmitterHost {
   compileConditionalExpression(node: ts.ConditionalExpression): void;
   compileTypeOfExpression(node: ts.TypeOfExpression): void;
   compileVoidExpression(node: ts.VoidExpression): void;
+  compileDeleteExpression(node: ts.DeleteExpression): void;
 }
 
 /**
@@ -88,6 +89,9 @@ export class ExpressionEmitter {
         return true;
       case ts.SyntaxKind.VoidExpression:
         this.host.compileVoidExpression(node as ts.VoidExpression);
+        return true;
+      case ts.SyntaxKind.DeleteExpression:
+        this.host.compileDeleteExpression(node as ts.DeleteExpression);
         return true;
       case ts.SyntaxKind.NoSubstitutionTemplateLiteral:
       case ts.SyntaxKind.TemplateExpression:

@@ -1,0 +1,6 @@
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/simple-var-init.js","event":"resolve-start","timestamp":"2025-12-04T06:33:09.140Z","reqCount":0}
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/simple-var-init.js","event":"resolve-done","timestamp":"2025-12-04T06:33:09.142Z"}
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/simple-var-init.js","event":"link-start","timestamp":"2025-12-04T06:33:09.142Z","status":0}
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/simple-var-init.js","event":"link-done","timestamp":"2025-12-04T06:33:09.145Z","status":2}
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/simple-var-init.js","event":"eval-start","timestamp":"2025-12-04T06:33:09.145Z","status":2,"isAsync":false,"hasTLA":false}
+{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/simple-var-init.js","event":"eval-done","timestamp":"2025-12-04T06:33:09.145Z","status":5,"bytecodeSize":91}

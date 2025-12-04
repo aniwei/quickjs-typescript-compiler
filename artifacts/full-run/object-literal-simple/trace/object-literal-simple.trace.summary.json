@@ -1,0 +1,9 @@
+{
+  "input": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/object-literal-simple.ts",
+  "moduleName": "__tests__/compiler/fixtures/object-literal-simple.js",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/object-literal-simple/trace",
+  "identical": true,
+  "tsEventCount": 6,
+  "wasmEventCount": 6,
+  "differences": []
+}

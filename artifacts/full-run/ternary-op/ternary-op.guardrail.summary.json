@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/ternary-op.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/ternary-op",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/ternary-op/cli/ternary-op.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/ternary-op/cli/ternary-op.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/ternary-op/cli/ternary-op.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/ternary-op/cli/ternary-op.pc2line.txt",
+    "bytecodeSize": 171,
+    "pc2lineLength": 14,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": false,
+    "tsSize": 175,
+    "wasmSize": 160,
+    "sizeDiff": 15,
+    "sizeDiffPercent": 9.375
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 6,
+    "wasmEventCount": 6,
+    "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/ternary-op/trace/ternary-op.trace.summary.json"
+  }
+}

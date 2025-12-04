@@ -1,0 +1,382 @@
+{
+  "timestamp": "2025-12-03T04:28:58.839Z",
+  "inputFile": "tmp/simple-var-assign.ts",
+  "compilation": {
+    "typescript": {
+      "size": 78,
+      "bytecode": [
+        "0x05",
+        "0x02",
+        "0x30",
+        "0x74",
+        "0x6d",
+        "0x70",
+        "0x2f",
+        "0x73",
+        "0x69",
+        "0x6d",
+        "0x70",
+        "0x6c",
+        "0x65",
+        "0x2d",
+        "0x76",
+        "0x61",
+        "0x72",
+        "0x2d",
+        "0x61",
+        "0x73",
+        "0x73",
+        "0x69",
+        "0x67",
+        "0x6e",
+        "0x2e",
+        "0x6a",
+        "0x73",
+        "0x02",
+        "0x61",
+        "0x0d",
+        "0xc8",
+        "0x03",
+        "0x00",
+        "0x00",
+        "0x00",
+        "0x00",
+        "0x00",
+        "0x0c",
+        "0x20",
+        "0x06",
+        "0x01",
+        "0xa4",
+        "0x01",
+        "0x00",
+        "0x00",
+        "0x00",
+        "0x02",
+        "0x01",
+        "0x00",
+        "0x0d",
+        "0x00",
+        "0xca",
+        "0x03",
+        "0x00",
+        "0x01",
+        "0x08",
+        "0xec",
+        "0x02",
+        "0x29",
+        "0xbf",
+        "0x0a",
+        "0xe3",
+        "0xdf",
+        "0xb8",
+        "0x9f",
+        "0xe3",
+        "0x06",
+        "0x2f",
+        "0xc8",
+        "0x03",
+        "0x06",
+        "0x00",
+        "0x00",
+        "0x26",
+        "0x08",
+        "0x0c",
+        "0x04",
+        "0x00"
+      ],
+      "hexDump": [
+        "00000000: 05 02 30 74 6d 70 2f 73 69 6d 70 6c 65 2d 76 61 |..0tmp/simple-va|",
+        "00000010: 72 2d 61 73 73 69 67 6e 2e 6a 73 02 61 0d c8 03 |r-assign.js.a...|",
+        "00000020: 00 00 00 00 00 0c 20 06 01 a4 01 00 00 00 02 01 |...... .........|",
+        "00000030: 00 0d 00 ca 03 00 01 08 ec 02 29 bf 0a e3 df b8 |..........).....|",
+        "00000040: 9f e3 06 2f c8 03 06 00 00 26 08 0c 04 00       |.../.....&....|"
+      ],
+      "structure": {
+        "source": "TypeScript",
+        "bcVersion": "0x5",
+        "userAtomCount": 2,
+        "atoms": [
+          {
+            "index": 0,
+            "rawLength": 48,
+            "actualLength": 24,
+            "isWideChar": 0,
+            "string": "tmp/simple-var-assign.js",
+            "offset": 2
+          },
+          {
+            "index": 1,
+            "rawLength": 2,
+            "actualLength": 1,
+            "isWideChar": 0,
+            "string": "a",
+            "offset": 27
+          }
+        ],
+        "functionHeader": {
+          "offset": 29,
+          "tag": "0xd",
+          "remaining": 49
+        }
+      }
+    },
+    "wasm": {
+      "size": 77,
+      "bytecode": [
+        "0x05",
+        "0x02",
+        "0x30",
+        "0x74",
+        "0x6d",
+        "0x70",
+        "0x2f",
+        "0x73",
+        "0x69",
+        "0x6d",
+        "0x70",
+        "0x6c",
+        "0x65",
+        "0x2d",
+        "0x76",
+        "0x61",
+        "0x72",
+        "0x2d",
+        "0x61",
+        "0x73",
+        "0x73",
+        "0x69",
+        "0x67",
+        "0x6e",
+        "0x2e",
+        "0x6a",
+        "0x73",
+        "0x02",
+        "0x61",
+        "0x0d",
+        "0xc8",
+        "0x03",
+        "0x00",
+        "0x00",
+        "0x00",
+        "0x00",
+        "0x00",
+        "0x0c",
+        "0x20",
+        "0x06",
+        "0x01",
+        "0xa4",
+        "0x01",
+        "0x00",
+        "0x00",
+        "0x00",
+        "0x02",
+        "0x01",
+        "0x00",
+        "0x0c",
+        "0x00",
+        "0xca",
+        "0x03",
+        "0x00",
+        "0x01",
+        "0x08",
+        "0xec",
+        "0x02",
+        "0x29",
+        "0xbf",
+        "0x0a",
+        "0xe7",
+        "0xb8",
+        "0x9f",
+        "0xe3",
+        "0x06",
+        "0x2f",
+        "0xc8",
+        "0x03",
+        "0x06",
+        "0x00",
+        "0x00",
+        "0x21",
+        "0x08",
+        "0x0c",
+        "0x04",
+        "0x00"
+      ],
+      "hexDump": [
+        "00000000: 05 02 30 74 6d 70 2f 73 69 6d 70 6c 65 2d 76 61 |..0tmp/simple-va|",
+        "00000010: 72 2d 61 73 73 69 67 6e 2e 6a 73 02 61 0d c8 03 |r-assign.js.a...|",
+        "00000020: 00 00 00 00 00 0c 20 06 01 a4 01 00 00 00 02 01 |...... .........|",
+        "00000030: 00 0c 00 ca 03 00 01 08 ec 02 29 bf 0a e7 b8 9f |..........).....|",
+        "00000040: e3 06 2f c8 03 06 00 00 21 08 0c 04 00          |../.....!....|"
+      ],
+      "structure": {
+        "source": "WASM",
+        "bcVersion": "0x5",
+        "userAtomCount": 2,
+        "atoms": [
+          {
+            "index": 0,
+            "rawLength": 48,
+            "actualLength": 24,
+            "isWideChar": 0,
+            "string": "tmp/simple-var-assign.js",
+            "offset": 2
+          },
+          {
+            "index": 1,
+            "rawLength": 2,
+            "actualLength": 1,
+            "isWideChar": 0,
+            "string": "a",
+            "offset": 27
+          }
+        ],
+        "functionHeader": {
+          "offset": 29,
+          "tag": "0xd",
+          "remaining": 48
+        }
+      }
+    }
+  },
+  "differences": [
+    {
+      "offset": 49,
+      "offsetHex": "0x31",
+      "typescript": "0x0d",
+      "wasm": "0x0c",
+      "typescriptDecimal": 13,
+      "wasmDecimal": 12
+    },
+    {
+      "offset": 61,
+      "offsetHex": "0x3d",
+      "typescript": "0xe3",
+      "wasm": "0xe7",
+      "typescriptDecimal": 227,
+      "wasmDecimal": 231
+    },
+    {
+      "offset": 62,
+      "offsetHex": "0x3e",
+      "typescript": "0xdf",
+      "wasm": "0xb8",
+      "typescriptDecimal": 223,
+      "wasmDecimal": 184
+    },
+    {
+      "offset": 63,
+      "offsetHex": "0x3f",
+      "typescript": "0xb8",
+      "wasm": "0x9f",
+      "typescriptDecimal": 184,
+      "wasmDecimal": 159
+    },
+    {
+      "offset": 64,
+      "offsetHex": "0x40",
+      "typescript": "0x9f",
+      "wasm": "0xe3",
+      "typescriptDecimal": 159,
+      "wasmDecimal": 227
+    },
+    {
+      "offset": 65,
+      "offsetHex": "0x41",
+      "typescript": "0xe3",
+      "wasm": "0x06",
+      "typescriptDecimal": 227,
+      "wasmDecimal": 6
+    },
+    {
+      "offset": 66,
+      "offsetHex": "0x42",
+      "typescript": "0x06",
+      "wasm": "0x2f",
+      "typescriptDecimal": 6,
+      "wasmDecimal": 47
+    },
+    {
+      "offset": 67,
+      "offsetHex": "0x43",
+      "typescript": "0x2f",
+      "wasm": "0xc8",
+      "typescriptDecimal": 47,
+      "wasmDecimal": 200
+    },
+    {
+      "offset": 68,
+      "offsetHex": "0x44",
+      "typescript": "0xc8",
+      "wasm": "0x03",
+      "typescriptDecimal": 200,
+      "wasmDecimal": 3
+    },
+    {
+      "offset": 69,
+      "offsetHex": "0x45",
+      "typescript": "0x03",
+      "wasm": "0x06",
+      "typescriptDecimal": 3,
+      "wasmDecimal": 6
+    },
+    {
+      "offset": 70,
+      "offsetHex": "0x46",
+      "typescript": "0x06",
+      "wasm": "0x00",
+      "typescriptDecimal": 6,
+      "wasmDecimal": 0
+    },
+    {
+      "offset": 72,
+      "offsetHex": "0x48",
+      "typescript": "0x00",
+      "wasm": "0x21",
+      "typescriptDecimal": 0,
+      "wasmDecimal": 33
+    },
+    {
+      "offset": 73,
+      "offsetHex": "0x49",
+      "typescript": "0x26",
+      "wasm": "0x08",
+      "typescriptDecimal": 38,
+      "wasmDecimal": 8
+    },
+    {
+      "offset": 74,
+      "offsetHex": "0x4a",
+      "typescript": "0x08",
+      "wasm": "0x0c",
+      "typescriptDecimal": 8,
+      "wasmDecimal": 12
+    },
+    {
+      "offset": 75,
+      "offsetHex": "0x4b",
+      "typescript": "0x0c",
+      "wasm": "0x04",
+      "typescriptDecimal": 12,
+      "wasmDecimal": 4
+    },
+    {
+      "offset": 76,
+      "offsetHex": "0x4c",
+      "typescript": "0x04",
+      "wasm": "0x00",
+      "typescriptDecimal": 4,
+      "wasmDecimal": 0
+    },
+    {
+      "offset": 77,
+      "offsetHex": "0x4d",
+      "typescript": "0x00",
+      "wasm": "EOF",
+      "typescriptDecimal": 0
+    }
+  ],
+  "sizeDifference": {
+    "absolute": 1,
+    "percentage": "1.30"
+  }
+}

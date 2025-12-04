@@ -1,0 +1,9 @@
+{
+  "input": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/compute.ts",
+  "moduleName": "__tests__/compiler/fixtures/compute.js",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/tmp/guardrail-compute/trace",
+  "identical": true,
+  "tsEventCount": 6,
+  "wasmEventCount": 6,
+  "differences": []
+}

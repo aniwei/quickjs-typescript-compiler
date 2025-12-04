@@ -1,0 +1,26 @@
+__tests__/compiler/fixtures/module-exports.js:1:0: function: <eval>
+  mode: strict
+  closure vars:
+    0: alpha local loc0 const
+    1: beta local loc1 const
+    2: helper local loc2 var
+    3: *default* local loc3 let
+    4: delta local loc4 var
+  stack_size: 1
+  opcodes (20 bytes):
+   0 push_this
+   1 if_false8  offset=10
+   3 fclosure8
+   5 put_var_ref2
+   6 fclosure8
+   8 put_var_ref
+  11 return_undef
+  12 push_1
+  13 put_var_ref0
+  14 push_2
+  15 put_var_ref1
+  16 get_var_ref2
+  17 put_var_ref3
+  18 undefined
+  19 return_async
+

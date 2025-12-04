@@ -10,6 +10,7 @@
 4. **模块边界 = QuickJS C 函数边界**：每个 TS 模块/类方法与 QuickJS 源中单个函数一一对应，便于对照源码 diff。
 5. **调试与差异定位**：字节码差异（尤其是 `compute.ts`）只能通过阅读 QuickJS 源并加入额外调试日志/trace（参考 `third_party/QuickJS/src/core/qts_trace.*`）定位。
 6. **测试口径**：所有 fixtures 作为“验收”，只能验证等价性，不得被用来推测实现细节。
+7. **env 代码禁止手改**：`src/env.ts` 及其衍生常量完全由 `scripts/getEnv.ts` 从 wasm/QuickJS 导出生成，严禁直接在仓库中修改（如需变更请改生成脚本并重新导出）。
 
 ### 2. QuickJS 源码→TS 模块映射
 
@@ -110,7 +111,7 @@
 * 所有 fixture 通过 `scripts/compareAllFixtures.ts`，`compute.ts` 差异清零。
 * 代码结构与 QuickJS C 源建立清晰映射，便于后续继续移植其它内建特性。
 
-### 11. 迭代进度同步（2025-12-01）
+### 11. 迭代进度同步（2025-12-04）
 
 **已完成**
 
@@ -143,14 +144,33 @@
 - Phase 3 迭代（新增）：类声明现拥有独立 BlockEnv，用于存储 `<class_fields_init>` 闭包并由 constructor 通过闭包变量驱动调用；同时在 constructor 入口发射 `OP_check_ctor`/`OP_init_ctor` 并强制派生类显式 `super()`，让 `new.target`/`super()` 约束与 QuickJS 行为保持一致。
 - Phase 3 迭代（新增）：完成私有字段 brand 链路：`ClassCompilationContext` 记录实例/静态 `#` 成员，`<class_fields_init>` 即使仅负责品牌也会生成且在入口发射 `OP_add_brand`，prototype/class 两侧分别插入 `OP_dup` + `OP_null`/`OP_dup` 序列触发 `OP_add_brand`，并在存储闭包前补上 `OP_set_home_object`，确保 brand 注入依照 QuickJS 栈约定执行；`pnpm -s tsc --noEmit` 与 compute fixture 双验证通过。
 - Phase 3 迭代（新增）：补齐私有符号与访问语义：类声明阶段为每个 `#` 成员发射 `OP_private_symbol` 并把符号存入私有 scope，私有方法/访问器以 `OP_scope_put_var_init` 绑定闭包，实例/静态字段分别在 `<class_fields_init>` 与构造函数上使用 `OP_define_private_field`；表达式侧新增 `OP_scope_get/put_private_field(2)` 与 `OP_scope_in_private_field`，让 `obj.#x`、`obj.#x()`、`obj.#x = v` 与 `#x in obj` 的字节码与 QuickJS 对齐。
+- Phase 3 迭代（新增）：接入 QuickJS `resolve_scope_var`/`resolve_scope_private_field` 逻辑，新增 `ScopeResolver` passes 在 serializer 之前逐条替换 `OP_scope_*` 临时指令，支持伪变量/参数/闭包/全局回退、`scope_make_ref/get_ref` 译码及私有字段引用语义，配套在 `TypeScriptCompiler.compile()` 中串联，实现与 QuickJS 相同的作用域折叠管线。
+- Scope Guardrail（新增）：修复 `scripts/runComputeGuardrail.ts` 的临时指令检测逻辑（过滤短指令别名、校验 atom/scope 操作数），并重新运行 compute guardrail，确认 CLI/Bytecode/Trace 全量输出与 QuickJS wasm 完全一致且 `temporaryScopeAnalysis.totalCount = 0`。
 - Serializer/Trace Guardrail（新增）：`__tests__/compiler/serializer.guardrail.test.ts` 与 `trace.guardrail.test.ts` 通过 `BytecodeComparator`、`compareModuleTrace.ts` 验证 `trace-smoke` fixture，确保 `.qbc` 与 trace JSONL 工件始终生成，并将 TS/wasm trace 结构归档至 `artifacts/<fixture>.*trace.*` 以支撑后续差异定位。
 - Serializer/Trace 差异验证（新增）：新增 `empty-program` fixture，并让 serializer/trace guardrail 覆盖 `trace-smoke` 与空程序两种输入，`compareWithWasm`/`compareModuleTrace` 现在会对两个样例生成 `.qbc`/trace/报告，从 smoke test 扩展到“空程序”场景，验证完全无语句时的序列化/Trace 行为。
 - Compute 差异归档（新增）：新增 `scripts/runComputeGuardrail.ts`，串联 CLI 编译（写入 `.qbc`/disasm/pc2line）、`BytecodeComparator` 以及 `compareModuleTrace`，并以 `__tests__/compiler/compute.guardrail.test.ts` 固化管线，可一键生成并校验 `compute.ts` 的 CLI/字节码/trace 全量工件。
 - Compute 差异定位（新增）：利用 `runComputeGuardrail` 落盘的 disasm/pc2line 确认 PC4 首个偏差来自顶层 `const arr`，TS 侧发射 `OP_set_loc_uninitialized` + `OP_put_loc0/OP_get_loc_check`，而 QuickJS 按 `parser.c/js_parse_var` → `resolve_scope` 折叠到 `OP_scope_put_var_init` → `OP_put_var_ref0/OP_get_var_ref_check`，导致整个 for-of 前缀与 wasm 不对齐。
+- Scope Block 清理 + guardrail 扩展（新增）：`ScopeResolver` 现在在 rewrite 阶段直接回收 `OP_enter_scope/leave_scope` 及其余临时 `OP_scope_*` 指令，并通过 operand 校验避免与 `push_*` 等短指令混淆；`scripts/runComputeGuardrail.ts` 与 `__tests__/compiler/compute.guardrail.test.ts` 已扩展到 `console-log.ts`、`arrow-fn-basic.ts`，三套夹具的 CLI/Trace/pc2line 工件均可稳定生成且 `temporaryScopeAnalysis.totalCount = 0`，为后续字节级对齐提供可靠的护栏。
+- **arrow-fn-basic Guardrail（新增）**：修复 `JSFunctionDef.args` 的 `scopeNext` 序列，保持与 QuickJS 一致（参数链表无需反向链接），重新生成 `arrow-fn-basic` CLI/bytecode/disasm，并通过 `compareWithWasm` 任务验证四处 00→01 差异全部消除，核心夹具 guardrail 现可强制 `Bytecode identical: ✅`。
+- compareAllFixtures Guardrail（新增）：`scripts/compareAllFixtures.ts` 已串联 CLI 编译（含 disasm、pc2line）、`BytecodeComparator` 与 `compareModuleTrace`，并以 `--side-by-side --normalize-short` 默认跑通全部 `__tests__/compiler/fixtures/*`；最新一次全量运行在 `artifacts/full-run/` 导出了 per-fixture 守护摘要，结果统计为 **15 个完全一致 / 28 个字节差异 / 14 个 stack underflow 错误**，为后续集中修复提供了明确清单（错误主要集中在 `set_var_ref*` 与 `call_constructor` 路径）。
+- Stack Guardrail（新增）：撤销对 `src/env.ts`/`src/opcodeInfo.ts` 的手工 `set_var_ref*` 栈元数据改动，重新采用 QuickJS 头文件导出的 `nPop=1/nPush=1` 设置，并以 `pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/unary-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts/unary-ops-debug` 回归验证，确认 unary-ops fixture 再无 stack underflow（`stack_size=7`），仅剩 -1 字节差异作为后续字节级对齐的输入。
+- assignment-operators pc2line 收敛（新增）：收紧 `ExpressionStatement` 的行号对齐策略，仅在复用 pending store 且语句为赋值/更新表达式时才回填前一条 store 指令的 PC，重新生成 `assignment-operators` 工件后，TS 侧字节码与 pc2line 均与 WASM 完全一致。
+- trace-smoke Stack Guardrail（新增）：修复 `compileNewExpression` 新建流程，像 QuickJS 一样在发射参数前 `OP_dup` 一份构造函数以充当 `new.target`，`OP_call_constructor` 现在拥有期望的三个入栈元素；`trace-smoke` 再次运行 `compareWithWasm` 不再触发 `stack underflow near call_constructor`，仅剩闭包元数据差异待后续收敛。
+- module-exports-class（新增）：`compileClassDeclaration` 现会识别顶层 `export`/`export default` 类，复刻 QuickJS 在声明后 `set_loc`+`put_var_ref` 的写入顺序，同时通过 `ensureModuleExportClosure` 复用现有局部槽位，让 `Counter`/`DefaultCounter` 的闭包元数据与 wasm 一致，为 `module-exports-class` fixture 的 35 字节差异清零打下基础。
+- module-exports-class 顶层词法顺序（新增）：`compileProgram` 引入 `collectTopLevelLexicalEntries`/`registerModuleTopLevelLexicals`，并限制预扫描阶段不再在模块顶层抢先注册变量，确保 `let/const/class` 绑定与闭包槽按照 QuickJS 源序进入匿名局部表，为后续 atom 表顺序与导出类 fixture 的剩余字节差对齐铺平道路。
+- module-exports 导出顺序追踪（新增）：`compileVariableDeclarationList`/`registerModuleLocalExport` 现会在捕获导出绑定时记录源顺序，`functionDef.ModuleExportEntry` 增加 `order` 字段，`serializer` 根据该字段排序导出表并与 QuickJS `add_export_entry` 输出来回对齐；最新 `module-exports-class` 比对显示顶层 `Counter`/`createCounter` 原子顺序已一致，仅剩闭包字段 atom 尚未收敛。
+- Serializer atom 重写（新增）：`src/serializer.ts` 新增 `rewriteBytecodeBuffer`，在写出每个函数前按 QuickJS `JS_WriteFunctionBytecode` 逻辑逐条重写 atom 操作数，并补全 `writeFunction` 以输出 stack/closure/const pool/bytecode/debug/常量池序列，帮助后续导出类/atom 顺序差异定位回到 QuickJS 参考结构。
+- compareAllFixtures 全量回归（新增 2025-12-04）：使用 `pnpm -s exec tsx scripts/compareAllFixtures.ts --side-by-side --normalize-short --artifacts-dir artifacts/full-run` 重新生成 67 个 fixture 的 TS/WASM bytecode 与 trace；本次统计 **5 个完全一致 / 48 个存在字节差 / 4 个报错**，新增错误集中在 `delete-operator`（drop 栈回收）、`labeled-statements`（pc=12 栈不一致）、`module-exports-class`（pc=42 仍会爆栈）以及 `regex-literal`（call_constructor 入栈不足），所有对比工件已写入 `artifacts/full-run/` 供后续逐案剖析。
+- delete-operator Stack Guardrail（新增）：仿照 QuickJS `js_parse_delete` 流程为 `DeleteExpression` 实现属性/元素/标识符三种分支，属性改为显式推入 prop key + `OP_delete`，标识符在非严格模式下改写为 `OP_scope_delete_var`，并在严格模块直接报错；`compareWithWasm delete-operator` 现仅剩 10 字节差异，栈下溢已清零，工件保存在 `artifacts/delete-operator-debug/`。
+- labeled-statements Guardrail（新增）：补齐模块级 `var` 的 hoist 语义，变量声明只要位于模块根函数内（即便包在 `for`/`if` 等语句中）都会复用 `ensureModuleTopLevelSlot` + `addClosureVar` 注册成 `var_ref`，彻底摆脱将其误判为 block local 的 `set_loc*` 流程；`labeled-statements` fixture 重新运行不再触发 `pc=12` 栈不一致，现仅剩字节差供后续整理。
+- module-exports-class Stack 跟踪（新增）：依照 Next Steps 再次运行 `compareWithWasm module-exports-class`，Serializer 仍在 `pc=42` 抛出 `inconsistent stack state`；随后以 `DEBUG_STACK_ALLOW_INCONSISTENT=1` 重跑并将 disasm/side-by-side/qbc 输出归档到 `artifacts/module-exports-class-debug/`，便于聚焦派生类导出阶段 `set_var_ref` 的栈平衡问题。
+- regex-literal 复现（新增）：`compareWithWasm regex-literal` 依旧在 `call_constructor` 前少推 `new.target`，`BytecodeSerializer.computeMaxStack` 在 `pc=13` 抛出 `stack underflow near call_constructor`，即便允许栈不一致也因 compute 阶段提前终止而无法生成工件；需先补齐 `compileNewExpression` 的 `OP_dup`/`new.target` 入栈逻辑再继续对比。
 
 **进行中 / 下一步**
 
-1. **Scope 临时 opcode 清理**：移除当前字节码中仍然保留的 `OP_enter_scope`/`OP_leave_scope`（临时指令在 QuickJS 最终输出中不会出现），改为只在 ScopeManager 内部追踪作用域，然后在 emit 阶段直接生成最终 opcodes。完成后 `compute.ts` 末段剩余 11 字节差异（全部来自这些临时指令）即可抹平，为后续 `compareAllFixtures` 扩容扫清阻碍。
+1. **堆栈守护修复（stack underflow 专项）**：在 delete-operator、labeled-statements 已回归的基础上，集中精力处理 compareAllFixtures 仍然报错的 `module-exports-class` 与 `regex-literal`（前者在派生类导出路径仍有 `set_var_ref` 栈起伏，后者 `call_constructor` 路径缺少 `new.target`），修复后需复跑 `scripts/compareWithWasm.ts` 并同步 `artifacts/full-run/` 差异，力争将堆栈异常清零，为后续纯字节差问题让路。
+2. **module-exports-class atom 顺序**：最新 `compareWithWasm` 运行仍有 63 字节差，集中在用户 atom 表尾部（`increment/current/initial/step`）与 `<class_fields_init>` 派生闭包的导出缓存顺序；需进一步对齐 ParseState 注册 atom 的时机，并复查闭包缓存入栈顺序以匹配 QuickJS `module.c` 的 `add_export_entry`/`sort_export_entries` 行为。
+3. **compareAllFixtures 回归跟进**：依照 2025-12-04 全量运行的统计结果，优先剖析剩余 3 个报错 fixture（`labeled-statements`、`module-exports-class`、`regex-literal`），整理各自的堆栈/作用域 trace，并在定位修复后再次触发 `scripts/compareAllFixtures.ts` 以验证统计项能从 5/48/4 持续回落。
 
 **未来 48h 行动项**
 
@@ -172,6 +192,9 @@
 - [x] compute 差异定位：利用 `runComputeGuardrail` 的 disasm/pc2line 找到 PC4 首差（顶层 `const arr` 被当作局部变量），并圈定 QuickJS 参考路径（`js_parse_var` → `OP_scope_put_var_init` → `OP_put_var_ref0`）。
 - [x] compute 模块 lexical → var_ref 修复：模块级 `const/let` 现在会分配专属匿名 local slot 并将闭包变量标记为 `isLocal`，TS 端 `put_var_ref0/get_var_ref_check` 与 QuickJS 完全一致，`closure` 元数据从 `parent loc65535` 修正为 `local loc0`，`compute` guardrail 字节码差异缩小到 11 字节（仅剩 scope 临时 opcode），为后续 scope 清理打下基础。
 - [x] compute pc2line 1 字节差异：重构 `emitLineCol`/`flushLineCol`，改为收集 `LineNumberSlot` 并在 serializer 内复刻 QuickJS `add_pc2line_info`→`compute_pc2line_info` 两阶段编码；`pc2line` 缓冲不再即时写入，待 bytecode 完全对齐即可复用 QuickJS 差分表，无需额外补丁（原 `Remaining difference in compute.ts: 1 byte at start of pc2line table` 已清除）。
+- [x] assignment-operators pc2line 收敛：基于最新 compareWithWasm 输出，梳理 `OP_put/set_var_ref*` 语句的行号锚点，将 `emitLineCol` 的 `pendingLinePcOverride` 改为引用最近一次 store PC，并在 `flushLineCol` 阶段去重/保持排序，重新生成 `assignment-operators` 工件验证 pc2line slot 0x155 之后的差异清零。
+- [x] compareAllFixtures 回归巡检：以 `scripts/compareAllFixtures.ts --side-by-side --normalize-short --artifacts-dir artifacts/full-run` 重新落地 67 个 fixture 的工件，记录 **5/48/4** 统计并归档 `delete-operator` / `labeled-statements` / `module-exports-class` / `regex-literal` 四个报错案例，作为后续堆栈专项输入。
+- [ ] 报错 fixture 逐案复现：`module-exports-class` 已获得 `artifacts/module-exports-class-debug/*`（含 disasm/report/qbc），`regex-literal` 仍停留在 `pc=13` 栈下溢阶段需补齐 `new.target`；继续梳理 compare trace 与 ScopeResolver log，定位根因后修复并回归 `scripts/compareAllFixtures.ts` 更新统计。
 
 **风控 / 依赖**
 

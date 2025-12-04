@@ -1,0 +1,32 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/console-log.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/tmp/guardrail-console",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/tmp/guardrail-console/cli/console-log.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/tmp/guardrail-console/cli/console-log.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/tmp/guardrail-console/cli/console-log.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/tmp/guardrail-console/cli/console-log.pc2line.txt",
+    "bytecodeSize": 110,
+    "pc2lineLength": 6,
+    "stackMax": 0,
+    "temporaryScopeAnalysis": {
+      "hasTemporaryScopeOpcodes": false,
+      "totalCount": 0,
+      "uniqueOpcodes": [],
+      "occurrences": []
+    }
+  },
+  "bytecode": {
+    "identical": true,
+    "tsSize": 110,
+    "wasmSize": 110,
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
+  },
+  "trace": {
+    "tsEventCount": 6,
+    "wasmEventCount": 6,
+    "differenceCount": 0,
+    "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/tmp/guardrail-console/trace/console-log.trace.summary.json"
+  }
+}

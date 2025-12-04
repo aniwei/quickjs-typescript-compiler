@@ -1,0 +1,44 @@
+__tests__/compiler/fixtures/module-exports-class.js:1:0: function: <eval>
+  mode: strict
+  locals:
+    0: const Counter [level:1 next:-1]
+    1: const <class_fields_init> [level:3 next:-1]
+    2: const DefaultCounter [level:1 next:0]
+  closure vars:
+    0: createCounter parent loc65535 var
+    1: sharedCounter local loc0 const
+  stack_size: 3
+  opcodes (72 bytes):
+   0 push_this
+   1 if_false8  offset=5
+   3 fclosure8
+   5 put_var_ref0
+   6 return_undef
+   7 set_loc_uninitialized
+  10 set_loc_uninitialized
+  13 undefined
+  14 fclosure8
+  16 define_class  atom=473 (Counter) flags=0
+  22 fclosure8
+  24 define_method  atom=475 (increment) flags=0
+  30 fclosure8
+  32 define_method  atom=477 (current) flags=1
+  38 fclosure8
+  40 set_home_object
+  41 put_loc1
+  42 drop
+  43 put_loc0
+  44 get_loc_check
+  47 dup
+  48 push_i8  42
+  50 call_constructor
+  53 put_var_ref1
+  54 set_loc_uninitialized
+  57 get_loc_check
+  60 fclosure8
+  62 define_class  atom=479 (DefaultCounter) flags=1
+  68 drop
+  69 put_loc2
+  70 undefined
+  71 return_async
+

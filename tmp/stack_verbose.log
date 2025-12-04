@@ -1,0 +1,310 @@
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+[stack:trace] { pos: 0, op: 'push_this', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 1, op: 'if_false8', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 3, op: 'fclosure8', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] {
+  pos: 5,
+  op: 'put_var_ref0',
+  nPop: 1,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 6,
+  op: 'return_undef',
+  nPop: 0,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 7,
+  op: 'set_loc_uninitialized',
+  nPop: 0,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 10,
+  op: 'set_loc_uninitialized',
+  nPop: 0,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] { pos: 13, op: 'undefined', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 14, op: 'fclosure8', nPop: 0, nPush: 1, depth: 2, catchPos: -1 }
+[stack:trace] {
+  pos: 16,
+  op: 'define_class',
+  nPop: 2,
+  nPush: 2,
+  depth: 2,
+  catchPos: -1
+}
+[stack:trace] { pos: 22, op: 'fclosure8', nPop: 0, nPush: 1, depth: 3, catchPos: -1 }
+[stack:trace] {
+  pos: 24,
+  op: 'define_method',
+  nPop: 2,
+  nPush: 1,
+  depth: 2,
+  catchPos: -1
+}
+[stack:trace] { pos: 30, op: 'fclosure8', nPop: 0, nPush: 1, depth: 3, catchPos: -1 }
+[stack:trace] {
+  pos: 32,
+  op: 'define_method',
+  nPop: 2,
+  nPush: 1,
+  depth: 2,
+  catchPos: -1
+}
+[stack:trace] { pos: 38, op: 'fclosure8', nPop: 0, nPush: 1, depth: 3, catchPos: -1 }
+[stack:trace] {
+  pos: 40,
+  op: 'set_home_object',
+  nPop: 2,
+  nPush: 2,
+  depth: 3,
+  catchPos: -1
+}
+[stack:trace] { pos: 41, op: 'put_loc1', nPop: 1, nPush: 0, depth: 2, catchPos: -1 }
+[stack:trace] { pos: 42, op: 'drop', nPop: 1, nPush: 0, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 43, op: 'put_loc0', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] {
+  pos: 44,
+  op: 'get_loc_check',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 47, op: 'dup', nPop: 1, nPush: 2, depth: 2, catchPos: -1 }
+[stack:trace] { pos: 48, op: 'push_i8', nPop: 0, nPush: 1, depth: 3, catchPos: -1 }
+[stack:trace] {
+  pos: 50,
+  op: 'call_constructor',
+  nPop: 3,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 53,
+  op: 'put_var_ref1',
+  nPop: 1,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 54,
+  op: 'set_loc_uninitialized',
+  nPop: 0,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 57,
+  op: 'set_loc_uninitialized',
+  nPop: 0,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 60,
+  op: 'get_loc_check',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 63, op: 'fclosure8', nPop: 0, nPush: 1, depth: 2, catchPos: -1 }
+[stack:trace] {
+  pos: 65,
+  op: 'define_class',
+  nPop: 2,
+  nPush: 2,
+  depth: 2,
+  catchPos: -1
+}
+[stack:trace] { pos: 71, op: 'undefined', nPop: 0, nPush: 1, depth: 3, catchPos: -1 }
+[stack:trace] { pos: 72, op: 'put_loc3', nPop: 1, nPush: 0, depth: 2, catchPos: -1 }
+[stack:trace] { pos: 73, op: 'drop', nPop: 1, nPush: 0, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 74, op: 'put_loc2', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 75, op: 'undefined', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] {
+  pos: 76,
+  op: 'return_async',
+  nPop: 1,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 0,
+  op: 'special_object',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 2, op: 'put_loc', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 5, op: 'get_var', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 10, op: 'dup', nPop: 1, nPush: 2, depth: 2, catchPos: -1 }
+[stack:trace] { pos: 11, op: 'get_arg0', nPop: 0, nPush: 1, depth: 3, catchPos: -1 }
+[stack:trace] {
+  pos: 12,
+  op: 'call_constructor',
+  nPop: 3,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 15, op: 'return', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] {
+  pos: 0,
+  op: 'special_object',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 2, op: 'put_loc', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] {
+  pos: 5,
+  op: 'special_object',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 7, op: 'put_loc', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 10, op: 'push_this', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 11, op: 'put_loc', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 14, op: 'push_this', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 15, op: 'undefined', nPop: 0, nPush: 1, depth: 2, catchPos: -1 }
+[stack:trace] {
+  pos: 16,
+  op: 'define_field',
+  nPop: 2,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 21, op: 'drop', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] {
+  pos: 22,
+  op: 'return_undef',
+  nPop: 0,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 0,
+  op: 'special_object',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 2, op: 'put_loc', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] {
+  pos: 5,
+  op: 'special_object',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 7, op: 'put_loc', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] {
+  pos: 10,
+  op: 'special_object',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 12, op: 'put_loc', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 15, op: 'push_this', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 16, op: 'put_loc', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] {
+  pos: 19,
+  op: 'check_ctor',
+  nPop: 0,
+  nPush: 0,
+  depth: 0,
+  catchPos: -1
+}
+[stack:trace] {
+  pos: 20,
+  op: 'get_var_ref0',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 21, op: 'if_false8', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] {
+  pos: 23,
+  op: 'get_var_ref0',
+  nPop: 0,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 24, op: 'get_loc3', nPop: 0, nPush: 1, depth: 2, catchPos: -1 }
+[stack:trace] { pos: 25, op: 'swap', nPop: 2, nPush: 2, depth: 2, catchPos: -1 }
+[stack:trace] {
+  pos: 26,
+  op: 'call_method',
+  nPop: 2,
+  nPush: 1,
+  depth: 1,
+  catchPos: -1
+}
+[stack:trace] { pos: 29, op: 'drop', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 30, op: 'push_this', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 31, op: 'get_arg0', nPop: 0, nPush: 1, depth: 2, catchPos: -1 }
+[stack:trace] { pos: 32, op: 'dup', nPop: 1, nPush: 2, depth: 3, catchPos: -1 }
+[stack:trace] { pos: 33, op: 'perm3', nPop: 3, nPush: 3, depth: 3, catchPos: -1 }
+[stack:trace] { pos: 34, op: 'put_field', nPop: 2, nPush: 0, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 39, op: 'drop', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 40, op: 'undefined', nPop: 0, nPush: 1, depth: 1, catchPos: -1 }
+[stack:trace] { pos: 41, op: 'return', nPop: 1, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 36, op: 'invalid', nPop: 0, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 37, op: 'invalid', nPop: 0, nPush: 0, depth: 0, catchPos: -1 }
+[stack:trace] { pos: 38, op: 'invalid', nPop: 0, nPush: 0, depth: 0, catchPos: -1 }
+[stack:mismatch] { pos: 39, prevDepth: 1, nextDepth: 0, prevCatch: -1, nextCatch: -1 }
+[stack:function] 0000: special_object
+0002: put_loc
+0005: special_object
+0007: put_loc
+0010: special_object
+0012: put_loc
+0015: push_this
+0016: put_loc
+0019: check_ctor
+0020: get_var_ref0
+0021: if_false8 +14 -> 36
+0023: get_var_ref0
+0024: get_loc3
+0025: swap
+0026: call_method
+0029: drop
+0030: push_this
+0031: get_arg0
+0032: dup
+0033: perm3
+0034: put_field
+0039: drop
+0040: undefined
+0041: return

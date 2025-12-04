@@ -1,0 +1,9 @@
+{
+  "input": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/complex-functions.ts",
+  "moduleName": "__tests__/compiler/fixtures/complex-functions.js",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/complex-functions/trace",
+  "identical": true,
+  "tsEventCount": 6,
+  "wasmEventCount": 6,
+  "differences": []
+}

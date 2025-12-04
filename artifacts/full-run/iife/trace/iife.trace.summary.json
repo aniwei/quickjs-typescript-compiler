@@ -1,0 +1,9 @@
+{
+  "input": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/iife.ts",
+  "moduleName": "__tests__/compiler/fixtures/iife.js",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/iife/trace",
+  "identical": true,
+  "tsEventCount": 6,
+  "wasmEventCount": 6,
+  "differences": []
+}

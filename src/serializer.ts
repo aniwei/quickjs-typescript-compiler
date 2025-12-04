@@ -1,4 +1,13 @@
-import { JSFunctionDef, JSVarDef, JSClosureVar, JSValue, JSVarKind } from './functionDef'
+import {
+  JSFunctionDef,
+  JSVarDef,
+  JSClosureVar,
+  JSValue,
+  JSVarKind,
+  ModuleExportEntry,
+  ModuleExportType,
+  ModuleRecord,
+} from './functionDef'
 import { BytecodeWriter } from './bytecode'
 import { AtomManager, JSAtom } from './atom'
 import {
@@ -47,6 +56,19 @@ const readI32 = (buf: Uint8Array, offset: number): number =>
     (buf[offset + 2] << 16) |
     (buf[offset + 3] << 24))
 
+const readU32 = (buf: Uint8Array, offset: number): number =>
+  (buf[offset] |
+    (buf[offset + 1] << 8) |
+    (buf[offset + 2] << 16) |
+    (buf[offset + 3] << 24)) >>> 0
+
+const writeU32 = (buf: Uint8Array, offset: number, value: number) => {
+  buf[offset] = value & 0xff
+  buf[offset + 1] = (value >>> 8) & 0xff
+  buf[offset + 2] = (value >>> 16) & 0xff
+  buf[offset + 3] = (value >>> 24) & 0xff
+}
+
 const opcodeNamesByCode = Opcode as unknown as Record<number, string>
 
 const getOpcodeName = (op: number): string => opcodeNamesByCode[op] ?? `op_${op}`
@@ -55,23 +77,23 @@ export class BytecodeSerializer {
   private writer: BytecodeWriter
   private atoms: JSAtom[] = []
   private atomById: Map<JSAtom, number> = new Map()
+  private usedAtoms: Set<JSAtom> = new Set()
+
+  private reset() {
+    this.writer.reset()
+    this.atoms = []
+    this.atomById.clear()
+    this.usedAtoms.clear()
+  }
 
   constructor() {
     this.writer = new BytecodeWriter()
   }
 
   serialize(func: JSFunctionDef): Uint8Array {
-    // Pre-populate atoms from AtomManager to ensure all atoms (including those in bytecode) are included
-    // and indices match.
+    this.reset()
     const atomManager = func.ctx.atomManager as AtomManager
-    const allAtoms = atomManager.dump()
-    // User atoms start at env.firstAtomId
-    // atomToName array index is the atom ID.
-    // We need to add atoms with ID >= env.firstAtomId to atoms.
-    for (let i = env.firstAtomId; i < allAtoms.length; i++) {
-      this.atoms.push(i)
-      this.atomById.set(i, i)
-    }
+    this.collectAtoms(func)
 
     // 1. Serialize object (function/module) to temporary buffer
     const objWriter = new BytecodeWriter()
@@ -92,7 +114,7 @@ export class BytecodeSerializer {
     this.writeLEB128(this.writer, this.atoms.length)
     
     for (const atom of this.atoms) {
-      this.writeAtom(this.writer, atom, func.ctx.atomManager);
+      this.writeAtom(this.writer, atom, atomManager)
     }
 
     // 3. Append object data
@@ -101,22 +123,142 @@ export class BytecodeSerializer {
     return this.writer.buffer;
   }
 
+  private collectAtoms(func: JSFunctionDef) {
+    this.markFunctionAtoms(func)
+    const orderedAtoms = Array.from(this.usedAtoms).sort((a, b) => a - b)
+    this.atoms = orderedAtoms
+    this.atomById.clear()
+    orderedAtoms.forEach((atom, idx) => {
+      this.atomById.set(atom, env.firstAtomId + idx)
+    })
+  }
+
+  private markFunctionAtoms(func: JSFunctionDef) {
+    this.markAtom(func.funcName)
+    this.markAtom(func.filename)
+    func.args.forEach(arg => this.markAtom(arg.varName))
+    func.vars.forEach(v => this.markAtom(v.varName))
+    func.closureVar?.forEach(cv => this.markAtom(cv.varName))
+    func.globalVars?.forEach(gv => this.markAtom(gv.varName))
+    if (func.module && !func.parent) {
+      this.collectModuleAtoms(func.module)
+    }
+    this.collectBytecodeAtoms(func)
+    func.cpool.forEach(entry => {
+      if (entry.type === 'function' && entry.value) {
+        this.markFunctionAtoms(entry.value as JSFunctionDef)
+      }
+    })
+  }
+
+  private collectModuleAtoms(module: ModuleRecord) {
+    this.markAtom(module.moduleName)
+    module.exportEntries.forEach(entry => {
+      if (entry.localName) this.markAtom(entry.localName)
+      this.markAtom(entry.exportedName)
+    })
+    module.importEntries.forEach(entry => {
+      this.markAtom(entry.importName)
+    })
+    module.requireEntries.forEach(entry => {
+      this.markAtom(entry.moduleName)
+    })
+  }
+
+  private collectBytecodeAtoms(func: JSFunctionDef) {
+    const buf = func.byteCode.buffer
+    let pos = 0
+    while (pos < buf.length) {
+      const op = buf[pos]
+      const def = opcodeDefsByCode[op]
+      if (!def) {
+        throw new Error(`unknown opcode ${op} at pc=${pos}`)
+      }
+      if (pos + def.size > buf.length) {
+        throw new Error(`truncated bytecode for ${getOpcodeName(op)} at pc=${pos}`)
+      }
+      switch (def.format) {
+        case OpFormat.atom:
+        case OpFormat.atom_u8:
+        case OpFormat.atom_u16:
+        case OpFormat.atom_label_u8:
+        case OpFormat.atom_label_u16: {
+          const atom = readU32(buf, pos + 1) as JSAtom
+          this.markAtom(atom)
+          break
+        }
+      }
+      pos += def.size
+    }
+  }
+
+  private markAtom(atom: JSAtom) {
+    if (!atom) return
+    if (atom < env.firstAtomId) return
+    this.usedAtoms.add(atom)
+  }
+
   private writeModule(out: BytecodeWriter, func: JSFunctionDef) {
     out.putU8(BytecodeTag.TC_TAG_MODULE);
-    
-    // Module name
-    // In WASM output, module name is the first atom (index 456)
-    // We assume func.filename is the module name for now
-    const moduleNameIdx = this.getAtomIndex(func.filename);
+
+    const moduleRecord = func.module;
+    const moduleNameAtom = moduleRecord?.moduleName ?? func.filename;
+    const moduleNameIdx = this.getAtomIndex(moduleNameAtom);
     this.writeAtomRef(out, moduleNameIdx);
-    
-    this.writeLEB128(out, 0); // req_module_entries_count
-    this.writeLEB128(out, 0); // export_entries_count
-    this.writeLEB128(out, 0); // star_export_entries_count
-    this.writeLEB128(out, 0); // import_entries_count
-    out.putU8(0); // has_tla
-    
+
+    const requireEntries = moduleRecord?.requireEntries ?? [];
+    this.writeLEB128(out, requireEntries.length);
+    for (const entry of requireEntries) {
+      this.writeAtomRef(out, this.getAtomIndex(entry.moduleName));
+      const attr = entry.attributes;
+      if (!attr) {
+        out.putU8(BytecodeTag.TC_TAG_NULL);
+      } else {
+        this.writeValue(out, attr);
+      }
+    }
+
+    const orderedExports = this.getOrderedExportEntries(moduleRecord);
+    this.writeLEB128(out, orderedExports.length);
+    for (const entry of orderedExports) {
+      out.putU8(entry.type);
+      if (entry.type === ModuleExportType.Local) {
+        this.writeLEB128(out, entry.localVarIndex ?? 0);
+      } else {
+        this.writeLEB128(out, entry.reqModuleIndex ?? 0);
+        const localNameAtom = entry.localName ?? entry.exportedName;
+        this.writeAtomRef(out, this.getAtomIndex(localNameAtom));
+      }
+      this.writeAtomRef(out, this.getAtomIndex(entry.exportedName));
+    }
+
+    const starExportEntries = moduleRecord?.starExportEntries ?? [];
+    this.writeLEB128(out, starExportEntries.length);
+    for (const reqIdx of starExportEntries) {
+      this.writeLEB128(out, reqIdx);
+    }
+
+    const importEntries = moduleRecord?.importEntries ?? [];
+    this.writeLEB128(out, importEntries.length);
+    for (const entry of importEntries) {
+      this.writeLEB128(out, entry.varIdx);
+      out.putU8(entry.isStar ? 1 : 0);
+      this.writeAtomRef(out, this.getAtomIndex(entry.importName));
+      this.writeLEB128(out, entry.reqModuleIndex);
+    }
+
+    out.putU8(moduleRecord?.hasTopLevelAwait ? 1 : 0);
+
     this.writeFunction(out, func);
+  }
+
+  private getOrderedExportEntries(moduleRecord?: ModuleRecord | null): ModuleExportEntry[] {
+    const exportEntries = moduleRecord?.exportEntries ?? []
+    return [...exportEntries].sort((a, b) => {
+      const aOrder = a.order ?? 0
+      const bOrder = b.order ?? 0
+      return aOrder - bOrder
+    })
   }
 
   private finalizePc2Line(func: JSFunctionDef) {
@@ -124,7 +266,7 @@ export class BytecodeSerializer {
       return;
 
     if (func.hasPendingLineInfo) {
-      const pc = func.byteCode.size;
+      const pc = func.pendingLinePcOverride ?? func.byteCode.size;
       func.lineNumberSlots.push({
         pc,
         sourcePos: func.pendingSourcePos,
@@ -132,6 +274,7 @@ export class BytecodeSerializer {
         column: func.pendingColumnNum,
       });
       func.hasPendingLineInfo = false;
+      func.pendingLinePcOverride = null;
     }
 
     const slots = func.lineNumberSlots ?? [];
@@ -188,11 +331,33 @@ export class BytecodeSerializer {
     func.pc2lineFinalized = true;
   }
 
-  private computeMaxStack(buf: Uint8Array): number {
+  private getAtomDebugName(atom: JSAtom, atomManager?: AtomManager | null): string {
+    if (!atomManager)
+      return atom ? `#${atom}` : '<null>'
+    const text = atomManager.getString(atom)
+    if (!text || text.length === 0)
+      return atom ? `#${atom}` : '<null>'
+    return text
+  }
+
+  private describeFunction(func?: JSFunctionDef | null): string {
+    if (!func)
+      return '<unknown>'
+    const atomManager = func.ctx?.atomManager as AtomManager | undefined
+    const name = this.getAtomDebugName(func.funcName, atomManager)
+    const filename = this.getAtomDebugName(func.filename, atomManager)
+    return `${name}@${filename}`
+  }
+
+  private computeMaxStack(buf: Uint8Array, func?: JSFunctionDef): number {
   const debugStack = process.env.DEBUG_STACK === '1'
   const verboseStack = process.env.DEBUG_STACK_VERBOSE === '1'
+  const allowInconsistentStack = process.env.DEBUG_STACK_ALLOW_INCONSISTENT === '1'
     const len = buf.length
     if (len === 0) return 0
+    if (verboseStack && func) {
+      console.debug('[stack:func]', { func: this.describeFunction(func) })
+    }
 
     const stackLevels = new Map<number, number>()
     const catchPositions = new Map<number, number>()
@@ -221,7 +386,15 @@ export class BytecodeSerializer {
       if (existingDepth !== undefined) {
         const existingCatch = catchPositions.get(pos) ?? -1
         if (existingDepth !== depth || existingCatch !== catchPos) {
-          throw new Error(`inconsistent stack state at pc=${pos}`)
+          if (allowInconsistentStack) {
+            return
+          }
+          const existingCatchText = existingCatch === -1 ? 'none' : existingCatch.toString()
+          const catchText = catchPos === -1 ? 'none' : catchPos.toString()
+          const funcLabel = this.describeFunction(func)
+          throw new Error(
+            `inconsistent stack state at pc=${pos} (existingDepth=${existingDepth}, incomingDepth=${depth}, existingCatch=${existingCatchText}, incomingCatch=${catchText}, source=${getOpcodeName(sourceOp)}, func=${funcLabel})`,
+          )
         }
         return
       }
@@ -244,19 +417,19 @@ export class BytecodeSerializer {
       const op = buf[pos]
       const def = opcodeDefsByCode[op]
       if (!def)
-        throw new Error(`unknown opcode ${op} at pc=${pos}`)
+        throw new Error(`unknown opcode ${op} at pc=${pos} (func=${this.describeFunction(func)})`)
 
       const opName = def.id ?? getOpcodeName(op)
       let posNext = pos + def.size
       if (posNext > len)
-        throw new Error(`bytecode overflow for ${opName} at pc=${pos}`)
+        throw new Error(`bytecode overflow for ${opName} at pc=${pos} (func=${this.describeFunction(func)})`)
 
       let nPop = def.nPop
       switch (def.format) {
         case OpFormat.npop:
         case OpFormat.npop_u16: {
           if (pos + 2 >= len)
-            throw new Error(`truncated bytecode for ${opName} at pc=${pos}`)
+            throw new Error(`truncated bytecode for ${opName} at pc=${pos} (func=${this.describeFunction(func)})`)
           const imm = readU16(buf, pos + 1)
           nPop += imm
           break
@@ -268,7 +441,7 @@ export class BytecodeSerializer {
 
       stackLen -= nPop
       if (stackLen < 0)
-        throw new Error(`stack underflow near ${opName} at pc=${pos}`)
+        throw new Error(`stack underflow near ${opName} at pc=${pos} (func=${this.describeFunction(func)})`)
       stackLen += def.nPush
       if (verboseStack) {
         console.debug('[stack:trace]', {
@@ -394,41 +567,55 @@ export class BytecodeSerializer {
 
   private getEffectiveStackUsage(func: JSFunctionDef): number {
     const tracked = func.byteCode.stackMax ?? 0;
-    const analyzed = this.computeMaxStack(func.byteCode.buffer);
+    const analyzed = this.computeMaxStack(func.byteCode.buffer, func);
     return Math.max(tracked, analyzed);
   }
 
-  private getAtomIndex(atom: JSAtom, atomManager?: AtomManager): number {
-    if (atom === 0) return 0; // JS_ATOM_NULL
-    
-    // If we pre-populated, the atom should be in the map if it's a user atom.
-    if (this.atomById.has(atom)) {
-      return this.atomById.get(atom)!;
-    }
-    
-    // Check for built-in atoms (hack for <eval>)
-    // We need atomManager to check the string value
-    if (atomManager) {
-      const str = atomManager.getString(atom);
-      if (str === '<eval>') {
-        // JS_ATOM_eval_ (built-in)
-        // Index 82 (shifted 164) observed in WASM output
-        return 82;
-      }
-    }
-    
-    // If it's not in map and not built-in, it might be a standard atom (ID < env.firstAtomId)
-    // In that case, return the ID directly.
+  private getAtomIndex(atom: JSAtom): number {
+    if (atom === 0) return 0 // JS_ATOM_NULL
+
     if (atom < env.firstAtomId) {
-      return atom;
+      return atom
     }
 
-    // Should not happen if we pre-populated correctly
-    // But if it does, add it.
-    const idx = this.atoms.length + env.firstAtomId;
-    this.atoms.push(atom);
-    this.atomById.set(atom, idx);
-    return idx;
+    const existing = this.atomById.get(atom)
+    if (existing === undefined) {
+      throw new Error(`Atom ${atom} missing from serializer mapping`)
+    }
+    return existing
+  }
+
+  private rewriteBytecodeBuffer(func: JSFunctionDef): Uint8Array {
+    const source = func.byteCode.buffer;
+    const buf = new Uint8Array(source);
+    const len = buf.length;
+    let pos = 0;
+
+    while (pos < len) {
+      const op = buf[pos];
+      const def = opcodeDefsByCode[op];
+      if (!def)
+        throw new Error(`unknown opcode ${op} at pc=${pos}`);
+      if (pos + def.size > len)
+        throw new Error(`truncated bytecode for ${getOpcodeName(op)} at pc=${pos}`);
+
+      switch (def.format) {
+        case OpFormat.atom:
+        case OpFormat.atom_u8:
+        case OpFormat.atom_u16:
+        case OpFormat.atom_label_u8:
+        case OpFormat.atom_label_u16: {
+          const atom = readU32(buf, pos + 1) as JSAtom;
+          const remapped = this.getAtomIndex(atom);
+          writeU32(buf, pos + 1, remapped);
+          break;
+        }
+      }
+
+      pos += def.size;
+    }
+
+    return buf;
   }
 
   private writeAtomRef(out: BytecodeWriter, atomIdx: number) {
@@ -440,108 +627,76 @@ export class BytecodeSerializer {
     const bytecodeStack = this.getEffectiveStackUsage(func);
     const requiredStack = Math.max(bytecodeStack, func.anonymousLocalsCount);
     func.stackSize = Math.max(func.stackSize, requiredStack);
-    
+
     out.putU8(BytecodeTag.TC_TAG_FUNCTION_BYTECODE);
-    
-    // Flags
-    // Match WASM output: 0x0620
-    // Bit 5: new_target_allowed
-    // Bit 9: has_debug
-    // Bit 10: is_direct_or_indirect_eval
-    
+
     let flags = 0;
-    if (func.hasPrototype) flags |= (1 << 0);
-    if (func.hasSimpleParameterList) flags |= (1 << 1);
-    if (func.isDerivedClassConstructor) flags |= (1 << 2);
-    if (func.hasHomeObject) flags |= (1 << 3);
-    flags |= (func.funcKind << 4);
-    if (func.newTargetAllowed) flags |= (1 << 6);
-    if (func.superCallAllowed) flags |= (1 << 7);
-    if (func.superAllowed) flags |= (1 << 8);
-    if (func.argumentsAllowed) flags |= (1 << 9);
-    
-    const hasDebug = true;
-    if (hasDebug) flags |= (1 << 10);
-    
-    if (func.isEval) flags |= (1 << 11);
+    if (func.hasPrototype) flags |= 1 << 0;
+    if (func.hasSimpleParameterList) flags |= 1 << 1;
+    if (func.isDerivedClassConstructor) flags |= 1 << 2;
+    if (func.needHomeObject) flags |= 1 << 3;
+    flags |= func.funcKind << 4;
+    if (func.newTargetAllowed) flags |= 1 << 6;
+    if (func.superCallAllowed) flags |= 1 << 7;
+    if (func.superAllowed) flags |= 1 << 8;
+    if (func.argumentsAllowed) flags |= 1 << 9;
+
+    const hasDebug = !func.stripDebug;
+    if (hasDebug) flags |= 1 << 10;
+
+    if (func.isEval) flags |= 1 << 11;
 
     out.putU16(flags);
-    
     out.putU8(func.jsMode);
-    
-    const nameIdx = this.getAtomIndex(func.funcName, func.ctx.atomManager);
+
+    const nameIdx = this.getAtomIndex(func.funcName);
     this.writeAtomRef(out, nameIdx);
-    
+
     const argCount = func.argCount !== -1 ? func.argCount : func.args.length;
-    this.writeLEB128(out, argCount); // arg_count
-    this.writeLEB128(out, func.vars.length); // var_count
-    this.writeLEB128(out, func.args.length); // defined_arg_count
+    const definedArgCount = func.definedArgCount || func.args.length;
+    this.writeLEB128(out, argCount);
+    this.writeLEB128(out, func.vars.length);
+    this.writeLEB128(out, definedArgCount);
     this.writeLEB128(out, func.stackSize);
-    this.writeLEB128(out, func.closureVar.length);
-    this.writeLEB128(out, func.cpool.length);
-    this.writeLEB128(out, func.byteCode.size);
-    
-    // Locals
-    // Write total count first
-    this.writeLEB128(out, func.args.length + func.vars.length);
-    
-    // Write args
-    for (const arg of func.args) {
-        this.writeVarDef(out, arg);
-    }
-    
-    // For now, just write vars.
-    // TODO: Handle args properly
-    for (const v of func.vars) {
-      this.writeVarDef(out, v);
-    }
-    
-    // Closure vars
-    for (const cv of func.closureVar) {
+
+    const closureVars = func.closureVar ?? [];
+    this.writeLEB128(out, closureVars.length);
+
+    const cpoolCount = func.cpool.length;
+    this.writeLEB128(out, cpoolCount);
+
+    const bytecode = this.rewriteBytecodeBuffer(func);
+    this.writeLEB128(out, bytecode.length);
+
+    this.writeVarDefs(out, func);
+
+    for (const cv of closureVars) {
       this.writeClosureVar(out, cv);
     }
-    
-    // Bytecode
-    out.write(func.byteCode.buffer);
-    
-    // Debug info
+
+    out.write(bytecode);
+
     if (hasDebug) {
-      this.finalizePc2Line(func);
-      const filenameIdx = this.getAtomIndex(func.filename, func.ctx.atomManager);
+      const filenameIdx = this.getAtomIndex(func.filename);
       this.writeAtomRef(out, filenameIdx);
-      
-      // pc2line
+
+      this.finalizePc2Line(func);
       const pc2lineBuf = func.pc2line.buffer;
       this.writeLEB128(out, pc2lineBuf.length);
       out.write(pc2lineBuf);
-      
-      // source
-      this.writeLEB128(out, 0); // len
-      // buf (empty)
+
+      if (func.stripSource || !func.source) {
+        this.writeLEB128(out, 0);
+      } else {
+        const sourceBuf = Buffer.from(func.source, 'utf8');
+        this.writeLEB128(out, sourceBuf.length);
+        out.write(sourceBuf);
+      }
     }
 
-    // CPool
-    for (const val of func.cpool) {
-      this.writeValue(out, val);
+    for (const entry of func.cpool) {
+      this.writeValue(out, entry);
     }
-  }
-
-  private writeVarDef(out: BytecodeWriter, v: JSVarDef) {
-    // Force recompile
-    this.writeAtomRef(out, v.varName);
-    this.writeLEB128(out, v.scopeLevel);
-    this.writeLEB128(out, v.scopeNext + 1);
-    
-    const JS_VAR_DEF_CONST = 0x10;
-    const JS_VAR_DEF_LEXICAL = 0x20;
-    const JS_VAR_DEF_CAPTURED = 0x40;
-
-    let kind = v.varKind;
-    if (v.isConst) kind |= JS_VAR_DEF_CONST;
-    if (v.isLexical) kind |= JS_VAR_DEF_LEXICAL;
-    if (v.isCaptured) kind |= JS_VAR_DEF_CAPTURED;
-    
-    out.putU8(kind);
   }
 
   private writeClosureVar(out: BytecodeWriter, cv: JSClosureVar) {
@@ -559,28 +714,72 @@ export class BytecodeSerializer {
     out.putU8(flags);
   }
 
-  private writeValue(out: BytecodeWriter, val: JSValue) {
-    // TODO: Implement value serialization
-    // For now, assume string or int
-    if (val.type === 'string') {
-      out.putU8(BytecodeTag.TC_TAG_STRING);
-      const buf = Buffer.from(val.value, 'utf8');
-      this.writeLEB128(out, buf.length);
-      out.write(buf);
-    } else if (val.type === 'number') {
-      if (Number.isInteger(val.value)) {
-        out.putU8(BytecodeTag.TC_TAG_INT32);
-        out.putU32(val.value);
-      } else {
-        out.putU8(BytecodeTag.TC_TAG_FLOAT64);
-        const buf = Buffer.alloc(8);
-        buf.writeDoubleLE(val.value);
-        out.write(buf);
-      }
-    } else if (val.type === 'function') {
-      this.writeFunction(out, val.value as JSFunctionDef);
-    } else {
+  private writeVarDefs(out: BytecodeWriter, func: JSFunctionDef) {
+    const defs: JSVarDef[] = [...func.args, ...func.vars];
+    this.writeLEB128(out, defs.length);
+
+    for (const def of defs) {
+      const nameIdx = this.getAtomIndex(def.varName);
+      this.writeAtomRef(out, nameIdx);
+      const scopeLevel = Math.max(0, def.scopeLevel ?? 0);
+      this.writeLEB128(out, scopeLevel);
+      const scopeNext = (def.scopeNext ?? -1) + 1;
+      this.writeLEB128(out, scopeNext);
+
+      let flags = (def.varKind ?? JSVarKind.JS_VAR_NORMAL) & 0xf;
+      if (def.isConst) flags |= 1 << 4;
+      if (def.isLexical) flags |= 1 << 5;
+      if (def.isCaptured) flags |= 1 << 6;
+      out.putU8(flags);
+    }
+  }
+
+  private writeValue(out: BytecodeWriter, val?: JSValue | null) {
+    if (!val) {
       out.putU8(BytecodeTag.TC_TAG_NULL);
+      return;
+    }
+
+    switch (val.type) {
+      case 'string': {
+        out.putU8(BytecodeTag.TC_TAG_STRING);
+        const buf = Buffer.from(val.value, 'utf8');
+        this.writeLEB128(out, buf.length);
+        out.write(buf);
+        break;
+      }
+      case 'number': {
+        if (Number.isInteger(val.value)) {
+          out.putU8(BytecodeTag.TC_TAG_INT32);
+          out.putU32(val.value);
+        } else {
+          out.putU8(BytecodeTag.TC_TAG_FLOAT64);
+          const buf = Buffer.alloc(8);
+          buf.writeDoubleLE(val.value);
+          out.write(buf);
+        }
+        break;
+      }
+      case 'function': {
+        this.writeFunction(out, val.value as JSFunctionDef);
+        break;
+      }
+      case 'boolean': {
+        out.putU8(val.value ? BytecodeTag.TC_TAG_BOOL_TRUE : BytecodeTag.TC_TAG_BOOL_FALSE);
+        break;
+      }
+      case 'undefined': {
+        out.putU8(BytecodeTag.TC_TAG_UNDEFINED);
+        break;
+      }
+      case 'null': {
+        out.putU8(BytecodeTag.TC_TAG_NULL);
+        break;
+      }
+      default: {
+        out.putU8(BytecodeTag.TC_TAG_NULL);
+        break;
+      }
     }
   }
 
