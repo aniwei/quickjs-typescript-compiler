@@ -403,9 +403,15 @@ export class BytecodeSerializer {
   }
 
   writeValue(buf: DynBuf, val: any) {
+    // console.log('writeValue', val);
     if (val instanceof JSFunctionDef) {
       this.writeFunction(buf, val);
       return;
+    }
+
+    if (typeof val === 'boolean') {
+        buf.putByte(val ? BytecodeTag.TC_TAG_BOOL_TRUE : BytecodeTag.TC_TAG_BOOL_FALSE);
+        return;
     }
 
     if (typeof val === 'number') {

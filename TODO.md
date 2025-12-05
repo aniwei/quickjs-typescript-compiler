@@ -13,12 +13,12 @@
 - [x] Static Fields
 - [x] Inheritance (`extends`)
 - [x] `super` calls (Explicit constructors only)
-- [ ] Modules (`import`/`export`)
+- [x] Modules (`import`/`export`)
 
 ## Phase 7: Advanced Features
-- [ ] Async/Await
-- [ ] Generators
-- [ ] Error Handling (try/catch)
+- [x] Async/Await
+- [x] Generators
+- [ ] Error Handling (try/catch/finally) - Basic try/catch works, finally needs fix for control flow
 
 ## Phase 8: Optimization & Polish (In Progress)
 - [x] Short Opcodes (`call0`, `if_false8`, etc.)

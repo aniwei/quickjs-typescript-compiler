@@ -1,8 +1,19 @@
 import * as ts from 'typescript';
 import { ParseState } from './parseState';
-import { JSFunctionDef, JSFunctionKind } from './jsFunctionDef';
-import { Opcode, JSAtom } from '../env';
+import { JSFunctionDef, JSFunctionKind, JSVarDefEnum, GLOBAL_VAR_OFFSET } from './jsFunctionDef';
+import { Opcode, JSAtom, JSMode } from '../env';
 import { BytecodeSerializer } from './serializer';
+
+// Constants from QuickJS
+const JS_EVAL_TYPE_GLOBAL = 0;
+const JS_EVAL_TYPE_MODULE = 1;
+const JS_EVAL_TYPE_DIRECT = 2;
+const JS_EVAL_TYPE_INDIRECT = 3;
+const JS_EVAL_FLAG_STRICT = 1 << 3;
+const JS_EVAL_FLAG_STRIP = 1 << 4;
+const JS_EVAL_FLAG_COMPILE_ONLY = 1 << 5;
+const JS_EVAL_FLAG_BACKTRACE_BARRIER = 1 << 6;
+const JS_EVAL_FLAG_ASYNC = 1 << 7;
 
 interface ClassFieldsDef {
   fields_init_fd: JSFunctionDef | null;
@@ -59,47 +70,74 @@ export class TypeScriptCompiler {
     this.state.cur_func = fd;
     this.state.filename = sourceFile.fileName;
 
-    // js_parse_program logic
-    fd.is_global_var = true;
+    // Logic from __JS_EvalInternal
+    const eval_type: number = this.isModule ? JS_EVAL_TYPE_MODULE : JS_EVAL_TYPE_GLOBAL;
+    let js_mode = 0;
+    if (this.isModule) {
+        js_mode |= JSMode.JS_MODE_STRICT;
+    }
     
-    console.log(`Compiler: isModule=${this.isModule}`);
-
-    // Always treat as module for internal structure (vars as closure vars, no locals in serialization)
-    // This matches QuickJS WASM output for strict scripts.
-    fd.is_module = true; 
-    fd.func_kind = JSFunctionKind.JS_FUNC_ASYNC; // Match WASM module behavior
-    fd.js_mode = 1; // JS_MODE_STRICT
-    fd.func_name = JSAtom.JS_ATOM__eval_; // Match WASM module behavior
+    fd.eval_type = eval_type;
+    fd.has_this_binding = (eval_type !== JS_EVAL_TYPE_DIRECT);
+    fd.new_target_allowed = false;
+    fd.super_call_allowed = false;
+    fd.super_allowed = false;
+    fd.arguments_allowed = true;
+    fd.js_mode = js_mode;
+    fd.func_name = JSAtom.JS_ATOM__eval_;
     
-    console.log(`Compiler: func_kind=${fd.func_kind}`);
+    if (this.isModule) {
+        fd.is_module = true;
+        fd.in_function_body = true;
+        fd.func_kind = JSFunctionKind.JS_FUNC_ASYNC;
+    } else {
+        fd.is_module = false;
+        fd.func_kind = JSFunctionKind.JS_FUNC_NORMAL;
+    }
 
-    fd.arguments_allowed = true; // Match WASM
+    // Logic from js_parse_program
+    fd.is_global_var = (fd.eval_type === JS_EVAL_TYPE_GLOBAL) ||
+                       (fd.eval_type === JS_EVAL_TYPE_MODULE) ||
+                       ((fd.js_mode & JSMode.JS_MODE_STRICT) === 0);
 
-    // Add hidden variable for return value
-    // fd.eval_ret_idx = fd.add_var(JSAtom.JS_ATOM__ret_);
+    if (!this.isModule) {
+        // hidden variable for the return value
+        fd.eval_ret_idx = fd.add_var(JSAtom.JS_ATOM__ret_);
+    }
     
     // Push body scope
     fd.push_scope();
     fd.body_scope = fd.scope_level;
 
-    let labelAsync: number = -1;
-
-    if (this.isModule) {
-        // Emit boilerplate for async module ONLY if explicitly requested
-        this.emitOp(Opcode.OP_push_this);
-        labelAsync = this.newLabel();
-        this.emitJump8(Opcode.OP_if_false8, labelAsync);
-        this.emitOp(Opcode.OP_return_undef);
-        this.emitLabel(labelAsync);
-    }
+    // Note: The async module boilerplate (OP_push_this check) found in previous versions
+    // is NOT present in QuickJS C source js_parse_program, so it is removed here.
 
     // Visit statements
     for (const statement of sourceFile.statements) {
-      this.visitStatement(statement);
+      this.visitSourceElement(statement);
     }
 
-    this.emitOp(Opcode.OP_undefined);
-    this.emitOp(Opcode.OP_return_async);
+    // Return logic from js_parse_program
+    if (!this.isModule) {
+        // return the value of the hidden variable eval_ret_idx
+        if (fd.func_kind === JSFunctionKind.JS_FUNC_ASYNC) {
+             // wrap the return value in an object so that promises can be safely returned
+             this.emitOp(Opcode.OP_object);
+             this.emitOp(Opcode.OP_dup);
+             this.emitOp(Opcode.OP_get_loc);
+             this.emitU16(fd.eval_ret_idx);
+             this.emitOp(Opcode.OP_put_field);
+             this.emitAtom(JSAtom.JS_ATOM_value);
+        } else {
+             this.emitOp(Opcode.OP_get_loc);
+             this.emitU16(fd.eval_ret_idx);
+        }
+        this.emitOp(Opcode.OP_return); 
+    } else {
+        // emit_return(s, FALSE) -> emits OP_undefined then return
+        this.emitOp(Opcode.OP_undefined);
+        this.emitOp(Opcode.OP_return_async); // Module is async
+    }
     
     // Serialize
     const serializer = new BytecodeSerializer(this.state.atomManager);
@@ -161,7 +199,7 @@ export class TypeScriptCompiler {
   
   addImportVar(name: number) {
       if (!this.state.cur_func) return;
-      this.state.cur_func.add_var(name);
+      this.state.cur_func.define_var(name, JSVarDefEnum.JS_VAR_DEF_CONST);
   }
 
   visitImportDeclaration(node: ts.ImportDeclaration): void {
@@ -252,7 +290,7 @@ export class TypeScriptCompiler {
       this.addExportEntry(0, defaultAtom, exportAtom);
       
       if (this.state.cur_func) {
-          const idx = this.state.cur_func.add_var(defaultAtom);
+          const idx = this.state.cur_func.define_var(defaultAtom, JSVarDefEnum.JS_VAR_DEF_CONST);
           if (this.state.cur_func.is_module) {
              if (idx === 0) this.emitOp(Opcode.OP_put_var_ref0);
              else if (idx === 1) this.emitOp(Opcode.OP_put_var_ref1);
@@ -290,6 +328,30 @@ export class TypeScriptCompiler {
       this.emitLabel(info.label);
       this.optionalChainLabels.pop();
     }
+  }
+
+  visitSourceElement(node: ts.Statement): void {
+    if (node.kind === ts.SyntaxKind.FunctionDeclaration) {
+        this.visitFunctionDeclaration(node as ts.FunctionDeclaration);
+        return;
+    }
+
+    if (this.isModule) {
+        if (node.kind === ts.SyntaxKind.ExportDeclaration) {
+            this.visitExportDeclaration(node as ts.ExportDeclaration);
+            return;
+        }
+        if (node.kind === ts.SyntaxKind.ExportAssignment) {
+            this.visitExportAssignment(node as ts.ExportAssignment);
+            return;
+        }
+        if (node.kind === ts.SyntaxKind.ImportDeclaration) {
+            this.visitImportDeclaration(node as ts.ImportDeclaration);
+            return;
+        }
+    }
+
+    this.visitStatement(node);
   }
 
   visitStatement(node: ts.Statement): void {
@@ -346,15 +408,6 @@ export class TypeScriptCompiler {
       case ts.SyntaxKind.ForOfStatement:
         this.visitForOfStatement(node as ts.ForOfStatement);
         break;
-      case ts.SyntaxKind.ImportDeclaration:
-        this.visitImportDeclaration(node as ts.ImportDeclaration);
-        break;
-      case ts.SyntaxKind.ExportDeclaration:
-        this.visitExportDeclaration(node as ts.ExportDeclaration);
-        break;
-      case ts.SyntaxKind.ExportAssignment:
-        this.visitExportAssignment(node as ts.ExportAssignment);
-        break;
       // TODO: Other statements
     }
   }
@@ -373,13 +426,7 @@ export class TypeScriptCompiler {
       this.visitStatement(stmt);
     }
     
-    const vars = this.state.cur_func.pop_scope();
-    for (const v of vars) {
-        if (v.def.is_captured) {
-            this.emitOp(Opcode.OP_close_loc);
-            this.emitU16(v.idx);
-        }
-    }
+    this.state.cur_func.pop_scope();
   }
 
   visitIfStatement(node: ts.IfStatement): void {
@@ -543,6 +590,10 @@ export class TypeScriptCompiler {
         this.emitOp(Opcode.OP_undefined);
       }
 
+      let varDefType = JSVarDefEnum.JS_VAR_DEF_VAR;
+      if (isConst) varDefType = JSVarDefEnum.JS_VAR_DEF_CONST;
+      else if (isLet) varDefType = JSVarDefEnum.JS_VAR_DEF_LET;
+
       if (ts.isIdentifier(decl.name)) {
         const name = decl.name.text;
         const atom = this.state.atomManager.getAtom(name);
@@ -553,23 +604,17 @@ export class TypeScriptCompiler {
         
         // Add to current function scope
         if (!this.state.cur_func) throw new Error("No function");
-        const idx = this.state.cur_func.add_var(atom);
         
-        if (isConst) {
-            this.state.cur_func.set_var_const(idx, true);
-            this.state.cur_func.set_var_lexical(idx, true);
-        } else if (isLet) {
-            this.state.cur_func.set_var_lexical(idx, true);
-        }
+        const idx = this.state.cur_func.define_var(atom, varDefType);
         
         this.emitPutVar(idx);
       } else {
-        this.visitBindingPattern(decl.name);
+        this.visitBindingPattern(decl.name, varDefType, isExport);
       }
     }
   }
 
-  visitBindingPattern(node: ts.BindingPattern): void {
+  visitBindingPattern(node: ts.BindingPattern, varDefType: JSVarDefEnum = JSVarDefEnum.JS_VAR_DEF_VAR, isExport: boolean = false): void {
     if (ts.isObjectBindingPattern(node)) {
         this.emitOp(Opcode.OP_to_object);
         for (const el of node.elements) {
@@ -602,10 +647,13 @@ export class TypeScriptCompiler {
             if (ts.isIdentifier(el.name)) {
                 const name = el.name.text;
                 const atom = this.state.atomManager.getAtom(name);
-                const idx = this.state.cur_func!.add_var(atom);
+                if (isExport) {
+                    this.addExportEntry(0, atom, atom);
+                }
+                const idx = this.state.cur_func!.define_var(atom, varDefType);
                 this.emitPutVar(idx);
             } else {
-                this.visitBindingPattern(el.name);
+                this.visitBindingPattern(el.name, varDefType, isExport);
             }
         }
         this.emitOp(Opcode.OP_drop);
@@ -638,10 +686,13 @@ export class TypeScriptCompiler {
             if (ts.isIdentifier(el.name)) {
                 const name = el.name.text;
                 const atom = this.state.atomManager.getAtom(name);
-                const idx = this.state.cur_func!.add_var(atom);
+                if (isExport) {
+                    this.addExportEntry(0, atom, atom);
+                }
+                const idx = this.state.cur_func!.define_var(atom, varDefType);
                 this.emitPutVar(idx);
             } else {
-                this.visitBindingPattern(el.name);
+                this.visitBindingPattern(el.name, varDefType, isExport);
             }
         }
         this.emitOp(Opcode.OP_iterator_close);
@@ -653,6 +704,15 @@ export class TypeScriptCompiler {
     const labelCont = this.newLabel();
     const labelBreak = this.newLabel();
     
+    let hasScope = false;
+    if (node.initializer && ts.isVariableDeclarationList(node.initializer)) {
+        const isLetOrConst = (node.initializer.flags & (ts.NodeFlags.Let | ts.NodeFlags.Const)) !== 0;
+        if (isLetOrConst) {
+            this.state.cur_func!.push_scope();
+            hasScope = true;
+        }
+    }
+
     this.state.cur_func!.pushBreakEntry(0, labelBreak, labelCont, -1, this.state.cur_func!.scope_level);
     
     if (node.initializer) {
@@ -683,6 +743,10 @@ export class TypeScriptCompiler {
     
     this.emitLabel(labelBreak);
     this.state.cur_func!.popBreakEntry();
+
+    if (hasScope) {
+        this.state.cur_func!.pop_scope();
+    }
   }
 
   visitThrowStatement(node: ts.ThrowStatement): void {
@@ -708,10 +772,10 @@ export class TypeScriptCompiler {
             if (ts.isIdentifier(decl.name)) {
                 const name = decl.name.text;
                 const atom = this.state.atomManager.getAtom(name);
-                const idx = this.state.cur_func!.add_var(atom);
+                const idx = this.state.cur_func!.define_var(atom, JSVarDefEnum.JS_VAR_DEF_CATCH);
                 this.emitPutVar(idx);
             } else {
-                this.visitBindingPattern(decl.name);
+                this.visitBindingPattern(decl.name, JSVarDefEnum.JS_VAR_DEF_CATCH);
             }
         } else {
             this.emitOp(Opcode.OP_drop);
@@ -746,13 +810,21 @@ export class TypeScriptCompiler {
     
     if (ts.isVariableDeclarationList(node.initializer)) {
         for (const decl of node.initializer.declarations) {
+            const isConst = (node.initializer.flags & ts.NodeFlags.Const) !== 0;
+            const isLet = (node.initializer.flags & ts.NodeFlags.Let) !== 0;
+            
+            let varDefType = JSVarDefEnum.JS_VAR_DEF_VAR;
+            if (isConst) varDefType = JSVarDefEnum.JS_VAR_DEF_CONST;
+            else if (isLet) varDefType = JSVarDefEnum.JS_VAR_DEF_LET;
+
             if (ts.isIdentifier(decl.name)) {
                 const name = decl.name.text;
                 const atom = this.state.atomManager.getAtom(name);
-                const idx = this.state.cur_func!.add_var(atom);
+                
+                const idx = this.state.cur_func!.define_var(atom, varDefType);
                 this.emitPutVar(idx);
             } else {
-                this.visitBindingPattern(decl.name);
+                this.visitBindingPattern(decl.name, varDefType);
             }
         }
     } else if (ts.isIdentifier(node.initializer)) {
@@ -795,13 +867,21 @@ export class TypeScriptCompiler {
     
     if (ts.isVariableDeclarationList(node.initializer)) {
         for (const decl of node.initializer.declarations) {
+            const isConst = (node.initializer.flags & ts.NodeFlags.Const) !== 0;
+            const isLet = (node.initializer.flags & ts.NodeFlags.Let) !== 0;
+            
+            let varDefType = JSVarDefEnum.JS_VAR_DEF_VAR;
+            if (isConst) varDefType = JSVarDefEnum.JS_VAR_DEF_CONST;
+            else if (isLet) varDefType = JSVarDefEnum.JS_VAR_DEF_LET;
+
             if (ts.isIdentifier(decl.name)) {
                 const name = decl.name.text;
                 const atom = this.state.atomManager.getAtom(name);
-                const idx = this.state.cur_func!.add_var(atom);
+                
+                const idx = this.state.cur_func!.define_var(atom, varDefType);
                 this.emitPutVar(idx);
             } else {
-                this.visitBindingPattern(decl.name);
+                this.visitBindingPattern(decl.name, varDefType);
             }
         }
     } else if (ts.isIdentifier(node.initializer)) {
@@ -967,7 +1047,7 @@ export class TypeScriptCompiler {
     this.state.cur_func.push_scope();
 
     // 2. Define class name variable (const)
-    const classNameVarIdx = this.state.cur_func.add_var(classNameAtom);
+    const classNameVarIdx = this.state.cur_func.define_var(classNameAtom, JSVarDefEnum.JS_VAR_DEF_CONST);
 
     // 3. Handle extends
     let classFlags = 0;
@@ -1235,6 +1315,9 @@ export class TypeScriptCompiler {
     const fd = JSFunctionDef.create(this.state.cur_func, false, false, this.state.cur_func!.filename, line, character);
     fd.func_name = className;
     fd.is_derived_class_constructor = (classFlags & 1) !== 0;
+    fd.has_simple_parameter_list = this.checkSimpleParameterList(node.parameters);
+    fd.new_target_allowed = true;
+    fd.arguments_allowed = true;
     
     const prevFunc = this.state.cur_func;
     this.state.cur_func = fd;
@@ -1346,6 +1429,9 @@ export class TypeScriptCompiler {
     const { line, character } = this.sourceFile.getLineAndCharacterOfPosition(node.pos);
     const fd = JSFunctionDef.create(this.state.cur_func, false, false, this.state.cur_func!.filename, line, character);
     fd.func_name = methodAtom;
+    fd.has_simple_parameter_list = this.checkSimpleParameterList(node.parameters);
+    fd.new_target_allowed = true;
+    fd.arguments_allowed = true;
     
     const prevFunc = this.state.cur_func;
     this.state.cur_func = fd;
@@ -1515,6 +1601,15 @@ export class TypeScriptCompiler {
     }
   }
 
+  checkSimpleParameterList(parameters: ts.NodeArray<ts.ParameterDeclaration>): boolean {
+    for (const param of parameters) {
+        if (!ts.isIdentifier(param.name)) return false; // Destructuring
+        if (param.initializer) return false; // Default value
+        if (param.dotDotDotToken) return false; // Rest
+    }
+    return true;
+  }
+
   visitFunctionDeclaration(node: ts.FunctionDeclaration): void {
     let name = "";
     if (node.name) {
@@ -1545,6 +1640,9 @@ export class TypeScriptCompiler {
     const { line, character } = this.sourceFile.getLineAndCharacterOfPosition(node.pos);
     const fd = JSFunctionDef.create(this.state.cur_func, false, false, this.state.cur_func!.filename, line, character);
     fd.func_name = atom;
+    fd.has_simple_parameter_list = this.checkSimpleParameterList(node.parameters);
+    fd.new_target_allowed = true;
+    fd.arguments_allowed = true;
     
     const isAsync = node.modifiers?.some(m => m.kind === ts.SyntaxKind.AsyncKeyword);
     if (isAsync) {
@@ -1614,8 +1712,12 @@ export class TypeScriptCompiler {
         this.emitU32(funcIdx);
     }
     
-    const varIdx = this.state.cur_func!.add_var(atom);
-    if (this.state.cur_func!.is_module) {
+    const varIdx = this.state.cur_func!.define_var(atom, JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL);
+    
+    if (varIdx === GLOBAL_VAR_OFFSET) {
+        this.emitOp(Opcode.OP_put_var);
+        this.emitAtom(atom);
+    } else if (this.state.cur_func!.is_module || (this.state.cur_func!.is_global_var && this.state.cur_func!.js_mode === 1)) {
         if (varIdx === 0) this.emitOp(Opcode.OP_put_var_ref0);
         else if (varIdx === 1) this.emitOp(Opcode.OP_put_var_ref1);
         else if (varIdx === 2) this.emitOp(Opcode.OP_put_var_ref2);
@@ -2009,6 +2111,7 @@ export class TypeScriptCompiler {
     const { line, character } = this.sourceFile.getLineAndCharacterOfPosition(node.pos);
     const fd = JSFunctionDef.create(this.state.cur_func, false, true, this.state.cur_func!.filename, line, character);
     fd.has_this_binding = false;
+    fd.has_simple_parameter_list = this.checkSimpleParameterList(node.parameters);
     
     const isAsync = node.modifiers?.some(m => m.kind === ts.SyntaxKind.AsyncKeyword);
     fd.func_kind = isAsync ? JSFunctionKind.JS_FUNC_ASYNC : JSFunctionKind.JS_FUNC_NORMAL;
@@ -2066,6 +2169,9 @@ export class TypeScriptCompiler {
     const { line, character } = this.sourceFile.getLineAndCharacterOfPosition(node.pos);
     const fd = JSFunctionDef.create(this.state.cur_func, false, true, this.state.cur_func!.filename, line, character);
     fd.has_this_binding = true;
+    fd.has_simple_parameter_list = this.checkSimpleParameterList(node.parameters);
+    fd.new_target_allowed = true;
+    fd.arguments_allowed = true;
     
     const isAsync = node.modifiers?.some(m => m.kind === ts.SyntaxKind.AsyncKeyword);
     if (isAsync) {

@@ -28,6 +28,7 @@ This plan details the step-by-step translation of the QuickJS compiler from C to
 - [x] Implement `Compiler.compile(ast)`.
 - [x] Implement `js_parse_program` equivalent.
 - [x] Setup global function definition (`JSFunctionDef`).
+- [x] Refine `visitSourceElement` vs `visitStatement` logic (QuickJS parity).
 
 ### 2.2 Function Definition (Basic)
 - [x] Implement `js_create_function`.

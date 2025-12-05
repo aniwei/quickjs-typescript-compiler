@@ -336,6 +336,8 @@ export enum Opcode {
   OP_get_field2_ic = 249,
   OP_put_field_ic = 250,
   OP_debugger = 251,
+  OP_enter_scope = 252,
+  OP_leave_scope = 253,
 }
 
 export const OPCODE_NAME_TO_CODE: Record<string, number> = {
@@ -591,6 +593,8 @@ export const OPCODE_NAME_TO_CODE: Record<string, number> = {
   "get_field2_ic": 249,
   "put_field_ic": 250,
   "debugger": 251,
+  "enter_scope": 252,
+  "leave_scope": 253,
 }
 
 export enum JSAtom {
@@ -1314,6 +1318,8 @@ export const OPCODE_DEFS: Record<string, OpcodeDefinition> = {
   OP_get_field2_ic: { id: "get_field2_ic", size: 5, nPop: 1, nPush: 2, format: OpFormat.none },
   OP_put_field_ic: { id: "put_field_ic", size: 5, nPop: 2, nPush: 0, format: OpFormat.none },
   OP_debugger: { id: "debugger", size: 1, nPop: 0, nPush: 0, format: OpFormat.none },
+  OP_enter_scope: { id: "enter_scope", size: 3, nPop: 0, nPush: 0, format: OpFormat.u16 },
+  OP_leave_scope: { id: "leave_scope", size: 3, nPop: 0, nPush: 0, format: OpFormat.u16 },
 }
 
 export const SHORT_OPCODE_DEFS: Record<string, OpcodeDefinition> = {

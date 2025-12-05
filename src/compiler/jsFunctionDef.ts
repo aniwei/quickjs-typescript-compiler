@@ -1,6 +1,6 @@
 import { BytecodeWriter } from '../bytecode/bytecodeWriter';
 import { DynBuf } from '../bytecode/dynBuffer';
-import { JSAtom, Opcode } from '../env';
+import { JSAtom, Opcode, JSMode } from '../env';
 
 export enum JSVarKind {
   JS_VAR_NORMAL,
@@ -13,6 +13,27 @@ export enum JSVarKind {
   JS_VAR_PRIVATE_GETTER,
   JS_VAR_PRIVATE_SETTER,
   JS_VAR_PRIVATE_GETTER_SETTER,
+}
+
+export enum JSVarDefEnum {
+  JS_VAR_DEF_VAR,
+  JS_VAR_DEF_LET,
+  JS_VAR_DEF_CONST,
+  JS_VAR_DEF_FUNCTION_DECL,
+  JS_VAR_DEF_NEW_FUNCTION_DECL,
+  JS_VAR_DEF_CATCH,
+  JS_VAR_DEF_WITH,
+}
+
+export const GLOBAL_VAR_OFFSET = 0x40000000;
+
+export interface JSGlobalVar {
+  cpool_idx: number;
+  force_init: boolean;
+  is_lexical: boolean;
+  is_const: boolean;
+  scope_level: number;
+  var_name: number;
 }
 
 export interface JSVarDef {
@@ -168,15 +189,10 @@ export class JSFunctionDef {
   add_var(name: number): number {
     const idx = this.vars.length;
     
-    // Update scope chain
-    const scope = this.scopes[this.scope_level];
-    const scope_next = scope.first;
-    scope.first = idx;
-
     this.vars.push({
       var_name: name,
-      scope_level: this.scope_level,
-      scope_next: scope_next,
+      scope_level: 0,
+      scope_next: -1,
       is_const: false,
       is_lexical: false,
       is_captured: false,
@@ -185,48 +201,240 @@ export class JSFunctionDef {
       func_pool_idx: -1
     });
     
-    // In QuickJS, top-level variables in modules AND strict global scripts are treated as closure variables
-    // (accessed via put_var_ref/get_var_ref instead of put_loc/get_loc).
     if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
-        const closureIdx = this.add_closure_var(name, true, false, idx, JSVarKind.JS_VAR_NORMAL, false, false);
-        return closureIdx;
+      const closureIdx = this.add_closure_var(name, true, false, idx, JSVarKind.JS_VAR_NORMAL, false, false);
+      return closureIdx;
     }
 
     return idx;
   }
 
-  set_var_const(idx: number, is_const: boolean) {
+  add_scope_var(name: number, var_kind: JSVarKind): number {
+    const idx = this.add_var(name);
+    if (idx >= 0) {
+      let varIdx = idx;
       if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
-          // idx is closure index
-          if (idx < this.closure_var.length) {
-              this.closure_var[idx].is_const = is_const;
-              // Also update the underlying var
-              const varIdx = this.closure_var[idx].var_idx;
-              if (varIdx < this.vars.length) {
-                  this.vars[varIdx].is_const = is_const;
+        varIdx = this.closure_var[idx].var_idx;
+      }
+      
+      const vd = this.vars[varIdx];
+      vd.var_kind = var_kind;
+      vd.scope_level = this.scope_level;
+      
+      vd.scope_next = this.scope_first;
+      this.scopes[this.scope_level].first = varIdx;
+      this.scope_first = varIdx;
+    }
+    return idx;
+  }
+
+  define_var(name: number, var_def_type: JSVarDefEnum): number {
+      let idx = -1;
+      switch (var_def_type) {
+          case JSVarDefEnum.JS_VAR_DEF_WITH:
+              idx = this.add_scope_var(name, JSVarKind.JS_VAR_NORMAL);
+              break;
+
+          case JSVarDefEnum.JS_VAR_DEF_LET:
+          case JSVarDefEnum.JS_VAR_DEF_CONST:
+          case JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL:
+          case JSVarDefEnum.JS_VAR_DEF_NEW_FUNCTION_DECL:
+              idx = this.find_lexical_decl(name, this.scope_first, true);
+              if (idx >= 0) {
+                  if (idx < GLOBAL_VAR_OFFSET) {
+                      const vd = this.vars[idx];
+                      if (vd.scope_level === this.scope_level) {
+                          if (!(!(this.js_mode & JSMode.JS_MODE_STRICT) && 
+                                var_def_type === JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL &&
+                                vd.var_kind === JSVarKind.JS_VAR_FUNCTION_DECL)) {
+                              throw new Error("invalid redefinition of lexical identifier");
+                          }
+                      } else if (vd.var_kind === JSVarKind.JS_VAR_CATCH && (vd.scope_level + 2) === this.scope_level) {
+                          throw new Error("invalid redefinition of lexical identifier");
+                      }
+                  } else {
+                      if (this.scope_level === this.body_scope) {
+                          throw new Error("invalid redefinition of lexical identifier");
+                      }
+                  }
               }
+              
+              if (var_def_type !== JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL &&
+                  var_def_type !== JSVarDefEnum.JS_VAR_DEF_NEW_FUNCTION_DECL &&
+                  this.scope_level === this.body_scope && this.find_arg(name) >= 0) {
+                  throw new Error("invalid redefinition of parameter name");
+              }
+
+              if (this.find_var_in_child_scope(name, this.scope_level) >= 0) {
+                  throw new Error("invalid redefinition of a variable");
+              }
+
+              if (this.is_global_var) {
+                  const hf = this.find_global_var(name);
+                  if (hf && this.is_child_scope(hf.scope_level, this.scope_level)) {
+                      throw new Error("invalid redefinition of global identifier");
+                  }
+              }
+
+              if (this.is_eval && 
+                  (this.eval_type === 0 || this.eval_type === 2) && 
+                  this.scope_level === this.body_scope) {
+                  const hf = this.add_global_var(name);
+                  if (!hf) return -1;
+                  hf.is_lexical = true;
+                  hf.is_const = (var_def_type === JSVarDefEnum.JS_VAR_DEF_CONST);
+                  idx = GLOBAL_VAR_OFFSET;
+              } else {
+                  let var_kind = JSVarKind.JS_VAR_NORMAL;
+                  if (var_def_type === JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL) var_kind = JSVarKind.JS_VAR_FUNCTION_DECL;
+                  else if (var_def_type === JSVarDefEnum.JS_VAR_DEF_NEW_FUNCTION_DECL) var_kind = JSVarKind.JS_VAR_NEW_FUNCTION_DECL;
+                  
+                  idx = this.add_scope_var(name, var_kind);
+                  if (idx >= 0) {
+                      this.set_var_lexical(idx, true);
+                      this.set_var_const(idx, var_def_type === JSVarDefEnum.JS_VAR_DEF_CONST);
+                  }
+              }
+              break;
+
+          case JSVarDefEnum.JS_VAR_DEF_CATCH:
+              idx = this.add_scope_var(name, JSVarKind.JS_VAR_CATCH);
+              break;
+
+          case JSVarDefEnum.JS_VAR_DEF_VAR:
+              if (this.find_lexical_decl(name, this.scope_first, false) >= 0) {
+                  throw new Error("invalid redefinition of lexical identifier");
+              }
+              if (this.is_global_var) {
+                  let hf = this.find_global_var(name);
+                  if (hf && hf.is_lexical && hf.scope_level === this.scope_level && this.eval_type === 2) {
+                      throw new Error("invalid redefinition of lexical identifier");
+                  }
+                  hf = this.add_global_var(name);
+                  if (!hf) return -1;
+                  idx = GLOBAL_VAR_OFFSET;
+              } else {
+                  idx = this.find_var(name);
+                  if (idx >= 0) break;
+                  idx = this.add_var(name);
+                  if (idx >= 0) {
+                      if (name === JSAtom.JS_ATOM_arguments && this.has_arguments_binding) {
+                          this.arguments_var_idx = idx;
+                      }
+                      let varIdx = idx;
+                      if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
+                          varIdx = this.closure_var[idx].var_idx;
+                      }
+                      this.vars[varIdx].scope_next = this.scope_level;
+                  }
+              }
+              break;
+          default:
+              throw new Error("Unsupported define_var type");
+      }
+      return idx;
+  }
+
+  find_lexical_decl(name: number, scope_idx: number, check_catch_var: boolean): number {
+      while (scope_idx >= 0) {
+          const vd = this.vars[scope_idx];
+          if (vd.var_name === name && (vd.is_lexical || (vd.var_kind === JSVarKind.JS_VAR_CATCH && check_catch_var))) {
+              return scope_idx;
           }
-      } else {
-          // idx is var index
-          if (idx < this.vars.length) {
-              this.vars[idx].is_const = is_const;
+          scope_idx = vd.scope_next;
+      }
+      
+      if (this.is_eval && this.eval_type === 0) {
+          const hf = this.find_global_var(name);
+          if (hf && hf.is_lexical) return GLOBAL_VAR_OFFSET;
+      }
+      return -1;
+  }
+
+  find_var_in_child_scope(name: number, scope_level: number): number {
+      for (let i = 0; i < this.vars.length; i++) {
+          const vd = this.vars[i];
+          if (vd.var_name === name && vd.scope_level > scope_level) {
+              return i;
           }
       }
+      return -1;
+  }
+
+  find_arg(name: number): number {
+      for (let i = 0; i < this.args.length; i++) {
+          if (this.args[i].var_name === name) return i;
+      }
+      return -1;
+  }
+
+  find_global_var(name: number): JSGlobalVar | null {
+      for (let i = 0; i < this.global_vars.length; i++) {
+          if (this.global_vars[i].var_name === name) return this.global_vars[i];
+      }
+      return null;
+  }
+
+  add_global_var(name: number): JSGlobalVar {
+      let hf = this.find_global_var(name);
+      if (hf) return hf;
+      
+      hf = {
+          cpool_idx: -1,
+          force_init: false,
+          is_lexical: false,
+          is_const: false,
+          scope_level: this.scope_level,
+          var_name: name
+      };
+      this.global_vars.push(hf);
+      return hf;
+  }
+
+  is_child_scope(scope_level: number, parent_scope_level: number): boolean {
+    while (scope_level >= 0) {
+      if (scope_level === parent_scope_level) return true;
+      if (scope_level === this.body_scope) break;
+      scope_level = this.scopes[scope_level].parent;
+    }
+    return false;
+  }
+
+  get_first_lexical_var(scope: number): number {
+    while (scope >= 0) {
+      const scope_idx = this.scopes[scope].first;
+      if (scope_idx >= 0) return scope_idx;
+      scope = this.scopes[scope].parent;
+    }
+    return -1;
+  }
+
+  set_var_const(idx: number, is_const: boolean) {
+    if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
+      if (idx < this.closure_var.length) {
+        this.closure_var[idx].is_const = is_const;
+        const varIdx = this.closure_var[idx].var_idx;
+        if (varIdx < this.vars.length) {
+          this.vars[varIdx].is_const = is_const;
+        }
+      }
+    } else {
+      if (idx < this.vars.length) {
+        this.vars[idx].is_const = is_const;
+      }
+    }
   }
 
   set_var_lexical(idx: number, is_lexical: boolean) {
       if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
-          // idx is closure index
           if (idx < this.closure_var.length) {
               this.closure_var[idx].is_lexical = is_lexical;
-              // Also update the underlying var
               const varIdx = this.closure_var[idx].var_idx;
               if (varIdx < this.vars.length) {
                   this.vars[varIdx].is_lexical = is_lexical;
               }
           }
       } else {
-          // idx is var index
           if (idx < this.vars.length) {
               this.vars[idx].is_lexical = is_lexical;
           }
@@ -280,35 +488,26 @@ export class JSFunctionDef {
   }
 
   get_var_ref(name: number): { idx: number, is_local: boolean, is_arg: boolean, is_const: boolean, is_lexical: boolean, var_kind: JSVarKind } | null {
-      // console.log(`get_var_ref: ${name} in ${this.func_name}`);
-      if (name === 165 || name === 166) { // Hack: check for arguments atom. I don't know the ID, so I'll log name if it matches "arguments" string lookup? No access to atomManager here.
-         // Just log everything for now, filtered by function name if possible?
+    if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
+      const idx = this.closure_var.findIndex(v => v.var_name === name);
+      if (idx !== -1) {
+        const v = this.closure_var[idx];
+        return { idx, is_local: false, is_arg: false, is_const: v.is_const, is_lexical: v.is_lexical, var_kind: v.var_kind };
       }
-      
-      // 0. Check module vars (closure vars)
-      if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
-          const idx = this.closure_var.findIndex(v => v.var_name === name);
-          if (idx !== -1) {
-              const v = this.closure_var[idx];
-              return { idx, is_local: false, is_arg: false, is_const: v.is_const, is_lexical: v.is_lexical, var_kind: v.var_kind };
-          }
-      }
+    }
 
-      // 1. Check local vars
-      let idx = this.find_var(name);
-      if (idx !== -1) {
-          const v = this.vars[idx];
-          return { idx, is_local: true, is_arg: false, is_const: v.is_const, is_lexical: v.is_lexical, var_kind: v.var_kind };
-      }
+    let idx = this.find_var(name);
+    if (idx !== -1) {
+      const v = this.vars[idx];
+      return { idx, is_local: true, is_arg: false, is_const: v.is_const, is_lexical: v.is_lexical, var_kind: v.var_kind };
+    }
       
-      // 2. Check args
-      idx = this.args.findIndex(v => v.var_name === name);
-      if (idx !== -1) {
-          const v = this.args[idx];
-          return { idx, is_local: true, is_arg: true, is_const: false, is_lexical: false, var_kind: JSVarKind.JS_VAR_NORMAL };
-      }
-      
-      // 3. Check parent
+    idx = this.args.findIndex(v => v.var_name === name);
+    if (idx !== -1) {
+      const v = this.args[idx];
+      return { idx, is_local: true, is_arg: true, is_const: false, is_lexical: false, var_kind: JSVarKind.JS_VAR_NORMAL };
+    }
+    
       if (this.parent) {
           const res = this.parent.get_var_ref(name);
           if (res) {
@@ -349,26 +548,23 @@ export class JSFunctionDef {
     const scope_idx = this.scopes.length;
     this.scopes.push({
       parent: this.scope_level,
-      first: -1
+      first: this.scope_first
     });
     this.scope_level = scope_idx;
+    this.byte_code.emitOp(Opcode.OP_enter_scope);
+    this.byte_code.emitU16(scope_idx);
     return scope_idx;
   }
 
-  pop_scope(): { def: JSVarDef, idx: number }[] {
+  pop_scope(): void {
     const scope = this.scopes.pop();
     if (!scope) throw new Error("No scope to pop");
     
-    const poppedLevel = this.scopes.length;
-    this.scope_level = scope.parent;
+    this.byte_code.emitOp(Opcode.OP_leave_scope);
+    this.byte_code.emitU16(this.scope_level);
     
-    const result: { def: JSVarDef, idx: number }[] = [];
-    for (let i = 0; i < this.vars.length; i++) {
-        if (this.vars[i].scope_level === poppedLevel) {
-            result.push({ def: this.vars[i], idx: i });
-        }
-    }
-    return result;
+    this.scope_level = scope.parent;
+    this.scope_first = this.get_first_lexical_var(this.scope_level);
   }
 
 

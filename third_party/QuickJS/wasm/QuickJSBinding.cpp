@@ -347,7 +347,7 @@ namespace quickjs {
     };
 
     // 然后填充格式数组
-  #define FMT(f) formats.push_back(OpFmt{ static_cast<uint8_t>(OPFMT_##f), #f });
+    #define FMT(f) formats.push_back(OpFmt{ static_cast<uint8_t>(OPFMT_##f), #f });
     #define DEF(id, size, n_pop, n_push, f)
     #define def(id, size, n_pop, n_push, f)
     #include "QuickJS/quickjs-opcode.h"
