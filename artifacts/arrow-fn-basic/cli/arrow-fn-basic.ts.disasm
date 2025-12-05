@@ -1,0 +1,142 @@
+bytecode_version: 5
+atoms (7):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "total"
+  [2] @230 = "doubled"
+  [3] @231 = "combined"
+  [4] @232 = "a"
+  [5] @233 = "b"
+  [6] @234 = "extra"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-fn-basic.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=3, closures=3
+    locals (3):
+      [0] total kind=kind#0 level=0 next=0
+      [1] doubled kind=kind#0 level=0 next=0
+      [2] combined kind=kind#0 level=0 next=0
+    closure_vars (3):
+      [0] total -> var#0 [local, kind#0]
+      [1] doubled -> var#1 [local, kind#0]
+      [2] combined -> var#2 [local, kind#0]
+    constant_pool (3):
+      [0] function <builtin:0>
+      [1] function <builtin:0>
+      [2] function <builtin:0>
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-fn-basic.ts
+      pc2line_bytes: 15
+      source_length: undefined
+
+    opcodes (30):
+      0000: push_this
+      0001: if_false +35 -> 41
+      0006: fclosure8 const[0] function <builtin:0>
+      0008: push_1
+      0009: push_2
+      0010: call 2
+      0013: put_var_ref0
+      0014: fclosure8 const[1] function <builtin:0>
+      0016: get_var_ref0
+      0017: call 1
+      0020: put_var_ref1
+      0021: fclosure8 const[2] function <builtin:0>
+      0023: get_var_ref1
+      0024: call 1
+      0027: put_var_ref2
+      0028: get_var_ref0
+      0029: drop
+      0030: undefined
+      0031: drop
+      0032: get_var_ref1
+      0033: drop
+      0034: undefined
+      0035: drop
+      0036: get_var_ref2
+      0037: drop
+      0038: undefined
+      0039: drop
+      0040: return_undef
+      0041: undefined
+      0042: return_async
+
+    function[1] <builtin:0> (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=2, defined=2, vars=0, closures=0
+      locals (2):
+        [0] a kind=kind#0 level=0 next=0
+        [1] b kind=kind#0 level=0 next=0
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-fn-basic.ts
+        pc2line_bytes: 0
+        source_length: undefined
+
+      opcodes (4):
+        0000: get_arg0
+        0001: get_arg1
+        0002: add
+        0003: return
+
+    function[2] <builtin:0> (const[1]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=1, defined=1, vars=0, closures=0
+      locals (1):
+        [0] value kind=kind#0 level=0 next=0
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-fn-basic.ts
+        pc2line_bytes: 3
+        source_length: undefined
+
+      opcodes (4):
+        0000: get_arg0
+        0001: push_2
+        0002: mul
+        0003: return
+
+    function[3] <builtin:0> (const[2]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=1, defined=1, vars=0, closures=0
+      locals (1):
+        [0] value kind=kind#0 level=0 next=0
+      constant_pool (1):
+        [0] function <builtin:0>
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-fn-basic.ts
+        pc2line_bytes: 3
+        source_length: undefined
+
+      opcodes (4):
+        0000: fclosure8 const[0] function <builtin:0>
+        0002: push_4
+        0003: call 1
+        0006: return
+
+      function[4] <builtin:0> (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+        mode: sloppy
+        stack_size: 3
+        args: total=1, defined=1, vars=0, closures=1
+        locals (1):
+          [0] extra kind=kind#0 level=0 next=0
+        closure_vars (1):
+          [0] value -> var#0 [local, arg, kind#0]
+
+        debug:
+          filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-fn-basic.ts
+          pc2line_bytes: 3
+          source_length: undefined
+
+        opcodes (4):
+          0000: get_var_ref0
+          0001: get_arg0
+          0002: add
+          0003: return

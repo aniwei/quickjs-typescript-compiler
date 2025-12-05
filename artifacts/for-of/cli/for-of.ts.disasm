@@ -1,0 +1,50 @@
+bytecode_version: 5
+atoms (5):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "arr"
+  [2] @230 = "v"
+  [3] @231 = "console"
+  [4] @232 = "log"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/for-of.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=2, closures=2
+    locals (2):
+      [0] arr kind=kind#0 level=0 next=0
+      [1] v kind=kind#0 level=0 next=0
+    closure_vars (2):
+      [0] arr -> var#0 [local, kind#0]
+      [1] v -> var#1 [local, kind#0]
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/for-of.ts
+      pc2line_bytes: 6
+      source_length: undefined
+
+    opcodes (23):
+      0000: push_this
+      0001: if_false +40 -> 46
+      0006: push_1
+      0007: push_2
+      0008: push_3
+      0009: array_from 3
+      0012: put_var_ref0
+      0013: get_var_ref0
+      0014: for_of_start
+      0015: goto +16 -> 36
+      0020: put_var_ref1
+      0021: get_var atom#231
+      0026: get_field2 atom#232
+      0031: get_var_ref1
+      0032: call_method 1
+      0035: drop
+      0036: for_of_next 0
+      0038: if_false -23 -> 20
+      0043: drop
+      0044: iterator_close
+      0045: return_undef
+      0046: undefined
+      0047: return_async

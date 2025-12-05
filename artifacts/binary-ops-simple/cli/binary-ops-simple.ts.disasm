@@ -1,0 +1,164 @@
+bytecode_version: 5
+atoms (3):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "console"
+  [2] @230 = "log"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/binary-ops-simple.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=0, closures=0
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/binary-ops-simple.ts
+      pc2line_bytes: 57
+      source_length: undefined
+
+    opcodes (145):
+      0000: push_this
+      0001: if_false +341 -> 347
+      0006: get_var atom#229
+      0011: get_field2 atom#230
+      0016: push_1
+      0017: push_2
+      0018: add
+      0019: call_method 1
+      0022: drop
+      0023: get_var atom#229
+      0028: get_field2 atom#230
+      0033: push_1
+      0034: push_2
+      0035: sub
+      0036: call_method 1
+      0039: drop
+      0040: get_var atom#229
+      0045: get_field2 atom#230
+      0050: push_2
+      0051: push_3
+      0052: mul
+      0053: call_method 1
+      0056: drop
+      0057: get_var atom#229
+      0062: get_field2 atom#230
+      0067: push_4
+      0068: push_2
+      0069: div
+      0070: call_method 1
+      0073: drop
+      0074: get_var atom#229
+      0079: get_field2 atom#230
+      0084: push_5
+      0085: push_2
+      0086: mod
+      0087: call_method 1
+      0090: drop
+      0091: get_var atom#229
+      0096: get_field2 atom#230
+      0101: push_2
+      0102: push_3
+      0103: pow
+      0104: call_method 1
+      0107: drop
+      0108: get_var atom#229
+      0113: get_field2 atom#230
+      0118: push_1
+      0119: push_2
+      0120: lt
+      0121: call_method 1
+      0124: drop
+      0125: get_var atom#229
+      0130: get_field2 atom#230
+      0135: push_1
+      0136: push_2
+      0137: gt
+      0138: call_method 1
+      0141: drop
+      0142: get_var atom#229
+      0147: get_field2 atom#230
+      0152: push_1
+      0153: push_2
+      0154: lte
+      0155: call_method 1
+      0158: drop
+      0159: get_var atom#229
+      0164: get_field2 atom#230
+      0169: push_1
+      0170: push_2
+      0171: gte
+      0172: call_method 1
+      0175: drop
+      0176: get_var atom#229
+      0181: get_field2 atom#230
+      0186: push_1
+      0187: push_2
+      0188: eq
+      0189: call_method 1
+      0192: drop
+      0193: get_var atom#229
+      0198: get_field2 atom#230
+      0203: push_1
+      0204: push_2
+      0205: neq
+      0206: call_method 1
+      0209: drop
+      0210: get_var atom#229
+      0215: get_field2 atom#230
+      0220: push_1
+      0221: push_2
+      0222: strict_eq
+      0223: call_method 1
+      0226: drop
+      0227: get_var atom#229
+      0232: get_field2 atom#230
+      0237: push_1
+      0238: push_2
+      0239: strict_neq
+      0240: call_method 1
+      0243: drop
+      0244: get_var atom#229
+      0249: get_field2 atom#230
+      0254: push_1
+      0255: push_2
+      0256: and
+      0257: call_method 1
+      0260: drop
+      0261: get_var atom#229
+      0266: get_field2 atom#230
+      0271: push_1
+      0272: push_2
+      0273: or
+      0274: call_method 1
+      0277: drop
+      0278: get_var atom#229
+      0283: get_field2 atom#230
+      0288: push_1
+      0289: push_2
+      0290: xor
+      0291: call_method 1
+      0294: drop
+      0295: get_var atom#229
+      0300: get_field2 atom#230
+      0305: push_1
+      0306: push_2
+      0307: shl
+      0308: call_method 1
+      0311: drop
+      0312: get_var atom#229
+      0317: get_field2 atom#230
+      0322: push_1
+      0323: push_2
+      0324: sar
+      0325: call_method 1
+      0328: drop
+      0329: get_var atom#229
+      0334: get_field2 atom#230
+      0339: push_1
+      0340: push_2
+      0341: shr
+      0342: call_method 1
+      0345: drop
+      0346: return_undef
+      0347: undefined
+      0348: return_async

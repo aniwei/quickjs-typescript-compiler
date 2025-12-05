@@ -1,0 +1,57 @@
+bytecode_version: 5
+atoms (4):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "i"
+  [2] @230 = "console"
+  [3] @231 = "log"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/loop-control.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=1, closures=1
+    locals (1):
+      [0] i kind=kind#0 level=0 next=0
+    closure_vars (1):
+      [0] i -> var#0 [local, kind#0]
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/loop-control.ts
+      pc2line_bytes: 18
+      source_length: undefined
+
+    opcodes (33):
+      0000: push_this
+      0001: if_false +75 -> 81
+      0006: push_0
+      0007: put_var_ref0
+      0008: get_var_ref0
+      0009: push_i32 10
+      0014: lt
+      0015: if_false +60 -> 80
+      0020: get_var_ref0
+      0021: push_1
+      0022: add
+      0023: put_loc0
+      0024: get_var_ref0
+      0025: push_5
+      0026: lt
+      0027: if_false +10 -> 42
+      0032: goto -29 -> 8
+      0037: goto +0 -> 42
+      0042: get_var atom#230
+      0047: get_field2 atom#231
+      0052: get_var_ref0
+      0053: call_method 1
+      0056: drop
+      0057: get_var_ref0
+      0058: push_7
+      0059: gt
+      0060: if_false +10 -> 75
+      0065: goto +10 -> 80
+      0070: goto +0 -> 75
+      0075: goto -72 -> 8
+      0080: return_undef
+      0081: undefined
+      0082: return_async

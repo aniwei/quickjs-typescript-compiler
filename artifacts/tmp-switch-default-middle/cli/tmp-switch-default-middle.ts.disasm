@@ -1,0 +1,74 @@
+bytecode_version: 5
+atoms (2):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "mix"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/tmp-switch-default-middle.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=1, closures=1
+    locals (1):
+      [0] mix kind=kind#0 level=0 next=0
+    closure_vars (1):
+      [0] mix -> var#0 [local, kind#0]
+    constant_pool (1):
+      [0] function mix
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/tmp-switch-default-middle.ts
+      pc2line_bytes: 6
+      source_length: undefined
+
+    opcodes (11):
+      0000: push_this
+      0001: if_false +10 -> 16
+      0006: fclosure8 const[0] function mix
+      0008: put_var_ref0
+      0009: get_var_ref0
+      0010: push_1
+      0011: call 1
+      0014: drop
+      0015: return_undef
+      0016: undefined
+      0017: return_async
+
+    function[1] mix (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=1, defined=1, vars=1, closures=0
+      locals (2):
+        [0] value kind=kind#0 level=0 next=0
+        [1] _ret_ kind=kind#0 level=0 next=0
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/tmp-switch-default-middle.ts
+        pc2line_bytes: 27
+        source_length: undefined
+
+      opcodes (24):
+        0000: get_arg0
+        0001: dup
+        0002: push_0
+        0003: strict_eq
+        0004: if_true +13 -> 22
+        0009: dup
+        0010: push_2
+        0011: strict_eq
+        0012: if_true +21 -> 38
+        0017: goto +8 -> 30
+        0022: push_1
+        0023: put_loc local[0] value
+        0026: get_loc local[0] value
+        0029: return
+        0030: push_2
+        0031: put_loc local[0] value
+        0034: get_loc local[0] value
+        0037: return
+        0038: push_3
+        0039: put_loc local[0] value
+        0042: get_loc local[0] value
+        0045: return
+        0046: drop
+        0047: return_undef

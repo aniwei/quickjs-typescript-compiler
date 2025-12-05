@@ -1,0 +1,250 @@
+bytecode_version: 5
+atoms (12):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "A"
+  [2] @230 = "#x"
+  [3] @231 = "#y"
+  [4] @232 = "#privateMethod"
+  [5] @233 = "a"
+  [6] @234 = "x"
+  [7] @235 = "p"
+  [8] @236 = "getX"
+  [9] @237 = "setX"
+  [10] @238 = "callPrivate"
+  [11] @239 = "v"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/private-fields.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=8, closures=8
+    locals (8):
+      [0] A kind=kind#0 level=1 next=0
+      [1] #x kind=kind#0 level=2 next=0
+      [2] #y kind=kind#0 level=2 next=0
+      [3] #privateMethod kind=kind#0 level=2 next=0
+      [4] class_fields_init kind=kind#0 level=2 next=0
+      [5] a kind=kind#0 level=0 next=0
+      [6] x kind=kind#0 level=0 next=0
+      [7] p kind=kind#0 level=0 next=0
+    closure_vars (8):
+      [0] A -> var#0 [local, kind#0]
+      [1] #x -> var#1 [local, kind#0]
+      [2] #y -> var#2 [local, kind#0]
+      [3] #privateMethod -> var#3 [local, kind#0]
+      [4] class_fields_init -> var#4 [local, kind#0]
+      [5] a -> var#5 [local, kind#0]
+      [6] x -> var#6 [local, kind#0]
+      [7] p -> var#7 [local, kind#0]
+    constant_pool (5):
+      [0] function getX
+      [1] function setX
+      [2] function callPrivate
+      [3] function A
+      [4] function <builtin:0>
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/private-fields.ts
+      pc2line_bytes: 15
+      source_length: undefined
+
+    opcodes (43):
+      0000: push_this
+      0001: if_false +132 -> 138
+      0006: undefined
+      0007: push_const const[3] function A
+      0012: define_class atom#229, 0
+      0018: private_symbol atom#230
+      0023: put_var_init atom#230
+      0028: private_symbol atom#231
+      0033: put_var_init atom#231
+      0038: private_symbol atom#232
+      0043: put_var_init atom#232
+      0048: fclosure8 const[0] function getX
+      0050: define_method atom#236, 0
+      0056: fclosure8 const[1] function setX
+      0058: define_method atom#237, 0
+      0064: fclosure8 const[2] function callPrivate
+      0066: define_method atom#238, 0
+      0072: fclosure const[4] function <builtin:0>
+      0077: set_home_object
+      0078: put_loc local[4] class_fields_init
+      0081: drop
+      0082: dup
+      0083: put_var_ref0
+      0084: set_proto
+      0085: get_var_ref0
+      0086: call_constructor 0
+      0089: put_var_ref var_ref[5] a
+      0092: get_var_ref var_ref[5] a
+      0095: get_field2 atom#236
+      0100: call_method 0
+      0103: put_var_ref var_ref[6] x
+      0106: get_var_ref var_ref[5] a
+      0109: get_field2 atom#237
+      0114: push_i32 10
+      0119: call_method 1
+      0122: drop
+      0123: get_var_ref var_ref[5] a
+      0126: get_field2 atom#238
+      0131: call_method 0
+      0134: put_var_ref var_ref[7] p
+      0137: return_undef
+      0138: undefined
+      0139: return_async
+
+    function[1] getX (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=0, defined=0, vars=1, closures=1
+      locals (1):
+        [0] this kind=kind#0 level=0 next=0
+      closure_vars (1):
+        [0] #x -> var#1 [kind#0]
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/private-fields.ts
+        pc2line_bytes: 6
+        source_length: undefined
+
+      opcodes (5):
+        0000: get_loc0
+        0001: get_var_ref0
+        0002: get_private_field
+        0003: return
+        0004: return_undef
+
+    function[2] setX (const[1]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=1, defined=1, vars=1, closures=1
+      locals (2):
+        [0] v kind=kind#0 level=0 next=0
+        [1] this kind=kind#0 level=0 next=0
+      closure_vars (1):
+        [0] #x -> var#1 [kind#0]
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/private-fields.ts
+        pc2line_bytes: 9
+        source_length: undefined
+
+      opcodes (7):
+        0000: get_arg0
+        0001: get_arg0
+        0002: get_loc0
+        0003: swap
+        0004: get_var_ref0
+        0005: put_private_field
+        0006: return_undef
+
+    function[3] callPrivate (const[2]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=0, defined=0, vars=1, closures=1
+      locals (1):
+        [0] this kind=kind#0 level=0 next=0
+      closure_vars (1):
+        [0] #privateMethod -> var#3 [kind#0]
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/private-fields.ts
+        pc2line_bytes: 6
+        source_length: undefined
+
+      opcodes (7):
+        0000: get_loc0
+        0001: dup
+        0002: get_var_ref0
+        0003: get_private_field
+        0004: call_method 0
+        0007: return
+        0008: return_undef
+
+    function[4] A (const[3]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=0, defined=0, vars=1, closures=1
+      locals (1):
+        [0] this kind=kind#0 level=0 next=0
+      closure_vars (1):
+        [0] #y -> var#2 [kind#0]
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/private-fields.ts
+        pc2line_bytes: 9
+        source_length: undefined
+
+      opcodes (18):
+        0000: push_this
+        0001: put_loc0
+        0002: check_ctor
+        0003: get_var atom#120
+        0008: dup
+        0009: if_false +6 -> 20
+        0014: get_loc0
+        0015: swap
+        0016: call_method 0
+        0019: drop
+        0020: drop
+        0021: push_2
+        0022: push_2
+        0023: get_loc0
+        0024: swap
+        0025: get_var_ref0
+        0026: put_private_field
+        0027: return_undef
+
+    function[5] <builtin:0> (const[4]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=0, defined=0, vars=1, closures=3
+      locals (1):
+        [0] this kind=kind#0 level=0 next=0
+      closure_vars (3):
+        [0] #x -> var#1 [kind#0]
+        [1] #y -> var#2 [kind#0]
+        [2] #privateMethod -> var#3 [kind#0]
+      constant_pool (1):
+        [0] function #privateMethod
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/private-fields.ts
+        pc2line_bytes: 3
+        source_length: undefined
+
+      opcodes (16):
+        0000: get_loc0
+        0001: get_var_ref0
+        0002: push_1
+        0003: swap
+        0004: define_private_field
+        0005: get_loc0
+        0006: get_var_ref1
+        0007: undefined
+        0008: swap
+        0009: define_private_field
+        0010: fclosure8 const[0] function #privateMethod
+        0012: get_loc0
+        0013: swap
+        0014: get_var_ref2
+        0015: define_private_field
+        0016: return_undef
+
+      function[6] #privateMethod (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+        mode: sloppy
+        stack_size: 3
+        args: total=0, defined=0, vars=1, closures=0
+        locals (1):
+          [0] this kind=kind#0 level=0 next=0
+
+        debug:
+          filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/private-fields.ts
+          pc2line_bytes: 6
+          source_length: undefined
+
+        opcodes (3):
+          0000: push_i32 42
+          0005: return
+          0006: return_undef

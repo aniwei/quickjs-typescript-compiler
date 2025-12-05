@@ -114,7 +114,7 @@ This plan details the step-by-step translation of the QuickJS compiler from C to
 - [x] Methods.
 - [x] Static methods.
 - [x] Fields (instance & static).
-- [ ] Private fields/methods.
+- [x] Private fields/methods.
 - [x] `super` calls.
 - [x] `extends` (Inheritance).
 
@@ -137,15 +137,15 @@ This plan details the step-by-step translation of the QuickJS compiler from C to
 
 ### 7.3 Other
 - [x] Template literals.
-- [ ] Tagged templates.
-- [ ] Optional chaining (`?.`).
+- [x] Tagged templates.
+- [x] Optional chaining (`?.`).
 - [x] Nullish coalescing (`??`).
 
 ## Phase 8: Verification & Optimization
 
 ### 8.1 Fixture Testing
-- [ ] Run all fixtures in `__tests__/compiler/fixtures`.
-- [ ] Verify byte-for-byte match with `qjsc`.
+- [x] Run all fixtures in `__tests__/compiler/fixtures`. (Ran, but mismatches found)
+- [ ] Verify byte-for-byte match with `qjsc`. (In Progress: Size differences detected, likely due to module/script mode mismatch)
 
 ### 8.2 Optimization
 - [ ] Peephole optimizations (if present in QuickJS).

@@ -97,6 +97,7 @@ export class JSFunctionDef {
   eval_type: number = 0;
   is_global_var: boolean = false;
   is_module: boolean = false;
+  has_debug: boolean = true;
   
   req_module_entries: JSModuleEntry[] = [];
   export_entries: JSModuleEntry[] = [];
@@ -178,12 +179,52 @@ export class JSFunctionDef {
       func_pool_idx: -1
     });
     
-    if (this.is_module) {
+    // In QuickJS, top-level variables in modules AND strict global scripts are treated as closure variables
+    // (accessed via put_var_ref/get_var_ref instead of put_loc/get_loc).
+    if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
         const closureIdx = this.add_closure_var(name, true, false, idx, JSVarKind.JS_VAR_NORMAL, false, false);
         return closureIdx;
     }
 
     return idx;
+  }
+
+  set_var_const(idx: number, is_const: boolean) {
+      if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
+          // idx is closure index
+          if (idx < this.closure_var.length) {
+              this.closure_var[idx].is_const = is_const;
+              // Also update the underlying var
+              const varIdx = this.closure_var[idx].var_idx;
+              if (varIdx < this.vars.length) {
+                  this.vars[varIdx].is_const = is_const;
+              }
+          }
+      } else {
+          // idx is var index
+          if (idx < this.vars.length) {
+              this.vars[idx].is_const = is_const;
+          }
+      }
+  }
+
+  set_var_lexical(idx: number, is_lexical: boolean) {
+      if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
+          // idx is closure index
+          if (idx < this.closure_var.length) {
+              this.closure_var[idx].is_lexical = is_lexical;
+              // Also update the underlying var
+              const varIdx = this.closure_var[idx].var_idx;
+              if (varIdx < this.vars.length) {
+                  this.vars[varIdx].is_lexical = is_lexical;
+              }
+          }
+      } else {
+          // idx is var index
+          if (idx < this.vars.length) {
+              this.vars[idx].is_lexical = is_lexical;
+          }
+      }
   }
 
   add_arg(name: number): number {
@@ -230,7 +271,7 @@ export class JSFunctionDef {
       }
       
       // 0. Check module vars (closure vars)
-      if (this.is_module) {
+      if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
           const idx = this.closure_var.findIndex(v => v.var_name === name);
           if (idx !== -1) {
               const v = this.closure_var[idx];

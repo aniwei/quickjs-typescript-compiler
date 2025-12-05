@@ -1,0 +1,134 @@
+bytecode_version: 5
+atoms (9):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "myTag"
+  [2] @230 = "val"
+  [3] @231 = "result"
+  [4] @232 = "world"
+  [5] @233 = "Hello "
+  [6] @234 = " world"
+  [7] @235 = "Line\nBreak"
+  [8] @236 = "strings"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/tagged-template.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=6, closures=4
+    locals (6):
+      [0] myTag kind=kind#0 level=0 next=0
+      [1] val kind=kind#0 level=0 next=0
+      [2] myTag kind=kind#0 level=0 next=0
+      [3] val kind=kind#0 level=0 next=0
+      [4] result kind=kind#0 level=0 next=0
+      [5] raw kind=kind#0 level=0 next=0
+    closure_vars (4):
+      [0] myTag -> var#0 [local, kind#0]
+      [1] val -> var#1 [local, kind#0]
+      [2] result -> var#4 [local, kind#0]
+      [3] raw -> var#5 [local, kind#0]
+    constant_pool (2):
+      [0] function myTag
+      [1] function myTag
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/tagged-template.ts
+      pc2line_bytes: 18
+      source_length: undefined
+
+    opcodes (32):
+      0000: push_this
+      0001: if_false +82 -> 88
+      0006: fclosure8 const[0] function myTag
+      0008: put_var_ref0
+      0009: push_i32 42
+      0014: put_var_ref1
+      0015: fclosure8 const[1] function myTag
+      0017: put_var_ref0
+      0018: push_atom_value atom#232
+      0023: put_var_ref1
+      0024: get_var_ref0
+      0025: push_atom_value atom#233
+      0030: push_atom_value atom#234
+      0035: array_from 2
+      0038: push_atom_value atom#233
+      0043: push_atom_value atom#234
+      0048: array_from 2
+      0051: define_field atom#114
+      0056: get_var_ref1
+      0057: call 2
+      0060: put_var_ref2
+      0061: get_var_ref0
+      0062: push_atom_value atom#235
+      0067: array_from 1
+      0070: push_atom_value atom#235
+      0075: array_from 1
+      0078: define_field atom#114
+      0083: call 1
+      0086: put_var_ref3
+      0087: return_undef
+      0088: undefined
+      0089: return_async
+
+    function[1] myTag (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=2, defined=2, vars=0, closures=0
+      locals (2):
+        [0] strings kind=kind#0 level=0 next=0
+        [1] values kind=kind#0 level=0 next=0
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/tagged-template.ts
+        pc2line_bytes: 3
+        source_length: undefined
+
+      opcodes (16):
+        0000: rest 1
+        0003: set_arg1
+        0004: drop
+        0005: get_arg0
+        0006: push_0
+        0007: get_array_el
+        0008: get_arg1
+        0009: push_0
+        0010: get_array_el
+        0011: add
+        0012: get_arg0
+        0013: push_1
+        0014: get_array_el
+        0015: add
+        0016: return
+        0017: return_undef
+
+    function[2] myTag (const[1]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=2, defined=2, vars=0, closures=0
+      locals (2):
+        [0] strings kind=kind#0 level=0 next=0
+        [1] values kind=kind#0 level=0 next=0
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/tagged-template.ts
+        pc2line_bytes: 6
+        source_length: undefined
+
+      opcodes (16):
+        0000: rest 1
+        0003: set_arg1
+        0004: drop
+        0005: get_arg0
+        0006: push_0
+        0007: get_array_el
+        0008: get_arg1
+        0009: push_0
+        0010: get_array_el
+        0011: add
+        0012: get_arg0
+        0013: push_1
+        0014: get_array_el
+        0015: add
+        0016: return
+        0017: return_undef

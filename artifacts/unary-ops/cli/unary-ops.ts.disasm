@@ -1,0 +1,69 @@
+bytecode_version: 5
+atoms (9):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "u_a"
+  [2] @230 = "u_b"
+  [3] @231 = "u_c"
+  [4] @232 = "u_d"
+  [5] @233 = "u_e"
+  [6] @234 = "u_f"
+  [7] @235 = "console"
+  [8] @236 = "log"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/unary-ops.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=6, closures=6
+    locals (6):
+      [0] u_a kind=kind#0 level=0 next=0
+      [1] u_b kind=kind#0 level=0 next=0
+      [2] u_c kind=kind#0 level=0 next=0
+      [3] u_d kind=kind#0 level=0 next=0
+      [4] u_e kind=kind#0 level=0 next=0
+      [5] u_f kind=kind#0 level=0 next=0
+    closure_vars (6):
+      [0] u_a -> var#0 [local, kind#0]
+      [1] u_b -> var#1 [local, kind#0]
+      [2] u_c -> var#2 [local, kind#0]
+      [3] u_d -> var#3 [local, kind#0]
+      [4] u_e -> var#4 [local, kind#0]
+      [5] u_f -> var#5 [local, kind#0]
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/unary-ops.ts
+      pc2line_bytes: 18
+      source_length: undefined
+
+    opcodes (30):
+      0000: push_this
+      0001: if_false +48 -> 54
+      0006: push_i32 10
+      0011: put_var_ref0
+      0012: get_var_ref0
+      0013: neg
+      0014: put_var_ref1
+      0015: get_var_ref0
+      0016: lnot
+      0017: put_var_ref2
+      0018: get_var_ref0
+      0019: not
+      0020: put_var_ref3
+      0021: undefined
+      0022: put_var_ref var_ref[4] u_e
+      0025: get_var_ref0
+      0026: typeof
+      0027: put_var_ref var_ref[5] u_f
+      0030: get_var atom#235
+      0035: get_field2 atom#236
+      0040: get_var_ref1
+      0041: get_var_ref2
+      0042: get_var_ref3
+      0043: get_var_ref var_ref[4] u_e
+      0046: get_var_ref var_ref[5] u_f
+      0049: call_method 5
+      0052: drop
+      0053: return_undef
+      0054: undefined
+      0055: return_async

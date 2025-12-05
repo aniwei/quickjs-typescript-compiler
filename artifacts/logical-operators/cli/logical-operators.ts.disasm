@@ -1,0 +1,118 @@
+bytecode_version: 5
+atoms (10):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "t"
+  [2] @230 = "f"
+  [3] @231 = "obj_l"
+  [4] @232 = "res"
+  [5] @233 = "val_l"
+  [6] @234 = "res2"
+  [7] @235 = "console"
+  [8] @236 = "log"
+  [9] @237 = "prop"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/logical-operators.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=6, closures=6
+    locals (6):
+      [0] t kind=kind#0 level=0 next=0
+      [1] f kind=kind#0 level=0 next=0
+      [2] obj_l kind=kind#0 level=0 next=0
+      [3] res kind=kind#0 level=0 next=0
+      [4] val_l kind=kind#0 level=0 next=0
+      [5] res2 kind=kind#0 level=0 next=0
+    closure_vars (6):
+      [0] t -> var#0 [local, kind#0]
+      [1] f -> var#1 [local, kind#0]
+      [2] obj_l -> var#2 [local, kind#0]
+      [3] res -> var#3 [local, kind#0]
+      [4] val_l -> var#4 [local, kind#0]
+      [5] res2 -> var#5 [local, kind#0]
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/logical-operators.ts
+      pc2line_bytes: 36
+      source_length: undefined
+
+    opcodes (78):
+      0000: push_this
+      0001: if_false +184 -> 190
+      0006: push_true
+      0007: put_var_ref0
+      0008: push_false
+      0009: put_var_ref1
+      0010: get_var atom#235
+      0015: get_field2 atom#236
+      0020: get_var_ref0
+      0021: dup
+      0022: if_false +2 -> 29
+      0027: drop
+      0028: get_var_ref1
+      0029: call_method 1
+      0032: drop
+      0033: get_var atom#235
+      0038: get_field2 atom#236
+      0043: get_var_ref0
+      0044: dup
+      0045: if_true +2 -> 52
+      0050: drop
+      0051: get_var_ref1
+      0052: call_method 1
+      0055: drop
+      0056: get_var atom#235
+      0061: get_field2 atom#236
+      0066: get_var_ref0
+      0067: lnot
+      0068: call_method 1
+      0071: drop
+      0072: get_var atom#235
+      0077: get_field2 atom#236
+      0082: get_var_ref0
+      0083: dup
+      0084: if_false +2 -> 91
+      0089: drop
+      0090: push_true
+      0091: call_method 1
+      0094: drop
+      0095: get_var atom#235
+      0100: get_field2 atom#236
+      0105: get_var_ref1
+      0106: dup
+      0107: if_true +2 -> 114
+      0112: drop
+      0113: push_false
+      0114: call_method 1
+      0117: drop
+      0118: null
+      0119: put_var_ref2
+      0120: get_var_ref2
+      0121: dup
+      0122: if_false +7 -> 134
+      0127: drop
+      0128: get_var_ref2
+      0129: get_field atom#237
+      0134: put_var_ref3
+      0135: get_var atom#235
+      0140: get_field2 atom#236
+      0145: get_var_ref3
+      0146: call_method 1
+      0149: drop
+      0150: push_0
+      0151: put_var_ref var_ref[4] val_l
+      0154: get_var_ref var_ref[4] val_l
+      0157: dup
+      0158: if_true +6 -> 169
+      0163: drop
+      0164: push_i32 10
+      0169: put_var_ref var_ref[5] res2
+      0172: get_var atom#235
+      0177: get_field2 atom#236
+      0182: get_var_ref var_ref[5] res2
+      0185: call_method 1
+      0188: drop
+      0189: return_undef
+      0190: undefined
+      0191: return_async

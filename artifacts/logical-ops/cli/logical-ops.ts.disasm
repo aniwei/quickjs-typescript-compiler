@@ -1,0 +1,80 @@
+bytecode_version: 5
+atoms (3):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "console"
+  [2] @230 = "log"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/logical-ops.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=0, closures=0
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/logical-ops.ts
+      pc2line_bytes: 15
+      source_length: undefined
+
+    opcodes (61):
+      0000: push_this
+      0001: if_false +153 -> 159
+      0006: get_var atom#229
+      0011: get_field2 atom#230
+      0016: push_true
+      0017: dup
+      0018: if_false +2 -> 25
+      0023: drop
+      0024: push_false
+      0025: call_method 1
+      0028: drop
+      0029: get_var atom#229
+      0034: get_field2 atom#230
+      0039: push_true
+      0040: dup
+      0041: if_true +2 -> 48
+      0046: drop
+      0047: push_false
+      0048: call_method 1
+      0051: drop
+      0052: get_var atom#229
+      0057: get_field2 atom#230
+      0062: null
+      0063: dup
+      0064: is_undefined_or_null
+      0065: if_false +6 -> 76
+      0070: drop
+      0071: push_atom_value atom#22
+      0076: call_method 1
+      0079: drop
+      0080: get_var atom#229
+      0085: get_field2 atom#230
+      0090: push_atom_value atom#66
+      0095: dup
+      0096: is_undefined_or_null
+      0097: if_false +6 -> 108
+      0102: drop
+      0103: push_atom_value atom#22
+      0108: call_method 1
+      0111: drop
+      0112: get_var atom#229
+      0117: get_field2 atom#230
+      0122: push_false
+      0123: dup
+      0124: if_false +2 -> 131
+      0129: drop
+      0130: push_true
+      0131: call_method 1
+      0134: drop
+      0135: get_var atom#229
+      0140: get_field2 atom#230
+      0145: push_false
+      0146: dup
+      0147: if_true +2 -> 154
+      0152: drop
+      0153: push_true
+      0154: call_method 1
+      0157: drop
+      0158: return_undef
+      0159: undefined
+      0160: return_async

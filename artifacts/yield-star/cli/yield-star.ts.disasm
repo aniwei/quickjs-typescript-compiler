@@ -1,0 +1,113 @@
+bytecode_version: 5
+atoms (4):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "gen"
+  [2] @230 = "g"
+  [3] @231 = "x"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/yield-star.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=2, closures=2
+    locals (2):
+      [0] gen kind=kind#0 level=0 next=0
+      [1] g kind=kind#0 level=0 next=0
+    closure_vars (2):
+      [0] gen -> var#0 [local, kind#0]
+      [1] g -> var#1 [local, kind#0]
+    constant_pool (1):
+      [0] function gen
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/yield-star.ts
+      pc2line_bytes: 9
+      source_length: undefined
+
+    opcodes (19):
+      0000: push_this
+      0001: if_false +30 -> 36
+      0006: fclosure8 const[0] function gen
+      0008: put_var_ref0
+      0009: get_var_ref0
+      0010: push_2
+      0011: call 1
+      0014: put_var_ref1
+      0015: get_var_ref1
+      0016: get_field2 atom#108
+      0021: call_method 0
+      0024: drop
+      0025: get_var_ref1
+      0026: get_field2 atom#108
+      0031: call_method 0
+      0034: drop
+      0035: return_undef
+      0036: undefined
+      0037: return_async
+
+    function[1] gen (const[0]) kind=kind#1 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=1, defined=1, vars=0, closures=0
+      locals (1):
+        [0] x kind=kind#0 level=0 next=0
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/yield-star.ts
+        pc2line_bytes: 6
+        source_length: undefined
+
+      opcodes (52):
+        0000: initial_yield
+        0001: get_arg0
+        0002: yield
+        0003: if_false8 +1 -> 6
+        0005: return_async
+        0006: drop
+        0007: get_var atom#229
+        0012: get_arg0
+        0013: push_1
+        0014: sub
+        0015: call 1
+        0018: for_of_start
+        0019: drop
+        0020: undefined
+        0021: undefined
+        0022: iterator_next
+        0023: iterator_check_object
+        0024: get_field2 atom#107
+        0029: if_true8 +55 -> 86
+        0031: yield_star
+        0032: dup
+        0033: if_true8 +3 -> 38
+        0035: drop
+        0036: goto8 +240 -> 278
+        0038: push_2
+        0039: strict_eq
+        0040: if_true8 +21 -> 63
+        0042: iterator_call 0
+        0044: if_true8 +13 -> 59
+        0046: iterator_check_object
+        0047: get_field2 atom#107
+        0052: if_false8 +233 -> 287
+        0054: get_field atom#66
+        0059: nip
+        0060: nip
+        0061: nip
+        0062: return_async
+        0063: iterator_call 1
+        0065: if_true8 +10 -> 77
+        0067: iterator_check_object
+        0068: get_field2 atom#107
+        0073: if_false8 +212 -> 287
+        0075: goto8 +9 -> 86
+        0077: iterator_call 2
+        0079: drop
+        0080: throw_error /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/yield-star.ts, 4
+        0086: get_field atom#66
+        0091: nip
+        0092: nip
+        0093: nip
+        0094: drop
+        0095: return_undef

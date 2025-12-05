@@ -1,0 +1,65 @@
+bytecode_version: 5
+atoms (4):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "testArgs"
+  [2] @230 = "console"
+  [3] @231 = "log"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arguments-object.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=1, closures=1
+    locals (1):
+      [0] testArgs kind=kind#0 level=0 next=0
+    closure_vars (1):
+      [0] testArgs -> var#0 [local, kind#0]
+    constant_pool (1):
+      [0] function testArgs
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arguments-object.ts
+      pc2line_bytes: 6
+      source_length: undefined
+
+    opcodes (13):
+      0000: push_this
+      0001: if_false +12 -> 18
+      0006: fclosure8 const[0] function testArgs
+      0008: put_var_ref0
+      0009: get_var_ref0
+      0010: push_1
+      0011: push_2
+      0012: push_3
+      0013: call 3
+      0016: drop
+      0017: return_undef
+      0018: undefined
+      0019: return_async
+
+    function[1] testArgs (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=0, defined=0, vars=0, closures=0
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arguments-object.ts
+        pc2line_bytes: 6
+        source_length: undefined
+
+      opcodes (14):
+        0000: get_var atom#230
+        0005: get_field2 atom#231
+        0010: get_var atom#79
+        0015: get_field atom#48
+        0020: call_method 1
+        0023: drop
+        0024: get_var atom#230
+        0029: get_field2 atom#231
+        0034: get_var atom#79
+        0039: push_0
+        0040: get_array_el
+        0041: call_method 1
+        0044: drop
+        0045: return_undef

@@ -37,6 +37,7 @@ export class BytecodeSerializer {
 
     // 4. Write object
     const objBuf = new DynBuf();
+    console.log(`Serializer: writing module, func_kind=${fd.func_kind}`);
     this.writeModule(objBuf, fd);
     this.buf.put(objBuf.buffer());
 
@@ -265,7 +266,7 @@ export class BytecodeSerializer {
     if (fd.super_call_allowed) flags |= 1 << bit; bit++;
     if (fd.super_allowed) flags |= 1 << bit; bit++;
     if (fd.arguments_allowed) flags |= 1 << bit; bit++;
-    if (true) flags |= 1 << bit; bit++; // has_debug (always true for now)
+    if (fd.has_debug) flags |= 1 << bit; bit++; // has_debug
     if (fd.is_eval) flags |= 1 << bit; bit++; // is_direct_or_indirect_eval
     
     buf.putU16(flags);
@@ -273,28 +274,40 @@ export class BytecodeSerializer {
     buf.putByte(fd.js_mode);
     this.putAtom(buf, fd.func_name);
     this.putLEB128(buf, fd.args.length); // arg_count
-    this.putLEB128(buf, fd.vars.length); // var_count
+    
+    if (fd.is_module) {
+        this.putLEB128(buf, 0); // var_count
+    } else {
+        this.putLEB128(buf, fd.vars.length); // var_count
+    }
+    
     this.putLEB128(buf, fd.args.length); // defined_arg_count (assume same as arg_count for now)
     this.putLEB128(buf, 3); // stack_size (TODO: calculate)
     this.putLEB128(buf, fd.closure_var.length); // closure_var_count
     this.putLEB128(buf, fd.cpool.length);
     this.putLEB128(buf, fd.byte_code.getOffset());
     
-    const local_count = fd.args.length + fd.vars.length;
+    console.log(`Serializer: writeFunction is_module=${fd.is_module}`);
+    let local_count = fd.args.length + fd.vars.length;
+    if (fd.is_module) {
+        local_count = 0;
+    }
     this.putLEB128(buf, local_count);
     
     // Vardefs (args then vars)
-    const allVars = [...fd.args, ...fd.vars];
-    for (const v of allVars) {
-      this.putAtom(buf, v.var_name);
-      this.putSLEB128(buf, v.scope_level);
-      this.putLEB128(buf, v.scope_next === -1 ? 0 : v.scope_next);
-      
-      let vFlags = v.var_kind & 0xf;
-      if (v.is_const) vFlags |= 16;
-      if (v.is_lexical) vFlags |= 32;
-      if (v.is_captured) vFlags |= 64;
-      buf.putByte(vFlags);
+    if (!fd.is_module) {
+        const allVars = [...fd.args, ...fd.vars];
+        for (const v of allVars) {
+        this.putAtom(buf, v.var_name);
+        this.putSLEB128(buf, v.scope_level);
+        this.putLEB128(buf, v.scope_next === -1 ? 0 : v.scope_next);
+        
+        let vFlags = v.var_kind & 0xf;
+        if (v.is_const) vFlags |= 16;
+        if (v.is_lexical) vFlags |= 32;
+        if (v.is_captured) vFlags |= 64;
+        buf.putByte(vFlags);
+        }
     }
     
     // Closure vars
@@ -315,9 +328,9 @@ export class BytecodeSerializer {
     buf.put(fd.byte_code.buffer());
     
     // Debug info (if has_debug)
-    if (true) { // has_debug
+    if (fd.has_debug) {
        this.putAtom(buf, fd.filename);
-       this.putLEB128(buf, 1); // line_num
+       // this.putLEB128(buf, 1); // line_num - QuickJS C implementation doesn't write this?
        this.putLEB128(buf, fd.pc2line.size); // pc2line_len
        buf.put(fd.pc2line.buffer());
        this.putAtom(buf, 0); // source (JS_ATOM_NULL)

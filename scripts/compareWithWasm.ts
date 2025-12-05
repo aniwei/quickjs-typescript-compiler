@@ -115,6 +115,7 @@ class BytecodeComparator {
       shortCode: !this.options.normalizeShort,
       debug: false,
       strictMode: false,
+      module: true, // Default to script mode to match WASM default
       firstAtomId
     } as const
 

@@ -10,6 +10,7 @@ interface ClassFieldsDef {
   need_brand: boolean;
   is_static: boolean;
   brand_push_pos: number;
+  private_methods: ts.MethodDeclaration[];
 }
 
 export interface CompilerOptions {
@@ -20,15 +21,18 @@ export interface CompilerOptions {
   shortCode?: boolean;
   debug?: boolean;
   strictMode?: boolean;
+  module?: boolean;
 }
 
 export class TypeScriptCompiler {
   state: ParseState;
   sourceFile!: ts.SourceFile;
   optionalChainLabels: number[] = [];
+  isModule: boolean;
 
   constructor(options: CompilerOptions = {}) {
     this.state = new ParseState(options.firstAtomId);
+    this.isModule = options.module !== false; // Default to true
   }
 
   async compileFileWithArtifacts(filename: string): Promise<{ bytecode: Uint8Array, functionDef: JSFunctionDef }> {
@@ -57,10 +61,18 @@ export class TypeScriptCompiler {
 
     // js_parse_program logic
     fd.is_global_var = true;
-    fd.is_module = true; // Treat as module
+    
+    console.log(`Compiler: isModule=${this.isModule}`);
+
+    // Always treat as module for internal structure (vars as closure vars, no locals in serialization)
+    // This matches QuickJS WASM output for strict scripts.
+    fd.is_module = true; 
     fd.func_kind = JSFunctionKind.JS_FUNC_ASYNC; // Match WASM module behavior
     fd.js_mode = 1; // JS_MODE_STRICT
     fd.func_name = JSAtom.JS_ATOM__eval_; // Match WASM module behavior
+    
+    console.log(`Compiler: func_kind=${fd.func_kind}`);
+
     fd.arguments_allowed = true; // Match WASM
 
     // Add hidden variable for return value
@@ -70,19 +82,22 @@ export class TypeScriptCompiler {
     fd.push_scope();
     fd.body_scope = fd.scope_level;
 
-    // Emit boilerplate for async module
-    this.emitOp(Opcode.OP_push_this);
-    const labelAsync = this.newLabel();
-    this.emitJump(Opcode.OP_if_false, labelAsync);
+    let labelAsync: number = -1;
+
+    if (this.isModule) {
+        // Emit boilerplate for async module ONLY if explicitly requested
+        this.emitOp(Opcode.OP_push_this);
+        labelAsync = this.newLabel();
+        this.emitJump8(Opcode.OP_if_false8, labelAsync);
+        this.emitOp(Opcode.OP_return_undef);
+        this.emitLabel(labelAsync);
+    }
 
     // Visit statements
     for (const statement of sourceFile.statements) {
       this.visitStatement(statement);
     }
 
-    this.emitOp(Opcode.OP_return_undef);
-    
-    this.emitLabel(labelAsync);
     this.emitOp(Opcode.OP_undefined);
     this.emitOp(Opcode.OP_return_async);
     
@@ -508,6 +523,9 @@ export class TypeScriptCompiler {
   }
 
   visitVariableDeclarationList(node: ts.VariableDeclarationList, isExport: boolean = false): void {
+    const isConst = (node.flags & ts.NodeFlags.Const) !== 0;
+    const isLet = (node.flags & ts.NodeFlags.Let) !== 0;
+
     for (const decl of node.declarations) {
       if (decl.initializer) {
         this.visitExpression(decl.initializer);
@@ -536,6 +554,13 @@ export class TypeScriptCompiler {
         // Add to current function scope
         if (!this.state.cur_func) throw new Error("No function");
         const idx = this.state.cur_func.add_var(atom);
+        
+        if (isConst) {
+            this.state.cur_func.set_var_const(idx, true);
+            this.state.cur_func.set_var_lexical(idx, true);
+        } else if (isLet) {
+            this.state.cur_func.set_var_lexical(idx, true);
+        }
         
         this.emitPutVar(idx);
       } else {
@@ -971,10 +996,23 @@ export class TypeScriptCompiler {
     this.emitAtom(classNameAtom);
     this.emitU8(classFlags);
 
+    // 6.5 Define private symbols
+    for (const member of node.members) {
+        if (member.name && ts.isPrivateIdentifier(member.name)) {
+            const name = member.name.text;
+            const atom = this.state.atomManager.getAtom(name);
+            this.emitOp(Opcode.OP_private_symbol);
+            this.emitAtom(atom);
+            this.state.cur_func.add_var(atom); // JS_VAR_DEF_CONST
+            this.emitOp(Opcode.OP_put_var_init);
+            this.emitAtom(atom);
+        }
+    }
+
     // Initialize ClassFieldsDef
     const classFields: ClassFieldsDef[] = [
-        { fields_init_fd: null, computed_fields_count: 0, need_brand: false, is_static: false, brand_push_pos: -1 },
-        { fields_init_fd: null, computed_fields_count: 0, need_brand: false, is_static: true, brand_push_pos: -1 }
+        { fields_init_fd: null, computed_fields_count: 0, need_brand: false, is_static: false, brand_push_pos: -1, private_methods: [] },
+        { fields_init_fd: null, computed_fields_count: 0, need_brand: false, is_static: true, brand_push_pos: -1, private_methods: [] }
     ];
 
     // 7. Process members
@@ -985,7 +1023,11 @@ export class TypeScriptCompiler {
             ctorFuncDef = this.compileClassConstructor(member, classNameAtom, classFlags);
         } else if (ts.isMethodDeclaration(member)) {
             const isStatic = member.modifiers?.some(m => m.kind === ts.SyntaxKind.StaticKeyword) || false;
-            this.compileClassMethod(member, isStatic);
+            if (member.name && ts.isPrivateIdentifier(member.name)) {
+                 classFields[isStatic ? 1 : 0].private_methods.push(member);
+            } else {
+                 this.compileClassMethod(member, isStatic);
+            }
         } else if (ts.isPropertyDeclaration(member)) {
             const isStatic = member.modifiers?.some(m => m.kind === ts.SyntaxKind.StaticKeyword) || false;
             const cf = classFields[isStatic ? 1 : 0];
@@ -1007,6 +1049,21 @@ export class TypeScriptCompiler {
     // 8. Finalize fields init
     // Instance fields
     const instanceCf = classFields[0];
+    
+    // Compile private instance methods if any
+    if (instanceCf.private_methods.length > 0) {
+        if (!instanceCf.fields_init_fd) {
+            this.emitClassInitStart(instanceCf);
+        }
+        const prevFunc = this.state.cur_func;
+        this.state.cur_func = instanceCf.fields_init_fd!;
+        
+        for (const method of instanceCf.private_methods) {
+             this.compileClassMethod(method, false); 
+        }
+        this.state.cur_func = prevFunc;
+    }
+
     const classFieldsInitAtom = JSAtom.JS_ATOM_class_fields_init;
     const classFieldsInitVarIdx = this.state.cur_func.add_var(classFieldsInitAtom); // JS_VAR_DEF_CONST
     
@@ -1023,6 +1080,21 @@ export class TypeScriptCompiler {
 
     // Static fields
     const staticCf = classFields[1];
+    
+    // Compile private static methods if any
+    if (staticCf.private_methods.length > 0) {
+        if (!staticCf.fields_init_fd) {
+            this.emitClassInitStart(staticCf);
+        }
+        const prevFunc = this.state.cur_func;
+        this.state.cur_func = staticCf.fields_init_fd!;
+        
+        for (const method of staticCf.private_methods) {
+             this.compileClassMethod(method, true); 
+        }
+        this.state.cur_func = prevFunc;
+    }
+
     if (staticCf.fields_init_fd) {
         this.emitOp(Opcode.OP_dup); // Duplicate class constructor
         this.emitClassInitEnd(staticCf);
@@ -1091,8 +1163,19 @@ export class TypeScriptCompiler {
   }
 
   compileClassField(node: ts.PropertyDeclaration, cf: ClassFieldsDef, isStatic: boolean): void {
-    if (!ts.isIdentifier(node.name)) return; // TODO: Computed names
-    const name = node.name.text;
+    let name = "";
+    let isPrivate = false;
+    
+    if (ts.isIdentifier(node.name)) {
+        name = node.name.text;
+    } else if (ts.isPrivateIdentifier(node.name)) {
+        name = node.name.text;
+        isPrivate = true;
+    } else {
+        // TODO: Computed names
+        return;
+    }
+    
     const atom = this.state.atomManager.getAtom(name);
 
     if (!cf.fields_init_fd) {
@@ -1104,6 +1187,11 @@ export class TypeScriptCompiler {
 
     // Get 'this'
     this.emitGetVar(this.state.atomManager.getAtom("this"));
+    
+    if (isPrivate) {
+        // Get private symbol
+        this.emitGetVar(atom);
+    }
 
     if (node.initializer) {
         this.visitExpression(node.initializer);
@@ -1111,8 +1199,13 @@ export class TypeScriptCompiler {
         this.emitOp(Opcode.OP_undefined);
     }
 
-    this.emitOp(Opcode.OP_define_field);
-    this.emitAtom(atom);
+    if (isPrivate) {
+        this.emitOp(Opcode.OP_swap);
+        this.emitOp(Opcode.OP_define_private_field);
+    } else {
+        this.emitOp(Opcode.OP_define_field);
+        this.emitAtom(atom);
+    }
 
     this.state.cur_func = prevFunc;
   }
@@ -1235,9 +1328,18 @@ export class TypeScriptCompiler {
   }
 
   compileClassMethod(node: ts.MethodDeclaration, isStatic: boolean): void {
-    if (!ts.isIdentifier(node.name)) return;
+    let methodName = "";
+    let isPrivate = false;
     
-    const methodName = node.name.text;
+    if (ts.isIdentifier(node.name)) {
+        methodName = node.name.text;
+    } else if (ts.isPrivateIdentifier(node.name)) {
+        methodName = node.name.text;
+        isPrivate = true;
+    } else {
+        return;
+    }
+    
     const methodAtom = this.state.atomManager.getAtom(methodName);
     
     const fd = JSFunctionDef.create(this.state.cur_func, false, false, this.state.cur_func!.filename);
@@ -1284,11 +1386,129 @@ export class TypeScriptCompiler {
         this.emitOp(Opcode.OP_swap);
     }
 
-    this.emitOp(Opcode.OP_define_method);
-    this.emitAtom(methodAtom);
-    this.emitU8(0); // OP_DEFINE_METHOD_METHOD
+    if (isPrivate) {
+        // Private methods are stored as private fields with function value
+        // Stack: [func]
+        // We need: [this, func, symbol]
+        this.emitGetVar(this.state.atomManager.getAtom("this")); // [func, this]
+        this.emitOp(Opcode.OP_swap); // [this, func]
+        this.emitGetVar(methodAtom); // [this, func, symbol]
+        this.emitOp(Opcode.OP_define_private_field);
+    } else {
+        this.emitOp(Opcode.OP_define_method);
+        this.emitAtom(methodAtom);
+        this.emitU8(0); // OP_DEFINE_METHOD_METHOD
+    }
 
-    if (isStatic) {
+    if (isStatic && !isPrivate) {
+        // define_method consumes the class object if it's static?
+        // No, define_method(obj, atom, flags)
+        // It takes obj from stack.
+        // If static, obj is the class constructor.
+        // We swapped it to top.
+        // After define_method, obj is still there?
+        // QuickJS define_method:
+        //   obj = stack[-2]
+        //   val = stack[-1]
+        //   ...
+        //   stack[-1] = obj (if keep_obj?) No, it usually consumes val and keeps obj?
+        //   Wait, define_method usually consumes the function value.
+        //   Does it consume the object?
+        //   OP_define_method:
+        //     obj = stack[-2]
+        //     val = stack[-1]
+        //     ...
+        //     pop val
+        //     (obj remains)
+        
+        // So if static, we swapped: [class, func] -> [func, class]
+        // Wait, define_method expects [obj, func] on stack?
+        // Let's check OP_define_method implementation in QuickJS.
+        // case OP_define_method:
+        //   obj = sp[-2];
+        //   val = sp[-1];
+        //   ...
+        //   sp--; // Pop val
+        
+        // So stack should be [obj, val].
+        // If static, we have [class, func].
+        // So we DON'T need swap if we want [class, func].
+        // Why did I have swap before?
+        // "if (isStatic) this.emitOp(Opcode.OP_swap);"
+        // Maybe I thought stack was [func, class]?
+        // Let's trace:
+        //   define_class pushes class constructor (and prototype).
+        //   Stack: [ctor, proto]
+        //   We are inside visitClassDeclaration loop.
+        //   Wait, define_class pushes [ctor, proto].
+        //   If static, we want to define on ctor.
+        //   If instance, we want to define on proto.
+        
+        // In visitClassDeclaration:
+        //   emitOp(Opcode.OP_define_class);
+        //   Stack: [ctor, proto]
+        
+        //   compileClassMethod is called.
+        //   It emits fclosure (pushes func).
+        //   Stack: [ctor, proto, func]
+        
+        //   If instance method:
+        //     We want define_method(proto, func).
+        //     Stack is [ctor, proto, func].
+        //     This matches [obj, val] for the top 2 elements.
+        //     So define_method works on proto. Correct.
+        
+        //   If static method:
+        //     We want define_method(ctor, func).
+        //     Stack is [ctor, proto, func].
+        //     We need [proto, ctor, func] ? No.
+        //     We need [..., ctor, func].
+        //     But proto is in the way.
+        //     We need to swap proto and func? No.
+        //     We need to bring ctor to below func.
+        //     Stack: [ctor, proto, func]
+        //     OP_swap (top 2): [ctor, func, proto] -> Wrong.
+        //     OP_rot3l: [proto, func, ctor] -> Wrong.
+        //     OP_rot3r: [func, ctor, proto] -> Wrong.
+        
+        //     Actually, for static methods, we usually define them after dropping proto?
+        //     In visitClassDeclaration:
+        //       // 7. Process members
+        //       ...
+        //       // Drop prototype (pushed by define_class)
+        //       this.emitOp(Opcode.OP_drop);
+        
+        //     So static methods should be compiled AFTER dropping proto?
+        //     But my code compiles them inside the loop.
+        
+        //     If I compile static methods inside the loop, I need to access ctor.
+        //     Stack: [ctor, proto]
+        //     Push func: [ctor, proto, func]
+        //     I need [ctor, func] at top? No, I need to reach ctor.
+        
+        //     Maybe I should separate instance and static methods?
+        //     Or use OP_perm3?
+        
+        //     Let's look at how I handle fields.
+        //     Fields are handled by class_fields_init function, which is called later.
+        
+        //     Methods are defined immediately.
+        
+        //     If I want to define static method on ctor while proto is on stack:
+        //     Stack: [ctor, proto]
+        //     Push func: [ctor, proto, func]
+        //     I want to call define_method on ctor.
+        //     I can use OP_swap2? (swap top with 3rd?) No such opcode.
+        //     OP_perm3: rotate top 3.
+        //     [ctor, proto, func] -> rot3l -> [proto, func, ctor] -> rot3l -> [func, ctor, proto]
+        //     This is getting complicated.
+        
+        //     Alternative:
+        //     Collect static methods and emit them after dropping proto.
+        //     Collect instance methods and emit them while proto is on stack.
+        
+        //     Let's check visitClassDeclaration again.
+        
         this.emitOp(Opcode.OP_swap);
     }
   }
@@ -1736,8 +1956,8 @@ export class TypeScriptCompiler {
         this.visitTypeOfExpression(node as ts.TypeOfExpression);
         break;
       case ts.SyntaxKind.VoidExpression:
-        this.visitVoidExpression(node as ts.VoidExpression);
-        break;
+        this.visitVoidExpression(node as ts.VoidExpression, keepValue);
+        return;
       case ts.SyntaxKind.BinaryExpression:
         this.visitBinaryExpression(node as ts.BinaryExpression, keepValue);
         return;
@@ -2073,8 +2293,14 @@ export class TypeScriptCompiler {
           
           const propName = node.left.name.text;
           const atom = this.state.atomManager.getAtom(propName);
-          this.emitOp(Opcode.OP_put_field);
-          this.emitAtom(atom);
+          
+          if (ts.isPrivateIdentifier(node.left.name)) {
+              this.emitGetVar(atom);
+              this.emitOp(Opcode.OP_put_private_field);
+          } else {
+              this.emitOp(Opcode.OP_put_field);
+              this.emitAtom(atom);
+          }
           return;
       }
     }
@@ -2242,20 +2468,24 @@ export class TypeScriptCompiler {
     this.emitOp(Opcode.OP_typeof);
   }
 
-  visitVoidExpression(node: ts.VoidExpression): void {
+  visitVoidExpression(node: ts.VoidExpression, keepValue: boolean = true): void {
     // Optimization: if operand is literal, don't emit it
     if (ts.isNumericLiteral(node.expression) || 
         node.expression.kind === ts.SyntaxKind.StringLiteral ||
         node.expression.kind === ts.SyntaxKind.TrueKeyword ||
         node.expression.kind === ts.SyntaxKind.FalseKeyword ||
         node.expression.kind === ts.SyntaxKind.NullKeyword) {
-        this.emitOp(Opcode.OP_undefined);
+        if (keepValue) {
+            this.emitOp(Opcode.OP_undefined);
+        }
         return;
     }
 
     this.visitExpression(node.expression);
     this.emitOp(Opcode.OP_drop);
-    this.emitOp(Opcode.OP_undefined);
+    if (keepValue) {
+        this.emitOp(Opcode.OP_undefined);
+    }
   }
 
   visitTaggedTemplateExpression(node: ts.TaggedTemplateExpression): void {
@@ -2307,10 +2537,27 @@ export class TypeScriptCompiler {
     this.emitOp(Opcode.OP_array_from);
     this.emitU16(spans.length + 1);
     
-    // Now we need to add the 'raw' property.
-    // For simplicity in this first pass, let's skip the 'raw' property and object caching
-    // and just pass the array of strings.
-    // TODO: Implement full template object spec compliance (caching + raw property)
+    // Add 'raw' property
+    // 1. Create raw array
+    this.emitOp(Opcode.OP_push_atom_value);
+    if (ts.isNoSubstitutionTemplateLiteral(template)) {
+        this.emitAtom(this.state.atomManager.getAtom(template.rawText || template.text));
+    } else {
+        this.emitAtom(this.state.atomManager.getAtom(template.head.rawText || template.head.text));
+    }
+    
+    for (const span of spans) {
+        this.emitOp(Opcode.OP_push_atom_value);
+        this.emitAtom(this.state.atomManager.getAtom(span.literal.rawText || span.literal.text));
+    }
+    
+    this.emitOp(Opcode.OP_array_from);
+    this.emitU16(spans.length + 1);
+    
+    // 2. Define 'raw' property on template object
+    // Stack: tag, templateObj, rawArray
+    this.emitOp(Opcode.OP_define_field);
+    this.emitAtom(this.state.atomManager.getAtom("raw"));
     
     // 3. Push substitutions
     for (const span of spans) {
@@ -2385,8 +2632,15 @@ export class TypeScriptCompiler {
       
       const propName = propAccess.name.text;
       const atom = this.state.atomManager.getAtom(propName);
-      this.emitOp(Opcode.OP_get_field2); // Push method, keep obj (this)
-      this.emitAtom(atom);
+      
+      if (ts.isPrivateIdentifier(propAccess.name)) {
+          this.emitOp(Opcode.OP_dup); // obj, obj
+          this.emitGetVar(atom); // obj, obj, symbol
+          this.emitOp(Opcode.OP_get_private_field); // obj, func
+      } else {
+          this.emitOp(Opcode.OP_get_field2); // Push method, keep obj (this)
+          this.emitAtom(atom);
+      }
       
       if (node.questionDotToken) {
           // obj.method?.()
@@ -2435,8 +2689,19 @@ export class TypeScriptCompiler {
         this.visitExpression(arg);
       }
       // Call
-      this.emitOp(Opcode.OP_call);
-      this.emitU16(node.arguments.length);
+      const argCount = node.arguments.length;
+      if (argCount === 0) {
+          this.emitOp(Opcode.OP_call0);
+      } else if (argCount === 1) {
+          this.emitOp(Opcode.OP_call1);
+      } else if (argCount === 2) {
+          this.emitOp(Opcode.OP_call2);
+      } else if (argCount === 3) {
+          this.emitOp(Opcode.OP_call3);
+      } else {
+          this.emitOp(Opcode.OP_call);
+          this.emitU16(argCount);
+      }
     }
     
     this.exitOptionalChain(chainInfo);
@@ -2464,8 +2729,14 @@ export class TypeScriptCompiler {
 
     const propName = node.name.text;
     const atom = this.state.atomManager.getAtom(propName);
-    this.emitOp(Opcode.OP_get_field);
-    this.emitAtom(atom);
+    
+    if (ts.isPrivateIdentifier(node.name)) {
+        this.emitGetVar(atom);
+        this.emitOp(Opcode.OP_get_private_field);
+    } else {
+        this.emitOp(Opcode.OP_get_field);
+        this.emitAtom(atom);
+    }
 
     this.exitOptionalChain(chainInfo);
   }
@@ -2512,13 +2783,18 @@ export class TypeScriptCompiler {
               }
           } else {
               // Closure variable
-              if (res.idx === 0) this.emitOp(Opcode.OP_get_var_ref0);
-              else if (res.idx === 1) this.emitOp(Opcode.OP_get_var_ref1);
-              else if (res.idx === 2) this.emitOp(Opcode.OP_get_var_ref2);
-              else if (res.idx === 3) this.emitOp(Opcode.OP_get_var_ref3);
-              else {
-                  this.emitOp(Opcode.OP_get_var_ref);
+              if (res.is_lexical) {
+                  this.emitOp(Opcode.OP_get_var_ref_check);
                   this.emitU16(res.idx);
+              } else {
+                  if (res.idx === 0) this.emitOp(Opcode.OP_get_var_ref0);
+                  else if (res.idx === 1) this.emitOp(Opcode.OP_get_var_ref1);
+                  else if (res.idx === 2) this.emitOp(Opcode.OP_get_var_ref2);
+                  else if (res.idx === 3) this.emitOp(Opcode.OP_get_var_ref3);
+                  else {
+                      this.emitOp(Opcode.OP_get_var_ref);
+                      this.emitU16(res.idx);
+                  }
               }
           }
           return;

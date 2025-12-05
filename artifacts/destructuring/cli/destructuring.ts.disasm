@@ -1,0 +1,141 @@
+bytecode_version: 5
+atoms (14):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "obj"
+  [2] @230 = "a"
+  [3] @231 = "b"
+  [4] @232 = "arr"
+  [5] @233 = "c"
+  [6] @234 = "d"
+  [7] @235 = "nested"
+  [8] @236 = "y"
+  [9] @237 = "arr2"
+  [10] @238 = "z"
+  [11] @239 = "def"
+  [12] @240 = "defArr"
+  [13] @241 = "x"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/destructuring.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=12, closures=12
+    locals (12):
+      [0] obj kind=kind#0 level=0 next=0
+      [1] a kind=kind#0 level=0 next=0
+      [2] b kind=kind#0 level=0 next=0
+      [3] arr kind=kind#0 level=0 next=0
+      [4] c kind=kind#0 level=0 next=0
+      [5] d kind=kind#0 level=0 next=0
+      [6] nested kind=kind#0 level=0 next=0
+      [7] y kind=kind#0 level=0 next=0
+      [8] arr2 kind=kind#0 level=0 next=0
+      [9] z kind=kind#0 level=0 next=0
+      [10] def kind=kind#0 level=0 next=0
+      [11] defArr kind=kind#0 level=0 next=0
+    closure_vars (12):
+      [0] obj -> var#0 [local, kind#0]
+      [1] a -> var#1 [local, kind#0]
+      [2] b -> var#2 [local, kind#0]
+      [3] arr -> var#3 [local, kind#0]
+      [4] c -> var#4 [local, kind#0]
+      [5] d -> var#5 [local, kind#0]
+      [6] nested -> var#6 [local, kind#0]
+      [7] y -> var#7 [local, kind#0]
+      [8] arr2 -> var#8 [local, kind#0]
+      [9] z -> var#9 [local, kind#0]
+      [10] def -> var#10 [local, kind#0]
+      [11] defArr -> var#11 [local, kind#0]
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/destructuring.ts
+      pc2line_bytes: 27
+      source_length: undefined
+
+    opcodes (85):
+      0000: push_this
+      0001: if_false +165 -> 171
+      0006: object
+      0007: push_1
+      0008: define_field atom#230
+      0013: push_2
+      0014: define_field atom#231
+      0019: put_var_ref0
+      0020: get_var_ref0
+      0021: to_object
+      0022: get_field2 atom#230
+      0027: put_var_ref1
+      0028: get_field2 atom#231
+      0033: put_var_ref2
+      0034: drop
+      0035: push_3
+      0036: push_4
+      0037: array_from 2
+      0040: put_var_ref3
+      0041: get_var_ref3
+      0042: for_of_start
+      0043: for_of_next 0
+      0045: drop
+      0046: put_var_ref var_ref[4] c
+      0049: for_of_next 0
+      0051: drop
+      0052: put_var_ref var_ref[5] d
+      0055: iterator_close
+      0056: object
+      0057: object
+      0058: push_1
+      0059: define_field atom#236
+      0064: define_field atom#241
+      0069: put_var_ref var_ref[6] nested
+      0072: get_var_ref var_ref[6] nested
+      0075: to_object
+      0076: get_field2 atom#241
+      0081: to_object
+      0082: get_field2 atom#236
+      0087: put_var_ref var_ref[7] y
+      0090: drop
+      0091: drop
+      0092: push_1
+      0093: push_2
+      0094: push_3
+      0095: array_from 3
+      0098: put_var_ref var_ref[8] arr2
+      0101: get_var_ref var_ref[8] arr2
+      0104: for_of_start
+      0105: for_of_next 0
+      0107: drop
+      0108: drop
+      0109: for_of_next 0
+      0111: drop
+      0112: drop
+      0113: for_of_next 0
+      0115: drop
+      0116: put_var_ref var_ref[9] z
+      0119: iterator_close
+      0120: object
+      0121: to_object
+      0122: get_field2 atom#239
+      0127: dup
+      0128: undefined
+      0129: strict_eq
+      0130: if_false +6 -> 141
+      0135: drop
+      0136: push_i32 10
+      0141: put_var_ref var_ref[10] def
+      0144: drop
+      0145: array_from 0
+      0148: for_of_start
+      0149: for_of_next 0
+      0151: drop
+      0152: dup
+      0153: undefined
+      0154: strict_eq
+      0155: if_false +6 -> 166
+      0160: drop
+      0161: push_i32 20
+      0166: put_var_ref var_ref[11] defArr
+      0169: iterator_close
+      0170: return_undef
+      0171: undefined
+      0172: return_async

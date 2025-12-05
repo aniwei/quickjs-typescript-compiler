@@ -1,0 +1,173 @@
+bytecode_version: 5
+atoms (9):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "MathUtil"
+  [2] @230 = "square"
+  [3] @231 = "area"
+  [4] @232 = "console"
+  [5] @233 = "log"
+  [6] @234 = "PI"
+  [7] @235 = "x"
+  [8] @236 = "r"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/class-static.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=2, closures=2
+    locals (2):
+      [0] MathUtil kind=kind#0 level=1 next=0
+      [1] class_fields_init kind=kind#0 level=2 next=0
+    closure_vars (2):
+      [0] MathUtil -> var#0 [local, kind#0]
+      [1] class_fields_init -> var#1 [local, kind#0]
+    constant_pool (4):
+      [0] function square
+      [1] function area
+      [2] function MathUtil
+      [3] function <builtin:0>
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/class-static.ts
+      pc2line_bytes: 12
+      source_length: undefined
+
+    opcodes (49):
+      0000: push_this
+      0001: if_false +120 -> 126
+      0006: undefined
+      0007: push_const const[2] function MathUtil
+      0012: define_class atom#229, 0
+      0018: fclosure8 const[0] function square
+      0020: swap
+      0021: define_method atom#230, 0
+      0027: swap
+      0028: fclosure8 const[1] function area
+      0030: swap
+      0031: define_method atom#231, 0
+      0037: swap
+      0038: undefined
+      0039: put_loc local[1] class_fields_init
+      0042: drop
+      0043: dup
+      0044: fclosure const[3] function <builtin:0>
+      0049: set_home_object
+      0050: call_method 0
+      0053: drop
+      0054: dup
+      0055: put_var_ref0
+      0056: set_proto
+      0057: get_var atom#232
+      0062: get_field2 atom#233
+      0067: get_var_ref0
+      0068: get_field atom#234
+      0073: call_method 1
+      0076: drop
+      0077: get_var atom#232
+      0082: get_field2 atom#233
+      0087: get_var_ref0
+      0088: get_field2 atom#230
+      0093: push_5
+      0094: call_method 1
+      0097: call_method 1
+      0100: drop
+      0101: get_var atom#232
+      0106: get_field2 atom#233
+      0111: get_var_ref0
+      0112: get_field2 atom#231
+      0117: push_2
+      0118: call_method 1
+      0121: call_method 1
+      0124: drop
+      0125: return_undef
+      0126: undefined
+      0127: return_async
+
+    function[1] square (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=1, defined=1, vars=1, closures=0
+      locals (2):
+        [0] x kind=kind#0 level=0 next=0
+        [1] this kind=kind#0 level=0 next=0
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/class-static.ts
+        pc2line_bytes: 6
+        source_length: undefined
+
+      opcodes (5):
+        0000: get_arg0
+        0001: get_arg0
+        0002: mul
+        0003: return
+        0004: return_undef
+
+    function[2] area (const[1]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=1, defined=1, vars=1, closures=1
+      locals (2):
+        [0] r kind=kind#0 level=0 next=0
+        [1] this kind=kind#0 level=0 next=0
+      closure_vars (1):
+        [0] MathUtil -> var#0 [kind#0]
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/class-static.ts
+        pc2line_bytes: 6
+        source_length: undefined
+
+      opcodes (9):
+        0000: get_var_ref0
+        0001: get_field atom#234
+        0006: get_var_ref0
+        0007: get_field2 atom#230
+        0012: get_arg0
+        0013: call_method 1
+        0016: mul
+        0017: return
+        0018: return_undef
+
+    function[3] MathUtil (const[2]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=0, defined=0, vars=0, closures=0
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/class-static.ts
+        pc2line_bytes: 0
+        source_length: undefined
+
+      opcodes (10):
+        0000: check_ctor
+        0001: get_var atom#120
+        0006: dup
+        0007: if_false +10 -> 22
+        0012: get_var r
+        0017: swap
+        0018: call_method 0
+        0021: drop
+        0022: drop
+        0023: return_undef
+
+    function[4] <builtin:0> (const[3]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=0, defined=0, vars=1, closures=0
+      locals (1):
+        [0] this kind=kind#0 level=0 next=0
+      constant_pool (1):
+        [0] 3.14159
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/class-static.ts
+        pc2line_bytes: 3
+        source_length: undefined
+
+      opcodes (4):
+        0000: get_loc0
+        0001: push_const const[0] 3.14159
+        0006: define_field atom#234
+        0011: return_undef

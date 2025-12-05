@@ -1,0 +1,85 @@
+bytecode_version: 5
+atoms (5):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "Foo"
+  [2] @230 = "arrow"
+  [3] @231 = "x"
+  [4] @232 = "y"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-this.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=1, closures=1
+    locals (1):
+      [0] Foo kind=kind#0 level=0 next=0
+    closure_vars (1):
+      [0] Foo -> var#0 [local, kind#0]
+    constant_pool (1):
+      [0] function Foo
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-this.ts
+      pc2line_bytes: 0
+      source_length: undefined
+
+    opcodes (7):
+      0000: push_this
+      0001: if_false +4 -> 10
+      0006: fclosure8 const[0] function Foo
+      0008: put_var_ref0
+      0009: return_undef
+      0010: undefined
+      0011: return_async
+
+    function[1] Foo (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=0, defined=0, vars=2, closures=0
+      locals (2):
+        [0] this kind=kind#0 level=0 next=0
+        [1] arrow kind=kind#0 level=0 next=0
+      constant_pool (1):
+        [0] function <builtin:0>
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-this.ts
+        pc2line_bytes: 15
+        source_length: undefined
+
+      opcodes (14):
+        0000: push_this
+        0001: put_loc0
+        0002: push_1
+        0003: push_1
+        0004: get_loc0
+        0005: swap
+        0006: put_field atom#231
+        0011: fclosure8 const[0] function <builtin:0>
+        0013: set_name atom#230
+        0018: put_loc local[1] arrow
+        0021: get_loc1
+        0022: call 0
+        0025: drop
+        0026: return_undef
+
+      function[2] <builtin:0> (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+        mode: sloppy
+        stack_size: 3
+        args: total=0, defined=0, vars=0, closures=1
+        closure_vars (1):
+          [0] this -> var#0 [local, kind#0]
+
+        debug:
+          filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-this.ts
+          pc2line_bytes: 9
+          source_length: undefined
+
+        opcodes (6):
+          0000: push_2
+          0001: push_2
+          0002: get_var_ref0
+          0003: swap
+          0004: put_field atom#232
+          0009: return_undef
