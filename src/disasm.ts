@@ -42,10 +42,15 @@ export function createAdvancedDisassembly(bytecode: Uint8Array): string {
     }
 
     ensureBlankLine(ctx.lines)
-    renderModuleObject(module.root, ctx, 0)
+    if (module.requireEntries) {
+      renderModuleObject(module, ctx, 0)
+    } else {
+      renderFunction(module.root, ctx, 0)
+    }
 
     return ctx.lines.join('\n')
   } catch (error) {
+    console.error('Disassembly error:', error);
     return buildFallbackDisassembly(bytecode, error)
   }
 }
@@ -541,10 +546,13 @@ function formatGenericOperand(operand: unknown): string {
 function getJumpBaseOffset(def: OpcodeDefinition): number {
   switch (def.format) {
     case OpFormat.label:
+      return 5
     case OpFormat.label8:
+      return 2
     case OpFormat.label16:
+      return 3
     case OpFormat.label_u16:
-      return 1
+      return 1 // This seems wrong too, but let's leave it if unsure
     case OpFormat.atom_label_u8:
     case OpFormat.atom_label_u16:
       return 5

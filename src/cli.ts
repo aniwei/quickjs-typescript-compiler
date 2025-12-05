@@ -83,6 +83,9 @@ async function main() {
       case '--pc2line':
         options.pc2line = true
         break
+      case '--first-atom-id':
+        options.firstAtomId = parseInt(args[++i], 10)
+        break
       case '--run-wasm':
         options.runWasm = true
         break
@@ -173,7 +176,7 @@ async function compileTsFile(inputFile: string, options: CLIOptions) {
   }
   
   if (options.pc2line) {
-    const table = functionDef.pc2line.toArray()
+    const table = Array.from(functionDef.pc2line.buffer())
     if (!table || table.length === 0) {
       console.log('⚠️  pc2line 表为空')
     } else {
@@ -202,15 +205,13 @@ function printPc2LineTable(buffer: number[]) {
   console.log('📦 pc2line 原始字节:', hexBytes.join(' '))
 
   const entries = decodePc2line(buffer)
-  console.log('┏━━╸PC ╺━━╸行 ╺━━╸列 ╺━━╸ΔPC ╺━━╸Δ行 ╺━━╸Δ列')
+  console.log('┏━━╸PC ╺━━╸行 ╺━━╸ΔPC ╺━━╸Δ行')
   for (const entry of entries) {
     const pcText = entry.pc.toString().padStart(4, ' ')
     const lineText = (entry.line + 1).toString().padStart(3, ' ')
-    const colText = (entry.column + 1).toString().padStart(3, ' ')
     const deltaPc = entry.deltaPc.toString().padStart(3, ' ')
     const deltaLine = entry.deltaLine.toString().padStart(3, ' ')
-    const deltaColumn = entry.deltaColumn.toString().padStart(3, ' ')
-    console.log(`┃ ${pcText} → ${lineText} : ${colText}  [Δpc=${deltaPc} Δ行=${deltaLine} Δ列=${deltaColumn}]`)
+    console.log(`┃ ${pcText} → ${lineText} [Δpc=${deltaPc} Δ行=${deltaLine}]`)
   }
 }
 
@@ -221,6 +222,7 @@ function decodePc2line(buffer: number[]) {
     let result = 0
     let shift = 0
     while (true) {
+      if (offset >= data.length) return 0
       const byte = data[offset++]
       result |= (byte & 0x7f) << shift
       if ((byte & 0x80) === 0) break
@@ -233,12 +235,19 @@ function decodePc2line(buffer: number[]) {
     return ((encoded >>> 1) ^ -(encoded & 1)) | 0
   }
 
-  const entries: Array<{ pc: number; line: number; column: number; deltaPc: number; deltaLine: number; deltaColumn: number }> = []
+  const entries: Array<{ pc: number; line: number; deltaPc: number; deltaLine: number }> = []
   let pc = 0
-  let line = readULEB()
-  let column = readULEB()
-  entries.push({ pc, line, column, deltaPc: 0, deltaLine: 0, deltaColumn: 0 })
-
+  // Initial line number is usually 1 or 0. QuickJS starts at 1.
+  // But the table encodes diffs.
+  // The first entry in QuickJS pc2line is NOT absolute line/col.
+  // It starts with diffs from (0, 1).
+  let line = 1
+  
+  // JSFunctionDef implementation:
+  // this.pc2line.putByte(0);
+  // this.putULEB128(this.pc2line, pc_diff);
+  // this.putSLEB128(this.pc2line, line_diff);
+  
   while (offset < data.length) {
     const op = data[offset++]
     let diffPc: number
@@ -252,17 +261,17 @@ function decodePc2line(buffer: number[]) {
       diffPc = Math.floor(encoded / PC2LINE_RANGE)
       diffLine = (encoded % PC2LINE_RANGE) + PC2LINE_BASE
     }
-    const diffColumn = readSLEB()
 
     pc += diffPc
     line += diffLine
-    column += diffColumn
 
-    entries.push({ pc, line, column, deltaPc: diffPc, deltaLine: diffLine, deltaColumn: diffColumn })
+    entries.push({ pc, line, deltaPc: diffPc, deltaLine: diffLine })
   }
 
   return entries
 }
+
+import { createAdvancedDisassembly } from './disasm'
 
 async function disassembleBytecode(bytecode: Uint8Array, sourceFile: string) {
   console.log('\n--- Disassembly ---')
@@ -270,19 +279,7 @@ async function disassembleBytecode(bytecode: Uint8Array, sourceFile: string) {
   console.log(`Bytecode size: ${bytecode.length} bytes`)
   console.log('')
   
-  // Simple hex dump for now
-  // TODO: Implement proper disassembler
-  for (let i = 0; i < bytecode.length; i += 16) {
-    const chunk = bytecode.slice(i, i + 16)
-    const hex = Array.from(chunk)
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join(' ')
-    const ascii = Array.from(chunk)
-      .map(b => (b >= 32 && b <= 126) ? String.fromCharCode(b) : '.')
-      .join('')
-    
-    console.log(`${i.toString(16).padStart(8, '0')}: ${hex.padEnd(47, ' ')} |${ascii}|`)
-  }
+  console.log(createAdvancedDisassembly(bytecode))
   
   console.log('--- End Disassembly ---\n')
 }

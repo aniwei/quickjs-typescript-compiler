@@ -96,6 +96,12 @@ class BytecodeComparator {
     let firstAtomId: number | undefined
     try {
       firstAtomId = await QuickJSLib.getFirstAtomId()
+      console.log(`QuickJS WASM firstAtomId: ${firstAtomId}`);
+      // Hack: The WASM runtime seems to have pre-allocated atoms up to 968
+      // if (firstAtomId === 228) {
+      //   console.log('⚠️  Adjusting firstAtomId to 968 to match WASM runtime state');
+      //   firstAtomId = 968;
+      // }
     } catch {}
     // 获取 QuickJS 的 opcode 映射，确保我们生成的数值与引擎一致
     let opcodeOverride: Map<string, number> | undefined

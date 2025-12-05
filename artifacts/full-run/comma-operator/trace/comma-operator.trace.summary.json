@@ -1,9 +1,0 @@
-{
-  "input": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/comma-operator.ts",
-  "moduleName": "__tests__/compiler/fixtures/comma-operator.js",
-  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/comma-operator/trace",
-  "identical": true,
-  "tsEventCount": 6,
-  "wasmEventCount": 6,
-  "differences": []
-}

@@ -1,6 +1,0 @@
-{"cat":"module","source":"ts","module":1,"moduleName":"tmp/trace-smoke.js","event":"resolve-start","reqCount":0}
-{"cat":"module","source":"ts","module":1,"moduleName":"tmp/trace-smoke.js","event":"resolve-done"}
-{"cat":"module","source":"ts","module":1,"moduleName":"tmp/trace-smoke.js","event":"link-start","status":0}
-{"cat":"module","source":"ts","module":1,"moduleName":"tmp/trace-smoke.js","event":"link-done","status":2}
-{"cat":"module","source":"ts","module":1,"moduleName":"tmp/trace-smoke.js","event":"eval-start","status":2,"isAsync":false,"hasTLA":false}
-{"cat":"module","source":"ts","module":1,"moduleName":"tmp/trace-smoke.js","event":"eval-done","status":5,"bytecodeSize":93}

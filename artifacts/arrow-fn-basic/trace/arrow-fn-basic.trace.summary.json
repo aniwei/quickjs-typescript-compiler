@@ -1,9 +1,0 @@
-{
-  "input": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-fn-basic.ts",
-  "moduleName": "__tests__/compiler/fixtures/arrow-fn-basic.js",
-  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/arrow-fn-basic/trace",
-  "identical": true,
-  "tsEventCount": 6,
-  "wasmEventCount": 6,
-  "differences": []
-}

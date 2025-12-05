@@ -1,6 +1,0 @@
-{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/variable-hoisting.js","event":"resolve-start","timestamp":"2025-12-04T06:33:09.887Z","reqCount":0}
-{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/variable-hoisting.js","event":"resolve-done","timestamp":"2025-12-04T06:33:09.891Z"}
-{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/variable-hoisting.js","event":"link-start","timestamp":"2025-12-04T06:33:09.891Z","status":0}
-{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/variable-hoisting.js","event":"link-done","timestamp":"2025-12-04T06:33:09.901Z","status":2}
-{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/variable-hoisting.js","event":"eval-start","timestamp":"2025-12-04T06:33:09.901Z","status":2,"isAsync":false,"hasTLA":false}
-{"cat":"module","source":"wasm","module":1,"moduleName":"__tests__/compiler/fixtures/variable-hoisting.js","event":"eval-done","timestamp":"2025-12-04T06:33:09.901Z","status":5,"bytecodeSize":183}

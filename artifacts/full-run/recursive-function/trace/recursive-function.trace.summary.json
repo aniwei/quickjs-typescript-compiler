@@ -1,9 +1,0 @@
-{
-  "input": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/recursive-function.ts",
-  "moduleName": "__tests__/compiler/fixtures/recursive-function.js",
-  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/recursive-function/trace",
-  "identical": true,
-  "tsEventCount": 6,
-  "wasmEventCount": 6,
-  "differences": []
-}

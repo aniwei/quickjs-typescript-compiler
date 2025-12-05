@@ -1,9 +1,0 @@
-{
-  "input": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/array-methods.ts",
-  "moduleName": "__tests__/compiler/fixtures/array-methods.js",
-  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/full-run/array-methods/trace",
-  "identical": true,
-  "tsEventCount": 6,
-  "wasmEventCount": 6,
-  "differences": []
-}

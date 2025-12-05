@@ -1,6 +1,5 @@
-export * from './compiler';
+export * from './compiler/compiler';
 export * from './compiler/parseState';
-export * from './env';
-export { AtomManager, JS_ATOM_NULL } from './atom';
-export * from './bytecode';
-export * from './functionDef';
+export * from './compiler/jsFunctionDef';
+export * from './bytecode/bytecodeWriter';
+export * from './bytecode/dynBuffer';

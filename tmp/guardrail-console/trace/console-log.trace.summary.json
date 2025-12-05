@@ -1,9 +1,0 @@
-{
-  "input": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/console-log.ts",
-  "moduleName": "__tests__/compiler/fixtures/console-log.js",
-  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/tmp/guardrail-console/trace",
-  "identical": true,
-  "tsEventCount": 6,
-  "wasmEventCount": 6,
-  "differences": []
-}

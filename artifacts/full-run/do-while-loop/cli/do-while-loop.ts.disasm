@@ -1,9 +1,0 @@
-; failed to parse bytecode: Cannot read properties of undefined (reading 'name')
-; fallback hex dump:
-00000000: 05 02 58 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..X__tests__/com|
-00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 64 |piler/fixtures/d|
-00000020: 6f 2d 77 68 69 6c 65 2d 6c 6f 6f 70 2e 74 73 08 |o-while-loop.ts.|
-00000030: 64 77 5f 69 0d c8 03 00 00 00 00 00 0c 20 06 01 |dw_i......... ..|
-00000040: a4 01 00 01 00 01 01 00 08 01 ca 03 01 00 20 ca |.............. .|
-00000050: 03 00 01 08 ec 02 29 b7 e3 06 2f c8 03 02 00 00 |......).../.....|
-00000060: 00                                              |.|

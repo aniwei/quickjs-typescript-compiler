@@ -1,1 +1,0 @@
-const value = `template literal`

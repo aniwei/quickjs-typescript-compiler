@@ -1,6 +1,0 @@
-{"cat":"module","source":"ts","module":1,"moduleName":"__tests__/compiler/fixtures/arrow-fn-basic.js","event":"resolve-start","timestamp":"2025-12-03T02:37:20.766Z","reqCount":0}
-{"cat":"module","source":"ts","module":1,"moduleName":"__tests__/compiler/fixtures/arrow-fn-basic.js","event":"resolve-done","timestamp":"2025-12-03T02:37:20.766Z"}
-{"cat":"module","source":"ts","module":1,"moduleName":"__tests__/compiler/fixtures/arrow-fn-basic.js","event":"link-start","timestamp":"2025-12-03T02:37:20.766Z","status":0}
-{"cat":"module","source":"ts","module":1,"moduleName":"__tests__/compiler/fixtures/arrow-fn-basic.js","event":"link-done","timestamp":"2025-12-03T02:37:20.767Z","status":2}
-{"cat":"module","source":"ts","module":1,"moduleName":"__tests__/compiler/fixtures/arrow-fn-basic.js","event":"eval-start","timestamp":"2025-12-03T02:37:20.767Z","status":2,"isAsync":false,"hasTLA":false}
-{"cat":"module","source":"ts","module":1,"moduleName":"__tests__/compiler/fixtures/arrow-fn-basic.js","event":"eval-done","timestamp":"2025-12-03T02:37:20.768Z","status":5,"bytecodeSize":316}
