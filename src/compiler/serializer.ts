@@ -69,21 +69,51 @@ export class BytecodeSerializer {
     }
     
     for (const e of fd.export_entries) {
-        this.putAtom(buf, e.local_name);
-        this.putAtom(buf, e.export_name);
+        if (e.module_name === 0) {
+            // JS_EXPORT_TYPE_LOCAL = 1
+            buf.putByte(1);
+            const varIdx = this.resolveVarIdx(fd, e.local_name);
+            this.putLEB128(buf, varIdx);
+            this.putAtom(buf, e.export_name);
+        } else {
+            // JS_EXPORT_TYPE_INDIRECT = 2
+            buf.putByte(2);
+            const reqIdx = fd.req_module_entries.findIndex(m => m.module_name === e.module_name);
+            this.putLEB128(buf, reqIdx);
+            this.putAtom(buf, e.local_name);
+            this.putAtom(buf, e.export_name);
+        }
     }
     
     for (const e of fd.star_export_entries) {
-        this.putAtom(buf, e.module_name);
+        const reqIdx = fd.req_module_entries.findIndex(m => m.module_name === e.module_name);
+        this.putLEB128(buf, reqIdx);
     }
     
     for (const e of fd.import_entries) {
-        this.putAtom(buf, e.module_name);
-        this.putAtom(buf, e.local_name);
+        const varIdx = this.resolveVarIdx(fd, e.local_name);
+        this.putLEB128(buf, varIdx);
+        buf.putByte(0); // is_star (TODO: support namespace imports if needed)
         this.putAtom(buf, e.export_name);
+        const reqIdx = fd.req_module_entries.findIndex(m => m.module_name === e.module_name);
+        this.putLEB128(buf, reqIdx);
     }
     
     this.writeFunction(buf, fd);
+  }
+
+  resolveVarIdx(fd: JSFunctionDef, name: number): number {
+      const closureIdx = fd.closure_var.findIndex(v => v.var_name === name);
+      if (closureIdx !== -1) return closureIdx;
+      
+      const varIdx = fd.vars.findIndex(v => v.var_name === name);
+      if (varIdx !== -1) return varIdx;
+      
+      const argIdx = fd.args.findIndex(v => v.var_name === name);
+      if (argIdx !== -1) return argIdx;
+      
+      // console.warn(`Serializer: Variable not found for export/import: ${this.atomManager.getString(name)}`);
+      return 0;
   }
 
   scanAndRewrite(fd: JSFunctionDef) {
@@ -330,8 +360,8 @@ export class BytecodeSerializer {
     // Debug info (if has_debug)
     if (fd.has_debug) {
        this.putAtom(buf, fd.filename);
-       // this.putLEB128(buf, 1); // line_num - QuickJS C implementation doesn't write this?
-       this.putLEB128(buf, fd.pc2line.size); // pc2line_len
+       this.putLEB128(buf, fd.line_start);
+       this.putLEB128(buf, fd.pc2line.size);
        buf.put(fd.pc2line.buffer());
        this.putAtom(buf, 0); // source (JS_ATOM_NULL)
     }

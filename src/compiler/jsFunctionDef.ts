@@ -167,10 +167,16 @@ export class JSFunctionDef {
 
   add_var(name: number): number {
     const idx = this.vars.length;
+    
+    // Update scope chain
+    const scope = this.scopes[this.scope_level];
+    const scope_next = scope.first;
+    scope.first = idx;
+
     this.vars.push({
       var_name: name,
       scope_level: this.scope_level,
-      scope_next: -1,
+      scope_next: scope_next,
       is_const: false,
       is_lexical: false,
       is_captured: false,
@@ -261,7 +267,16 @@ export class JSFunctionDef {
   }
 
   find_var(name: number): number {
-    return this.vars.findIndex(v => v.var_name === name);
+    for (let i = this.vars.length - 1; i >= 0; i--) {
+      if (this.vars[i].var_name === name) return i;
+    }
+    return -1;
+  }
+
+  add_arguments_var(name: number): number {
+    const idx = this.add_var(name);
+    this.arguments_var_idx = idx;
+    return idx;
   }
 
   get_var_ref(name: number): { idx: number, is_local: boolean, is_arg: boolean, is_const: boolean, is_lexical: boolean, var_kind: JSVarKind } | null {
@@ -360,12 +375,31 @@ export class JSFunctionDef {
 
   last_line_num: number = 1;
   last_pc: number = 0;
+  last_column: number = 0;
+  line_start: number = 1;
+  column_start: number = 0;
+  
+  // Pending pc2line state
+  pc2line_last_pc: number = 0;
+  pc2line_last_line: number = 1;
+  pc2line_last_column: number = 0;
+  
+  pending_pc: number = 0;
+  pending_line: number = 1;
+  pending_column: number = 0;
 
   constructor(parent: JSFunctionDef | null = null) {
     this.parent = parent;
     this.byte_code = new BytecodeWriter();
     this.pc2line = new DynBuf();
     this.pc2column = new DynBuf();
+    
+    // Initialize root scope
+    this.scopes.push({
+        parent: -1,
+        first: -1
+    });
+    this.scope_level = 0;
   }
 
   newLabel(): number {
@@ -462,6 +496,14 @@ export class JSFunctionDef {
   }
 
   finalizeBody(): void {
+    // Flush any pending pc2line info
+    const current_pc = this.byte_code.getOffset();
+    if (current_pc > this.pending_pc) {
+        if (this.pending_line !== this.pc2line_last_line || this.pending_column !== this.pc2line_last_column) {
+            this.write_pc2line(this.pending_pc, this.pending_line, this.pending_column);
+        }
+    }
+
     if (this.has_arguments_binding) {
         // Generate setup code
         const setupBuf = new BytecodeWriter();
@@ -502,6 +544,7 @@ export class JSFunctionDef {
         pc2lineBuf.putByte(0);
         this.putULEB128(pc2lineBuf, len);
         this.putSLEB128(pc2lineBuf, 0);
+        this.putSLEB128(pc2lineBuf, 0); // diff_col
         
         this.pc2line.prepend(pc2lineBuf.buffer());
     }
@@ -528,29 +571,48 @@ export class JSFunctionDef {
     }
   }
 
-  update_line_num(line_num: number) {
-    if (line_num === this.last_line_num) return;
+  update_line_num(line_num: number, column: number = 0) {
+    const current_pc = this.byte_code.getOffset();
     
-    const pc = this.byte_code.getOffset();
-    const line_diff = line_num - this.last_line_num;
-    const pc_diff = pc - this.last_pc;
+    // If PC has advanced since we last recorded a pending line,
+    // we should commit the pending line info for the *previous* block.
+    if (current_pc > this.pending_pc) {
+        if (this.pending_line !== this.pc2line_last_line || this.pending_column !== this.pc2line_last_column) {
+            this.write_pc2line(this.pending_pc, this.pending_line, this.pending_column);
+            this.pc2line_last_pc = this.pending_pc;
+            this.pc2line_last_line = this.pending_line;
+            this.pc2line_last_column = this.pending_column;
+        }
+        this.pending_pc = current_pc;
+    }
     
-    // Encode
-    // QuickJS pc2line encoding:
-    // op (1 byte)
-    // if op == 0: uleb128(pc_diff), sleb128(line_diff)
-    // else:
-    //   op -= PC2LINE_OP_FIRST (1)
-    //   pc_diff = op / PC2LINE_RANGE
-    //   line_diff = op % PC2LINE_RANGE + PC2LINE_BASE (-1)
+    this.pending_line = line_num;
+    this.pending_column = column;
+  }
+
+  write_pc2line(pc: number, line: number, column: number) {
+    const pc_diff = pc - this.pc2line_last_pc;
+    const line_diff = line - this.pc2line_last_line;
+    const col_diff = column - this.pc2line_last_column;
     
-    // For now, use generic encoding (op=0)
+    // QuickJS pc2line encoding
+    const PC2LINE_BASE = -1;
+    const PC2LINE_RANGE = 5;
+    const PC2LINE_OP_FIRST = 1;
+
+    if (line_diff >= PC2LINE_BASE && line_diff < PC2LINE_BASE + PC2LINE_RANGE) {
+        const op = PC2LINE_OP_FIRST + (pc_diff * PC2LINE_RANGE) + (line_diff - PC2LINE_BASE);
+        if (op <= 255) {
+            this.pc2line.putByte(op);
+            this.putSLEB128(this.pc2line, col_diff);
+            return;
+        }
+    }
+    
     this.pc2line.putByte(0);
     this.putULEB128(this.pc2line, pc_diff);
     this.putSLEB128(this.pc2line, line_diff);
-    
-    this.last_line_num = line_num;
-    this.last_pc = pc;
+    this.putSLEB128(this.pc2line, col_diff);
   }
 
   putSLEB128(buf: DynBuf, val: number) {
@@ -579,12 +641,19 @@ export class JSFunctionDef {
   }
 
 
-  static create(parent: JSFunctionDef | null, is_eval: boolean, is_func_expr: boolean, filename: number): JSFunctionDef {
+  static create(parent: JSFunctionDef | null, is_eval: boolean, is_func_expr: boolean, filename: number, line: number = 0, column: number = 0): JSFunctionDef {
     const fd = new JSFunctionDef(parent);
     fd.is_eval = is_eval;
     fd.is_func_expr = is_func_expr;
     fd.filename = filename;
-    // TODO: Initialize other fields as in js_new_function_def
+    fd.line_start = line;
+    fd.column_start = column;
+    
+    fd.pc2line_last_line = line;
+    fd.pc2line_last_column = column;
+    fd.pending_line = line;
+    fd.pending_column = column;
+    
     return fd;
   }
 }

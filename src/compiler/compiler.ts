@@ -55,7 +55,7 @@ export class TypeScriptCompiler {
     this.sourceFile = sourceFile;
 
     const filenameAtom = this.state.atomManager.getAtom(sourceFile.fileName);
-    const fd = JSFunctionDef.create(null, false, false, filenameAtom);
+    const fd = JSFunctionDef.create(null, false, false, filenameAtom, 0, 0);
     this.state.cur_func = fd;
     this.state.filename = sourceFile.fileName;
 
@@ -109,9 +109,9 @@ export class TypeScriptCompiler {
 
   updateLineNumber(pos: number) {
     if (pos < 0 || !this.state.cur_func) return;
-    const { line } = this.sourceFile.getLineAndCharacterOfPosition(pos);
-    const lineNum = line + 1;
-    this.state.cur_func.update_line_num(lineNum);
+    const { line, character } = this.sourceFile.getLineAndCharacterOfPosition(pos);
+    // Pass 0-based line and column
+    this.state.cur_func.update_line_num(line, character);
   }
 
   hasThisUsage(node: ts.Node): boolean {
@@ -293,7 +293,7 @@ export class TypeScriptCompiler {
   }
 
   visitStatement(node: ts.Statement): void {
-    this.updateLineNumber(node.pos);
+    this.updateLineNumber(node.getStart(this.sourceFile));
     switch (node.kind) {
       case ts.SyntaxKind.ExpressionStatement:
         this.visitExpression((node as ts.ExpressionStatement).expression, false);
@@ -1231,7 +1231,8 @@ export class TypeScriptCompiler {
   }
 
   compileClassConstructor(node: ts.ConstructorDeclaration, className: JSAtom, classFlags: number): JSFunctionDef {
-    const fd = JSFunctionDef.create(this.state.cur_func, false, false, this.state.cur_func!.filename);
+    const { line, character } = this.sourceFile.getLineAndCharacterOfPosition(node.pos);
+    const fd = JSFunctionDef.create(this.state.cur_func, false, false, this.state.cur_func!.filename, line, character);
     fd.func_name = className;
     fd.is_derived_class_constructor = (classFlags & 1) !== 0;
     
@@ -1342,7 +1343,8 @@ export class TypeScriptCompiler {
     
     const methodAtom = this.state.atomManager.getAtom(methodName);
     
-    const fd = JSFunctionDef.create(this.state.cur_func, false, false, this.state.cur_func!.filename);
+    const { line, character } = this.sourceFile.getLineAndCharacterOfPosition(node.pos);
+    const fd = JSFunctionDef.create(this.state.cur_func, false, false, this.state.cur_func!.filename, line, character);
     fd.func_name = methodAtom;
     
     const prevFunc = this.state.cur_func;
@@ -1540,7 +1542,8 @@ export class TypeScriptCompiler {
         }
     }
     
-    const fd = JSFunctionDef.create(this.state.cur_func, false, false, this.state.cur_func!.filename);
+    const { line, character } = this.sourceFile.getLineAndCharacterOfPosition(node.pos);
+    const fd = JSFunctionDef.create(this.state.cur_func, false, false, this.state.cur_func!.filename, line, character);
     fd.func_name = atom;
     
     const isAsync = node.modifiers?.some(m => m.kind === ts.SyntaxKind.AsyncKeyword);
@@ -1847,7 +1850,7 @@ export class TypeScriptCompiler {
   }
 
   visitExpression(node: ts.Expression, keepValue: boolean = true): void {
-    this.updateLineNumber(node.pos);
+    this.updateLineNumber(node.getStart(this.sourceFile));
     switch (node.kind) {
       case ts.SyntaxKind.NoSubstitutionTemplateLiteral: {
         const str = (node as ts.NoSubstitutionTemplateLiteral).text;
@@ -2003,7 +2006,8 @@ export class TypeScriptCompiler {
   }
 
   visitArrowFunction(node: ts.ArrowFunction): void {
-    const fd = JSFunctionDef.create(this.state.cur_func, false, true, this.state.cur_func!.filename);
+    const { line, character } = this.sourceFile.getLineAndCharacterOfPosition(node.pos);
+    const fd = JSFunctionDef.create(this.state.cur_func, false, true, this.state.cur_func!.filename, line, character);
     fd.has_this_binding = false;
     
     const isAsync = node.modifiers?.some(m => m.kind === ts.SyntaxKind.AsyncKeyword);
@@ -2059,7 +2063,8 @@ export class TypeScriptCompiler {
   }
 
   visitFunctionExpression(node: ts.FunctionExpression): void {
-    const fd = JSFunctionDef.create(this.state.cur_func, false, true, this.state.cur_func!.filename);
+    const { line, character } = this.sourceFile.getLineAndCharacterOfPosition(node.pos);
+    const fd = JSFunctionDef.create(this.state.cur_func, false, true, this.state.cur_func!.filename, line, character);
     fd.has_this_binding = true;
     
     const isAsync = node.modifiers?.some(m => m.kind === ts.SyntaxKind.AsyncKeyword);
@@ -2820,7 +2825,7 @@ export class TypeScriptCompiler {
         if (fd) {
             fd.has_arguments_binding = true;
             if (fd.arguments_var_idx === -1) {
-                fd.arguments_var_idx = fd.add_var(atom);
+                fd.add_arguments_var(atom);
             }
             
             // Force resolution to find the arguments var we just added/ensured

@@ -261,7 +261,7 @@ class BytecodeReader {
       debug.pc2line = this.buffer.slice(this.pos, this.pos + pc2lineLen);
       this.pos += pc2lineLen;
       
-      debug.sourceLen = this.readLEB128(); // source_len (not atom)
+      debug.sourceLength = this.readLEB128(); // source_len (not atom)
       // source is raw bytes, not atom
       // But wait, QuickJS writes source as raw bytes?
       // dbuf_put(s, fd->source, fd->source_len);
@@ -290,7 +290,7 @@ class BytecodeReader {
       
       // So I just need to fix the lineNum/pc2lineLen part.
       
-      this.pos += debug.sourceLen;
+      this.pos += debug.sourceLength;
     }
 
     const cpool: ParsedTaggedValue[] = [];
@@ -370,15 +370,18 @@ class BytecodeReader {
   readModule(): ParsedModuleObject {
     const moduleName = this.readAtom();
     const reqModuleEntriesCount = this.readLEB128();
+    const exportEntriesCount = this.readLEB128();
+    const starExportEntriesCount = this.readLEB128();
+    const importEntriesCount = this.readLEB128();
+    const hasTopLevelAwait = !!this.readByte();
+
     const requireEntries = [];
     for (let i = 0; i < reqModuleEntriesCount; i++) {
       requireEntries.push({
-        name: this.readAtom(),
-        attributes: this.readObject()
+        name: this.readAtom()
       });
     }
 
-    const exportEntriesCount = this.readLEB128();
     const exportEntries = [];
     for (let i = 0; i < exportEntriesCount; i++) {
       const type = this.readByte();
@@ -389,13 +392,11 @@ class BytecodeReader {
       }
     }
 
-    const starExportEntriesCount = this.readLEB128();
     const starExportEntries = [];
     for (let i = 0; i < starExportEntriesCount; i++) {
       starExportEntries.push({ reqModuleIdx: this.readLEB128() });
     }
 
-    const importEntriesCount = this.readLEB128();
     const importEntries = [];
     for (let i = 0; i < importEntriesCount; i++) {
       importEntries.push({
@@ -406,7 +407,6 @@ class BytecodeReader {
       });
     }
 
-    const hasTopLevelAwait = !!this.readByte();
     const funcObj = this.readObject(); // Function bytecode
     const func = funcObj.value;
 

@@ -60,45 +60,48 @@ function renderModuleObject(moduleObj: ParsedModuleObject, ctx: RenderContext, i
   const suffix = origin ? ` (${origin})` : ''
   ctx.lines.push(`${indent(indentLevel)}module ${moduleName}${suffix}`)
 
-  if (moduleObj.requireEntries.length > 0) {
+  if (moduleObj.requireEntries && moduleObj.requireEntries.length > 0) {
     ctx.lines.push(`${indent(indentLevel + 1)}requires (${moduleObj.requireEntries.length}):`)
     moduleObj.requireEntries.forEach((entry, index) => {
-      const attrs = summarizeTaggedValueSimple(entry.attributes)
+      // entry is { name: AtomRef }
       ctx.lines.push(
-        `${indent(indentLevel + 2)}[${index}] module=${formatAtomRef(entry.module)} attributes=${attrs}`
+        `${indent(indentLevel + 2)}[${index}] module=${formatAtomRef(entry.name)}`
       )
     })
   }
 
-  if (moduleObj.importEntries.length > 0) {
+  if (moduleObj.importEntries && moduleObj.importEntries.length > 0) {
     ctx.lines.push(`${indent(indentLevel + 1)}imports (${moduleObj.importEntries.length}):`)
     moduleObj.importEntries.forEach((entry, index) => {
       const star = entry.isStar ? ' (star)' : ''
+      // entry is { varIndex, isStar, importName, reqModuleIdx }
       ctx.lines.push(
-        `${indent(indentLevel + 2)}[${index}] var=${entry.varIndex} name=${formatAtomRef(entry.importName)} from require[${entry.reqModuleIndex}]${star}`
+        `${indent(indentLevel + 2)}[${index}] var=${entry.varIndex} name=${formatAtomRef(entry.importName)} from require[${entry.reqModuleIdx}]${star}`
       )
     })
   }
 
-  if (moduleObj.exportEntries.length > 0) {
+  if (moduleObj.exportEntries && moduleObj.exportEntries.length > 0) {
     ctx.lines.push(`${indent(indentLevel + 1)}exports (${moduleObj.exportEntries.length}):`)
     moduleObj.exportEntries.forEach((entry, index) => {
-      if (entry.type === 'local') {
+      // entry is { type: number, varIndex?, exportName, reqModuleIdx?, localName? }
+      // type 1 = local, 2 = indirect
+      if (entry.type === 1) {
         ctx.lines.push(
-          `${indent(indentLevel + 2)}[${index}] local ${formatAtomRef(entry.exportedName)} -> local#${entry.localVarIndex}`
+          `${indent(indentLevel + 2)}[${index}] local ${formatAtomRef(entry.exportName)} -> local#${entry.varIndex}`
         )
       } else {
         ctx.lines.push(
-          `${indent(indentLevel + 2)}[${index}] re-export ${formatAtomRef(entry.localName)} as ${formatAtomRef(entry.exportedName)} from require[${entry.reqModuleIndex}]`
+          `${indent(indentLevel + 2)}[${index}] re-export ${formatAtomRef(entry.localName)} as ${formatAtomRef(entry.exportName)} from require[${entry.reqModuleIdx}]`
         )
       }
     })
   }
 
-  if (moduleObj.starExportEntries.length > 0) {
+  if (moduleObj.starExportEntries && moduleObj.starExportEntries.length > 0) {
     ctx.lines.push(`${indent(indentLevel + 1)}star_exports (${moduleObj.starExportEntries.length}):`)
     moduleObj.starExportEntries.forEach((entry, index) => {
-      ctx.lines.push(`${indent(indentLevel + 2)}[${index}] require[${entry.reqModuleIndex}]`)
+      ctx.lines.push(`${indent(indentLevel + 2)}[${index}] require[${entry.reqModuleIdx}]`)
     })
   }
 
@@ -107,7 +110,9 @@ function renderModuleObject(moduleObj: ParsedModuleObject, ctx: RenderContext, i
   }
 
   ensureBlankLine(ctx.lines)
-  renderFunction(moduleObj.function, ctx, indentLevel + 1, 'module body')
+  if (moduleObj.function) {
+    renderFunction(moduleObj.function, ctx, indentLevel + 1, 'module body')
+  }
 }
 
 function renderFunction(func: ParsedFunction, ctx: RenderContext, indentLevel: number, origin?: string) {
