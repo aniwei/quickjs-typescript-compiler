@@ -311,7 +311,6 @@ export class BytecodeSerializer {
     this.putLEB128(buf, fd.max_stack); // stack_size
     this.putLEB128(buf, fd.closure_var.length); // closure_var_count
     this.putLEB128(buf, fd.cpool.length);
-    console.log('Serializer cpool length:', fd.cpool.length, 'for func:', this.atomManager.getString(fd.func_name));
     this.putLEB128(buf, fd.byte_code.getOffset());
 
     // Vardefs

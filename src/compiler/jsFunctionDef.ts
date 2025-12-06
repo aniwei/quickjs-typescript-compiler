@@ -304,7 +304,7 @@ export class JSFunctionDef {
         }
 
         if (this.is_eval && 
-          (this.eval_type === 0 || this.eval_type === 1) && 
+          (this.eval_type === 0) && 
           this.scope_level === this.body_scope) {
           const hf = this.add_global_var(name);
           if (!hf) return -1;
@@ -332,7 +332,7 @@ export class JSFunctionDef {
         if (this.find_lexical_decl(name, this.scope_first, false) >= 0) {
           throw new Error("invalid redefinition of lexical identifier");
         }
-        if (this.is_global_var) {
+        if (this.is_global_var && !this.is_module) {
           let hf = this.find_global_var(name);
           if (hf && hf.is_lexical && hf.scope_level === this.scope_level && this.eval_type === 1) {
             throw new Error("invalid redefinition of lexical identifier");
