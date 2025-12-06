@@ -26,7 +26,6 @@ export class BytecodeSerializer {
   }
 
   serialize(fd: JSFunctionDef): Uint8Array {
-    console.log('BytecodeSerializer.serialize called');
     // 1. Scan to collect atoms and rewrite them (recursively)
     this.scanAndRewriteRecursive(fd);
     
@@ -38,7 +37,6 @@ export class BytecodeSerializer {
 
     // 4. Write object
     const objBuf = new DynBuf();
-    console.log(`Serializer: writing module, func_kind=${fd.func_kind}`);
     this.writeModule(objBuf, fd);
     this.buf.put(objBuf.buffer());
 
@@ -312,13 +310,12 @@ export class BytecodeSerializer {
         this.putLEB128(buf, fd.vars.length); // var_count
     }
     
-    this.putLEB128(buf, fd.args.length); // defined_arg_count (assume same as arg_count for now)
+    this.putLEB128(buf, fd.defined_arg_count); // defined_arg_count
     this.putLEB128(buf, fd.max_stack); // stack_size
     this.putLEB128(buf, fd.closure_var.length); // closure_var_count
     this.putLEB128(buf, fd.cpool.length);
     this.putLEB128(buf, fd.byte_code.getOffset());
     
-    console.log(`Serializer: writeFunction is_module=${fd.is_module}`);
     let local_count = fd.args.length + fd.vars.length;
     if (fd.is_module) {
         local_count = 0;
@@ -361,6 +358,7 @@ export class BytecodeSerializer {
     // Debug info (if has_debug)
     if (fd.has_debug) {
        this.putAtom(buf, fd.filename);
+       this.putLEB128(buf, fd.line_start); // line_num
        this.putLEB128(buf, fd.pc2line.size);
        buf.put(fd.pc2line.buffer());
        this.putAtom(buf, 0); // source (JS_ATOM_NULL)
@@ -403,7 +401,6 @@ export class BytecodeSerializer {
   }
 
   writeValue(buf: DynBuf, val: any) {
-    // console.log('writeValue', val);
     if (val instanceof JSFunctionDef) {
       this.writeFunction(buf, val);
       return;

@@ -147,6 +147,7 @@ export class JSFunctionDef {
 
   vars: JSVarDef[] = [];
   args: JSVarDef[] = [];
+  defined_arg_count: number = 0;
   
   var_object_idx: number = -1;
   arg_var_object_idx: number = -1;
