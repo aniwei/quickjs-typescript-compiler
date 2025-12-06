@@ -284,31 +284,25 @@ export class BytecodeSerializer {
     buf.putByte(BytecodeTag.TC_TAG_FUNCTION_BYTECODE);
     
     // Flags
-    let flags = 0;
-    let bit = 0;
-    if (fd.has_prototype) flags |= 1 << bit; bit++;
-    if (fd.has_simple_parameter_list) flags |= 1 << bit; bit++;
-    if (fd.is_derived_class_constructor) flags |= 1 << bit; bit++;
-    if (fd.need_home_object) flags |= 1 << bit; bit++;
-    flags |= (fd.func_kind & 3) << bit; bit += 2;
-    if (fd.new_target_allowed) flags |= 1 << bit; bit++;
-    if (fd.super_call_allowed) flags |= 1 << bit; bit++;
-    if (fd.super_allowed) flags |= 1 << bit; bit++;
-    if (fd.arguments_allowed) flags |= 1 << bit; bit++;
-    if (fd.has_debug) flags |= 1 << bit; bit++; // has_debug
-    if (fd.is_eval) flags |= 1 << bit; bit++; // is_direct_or_indirect_eval
+    const state = { flags: 0, bit: 0 };
+    this.setFlags(state, fd.has_prototype, 1);
+    this.setFlags(state, fd.has_simple_parameter_list, 1);
+    this.setFlags(state, fd.is_derived_class_constructor, 1);
+    this.setFlags(state, fd.need_home_object, 1);
+    this.setFlags(state, fd.func_kind, 2);
+    this.setFlags(state, fd.new_target_allowed, 1);
+    this.setFlags(state, fd.super_call_allowed, 1);
+    this.setFlags(state, fd.super_allowed, 1);
+    this.setFlags(state, fd.arguments_allowed, 1);
+    this.setFlags(state, fd.has_debug, 1);
+    this.setFlags(state, fd.is_eval, 1);
     
-    buf.putU16(flags);
-    
+    buf.putU16(state.flags);
     buf.putByte(fd.js_mode);
     this.putAtom(buf, fd.func_name);
     this.putLEB128(buf, fd.args.length); // arg_count
     
-    if (fd.is_module) {
-        this.putLEB128(buf, 0); // var_count
-    } else {
-        this.putLEB128(buf, fd.vars.length); // var_count
-    }
+    this.putLEB128(buf, fd.vars.length); // var_count
     
     this.putLEB128(buf, fd.defined_arg_count); // defined_arg_count
     this.putLEB128(buf, fd.max_stack); // stack_size
@@ -317,39 +311,35 @@ export class BytecodeSerializer {
     this.putLEB128(buf, fd.byte_code.getOffset());
     
     let local_count = fd.args.length + fd.vars.length;
-    if (fd.is_module) {
-        local_count = 0;
-    }
     this.putLEB128(buf, local_count);
     
     // Vardefs (args then vars)
-    if (!fd.is_module) {
-        const allVars = [...fd.args, ...fd.vars];
-        for (const v of allVars) {
+    const allVars = [...fd.args, ...fd.vars];
+    for (const v of allVars) {
         this.putAtom(buf, v.var_name);
         this.putSLEB128(buf, v.scope_level);
         this.putLEB128(buf, v.scope_next === -1 ? 0 : v.scope_next);
         
-        let vFlags = v.var_kind & 0xf;
-        if (v.is_const) vFlags |= 16;
-        if (v.is_lexical) vFlags |= 32;
-        if (v.is_captured) vFlags |= 64;
-        buf.putByte(vFlags);
-        }
+        const state = { flags: 0, bit: 0 };
+        this.setFlags(state, v.var_kind, 4);
+        this.setFlags(state, v.is_const, 1);
+        this.setFlags(state, v.is_lexical, 1);
+        this.setFlags(state, v.is_captured, 1);
+        buf.putByte(state.flags);
     }
     
     // Closure vars
     for (const cv of fd.closure_var) {
        this.putAtom(buf, cv.var_name);
-       this.putSLEB128(buf, cv.var_idx);
+       this.putLEB128(buf, cv.var_idx);
        
-       let vFlags = 0;
-       if (cv.is_local) vFlags |= 1;
-       if (cv.is_arg) vFlags |= 2;
-       if (cv.is_const) vFlags |= 4;
-       if (cv.is_lexical) vFlags |= 8;
-       vFlags |= (cv.var_kind & 0xf) << 4;
-       buf.putByte(vFlags);
+       const state = { flags: 0, bit: 0 };
+       this.setFlags(state, cv.is_local, 1);
+       this.setFlags(state, cv.is_arg, 1);
+       this.setFlags(state, cv.is_const, 1);
+       this.setFlags(state, cv.is_lexical, 1);
+       this.setFlags(state, cv.var_kind, 4);
+       buf.putByte(state.flags);
     }
     
     // Bytecode
@@ -373,6 +363,12 @@ export class BytecodeSerializer {
   putAtom(buf: DynBuf, atom: number) {
     const idx = this.getAtomIdx(atom);
     this.putLEB128(buf, idx << 1);
+  }
+
+  setFlags(state: { flags: number, bit: number }, val: number | boolean, n: number) {
+    const v = typeof val === 'boolean' ? (val ? 1 : 0) : val;
+    state.flags |= (v << state.bit);
+    state.bit += n;
   }
 
   putLEB128(buf: DynBuf, val: number) {

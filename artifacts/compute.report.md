@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: __tests__/compiler/fixtures/compute.ts
-**生成时间**: 2025-12-05T19:53:38.666Z
+**生成时间**: 2025-12-06T04:25:44.641Z
 
 ## 大小对比
 
-- TypeScript编译器: 153 字节
+- TypeScript编译器: 167 字节
 - WASM编译器: 155 字节
-- 差异: -2 字节 (-1.29%)
+- 差异: 12 字节 (7.74%)
 
 ## 结构分析
 
@@ -28,19 +28,19 @@
     },
     {
       "index": 1,
-      "rawLength": 6,
-      "actualLength": 3,
-      "isWideChar": 0,
-      "string": "arr",
-      "offset": 41
-    },
-    {
-      "index": 2,
       "rawLength": 8,
       "actualLength": 4,
       "isWideChar": 0,
       "string": "item",
-      "offset": 45
+      "offset": 41
+    },
+    {
+      "index": 2,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "arr",
+      "offset": 46
     },
     {
       "index": 3,
@@ -62,7 +62,7 @@
   "functionHeader": {
     "offset": 62,
     "tag": "0xd",
-    "remaining": 91
+    "remaining": 105
   }
 }
 ```
@@ -125,29 +125,29 @@
 
 ## 字节级差异
 
-共发现 77 个字节差异:
+共发现 59 个字节差异:
 
-- 偏移量 0x29: TS=0x06 vs WASM=0x08
-- 偏移量 0x2a: TS=0x61 vs WASM=0x69
-- 偏移量 0x2b: TS=0x72 vs WASM=0x74
-- 偏移量 0x2c: TS=0x72 vs WASM=0x65
-- 偏移量 0x2d: TS=0x08 vs WASM=0x6d
-- 偏移量 0x2e: TS=0x69 vs WASM=0x06
-- 偏移量 0x2f: TS=0x74 vs WASM=0x61
-- 偏移量 0x30: TS=0x65 vs WASM=0x72
-- 偏移量 0x31: TS=0x6d vs WASM=0x72
-- 偏移量 0x4d: TS=0x00 vs WASM=0x01
-- 偏移量 0x4f: TS=0x03 vs WASM=0x06
-- 偏移量 0x52: TS=0x32 vs WASM=0x2e
-- 偏移量 0x53: TS=0x00 vs WASM=0x01
-- 偏移量 0x56: TS=0x00 vs WASM=0x02
-- 偏移量 0x57: TS=0x0d vs WASM=0x00
-- 偏移量 0x58: TS=0x08 vs WASM=0x30
-- 偏移量 0x59: TS=0xec vs WASM=0xcc
-- 偏移量 0x5a: TS=0x01 vs WASM=0x03
-- 偏移量 0x5b: TS=0x29 vs WASM=0x00
-- 偏移量 0x5c: TS=0xb8 vs WASM=0x0d
-- ... (显示前20个差异，总共77个)
+- 偏移量 0x48: TS=0x0e vs WASM=0x06
+- 偏移量 0x4f: TS=0x08 vs WASM=0x06
+- 偏移量 0x52: TS=0x36 vs WASM=0x2e
+- 偏移量 0x58: TS=0x00 vs WASM=0x30
+- 偏移量 0x67: TS=0x61 vs WASM=0xe3
+- 偏移量 0x68: TS=0x00 vs WASM=0x63
+- 偏移量 0x6a: TS=0x39 vs WASM=0x00
+- 偏移量 0x6b: TS=0xe6 vs WASM=0x68
+- 偏移量 0x6e: TS=0x00 vs WASM=0x7f
+- 偏移量 0x6f: TS=0x63 vs WASM=0xee
+- 偏移量 0x70: TS=0x00 vs WASM=0x13
+- 偏移量 0x71: TS=0x00 vs WASM=0xcb
+- 偏移量 0x72: TS=0x7f vs WASM=0x39
+- 偏移量 0x73: TS=0x6e vs WASM=0xe7
+- 偏移量 0x74: TS=0x14 vs WASM=0x00
+- 偏移量 0x77: TS=0x00 vs WASM=0x43
+- 偏移量 0x78: TS=0xcb vs WASM=0xe8
+- 偏移量 0x79: TS=0x39 vs WASM=0x00
+- 偏移量 0x7a: TS=0xe7 vs WASM=0x00
+- 偏移量 0x7c: TS=0x00 vs WASM=0x64
+- ... (显示前20个差异，总共59个)
 
 ## 十六进制转储对比
 
@@ -155,14 +155,15 @@
 ```
 00000000: 05 05 4c 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..L__tests__/com|
 00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 63 |piler/fixtures/c|
-00000020: 6f 6d 70 75 74 65 2e 6a 73 06 61 72 72 08 69 74 |ompute.js.arr.it|
-00000030: 65 6d 0e 63 6f 6e 73 6f 6c 65 06 6c 6f 67 0d c8 |em.console.log..|
-00000040: 03 00 00 00 00 00 0c 20 06 01 a4 01 00 00 00 03 |....... ........|
-00000050: 01 00 32 00 ca 03 00 0d 08 ec 01 29 b8 b9 ba 26 |..2........)...&|
-00000060: 03 00 e3 68 00 00 63 01 00 7f 6e 10 00 00 00 cc |...h..c...n.....|
-00000070: 39 e7 00 00 00 43 e8 00 00 00 c8 24 01 00 0e 82 |9....C.....$....|
-00000080: 00 6c e9 ff ff ff 0e 86 06 2f c8 03 00 0a 16 0d |.l......./......|
-00000090: 07 03 07 03 1c 00 44 71 00                      |......Dq.|
+00000020: 6f 6d 70 75 74 65 2e 6a 73 08 69 74 65 6d 06 61 |ompute.js.item.a|
+00000030: 72 72 0e 63 6f 6e 73 6f 6c 65 06 6c 6f 67 0d c8 |rr.console.log..|
+00000040: 03 00 00 00 00 00 0c 20 0e 01 a4 01 00 01 00 08 |....... ........|
+00000050: 01 00 36 01 ca 03 02 00 00 cc 03 00 0d 08 ec 02 |..6.............|
+00000060: 29 b8 b9 ba 26 03 00 61 00 00 39 e6 00 00 00 63 |)...&..a..9....c|
+00000070: 00 00 7f 6e 14 00 00 00 cb 39 e7 00 00 00 43 e8 |...n.....9....C.|
+00000080: 00 00 00 c7 24 01 00 0e 82 00 6c ed ff ff ff 0e |....$.....l.....|
+00000090: 86 06 2f c8 03 10 00 00 16 0d 07 03 07 03 26 00 |../...........&.|
+000000a0: 4e 71 34 0c 07 74 00                            |Nq4..t.|
 ```
 
 ### WASM
