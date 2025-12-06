@@ -1,3 +1,3 @@
-for (var f_i = 0; f_i < 5; f_i++) {
-  console.log(f_i);
+for (let i = 0; i < 3; i++) {
+    console.log(i);
 }

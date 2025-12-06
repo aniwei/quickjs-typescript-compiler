@@ -3642,6 +3642,14 @@ static const JSMallocFunctions def_malloc_funcs = {
     js_def_malloc_usable_size,
 };
 
+uint32_t JS_GetRuntimeAtomCount(JSRuntime *rt) {
+  return rt->atom_count;
+}
+
+uint32_t JS_GetRuntimeAtomFreeIndex(JSRuntime *rt) {
+  return rt->atom_free_index;
+}
+
 JSRuntime* JS_NewRuntime(void) {
   return JS_NewRuntime2(&def_malloc_funcs, NULL);
 }

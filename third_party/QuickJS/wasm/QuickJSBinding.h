@@ -85,6 +85,7 @@ class QuickJSBinding {
   static std::vector<PC2Line> getPC2LineCodes();
 
   static std::vector<Atom> getAtoms();
+  static std::vector<Atom> getEnvironmentAtoms();
   static std::vector<OpFmt> getOpcodeFormats();
   static std::vector<Op> getOpcodes();
 

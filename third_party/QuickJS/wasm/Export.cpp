@@ -73,6 +73,7 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .class_function("getCompileOptions", &QuickJSBinding::getCompileOptions)
     .class_function("getFirstAtomId", &QuickJSBinding::getFirstAtomId)
     .class_function("getAtoms", &QuickJSBinding::getAtoms)
+    .class_function("getEnvironmentAtoms", &QuickJSBinding::getEnvironmentAtoms)
     .class_function("getOpcodeFormats", &QuickJSBinding::getOpcodeFormats)
     .class_function("getOpcodes", &QuickJSBinding::getOpcodes)
     .class_function("getBytecodeTags", &QuickJSBinding::getBytecodeTags)

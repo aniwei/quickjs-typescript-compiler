@@ -269,8 +269,32 @@ namespace quickjs {
     return atoms;
   }
 
+  std::vector<Atom> QuickJSBinding::getEnvironmentAtoms() {
+    std::vector<Atom> atoms;
+    JSRuntime *rt = JS_NewRuntime();
+    if (!rt) return atoms;
+    JSContext *ctx = JS_NewContext(rt);
+    if (!ctx) {
+      JS_FreeRuntime(rt);
+      return atoms;
+    }
+
+    uint32_t count = JS_GetRuntimeAtomCount(rt);
+    for (uint32_t i = JS_ATOM_END; i < count; i++) {
+      const char *str = JS_AtomToCString(ctx, i);
+      if (str) {
+        atoms.push_back(Atom{ i, str });
+        JS_FreeCString(ctx, str);
+      }
+    }
+
+    JS_FreeContext(ctx);
+    JS_FreeRuntime(rt);
+    return atoms;
+  }
+
   uint32_t QuickJSBinding::getFirstAtomId() {
-    return static_cast<uint32_t>(JS_ATOM_END);
+    return JS_ATOM_END;
   }
 
   std::vector<JSMode> QuickJSBinding::getJSModes() {

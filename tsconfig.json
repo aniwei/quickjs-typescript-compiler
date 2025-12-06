@@ -10,12 +10,11 @@
     "types": ["./types.d.ts", "node", "jest"]
   },
   "include": [
-    "types.d.ts", 
-    "example/**/*.ts", 
-    "scripts/**/*.ts", 
+    "types.d.ts",
+    "example/**/*.ts",
     "src/**/*.ts"
   ],
   "exclude": [
-    
+    "scripts/**/*.ts"
   ]
 }

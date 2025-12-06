@@ -65,6 +65,230 @@
 			"command": "echo \"Remaining difference in compute.ts: 1 byte at start of pc2line table. Likely due to push_1 encoding or similar.\" >> TODO.md",
 			"args": [],
 			"group": "build"
+		},
+		{
+			"label": "compare primitives",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/primitives.ts --input-js __tests__/compiler/fixtures/primitives.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts --show-diff",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare number",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/number.ts --input-js __tests__/compiler/fixtures/number.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts --show-diff",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-comparison-ops",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/comparison-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-comparison-ops-2",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/comparison-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-comparison-ops-3",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/comparison-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-comparison-ops-4",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/comparison-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-comparison-ops-5",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/comparison-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-bitwise-ops",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/bitwise-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-bitwise-ops-2",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/bitwise-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-unary-ops",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/unary-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-unary-ops-2",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/unary-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-unary-ops-3",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/unary-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-unary-ops-4",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/unary-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-unary-ops-5",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/unary-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-unary-ops-6",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/unary-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-unary-ops-7",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/unary-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-conditional-operator",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/conditional-operator.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-conditional-operator-2",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/conditional-operator.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-conditional-operator-3",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/conditional-operator.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-conditional-operator-4",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/conditional-operator.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-conditional-operator-fixed",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/conditional-operator.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-conditional-operator-fixed-2",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/conditional-operator.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-conditional-operator-fixed-3",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/conditional-operator.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-postfix-unary",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/postfix-unary.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-postfix-unary-2",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/postfix-unary.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-debug-info-basic",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/debug-info-basic.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-debug-info-basic-2",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/debug-info-basic.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-debug-info-basic-3",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/debug-info-basic.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-debug-info-basic-4",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/debug-info-basic.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-debug-info-basic-5",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/debug-info-basic.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-debug-info-basic-6",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/debug-info-basic.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "debug-loop-break",
+			"type": "shell",
+			"command": "pnpm -s start __tests__/compiler/fixtures/loop-break-continue.ts --disasm --debug",
+			"args": [],
+			"group": "build"
 		}
 	]
 }

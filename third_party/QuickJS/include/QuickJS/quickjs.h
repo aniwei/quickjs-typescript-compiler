@@ -145,6 +145,8 @@ typedef struct JSMallocFunctions {
 } JSMallocFunctions;
 
 JSRuntime* JS_NewRuntime(void);
+uint32_t JS_GetRuntimeAtomCount(JSRuntime *rt);
+uint32_t JS_GetRuntimeAtomFreeIndex(JSRuntime *rt);
 /* info lifetime must exceed that of rt */
 void JS_SetRuntimeInfo(JSRuntime* rt, const char* info);
 void JS_SetMemoryLimit(JSRuntime* rt, size_t limit);

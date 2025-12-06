@@ -34,6 +34,7 @@ interface WasmInstance {
   getBytecodeVersion: () => number
   getFirstAtomId: () => number
   getAtoms: () => Atom[]
+  getEnvironmentAtoms: () => Atom[]
   getOpcodes: () => OpcodeMeta[]
   getBytecodeTags: () => BytecodeTag[]
   getCompileFlags: () => number
@@ -127,10 +128,10 @@ export class QuickJSLib {
     const WasmInstance = await QuickJSLib.getWasmInstance()
     const enums: Record<string, number> = {}
 
-    enums['COMPILE_FLAG_NONE'] = WasmInstance.QuickJSBinding.CompileFlags.COMPILE_FLAG_NONE
-    enums['COMPILE_FLAG_DUMP'] = WasmInstance.QuickJSBinding.CompileFlags.COMPILE_FLAG_DUMP
-    enums['COMPILE_FLAG_BIGNUM'] = WasmInstance.QuickJSBinding.CompileFlags.COMPILE_FLAG_BIGNUM
-    enums['COMPILE_FLAG_SHORT_OPCODES'] = WasmInstance.QuickJSBinding.CompileFlags.COMPILE_FLAG_SHORT_OPCODES
+    enums['COMPILE_FLAG_NONE'] = WasmInstance.CompileFlags.COMPILE_FLAG_NONE.value
+    enums['COMPILE_FLAG_DUMP'] = WasmInstance.CompileFlags.COMPILE_FLAG_DUMP.value
+    enums['COMPILE_FLAG_BIGNUM'] = WasmInstance.CompileFlags.COMPILE_FLAG_BIGNUM.value
+    enums['COMPILE_FLAG_SHORT_OPCODES'] = WasmInstance.CompileFlags.COMPILE_FLAG_SHORT_OPCODES.value
 
     return enums
   }
@@ -208,6 +209,17 @@ export class QuickJSLib {
   static async getAllAtoms() {
     const WasmInstance = await QuickJSLib.getWasmInstance()
     const vec = WasmInstance.QuickJSBinding.getAtoms()
+    const atoms: Atom[] = []
+    for (let i = 0; i < vec.size(); i++) {
+      const a = vec.get(i)
+      atoms.push({ id: a.id, key: a.name })
+    }
+    return atoms
+  }
+
+  static async getEnvironmentAtoms() {
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const vec = WasmInstance.QuickJSBinding.getEnvironmentAtoms()
     const atoms: Atom[] = []
     for (let i = 0; i < vec.size(); i++) {
       const a = vec.get(i)
