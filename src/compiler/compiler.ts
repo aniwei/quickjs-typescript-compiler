@@ -144,6 +144,8 @@ export class TypeScriptCompiler {
     if (this.isModule) {
         fd.add_module_variables();
     }
+    
+    console.log('cpool final', fd.cpool);
 
     // Return logic from js_parse_program
     if (!this.isModule) {
@@ -2368,6 +2370,7 @@ export class TypeScriptCompiler {
     this.state.cur_func = prevFunc;
     
     const funcIdx = this.state.cur_func!.cpool.length;
+    console.log('Pushing arrow function to cpool', fd);
     this.state.cur_func!.cpool.push(fd);
     
     if (funcIdx < 256) {
@@ -3232,6 +3235,7 @@ export class TypeScriptCompiler {
 
   cpool_add(val: any): number {
     if (!this.state.cur_func) return -1;
+    console.log('cpool_add', val);
     // Check if already exists
     const idx = this.state.cur_func.cpool.findIndex((v: any) => v === val);
     if (idx !== -1) return idx;
