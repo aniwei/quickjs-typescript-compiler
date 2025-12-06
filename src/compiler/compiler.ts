@@ -59,7 +59,7 @@ export class TypeScriptCompiler {
   private compileInternal(input: ts.SourceFile | string, filename?: string): { bytecode: Uint8Array, functionDef: JSFunctionDef } {
     let sourceFile: ts.SourceFile;
     if (typeof input === 'string') {
-      sourceFile = ts.createSourceFile(filename || 'dummy.ts', input, ts.ScriptTarget.ES2020, true);
+      sourceFile = ts.createSourceFile(filename || 'source.ts', input, ts.ScriptTarget.ES2020, true);
     } else {
       sourceFile = input;
     }
@@ -328,7 +328,7 @@ export class TypeScriptCompiler {
              else if (idx === 3) this.emitOp(Opcode.OP_put_var_ref3);
              else {
                  this.emitOp(Opcode.OP_put_var_ref);
-                 this.emitU16(idx);
+                 this.emitAtom(defaultAtom);
              }
           } else {
               this.emitOp(Opcode.OP_put_loc);
@@ -1855,13 +1855,26 @@ export class TypeScriptCompiler {
         }
     }
     
+    let defined_arg_count = 0;
+    let stop_counting = false;
     for (const param of node.parameters) {
         if (ts.isIdentifier(param.name)) {
             const paramName = param.name.text;
             const paramAtom = this.state.atomManager.getAtom(paramName);
             fd.add_arg(paramAtom);
         }
+        
+        if (!stop_counting) {
+            if (param.dotDotDotToken) {
+                stop_counting = true;
+            } else if (param.initializer) {
+                stop_counting = true;
+            } else {
+                defined_arg_count++;
+            }
+        }
     }
+    fd.defined_arg_count = defined_arg_count;
     
     this.handleRestParameters(node.parameters);
     this.handleDefaultParameters(node.parameters);
@@ -1906,7 +1919,7 @@ export class TypeScriptCompiler {
         else if (varIdx === 3) this.emitOp(Opcode.OP_put_var_ref3);
         else {
             this.emitOp(Opcode.OP_put_var_ref);
-            this.emitU16(varIdx);
+            this.emitAtom(atom);
         }
     } else {
         this.emitOp(Opcode.OP_put_loc);
@@ -2134,7 +2147,7 @@ export class TypeScriptCompiler {
   }
 
   visitExpression(node: ts.Expression, keepValue: boolean = true): void {
-    this.updateLineNumber(node.getStart(this.sourceFile));
+    // this.updateLineNumber(node.getStart(this.sourceFile));
     switch (node.kind) {
       case ts.SyntaxKind.NoSubstitutionTemplateLiteral: {
         const str = (node as ts.NoSubstitutionTemplateLiteral).text;
@@ -2306,6 +2319,8 @@ export class TypeScriptCompiler {
     this.state.cur_func = fd;
     
     // Parameters
+    let defined_arg_count = 0;
+    let stop_counting = false;
     for (const param of node.parameters) {
         if (ts.isIdentifier(param.name)) {
             const paramName = param.name.text;
@@ -2314,7 +2329,18 @@ export class TypeScriptCompiler {
         } else {
             // TODO: Binding pattern
         }
+        
+        if (!stop_counting) {
+            if (param.dotDotDotToken) {
+                stop_counting = true;
+            } else if (param.initializer) {
+                stop_counting = true;
+            } else {
+                defined_arg_count++;
+            }
+        }
     }
+    fd.defined_arg_count = defined_arg_count;
     
     this.handleRestParameters(node.parameters);
     this.handleDefaultParameters(node.parameters);
@@ -2398,13 +2424,26 @@ export class TypeScriptCompiler {
         }
     }
     
+    let defined_arg_count = 0;
+    let stop_counting = false;
     for (const param of node.parameters) {
         if (ts.isIdentifier(param.name)) {
             const paramName = param.name.text;
             const paramAtom = this.state.atomManager.getAtom(paramName);
             fd.add_arg(paramAtom);
         }
+        
+        if (!stop_counting) {
+            if (param.dotDotDotToken) {
+                stop_counting = true;
+            } else if (param.initializer) {
+                stop_counting = true;
+            } else {
+                defined_arg_count++;
+            }
+        }
     }
+    fd.defined_arg_count = defined_arg_count;
     
     this.handleRestParameters(node.parameters);
     this.handleDefaultParameters(node.parameters);
@@ -2483,6 +2522,11 @@ export class TypeScriptCompiler {
     for (const arg of args) {
       this.visitExpression(arg);
     }
+    if (node.arguments) {
+        this.updateLineNumber(node.expression.end);
+    } else {
+        this.updateLineNumber(node.end);
+    }
     this.emitOp(Opcode.OP_call_constructor);
     this.emitU16(args.length);
   }
@@ -2536,6 +2580,7 @@ export class TypeScriptCompiler {
     }
 
     this.visitExpression(node.argumentExpression);
+    this.updateLineNumber(node.expression.end);
     this.emitOp(Opcode.OP_get_array_el);
 
     this.exitOptionalChain(chainInfo);
@@ -2753,15 +2798,18 @@ export class TypeScriptCompiler {
     switch (node.operator) {
       case ts.SyntaxKind.PlusToken:
         this.emitOp(Opcode.OP_plus);
+        this.updateLineNumber(node.getStart(this.sourceFile));
         break;
       case ts.SyntaxKind.MinusToken:
         this.emitOp(Opcode.OP_neg);
+        this.updateLineNumber(node.getStart(this.sourceFile));
         break;
       case ts.SyntaxKind.ExclamationToken:
         this.emitOp(Opcode.OP_lnot);
         break;
       case ts.SyntaxKind.TildeToken:
         this.emitOp(Opcode.OP_not);
+        this.updateLineNumber(node.getStart(this.sourceFile));
         break;
       // TODO: ++ and -- (Update expressions)
     }
@@ -2968,7 +3016,7 @@ export class TypeScriptCompiler {
       }
       
       // Call method
-      this.updateLineNumber(node.getStart(this.sourceFile));
+      this.updateLineNumber(node.expression.end);
       this.emitOp(Opcode.OP_call_method);
       this.emitU16(node.arguments.length);
     } else {
@@ -2995,6 +3043,7 @@ export class TypeScriptCompiler {
       }
       
       // Call
+      this.updateLineNumber(node.expression.end);
       const argCount = node.arguments.length;
       if (argCount === 0) {
           this.emitOp(Opcode.OP_call0);
@@ -3036,6 +3085,8 @@ export class TypeScriptCompiler {
     const propName = node.name.text;
     const atom = this.state.atomManager.getAtom(propName);
     
+    this.updateLineNumber(node.expression.end);
+
     if (ts.isPrivateIdentifier(node.name)) {
         this.emitGetVar(atom);
         this.emitOp(Opcode.OP_get_private_field);
@@ -3054,8 +3105,6 @@ export class TypeScriptCompiler {
       const isClosure = isModuleOrStrictGlobal && 
                         this.state.cur_func!.scope_level === this.state.cur_func!.body_scope;
 
-      // console.log(`emitPutVar: idx=${idx} isClosure=${isClosure} scope=${this.state.cur_func!.scope_level} body=${this.state.cur_func!.body_scope}`);
-
       if (isClosure) {
           if (idx === 0) this.emitOp(Opcode.OP_put_var_ref0);
           else if (idx === 1) this.emitOp(Opcode.OP_put_var_ref1);
@@ -3063,7 +3112,7 @@ export class TypeScriptCompiler {
           else if (idx === 3) this.emitOp(Opcode.OP_put_var_ref3);
           else {
               this.emitOp(Opcode.OP_put_var_ref);
-              this.emitU16(idx);
+              this.emitAtom(this.state.cur_func!.closure_var[idx].var_name);
           }
       } else {
           if (idx === 0) this.emitOp(Opcode.OP_put_loc0);

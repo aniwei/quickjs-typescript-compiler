@@ -26,7 +26,6 @@ export class BytecodeSerializer {
   }
 
   serialize(fd: JSFunctionDef): Uint8Array {
-    console.log('BytecodeSerializer.serialize called');
     // 1. Scan to collect atoms and rewrite them (recursively)
     this.scanAndRewriteRecursive(fd);
     
@@ -38,7 +37,6 @@ export class BytecodeSerializer {
 
     // 4. Write object
     const objBuf = new DynBuf();
-    console.log(`Serializer: writing module, func_kind=${fd.func_kind}`);
     this.writeModule(objBuf, fd);
     this.buf.put(objBuf.buffer());
 
@@ -318,36 +316,36 @@ export class BytecodeSerializer {
     // Vardefs
     const total_vars = fd.args.length + fd.vars.length;
     if (total_vars > 0) {
-        this.putLEB128(buf, total_vars);
-        const allVars = [...fd.args, ...fd.vars];
-        for (const v of allVars) {
-            this.putAtom(buf, v.var_name);
-            this.putLEB128(buf, v.scope_level);
-            this.putLEB128(buf, v.scope_next + 1);
-            
-            const state = { flags: 0, bit: 0 };
-            this.setFlags(state, v.var_kind, 4);
-            this.setFlags(state, v.is_const, 1);
-            this.setFlags(state, v.is_lexical, 1);
-            this.setFlags(state, v.is_captured, 1);
-            buf.putByte(state.flags);
-        }
+      this.putLEB128(buf, total_vars);
+      const allVars = [...fd.args, ...fd.vars];
+      for (const v of allVars) {
+        this.putAtom(buf, v.var_name);
+        this.putLEB128(buf, v.scope_level);
+        this.putLEB128(buf, v.scope_next + 1);
+        
+        const state = { flags: 0, bit: 0 };
+        this.setFlags(state, v.var_kind, 4);
+        this.setFlags(state, v.is_const, 1);
+        this.setFlags(state, v.is_lexical, 1);
+        this.setFlags(state, v.is_captured, 1);
+        buf.putByte(state.flags);
+      }
     } else {
-        this.putLEB128(buf, 0);
+      this.putLEB128(buf, 0);
     }
     
     // Closure vars
     for (const cv of fd.closure_var) {
-       this.putAtom(buf, cv.var_name);
-       this.putLEB128(buf, cv.var_idx);
-       
-       const state = { flags: 0, bit: 0 };
-       this.setFlags(state, cv.is_local, 1);
-       this.setFlags(state, cv.is_arg, 1);
-       this.setFlags(state, cv.is_const, 1);
-       this.setFlags(state, cv.is_lexical, 1);
-       this.setFlags(state, cv.var_kind, 4);
-       buf.putByte(state.flags);
+      this.putAtom(buf, cv.var_name);
+      this.putLEB128(buf, cv.var_idx);
+      
+      const state = { flags: 0, bit: 0 };
+      this.setFlags(state, cv.is_local, 1);
+      this.setFlags(state, cv.is_arg, 1);
+      this.setFlags(state, cv.is_const, 1);
+      this.setFlags(state, cv.is_lexical, 1);
+      this.setFlags(state, cv.var_kind, 4);
+      buf.putByte(state.flags);
     }
     
     // Bytecode
@@ -356,6 +354,7 @@ export class BytecodeSerializer {
     // Debug info (if has_debug)
     if (fd.has_debug) {
        this.putAtom(buf, fd.filename);
+       this.putLEB128(buf, fd.line_start); // line_num
        this.putLEB128(buf, fd.pc2line.size);
        buf.put(fd.pc2line.buffer());
        // source
@@ -405,7 +404,6 @@ export class BytecodeSerializer {
   }
 
   writeValue(buf: DynBuf, val: any) {
-    // console.log('writeValue', val);
     if (val instanceof JSFunctionDef) {
       this.writeFunction(buf, val);
       return;
