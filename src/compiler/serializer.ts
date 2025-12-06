@@ -145,7 +145,9 @@ export class BytecodeSerializer {
       this.getAtomIdx(a.var_name);
     }
     // Closure vars
-    // TODO: closure vars
+    for (const cv of fd.closure_var) {
+      this.getAtomIdx(cv.var_name);
+    }
 
     // Bytecode
     const buf = fd.byte_code.buf;
@@ -305,8 +307,8 @@ export class BytecodeSerializer {
     buf.putByte(fd.js_mode);
     this.putAtom(buf, fd.func_name);
 
-    this.putLEB128(buf, fd.args.length); // arg_count
-    this.putLEB128(buf, fd.vars.length); // var_count
+    this.putLEB128(buf, fd.arg_count); // arg_count
+    this.putLEB128(buf, fd.var_count); // var_count
     this.putLEB128(buf, fd.defined_arg_count); // defined_arg_count
     this.putLEB128(buf, fd.max_stack); // stack_size
     this.putLEB128(buf, fd.closure_var.length); // closure_var_count
@@ -314,12 +316,11 @@ export class BytecodeSerializer {
     this.putLEB128(buf, fd.byte_code.getOffset());
 
     // Vardefs
-    const total_vars = fd.args.length + fd.vars.length;
-    if (total_vars > 0) {
-      this.putLEB128(buf, total_vars);
-      const allVars = [...fd.args, ...fd.vars];
-      for (const v of allVars) {
-        this.putAtom(buf, v.var_name);
+    const vardefs = fd.vardefs;
+    if (vardefs.length > 0) {
+        this.putLEB128(buf, vardefs.length);
+        for (const v of vardefs) {
+            this.putAtom(buf, v.var_name);
         this.putLEB128(buf, v.scope_level);
         this.putLEB128(buf, v.scope_next + 1);
         

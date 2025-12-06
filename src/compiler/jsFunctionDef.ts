@@ -148,6 +148,18 @@ export class JSFunctionDef {
   vars: JSVarDef[] = [];
   args: JSVarDef[] = [];
   defined_arg_count: number = 0;
+
+  get arg_count(): number {
+    return this.args.length;
+  }
+
+  get var_count(): number {
+    return this.vars.length;
+  }
+
+  get vardefs(): JSVarDef[] {
+    return [...this.args, ...this.vars];
+  }
   
   var_object_idx: number = -1;
   arg_var_object_idx: number = -1;
@@ -304,13 +316,19 @@ export class JSFunctionDef {
         }
 
         if (this.is_eval && 
-          (this.eval_type === 0) && 
+          (this.eval_type === 0 || this.eval_type === 1) && 
           this.scope_level === this.body_scope) {
           const hf = this.add_global_var(name);
           if (!hf) return -1;
           hf.is_lexical = true;
           hf.is_const = (var_def_type === JSVarDefEnum.JS_VAR_DEF_CONST);
-          idx = GLOBAL_VAR_OFFSET;
+          
+          if (this.is_module) {
+             const globalIdx = this.global_vars.indexOf(hf);
+             idx = this.add_closure_var(name, true, false, globalIdx, JSVarKind.JS_VAR_NORMAL, hf.is_const, hf.is_lexical);
+          } else {
+             idx = GLOBAL_VAR_OFFSET;
+          }
         } else {
           let var_kind = JSVarKind.JS_VAR_NORMAL;
           if (var_def_type === JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL) var_kind = JSVarKind.JS_VAR_FUNCTION_DECL;
@@ -332,14 +350,20 @@ export class JSFunctionDef {
         if (this.find_lexical_decl(name, this.scope_first, false) >= 0) {
           throw new Error("invalid redefinition of lexical identifier");
         }
-        if (this.is_global_var && !this.is_module) {
+        if (this.is_global_var) {
           let hf = this.find_global_var(name);
           if (hf && hf.is_lexical && hf.scope_level === this.scope_level && this.eval_type === 1) {
             throw new Error("invalid redefinition of lexical identifier");
           }
           hf = this.add_global_var(name);
           if (!hf) return -1;
-          idx = GLOBAL_VAR_OFFSET;
+          
+          if (this.is_module) {
+             const globalIdx = this.global_vars.indexOf(hf);
+             idx = this.add_closure_var(name, true, false, globalIdx, JSVarKind.JS_VAR_NORMAL, false, false);
+          } else {
+             idx = GLOBAL_VAR_OFFSET;
+          }
         } else {
           idx = this.find_var(name);
           if (idx >= 0) break;

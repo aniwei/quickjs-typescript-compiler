@@ -162,6 +162,16 @@ export class TypeScriptCompiler {
         }
         this.emitOp(Opcode.OP_return); 
     } else {
+        // Check that imported variables are initialized
+        for (let i = 0; i < fd.closure_var.length; i++) {
+            const cv = fd.closure_var[i];
+            if (cv.is_local && cv.is_lexical) {
+                this.emitOp(Opcode.OP_get_var_ref_check);
+                this.emitU16(i);
+                this.emitOp(Opcode.OP_drop);
+            }
+        }
+
         // emit_return(s, FALSE) -> emits OP_undefined then return
         this.emitOp(Opcode.OP_undefined);
         this.emitOp(Opcode.OP_return_async); // Module is async
@@ -3099,13 +3109,7 @@ export class TypeScriptCompiler {
     this.exitOptionalChain(chainInfo);
   }
 
-  emitPutVar(idx: number, atom: number): void {
-      if (idx === GLOBAL_VAR_OFFSET) {
-          this.emitOp(Opcode.OP_put_var);
-          this.emitAtom(atom);
-          return;
-      }
-
+  emitPutVar(idx: number, atom?: number): void {
       const isModuleOrStrictGlobal = this.state.cur_func!.is_module || 
                                      (this.state.cur_func!.is_global_var && this.state.cur_func!.js_mode === 1);
       
@@ -3119,7 +3123,11 @@ export class TypeScriptCompiler {
           else if (idx === 3) this.emitOp(Opcode.OP_put_var_ref3);
           else {
               this.emitOp(Opcode.OP_put_var_ref);
-              this.emitU16(idx);
+              if (atom !== undefined) {
+                  this.emitAtom(atom);
+              } else {
+                  this.emitAtom(this.state.cur_func!.closure_var[idx].var_name);
+              }
           }
       } else {
           if (idx === 0) this.emitOp(Opcode.OP_put_loc0);
