@@ -661,7 +661,7 @@ export class TypeScriptCompiler {
         
         const idx = this.state.cur_func.define_var(atom, varDefType);
         
-        this.emitPutVar(idx);
+        this.emitPutVar(idx, atom);
       } else {
         this.visitBindingPattern(decl.name, varDefType, isExport);
       }
@@ -705,7 +705,7 @@ export class TypeScriptCompiler {
                     this.addExportEntry(0, atom, atom);
                 }
                 const idx = this.state.cur_func!.define_var(atom, varDefType);
-                this.emitPutVar(idx);
+                this.emitPutVar(idx, atom);
             } else {
                 this.visitBindingPattern(el.name, varDefType, isExport);
             }
@@ -744,7 +744,7 @@ export class TypeScriptCompiler {
                     this.addExportEntry(0, atom, atom);
                 }
                 const idx = this.state.cur_func!.define_var(atom, varDefType);
-                this.emitPutVar(idx);
+                this.emitPutVar(idx, atom);
             } else {
                 this.visitBindingPattern(el.name, varDefType, isExport);
             }
@@ -854,7 +854,7 @@ export class TypeScriptCompiler {
                 const name = decl.name.text;
                 const atom = this.state.atomManager.getAtom(name);
                 const idx = this.state.cur_func!.define_var(atom, JSVarDefEnum.JS_VAR_DEF_CATCH);
-                this.emitPutVar(idx);
+                this.emitPutVar(idx, atom);
             } else {
                 this.visitBindingPattern(decl.name, JSVarDefEnum.JS_VAR_DEF_CATCH);
             }
@@ -959,7 +959,7 @@ export class TypeScriptCompiler {
                 const atom = this.state.atomManager.getAtom(name);
                 
                 const idx = this.state.cur_func!.define_var(atom, varDefType);
-                this.emitPutVar(idx);
+                this.emitPutVar(idx, atom);
             } else {
                 this.visitBindingPattern(decl.name, varDefType);
             }
@@ -1046,7 +1046,7 @@ export class TypeScriptCompiler {
                 const atom = this.state.atomManager.getAtom(name);
                 const v = definedVars.find(v => v.name === atom);
                 if (v) {
-                    this.emitPutVar(v.idx);
+                    this.emitPutVar(v.idx, v.name);
                 } else {
                      const isConst = (node.initializer.flags & ts.NodeFlags.Const) !== 0;
                      const isLet = (node.initializer.flags & ts.NodeFlags.Let) !== 0;
@@ -1054,7 +1054,7 @@ export class TypeScriptCompiler {
                      if (isConst) varDefType = JSVarDefEnum.JS_VAR_DEF_CONST;
                      else if (isLet) varDefType = JSVarDefEnum.JS_VAR_DEF_LET;
                      const idx = this.state.cur_func!.define_var(atom, varDefType);
-                     this.emitPutVar(idx);
+                     this.emitPutVar(idx, atom);
                 }
             } else {
                 const isConst = (node.initializer.flags & ts.NodeFlags.Const) !== 0;
@@ -1368,7 +1368,7 @@ export class TypeScriptCompiler {
     
     // 10. Store class in variable
     this.emitOp(Opcode.OP_dup); // Duplicate ctor
-    this.emitPutVar(classNameVarIdx);
+    this.emitPutVar(classNameVarIdx, classNameAtom);
     
     this.emitOp(Opcode.OP_set_proto);
   }
@@ -3098,7 +3098,7 @@ export class TypeScriptCompiler {
     this.exitOptionalChain(chainInfo);
   }
 
-  emitPutVar(idx: number): void {
+  emitPutVar(idx: number, atom?: number): void {
       const isModuleOrStrictGlobal = this.state.cur_func!.is_module || 
                                      (this.state.cur_func!.is_global_var && this.state.cur_func!.js_mode === 1);
       
@@ -3112,7 +3112,11 @@ export class TypeScriptCompiler {
           else if (idx === 3) this.emitOp(Opcode.OP_put_var_ref3);
           else {
               this.emitOp(Opcode.OP_put_var_ref);
-              this.emitAtom(this.state.cur_func!.closure_var[idx].var_name);
+              if (atom !== undefined) {
+                  this.emitAtom(atom);
+              } else {
+                  this.emitAtom(this.state.cur_func!.closure_var[idx].var_name);
+              }
           }
       } else {
           if (idx === 0) this.emitOp(Opcode.OP_put_loc0);
