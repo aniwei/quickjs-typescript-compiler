@@ -330,7 +330,7 @@ export class TypeScriptCompiler {
              else if (idx === 3) this.emitOp(Opcode.OP_put_var_ref3);
              else {
                  this.emitOp(Opcode.OP_put_var_ref);
-                 this.emitU16(idx);
+                 this.emitAtom(defaultAtom);
              }
           } else {
               this.emitOp(Opcode.OP_put_loc);
@@ -1921,7 +1921,7 @@ export class TypeScriptCompiler {
         else if (varIdx === 3) this.emitOp(Opcode.OP_put_var_ref3);
         else {
             this.emitOp(Opcode.OP_put_var_ref);
-            this.emitU16(varIdx);
+            this.emitAtom(atom);
         }
     } else {
         this.emitOp(Opcode.OP_put_loc);
@@ -3115,7 +3115,7 @@ export class TypeScriptCompiler {
           else if (idx === 3) this.emitOp(Opcode.OP_put_var_ref3);
           else {
               this.emitOp(Opcode.OP_put_var_ref);
-              this.emitU16(idx);
+              this.emitAtom(this.state.cur_func!.closure_var[idx].var_name);
           }
       } else {
           if (idx === 0) this.emitOp(Opcode.OP_put_loc0);

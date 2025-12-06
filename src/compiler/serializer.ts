@@ -295,31 +295,34 @@ export class BytecodeSerializer {
     this.setFlags(state, fd.super_allowed, 1);
     this.setFlags(state, fd.arguments_allowed, 1);
     this.setFlags(state, fd.has_debug, 1);
-    this.setFlags(state, fd.is_eval, 1);
+    
+    // is_direct_or_indirect_eval
+    // JS_EVAL_TYPE_DIRECT = 2, JS_EVAL_TYPE_INDIRECT = 3
+    const is_direct_or_indirect_eval = (fd.eval_type === 2 || fd.eval_type === 3);
+    this.setFlags(state, is_direct_or_indirect_eval, 1);
     
     buf.putU16(state.flags);
     buf.putByte(fd.js_mode);
     this.putAtom(buf, fd.func_name);
+
     this.putLEB128(buf, fd.args.length); // arg_count
-    
     this.putLEB128(buf, fd.vars.length); // var_count
-    
     this.putLEB128(buf, fd.defined_arg_count); // defined_arg_count
     this.putLEB128(buf, fd.max_stack); // stack_size
     this.putLEB128(buf, fd.closure_var.length); // closure_var_count
     this.putLEB128(buf, fd.cpool.length);
     console.log('Serializer cpool length:', fd.cpool.length, 'for func:', this.atomManager.getString(fd.func_name));
     this.putLEB128(buf, fd.byte_code.getOffset());
-    
-    let local_count = fd.args.length + fd.vars.length;
-    this.putLEB128(buf, local_count);
-    
-    // Vardefs (args then vars)
-    const allVars = [...fd.args, ...fd.vars];
-    for (const v of allVars) {
+
+    // Vardefs
+    const total_vars = fd.args.length + fd.vars.length;
+    if (total_vars > 0) {
+      this.putLEB128(buf, total_vars);
+      const allVars = [...fd.args, ...fd.vars];
+      for (const v of allVars) {
         this.putAtom(buf, v.var_name);
-        this.putSLEB128(buf, v.scope_level);
-        this.putLEB128(buf, v.scope_next === -1 ? 0 : v.scope_next);
+        this.putLEB128(buf, v.scope_level);
+        this.putLEB128(buf, v.scope_next + 1);
         
         const state = { flags: 0, bit: 0 };
         this.setFlags(state, v.var_kind, 4);
@@ -327,20 +330,23 @@ export class BytecodeSerializer {
         this.setFlags(state, v.is_lexical, 1);
         this.setFlags(state, v.is_captured, 1);
         buf.putByte(state.flags);
+      }
+    } else {
+      this.putLEB128(buf, 0);
     }
     
     // Closure vars
     for (const cv of fd.closure_var) {
-       this.putAtom(buf, cv.var_name);
-       this.putLEB128(buf, cv.var_idx);
-       
-       const state = { flags: 0, bit: 0 };
-       this.setFlags(state, cv.is_local, 1);
-       this.setFlags(state, cv.is_arg, 1);
-       this.setFlags(state, cv.is_const, 1);
-       this.setFlags(state, cv.is_lexical, 1);
-       this.setFlags(state, cv.var_kind, 4);
-       buf.putByte(state.flags);
+      this.putAtom(buf, cv.var_name);
+      this.putLEB128(buf, cv.var_idx);
+      
+      const state = { flags: 0, bit: 0 };
+      this.setFlags(state, cv.is_local, 1);
+      this.setFlags(state, cv.is_arg, 1);
+      this.setFlags(state, cv.is_const, 1);
+      this.setFlags(state, cv.is_lexical, 1);
+      this.setFlags(state, cv.var_kind, 4);
+      buf.putByte(state.flags);
     }
     
     // Bytecode
@@ -352,7 +358,8 @@ export class BytecodeSerializer {
        this.putLEB128(buf, fd.line_start); // line_num
        this.putLEB128(buf, fd.pc2line.size);
        buf.put(fd.pc2line.buffer());
-       this.putAtom(buf, 0); // source (JS_ATOM_NULL)
+       // source
+       this.putLEB128(buf, 0); // source_len = 0
     }
 
     // Cpool

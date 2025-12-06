@@ -481,6 +481,7 @@ export class JSFunctionDef {
       var_kind: JSVarKind.JS_VAR_NORMAL,
       func_pool_idx: -1
     });
+    this.defined_arg_count = this.args.length;
     return idx;
   }
 
