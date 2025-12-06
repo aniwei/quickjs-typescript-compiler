@@ -205,6 +205,13 @@ export class JSFunctionDef {
   source: string = "";
   filename: number = 0; // JSAtom
 
+  add_module_variables() {
+    for (let i = 0; i < this.global_vars.length; i++) {
+      const hf = this.global_vars[i];
+      this.add_closure_var(hf.var_name, true, false, i, hf.var_kind || JSVarKind.JS_VAR_NORMAL, hf.is_const, hf.is_lexical);
+    }
+  }
+
   add_var(name: number, is_hoisted: boolean = false): number {
     const idx = this.vars.length;
     
@@ -251,14 +258,14 @@ export class JSFunctionDef {
     let idx = -1;
     switch (var_def_type) {
       case JSVarDefEnum.JS_VAR_DEF_WITH:
-        idx = this.add_scope_var(name, JSVarKind.JS_VAR_NORMAL);
-        break;
+        idx = this.add_scope_var(name, JSVarKind.JS_VAR_NORMAL)
+        break
 
       case JSVarDefEnum.JS_VAR_DEF_LET:
       case JSVarDefEnum.JS_VAR_DEF_CONST:
       case JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL:
       case JSVarDefEnum.JS_VAR_DEF_NEW_FUNCTION_DECL:
-        idx = this.find_lexical_decl(name, this.scope_first, true);
+        idx = this.find_lexical_decl(name, this.scope_first, true)
         if (idx >= 0) {
           if (idx < GLOBAL_VAR_OFFSET) {
             const vd = this.vars[idx];
@@ -296,7 +303,7 @@ export class JSFunctionDef {
         }
 
         if (this.is_eval && 
-          (this.eval_type === 0 || this.eval_type === 2) && 
+          (this.eval_type === 0 || this.eval_type === 1) && 
           this.scope_level === this.body_scope) {
           const hf = this.add_global_var(name);
           if (!hf) return -1;
@@ -324,9 +331,9 @@ export class JSFunctionDef {
         if (this.find_lexical_decl(name, this.scope_first, false) >= 0) {
           throw new Error("invalid redefinition of lexical identifier");
         }
-        if (this.is_global_var && this.eval_type !== 1) {
+        if (this.is_global_var) {
           let hf = this.find_global_var(name);
-          if (hf && hf.is_lexical && hf.scope_level === this.scope_level && this.eval_type === 2) {
+          if (hf && hf.is_lexical && hf.scope_level === this.scope_level && this.eval_type === 1) {
             throw new Error("invalid redefinition of lexical identifier");
           }
           hf = this.add_global_var(name);

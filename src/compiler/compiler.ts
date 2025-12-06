@@ -66,7 +66,7 @@ export class TypeScriptCompiler {
     this.sourceFile = sourceFile;
 
     const filenameAtom = this.state.atomManager.getAtom(sourceFile.fileName);
-    const fd = JSFunctionDef.create(null, false, false, filenameAtom, 0, 0);
+    const fd = JSFunctionDef.create(null, true, false, filenameAtom, 0, 0);
     this.state.cur_func = fd;
     this.state.filename = sourceFile.fileName;
 
@@ -139,6 +139,10 @@ export class TypeScriptCompiler {
         for (const statement of sourceFile.statements) {
             this.visitSourceElement(statement);
         }
+    }
+
+    if (this.isModule) {
+        fd.add_module_variables();
     }
 
     // Return logic from js_parse_program
