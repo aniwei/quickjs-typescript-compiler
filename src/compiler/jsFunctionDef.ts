@@ -147,6 +147,7 @@ export class JSFunctionDef {
 
   vars: JSVarDef[] = [];
   args: JSVarDef[] = [];
+  defined_arg_count: number = 0;
   
   var_object_idx: number = -1;
   arg_var_object_idx: number = -1;
@@ -480,6 +481,7 @@ export class JSFunctionDef {
       var_kind: JSVarKind.JS_VAR_NORMAL,
       func_pool_idx: -1
     });
+    this.defined_arg_count = this.args.length;
     return idx;
   }
 
