@@ -12,36 +12,34 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=1, closures=1
-    locals (1):
-      [0] obj kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=1
     closure_vars (1):
       [0] obj -> var#0 [local, kind#0]
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/delete-operator.ts
-      pc2line_bytes: 6
-      source_length: undefined
+      pc2line_bytes: 10
+      source_length: 0
 
     opcodes (21):
       0000: push_this
-      0001: if_false +43 -> 49
-      0006: object
-      0007: push_1
-      0008: define_field atom#230
-      0013: push_2
-      0014: define_field atom#231
-      0019: put_var_ref0
-      0020: get_var_ref0
-      0021: push_atom_value atom#230
-      0026: delete
-      0027: drop
-      0028: get_var atom#232
-      0033: get_field2 atom#233
-      0038: get_var_ref0
-      0039: get_field atom#230
-      0044: call_method 1
-      0047: drop
-      0048: return_undef
-      0049: undefined
-      0050: return_async
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: object
+      0005: push_1
+      0006: define_field atom#230
+      0011: push_2
+      0012: define_field atom#231
+      0017: put_var_ref0
+      0018: get_var_ref0
+      0019: push_atom_value atom#230
+      0024: delete
+      0025: drop
+      0026: get_var atom#232
+      0031: get_field2 atom#233
+      0036: get_var_ref0
+      0037: get_field atom#230
+      0042: call_method 1
+      0045: drop
+      0046: undefined
+      0047: return_async

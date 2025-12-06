@@ -10,77 +10,75 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=1, closures=1
-    locals (1):
-      [0] x kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=1
     closure_vars (1):
-      [0] x -> var#0 [local, kind#0]
+      [0] x -> var#0 [local, lexical, kind#0]
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/assignment-ops.ts
-      pc2line_bytes: 42
-      source_length: undefined
+      pc2line_bytes: 54
+      source_length: 0
 
     opcodes (62):
       0000: push_this
-      0001: if_false +92 -> 98
-      0006: push_1
-      0007: put_var_ref0
-      0008: push_2
-      0009: put_loc0
-      0010: get_var_ref0
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: push_1
+      0005: put_var_ref0
+      0006: push_2
+      0007: put_loc0
+      0008: get_var_ref_check var_ref[0] x
       0011: push_1
       0012: add
-      0013: put_loc local[0] x
-      0016: get_var_ref0
-      0017: push_1
-      0018: sub
-      0019: put_loc local[0] x
-      0022: get_var_ref0
-      0023: push_2
-      0024: mul
-      0025: put_loc local[0] x
-      0028: get_var_ref0
-      0029: push_2
-      0030: div
-      0031: put_loc local[0] x
-      0034: get_var_ref0
+      0013: put_loc local[0]
+      0016: get_var_ref_check var_ref[0] x
+      0019: push_1
+      0020: sub
+      0021: put_loc local[0]
+      0024: get_var_ref_check var_ref[0] x
+      0027: push_2
+      0028: mul
+      0029: put_loc local[0]
+      0032: get_var_ref_check var_ref[0] x
       0035: push_2
-      0036: mod
-      0037: put_loc local[0] x
-      0040: get_var_ref0
-      0041: push_2
-      0042: pow
-      0043: put_loc local[0] x
-      0046: get_var_ref0
-      0047: push_1
-      0048: shl
-      0049: put_loc local[0] x
-      0052: get_var_ref0
-      0053: push_1
-      0054: sar
-      0055: put_loc local[0] x
-      0058: get_var_ref0
+      0036: div
+      0037: put_loc local[0]
+      0040: get_var_ref_check var_ref[0] x
+      0043: push_2
+      0044: mod
+      0045: put_loc local[0]
+      0048: get_var_ref_check var_ref[0] x
+      0051: push_2
+      0052: pow
+      0053: put_loc local[0]
+      0056: get_var_ref_check var_ref[0] x
       0059: push_1
-      0060: shr
-      0061: put_loc local[0] x
-      0064: get_var_ref0
-      0065: push_1
-      0066: and
-      0067: put_loc local[0] x
-      0070: get_var_ref0
-      0071: push_1
-      0072: or
-      0073: put_loc local[0] x
-      0076: get_var_ref0
-      0077: push_1
-      0078: xor
-      0079: put_loc local[0] x
-      0082: get_var atom#230
-      0087: get_field2 atom#231
-      0092: get_var_ref0
-      0093: call_method 1
-      0096: drop
-      0097: return_undef
-      0098: undefined
-      0099: return_async
+      0060: shl
+      0061: put_loc local[0]
+      0064: get_var_ref_check var_ref[0] x
+      0067: push_1
+      0068: sar
+      0069: put_loc local[0]
+      0072: get_var_ref_check var_ref[0] x
+      0075: push_1
+      0076: shr
+      0077: put_loc local[0]
+      0080: get_var_ref_check var_ref[0] x
+      0083: push_1
+      0084: and
+      0085: put_loc local[0]
+      0088: get_var_ref_check var_ref[0] x
+      0091: push_1
+      0092: or
+      0093: put_loc local[0]
+      0096: get_var_ref_check var_ref[0] x
+      0099: push_1
+      0100: xor
+      0101: put_loc local[0]
+      0104: get_var atom#230
+      0109: get_field2 atom#231
+      0114: get_var_ref_check var_ref[0] x
+      0117: call_method 1
+      0120: drop
+      0121: undefined
+      0122: return_async

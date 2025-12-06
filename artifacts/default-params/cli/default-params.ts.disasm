@@ -12,11 +12,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=3, closures=3
-    locals (3):
-      [0] defaultBasic kind=kind#0 level=0 next=0
-      [1] defaultExpr kind=kind#0 level=0 next=0
-      [2] defaultRef kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=3
     closure_vars (3):
       [0] defaultBasic -> var#0 [local, kind#0]
       [1] defaultExpr -> var#1 [local, kind#0]
@@ -28,23 +24,23 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/default-params.ts
-      pc2line_bytes: 6
-      source_length: undefined
+      pc2line_bytes: 2
+      source_length: 0
 
     opcodes (11):
       0000: push_this
-      0001: if_false +10 -> 16
-      0006: fclosure8 const[0] function defaultBasic
-      0008: put_var_ref0
-      0009: fclosure8 const[1] function defaultExpr
-      0011: put_var_ref1
-      0012: fclosure8 const[2] function defaultRef
-      0014: put_var_ref2
-      0015: return_undef
-      0016: undefined
-      0017: return_async
+      0001: if_false8 +11 -> 14
+      0003: fclosure8 const[0] function defaultBasic
+      0005: put_var_ref0
+      0006: fclosure8 const[1] function defaultExpr
+      0008: put_var_ref1
+      0009: fclosure8 const[2] function defaultRef
+      0011: put_var_ref2
+      0012: return_undef
+      0013: undefined
+      0014: return_async
 
-    function[1] defaultBasic (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[1] defaultBasic (const[0]) kind=kind#0 flags=[newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=1, defined=1, vars=0, closures=0
@@ -53,14 +49,14 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/default-params.ts
-        pc2line_bytes: 3
-        source_length: undefined
+        pc2line_bytes: 4
+        source_length: 0
 
       opcodes (11):
         0000: get_arg0
         0001: dup
         0002: is_undefined
-        0003: if_false +3 -> 11
+        0003: if_false +7 -> 15
         0008: drop
         0009: push_1
         0010: set_arg0
@@ -69,7 +65,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
         0013: return
         0014: return_undef
 
-    function[2] defaultExpr (const[1]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[2] defaultExpr (const[1]) kind=kind#0 flags=[newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=1, defined=1, vars=0, closures=0
@@ -79,13 +75,13 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/default-params.ts
         pc2line_bytes: 6
-        source_length: undefined
+        source_length: 0
 
       opcodes (13):
         0000: get_arg0
         0001: dup
         0002: is_undefined
-        0003: if_false +5 -> 13
+        0003: if_false +9 -> 17
         0008: drop
         0009: push_1
         0010: push_2
@@ -96,7 +92,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
         0015: return
         0016: return_undef
 
-    function[3] defaultRef (const[2]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[3] defaultRef (const[2]) kind=kind#0 flags=[newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=2, defined=2, vars=0, closures=0
@@ -106,14 +102,14 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/default-params.ts
-        pc2line_bytes: 6
-        source_length: undefined
+        pc2line_bytes: 4
+        source_length: 0
 
       opcodes (11):
         0000: get_arg1
         0001: dup
         0002: is_undefined
-        0003: if_false +3 -> 11
+        0003: if_false +7 -> 15
         0008: drop
         0009: get_arg0
         0010: set_arg1

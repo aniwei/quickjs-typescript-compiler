@@ -10,27 +10,25 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=1, closures=1
-    locals (1):
-      [0] a kind=kind#0 level=1 next=0
+    args: total=0, defined=0, vars=0, closures=1
     closure_vars (1):
       [0] a -> var#0 [local, kind#0]
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/empty-block.ts
-      pc2line_bytes: 9
-      source_length: undefined
+      pc2line_bytes: 4
+      source_length: 0
 
     opcodes (12):
       0000: push_this
-      0001: if_false +18 -> 24
-      0006: push_1
-      0007: put_var_ref0
-      0008: get_var atom#230
-      0013: get_field2 atom#231
-      0018: get_var_ref0
-      0019: call_method 1
-      0022: drop
-      0023: return_undef
-      0024: undefined
-      0025: return_async
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: push_1
+      0005: put_loc0
+      0006: get_var atom#230
+      0011: get_field2 atom#231
+      0016: get_var_ref0
+      0017: call_method 1
+      0020: drop
+      0021: undefined
+      0022: return_async

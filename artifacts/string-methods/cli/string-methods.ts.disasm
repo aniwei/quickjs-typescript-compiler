@@ -16,54 +16,52 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=1, closures=1
-    locals (1):
-      [0] str kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=1
     closure_vars (1):
       [0] str -> var#0 [local, kind#0]
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/string-methods.ts
-      pc2line_bytes: 12
-      source_length: undefined
+      pc2line_bytes: 24
+      source_length: 0
 
     opcodes (39):
       0000: push_this
-      0001: if_false +107 -> 113
-      0006: push_atom_value atom#230
-      0011: put_var_ref0
-      0012: get_var atom#231
-      0017: get_field2 atom#232
-      0022: get_var_ref0
-      0023: get_field2 atom#233
-      0028: push_0
-      0029: call_method 1
-      0032: call_method 1
-      0035: drop
-      0036: get_var atom#231
-      0041: get_field2 atom#232
-      0046: get_var_ref0
-      0047: get_field2 atom#234
-      0052: push_atom_value atom#235
-      0057: call_method 1
-      0060: call_method 1
-      0063: drop
-      0064: get_var atom#231
-      0069: get_field2 atom#232
-      0074: get_var_ref0
-      0075: get_field2 atom#236
-      0080: push_0
-      0081: push_5
-      0082: call_method 2
-      0085: call_method 1
-      0088: drop
-      0089: get_var atom#231
-      0094: get_field2 atom#232
-      0099: get_var_ref0
-      0100: get_field2 atom#237
-      0105: call_method 0
-      0108: call_method 1
-      0111: drop
-      0112: return_undef
-      0113: undefined
-      0114: return_async
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: push_atom_value atom#230
+      0009: put_var_ref0
+      0010: get_var atom#231
+      0015: get_field2 atom#232
+      0020: get_var_ref0
+      0021: get_field2 atom#233
+      0026: push_0
+      0027: call_method 1
+      0030: call_method 1
+      0033: drop
+      0034: get_var atom#231
+      0039: get_field2 atom#232
+      0044: get_var_ref0
+      0045: get_field2 atom#234
+      0050: push_atom_value atom#235
+      0055: call_method 1
+      0058: call_method 1
+      0061: drop
+      0062: get_var atom#231
+      0067: get_field2 atom#232
+      0072: get_var_ref0
+      0073: get_field2 atom#236
+      0078: push_0
+      0079: push_5
+      0080: call_method 2
+      0083: call_method 1
+      0086: drop
+      0087: get_var atom#231
+      0092: get_field2 atom#232
+      0097: get_var_ref0
+      0098: get_field2 atom#237
+      0103: call_method 0
+      0106: call_method 1
+      0109: drop
+      0110: undefined
+      0111: return_async

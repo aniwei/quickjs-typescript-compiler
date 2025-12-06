@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/delete-operator/cli/delete-operator.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/delete-operator/cli/delete-operator.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/delete-operator/cli/delete-operator.pc2line.txt",
-    "bytecodeSize": 231,
+    "bytecodeSize": 227,
     "pc2lineLength": 0,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 231,
+    "tsSize": 158,
     "wasmSize": 162,
-    "sizeDiff": 69,
-    "sizeDiffPercent": 42.592592592592595
+    "sizeDiff": -4,
+    "sizeDiffPercent": -2.4691358024691357
   },
   "trace": {
     "differenceCount": 0,

@@ -13,10 +13,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=2, closures=2
-    locals (2):
-      [0] makeAdder kind=kind#0 level=0 next=0
-      [1] add5 kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=2
     closure_vars (2):
       [0] makeAdder -> var#0 [local, kind#0]
       [1] add5 -> var#1 [local, kind#0]
@@ -25,30 +22,30 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/closure-basic.ts
-      pc2line_bytes: 9
-      source_length: undefined
+      pc2line_bytes: 10
+      source_length: 0
 
     opcodes (18):
       0000: push_this
-      0001: if_false +29 -> 35
-      0006: fclosure8 const[0] function makeAdder
-      0008: put_var_ref0
-      0009: get_var_ref0
-      0010: push_5
-      0011: call 1
-      0014: put_var_ref1
-      0015: get_var atom#231
-      0020: get_field2 atom#232
-      0025: get_var_ref1
-      0026: push_2
-      0027: call 1
-      0030: call_method 1
-      0033: drop
-      0034: return_undef
-      0035: undefined
-      0036: return_async
+      0001: if_false8 +5 -> 8
+      0003: fclosure8 const[0] function makeAdder
+      0005: put_var_ref0
+      0006: return_undef
+      0007: get_var_ref0
+      0008: push_5
+      0009: call1
+      0010: put_var_ref1
+      0011: get_var atom#231
+      0016: get_field2 atom#232
+      0021: get_var_ref1
+      0022: push_2
+      0023: call1
+      0024: call_method 1
+      0027: drop
+      0028: undefined
+      0029: return_async
 
-    function[1] makeAdder (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[1] makeAdder (const[0]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=1, defined=1, vars=0, closures=0
@@ -59,15 +56,15 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/closure-basic.ts
-        pc2line_bytes: 3
-        source_length: undefined
+        pc2line_bytes: 2
+        source_length: 0
 
       opcodes (3):
         0000: fclosure8 const[0] function <builtin:0>
         0002: return
         0003: return_undef
 
-      function[2] <builtin:0> (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      function[2] <builtin:0> (const[0]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
         mode: sloppy
         stack_size: 3
         args: total=1, defined=1, vars=0, closures=1
@@ -78,8 +75,8 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
         debug:
           filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/closure-basic.ts
-          pc2line_bytes: 6
-          source_length: undefined
+          pc2line_bytes: 4
+          source_length: 0
 
         opcodes (5):
           0000: get_var_ref0

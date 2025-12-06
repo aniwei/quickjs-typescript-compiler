@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/math-date.ts
-**生成时间**: 2025-12-05T12:54:24.112Z
+**生成时间**: 2025-12-06T02:09:56.415Z
 
 ## 大小对比
 
-- TypeScript编译器: 296 字节
+- TypeScript编译器: 232 字节
 - WASM编译器: 256 字节
-- 差异: 40 字节 (15.63%)
+- 差异: -24 字节 (-9.38%)
 
 ## 结构分析
 
@@ -20,10 +20,10 @@
   "atoms": [
     {
       "index": 0,
-      "rawLength": 216,
-      "actualLength": 108,
+      "rawLength": 80,
+      "actualLength": 40,
       "isWideChar": 0,
-      "string": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/math-date.js",
+      "string": "__tests__/compiler/fixtures/math-date.js",
       "offset": 2
     },
     {
@@ -32,7 +32,7 @@
       "actualLength": 1,
       "isWideChar": 0,
       "string": "d",
-      "offset": 112
+      "offset": 43
     },
     {
       "index": 2,
@@ -40,7 +40,7 @@
       "actualLength": 7,
       "isWideChar": 0,
       "string": "console",
-      "offset": 114
+      "offset": 45
     },
     {
       "index": 3,
@@ -48,7 +48,7 @@
       "actualLength": 3,
       "isWideChar": 0,
       "string": "log",
-      "offset": 122
+      "offset": 53
     },
     {
       "index": 4,
@@ -56,7 +56,7 @@
       "actualLength": 7,
       "isWideChar": 0,
       "string": "getTime",
-      "offset": 126
+      "offset": 57
     },
     {
       "index": 5,
@@ -64,7 +64,7 @@
       "actualLength": 3,
       "isWideChar": 0,
       "string": "abs",
-      "offset": 134
+      "offset": 65
     },
     {
       "index": 6,
@@ -72,13 +72,13 @@
       "actualLength": 3,
       "isWideChar": 0,
       "string": "max",
-      "offset": 138
+      "offset": 69
     }
   ],
   "functionHeader": {
-    "offset": 142,
+    "offset": 73,
     "tag": "0xd",
-    "remaining": 154
+    "remaining": 159
   }
 }
 ```
@@ -157,53 +157,49 @@
 
 ## 字节级差异
 
-共发现 280 个字节差异:
+共发现 134 个字节差异:
 
-- 偏移量 0x2: TS=0xd8 vs WASM=0x50
-- 偏移量 0x3: TS=0x01 vs WASM=0x5f
-- 偏移量 0x4: TS=0x2f vs WASM=0x5f
-- 偏移量 0x5: TS=0x55 vs WASM=0x74
-- 偏移量 0x6: TS=0x73 vs WASM=0x65
-- 偏移量 0x7: TS=0x65 vs WASM=0x73
-- 偏移量 0x8: TS=0x72 vs WASM=0x74
-- 偏移量 0xa: TS=0x2f vs WASM=0x5f
-- 偏移量 0xb: TS=0x61 vs WASM=0x5f
-- 偏移量 0xc: TS=0x6e vs WASM=0x2f
-- 偏移量 0xd: TS=0x69 vs WASM=0x63
-- 偏移量 0xe: TS=0x77 vs WASM=0x6f
-- 偏移量 0xf: TS=0x65 vs WASM=0x6d
-- 偏移量 0x10: TS=0x69 vs WASM=0x70
-- 偏移量 0x11: TS=0x2f vs WASM=0x69
-- 偏移量 0x12: TS=0x44 vs WASM=0x6c
-- 偏移量 0x14: TS=0x73 vs WASM=0x72
-- 偏移量 0x15: TS=0x6b vs WASM=0x2f
-- 偏移量 0x16: TS=0x74 vs WASM=0x66
-- 偏移量 0x17: TS=0x6f vs WASM=0x69
-- ... (显示前20个差异，总共280个)
+- 偏移量 0x5a: TS=0x03 vs WASM=0x07
+- 偏移量 0x5c: TS=0x00 vs WASM=0x01
+- 偏移量 0x5d: TS=0x6a vs WASM=0x64
+- 偏移量 0x6c: TS=0x01 vs WASM=0x11
+- 偏移量 0x6d: TS=0x00 vs WASM=0xc1
+- 偏移量 0x6e: TS=0x80 vs WASM=0x00
+- 偏移量 0x6f: TS=0x6e vs WASM=0x21
+- 偏移量 0x70: TS=0x87 vs WASM=0x01
+- 偏移量 0x71: TS=0x21 vs WASM=0x00
+- 偏移量 0x72: TS=0x01 vs WASM=0xe3
+- 偏移量 0x73: TS=0x00 vs WASM=0x39
+- 偏移量 0x74: TS=0xe3 vs WASM=0xe6
+- 偏移量 0x75: TS=0x39 vs WASM=0x00
+- 偏移量 0x76: TS=0xe6 vs WASM=0x00
+- 偏移量 0x78: TS=0x00 vs WASM=0x43
+- 偏移量 0x79: TS=0x00 vs WASM=0xe7
+- 偏移量 0x7a: TS=0x43 vs WASM=0x00
+- 偏移量 0x7b: TS=0xe7 vs WASM=0x00
+- 偏移量 0x7d: TS=0x00 vs WASM=0xdf
+- 偏移量 0x7e: TS=0x00 vs WASM=0x43
+- ... (显示前20个差异，总共134个)
 
 ## 十六进制转储对比
 
 ### TypeScript
 ```
-00000000: 05 07 d8 01 2f 55 73 65 72 73 2f 61 6e 69 77 65 |..../Users/aniwe|
-00000010: 69 2f 44 65 73 6b 74 6f 70 2f 77 6f 72 6b 73 70 |i/Desktop/worksp|
-00000020: 61 63 65 73 2f 71 75 69 63 6b 6a 73 2d 74 79 70 |aces/quickjs-typ|
-00000030: 65 73 63 72 69 70 74 2d 63 6f 6d 70 69 6c 65 72 |escript-compiler|
-00000040: 5f 73 65 63 6f 6e 64 2f 5f 5f 74 65 73 74 73 5f |_second/__tests_|
-00000050: 5f 2f 63 6f 6d 70 69 6c 65 72 2f 66 69 78 74 75 |_/compiler/fixtu|
-00000060: 72 65 73 2f 6d 61 74 68 2d 64 61 74 65 2e 6a 73 |res/math-date.js|
-00000070: 02 64 0e 63 6f 6e 73 6f 6c 65 06 6c 6f 67 0e 67 |.d.console.log.g|
-00000080: 65 74 54 69 6d 65 06 61 62 73 06 6d 61 78 0d c8 |etTime.abs.max..|
-00000090: 03 00 00 00 00 00 0c 20 06 01 a4 01 00 01 00 03 |....... ........|
-000000a0: 01 00 6d 01 ca 03 00 00 00 ca 03 00 01 08 6c 65 |..m...........le|
-000000b0: 00 00 00 39 a7 00 00 00 01 00 80 6e 87 21 01 00 |...9.......n.!..|
-000000c0: e3 39 e6 00 00 00 43 e7 00 00 00 df 43 e8 00 00 |.9....C.....C...|
-000000d0: 00 24 00 00 24 01 00 0e 39 e6 00 00 00 43 e7 00 |.$..$...9....C..|
-000000e0: 00 00 39 a5 00 00 00 43 e9 00 00 00 01 0a 00 00 |..9....C........|
-000000f0: 00 8e 24 01 00 24 01 00 0e 39 e6 00 00 00 43 e7 |..$..$...9....C.|
-00000100: 00 00 00 39 a5 00 00 00 43 ea 00 00 00 b8 b9 ba |...9....C.......|
-00000110: 24 03 00 24 01 00 0e 29 06 2f c8 03 01 09 00 1e |$..$...)./......|
-00000120: 01 00 17 01 00 21 01 00                         |.....!..|
+00000000: 05 07 50 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..P__tests__/com|
+00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 6d |piler/fixtures/m|
+00000020: 61 74 68 2d 64 61 74 65 2e 6a 73 02 64 0e 63 6f |ath-date.js.d.co|
+00000030: 6e 73 6f 6c 65 06 6c 6f 67 0e 67 65 74 54 69 6d |nsole.log.getTim|
+00000040: 65 06 61 62 73 06 6d 61 78 0d c8 03 00 00 00 00 |e.abs.max.......|
+00000050: 00 0c 20 06 01 a4 01 00 00 00 03 01 00 6a 00 ca |.. ..........j..|
+00000060: 03 00 01 08 ec 02 29 39 a7 00 00 00 01 00 80 6e |......)9.......n|
+00000070: 87 21 01 00 e3 39 e6 00 00 00 43 e7 00 00 00 df |.!...9....C.....|
+00000080: 43 e8 00 00 00 24 00 00 24 01 00 0e 39 e6 00 00 |C....$..$...9...|
+00000090: 00 43 e7 00 00 00 39 a5 00 00 00 43 e9 00 00 00 |.C....9....C....|
+000000a0: 01 0a 00 00 00 8e 24 01 00 24 01 00 0e 39 e6 00 |......$..$...9..|
+000000b0: 00 00 43 e7 00 00 00 39 a5 00 00 00 43 ea 00 00 |..C....9....C...|
+000000c0: 00 b8 b9 ba 24 03 00 24 01 00 0e 06 2f c8 03 00 |....$..$..../...|
+000000d0: 16 16 0c 1b 05 30 6f 34 0c 44 74 34 0c 34 0a 44 |.....0o4.Dt4.4.D|
+000000e0: 6a 34 0c 34 09 07 03 00                         |j4.4....|
 ```
 
 ### WASM

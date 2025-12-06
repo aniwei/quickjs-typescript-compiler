@@ -13,15 +13,11 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=3, closures=3
-    locals (3):
-      [0] foo kind=kind#0 level=0 next=0
-      [1] bar kind=kind#0 level=0 next=0
-      [2] baz kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=3
     closure_vars (3):
       [0] foo -> var#0 [local, kind#0]
       [1] bar -> var#1 [local, kind#0]
-      [2] baz -> var#2 [local, kind#0]
+      [2] baz -> var#2 [local, const, lexical, kind#0]
     constant_pool (4):
       [0] function foo
       [1] function bar
@@ -30,27 +26,27 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/async-await.ts
-      pc2line_bytes: 15
-      source_length: undefined
+      pc2line_bytes: 8
+      source_length: 0
 
     opcodes (15):
       0000: push_this
-      0001: if_false +21 -> 27
-      0006: fclosure8 const[0] function foo
-      0008: put_var_ref0
-      0009: fclosure8 const[1] function bar
-      0011: put_var_ref1
-      0012: fclosure8 const[2] function <builtin:0>
-      0014: set_name atom#231
-      0019: put_var_ref2
-      0020: fclosure8 const[3] function <builtin:0>
-      0022: call 0
-      0025: drop
-      0026: return_undef
-      0027: undefined
-      0028: return_async
+      0001: if_false8 +8 -> 11
+      0003: fclosure8 const[0] function foo
+      0005: put_var_ref0
+      0006: fclosure8 const[1] function bar
+      0008: put_var_ref1
+      0009: return_undef
+      0010: fclosure8 const[2] function <builtin:0>
+      0012: set_name atom#231
+      0017: put_var_ref2
+      0018: fclosure8 const[3] function <builtin:0>
+      0020: call0
+      0021: drop
+      0022: undefined
+      0023: return_async
 
-    function[1] foo (const[0]) kind=kind#2 flags=[argumentsDisallowed, hasDebug]
+    function[1] foo (const[0]) kind=kind#2 flags=[hasSimpleParameters, newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=1, defined=1, vars=0, closures=0
@@ -59,19 +55,19 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/async-await.ts
-        pc2line_bytes: 3
-        source_length: undefined
+        pc2line_bytes: 4
+        source_length: 0
 
       opcodes (7):
         0000: get_var atom#230
         0005: get_arg0
-        0006: call 1
-        0009: await
+        0006: call1
+        0007: await
+        0008: return_async
+        0009: undefined
         0010: return_async
-        0011: undefined
-        0012: return_async
 
-    function[2] bar (const[1]) kind=kind#2 flags=[argumentsDisallowed, hasDebug]
+    function[2] bar (const[1]) kind=kind#2 flags=[hasSimpleParameters, newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=1, defined=1, vars=0, closures=0
@@ -80,8 +76,8 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/async-await.ts
-        pc2line_bytes: 6
-        source_length: undefined
+        pc2line_bytes: 4
+        source_length: 0
 
       opcodes (6):
         0000: get_arg0
@@ -91,7 +87,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
         0004: undefined
         0005: return_async
 
-    function[3] <builtin:0> (const[2]) kind=kind#2 flags=[argumentsDisallowed, hasDebug]
+    function[3] <builtin:0> (const[2]) kind=kind#2 flags=[hasSimpleParameters, argumentsDisallowed, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=1, defined=1, vars=0, closures=1
@@ -102,34 +98,34 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/async-await.ts
-        pc2line_bytes: 6
-        source_length: undefined
+        pc2line_bytes: 2
+        source_length: 0
 
       opcodes (7):
         0000: get_var_ref0
         0001: get_arg0
-        0002: call 1
-        0005: await
+        0002: call1
+        0003: await
+        0004: return_async
+        0005: undefined
         0006: return_async
-        0007: undefined
-        0008: return_async
 
-    function[4] <builtin:0> (const[3]) kind=kind#2 flags=[argumentsDisallowed, hasDebug]
+    function[4] <builtin:0> (const[3]) kind=kind#2 flags=[hasSimpleParameters, newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=0, defined=0, vars=0, closures=1
       closure_vars (1):
-        [0] baz -> var#2 [kind#0]
+        [0] baz -> var#2 [const, lexical, kind#0]
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/async-await.ts
-        pc2line_bytes: 6
-        source_length: undefined
+        pc2line_bytes: 4
+        source_length: 0
 
       opcodes (7):
-        0000: get_var_ref0
-        0001: push_i32 10
-        0006: call 1
+        0000: get_var_ref_check var_ref[0] baz
+        0003: push_i32 10
+        0008: call1
         0009: await
         0010: drop
         0011: undefined

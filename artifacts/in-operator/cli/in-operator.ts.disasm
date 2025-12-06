@@ -12,38 +12,36 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=1, closures=1
-    locals (1):
-      [0] in_obj kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=1
     closure_vars (1):
       [0] in_obj -> var#0 [local, kind#0]
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/in-operator.ts
-      pc2line_bytes: 6
-      source_length: undefined
+      pc2line_bytes: 14
+      source_length: 0
 
     opcodes (23):
       0000: push_this
-      0001: if_false +51 -> 57
-      0006: object
-      0007: push_1
-      0008: define_field atom#230
-      0013: put_var_ref0
-      0014: get_var atom#231
-      0019: get_field2 atom#232
-      0024: push_atom_value atom#230
-      0029: get_var_ref0
-      0030: in
-      0031: call_method 1
-      0034: drop
-      0035: get_var atom#231
-      0040: get_field2 atom#232
-      0045: push_atom_value atom#233
-      0050: get_var_ref0
-      0051: in
-      0052: call_method 1
-      0055: drop
-      0056: return_undef
-      0057: undefined
-      0058: return_async
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: object
+      0005: push_1
+      0006: define_field atom#230
+      0011: put_var_ref0
+      0012: get_var atom#231
+      0017: get_field2 atom#232
+      0022: push_atom_value atom#230
+      0027: get_var_ref0
+      0028: in
+      0029: call_method 1
+      0032: drop
+      0033: get_var atom#231
+      0038: get_field2 atom#232
+      0043: push_atom_value atom#233
+      0048: get_var_ref0
+      0049: in
+      0050: call_method 1
+      0053: drop
+      0054: undefined
+      0055: return_async

@@ -124,7 +124,10 @@ class BytecodeComparator {
       referenceJsSource: reference?.code,
     })
     // Use JS filename to match WASM output
-    const filename = reference ? reference.path : this.options.inputTs;
+    let filename = reference ? reference.path : this.options.inputTs;
+    // Ensure filename is relative to CWD, matching QuickJSLib behavior
+    filename = path.relative(process.cwd(), filename);
+
     const bytecode = await compiler.compile(sourceCode, filename);
 
     let disassembly: string | undefined

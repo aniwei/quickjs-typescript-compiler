@@ -19,40 +19,40 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/global-functions.ts
-      pc2line_bytes: 9
-      source_length: undefined
+      pc2line_bytes: 20
+      source_length: 0
 
     opcodes (33):
       0000: push_this
-      0001: if_false +109 -> 115
-      0006: get_var atom#229
-      0011: get_field2 atom#230
-      0016: get_var atom#231
-      0021: push_atom_value atom#232
-      0026: call 1
-      0029: call_method 1
-      0032: drop
-      0033: get_var atom#229
-      0038: get_field2 atom#230
-      0043: get_var atom#233
-      0048: push_atom_value atom#234
-      0053: call 1
-      0056: call_method 1
-      0059: drop
-      0060: get_var atom#229
-      0065: get_field2 atom#230
-      0070: get_var atom#235
-      0075: get_var atom#146
-      0080: call 1
-      0083: call_method 1
-      0086: drop
-      0087: get_var atom#229
-      0092: get_field2 atom#230
-      0097: get_var atom#236
-      0102: push_i32 100
-      0107: call 1
-      0110: call_method 1
-      0113: drop
-      0114: return_undef
-      0115: undefined
-      0116: return_async
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: get_var atom#229
+      0009: get_field2 atom#230
+      0014: get_var atom#231
+      0019: push_atom_value atom#232
+      0024: call1
+      0025: call_method 1
+      0028: drop
+      0029: get_var atom#229
+      0034: get_field2 atom#230
+      0039: get_var atom#233
+      0044: push_atom_value atom#234
+      0049: call1
+      0050: call_method 1
+      0053: drop
+      0054: get_var atom#229
+      0059: get_field2 atom#230
+      0064: get_var atom#235
+      0069: get_var atom#146
+      0074: call1
+      0075: call_method 1
+      0078: drop
+      0079: get_var atom#229
+      0084: get_field2 atom#230
+      0089: get_var atom#236
+      0094: push_i32 100
+      0099: call1
+      0100: call_method 1
+      0103: drop
+      0104: undefined
+      0105: return_async

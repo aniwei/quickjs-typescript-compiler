@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/custom-atoms/cli/custom-atoms.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/custom-atoms/cli/custom-atoms.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/custom-atoms/cli/custom-atoms.pc2line.txt",
-    "bytecodeSize": 249,
+    "bytecodeSize": 238,
     "pc2lineLength": 0,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 249,
+    "tsSize": 169,
     "wasmSize": 169,
-    "sizeDiff": 80,
-    "sizeDiffPercent": 47.337278106508876
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
   },
   "trace": {
     "differenceCount": 0,

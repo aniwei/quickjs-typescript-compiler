@@ -1,6 +1,6 @@
 import { BytecodeWriter } from '../bytecode/bytecodeWriter';
 import { DynBuf } from '../bytecode/dynBuffer';
-import { JSAtom, Opcode, JSMode } from '../env';
+import { JSAtom, Opcode, JSMode, OPCODE_DEFS } from '../env';
 
 export enum JSVarKind {
   JS_VAR_NORMAL,
@@ -171,6 +171,25 @@ export class JSFunctionDef {
   last_opcode_pos: number = -1;
   use_short_opcodes: boolean = false;
 
+  cur_stack: number = 0;
+  max_stack: number = 0;
+
+  updateStack(op: Opcode) {
+    const def = OPCODE_DEFS[Opcode[op]];
+    if (def) {
+        const stackLen = def.nPush - def.nPop;
+        this.cur_stack += stackLen;
+        if (this.cur_stack > this.max_stack) {
+            this.max_stack = this.cur_stack;
+        }
+    }
+  }
+
+  emitOp(op: Opcode) {
+    this.updateStack(op);
+    this.byte_code.emitOp(op);
+  }
+
   label_slots: LabelSlot[] = [];
   top_break: BlockEnv | null = null;
 
@@ -186,7 +205,7 @@ export class JSFunctionDef {
   source: string = "";
   filename: number = 0; // JSAtom
 
-  add_var(name: number): number {
+  add_var(name: number, is_hoisted: boolean = false): number {
     const idx = this.vars.length;
     
     this.vars.push({
@@ -201,7 +220,7 @@ export class JSFunctionDef {
       func_pool_idx: -1
     });
     
-    if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
+    if ((this.is_module || (this.is_global_var && this.js_mode === 1)) && (this.scope_level === this.body_scope || is_hoisted)) {
       const closureIdx = this.add_closure_var(name, true, false, idx, JSVarKind.JS_VAR_NORMAL, false, false);
       return closureIdx;
     }
@@ -210,10 +229,10 @@ export class JSFunctionDef {
   }
 
   add_scope_var(name: number, var_kind: JSVarKind): number {
-    const idx = this.add_var(name);
+    const idx = this.add_var(name, false);
     if (idx >= 0) {
       let varIdx = idx;
-      if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
+      if ((this.is_module || (this.is_global_var && this.js_mode === 1)) && this.scope_level === this.body_scope) {
         varIdx = this.closure_var[idx].var_idx;
       }
       
@@ -229,166 +248,166 @@ export class JSFunctionDef {
   }
 
   define_var(name: number, var_def_type: JSVarDefEnum): number {
-      let idx = -1;
-      switch (var_def_type) {
-          case JSVarDefEnum.JS_VAR_DEF_WITH:
-              idx = this.add_scope_var(name, JSVarKind.JS_VAR_NORMAL);
-              break;
+    let idx = -1;
+    switch (var_def_type) {
+      case JSVarDefEnum.JS_VAR_DEF_WITH:
+        idx = this.add_scope_var(name, JSVarKind.JS_VAR_NORMAL);
+        break;
 
-          case JSVarDefEnum.JS_VAR_DEF_LET:
-          case JSVarDefEnum.JS_VAR_DEF_CONST:
-          case JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL:
-          case JSVarDefEnum.JS_VAR_DEF_NEW_FUNCTION_DECL:
-              idx = this.find_lexical_decl(name, this.scope_first, true);
-              if (idx >= 0) {
-                  if (idx < GLOBAL_VAR_OFFSET) {
-                      const vd = this.vars[idx];
-                      if (vd.scope_level === this.scope_level) {
-                          if (!(!(this.js_mode & JSMode.JS_MODE_STRICT) && 
-                                var_def_type === JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL &&
-                                vd.var_kind === JSVarKind.JS_VAR_FUNCTION_DECL)) {
-                              throw new Error("invalid redefinition of lexical identifier");
-                          }
-                      } else if (vd.var_kind === JSVarKind.JS_VAR_CATCH && (vd.scope_level + 2) === this.scope_level) {
-                          throw new Error("invalid redefinition of lexical identifier");
-                      }
-                  } else {
-                      if (this.scope_level === this.body_scope) {
-                          throw new Error("invalid redefinition of lexical identifier");
-                      }
-                  }
+      case JSVarDefEnum.JS_VAR_DEF_LET:
+      case JSVarDefEnum.JS_VAR_DEF_CONST:
+      case JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL:
+      case JSVarDefEnum.JS_VAR_DEF_NEW_FUNCTION_DECL:
+        idx = this.find_lexical_decl(name, this.scope_first, true);
+        if (idx >= 0) {
+          if (idx < GLOBAL_VAR_OFFSET) {
+            const vd = this.vars[idx];
+            if (vd.scope_level === this.scope_level) {
+              if (!(!(this.js_mode & JSMode.JS_MODE_STRICT) && 
+                var_def_type === JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL &&
+                vd.var_kind === JSVarKind.JS_VAR_FUNCTION_DECL)) {
+                throw new Error("invalid redefinition of lexical identifier");
               }
-              
-              if (var_def_type !== JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL &&
-                  var_def_type !== JSVarDefEnum.JS_VAR_DEF_NEW_FUNCTION_DECL &&
-                  this.scope_level === this.body_scope && this.find_arg(name) >= 0) {
-                  throw new Error("invalid redefinition of parameter name");
-              }
+            } else if (vd.var_kind === JSVarKind.JS_VAR_CATCH && (vd.scope_level + 2) === this.scope_level) {
+              throw new Error("invalid redefinition of lexical identifier");
+            }
+          } else {
+            if (this.scope_level === this.body_scope) {
+              throw new Error("invalid redefinition of lexical identifier");
+            }
+          }
+        }
+        
+        if (var_def_type !== JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL &&
+          var_def_type !== JSVarDefEnum.JS_VAR_DEF_NEW_FUNCTION_DECL &&
+          this.scope_level === this.body_scope && this.find_arg(name) >= 0) {
+          throw new Error("invalid redefinition of parameter name");
+        }
 
-              if (this.find_var_in_child_scope(name, this.scope_level) >= 0) {
-                  throw new Error("invalid redefinition of a variable");
-              }
+        if (this.find_var_in_child_scope(name, this.scope_level) >= 0) {
+          throw new Error("invalid redefinition of a variable");
+        }
 
-              if (this.is_global_var) {
-                  const hf = this.find_global_var(name);
-                  if (hf && this.is_child_scope(hf.scope_level, this.scope_level)) {
-                      throw new Error("invalid redefinition of global identifier");
-                  }
-              }
+        if (this.is_global_var) {
+          const hf = this.find_global_var(name);
+          if (hf && this.is_child_scope(hf.scope_level, this.scope_level)) {
+            throw new Error("invalid redefinition of global identifier");
+          }
+        }
 
-              if (this.is_eval && 
-                  (this.eval_type === 0 || this.eval_type === 2) && 
-                  this.scope_level === this.body_scope) {
-                  const hf = this.add_global_var(name);
-                  if (!hf) return -1;
-                  hf.is_lexical = true;
-                  hf.is_const = (var_def_type === JSVarDefEnum.JS_VAR_DEF_CONST);
-                  idx = GLOBAL_VAR_OFFSET;
-              } else {
-                  let var_kind = JSVarKind.JS_VAR_NORMAL;
-                  if (var_def_type === JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL) var_kind = JSVarKind.JS_VAR_FUNCTION_DECL;
-                  else if (var_def_type === JSVarDefEnum.JS_VAR_DEF_NEW_FUNCTION_DECL) var_kind = JSVarKind.JS_VAR_NEW_FUNCTION_DECL;
-                  
-                  idx = this.add_scope_var(name, var_kind);
-                  if (idx >= 0) {
-                      this.set_var_lexical(idx, true);
-                      this.set_var_const(idx, var_def_type === JSVarDefEnum.JS_VAR_DEF_CONST);
-                  }
-              }
-              break;
+        if (this.is_eval && 
+          (this.eval_type === 0 || this.eval_type === 2) && 
+          this.scope_level === this.body_scope) {
+          const hf = this.add_global_var(name);
+          if (!hf) return -1;
+          hf.is_lexical = true;
+          hf.is_const = (var_def_type === JSVarDefEnum.JS_VAR_DEF_CONST);
+          idx = GLOBAL_VAR_OFFSET;
+        } else {
+          let var_kind = JSVarKind.JS_VAR_NORMAL;
+          if (var_def_type === JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL) var_kind = JSVarKind.JS_VAR_FUNCTION_DECL;
+          else if (var_def_type === JSVarDefEnum.JS_VAR_DEF_NEW_FUNCTION_DECL) var_kind = JSVarKind.JS_VAR_NEW_FUNCTION_DECL;
+          
+          idx = this.add_scope_var(name, var_kind);
+          if (idx >= 0) {
+            this.set_var_lexical(idx, var_def_type !== JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL && var_def_type !== JSVarDefEnum.JS_VAR_DEF_NEW_FUNCTION_DECL);
+            this.set_var_const(idx, var_def_type === JSVarDefEnum.JS_VAR_DEF_CONST);
+          }
+        }
+        break;
 
-          case JSVarDefEnum.JS_VAR_DEF_CATCH:
-              idx = this.add_scope_var(name, JSVarKind.JS_VAR_CATCH);
-              break;
+      case JSVarDefEnum.JS_VAR_DEF_CATCH:
+        idx = this.add_scope_var(name, JSVarKind.JS_VAR_CATCH);
+        break;
 
-          case JSVarDefEnum.JS_VAR_DEF_VAR:
-              if (this.find_lexical_decl(name, this.scope_first, false) >= 0) {
-                  throw new Error("invalid redefinition of lexical identifier");
-              }
-              if (this.is_global_var) {
-                  let hf = this.find_global_var(name);
-                  if (hf && hf.is_lexical && hf.scope_level === this.scope_level && this.eval_type === 2) {
-                      throw new Error("invalid redefinition of lexical identifier");
-                  }
-                  hf = this.add_global_var(name);
-                  if (!hf) return -1;
-                  idx = GLOBAL_VAR_OFFSET;
-              } else {
-                  idx = this.find_var(name);
-                  if (idx >= 0) break;
-                  idx = this.add_var(name);
-                  if (idx >= 0) {
-                      if (name === JSAtom.JS_ATOM_arguments && this.has_arguments_binding) {
-                          this.arguments_var_idx = idx;
-                      }
-                      let varIdx = idx;
-                      if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
-                          varIdx = this.closure_var[idx].var_idx;
-                      }
-                      this.vars[varIdx].scope_next = this.scope_level;
-                  }
-              }
-              break;
-          default:
-              throw new Error("Unsupported define_var type");
-      }
-      return idx;
+      case JSVarDefEnum.JS_VAR_DEF_VAR:
+        if (this.find_lexical_decl(name, this.scope_first, false) >= 0) {
+          throw new Error("invalid redefinition of lexical identifier");
+        }
+        if (this.is_global_var && this.eval_type !== 1) {
+          let hf = this.find_global_var(name);
+          if (hf && hf.is_lexical && hf.scope_level === this.scope_level && this.eval_type === 2) {
+            throw new Error("invalid redefinition of lexical identifier");
+          }
+          hf = this.add_global_var(name);
+          if (!hf) return -1;
+          idx = GLOBAL_VAR_OFFSET;
+        } else {
+          idx = this.find_var(name);
+          if (idx >= 0) break;
+          idx = this.add_var(name, true);
+          if (idx >= 0) {
+            if (name === JSAtom.JS_ATOM_arguments && this.has_arguments_binding) {
+              this.arguments_var_idx = idx;
+            }
+            let varIdx = idx;
+            if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
+              varIdx = this.closure_var[idx].var_idx;
+            }
+            this.vars[varIdx].scope_next = this.scope_level;
+          }
+        }
+        break;
+      default:
+        throw new Error("Unsupported define_var type");
+    }
+    return idx;
   }
 
   find_lexical_decl(name: number, scope_idx: number, check_catch_var: boolean): number {
-      while (scope_idx >= 0) {
-          const vd = this.vars[scope_idx];
-          if (vd.var_name === name && (vd.is_lexical || (vd.var_kind === JSVarKind.JS_VAR_CATCH && check_catch_var))) {
-              return scope_idx;
-          }
-          scope_idx = vd.scope_next;
+    while (scope_idx >= 0) {
+      const vd = this.vars[scope_idx];
+      if (vd.var_name === name && (vd.is_lexical || (vd.var_kind === JSVarKind.JS_VAR_CATCH && check_catch_var))) {
+        return scope_idx;
       }
-      
-      if (this.is_eval && this.eval_type === 0) {
-          const hf = this.find_global_var(name);
-          if (hf && hf.is_lexical) return GLOBAL_VAR_OFFSET;
-      }
-      return -1;
+      scope_idx = vd.scope_next;
+    }
+    
+    if (this.is_eval && this.eval_type === 0) {
+      const hf = this.find_global_var(name);
+      if (hf && hf.is_lexical) return GLOBAL_VAR_OFFSET;
+    }
+    return -1;
   }
 
   find_var_in_child_scope(name: number, scope_level: number): number {
-      for (let i = 0; i < this.vars.length; i++) {
-          const vd = this.vars[i];
-          if (vd.var_name === name && vd.scope_level > scope_level) {
-              return i;
-          }
+    for (let i = 0; i < this.vars.length; i++) {
+      const vd = this.vars[i];
+      if (vd.var_name === name && vd.scope_level > scope_level) {
+        return i;
       }
-      return -1;
+    }
+    return -1;
   }
 
   find_arg(name: number): number {
-      for (let i = 0; i < this.args.length; i++) {
-          if (this.args[i].var_name === name) return i;
-      }
-      return -1;
+    for (let i = 0; i < this.args.length; i++) {
+      if (this.args[i].var_name === name) return i;
+    }
+    return -1;
   }
 
   find_global_var(name: number): JSGlobalVar | null {
-      for (let i = 0; i < this.global_vars.length; i++) {
-          if (this.global_vars[i].var_name === name) return this.global_vars[i];
-      }
-      return null;
+    for (let i = 0; i < this.global_vars.length; i++) {
+      if (this.global_vars[i].var_name === name) return this.global_vars[i];
+    }
+    return null;
   }
 
   add_global_var(name: number): JSGlobalVar {
-      let hf = this.find_global_var(name);
-      if (hf) return hf;
-      
-      hf = {
-          cpool_idx: -1,
-          force_init: false,
-          is_lexical: false,
-          is_const: false,
-          scope_level: this.scope_level,
-          var_name: name
-      };
-      this.global_vars.push(hf);
-      return hf;
+    let hf = this.find_global_var(name);
+    if (hf) return hf;
+    
+    hf = {
+      cpool_idx: -1,
+      force_init: false,
+      is_lexical: false,
+      is_const: false,
+      scope_level: this.scope_level,
+      var_name: name
+    };
+    this.global_vars.push(hf);
+    return hf;
   }
 
   is_child_scope(scope_level: number, parent_scope_level: number): boolean {
@@ -426,19 +445,19 @@ export class JSFunctionDef {
   }
 
   set_var_lexical(idx: number, is_lexical: boolean) {
-      if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
-          if (idx < this.closure_var.length) {
-              this.closure_var[idx].is_lexical = is_lexical;
-              const varIdx = this.closure_var[idx].var_idx;
-              if (varIdx < this.vars.length) {
-                  this.vars[varIdx].is_lexical = is_lexical;
-              }
-          }
-      } else {
-          if (idx < this.vars.length) {
-              this.vars[idx].is_lexical = is_lexical;
-          }
+    if (this.is_module || (this.is_global_var && this.js_mode === 1)) {
+      if (idx < this.closure_var.length) {
+        this.closure_var[idx].is_lexical = is_lexical;
+        const varIdx = this.closure_var[idx].var_idx;
+        if (varIdx < this.vars.length) {
+          this.vars[varIdx].is_lexical = is_lexical;
+        }
       }
+    } else {
+      if (idx < this.vars.length) {
+        this.vars[idx].is_lexical = is_lexical;
+      }
+    }
   }
 
   add_arg(name: number): number {
@@ -508,40 +527,40 @@ export class JSFunctionDef {
       return { idx, is_local: true, is_arg: true, is_const: false, is_lexical: false, var_kind: JSVarKind.JS_VAR_NORMAL };
     }
     
-      if (this.parent) {
-          const res = this.parent.get_var_ref(name);
-          if (res) {
-              let is_local_capture = false;
-              let is_arg_capture = false;
-              let var_idx = res.idx;
-              
-              if (res.is_local) { 
-                  if (res.is_arg) {
-                      is_local_capture = true;
-                      is_arg_capture = true;
-                  } else {
-                      is_local_capture = true;
-                      is_arg_capture = false;
-                  }
-              } else { 
-                  is_local_capture = false;
-                  is_arg_capture = false;
-              }
-              
-              const closureIdx = this.add_closure_var(name, is_local_capture, is_arg_capture, var_idx, res.var_kind, res.is_const, res.is_lexical);
-              
-              return { 
-                  idx: closureIdx, 
-                  is_local: false, 
-                  is_arg: false, 
-                  is_const: res.is_const, 
-                  is_lexical: res.is_lexical, 
-                  var_kind: res.var_kind 
-              };
+    if (this.parent) {
+      const res = this.parent.get_var_ref(name);
+      if (res) {
+        let is_local_capture = false;
+        let is_arg_capture = false;
+        let var_idx = res.idx;
+        
+        if (res.is_local) { 
+          if (res.is_arg) {
+            is_local_capture = true;
+            is_arg_capture = true;
+          } else {
+            is_local_capture = true;
+            is_arg_capture = false;
           }
+        } else { 
+          is_local_capture = false;
+          is_arg_capture = false;
+        }
+        
+        const closureIdx = this.add_closure_var(name, is_local_capture, is_arg_capture, var_idx, res.var_kind, res.is_const, res.is_lexical);
+        
+        return { 
+          idx: closureIdx, 
+          is_local: false, 
+          is_arg: false, 
+          is_const: res.is_const, 
+          is_lexical: res.is_lexical, 
+          var_kind: res.var_kind 
+        };
       }
-      
-      return null;
+    }
+    
+    return null;
   }
 
   push_scope(): number {
@@ -551,8 +570,8 @@ export class JSFunctionDef {
       first: this.scope_first
     });
     this.scope_level = scope_idx;
-    this.byte_code.emitOp(Opcode.OP_enter_scope);
-    this.byte_code.emitU16(scope_idx);
+    // this.byte_code.emitOp(Opcode.OP_enter_scope);
+    // this.byte_code.emitU16(scope_idx);
     return scope_idx;
   }
 
@@ -560,8 +579,8 @@ export class JSFunctionDef {
     const scope = this.scopes.pop();
     if (!scope) throw new Error("No scope to pop");
     
-    this.byte_code.emitOp(Opcode.OP_leave_scope);
-    this.byte_code.emitU16(this.scope_level);
+    // this.byte_code.emitOp(Opcode.OP_leave_scope);
+    // this.byte_code.emitU16(this.scope_level);
     
     this.scope_level = scope.parent;
     this.scope_first = this.get_first_lexical_var(this.scope_level);
@@ -592,8 +611,8 @@ export class JSFunctionDef {
     
     // Initialize root scope
     this.scopes.push({
-        parent: -1,
-        first: -1
+      parent: -1,
+      first: -1
     });
     this.scope_level = 0;
   }
@@ -621,15 +640,15 @@ export class JSFunctionDef {
     let reloc = slot.first_reloc;
     while (reloc) {
       if (reloc.size === 4) {
-          const offset = slot.pos - (reloc.addr + 4);
-          this.patchJump(reloc.addr, offset);
+        const offset = slot.pos - reloc.addr;
+        this.patchJump(reloc.addr, offset);
       } else if (reloc.size === 1) {
-          const offset = slot.pos - (reloc.addr + 1);
-          if (offset < -128 || offset > 127) {
-            console.log(`Jump8 overflow: offset=${offset}, pos=${slot.pos}, addr=${reloc.addr}`);
-            throw new Error("Jump8 overflow");
-          }
-          this.patchJump8(reloc.addr, offset);
+        const offset = slot.pos - reloc.addr;
+        if (offset < -128 || offset > 127) {
+          console.log(`Jump8 overflow: offset=${offset}, pos=${slot.pos}, addr=${reloc.addr}`);
+          throw new Error("Jump8 overflow");
+        }
+        this.patchJump8(reloc.addr, offset);
       }
       reloc = reloc.next;
     }
@@ -637,14 +656,14 @@ export class JSFunctionDef {
   }
 
   emitJump(op: Opcode, label: number): void {
-    this.byte_code.emitOp(op);
+    this.emitOp(op);
     const addr = this.byte_code.getOffset();
     this.byte_code.emitU32(0); // Placeholder
     
     const slot = this.label_slots[label];
     if (slot.pos !== -1) {
       // Label defined, patch immediately
-      const offset = slot.pos - (addr + 4);
+      const offset = slot.pos - addr;
       this.patchJump(addr, offset);
     } else {
       // Label undefined, add to reloc
@@ -659,13 +678,13 @@ export class JSFunctionDef {
   }
 
   emitJump8(op: Opcode, label: number): void {
-    this.byte_code.emitOp(op);
+    this.emitOp(op);
     const addr = this.byte_code.getOffset();
     this.byte_code.emitU8(0); // Placeholder
     
     const slot = this.label_slots[label];
     if (slot.pos !== -1) {
-      const offset = slot.pos - (addr + 1);
+      const offset = slot.pos - addr;
       if (offset < -128 || offset > 127) throw new Error("Jump8 overflow");
       this.patchJump8(addr, offset);
     } else {
@@ -695,64 +714,71 @@ export class JSFunctionDef {
     // Flush any pending pc2line info
     const current_pc = this.byte_code.getOffset();
     if (current_pc > this.pending_pc) {
-        if (this.pending_line !== this.pc2line_last_line || this.pending_column !== this.pc2line_last_column) {
-            this.write_pc2line(this.pending_pc, this.pending_line, this.pending_column);
-        }
+      if (this.pending_line !== this.pc2line_last_line || this.pending_column !== this.pc2line_last_column) {
+        this.write_pc2line(this.pending_pc, this.pending_line, this.pending_column);
+      }
     }
 
     if (this.has_arguments_binding) {
-        // Generate setup code
-        const setupBuf = new BytecodeWriter();
-        setupBuf.emitOp(Opcode.OP_special_object);
-        setupBuf.emitU8(0); // ARGUMENTS
-        
-        if (this.arguments_var_idx !== -1) {
-            const varIdx = this.arguments_var_idx;
-            if (varIdx === 0) setupBuf.emitOp(Opcode.OP_put_loc0);
-            else if (varIdx === 1) setupBuf.emitOp(Opcode.OP_put_loc1);
-            else if (varIdx === 2) setupBuf.emitOp(Opcode.OP_put_loc2);
-            else if (varIdx === 3) setupBuf.emitOp(Opcode.OP_put_loc3);
-            else {
-                setupBuf.emitOp(Opcode.OP_put_loc);
-                setupBuf.emitU16(varIdx);
-            }
+      // Generate setup code
+      const setupBuf = new BytecodeWriter();
+      setupBuf.emitOp(Opcode.OP_special_object);
+      setupBuf.emitU8(0); // ARGUMENTS
+      
+      if (this.arguments_var_idx !== -1) {
+        const varIdx = this.arguments_var_idx;
+        if (varIdx === 0) setupBuf.emitOp(Opcode.OP_put_loc0);
+        else if (varIdx === 1) setupBuf.emitOp(Opcode.OP_put_loc1);
+        else if (varIdx === 2) setupBuf.emitOp(Opcode.OP_put_loc2);
+        else if (varIdx === 3) setupBuf.emitOp(Opcode.OP_put_loc3);
+        else {
+          setupBuf.emitOp(Opcode.OP_put_loc);
+          setupBuf.emitU16(varIdx);
         }
-        
-        const setupBytes = setupBuf.buffer();
-        const len = setupBytes.length;
-        
-        this.byte_code.prepend(setupBytes);
-        
-        // Shift labels
-        for (const slot of this.label_slots) {
-            if (slot.pos !== -1) {
-                slot.pos += len;
-            }
+      }
+      
+      const setupBytes = setupBuf.buffer();
+      const len = setupBytes.length;
+      
+      this.byte_code.prepend(setupBytes);
+      
+      // Shift labels
+      for (const slot of this.label_slots) {
+        if (slot.pos !== -1) {
+          slot.pos += len;
         }
-        
-        // Shift jump slots
-        for (const slot of this.jump_slots) {
-            slot.pos += len;
-        }
-        
-        // Shift pc2line
-        const pc2lineBuf = new DynBuf();
-        pc2lineBuf.putByte(0);
-        this.putULEB128(pc2lineBuf, len);
-        this.putSLEB128(pc2lineBuf, 0);
-        this.putSLEB128(pc2lineBuf, 0); // diff_col
-        
-        this.pc2line.prepend(pc2lineBuf.buffer());
+      }
+      
+      // Shift jump slots
+      for (const slot of this.jump_slots) {
+        slot.pos += len;
+      }
+      
+      // Shift pc2line
+      const pc2lineBuf = new DynBuf();
+      pc2lineBuf.putByte(0);
+      this.putULEB128(pc2lineBuf, len);
+      this.putSLEB128(pc2lineBuf, 0);
+      this.putSLEB128(pc2lineBuf, 0); // diff_col
+      
+      this.pc2line.prepend(pc2lineBuf.buffer());
     }
+
+    // Prepend initial line and column to pc2line
+    // console.log('finalizeBody called, prepending line/col', this.line_start, this.column_start);
+    const initBuf = new DynBuf();
+    this.putSLEB128(initBuf, this.line_start);
+    this.putSLEB128(initBuf, this.column_start);
+    this.pc2line.prepend(initBuf.buffer());
   }
 
-  pushBreakEntry(label_name: number, label_break: number, label_cont: number, label_finally: number, scope_level: number): void {
+  pushBreakEntry(label_name: number, label_break: number, label_cont: number, label_finally: number, scope_level: number, drop_count: number = 0): void {
     const entry: BlockEnv = {
       prev: this.top_break,
       label_name,
       label_break,
       label_cont,
-      drop_count: 0,
+      drop_count,
       label_finally,
       scope_level,
       has_iterator: false,
@@ -773,13 +799,13 @@ export class JSFunctionDef {
     // If PC has advanced since we last recorded a pending line,
     // we should commit the pending line info for the *previous* block.
     if (current_pc > this.pending_pc) {
-        if (this.pending_line !== this.pc2line_last_line || this.pending_column !== this.pc2line_last_column) {
-            this.write_pc2line(this.pending_pc, this.pending_line, this.pending_column);
-            this.pc2line_last_pc = this.pending_pc;
-            this.pc2line_last_line = this.pending_line;
-            this.pc2line_last_column = this.pending_column;
-        }
-        this.pending_pc = current_pc;
+      if (this.pending_line !== this.pc2line_last_line || this.pending_column !== this.pc2line_last_column) {
+        this.write_pc2line(this.pending_pc, this.pending_line, this.pending_column);
+        this.pc2line_last_pc = this.pending_pc;
+        this.pc2line_last_line = this.pending_line;
+        this.pc2line_last_column = this.pending_column;
+      }
+      this.pending_pc = current_pc;
     }
     
     this.pending_line = line_num;
@@ -797,12 +823,12 @@ export class JSFunctionDef {
     const PC2LINE_OP_FIRST = 1;
 
     if (line_diff >= PC2LINE_BASE && line_diff < PC2LINE_BASE + PC2LINE_RANGE) {
-        const op = PC2LINE_OP_FIRST + (pc_diff * PC2LINE_RANGE) + (line_diff - PC2LINE_BASE);
-        if (op <= 255) {
-            this.pc2line.putByte(op);
-            this.putSLEB128(this.pc2line, col_diff);
-            return;
-        }
+      const op = PC2LINE_OP_FIRST + (pc_diff * PC2LINE_RANGE) + (line_diff - PC2LINE_BASE);
+      if (op <= 255) {
+        this.pc2line.putByte(op);
+        this.putSLEB128(this.pc2line, col_diff);
+        return;
+      }
     }
     
     this.pc2line.putByte(0);

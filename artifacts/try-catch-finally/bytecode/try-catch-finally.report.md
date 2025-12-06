@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/try-catch-finally.ts
-**生成时间**: 2025-12-05T12:54:24.382Z
+**生成时间**: 2025-12-06T02:09:56.547Z
 
 ## 大小对比
 
-- TypeScript编译器: 264 字节
+- TypeScript编译器: 210 字节
 - WASM编译器: 206 字节
-- 差异: 58 字节 (28.16%)
+- 差异: 4 字节 (1.94%)
 
 ## 结构分析
 
@@ -20,10 +20,10 @@
   "atoms": [
     {
       "index": 0,
-      "rawLength": 232,
-      "actualLength": 116,
+      "rawLength": 96,
+      "actualLength": 48,
       "isWideChar": 0,
-      "string": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/try-catch-finally.js",
+      "string": "__tests__/compiler/fixtures/try-catch-finally.js",
       "offset": 2
     },
     {
@@ -32,7 +32,7 @@
       "actualLength": 1,
       "isWideChar": 0,
       "string": "e",
-      "offset": 120
+      "offset": 51
     },
     {
       "index": 2,
@@ -40,7 +40,7 @@
       "actualLength": 5,
       "isWideChar": 0,
       "string": "error",
-      "offset": 122
+      "offset": 53
     },
     {
       "index": 3,
@@ -48,7 +48,7 @@
       "actualLength": 7,
       "isWideChar": 0,
       "string": "console",
-      "offset": 128
+      "offset": 59
     },
     {
       "index": 4,
@@ -56,7 +56,7 @@
       "actualLength": 3,
       "isWideChar": 0,
       "string": "log",
-      "offset": 136
+      "offset": 67
     },
     {
       "index": 5,
@@ -64,13 +64,13 @@
       "actualLength": 6,
       "isWideChar": 0,
       "string": "caught",
-      "offset": 140
+      "offset": 71
     }
   ],
   "functionHeader": {
-    "offset": 147,
+    "offset": 78,
     "tag": "0xd",
-    "remaining": 117
+    "remaining": 132
   }
 }
 ```
@@ -141,51 +141,48 @@
 
 ## 字节级差异
 
-共发现 247 个字节差异:
+共发现 92 个字节差异:
 
-- 偏移量 0x2: TS=0xe8 vs WASM=0x60
-- 偏移量 0x3: TS=0x01 vs WASM=0x5f
-- 偏移量 0x4: TS=0x2f vs WASM=0x5f
-- 偏移量 0x5: TS=0x55 vs WASM=0x74
-- 偏移量 0x6: TS=0x73 vs WASM=0x65
-- 偏移量 0x7: TS=0x65 vs WASM=0x73
-- 偏移量 0x8: TS=0x72 vs WASM=0x74
-- 偏移量 0xa: TS=0x2f vs WASM=0x5f
-- 偏移量 0xb: TS=0x61 vs WASM=0x5f
-- 偏移量 0xc: TS=0x6e vs WASM=0x2f
-- 偏移量 0xd: TS=0x69 vs WASM=0x63
-- 偏移量 0xe: TS=0x77 vs WASM=0x6f
-- 偏移量 0xf: TS=0x65 vs WASM=0x6d
-- 偏移量 0x10: TS=0x69 vs WASM=0x70
-- 偏移量 0x11: TS=0x2f vs WASM=0x69
-- 偏移量 0x12: TS=0x44 vs WASM=0x6c
-- 偏移量 0x14: TS=0x73 vs WASM=0x72
-- 偏移量 0x15: TS=0x6b vs WASM=0x2f
-- 偏移量 0x16: TS=0x74 vs WASM=0x66
-- 偏移量 0x17: TS=0x6f vs WASM=0x69
-- ... (显示前20个差异，总共247个)
+- 偏移量 0x5d: TS=0x00 vs WASM=0x01
+- 偏移量 0x5f: TS=0x03 vs WASM=0x05
+- 偏移量 0x62: TS=0x5f vs WASM=0x4f
+- 偏移量 0x63: TS=0x00 vs WASM=0x01
+- 偏移量 0x64: TS=0x08 vs WASM=0xca
+- 偏移量 0x65: TS=0xec vs WASM=0x03
+- 偏移量 0x66: TS=0x02 vs WASM=0x03
+- 偏移量 0x67: TS=0x29 vs WASM=0x00
+- 偏移量 0x68: TS=0x6f vs WASM=0x03
+- 偏移量 0x69: TS=0x17 vs WASM=0x08
+- 偏移量 0x6a: TS=0x00 vs WASM=0xec
+- 偏移量 0x6b: TS=0x00 vs WASM=0x02
+- 偏移量 0x6c: TS=0x00 vs WASM=0x29
+- 偏移量 0x6d: TS=0x04 vs WASM=0x6f
+- 偏移量 0x6e: TS=0xe6 vs WASM=0x0a
+- 偏移量 0x72: TS=0x30 vs WASM=0x04
+- 偏移量 0x73: TS=0x0e vs WASM=0xe6
+- 偏移量 0x74: TS=0x06 vs WASM=0x00
+- 偏移量 0x75: TS=0x70 vs WASM=0x00
+- 偏移量 0x76: TS=0x37 vs WASM=0x00
+- ... (显示前20个差异，总共92个)
 
 ## 十六进制转储对比
 
 ### TypeScript
 ```
-00000000: 05 06 e8 01 2f 55 73 65 72 73 2f 61 6e 69 77 65 |..../Users/aniwe|
-00000010: 69 2f 44 65 73 6b 74 6f 70 2f 77 6f 72 6b 73 70 |i/Desktop/worksp|
-00000020: 61 63 65 73 2f 71 75 69 63 6b 6a 73 2d 74 79 70 |aces/quickjs-typ|
-00000030: 65 73 63 72 69 70 74 2d 63 6f 6d 70 69 6c 65 72 |escript-compiler|
-00000040: 5f 73 65 63 6f 6e 64 2f 5f 5f 74 65 73 74 73 5f |_second/__tests_|
-00000050: 5f 2f 63 6f 6d 70 69 6c 65 72 2f 66 69 78 74 75 |_/compiler/fixtu|
-00000060: 72 65 73 2f 74 72 79 2d 63 61 74 63 68 2d 66 69 |res/try-catch-fi|
-00000070: 6e 61 6c 6c 79 2e 6a 73 02 65 0a 65 72 72 6f 72 |nally.js.e.error|
-00000080: 0e 63 6f 6e 73 6f 6c 65 06 6c 6f 67 0c 63 61 75 |.console.log.cau|
-00000090: 67 68 74 0d c8 03 00 00 00 00 00 0c 20 06 01 a4 |ght......... ...|
-000000a0: 01 00 01 00 03 01 00 42 01 ca 03 00 00 00 ca 03 |.......B........|
-000000b0: 00 01 08 6c 3a 00 00 00 6f 0c 00 00 00 04 e6 00 |...l:...o.......|
-000000c0: 00 00 30 0e 6e 15 00 00 00 e3 39 e7 00 00 00 43 |..0.n.....9....C|
-000000d0: e8 00 00 00 04 e9 00 00 00 df 24 02 00 0e 39 e7 |..........$...9.|
-000000e0: 00 00 00 43 e8 00 00 00 04 1a 00 00 00 24 01 00 |...C.........$..|
-000000f0: 0e 29 06 2f c8 03 01 0f 00 0b 01 00 0d 01 00 0a |.)./............|
-00000100: 01 00 0a 01 00 0a 01 00                         |........|
+00000000: 05 06 60 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..`__tests__/com|
+00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 74 |piler/fixtures/t|
+00000020: 72 79 2d 63 61 74 63 68 2d 66 69 6e 61 6c 6c 79 |ry-catch-finally|
+00000030: 2e 6a 73 02 65 0a 65 72 72 6f 72 0e 63 6f 6e 73 |.js.e.error.cons|
+00000040: 6f 6c 65 06 6c 6f 67 0c 63 61 75 67 68 74 0d c8 |ole.log.caught..|
+00000050: 03 00 00 00 00 00 0c 20 06 01 a4 01 00 00 00 03 |....... ........|
+00000060: 00 00 5f 00 08 ec 02 29 6f 17 00 00 00 04 e6 00 |.._....)o.......|
+00000070: 00 00 30 0e 06 70 37 00 00 00 0e 6e 45 00 00 00 |..0..p7....nE...|
+00000080: cb 6f 25 00 00 00 39 e7 00 00 00 43 e8 00 00 00 |.o%...9....C....|
+00000090: 04 e9 00 00 00 c7 24 02 00 0e 0e 06 70 10 00 00 |......$.....p...|
+000000a0: 00 0e 6e 1e 00 00 00 70 05 00 00 00 30 39 e7 00 |..n....p....09..|
+000000b0: 00 00 43 e8 00 00 00 04 1a 00 00 00 24 01 00 0e |..C.........$...|
+000000c0: 71 06 2f c8 03 00 0a 30 08 81 7a 34 0c 1b 0a 7c |q./....0..z4...||
+000000d0: 6a 00                                           |j.|
 ```
 
 ### WASM

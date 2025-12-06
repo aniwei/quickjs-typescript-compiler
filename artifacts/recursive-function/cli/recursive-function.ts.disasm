@@ -11,9 +11,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=1, closures=1
-    locals (1):
-      [0] factorial kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=1
     closure_vars (1):
       [0] factorial -> var#0 [local, kind#0]
     constant_pool (1):
@@ -22,25 +20,25 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/recursive-function.ts
       pc2line_bytes: 6
-      source_length: undefined
+      source_length: 0
 
     opcodes (14):
       0000: push_this
-      0001: if_false +23 -> 29
-      0006: fclosure8 const[0] function factorial
-      0008: put_var_ref0
-      0009: get_var atom#230
-      0014: get_field2 atom#231
-      0019: get_var_ref0
-      0020: push_5
-      0021: call 1
-      0024: call_method 1
-      0027: drop
-      0028: return_undef
-      0029: undefined
-      0030: return_async
+      0001: if_false8 +5 -> 8
+      0003: fclosure8 const[0] function factorial
+      0005: put_var_ref0
+      0006: return_undef
+      0007: get_var atom#230
+      0012: get_field2 atom#231
+      0017: get_var_ref0
+      0018: push_5
+      0019: call1
+      0020: call_method 1
+      0023: drop
+      0024: undefined
+      0025: return_async
 
-    function[1] factorial (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[1] factorial (const[0]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=1, defined=1, vars=0, closures=0
@@ -49,23 +47,23 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/recursive-function.ts
-        pc2line_bytes: 6
-        source_length: undefined
+        pc2line_bytes: 14
+        source_length: 0
 
       opcodes (16):
         0000: get_arg0
         0001: push_1
         0002: lte
-        0003: if_false +7 -> 15
+        0003: if_false +11 -> 19
         0008: push_1
         0009: return
-        0010: goto +0 -> 15
+        0010: goto +4 -> 19
         0015: get_arg0
         0016: get_var atom#229
         0021: get_arg0
         0022: push_1
         0023: sub
-        0024: call 1
-        0027: mul
-        0028: return
-        0029: return_undef
+        0024: call1
+        0025: mul
+        0026: return
+        0027: return_undef

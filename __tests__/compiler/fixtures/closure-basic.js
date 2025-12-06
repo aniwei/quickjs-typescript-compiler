@@ -1,5 +1,5 @@
-function makeAdder(x: number) {
-  return function(y: number) {
+function makeAdder(x) {
+  return function(y) {
     return x + y;
   };
 }

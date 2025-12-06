@@ -11,41 +11,39 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=1, closures=1
-    locals (1):
-      [0] i kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=1
     closure_vars (1):
-      [0] i -> var#0 [local, kind#0]
+      [0] i -> var#0 [local, lexical, kind#0]
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/while-loop.ts
-      pc2line_bytes: 15
-      source_length: undefined
+      pc2line_bytes: 16
+      source_length: 0
 
     opcodes (26):
       0000: push_this
-      0001: if_false +54 -> 60
-      0006: push_0
-      0007: put_var_ref0
-      0008: get_var_ref0
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: push_0
+      0005: put_var_ref0
+      0006: get_var_ref_check var_ref[0] i
       0009: push_3
       0010: lt
-      0011: if_false +24 -> 40
+      0011: if_false +32 -> 48
       0016: get_var atom#230
       0021: get_field2 atom#231
-      0026: get_var_ref0
-      0027: call_method 1
-      0030: drop
-      0031: get_var_ref0
-      0032: push_1
-      0033: add
-      0034: put_loc0
-      0035: goto -32 -> 8
-      0040: get_var atom#230
-      0045: get_field2 atom#231
-      0050: push_atom_value atom#232
-      0055: call_method 1
-      0058: drop
-      0059: return_undef
-      0060: undefined
-      0061: return_async
+      0026: get_var_ref_check var_ref[0] i
+      0029: call_method 1
+      0032: drop
+      0033: get_var_ref_check var_ref[0] i
+      0036: push_1
+      0037: add
+      0038: put_loc0
+      0039: goto -34 -> 10
+      0044: get_var atom#230
+      0049: get_field2 atom#231
+      0054: push_atom_value atom#232
+      0059: call_method 1
+      0062: drop
+      0063: undefined
+      0064: return_async

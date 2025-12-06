@@ -1,8 +1,8 @@
 bytecode_version: 5
 atoms (8):
   [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
-  [1] @229 = "ns_x"
-  [2] @230 = "ns_outer"
+  [1] @229 = "ns_outer"
+  [2] @230 = "ns_x"
   [3] @231 = "ns_y"
   [4] @232 = "ns_inner"
   [5] @233 = "ns_z"
@@ -14,87 +14,81 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=2, closures=2
-    locals (2):
-      [0] ns_x kind=kind#0 level=0 next=0
-      [1] ns_outer kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=2
     closure_vars (2):
-      [0] ns_x -> var#0 [local, kind#0]
-      [1] ns_outer -> var#1 [local, kind#0]
+      [0] ns_outer -> var#0 [local, kind#0]
+      [1] ns_x -> var#1 [local, kind#0]
     constant_pool (1):
       [0] function ns_outer
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/nested-scopes.ts
-      pc2line_bytes: 3
-      source_length: undefined
+      pc2line_bytes: 4
+      source_length: 0
 
     opcodes (12):
       0000: push_this
-      0001: if_false +15 -> 21
-      0006: push_i32 10
-      0011: put_var_ref0
-      0012: fclosure8 const[0] function ns_outer
-      0014: put_var_ref1
-      0015: get_var_ref1
-      0016: call 0
-      0019: drop
-      0020: return_undef
-      0021: undefined
-      0022: return_async
+      0001: if_false8 +5 -> 8
+      0003: fclosure8 const[0] function ns_outer
+      0005: put_var_ref0
+      0006: return_undef
+      0007: push_i32 10
+      0012: put_var_ref1
+      0013: get_var_ref0
+      0014: call0
+      0015: drop
+      0016: undefined
+      0017: return_async
 
-    function[1] ns_outer (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[1] ns_outer (const[0]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
-      args: total=0, defined=0, vars=2, closures=1
+      args: total=0, defined=0, vars=2, closures=0
       locals (2):
-        [0] ns_y kind=kind#0 level=0 next=0
-        [1] ns_inner kind=kind#0 level=0 next=0
-      closure_vars (1):
-        [0] ns_x -> var#0 [kind#0]
+        [0] ns_y kind=kind#0 level=0 next=1
+        [1] ns_inner kind=kind#1 level=1 next=0
       constant_pool (1):
         [0] function ns_inner
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/nested-scopes.ts
-        pc2line_bytes: 9
-        source_length: undefined
+        pc2line_bytes: 8
+        source_length: 0
 
       opcodes (8):
         0000: push_i32 20
-        0005: put_loc local[0] ns_y
-        0008: fclosure8 const[0] function ns_inner
-        0010: put_loc local[1] ns_inner
-        0013: get_loc1
-        0014: call 0
-        0017: drop
-        0018: return_undef
+        0005: put_loc0
+        0006: fclosure8 const[0] function ns_inner
+        0008: put_loc local[1] ns_inner
+        0011: get_loc1
+        0012: call0
+        0013: drop
+        0014: return_undef
 
-      function[2] ns_inner (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      function[2] ns_inner (const[0]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
         mode: sloppy
         stack_size: 3
-        args: total=0, defined=0, vars=1, closures=2
+        args: total=0, defined=0, vars=1, closures=1
         locals (1):
-          [0] ns_z kind=kind#0 level=0 next=0
-        closure_vars (2):
-          [0] ns_x -> var#0 [kind#0]
-          [1] ns_y -> var#0 [local, kind#0]
+          [0] ns_z kind=kind#0 level=0 next=1
+        closure_vars (1):
+          [0] ns_y -> var#0 [local, kind#0]
 
         debug:
           filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/nested-scopes.ts
-          pc2line_bytes: 9
-          source_length: undefined
+          pc2line_bytes: 10
+          source_length: 0
 
         opcodes (12):
           0000: push_i32 30
-          0005: put_loc local[0] ns_z
-          0008: get_var atom#234
-          0013: get_field2 atom#235
-          0018: get_var_ref0
-          0019: get_var_ref1
-          0020: add
-          0021: get_loc0
+          0005: put_loc0
+          0006: get_var atom#234
+          0011: get_field2 atom#235
+          0016: get_var atom#230
+          0021: get_var_ref0
           0022: add
-          0023: call_method 1
-          0026: drop
-          0027: return_undef
+          0023: get_loc0
+          0024: add
+          0025: call_method 1
+          0028: drop
+          0029: return_undef

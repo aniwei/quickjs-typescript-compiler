@@ -15,14 +15,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=6, closures=6
-    locals (6):
-      [0] u_a kind=kind#0 level=0 next=0
-      [1] u_b kind=kind#0 level=0 next=0
-      [2] u_c kind=kind#0 level=0 next=0
-      [3] u_d kind=kind#0 level=0 next=0
-      [4] u_e kind=kind#0 level=0 next=0
-      [5] u_f kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=6
     closure_vars (6):
       [0] u_a -> var#0 [local, kind#0]
       [1] u_b -> var#1 [local, kind#0]
@@ -33,37 +26,37 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/unary-ops.ts
-      pc2line_bytes: 18
-      source_length: undefined
+      pc2line_bytes: 22
+      source_length: 0
 
     opcodes (30):
       0000: push_this
-      0001: if_false +48 -> 54
-      0006: push_i32 10
-      0011: put_var_ref0
-      0012: get_var_ref0
-      0013: neg
-      0014: put_var_ref1
-      0015: get_var_ref0
-      0016: lnot
-      0017: put_var_ref2
-      0018: get_var_ref0
-      0019: not
-      0020: put_var_ref3
-      0021: undefined
-      0022: put_var_ref var_ref[4] u_e
-      0025: get_var_ref0
-      0026: typeof
-      0027: put_var_ref var_ref[5] u_f
-      0030: get_var atom#235
-      0035: get_field2 atom#236
-      0040: get_var_ref1
-      0041: get_var_ref2
-      0042: get_var_ref3
-      0043: get_var_ref var_ref[4] u_e
-      0046: get_var_ref var_ref[5] u_f
-      0049: call_method 5
-      0052: drop
-      0053: return_undef
-      0054: undefined
-      0055: return_async
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: push_i32 10
+      0009: put_var_ref0
+      0010: get_var_ref0
+      0011: neg
+      0012: put_var_ref1
+      0013: get_var_ref0
+      0014: lnot
+      0015: put_var_ref2
+      0016: get_var_ref0
+      0017: not
+      0018: put_var_ref3
+      0019: undefined
+      0020: put_var_ref var_ref[4] u_e
+      0023: get_var_ref0
+      0024: typeof
+      0025: put_var_ref var_ref[5] u_f
+      0028: get_var atom#235
+      0033: get_field2 atom#236
+      0038: get_var_ref1
+      0039: get_var_ref2
+      0040: get_var_ref3
+      0041: get_var_ref var_ref[4] u_e
+      0044: get_var_ref var_ref[5] u_f
+      0047: call_method 5
+      0050: drop
+      0051: undefined
+      0052: return_async

@@ -26,6 +26,7 @@ export class BytecodeSerializer {
   }
 
   serialize(fd: JSFunctionDef): Uint8Array {
+    console.log('BytecodeSerializer.serialize called');
     // 1. Scan to collect atoms and rewrite them (recursively)
     this.scanAndRewriteRecursive(fd);
     
@@ -312,7 +313,7 @@ export class BytecodeSerializer {
     }
     
     this.putLEB128(buf, fd.args.length); // defined_arg_count (assume same as arg_count for now)
-    this.putLEB128(buf, 3); // stack_size (TODO: calculate)
+    this.putLEB128(buf, fd.max_stack); // stack_size
     this.putLEB128(buf, fd.closure_var.length); // closure_var_count
     this.putLEB128(buf, fd.cpool.length);
     this.putLEB128(buf, fd.byte_code.getOffset());
@@ -360,7 +361,6 @@ export class BytecodeSerializer {
     // Debug info (if has_debug)
     if (fd.has_debug) {
        this.putAtom(buf, fd.filename);
-       this.putLEB128(buf, fd.line_start);
        this.putLEB128(buf, fd.pc2line.size);
        buf.put(fd.pc2line.buffer());
        this.putAtom(buf, 0); // source (JS_ATOM_NULL)
@@ -433,6 +433,10 @@ export class BytecodeSerializer {
       for (let i = 0; i < len; i++) {
         buf.putByte(val.charCodeAt(i));
       }
+    } else {
+        console.error('Serializer: Unknown value type in cpool:', val);
+        // Write NULL to avoid corruption, but this is an error
+        buf.putByte(BytecodeTag.TC_TAG_NULL);
     }
   }
 

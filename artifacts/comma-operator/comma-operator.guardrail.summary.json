@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/comma-operator/cli/comma-operator.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/comma-operator/cli/comma-operator.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/comma-operator/cli/comma-operator.pc2line.txt",
-    "bytecodeSize": 252,
+    "bytecodeSize": 235,
     "pc2lineLength": 0,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 252,
+    "tsSize": 166,
     "wasmSize": 169,
-    "sizeDiff": 83,
-    "sizeDiffPercent": 49.112426035502956
+    "sizeDiff": -3,
+    "sizeDiffPercent": -1.7751479289940828
   },
   "trace": {
     "differenceCount": 0,

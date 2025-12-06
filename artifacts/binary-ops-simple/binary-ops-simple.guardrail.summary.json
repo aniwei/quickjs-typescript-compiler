@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/binary-ops-simple/cli/binary-ops-simple.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/binary-ops-simple/cli/binary-ops-simple.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/binary-ops-simple/cli/binary-ops-simple.pc2line.txt",
-    "bytecodeSize": 566,
+    "bytecodeSize": 622,
     "pc2lineLength": 0,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 566,
+    "tsSize": 553,
     "wasmSize": 597,
-    "sizeDiff": -31,
-    "sizeDiffPercent": -5.192629815745393
+    "sizeDiff": -44,
+    "sizeDiffPercent": -7.370184254606365
   },
   "trace": {
     "differenceCount": 0,

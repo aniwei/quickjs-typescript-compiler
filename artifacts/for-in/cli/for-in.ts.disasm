@@ -13,41 +13,37 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=2, closures=2
-    locals (2):
-      [0] obj kind=kind#0 level=0 next=0
-      [1] k kind=kind#0 level=0 next=0
-    closure_vars (2):
-      [0] obj -> var#0 [local, kind#0]
-      [1] k -> var#1 [local, kind#0]
+    args: total=0, defined=0, vars=0, closures=1
+    closure_vars (1):
+      [0] obj -> var#0 [local, const, lexical, kind#0]
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/for-in.ts
-      pc2line_bytes: 6
-      source_length: undefined
+      pc2line_bytes: 10
+      source_length: 0
 
     opcodes (24):
       0000: push_this
-      0001: if_false +46 -> 52
-      0006: object
-      0007: push_1
-      0008: define_field atom#231
-      0013: push_2
-      0014: define_field atom#232
-      0019: put_var_ref0
-      0020: get_var_ref0
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: object
+      0005: push_1
+      0006: define_field atom#231
+      0011: push_2
+      0012: define_field atom#232
+      0017: put_var_ref0
+      0018: get_var_ref_check var_ref[0] obj
       0021: for_in_start
-      0022: goto +16 -> 43
-      0027: put_var_ref1
+      0022: goto +20 -> 47
+      0027: put_loc1
       0028: get_var atom#233
       0033: get_field2 atom#234
-      0038: get_var_ref1
+      0038: get_loc1
       0039: call_method 1
       0042: drop
       0043: for_in_next
-      0044: if_false -22 -> 27
+      0044: if_false -18 -> 31
       0049: drop
       0050: drop
-      0051: return_undef
-      0052: undefined
-      0053: return_async
+      0051: undefined
+      0052: return_async
