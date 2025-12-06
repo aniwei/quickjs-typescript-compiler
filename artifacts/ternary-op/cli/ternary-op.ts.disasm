@@ -13,37 +13,34 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=2, closures=2
-    locals (2):
-      [0] t_a kind=kind#0 level=0 next=0
-      [1] t_b kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=2
     closure_vars (2):
       [0] t_a -> var#0 [local, kind#0]
       [1] t_b -> var#1 [local, kind#0]
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/ternary-op.ts
-      pc2line_bytes: 6
-      source_length: undefined
+      pc2line_bytes: 12
+      source_length: 0
 
     opcodes (20):
       0000: push_this
-      0001: if_false +46 -> 52
-      0006: push_i32 10
-      0011: put_var_ref0
-      0012: get_var_ref0
-      0013: push_5
-      0014: gt
-      0015: if_false +10 -> 30
-      0020: push_atom_value atom#231
-      0025: goto +5 -> 35
-      0030: push_atom_value atom#232
-      0035: put_var_ref1
-      0036: get_var atom#233
-      0041: get_field2 atom#234
-      0046: get_var_ref1
-      0047: call_method 1
-      0050: drop
-      0051: return_undef
-      0052: undefined
-      0053: return_async
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: push_i32 10
+      0009: put_var_ref0
+      0010: get_var_ref0
+      0011: push_5
+      0012: gt
+      0013: if_false +14 -> 32
+      0018: push_atom_value atom#231
+      0023: goto +9 -> 37
+      0028: push_atom_value atom#232
+      0033: put_var_ref1
+      0034: get_var atom#233
+      0039: get_field2 atom#234
+      0044: get_var_ref1
+      0045: call_method 1
+      0048: drop
+      0049: undefined
+      0050: return_async

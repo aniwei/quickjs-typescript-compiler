@@ -14,9 +14,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=1, closures=1
-    locals (1):
-      [0] iife_result kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=1
     closure_vars (1):
       [0] iife_result -> var#0 [local, kind#0]
     constant_pool (2):
@@ -25,51 +23,51 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/iife.ts
-      pc2line_bytes: 12
-      source_length: undefined
+      pc2line_bytes: 10
+      source_length: 0
 
     opcodes (17):
       0000: push_this
-      0001: if_false +33 -> 39
-      0006: fclosure8 const[0] function <builtin:0>
-      0008: call 0
-      0011: drop
-      0012: fclosure8 const[1] function <builtin:0>
-      0014: push_atom_value atom#230
-      0019: call 1
-      0022: put_var_ref0
-      0023: get_var atom#231
-      0028: get_field2 atom#232
-      0033: get_var_ref0
-      0034: call_method 1
-      0037: drop
-      0038: return_undef
-      0039: undefined
-      0040: return_async
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: fclosure8 const[0] function <builtin:0>
+      0006: call0
+      0007: drop
+      0008: fclosure8 const[1] function <builtin:0>
+      0010: push_atom_value atom#230
+      0015: call1
+      0016: put_var_ref0
+      0017: get_var atom#231
+      0022: get_field2 atom#232
+      0027: get_var_ref0
+      0028: call_method 1
+      0031: drop
+      0032: undefined
+      0033: return_async
 
-    function[1] <builtin:0> (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[1] <builtin:0> (const[0]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=0, defined=0, vars=1, closures=0
       locals (1):
-        [0] iife_var kind=kind#0 level=0 next=0
+        [0] iife_var kind=kind#0 level=0 next=1
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/iife.ts
         pc2line_bytes: 6
-        source_length: undefined
+        source_length: 0
 
       opcodes (8):
         0000: push_atom_value atom#234
-        0005: put_loc local[0] iife_var
-        0008: get_var atom#231
-        0013: get_field2 atom#232
-        0018: get_loc0
-        0019: call_method 1
-        0022: drop
-        0023: return_undef
+        0005: put_loc0
+        0006: get_var atom#231
+        0011: get_field2 atom#232
+        0016: get_loc0
+        0017: call_method 1
+        0020: drop
+        0021: return_undef
 
-    function[2] <builtin:0> (const[1]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[2] <builtin:0> (const[1]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=1, defined=1, vars=0, closures=0
@@ -78,8 +76,8 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/iife.ts
-        pc2line_bytes: 6
-        source_length: undefined
+        pc2line_bytes: 4
+        source_length: 0
 
       opcodes (5):
         0000: push_atom_value atom#235

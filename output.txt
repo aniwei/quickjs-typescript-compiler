@@ -1,54 +1,28 @@
-DEBUG: push_atom_value code = 4
-DEBUG: push_const code = 2
-🔍 Starting bytecode comparison...
-📦 Compiling with TypeScript compiler...
-QuickJS WASM firstAtomId: 228
-🌐 Compiling with QuickJS WASM...
-__tests__/compiler/fixtures/console-log.js:1:1: function: <eval>
+
+--- WASM ---
+__tests__/compiler/fixtures/closure-basic.js:1:0: function: <eval>
   mode: strict
-  stack_size: 3
-  opcodes:
-        push_this
-        if_false8 4
-        return_undef
-    4:  get_var console
-        get_field2 log
-        push_1 1
-        call_method 1
-        drop
-        undefined
-        return_async
+  closure vars:
+    0: makeAdder local loc0 var
+    1: add5 local loc1 var
+  stack_size: 4
+  opcodes (30 bytes):
+   0 push_this
+   1 if_false8  offset=5
+   3 fclosure8
+   5 put_var_ref0
+   6 return_undef
+   7 get_var_ref0
+   8 push_5
+   9 call1
+  10 put_var_ref1
+  11 get_var  atom=474 (console)
+  16 get_field2  atom=475 (log)
+  21 get_var_ref1
+  22 push_2
+  23 call1
+  24 call_method
+  27 drop
+  28 undefined
+  29 return_async
 
-💾 Artifacts saved to artifacts/
-
-📊 Comparison Results:
-──────────────────────────────────────────────────
-TypeScript compiler: 104 bytes
-WASM compiler:       110 bytes
-Size difference:     -6 bytes (-5.5%)
-Bytecode identical:  ❌ No
-
-🔍 Byte-level differences:
-  Position 102: TS=00 vs WASM=06
-  Position 104: TS=EOF vs WASM=00
-  Position 105: TS=EOF vs WASM=2f
-  Position 106: TS=EOF vs WASM=0e
-  Position 107: TS=EOF vs WASM=20
-  Position 108: TS=EOF vs WASM=08
-  Position 109: TS=EOF vs WASM=00
-
-📋 Side-by-side disassembly:
-────────────────────────────────────────────────────────────────────────────────────────────────────
---- TS Disassembly ---                           | --- WASM Disassembly ---
-Bytecode size: 104 bytes                         | Bytecode size: 110 bytes
-                                                 | 
-00000000: 05 03 54 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..T__tests__/com| | 00000000: 05 03 54 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..T__tests__/com|
-00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 63 |piler/fixtures/c| | 00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 63 |piler/fixtures/c|
-00000020: 6f 6e 73 6f 6c 65 2d 6c 6f 67 2e 6a 73 0e 63 6f |onsole-log.js.co| | 00000020: 6f 6e 73 6f 6c 65 2d 6c 6f 67 2e 6a 73 0e 63 6f |onsole-log.js.co|
-00000030: 6e 73 6f 6c 65 06 6c 6f 67 0d c8 03 00 00 00 00 |nsole.log.......| | 00000030: 6e 73 6f 6c 65 06 6c 6f 67 0d c8 03 00 00 00 00 |nsole.log.......|
-00000040: 00 0c 20 06 01 a4 01 00 00 00 03 00 00 15 00 08 |.. .............| | 00000040: 00 0c 20 06 01 a4 01 00 00 00 03 00 00 15 00 08 |.. .............|
-00000050: ec 02 29 39 e5 00 00 00 43 e6 00 00 00 b8 24 01 |..)9....C.....$.| | 00000050: ec 02 29 39 e5 00 00 00 43 e6 00 00 00 b8 24 01 |..)9....C.....$.|
-00000060: 00 0e 06 2f c8 03 00 00                         |.../....| | 00000060: 00 0e 06 2f c8 03 06 00 00 2f 0e 20 08 00       |.../...../. ..|
---- End Disassembly ---                          | --- End Disassembly ---
-──────────────────────────────────────────────────
-⚠️  Differences found. Review artifacts for detailed analysis.

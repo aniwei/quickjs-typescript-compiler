@@ -96,9 +96,12 @@ async function main() {
     console.log([...code].map(b => b.toString(16).padStart(2, '0')).join(' '));
     pos += bytecodeLen;
 
+    console.log('Next 10 bytes:', [...buf.slice(pos, pos + 10)].map(b => b.toString(16).padStart(2, '0')).join(' '));
+
     // Debug
     if (flags & (1 << 10)) { // has_debug
         readAtom(); // filename
+        readULEB(); // line_start
         const pc2lineLen = readULEB();
         console.log(`PC2Line: ${pc2lineLen} bytes`);
         pos += pc2lineLen;

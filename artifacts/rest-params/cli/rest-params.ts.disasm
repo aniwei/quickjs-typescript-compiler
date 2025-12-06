@@ -11,10 +11,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=2, closures=2
-    locals (2):
-      [0] restBasic kind=kind#0 level=0 next=0
-      [1] restMixed kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=2
     closure_vars (2):
       [0] restBasic -> var#0 [local, kind#0]
       [1] restMixed -> var#1 [local, kind#0]
@@ -24,21 +21,21 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/rest-params.ts
-      pc2line_bytes: 3
-      source_length: undefined
+      pc2line_bytes: 0
+      source_length: 0
 
     opcodes (9):
       0000: push_this
-      0001: if_false +7 -> 13
-      0006: fclosure8 const[0] function restBasic
-      0008: put_var_ref0
-      0009: fclosure8 const[1] function restMixed
-      0011: put_var_ref1
-      0012: return_undef
-      0013: undefined
-      0014: return_async
+      0001: if_false8 +8 -> 11
+      0003: fclosure8 const[0] function restBasic
+      0005: put_var_ref0
+      0006: fclosure8 const[1] function restMixed
+      0008: put_var_ref1
+      0009: return_undef
+      0010: undefined
+      0011: return_async
 
-    function[1] restBasic (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[1] restBasic (const[0]) kind=kind#0 flags=[newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=1, defined=1, vars=0, closures=0
@@ -47,8 +44,8 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/rest-params.ts
-        pc2line_bytes: 3
-        source_length: undefined
+        pc2line_bytes: 2
+        source_length: 0
 
       opcodes (6):
         0000: rest 0
@@ -58,7 +55,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
         0006: return
         0007: return_undef
 
-    function[2] restMixed (const[1]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[2] restMixed (const[1]) kind=kind#0 flags=[newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=2, defined=2, vars=0, closures=0
@@ -68,8 +65,8 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/rest-params.ts
-        pc2line_bytes: 6
-        source_length: undefined
+        pc2line_bytes: 2
+        source_length: 0
 
       opcodes (6):
         0000: rest 1

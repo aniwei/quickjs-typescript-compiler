@@ -13,10 +13,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=2, closures=2
-    locals (2):
-      [0] multiply kind=kind#0 level=0 next=0
-      [1] factorial kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=2
     closure_vars (2):
       [0] multiply -> var#0 [local, kind#0]
       [1] factorial -> var#1 [local, kind#0]
@@ -26,44 +23,44 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/complex-functions.ts
-      pc2line_bytes: 3
-      source_length: undefined
+      pc2line_bytes: 0
+      source_length: 0
 
     opcodes (9):
       0000: push_this
-      0001: if_false +7 -> 13
-      0006: fclosure8 const[0] function multiply
-      0008: put_var_ref0
-      0009: fclosure8 const[1] function factorial
-      0011: put_var_ref1
-      0012: return_undef
-      0013: undefined
-      0014: return_async
+      0001: if_false8 +8 -> 11
+      0003: fclosure8 const[0] function multiply
+      0005: put_var_ref0
+      0006: fclosure8 const[1] function factorial
+      0008: put_var_ref1
+      0009: return_undef
+      0010: undefined
+      0011: return_async
 
-    function[1] multiply (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[1] multiply (const[0]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=2, defined=2, vars=1, closures=0
       locals (3):
         [0] a kind=kind#0 level=0 next=0
         [1] b kind=kind#0 level=0 next=0
-        [2] result kind=kind#0 level=0 next=0
+        [2] result kind=kind#0 level=1 next=0 [const, lexical]
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/complex-functions.ts
         pc2line_bytes: 6
-        source_length: undefined
+        source_length: 0
 
       opcodes (7):
         0000: get_arg0
         0001: get_arg1
         0002: mul
-        0003: put_loc local[0] a
-        0006: get_loc0
-        0007: return
-        0008: return_undef
+        0003: put_loc0
+        0004: get_loc0
+        0005: return
+        0006: return_undef
 
-    function[2] factorial (const[1]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[2] factorial (const[1]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=1, defined=1, vars=0, closures=0
@@ -72,23 +69,23 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/complex-functions.ts
-        pc2line_bytes: 15
-        source_length: undefined
+        pc2line_bytes: 14
+        source_length: 0
 
       opcodes (16):
         0000: get_arg0
         0001: push_1
         0002: lte
-        0003: if_false +7 -> 15
+        0003: if_false +11 -> 19
         0008: push_1
         0009: return
-        0010: goto +0 -> 15
+        0010: goto +4 -> 19
         0015: get_arg0
         0016: get_var atom#230
         0021: get_arg0
         0022: push_1
         0023: sub
-        0024: call 1
-        0027: mul
-        0028: return
-        0029: return_undef
+        0024: call1
+        0025: mul
+        0026: return
+        0027: return_undef

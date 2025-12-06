@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/global-functions.ts
-**生成时间**: 2025-12-05T12:54:24.029Z
+**生成时间**: 2025-12-06T02:09:56.388Z
 
 ## 大小对比
 
-- TypeScript编译器: 327 字节
+- TypeScript编译器: 258 字节
 - WASM编译器: 274 字节
-- 差异: 53 字节 (19.34%)
+- 差异: -16 字节 (-5.84%)
 
 ## 结构分析
 
@@ -20,10 +20,10 @@
   "atoms": [
     {
       "index": 0,
-      "rawLength": 230,
-      "actualLength": 115,
+      "rawLength": 94,
+      "actualLength": 47,
       "isWideChar": 0,
-      "string": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/global-functions.js",
+      "string": "__tests__/compiler/fixtures/global-functions.js",
       "offset": 2
     },
     {
@@ -32,7 +32,7 @@
       "actualLength": 7,
       "isWideChar": 0,
       "string": "console",
-      "offset": 119
+      "offset": 50
     },
     {
       "index": 2,
@@ -40,7 +40,7 @@
       "actualLength": 3,
       "isWideChar": 0,
       "string": "log",
-      "offset": 127
+      "offset": 58
     },
     {
       "index": 3,
@@ -48,7 +48,7 @@
       "actualLength": 8,
       "isWideChar": 0,
       "string": "parseInt",
-      "offset": 131
+      "offset": 62
     },
     {
       "index": 4,
@@ -56,7 +56,7 @@
       "actualLength": 2,
       "isWideChar": 0,
       "string": "10",
-      "offset": 140
+      "offset": 71
     },
     {
       "index": 5,
@@ -64,7 +64,7 @@
       "actualLength": 10,
       "isWideChar": 0,
       "string": "parseFloat",
-      "offset": 143
+      "offset": 74
     },
     {
       "index": 6,
@@ -72,7 +72,7 @@
       "actualLength": 4,
       "isWideChar": 0,
       "string": "10.5",
-      "offset": 154
+      "offset": 85
     },
     {
       "index": 7,
@@ -80,7 +80,7 @@
       "actualLength": 5,
       "isWideChar": 0,
       "string": "isNaN",
-      "offset": 159
+      "offset": 90
     },
     {
       "index": 8,
@@ -88,11 +88,11 @@
       "actualLength": 8,
       "isWideChar": 0,
       "string": "isFinite",
-      "offset": 165
+      "offset": 96
     }
   ],
   "functionHeader": {
-    "offset": 174,
+    "offset": 105,
     "tag": "0xd",
     "remaining": 153
   }
@@ -181,55 +181,51 @@
 
 ## 字节级差异
 
-共发现 309 个字节差异:
+共发现 169 个字节差异:
 
 - 偏移量 0x1: TS=0x09 vs WASM=0x08
-- 偏移量 0x2: TS=0xe6 vs WASM=0x5e
-- 偏移量 0x3: TS=0x01 vs WASM=0x5f
-- 偏移量 0x4: TS=0x2f vs WASM=0x5f
-- 偏移量 0x5: TS=0x55 vs WASM=0x74
-- 偏移量 0x6: TS=0x73 vs WASM=0x65
-- 偏移量 0x7: TS=0x65 vs WASM=0x73
-- 偏移量 0x8: TS=0x72 vs WASM=0x74
-- 偏移量 0xa: TS=0x2f vs WASM=0x5f
-- 偏移量 0xb: TS=0x61 vs WASM=0x5f
-- 偏移量 0xc: TS=0x6e vs WASM=0x2f
-- 偏移量 0xd: TS=0x69 vs WASM=0x63
-- 偏移量 0xe: TS=0x77 vs WASM=0x6f
-- 偏移量 0xf: TS=0x65 vs WASM=0x6d
-- 偏移量 0x10: TS=0x69 vs WASM=0x70
-- 偏移量 0x11: TS=0x2f vs WASM=0x69
-- 偏移量 0x12: TS=0x44 vs WASM=0x6c
-- 偏移量 0x14: TS=0x73 vs WASM=0x72
-- 偏移量 0x15: TS=0x6b vs WASM=0x2f
-- 偏移量 0x16: TS=0x74 vs WASM=0x66
-- ... (显示前20个差异，总共309个)
+- 偏移量 0x47: TS=0x04 vs WASM=0x14
+- 偏移量 0x48: TS=0x31 vs WASM=0x70
+- 偏移量 0x49: TS=0x30 vs WASM=0x61
+- 偏移量 0x4a: TS=0x14 vs WASM=0x72
+- 偏移量 0x4b: TS=0x70 vs WASM=0x73
+- 偏移量 0x4c: TS=0x61 vs WASM=0x65
+- 偏移量 0x4d: TS=0x72 vs WASM=0x46
+- 偏移量 0x4e: TS=0x73 vs WASM=0x6c
+- 偏移量 0x4f: TS=0x65 vs WASM=0x6f
+- 偏移量 0x50: TS=0x46 vs WASM=0x61
+- 偏移量 0x51: TS=0x6c vs WASM=0x74
+- 偏移量 0x52: TS=0x6f vs WASM=0x08
+- 偏移量 0x53: TS=0x61 vs WASM=0x31
+- 偏移量 0x54: TS=0x74 vs WASM=0x30
+- 偏移量 0x55: TS=0x08 vs WASM=0x2e
+- 偏移量 0x56: TS=0x31 vs WASM=0x35
+- 偏移量 0x57: TS=0x30 vs WASM=0x0a
+- 偏移量 0x58: TS=0x2e vs WASM=0x69
+- 偏移量 0x59: TS=0x35 vs WASM=0x73
+- ... (显示前20个差异，总共169个)
 
 ## 十六进制转储对比
 
 ### TypeScript
 ```
-00000000: 05 09 e6 01 2f 55 73 65 72 73 2f 61 6e 69 77 65 |..../Users/aniwe|
-00000010: 69 2f 44 65 73 6b 74 6f 70 2f 77 6f 72 6b 73 70 |i/Desktop/worksp|
-00000020: 61 63 65 73 2f 71 75 69 63 6b 6a 73 2d 74 79 70 |aces/quickjs-typ|
-00000030: 65 73 63 72 69 70 74 2d 63 6f 6d 70 69 6c 65 72 |escript-compiler|
-00000040: 5f 73 65 63 6f 6e 64 2f 5f 5f 74 65 73 74 73 5f |_second/__tests_|
-00000050: 5f 2f 63 6f 6d 70 69 6c 65 72 2f 66 69 78 74 75 |_/compiler/fixtu|
-00000060: 72 65 73 2f 67 6c 6f 62 61 6c 2d 66 75 6e 63 74 |res/global-funct|
-00000070: 69 6f 6e 73 2e 6a 73 0e 63 6f 6e 73 6f 6c 65 06 |ions.js.console.|
-00000080: 6c 6f 67 10 70 61 72 73 65 49 6e 74 04 31 30 14 |log.parseInt.10.|
-00000090: 70 61 72 73 65 46 6c 6f 61 74 08 31 30 2e 35 0a |parseFloat.10.5.|
-000000a0: 69 73 4e 61 4e 10 69 73 46 69 6e 69 74 65 0d c8 |isNaN.isFinite..|
-000000b0: 03 00 00 00 00 00 0c 20 06 01 a4 01 00 00 00 03 |....... ........|
-000000c0: 00 00 75 00 08 6c 6d 00 00 00 39 e5 00 00 00 43 |..u..lm...9....C|
-000000d0: e6 00 00 00 39 e7 00 00 00 04 e8 00 00 00 22 01 |....9.........".|
-000000e0: 00 24 01 00 0e 39 e5 00 00 00 43 e6 00 00 00 39 |.$...9....C....9|
-000000f0: e9 00 00 00 04 ea 00 00 00 22 01 00 24 01 00 0e |........."..$...|
-00000100: 39 e5 00 00 00 43 e6 00 00 00 39 eb 00 00 00 39 |9....C....9....9|
-00000110: 92 00 00 00 22 01 00 24 01 00 0e 39 e5 00 00 00 |...."..$...9....|
-00000120: 43 e6 00 00 00 39 ec 00 00 00 01 64 00 00 00 22 |C....9.....d..."|
-00000130: 01 00 24 01 00 0e 29 06 2f c8 03 01 09 00 2b 01 |..$...)./.....+.|
-00000140: 00 1b 01 00 1b 01 00                            |.......|
+00000000: 05 09 5e 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..^__tests__/com|
+00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 67 |piler/fixtures/g|
+00000020: 6c 6f 62 61 6c 2d 66 75 6e 63 74 69 6f 6e 73 2e |lobal-functions.|
+00000030: 6a 73 0e 63 6f 6e 73 6f 6c 65 06 6c 6f 67 10 70 |js.console.log.p|
+00000040: 61 72 73 65 49 6e 74 04 31 30 14 70 61 72 73 65 |arseInt.10.parse|
+00000050: 46 6c 6f 61 74 08 31 30 2e 35 0a 69 73 4e 61 4e |Float.10.5.isNaN|
+00000060: 10 69 73 46 69 6e 69 74 65 0d c8 03 00 00 00 00 |.isFinite.......|
+00000070: 00 0c 20 06 01 a4 01 00 00 00 03 00 00 6a 00 08 |.. ..........j..|
+00000080: ec 02 29 39 e5 00 00 00 43 e6 00 00 00 39 e7 00 |..)9....C....9..|
+00000090: 00 00 04 e8 00 00 00 f1 24 01 00 0e 39 e5 00 00 |........$...9...|
+000000a0: 00 43 e6 00 00 00 39 e9 00 00 00 04 ea 00 00 00 |.C....9.........|
+000000b0: f1 24 01 00 0e 39 e5 00 00 00 43 e6 00 00 00 39 |.$...9....C....9|
+000000c0: eb 00 00 00 39 92 00 00 00 f1 24 01 00 0e 39 e5 |....9.....$...9.|
+000000d0: 00 00 00 43 e6 00 00 00 39 ec 00 00 00 01 64 00 |...C....9.....d.|
+000000e0: 00 00 f1 24 01 00 0e 06 2f c8 03 00 14 48 0c 1b |...$..../....H..|
+000000f0: 09 35 6b 34 0c 1b 0b 35 69 34 0c 1b 06 35 6e 34 |.5k4...5i4...5n4|
+00000100: 0c 00                                           |..|
 ```
 
 ### WASM

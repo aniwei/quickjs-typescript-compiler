@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/labeled-statements.ts
-**生成时间**: 2025-12-05T12:54:24.043Z
+**生成时间**: 2025-12-06T02:09:56.396Z
 
 ## 大小对比
 
-- TypeScript编译器: 157 字节
+- TypeScript编译器: 85 字节
 - WASM编译器: 202 字节
-- 差异: -45 字节 (-22.28%)
+- 差异: -117 字节 (-57.92%)
 
 ## 结构分析
 
@@ -20,17 +20,17 @@
   "atoms": [
     {
       "index": 0,
-      "rawLength": 234,
-      "actualLength": 117,
+      "rawLength": 98,
+      "actualLength": 49,
       "isWideChar": 0,
-      "string": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/labeled-statements.js",
+      "string": "__tests__/compiler/fixtures/labeled-statements.js",
       "offset": 2
     }
   ],
   "functionHeader": {
-    "offset": 121,
+    "offset": 52,
     "tag": "0xd",
-    "remaining": 36
+    "remaining": 33
   }
 }
 ```
@@ -93,44 +93,40 @@
 
 ## 字节级差异
 
-共发现 195 个字节差异:
+共发现 151 个字节差异:
 
 - 偏移量 0x1: TS=0x01 vs WASM=0x05
-- 偏移量 0x2: TS=0xea vs WASM=0x62
-- 偏移量 0x3: TS=0x01 vs WASM=0x5f
-- 偏移量 0x4: TS=0x2f vs WASM=0x5f
-- 偏移量 0x5: TS=0x55 vs WASM=0x74
-- 偏移量 0x6: TS=0x73 vs WASM=0x65
-- 偏移量 0x7: TS=0x65 vs WASM=0x73
-- 偏移量 0x8: TS=0x72 vs WASM=0x74
-- 偏移量 0xa: TS=0x2f vs WASM=0x5f
-- 偏移量 0xb: TS=0x61 vs WASM=0x5f
-- 偏移量 0xc: TS=0x6e vs WASM=0x2f
-- 偏移量 0xd: TS=0x69 vs WASM=0x63
-- 偏移量 0xe: TS=0x77 vs WASM=0x6f
-- 偏移量 0xf: TS=0x65 vs WASM=0x6d
-- 偏移量 0x10: TS=0x69 vs WASM=0x70
-- 偏移量 0x11: TS=0x2f vs WASM=0x69
-- 偏移量 0x12: TS=0x44 vs WASM=0x6c
-- 偏移量 0x14: TS=0x73 vs WASM=0x72
-- 偏移量 0x15: TS=0x6b vs WASM=0x2f
-- 偏移量 0x16: TS=0x74 vs WASM=0x66
-- ... (显示前20个差异，总共195个)
+- 偏移量 0x34: TS=0x0d vs WASM=0x06
+- 偏移量 0x35: TS=0xc8 vs WASM=0x6c
+- 偏移量 0x36: TS=0x03 vs WASM=0x5f
+- 偏移量 0x37: TS=0x00 vs WASM=0x69
+- 偏移量 0x38: TS=0x00 vs WASM=0x06
+- 偏移量 0x39: TS=0x00 vs WASM=0x6c
+- 偏移量 0x3a: TS=0x00 vs WASM=0x5f
+- 偏移量 0x3b: TS=0x00 vs WASM=0x6a
+- 偏移量 0x3c: TS=0x0c vs WASM=0x0e
+- 偏移量 0x3d: TS=0x20 vs WASM=0x63
+- 偏移量 0x3e: TS=0x06 vs WASM=0x6f
+- 偏移量 0x3f: TS=0x01 vs WASM=0x6e
+- 偏移量 0x40: TS=0xa4 vs WASM=0x73
+- 偏移量 0x41: TS=0x01 vs WASM=0x6f
+- 偏移量 0x42: TS=0x00 vs WASM=0x6c
+- 偏移量 0x43: TS=0x00 vs WASM=0x65
+- 偏移量 0x44: TS=0x00 vs WASM=0x06
+- 偏移量 0x45: TS=0x03 vs WASM=0x6c
+- 偏移量 0x46: TS=0x00 vs WASM=0x6f
+- ... (显示前20个差异，总共151个)
 
 ## 十六进制转储对比
 
 ### TypeScript
 ```
-00000000: 05 01 ea 01 2f 55 73 65 72 73 2f 61 6e 69 77 65 |..../Users/aniwe|
-00000010: 69 2f 44 65 73 6b 74 6f 70 2f 77 6f 72 6b 73 70 |i/Desktop/worksp|
-00000020: 61 63 65 73 2f 71 75 69 63 6b 6a 73 2d 74 79 70 |aces/quickjs-typ|
-00000030: 65 73 63 72 69 70 74 2d 63 6f 6d 70 69 6c 65 72 |escript-compiler|
-00000040: 5f 73 65 63 6f 6e 64 2f 5f 5f 74 65 73 74 73 5f |_second/__tests_|
-00000050: 5f 2f 63 6f 6d 70 69 6c 65 72 2f 66 69 78 74 75 |_/compiler/fixtu|
-00000060: 72 65 73 2f 6c 61 62 65 6c 65 64 2d 73 74 61 74 |res/labeled-stat|
-00000070: 65 6d 65 6e 74 73 2e 6a 73 0d c8 03 00 00 00 00 |ements.js.......|
-00000080: 00 0c 20 06 01 a4 01 00 00 00 03 00 00 09 00 08 |.. .............|
-00000090: 6c 01 00 00 00 29 06 2f c8 03 01 00 00          |l....)./.....|
+00000000: 05 01 62 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..b__tests__/com|
+00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 6c |piler/fixtures/l|
+00000020: 61 62 65 6c 65 64 2d 73 74 61 74 65 6d 65 6e 74 |abeled-statement|
+00000030: 73 2e 6a 73 0d c8 03 00 00 00 00 00 0c 20 06 01 |s.js......... ..|
+00000040: a4 01 00 00 00 03 00 00 06 00 08 ec 02 29 06 2f |.............)./|
+00000050: c8 03 00 00 00                                  |.....|
 ```
 
 ### WASM

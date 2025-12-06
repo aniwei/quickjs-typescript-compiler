@@ -13,68 +13,68 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/logical-ops.ts
-      pc2line_bytes: 15
-      source_length: undefined
+      pc2line_bytes: 32
+      source_length: 0
 
     opcodes (61):
       0000: push_this
-      0001: if_false +153 -> 159
-      0006: get_var atom#229
-      0011: get_field2 atom#230
-      0016: push_true
-      0017: dup
-      0018: if_false +2 -> 25
-      0023: drop
-      0024: push_false
-      0025: call_method 1
-      0028: drop
-      0029: get_var atom#229
-      0034: get_field2 atom#230
-      0039: push_true
-      0040: dup
-      0041: if_true +2 -> 48
-      0046: drop
-      0047: push_false
-      0048: call_method 1
-      0051: drop
-      0052: get_var atom#229
-      0057: get_field2 atom#230
-      0062: null
-      0063: dup
-      0064: is_undefined_or_null
-      0065: if_false +6 -> 76
-      0070: drop
-      0071: push_atom_value atom#22
-      0076: call_method 1
-      0079: drop
-      0080: get_var atom#229
-      0085: get_field2 atom#230
-      0090: push_atom_value atom#66
-      0095: dup
-      0096: is_undefined_or_null
-      0097: if_false +6 -> 108
-      0102: drop
-      0103: push_atom_value atom#22
-      0108: call_method 1
-      0111: drop
-      0112: get_var atom#229
-      0117: get_field2 atom#230
-      0122: push_false
-      0123: dup
-      0124: if_false +2 -> 131
-      0129: drop
-      0130: push_true
-      0131: call_method 1
-      0134: drop
-      0135: get_var atom#229
-      0140: get_field2 atom#230
-      0145: push_false
-      0146: dup
-      0147: if_true +2 -> 154
-      0152: drop
-      0153: push_true
-      0154: call_method 1
-      0157: drop
-      0158: return_undef
-      0159: undefined
-      0160: return_async
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: get_var atom#229
+      0009: get_field2 atom#230
+      0014: push_true
+      0015: dup
+      0016: if_false +6 -> 27
+      0021: drop
+      0022: push_false
+      0023: call_method 1
+      0026: drop
+      0027: get_var atom#229
+      0032: get_field2 atom#230
+      0037: push_true
+      0038: dup
+      0039: if_true +6 -> 50
+      0044: drop
+      0045: push_false
+      0046: call_method 1
+      0049: drop
+      0050: get_var atom#229
+      0055: get_field2 atom#230
+      0060: null
+      0061: dup
+      0062: is_undefined_or_null
+      0063: if_false +10 -> 78
+      0068: drop
+      0069: push_atom_value atom#22
+      0074: call_method 1
+      0077: drop
+      0078: get_var atom#229
+      0083: get_field2 atom#230
+      0088: push_atom_value atom#66
+      0093: dup
+      0094: is_undefined_or_null
+      0095: if_false +10 -> 110
+      0100: drop
+      0101: push_atom_value atom#22
+      0106: call_method 1
+      0109: drop
+      0110: get_var atom#229
+      0115: get_field2 atom#230
+      0120: push_false
+      0121: dup
+      0122: if_false +6 -> 133
+      0127: drop
+      0128: push_true
+      0129: call_method 1
+      0132: drop
+      0133: get_var atom#229
+      0138: get_field2 atom#230
+      0143: push_false
+      0144: dup
+      0145: if_true +6 -> 156
+      0150: drop
+      0151: push_true
+      0152: call_method 1
+      0155: drop
+      0156: undefined
+      0157: return_async

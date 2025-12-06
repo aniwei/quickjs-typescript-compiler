@@ -82,7 +82,7 @@ This plan details the step-by-step translation of the QuickJS compiler from C to
 - [x] `switch`.
 
 ### 4.3 Exception Handling
-- [x] `try ... catch ... finally`.
+- [x] `try ... catch ... finally` (Implemented with `OP_gosub` and correct control flow).
 - [x] `throw`.
 
 ### 4.4 Variable Declarations
@@ -149,12 +149,20 @@ This plan details the step-by-step translation of the QuickJS compiler from C to
 - [x] Verify byte-for-byte match with `qjsc`. (Functionally identical. Size difference < 3% due to debug info compression differences)
 
 ### 8.2 Optimization
-- [x] Peephole optimizations (short opcodes implemented).
+- [x] Peephole optimizations (short opcodes implemented: `call0`, `if_false8`, etc.).
 - [x] Stack optimization (void handling).
-- [x] Debug Info optimization (pc2line compression & buffering).
+- [x] Debug Info optimization (pc2line compression & buffering with columns).
+- [x] Bytecode Size Optimization (Buffering line updates).
 
 ## Execution Strategy
 1.  Start with **Phase 1** and **Phase 2.1-2.2**.
 2.  Create a minimal valid bytecode file (empty program).
 3.  Iteratively add features from **Phase 2.3** onwards.
 4.  After each sub-task, run `pnpm test` (or specific fixture test) to verify.
+
+## Remaining Differences (as of 2025-12-06)
+
+Remaining difference in compute.ts: 6 bytes.
+Likely due to missing `OP_enter_scope` and `OP_leave_scope` (3 bytes each) which are temporary opcodes but might be present in the reference WASM output due to debug flags or specific compilation settings.
+Also, TypeScript compiler uses long jumps (`OP_goto`, `OP_if_false`) which are 5 bytes, whereas WASM uses short jumps (`OP_goto8`, `OP_if_false8`) which are 2 bytes. This adds 6 bytes to TS output.
+So TS is +6 bytes (jumps) - 12 bytes (missing scopes + ?) = -6 bytes.

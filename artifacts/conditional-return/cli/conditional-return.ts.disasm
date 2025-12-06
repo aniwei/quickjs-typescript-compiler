@@ -8,9 +8,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=1, closures=1
-    locals (1):
-      [0] adjust kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=1
     closure_vars (1):
       [0] adjust -> var#0 [local, kind#0]
     constant_pool (1):
@@ -18,23 +16,23 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/conditional-return.ts
-      pc2line_bytes: 6
-      source_length: undefined
+      pc2line_bytes: 4
+      source_length: 0
 
     opcodes (11):
       0000: push_this
-      0001: if_false +10 -> 16
-      0006: fclosure8 const[0] function adjust
-      0008: put_var_ref0
-      0009: get_var_ref0
-      0010: push_3
-      0011: call 1
-      0014: drop
-      0015: return_undef
-      0016: undefined
-      0017: return_async
+      0001: if_false8 +5 -> 8
+      0003: fclosure8 const[0] function adjust
+      0005: put_var_ref0
+      0006: return_undef
+      0007: get_var_ref0
+      0008: push_3
+      0009: call1
+      0010: drop
+      0011: undefined
+      0012: return_async
 
-    function[1] adjust (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[1] adjust (const[0]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=1, defined=1, vars=0, closures=0
@@ -44,18 +42,18 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/conditional-return.ts
         pc2line_bytes: 12
-        source_length: undefined
+        source_length: 0
 
       opcodes (14):
         0000: get_arg0
         0001: push_5
         0002: lte
-        0003: if_false +9 -> 17
+        0003: if_false +13 -> 21
         0008: get_arg0
         0009: push_1
         0010: add
         0011: return
-        0012: goto +0 -> 17
+        0012: goto +4 -> 21
         0017: get_arg0
         0018: push_1
         0019: sub

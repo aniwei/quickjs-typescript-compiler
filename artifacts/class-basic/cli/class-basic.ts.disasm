@@ -16,15 +16,9 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=3, closures=3
-    locals (3):
-      [0] Point kind=kind#0 level=1 next=0
-      [1] class_fields_init kind=kind#0 level=2 next=0
-      [2] p kind=kind#0 level=0 next=0
-    closure_vars (3):
-      [0] Point -> var#0 [local, kind#0]
-      [1] class_fields_init -> var#1 [local, kind#0]
-      [2] p -> var#2 [local, kind#0]
+    args: total=0, defined=0, vars=0, closures=1
+    closure_vars (1):
+      [0] p -> var#2 [local, const, lexical, kind#0]
     constant_pool (3):
       [0] function move
       [1] function Point
@@ -32,30 +26,31 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/class-basic.ts
-      pc2line_bytes: 12
-      source_length: undefined
+      pc2line_bytes: 18
+      source_length: 0
 
     opcodes (36):
       0000: push_this
-      0001: if_false +79 -> 85
-      0006: undefined
-      0007: push_const const[1] function Point
-      0012: define_class atom#229, 0
-      0018: fclosure8 const[0] function move
-      0020: define_method atom#231, 0
-      0026: fclosure const[2] function <builtin:0>
-      0031: set_home_object
-      0032: put_loc local[1] class_fields_init
-      0035: drop
-      0036: dup
-      0037: put_var_ref0
-      0038: set_proto
-      0039: get_var_ref0
-      0040: push_1
-      0041: push_2
-      0042: call_constructor 2
-      0045: put_var_ref2
-      0046: get_var_ref2
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: undefined
+      0005: push_const const[1] function Point
+      0010: define_class atom#229, 0
+      0016: fclosure8 const[0] function move
+      0018: define_method atom#231, 0
+      0024: fclosure const[2] function <builtin:0>
+      0029: set_home_object
+      0030: put_loc local[1]
+      0033: drop
+      0034: dup
+      0035: put_var_ref0
+      0036: set_proto
+      0037: get_loc0
+      0038: push_1
+      0039: push_2
+      0040: call_constructor 2
+      0043: put_var_ref0
+      0044: get_var_ref_check var_ref[0] p
       0047: get_field2 atom#231
       0052: push_3
       0053: push_4
@@ -63,17 +58,16 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
       0057: drop
       0058: get_var atom#232
       0063: get_field2 atom#233
-      0068: get_var_ref2
-      0069: get_field atom#234
-      0074: get_var_ref2
-      0075: get_field atom#235
-      0080: call_method 2
-      0083: drop
-      0084: return_undef
-      0085: undefined
-      0086: return_async
+      0068: get_var_ref_check var_ref[0] p
+      0071: get_field atom#234
+      0076: get_var_ref_check var_ref[0] p
+      0079: get_field atom#235
+      0084: call_method 2
+      0087: drop
+      0088: undefined
+      0089: return_async
 
-    function[1] move (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[1] move (const[0]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=2, defined=2, vars=1, closures=0
@@ -84,8 +78,8 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/class-basic.ts
-        pc2line_bytes: 18
-        source_length: undefined
+        pc2line_bytes: 20
+        source_length: 0
 
       opcodes (23):
         0000: get_loc0
@@ -112,7 +106,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
         0041: put_field atom#235
         0046: return_undef
 
-    function[2] Point (const[1]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[2] Point (const[1]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=2, defined=2, vars=1, closures=0
@@ -123,8 +117,8 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/class-basic.ts
-        pc2line_bytes: 18
-        source_length: undefined
+        pc2line_bytes: 8
+        source_length: 0
 
       opcodes (22):
         0000: push_this
@@ -132,7 +126,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
         0002: check_ctor
         0003: get_var atom#120
         0008: dup
-        0009: if_false +6 -> 20
+        0009: if_false +10 -> 24
         0014: get_loc0
         0015: swap
         0016: call_method 0
@@ -160,7 +154,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/class-basic.ts
         pc2line_bytes: 0
-        source_length: undefined
+        source_length: 0
 
       opcodes (7):
         0000: get_loc0

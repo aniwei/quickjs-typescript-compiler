@@ -13,37 +13,33 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=3, closures=3
-    locals (3):
-      [0] a kind=kind#0 level=0 next=0
-      [1] b kind=kind#0 level=0 next=0
-      [2] c kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=3
     closure_vars (3):
-      [0] a -> var#0 [local, kind#0]
-      [1] b -> var#1 [local, kind#0]
-      [2] c -> var#2 [local, kind#0]
+      [0] a -> var#0 [local, const, lexical, kind#0]
+      [1] b -> var#1 [local, const, lexical, kind#0]
+      [2] c -> var#2 [local, const, lexical, kind#0]
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/template-literal.ts
-      pc2line_bytes: 6
-      source_length: undefined
+      pc2line_bytes: 8
+      source_length: 0
 
     opcodes (18):
       0000: push_this
-      0001: if_false +38 -> 44
-      0006: push_1
-      0007: put_var_ref0
-      0008: push_atom_value atom#232
-      0013: get_field2 atom#94
-      0018: get_var_ref0
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: push_1
+      0005: put_var_ref0
+      0006: push_atom_value atom#232
+      0011: get_field2 atom#94
+      0016: get_var_ref_check var_ref[0] a
       0019: call_method 1
       0022: put_var_ref1
       0023: push_atom_value atom#233
       0028: get_field2 atom#94
-      0033: get_var_ref0
-      0034: push_atom_value atom#234
-      0039: call_method 2
-      0042: put_var_ref2
-      0043: return_undef
-      0044: undefined
-      0045: return_async
+      0033: get_var_ref_check var_ref[0] a
+      0036: push_atom_value atom#234
+      0041: call_method 2
+      0044: put_var_ref2
+      0045: undefined
+      0046: return_async

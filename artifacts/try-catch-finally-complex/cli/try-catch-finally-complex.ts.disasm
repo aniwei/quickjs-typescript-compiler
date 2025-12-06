@@ -1,0 +1,224 @@
+bytecode_version: 5
+atoms (9):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "testFinallyReturn"
+  [2] @230 = "testFinallyBreak"
+  [3] @231 = "testFinallyContinue"
+  [4] @232 = "testNestedFinally"
+  [5] @233 = "console"
+  [6] @234 = "log"
+  [7] @235 = "x"
+  [8] @236 = "i"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/try-catch-finally-complex.ts"
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=0, closures=4
+    closure_vars (4):
+      [0] testFinallyReturn -> var#0 [local, kind#0]
+      [1] testFinallyBreak -> var#1 [local, kind#0]
+      [2] testFinallyContinue -> var#2 [local, kind#0]
+      [3] testNestedFinally -> var#3 [local, kind#0]
+    constant_pool (4):
+      [0] function testFinallyReturn
+      [1] function testFinallyBreak
+      [2] function testFinallyContinue
+      [3] function testNestedFinally
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/try-catch-finally-complex.ts
+      pc2line_bytes: 30
+      source_length: 0
+
+    opcodes (37):
+      0000: push_this
+      0001: if_false8 +14 -> 17
+      0003: fclosure8 const[0] function testFinallyReturn
+      0005: put_var_ref0
+      0006: fclosure8 const[1] function testFinallyBreak
+      0008: put_var_ref1
+      0009: fclosure8 const[2] function testFinallyContinue
+      0011: put_var_ref2
+      0012: fclosure8 const[3] function testNestedFinally
+      0014: put_var_ref3
+      0015: return_undef
+      0016: get_var atom#233
+      0021: get_field2 atom#234
+      0026: get_var_ref0
+      0027: call0
+      0028: call_method 1
+      0031: drop
+      0032: get_var atom#233
+      0037: get_field2 atom#234
+      0042: get_var_ref1
+      0043: call0
+      0044: call_method 1
+      0047: drop
+      0048: get_var atom#233
+      0053: get_field2 atom#234
+      0058: get_var_ref2
+      0059: call0
+      0060: call_method 1
+      0063: drop
+      0064: get_var atom#233
+      0069: get_field2 atom#234
+      0074: get_var_ref3
+      0075: call0
+      0076: call_method 1
+      0079: drop
+      0080: undefined
+      0081: return_async
+
+    function[1] testFinallyReturn (const[0]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=0, defined=0, vars=0, closures=0
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/try-catch-finally-complex.ts
+        pc2line_bytes: 6
+        source_length: 0
+
+      opcodes (18):
+        0000: catch +25 -> 30
+        0005: push_1
+        0006: gosub +25 -> 36
+        0011: nip
+        0012: return
+        0013: drop
+        0014: undefined
+        0015: gosub +16 -> 36
+        0020: drop
+        0021: goto +15 -> 41
+        0026: gosub +5 -> 36
+        0031: throw
+        0032: push_2
+        0033: nip
+        0034: nip
+        0035: return
+        0036: ret
+        0037: return_undef
+
+    function[2] testFinallyBreak (const[1]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=0, defined=0, vars=1, closures=0
+      locals (1):
+        [0] x kind=kind#0 level=1 next=0 [lexical]
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/try-catch-finally-complex.ts
+        pc2line_bytes: 12
+        source_length: 0
+
+      opcodes (22):
+        0000: push_0
+        0001: put_loc0
+        0002: push_true
+        0003: if_false +47 -> 55
+        0008: catch +28 -> 41
+        0013: gosub +29 -> 47
+        0018: drop
+        0019: goto +31 -> 55
+        0024: drop
+        0025: undefined
+        0026: gosub +16 -> 47
+        0031: drop
+        0032: goto +13 -> 50
+        0037: gosub +5 -> 47
+        0042: throw
+        0043: push_1
+        0044: put_loc0
+        0045: ret
+        0046: goto -45 -> 6
+        0051: get_loc0
+        0052: return
+        0053: return_undef
+
+    function[3] testFinallyContinue (const[2]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=0, defined=0, vars=2, closures=0
+      locals (2):
+        [0] x kind=kind#0 level=1 next=0 [lexical]
+        [1] i kind=kind#0 level=1 next=0 [lexical]
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/try-catch-finally-complex.ts
+        pc2line_bytes: 18
+        source_length: 0
+
+      opcodes (26):
+        0000: push_0
+        0001: put_loc0
+        0002: push_0
+        0003: put_loc1
+        0004: get_loc1
+        0005: push_2
+        0006: lt
+        0007: if_false +47 -> 59
+        0012: drop
+        0013: catch +28 -> 46
+        0018: gosub +29 -> 52
+        0023: drop
+        0024: goto -21 -> 8
+        0029: drop
+        0030: undefined
+        0031: gosub +16 -> 52
+        0036: drop
+        0037: goto +12 -> 54
+        0042: gosub +5 -> 52
+        0047: throw
+        0048: drop
+        0049: ret
+        0050: goto -47 -> 8
+        0055: get_loc0
+        0056: return
+        0057: return_undef
+
+    function[4] testNestedFinally (const[3]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=0, defined=0, vars=1, closures=0
+      locals (1):
+        [0] x kind=kind#0 level=1 next=0 [lexical]
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/try-catch-finally-complex.ts
+        pc2line_bytes: 14
+        source_length: 0
+
+      opcodes (31):
+        0000: push_0
+        0001: put_loc0
+        0002: catch +57 -> 64
+        0007: catch +31 -> 43
+        0012: push_1
+        0013: gosub +31 -> 49
+        0018: nip
+        0019: gosub +46 -> 70
+        0024: nip
+        0025: return
+        0026: drop
+        0027: undefined
+        0028: gosub +16 -> 49
+        0033: drop
+        0034: goto +12 -> 51
+        0039: gosub +5 -> 49
+        0044: throw
+        0045: drop
+        0046: ret
+        0047: drop
+        0048: undefined
+        0049: gosub +16 -> 70
+        0054: drop
+        0055: goto +12 -> 72
+        0060: gosub +5 -> 70
+        0065: throw
+        0066: drop
+        0067: ret
+        0068: get_loc0
+        0069: return
+        0070: return_undef

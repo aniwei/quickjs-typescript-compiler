@@ -16,14 +16,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=6, closures=6
-    locals (6):
-      [0] t kind=kind#0 level=0 next=0
-      [1] f kind=kind#0 level=0 next=0
-      [2] obj_l kind=kind#0 level=0 next=0
-      [3] res kind=kind#0 level=0 next=0
-      [4] val_l kind=kind#0 level=0 next=0
-      [5] res2 kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=6
     closure_vars (6):
       [0] t -> var#0 [local, kind#0]
       [1] f -> var#1 [local, kind#0]
@@ -34,85 +27,85 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/logical-operators.ts
-      pc2line_bytes: 36
-      source_length: undefined
+      pc2line_bytes: 50
+      source_length: 0
 
     opcodes (78):
       0000: push_this
-      0001: if_false +184 -> 190
-      0006: push_true
-      0007: put_var_ref0
-      0008: push_false
-      0009: put_var_ref1
-      0010: get_var atom#235
-      0015: get_field2 atom#236
-      0020: get_var_ref0
-      0021: dup
-      0022: if_false +2 -> 29
-      0027: drop
-      0028: get_var_ref1
-      0029: call_method 1
-      0032: drop
-      0033: get_var atom#235
-      0038: get_field2 atom#236
-      0043: get_var_ref0
-      0044: dup
-      0045: if_true +2 -> 52
-      0050: drop
-      0051: get_var_ref1
-      0052: call_method 1
-      0055: drop
-      0056: get_var atom#235
-      0061: get_field2 atom#236
-      0066: get_var_ref0
-      0067: lnot
-      0068: call_method 1
-      0071: drop
-      0072: get_var atom#235
-      0077: get_field2 atom#236
-      0082: get_var_ref0
-      0083: dup
-      0084: if_false +2 -> 91
-      0089: drop
-      0090: push_true
-      0091: call_method 1
-      0094: drop
-      0095: get_var atom#235
-      0100: get_field2 atom#236
-      0105: get_var_ref1
-      0106: dup
-      0107: if_true +2 -> 114
-      0112: drop
-      0113: push_false
-      0114: call_method 1
-      0117: drop
-      0118: null
-      0119: put_var_ref2
-      0120: get_var_ref2
-      0121: dup
-      0122: if_false +7 -> 134
-      0127: drop
-      0128: get_var_ref2
-      0129: get_field atom#237
-      0134: put_var_ref3
-      0135: get_var atom#235
-      0140: get_field2 atom#236
-      0145: get_var_ref3
-      0146: call_method 1
-      0149: drop
-      0150: push_0
-      0151: put_var_ref var_ref[4] val_l
-      0154: get_var_ref var_ref[4] val_l
-      0157: dup
-      0158: if_true +6 -> 169
-      0163: drop
-      0164: push_i32 10
-      0169: put_var_ref var_ref[5] res2
-      0172: get_var atom#235
-      0177: get_field2 atom#236
-      0182: get_var_ref var_ref[5] res2
-      0185: call_method 1
-      0188: drop
-      0189: return_undef
-      0190: undefined
-      0191: return_async
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: push_true
+      0005: put_var_ref0
+      0006: push_false
+      0007: put_var_ref1
+      0008: get_var atom#235
+      0013: get_field2 atom#236
+      0018: get_var_ref0
+      0019: dup
+      0020: if_false +6 -> 31
+      0025: drop
+      0026: get_var_ref1
+      0027: call_method 1
+      0030: drop
+      0031: get_var atom#235
+      0036: get_field2 atom#236
+      0041: get_var_ref0
+      0042: dup
+      0043: if_true +6 -> 54
+      0048: drop
+      0049: get_var_ref1
+      0050: call_method 1
+      0053: drop
+      0054: get_var atom#235
+      0059: get_field2 atom#236
+      0064: get_var_ref0
+      0065: lnot
+      0066: call_method 1
+      0069: drop
+      0070: get_var atom#235
+      0075: get_field2 atom#236
+      0080: get_var_ref0
+      0081: dup
+      0082: if_false +6 -> 93
+      0087: drop
+      0088: push_true
+      0089: call_method 1
+      0092: drop
+      0093: get_var atom#235
+      0098: get_field2 atom#236
+      0103: get_var_ref1
+      0104: dup
+      0105: if_true +6 -> 116
+      0110: drop
+      0111: push_false
+      0112: call_method 1
+      0115: drop
+      0116: null
+      0117: put_var_ref2
+      0118: get_var_ref2
+      0119: dup
+      0120: if_false +11 -> 136
+      0125: drop
+      0126: get_var_ref2
+      0127: get_field atom#237
+      0132: put_var_ref3
+      0133: get_var atom#235
+      0138: get_field2 atom#236
+      0143: get_var_ref3
+      0144: call_method 1
+      0147: drop
+      0148: push_0
+      0149: put_var_ref var_ref[4] val_l
+      0152: get_var_ref var_ref[4] val_l
+      0155: dup
+      0156: if_true +10 -> 171
+      0161: drop
+      0162: push_i32 10
+      0167: put_var_ref var_ref[5] res2
+      0170: get_var atom#235
+      0175: get_field2 atom#236
+      0180: get_var_ref var_ref[5] res2
+      0183: call_method 1
+      0186: drop
+      0187: undefined
+      0188: return_async

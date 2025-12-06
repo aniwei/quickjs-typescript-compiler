@@ -12,11 +12,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=3, closures=3
-    locals (3):
-      [0] a_op kind=kind#0 level=0 next=0
-      [1] b_op kind=kind#0 level=0 next=0
-      [2] c_op kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=3
     closure_vars (3):
       [0] a_op -> var#0 [local, kind#0]
       [1] b_op -> var#1 [local, kind#0]
@@ -24,117 +20,117 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/assignment-operators.ts
-      pc2line_bytes: 72
-      source_length: undefined
+      pc2line_bytes: 92
+      source_length: 0
 
     opcodes (110):
       0000: push_this
-      0001: if_false +242 -> 248
-      0006: push_i32 10
-      0011: put_var_ref0
-      0012: get_var_ref0
-      0013: push_5
-      0014: add
-      0015: put_loc local[0] a_op
-      0018: get_var atom#232
-      0023: get_field2 atom#233
-      0028: get_var_ref0
-      0029: call_method 1
-      0032: drop
-      0033: get_var_ref0
-      0034: push_3
-      0035: sub
-      0036: put_loc local[0] a_op
-      0039: get_var atom#232
-      0044: get_field2 atom#233
-      0049: get_var_ref0
-      0050: call_method 1
-      0053: drop
-      0054: get_var_ref0
-      0055: push_2
-      0056: mul
-      0057: put_loc local[0] a_op
-      0060: get_var atom#232
-      0065: get_field2 atom#233
-      0070: get_var_ref0
-      0071: call_method 1
-      0074: drop
-      0075: get_var_ref0
-      0076: push_4
-      0077: div
-      0078: put_loc local[0] a_op
-      0081: get_var atom#232
-      0086: get_field2 atom#233
-      0091: get_var_ref0
-      0092: call_method 1
-      0095: drop
-      0096: get_var_ref0
-      0097: push_3
-      0098: mod
-      0099: put_loc local[0] a_op
-      0102: get_var atom#232
-      0107: get_field2 atom#233
-      0112: get_var_ref0
-      0113: call_method 1
-      0116: drop
-      0117: push_1
-      0118: put_var_ref1
-      0119: get_var_ref1
-      0120: push_1
-      0121: shl
-      0122: put_loc local[1] b_op
-      0125: get_var atom#232
-      0130: get_field2 atom#233
-      0135: get_var_ref1
-      0136: call_method 1
-      0139: drop
-      0140: get_var_ref1
-      0141: push_1
-      0142: sar
-      0143: put_loc local[1] b_op
-      0146: get_var atom#232
-      0151: get_field2 atom#233
-      0156: get_var_ref1
-      0157: call_method 1
-      0160: drop
-      0161: get_var_ref1
-      0162: push_1
-      0163: shr
-      0164: put_loc local[1] b_op
-      0167: get_var atom#232
-      0172: get_field2 atom#233
-      0177: get_var_ref1
-      0178: call_method 1
-      0181: drop
-      0182: push_5
-      0183: put_var_ref2
-      0184: get_var_ref2
-      0185: push_3
-      0186: and
-      0187: put_loc local[2] c_op
-      0190: get_var atom#232
-      0195: get_field2 atom#233
-      0200: get_var_ref2
-      0201: call_method 1
-      0204: drop
-      0205: get_var_ref2
-      0206: push_2
-      0207: or
-      0208: put_loc local[2] c_op
-      0211: get_var atom#232
-      0216: get_field2 atom#233
-      0221: get_var_ref2
-      0222: call_method 1
-      0225: drop
-      0226: get_var_ref2
-      0227: push_1
-      0228: xor
-      0229: put_loc local[2] c_op
-      0232: get_var atom#232
-      0237: get_field2 atom#233
-      0242: get_var_ref2
-      0243: call_method 1
-      0246: drop
-      0247: return_undef
-      0248: undefined
-      0249: return_async
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: push_i32 10
+      0009: put_var_ref0
+      0010: get_var_ref0
+      0011: push_5
+      0012: add
+      0013: put_loc local[0]
+      0016: get_var atom#232
+      0021: get_field2 atom#233
+      0026: get_var_ref0
+      0027: call_method 1
+      0030: drop
+      0031: get_var_ref0
+      0032: push_3
+      0033: sub
+      0034: put_loc local[0]
+      0037: get_var atom#232
+      0042: get_field2 atom#233
+      0047: get_var_ref0
+      0048: call_method 1
+      0051: drop
+      0052: get_var_ref0
+      0053: push_2
+      0054: mul
+      0055: put_loc local[0]
+      0058: get_var atom#232
+      0063: get_field2 atom#233
+      0068: get_var_ref0
+      0069: call_method 1
+      0072: drop
+      0073: get_var_ref0
+      0074: push_4
+      0075: div
+      0076: put_loc local[0]
+      0079: get_var atom#232
+      0084: get_field2 atom#233
+      0089: get_var_ref0
+      0090: call_method 1
+      0093: drop
+      0094: get_var_ref0
+      0095: push_3
+      0096: mod
+      0097: put_loc local[0]
+      0100: get_var atom#232
+      0105: get_field2 atom#233
+      0110: get_var_ref0
+      0111: call_method 1
+      0114: drop
+      0115: push_1
+      0116: put_var_ref1
+      0117: get_var_ref1
+      0118: push_1
+      0119: shl
+      0120: put_loc local[1]
+      0123: get_var atom#232
+      0128: get_field2 atom#233
+      0133: get_var_ref1
+      0134: call_method 1
+      0137: drop
+      0138: get_var_ref1
+      0139: push_1
+      0140: sar
+      0141: put_loc local[1]
+      0144: get_var atom#232
+      0149: get_field2 atom#233
+      0154: get_var_ref1
+      0155: call_method 1
+      0158: drop
+      0159: get_var_ref1
+      0160: push_1
+      0161: shr
+      0162: put_loc local[1]
+      0165: get_var atom#232
+      0170: get_field2 atom#233
+      0175: get_var_ref1
+      0176: call_method 1
+      0179: drop
+      0180: push_5
+      0181: put_var_ref2
+      0182: get_var_ref2
+      0183: push_3
+      0184: and
+      0185: put_loc local[2]
+      0188: get_var atom#232
+      0193: get_field2 atom#233
+      0198: get_var_ref2
+      0199: call_method 1
+      0202: drop
+      0203: get_var_ref2
+      0204: push_2
+      0205: or
+      0206: put_loc local[2]
+      0209: get_var atom#232
+      0214: get_field2 atom#233
+      0219: get_var_ref2
+      0220: call_method 1
+      0223: drop
+      0224: get_var_ref2
+      0225: push_1
+      0226: xor
+      0227: put_loc local[2]
+      0230: get_var atom#232
+      0235: get_field2 atom#233
+      0240: get_var_ref2
+      0241: call_method 1
+      0244: drop
+      0245: undefined
+      0246: return_async

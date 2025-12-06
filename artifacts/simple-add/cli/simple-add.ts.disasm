@@ -12,15 +12,15 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/simple-add.ts
       pc2line_bytes: 0
-      source_length: undefined
+      source_length: 0
 
     opcodes (9):
       0000: push_this
-      0001: if_false +5 -> 11
-      0006: push_1
-      0007: push_2
-      0008: add
-      0009: drop
-      0010: return_undef
-      0011: undefined
-      0012: return_async
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: push_1
+      0005: push_2
+      0006: add
+      0007: drop
+      0008: undefined
+      0009: return_async

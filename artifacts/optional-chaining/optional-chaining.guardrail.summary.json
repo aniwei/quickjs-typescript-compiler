@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/optional-chaining/cli/optional-chaining.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/optional-chaining/cli/optional-chaining.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/optional-chaining/cli/optional-chaining.pc2line.txt",
-    "bytecodeSize": 483,
+    "bytecodeSize": 457,
     "pc2lineLength": 0,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 483,
+    "tsSize": 388,
     "wasmSize": 377,
-    "sizeDiff": 106,
-    "sizeDiffPercent": 28.116710875331563
+    "sizeDiff": 11,
+    "sizeDiffPercent": 2.9177718832891246
   },
   "trace": {
     "differenceCount": 0,

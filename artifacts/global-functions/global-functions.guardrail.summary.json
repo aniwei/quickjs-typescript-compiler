@@ -12,10 +12,10 @@
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 327,
+    "tsSize": 258,
     "wasmSize": 274,
-    "sizeDiff": 53,
-    "sizeDiffPercent": 19.34306569343066
+    "sizeDiff": -16,
+    "sizeDiffPercent": -5.839416058394161
   },
   "trace": {
     "differenceCount": 0,

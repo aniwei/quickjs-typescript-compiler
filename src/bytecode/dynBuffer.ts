@@ -95,30 +95,36 @@ export class DynBuf {
   }
 
   putU64(val: bigint): void {
-    if (this.error) return;
-    if (!this.realloc(this.size + 8)) return;
-    const low = Number(val & 0xffffffffn);
-    const high = Number((val >> 32n) & 0xffffffffn);
-    this.putU32(low);
-    this.size -= 4; // putU32 increments size, so we adjust back to overwrite
-    this.buf[this.size] = low & 0xff;
-    this.buf[this.size + 1] = (low >> 8) & 0xff;
-    this.buf[this.size + 2] = (low >> 16) & 0xff;
-    this.buf[this.size + 3] = (low >>> 24) & 0xff;
+    if (this.error) {
+      return
+    }
+
+    if (!this.realloc(this.size + 8)) {
+      return
+    }
+
+    const low = Number(val & 0xffffffffn)
+    const high = Number((val >> 32n) & 0xffffffffn)
+    this.putU32(low)
+    this.size -= 4 // putU32 increments size, so we adjust back to overwrite
+    this.buf[this.size] = low & 0xff
+    this.buf[this.size + 1] = (low >> 8) & 0xff
+    this.buf[this.size + 2] = (low >> 16) & 0xff
+    this.buf[this.size + 3] = (low >>> 24) & 0xff
     
-    this.buf[this.size + 4] = high & 0xff;
-    this.buf[this.size + 5] = (high >> 8) & 0xff;
-    this.buf[this.size + 6] = (high >> 16) & 0xff;
-    this.buf[this.size + 7] = (high >>> 24) & 0xff;
-    this.size += 8;
+    this.buf[this.size + 4] = high & 0xff
+    this.buf[this.size + 5] = (high >> 8) & 0xff
+    this.buf[this.size + 6] = (high >> 16) & 0xff
+    this.buf[this.size + 7] = (high >>> 24) & 0xff
+    this.size += 8
   }
 
   reset(): void {
-    this.size = 0;
-    this.error = false;
+    this.size = 0
+    this.error = false
   }
 
   buffer(): Uint8Array {
-    return this.buf.subarray(0, this.size);
+    return this.buf.subarray(0, this.size)
   }
 }

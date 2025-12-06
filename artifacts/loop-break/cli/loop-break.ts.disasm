@@ -11,33 +11,27 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=2, closures=2
-    locals (2):
-      [0] first kind=kind#0 level=1 next=0
-      [1] second kind=kind#0 level=1 next=0
-    closure_vars (2):
-      [0] first -> var#0 [local, kind#0]
-      [1] second -> var#1 [local, kind#0]
+    args: total=0, defined=0, vars=0, closures=0
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/loop-break.ts
-      pc2line_bytes: 9
-      source_length: undefined
+      pc2line_bytes: 8
+      source_length: 0
 
     opcodes (16):
       0000: push_this
-      0001: if_false +22 -> 28
-      0006: push_1
-      0007: put_var_ref0
-      0008: push_2
-      0009: put_var_ref1
-      0010: get_var atom#231
-      0015: get_field2 atom#232
-      0020: get_var_ref0
-      0021: get_var_ref1
-      0022: add
-      0023: call_method 1
-      0026: drop
-      0027: return_undef
-      0028: undefined
-      0029: return_async
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: push_1
+      0005: put_loc0
+      0006: push_2
+      0007: put_loc1
+      0008: get_var atom#231
+      0013: get_field2 atom#232
+      0018: get_loc0
+      0019: get_loc1
+      0020: add
+      0021: call_method 1
+      0024: drop
+      0025: undefined
+      0026: return_async

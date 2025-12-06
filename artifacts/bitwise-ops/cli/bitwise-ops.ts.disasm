@@ -1,40 +1,146 @@
-; failed to parse bytecode: Unexpected EOF
-; fallback hex dump:
-00000000: 05 10 dc 01 2f 55 73 65 72 73 2f 61 6e 69 77 65 |..../Users/aniwe|
-00000010: 69 2f 44 65 73 6b 74 6f 70 2f 77 6f 72 6b 73 70 |i/Desktop/worksp|
-00000020: 61 63 65 73 2f 71 75 69 63 6b 6a 73 2d 74 79 70 |aces/quickjs-typ|
-00000030: 65 73 63 72 69 70 74 2d 63 6f 6d 70 69 6c 65 72 |escript-compiler|
-00000040: 5f 73 65 63 6f 6e 64 2f 5f 5f 74 65 73 74 73 5f |_second/__tests_|
-00000050: 5f 2f 63 6f 6d 70 69 6c 65 72 2f 66 69 78 74 75 |_/compiler/fixtu|
-00000060: 72 65 73 2f 62 69 74 77 69 73 65 2d 6f 70 73 2e |res/bitwise-ops.|
-00000070: 74 73 14 62 69 74 77 69 73 65 4f 70 73 12 73 68 |ts.bitwiseOps.sh|
-00000080: 69 66 74 4c 65 66 74 14 73 68 69 66 74 52 69 67 |iftLeft.shiftRig|
-00000090: 68 74 1a 73 68 69 66 74 55 6e 73 69 67 6e 65 64 |ht.shiftUnsigned|
-000000a0: 0a 70 6f 77 65 72 14 62 69 74 77 69 73 65 41 6e |.power.bitwiseAn|
-000000b0: 64 12 62 69 74 77 69 73 65 4f 72 14 62 69 74 77 |d.bitwiseOr.bitw|
-000000c0: 69 73 65 58 6f 72 0c 68 61 73 4b 65 79 14 69 73 |iseXor.hasKey.is|
-000000d0: 49 6e 73 74 61 6e 63 65 08 62 61 73 65 08 6d 61 |Instance.base.ma|
-000000e0: 73 6b 06 6f 62 6a 08 63 74 6f 72 06 6b 65 79 0d |sk.obj.ctor.key.|
-000000f0: c8 03 00 01 00 00 00 ca 03 ca 03 0c 20 06 01 a4 |............ ...|
-00000100: 01 00 01 00 03 01 01 0c 01 ca 03 00 00 00 ca 03 |................|
-00000110: 00 01 08 6c 04 00 00 00 c2 00 e3 29 06 2f c8 03 |...l.......)./..|
-00000120: 01 00 00 0c 00 04 00 ca 03 04 0a 04 03 00 00 8e |................|
-00000130: 01 0e 84 01 00 00 00 e0 03 00 00 00 e2 03 00 00 |................|
-00000140: 00 e4 03 00 00 00 cc 03 00 00 00 ce 03 00 00 00 |................|
-00000150: d0 03 00 00 00 d2 03 00 00 00 d4 03 00 00 00 d6 |................|
-00000160: 03 00 00 00 d8 03 00 00 00 da 03 00 00 00 dc 03 |................|
-00000170: 00 00 00 de 03 00 00 00 d3 b9 a2 5b 00 00 d3 b8 |...........[....|
-00000180: a3 5b 01 00 d3 b8 a4 5b 02 00 d3 ba a1 5b 03 00 |.[.....[.....[..|
-00000190: d3 d4 af 5b 04 00 d3 d4 b1 5b 05 00 d3 d4 b0 5b |...[.....[.....[|
-000001a0: 06 00 04 f3 00 00 00 d5 aa 5b 07 00 d5 d6 a9 5b |.........[.....[|
-000001b0: 08 00 c7 c8 9f c9 9f ca 9f 5a 04 00 9f 5a 05 00 |.........Z...Z..|
-000001c0: 9f 5a 06 00 9f 5b 09 00 5a 07 00 6c 1e 00 00 00 |.Z...[..Z..l....|
-000001d0: 5a 08 00 6c 0b 00 00 00 5a 09 00 b9 9f 28 6e 00 |Z..l....Z....(n.|
-000001e0: 00 00 00 5a 09 00 b8 9f 28 6e 00 00 00 00 5a 08 |...Z....(n....Z.|
-000001f0: 00 6c 0b 00 00 00 5a 09 00 b8 9f 28 6e 00 00 00 |.l....Z....(n...|
-00000200: 00 5a 09 00 28 29 c8 03 01 51 00 00 01 00 06 01 |.Z..()...Q......|
-00000210: 00 06 01 00 06 01 00 06 01 00 06 01 00 06 01 00 |................|
-00000220: 06 01 00 0a 01 00 06 02 00 01 01 00 02 01 00 02 |................|
-00000230: 01 00 02 01 00 04 01 00 04 01 00 07 01 00 00 02 |................|
-00000240: 00 08 01 00 08 01 00 0b 01 00 00 01 00 0b 01 00 |................|
-00000250: 00 02 00 08 01 00 0b 01 00 00 02 00             |............|
+bytecode_version: 5
+atoms (16):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "bitwiseOps"
+  [2] @230 = "shiftLeft"
+  [3] @231 = "shiftRight"
+  [4] @232 = "shiftUnsigned"
+  [5] @233 = "power"
+  [6] @234 = "bitwiseAnd"
+  [7] @235 = "bitwiseOr"
+  [8] @236 = "bitwiseXor"
+  [9] @237 = "hasKey"
+  [10] @238 = "isInstance"
+  [11] @239 = "base"
+  [12] @240 = "mask"
+  [13] @241 = "obj"
+  [14] @242 = "ctor"
+  [15] @243 = "key"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/bitwise-ops.ts"
+  exports (1):
+    [0] local bitwiseOps -> local#0
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=0, closures=1
+    closure_vars (1):
+      [0] bitwiseOps -> var#0 [local, kind#0]
+    constant_pool (1):
+      [0] function bitwiseOps
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/bitwise-ops.ts
+      pc2line_bytes: 0
+      source_length: 0
+
+    opcodes (7):
+      0000: push_this
+      0001: if_false8 +5 -> 8
+      0003: fclosure8 const[0] function bitwiseOps
+      0005: put_var_ref0
+      0006: return_undef
+      0007: undefined
+      0008: return_async
+
+    function[1] bitwiseOps (const[0]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=4, defined=4, vars=10, closures=0
+      locals (14):
+        [0] value kind=kind#0 level=0 next=0
+        [1] mask kind=kind#0 level=0 next=0
+        [2] obj kind=kind#0 level=0 next=0
+        [3] ctor kind=kind#0 level=0 next=0
+        [4] shiftLeft kind=kind#0 level=1 next=0 [const, lexical]
+        [5] shiftRight kind=kind#0 level=1 next=0 [const, lexical]
+        [6] shiftUnsigned kind=kind#0 level=1 next=1 [const, lexical]
+        [7] power kind=kind#0 level=1 next=2 [const, lexical]
+        [8] bitwiseAnd kind=kind#0 level=1 next=3 [const, lexical]
+        [9] bitwiseOr kind=kind#0 level=1 next=4 [const, lexical]
+        [10] bitwiseXor kind=kind#0 level=1 next=5 [const, lexical]
+        [11] hasKey kind=kind#0 level=1 next=6 [const, lexical]
+        [12] isInstance kind=kind#0 level=1 next=7 [const, lexical]
+        [13] base kind=kind#0 level=1 next=8 [const, lexical]
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/bitwise-ops.ts
+        pc2line_bytes: 70
+        source_length: 0
+
+      opcodes (74):
+        0000: get_arg0
+        0001: push_2
+        0002: shl
+        0003: put_loc0
+        0004: get_arg0
+        0005: push_1
+        0006: sar
+        0007: put_loc1
+        0008: get_arg0
+        0009: push_1
+        0010: shr
+        0011: put_loc2
+        0012: get_arg0
+        0013: push_3
+        0014: pow
+        0015: put_loc3
+        0016: get_arg0
+        0017: get_arg1
+        0018: and
+        0019: put_loc local[4] shiftLeft
+        0022: get_arg0
+        0023: get_arg1
+        0024: or
+        0025: put_loc local[5] shiftRight
+        0028: get_arg0
+        0029: get_arg1
+        0030: xor
+        0031: put_loc local[6] shiftUnsigned
+        0034: push_atom_value atom#243
+        0039: get_arg2
+        0040: in
+        0041: put_loc local[7] power
+        0044: get_arg2
+        0045: get_arg3
+        0046: instanceof
+        0047: put_loc local[8] bitwiseAnd
+        0050: get_loc0
+        0051: get_loc1
+        0052: add
+        0053: get_loc2
+        0054: add
+        0055: get_loc3
+        0056: add
+        0057: get_loc local[4] shiftLeft
+        0060: add
+        0061: get_loc local[5] shiftRight
+        0064: add
+        0065: get_loc local[6] shiftUnsigned
+        0068: add
+        0069: put_loc local[9] bitwiseOr
+        0072: get_loc local[7] power
+        0075: if_false +34 -> 114
+        0080: get_loc local[8] bitwiseAnd
+        0083: if_false +15 -> 103
+        0088: get_loc local[9] bitwiseOr
+        0091: push_2
+        0092: add
+        0093: return
+        0094: goto +4 -> 103
+        0099: get_loc local[9] bitwiseOr
+        0102: push_1
+        0103: add
+        0104: return
+        0105: goto +4 -> 114
+        0110: get_loc local[8] bitwiseAnd
+        0113: if_false +15 -> 133
+        0118: get_loc local[9] bitwiseOr
+        0121: push_1
+        0122: add
+        0123: return
+        0124: goto +4 -> 133
+        0129: get_loc local[9] bitwiseOr
+        0132: return
+        0133: return_undef

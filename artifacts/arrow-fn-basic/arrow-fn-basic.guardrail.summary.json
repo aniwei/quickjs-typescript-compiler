@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/arrow-fn-basic/cli/arrow-fn-basic.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/arrow-fn-basic/cli/arrow-fn-basic.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/arrow-fn-basic/cli/arrow-fn-basic.pc2line.txt",
-    "bytecodeSize": 391,
+    "bytecodeSize": 371,
     "pc2lineLength": 0,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 391,
+    "tsSize": 302,
     "wasmSize": 316,
-    "sizeDiff": 75,
-    "sizeDiffPercent": 23.734177215189874
+    "sizeDiff": -14,
+    "sizeDiffPercent": -4.430379746835443
   },
   "trace": {
     "differenceCount": 0,

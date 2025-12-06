@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/labeled-statements/cli/labeled-statements.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/labeled-statements/cli/labeled-statements.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/labeled-statements/cli/labeled-statements.pc2line.txt",
-    "bytecodeSize": 157,
+    "bytecodeSize": 154,
     "pc2lineLength": 0,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 157,
+    "tsSize": 85,
     "wasmSize": 202,
-    "sizeDiff": -45,
-    "sizeDiffPercent": -22.277227722772277
+    "sizeDiff": -117,
+    "sizeDiffPercent": -57.920792079207914
   },
   "trace": {
     "differenceCount": 0,

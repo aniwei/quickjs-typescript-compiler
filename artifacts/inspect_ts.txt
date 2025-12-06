@@ -1,0 +1,70 @@
+Version: 5, Atoms: 7
+Tag: 13 (Expected 13)
+
+Function: <eval>
+Flags: 0x620, Mode: 1
+Args: 0, Vars: 0, Stack: 3
+ClosureVars: 3, CPool: 3, Bytecode: 38
+Locals: 0
+ClosureVar 0: Atom=458, Idx=0, Flags=0xd
+ClosureVar 1: Atom=460, Idx=1, Flags=0xd
+ClosureVar 2: Atom=462, Idx=2, Flags=0xd
+Bytecode (38 bytes):
+08 ec 02 29 c2 00 b8 b9 f2 e3 c2 01 68 00 00 f1 e4 c2 02 68 01 00 f1 e5 68 00 00 0e 68 01 00 0e 68 02 00 0e 06 2f
+Next 10 bytes: c8 03 00 12 16 0f 0c 11 07 03
+PC2Line: 18 bytes
+CPool 0: Tag=12
+
+Function: Nested 0
+Flags: 0x402, Mode: 0
+Args: 2, Vars: 0, Stack: 3
+ClosureVars: 0, CPool: 0, Bytecode: 4
+Locals: 2
+Arg 0:
+  Atom=464, Level=0, Next=0, Kind=0
+Arg 1:
+  Atom=466, Level=0, Next=0, Kind=0
+Bytecode (4 bytes):
+d3 d4 9f 28
+Next 10 bytes: c8 03 00 02 02 0a 00 0c 02 04
+PC2Line: 2 bytes
+CPool 1: Tag=12
+
+Function: Nested 1
+Flags: 0x402, Mode: 0
+Args: 1, Vars: 0, Stack: 3
+ClosureVars: 0, CPool: 0, Bytecode: 4
+Locals: 1
+Arg 0:
+  Atom=132, Level=0, Next=0, Kind=0
+Bytecode (4 bytes):
+d3 b9 9c 28
+Next 10 bytes: c8 03 01 02 02 0b 00 0c 02 04
+PC2Line: 2 bytes
+CPool 2: Tag=12
+
+Function: Nested 2
+Flags: 0x402, Mode: 0
+Args: 1, Vars: 0, Stack: 3
+ClosureVars: 0, CPool: 1, Bytecode: 5
+Locals: 1
+Arg 0:
+  Atom=132, Level=0, Next=0, Kind=0
+Bytecode (5 bytes):
+c2 00 bb f1 28
+Next 10 bytes: c8 03 02 02 02 0c 00 0c 02 04
+PC2Line: 2 bytes
+CPool 0: Tag=12
+
+Function: Nested 0
+Flags: 0x402, Mode: 0
+Args: 1, Vars: 0, Stack: 3
+ClosureVars: 1, CPool: 0, Bytecode: 4
+Locals: 1
+Arg 0:
+  Atom=468, Level=0, Next=0, Kind=0
+ClosureVar 0: Atom=132, Idx=0, Flags=0x3
+Bytecode (4 bytes):
+df d3 9f 28
+Next 10 bytes: c8 03 02 02 02 0b 00
+PC2Line: 2 bytes

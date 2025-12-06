@@ -18,124 +18,116 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=7, closures=7
-    locals (7):
-      [0] a kind=kind#0 level=0 next=0
-      [1] x kind=kind#0 level=0 next=0
-      [2] y kind=kind#0 level=0 next=0
-      [3] z kind=kind#0 level=0 next=0
-      [4] w kind=kind#0 level=0 next=0
-      [5] mixed kind=kind#0 level=0 next=0
-      [6] callChain kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=7
     closure_vars (7):
-      [0] a -> var#0 [local, kind#0]
-      [1] x -> var#1 [local, kind#0]
-      [2] y -> var#2 [local, kind#0]
-      [3] z -> var#3 [local, kind#0]
-      [4] w -> var#4 [local, kind#0]
-      [5] mixed -> var#5 [local, kind#0]
-      [6] callChain -> var#6 [local, kind#0]
+      [0] a -> var#0 [local, const, lexical, kind#0]
+      [1] x -> var#1 [local, const, lexical, kind#0]
+      [2] y -> var#2 [local, const, lexical, kind#0]
+      [3] z -> var#3 [local, const, lexical, kind#0]
+      [4] w -> var#4 [local, const, lexical, kind#0]
+      [5] mixed -> var#5 [local, const, lexical, kind#0]
+      [6] callChain -> var#6 [local, const, lexical, kind#0]
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/optional-chaining.ts
       pc2line_bytes: 18
-      source_length: undefined
+      source_length: 0
 
     opcodes (97):
       0000: push_this
-      0001: if_false +201 -> 207
-      0006: object
-      0007: object
-      0008: push_1
-      0009: define_field atom#236
-      0014: define_field atom#237
-      0019: put_var_ref0
-      0020: get_var_ref0
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: object
+      0005: object
+      0006: push_1
+      0007: define_field atom#236
+      0012: define_field atom#237
+      0017: put_var_ref0
+      0018: get_var_ref_check var_ref[0] a
       0021: dup
       0022: is_undefined_or_null
-      0023: if_false8 +7 -> 32
+      0023: if_false8 +8 -> 33
       0025: drop
       0026: undefined
-      0027: goto +21 -> 53
+      0027: goto +25 -> 57
       0032: get_field atom#237
       0037: dup
       0038: is_undefined_or_null
-      0039: if_false8 +7 -> 48
+      0039: if_false8 +8 -> 49
       0041: drop
       0042: undefined
-      0043: goto +5 -> 53
+      0043: goto +9 -> 57
       0048: get_field atom#236
       0053: put_var_ref1
-      0054: get_var_ref0
-      0055: dup
-      0056: is_undefined_or_null
-      0057: if_false8 +7 -> 66
-      0059: drop
-      0060: undefined
-      0061: goto +22 -> 88
-      0066: push_atom_value atom#237
-      0071: get_array_el
-      0072: dup
-      0073: is_undefined_or_null
-      0074: if_false8 +7 -> 83
-      0076: drop
-      0077: undefined
-      0078: goto +5 -> 88
-      0083: get_field atom#236
-      0088: put_var_ref2
-      0089: get_var_ref0
-      0090: dup
-      0091: is_undefined_or_null
-      0092: if_false8 +7 -> 101
-      0094: drop
-      0095: undefined
-      0096: goto +21 -> 122
-      0101: get_field atom#238
-      0106: dup
-      0107: is_undefined_or_null
-      0108: if_false8 +7 -> 117
-      0110: drop
-      0111: undefined
-      0112: goto +5 -> 122
-      0117: get_field atom#236
-      0122: put_var_ref3
-      0123: get_var_ref0
-      0124: dup
-      0125: is_undefined_or_null
-      0126: if_false8 +7 -> 135
-      0128: drop
-      0129: undefined
-      0130: goto +20 -> 155
-      0135: get_field2 atom#239
-      0140: dup
-      0141: is_undefined_or_null
-      0142: if_false8 +8 -> 152
-      0144: drop
-      0145: drop
-      0146: undefined
-      0147: goto +3 -> 155
-      0152: call_method 0
-      0155: put_var_ref var_ref[4] w
-      0158: get_var_ref0
-      0159: dup
-      0160: is_undefined_or_null
-      0161: if_false8 +7 -> 170
-      0163: drop
-      0164: undefined
-      0165: goto +10 -> 180
-      0170: get_field atom#237
-      0175: get_field atom#236
-      0180: put_var_ref var_ref[5] mixed
-      0183: get_var_ref0
-      0184: dup
-      0185: is_undefined_or_null
-      0186: if_false8 +7 -> 195
-      0188: drop
-      0189: undefined
-      0190: goto +8 -> 203
-      0195: get_field2 atom#237
-      0200: call_method 0
-      0203: put_var_ref var_ref[6] callChain
-      0206: return_undef
-      0207: undefined
-      0208: return_async
+      0054: get_var_ref_check var_ref[0] a
+      0057: dup
+      0058: is_undefined_or_null
+      0059: if_false8 +8 -> 69
+      0061: drop
+      0062: undefined
+      0063: goto +26 -> 94
+      0068: push_atom_value atom#237
+      0073: get_array_el
+      0074: dup
+      0075: is_undefined_or_null
+      0076: if_false8 +8 -> 86
+      0078: drop
+      0079: undefined
+      0080: goto +9 -> 94
+      0085: get_field atom#236
+      0090: put_var_ref2
+      0091: get_var_ref_check var_ref[0] a
+      0094: dup
+      0095: is_undefined_or_null
+      0096: if_false8 +8 -> 106
+      0098: drop
+      0099: undefined
+      0100: goto +25 -> 130
+      0105: get_field atom#238
+      0110: dup
+      0111: is_undefined_or_null
+      0112: if_false8 +8 -> 122
+      0114: drop
+      0115: undefined
+      0116: goto +9 -> 130
+      0121: get_field atom#236
+      0126: put_var_ref3
+      0127: get_var_ref_check var_ref[0] a
+      0130: dup
+      0131: is_undefined_or_null
+      0132: if_false8 +8 -> 142
+      0134: drop
+      0135: undefined
+      0136: goto +24 -> 165
+      0141: get_field2 atom#239
+      0146: dup
+      0147: is_undefined_or_null
+      0148: if_false8 +9 -> 159
+      0150: drop
+      0151: drop
+      0152: undefined
+      0153: goto +7 -> 165
+      0158: call_method 0
+      0161: put_var_ref var_ref[4] w
+      0164: get_var_ref_check var_ref[0] a
+      0167: dup
+      0168: is_undefined_or_null
+      0169: if_false8 +8 -> 179
+      0171: drop
+      0172: undefined
+      0173: goto +14 -> 192
+      0178: get_field atom#237
+      0183: get_field atom#236
+      0188: put_var_ref var_ref[5] mixed
+      0191: get_var_ref_check var_ref[0] a
+      0194: dup
+      0195: is_undefined_or_null
+      0196: if_false8 +8 -> 206
+      0198: drop
+      0199: undefined
+      0200: goto +12 -> 217
+      0205: get_field2 atom#237
+      0210: call_method 0
+      0213: put_var_ref var_ref[6] callChain
+      0216: undefined
+      0217: return_async

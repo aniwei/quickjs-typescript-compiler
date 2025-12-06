@@ -14,82 +14,82 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/comparison-operators.ts
-      pc2line_bytes: 27
-      source_length: undefined
+      pc2line_bytes: 56
+      source_length: 0
 
     opcodes (75):
       0000: push_this
-      0001: if_false +179 -> 185
-      0006: get_var atom#229
-      0011: get_field2 atom#230
-      0016: push_1
-      0017: push_1
-      0018: eq
-      0019: call_method 1
-      0022: drop
-      0023: get_var atom#229
-      0028: get_field2 atom#230
-      0033: push_1
-      0034: push_2
-      0035: neq
-      0036: call_method 1
-      0039: drop
-      0040: get_var atom#229
-      0045: get_field2 atom#230
-      0050: push_1
-      0051: push_1
-      0052: strict_eq
-      0053: call_method 1
-      0056: drop
-      0057: get_var atom#229
-      0062: get_field2 atom#230
-      0067: push_1
-      0068: push_2
-      0069: strict_neq
-      0070: call_method 1
-      0073: drop
-      0074: get_var atom#229
-      0079: get_field2 atom#230
-      0084: push_1
-      0085: push_2
-      0086: lt
-      0087: call_method 1
-      0090: drop
-      0091: get_var atom#229
-      0096: get_field2 atom#230
-      0101: push_2
-      0102: push_1
-      0103: gt
-      0104: call_method 1
-      0107: drop
-      0108: get_var atom#229
-      0113: get_field2 atom#230
-      0118: push_1
-      0119: push_1
-      0120: lte
-      0121: call_method 1
-      0124: drop
-      0125: get_var atom#229
-      0130: get_field2 atom#230
-      0135: push_1
-      0136: push_1
-      0137: gte
-      0138: call_method 1
-      0141: drop
-      0142: get_var atom#229
-      0147: get_field2 atom#230
-      0152: push_atom_value atom#231
-      0157: push_1
-      0158: eq
-      0159: call_method 1
-      0162: drop
-      0163: get_var atom#229
-      0168: get_field2 atom#230
-      0173: push_atom_value atom#231
-      0178: push_1
-      0179: strict_eq
-      0180: call_method 1
-      0183: drop
-      0184: return_undef
-      0185: undefined
-      0186: return_async
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: get_var atom#229
+      0009: get_field2 atom#230
+      0014: push_1
+      0015: push_1
+      0016: eq
+      0017: call_method 1
+      0020: drop
+      0021: get_var atom#229
+      0026: get_field2 atom#230
+      0031: push_1
+      0032: push_2
+      0033: neq
+      0034: call_method 1
+      0037: drop
+      0038: get_var atom#229
+      0043: get_field2 atom#230
+      0048: push_1
+      0049: push_1
+      0050: strict_eq
+      0051: call_method 1
+      0054: drop
+      0055: get_var atom#229
+      0060: get_field2 atom#230
+      0065: push_1
+      0066: push_2
+      0067: strict_neq
+      0068: call_method 1
+      0071: drop
+      0072: get_var atom#229
+      0077: get_field2 atom#230
+      0082: push_1
+      0083: push_2
+      0084: lt
+      0085: call_method 1
+      0088: drop
+      0089: get_var atom#229
+      0094: get_field2 atom#230
+      0099: push_2
+      0100: push_1
+      0101: gt
+      0102: call_method 1
+      0105: drop
+      0106: get_var atom#229
+      0111: get_field2 atom#230
+      0116: push_1
+      0117: push_1
+      0118: lte
+      0119: call_method 1
+      0122: drop
+      0123: get_var atom#229
+      0128: get_field2 atom#230
+      0133: push_1
+      0134: push_1
+      0135: gte
+      0136: call_method 1
+      0139: drop
+      0140: get_var atom#229
+      0145: get_field2 atom#230
+      0150: push_atom_value atom#231
+      0155: push_1
+      0156: eq
+      0157: call_method 1
+      0160: drop
+      0161: get_var atom#229
+      0166: get_field2 atom#230
+      0171: push_atom_value atom#231
+      0176: push_1
+      0177: strict_eq
+      0178: call_method 1
+      0181: drop
+      0182: undefined
+      0183: return_async

@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/bitwise-ops.ts
-**生成时间**: 2025-12-05T12:54:23.826Z
+**生成时间**: 2025-12-06T02:09:56.267Z
 
 ## 大小对比
 
-- TypeScript编译器: 604 字节
+- TypeScript编译器: 508 字节
 - WASM编译器: 545 字节
-- 差异: 59 字节 (10.83%)
+- 差异: -37 字节 (-6.79%)
 
 ## 结构分析
 
@@ -20,10 +20,10 @@
   "atoms": [
     {
       "index": 0,
-      "rawLength": 220,
-      "actualLength": 110,
+      "rawLength": 84,
+      "actualLength": 42,
       "isWideChar": 0,
-      "string": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/bitwise-ops.js",
+      "string": "__tests__/compiler/fixtures/bitwise-ops.js",
       "offset": 2
     },
     {
@@ -32,7 +32,7 @@
       "actualLength": 10,
       "isWideChar": 0,
       "string": "bitwiseOps",
-      "offset": 114
+      "offset": 45
     },
     {
       "index": 2,
@@ -40,7 +40,7 @@
       "actualLength": 9,
       "isWideChar": 0,
       "string": "shiftLeft",
-      "offset": 125
+      "offset": 56
     },
     {
       "index": 3,
@@ -48,7 +48,7 @@
       "actualLength": 10,
       "isWideChar": 0,
       "string": "shiftRight",
-      "offset": 135
+      "offset": 66
     },
     {
       "index": 4,
@@ -56,7 +56,7 @@
       "actualLength": 13,
       "isWideChar": 0,
       "string": "shiftUnsigned",
-      "offset": 146
+      "offset": 77
     },
     {
       "index": 5,
@@ -64,7 +64,7 @@
       "actualLength": 5,
       "isWideChar": 0,
       "string": "power",
-      "offset": 160
+      "offset": 91
     },
     {
       "index": 6,
@@ -72,7 +72,7 @@
       "actualLength": 10,
       "isWideChar": 0,
       "string": "bitwiseAnd",
-      "offset": 166
+      "offset": 97
     },
     {
       "index": 7,
@@ -80,7 +80,7 @@
       "actualLength": 9,
       "isWideChar": 0,
       "string": "bitwiseOr",
-      "offset": 177
+      "offset": 108
     },
     {
       "index": 8,
@@ -88,7 +88,7 @@
       "actualLength": 10,
       "isWideChar": 0,
       "string": "bitwiseXor",
-      "offset": 187
+      "offset": 118
     },
     {
       "index": 9,
@@ -96,7 +96,7 @@
       "actualLength": 6,
       "isWideChar": 0,
       "string": "hasKey",
-      "offset": 198
+      "offset": 129
     },
     {
       "index": 10,
@@ -104,7 +104,7 @@
       "actualLength": 10,
       "isWideChar": 0,
       "string": "isInstance",
-      "offset": 205
+      "offset": 136
     },
     {
       "index": 11,
@@ -112,7 +112,7 @@
       "actualLength": 4,
       "isWideChar": 0,
       "string": "base",
-      "offset": 216
+      "offset": 147
     },
     {
       "index": 12,
@@ -120,7 +120,7 @@
       "actualLength": 4,
       "isWideChar": 0,
       "string": "mask",
-      "offset": 221
+      "offset": 152
     },
     {
       "index": 13,
@@ -128,7 +128,7 @@
       "actualLength": 3,
       "isWideChar": 0,
       "string": "obj",
-      "offset": 226
+      "offset": 157
     },
     {
       "index": 14,
@@ -136,7 +136,7 @@
       "actualLength": 4,
       "isWideChar": 0,
       "string": "ctor",
-      "offset": 230
+      "offset": 161
     },
     {
       "index": 15,
@@ -144,13 +144,13 @@
       "actualLength": 3,
       "isWideChar": 0,
       "string": "key",
-      "offset": 235
+      "offset": 166
     }
   ],
   "functionHeader": {
-    "offset": 239,
+    "offset": 170,
     "tag": "0xd",
-    "remaining": 365
+    "remaining": 338
   }
 }
 ```
@@ -301,72 +301,66 @@
 
 ## 字节级差异
 
-共发现 573 个字节差异:
+共发现 424 个字节差异:
 
-- 偏移量 0x2: TS=0xdc vs WASM=0x54
-- 偏移量 0x3: TS=0x01 vs WASM=0x5f
-- 偏移量 0x4: TS=0x2f vs WASM=0x5f
-- 偏移量 0x5: TS=0x55 vs WASM=0x74
-- 偏移量 0x6: TS=0x73 vs WASM=0x65
-- 偏移量 0x7: TS=0x65 vs WASM=0x73
-- 偏移量 0x8: TS=0x72 vs WASM=0x74
-- 偏移量 0xa: TS=0x2f vs WASM=0x5f
-- 偏移量 0xb: TS=0x61 vs WASM=0x5f
-- 偏移量 0xc: TS=0x6e vs WASM=0x2f
-- 偏移量 0xd: TS=0x69 vs WASM=0x63
-- 偏移量 0xe: TS=0x77 vs WASM=0x6f
-- 偏移量 0xf: TS=0x65 vs WASM=0x6d
-- 偏移量 0x10: TS=0x69 vs WASM=0x70
-- 偏移量 0x11: TS=0x2f vs WASM=0x69
-- 偏移量 0x12: TS=0x44 vs WASM=0x6c
-- 偏移量 0x14: TS=0x73 vs WASM=0x72
-- 偏移量 0x15: TS=0x6b vs WASM=0x2f
-- 偏移量 0x16: TS=0x74 vs WASM=0x66
-- 偏移量 0x17: TS=0x6f vs WASM=0x69
-- ... (显示前20个差异，总共573个)
+- 偏移量 0x38: TS=0x12 vs WASM=0x08
+- 偏移量 0x39: TS=0x73 vs WASM=0x6d
+- 偏移量 0x3a: TS=0x68 vs WASM=0x61
+- 偏移量 0x3b: TS=0x69 vs WASM=0x73
+- 偏移量 0x3c: TS=0x66 vs WASM=0x6b
+- 偏移量 0x3d: TS=0x74 vs WASM=0x06
+- 偏移量 0x3e: TS=0x4c vs WASM=0x6f
+- 偏移量 0x3f: TS=0x65 vs WASM=0x62
+- 偏移量 0x40: TS=0x66 vs WASM=0x6a
+- 偏移量 0x41: TS=0x74 vs WASM=0x08
+- 偏移量 0x42: TS=0x14 vs WASM=0x63
+- 偏移量 0x43: TS=0x73 vs WASM=0x74
+- 偏移量 0x44: TS=0x68 vs WASM=0x6f
+- 偏移量 0x45: TS=0x69 vs WASM=0x72
+- 偏移量 0x46: TS=0x66 vs WASM=0x12
+- 偏移量 0x47: TS=0x74 vs WASM=0x73
+- 偏移量 0x48: TS=0x52 vs WASM=0x68
+- 偏移量 0x4a: TS=0x67 vs WASM=0x66
+- 偏移量 0x4b: TS=0x68 vs WASM=0x74
+- 偏移量 0x4c: TS=0x74 vs WASM=0x4c
+- ... (显示前20个差异，总共424个)
 
 ## 十六进制转储对比
 
 ### TypeScript
 ```
-00000000: 05 10 dc 01 2f 55 73 65 72 73 2f 61 6e 69 77 65 |..../Users/aniwe|
-00000010: 69 2f 44 65 73 6b 74 6f 70 2f 77 6f 72 6b 73 70 |i/Desktop/worksp|
-00000020: 61 63 65 73 2f 71 75 69 63 6b 6a 73 2d 74 79 70 |aces/quickjs-typ|
-00000030: 65 73 63 72 69 70 74 2d 63 6f 6d 70 69 6c 65 72 |escript-compiler|
-00000040: 5f 73 65 63 6f 6e 64 2f 5f 5f 74 65 73 74 73 5f |_second/__tests_|
-00000050: 5f 2f 63 6f 6d 70 69 6c 65 72 2f 66 69 78 74 75 |_/compiler/fixtu|
-00000060: 72 65 73 2f 62 69 74 77 69 73 65 2d 6f 70 73 2e |res/bitwise-ops.|
-00000070: 6a 73 14 62 69 74 77 69 73 65 4f 70 73 12 73 68 |js.bitwiseOps.sh|
-00000080: 69 66 74 4c 65 66 74 14 73 68 69 66 74 52 69 67 |iftLeft.shiftRig|
-00000090: 68 74 1a 73 68 69 66 74 55 6e 73 69 67 6e 65 64 |ht.shiftUnsigned|
-000000a0: 0a 70 6f 77 65 72 14 62 69 74 77 69 73 65 41 6e |.power.bitwiseAn|
-000000b0: 64 12 62 69 74 77 69 73 65 4f 72 14 62 69 74 77 |d.bitwiseOr.bitw|
-000000c0: 69 73 65 58 6f 72 0c 68 61 73 4b 65 79 14 69 73 |iseXor.hasKey.is|
-000000d0: 49 6e 73 74 61 6e 63 65 08 62 61 73 65 08 6d 61 |Instance.base.ma|
-000000e0: 73 6b 06 6f 62 6a 08 63 74 6f 72 06 6b 65 79 0d |sk.obj.ctor.key.|
-000000f0: c8 03 00 01 00 00 00 ca 03 ca 03 0c 20 06 01 a4 |............ ...|
-00000100: 01 00 01 00 03 01 01 0c 01 ca 03 00 00 00 ca 03 |................|
-00000110: 00 01 08 6c 04 00 00 00 c2 00 e3 29 06 2f c8 03 |...l.......)./..|
-00000120: 01 00 00 0c 00 04 00 ca 03 04 0a 04 03 00 00 8e |................|
-00000130: 01 0e 84 01 00 00 00 e0 03 00 00 00 e2 03 00 00 |................|
-00000140: 00 e4 03 00 00 00 cc 03 00 00 00 ce 03 00 00 00 |................|
-00000150: d0 03 00 00 00 d2 03 00 00 00 d4 03 00 00 00 d6 |................|
-00000160: 03 00 00 00 d8 03 00 00 00 da 03 00 00 00 dc 03 |................|
-00000170: 00 00 00 de 03 00 00 00 d3 b9 a2 5b 00 00 d3 b8 |...........[....|
-00000180: a3 5b 01 00 d3 b8 a4 5b 02 00 d3 ba a1 5b 03 00 |.[.....[.....[..|
-00000190: d3 d4 af 5b 04 00 d3 d4 b1 5b 05 00 d3 d4 b0 5b |...[.....[.....[|
-000001a0: 06 00 04 f3 00 00 00 d5 aa 5b 07 00 d5 d6 a9 5b |.........[.....[|
-000001b0: 08 00 c7 c8 9f c9 9f ca 9f 5a 04 00 9f 5a 05 00 |.........Z...Z..|
-000001c0: 9f 5a 06 00 9f 5b 09 00 5a 07 00 6c 1e 00 00 00 |.Z...[..Z..l....|
-000001d0: 5a 08 00 6c 0b 00 00 00 5a 09 00 b9 9f 28 6e 00 |Z..l....Z....(n.|
-000001e0: 00 00 00 5a 09 00 b8 9f 28 6e 00 00 00 00 5a 08 |...Z....(n....Z.|
-000001f0: 00 6c 0b 00 00 00 5a 09 00 b8 9f 28 6e 00 00 00 |.l....Z....(n...|
-00000200: 00 5a 09 00 28 29 c8 03 01 51 00 00 01 00 06 01 |.Z..()...Q......|
-00000210: 00 06 01 00 06 01 00 06 01 00 06 01 00 06 01 00 |................|
-00000220: 06 01 00 0a 01 00 06 02 00 01 01 00 02 01 00 02 |................|
-00000230: 01 00 02 01 00 04 01 00 04 01 00 07 01 00 00 02 |................|
-00000240: 00 08 01 00 08 01 00 0b 01 00 00 01 00 0b 01 00 |................|
-00000250: 00 02 00 08 01 00 0b 01 00 00 02 00             |............|
+00000000: 05 10 54 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..T__tests__/com|
+00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 62 |piler/fixtures/b|
+00000020: 69 74 77 69 73 65 2d 6f 70 73 2e 6a 73 14 62 69 |itwise-ops.js.bi|
+00000030: 74 77 69 73 65 4f 70 73 12 73 68 69 66 74 4c 65 |twiseOps.shiftLe|
+00000040: 66 74 14 73 68 69 66 74 52 69 67 68 74 1a 73 68 |ft.shiftRight.sh|
+00000050: 69 66 74 55 6e 73 69 67 6e 65 64 0a 70 6f 77 65 |iftUnsigned.powe|
+00000060: 72 14 62 69 74 77 69 73 65 41 6e 64 12 62 69 74 |r.bitwiseAnd.bit|
+00000070: 77 69 73 65 4f 72 14 62 69 74 77 69 73 65 58 6f |wiseOr.bitwiseXo|
+00000080: 72 0c 68 61 73 4b 65 79 14 69 73 49 6e 73 74 61 |r.hasKey.isInsta|
+00000090: 6e 63 65 08 62 61 73 65 08 6d 61 73 6b 06 6f 62 |nce.base.mask.ob|
+000000a0: 6a 08 63 74 6f 72 06 6b 65 79 0d c8 03 00 01 00 |j.ctor.key......|
+000000b0: 00 00 01 00 ca 03 0c 20 06 01 a4 01 00 00 00 03 |....... ........|
+000000c0: 01 01 09 00 ca 03 00 01 08 ec 05 c2 00 e3 29 06 |..............).|
+000000d0: 2f c8 03 00 00 00 0c 42 06 00 ca 03 04 0a 04 03 |/......B........|
+000000e0: 00 00 86 01 0e 84 01 00 00 00 e0 03 00 00 00 e2 |................|
+000000f0: 03 00 00 00 e4 03 00 00 00 cc 03 01 00 30 ce 03 |.............0..|
+00000100: 01 00 30 d0 03 01 01 30 d2 03 01 02 30 d4 03 01 |..0....0....0...|
+00000110: 03 30 d6 03 01 04 30 d8 03 01 05 30 da 03 01 06 |.0....0....0....|
+00000120: 30 dc 03 01 07 30 de 03 01 08 30 d3 b9 a2 cb d3 |0....0....0.....|
+00000130: b8 a3 cc d3 b8 a4 cd d3 ba a1 ce d3 d4 af 5b 04 |..............[.|
+00000140: 00 d3 d4 b1 5b 05 00 d3 d4 b0 5b 06 00 04 f3 00 |....[.....[.....|
+00000150: 00 00 d5 aa 5b 07 00 d5 d6 a9 5b 08 00 c7 c8 9f |....[.....[.....|
+00000160: c9 9f ca 9f 5a 04 00 9f 5a 05 00 9f 5a 06 00 9f |....Z...Z...Z...|
+00000170: 5b 09 00 5a 07 00 6c 22 00 00 00 5a 08 00 6c 0f |[..Z..l"...Z..l.|
+00000180: 00 00 00 5a 09 00 b9 9f 28 6e 04 00 00 00 5a 09 |...Z....(n....Z.|
+00000190: 00 b8 9f 28 6e 04 00 00 00 5a 08 00 6c 0f 00 00 |...(n....Z..l...|
+000001a0: 00 5a 09 00 b8 9f 28 6e 04 00 00 00 5a 09 00 28 |.Z....(n....Z..(|
+000001b0: 29 c8 03 00 46 03 14 07 09 12 78 07 09 12 7a 07 |)...F.....x...z.|
+000001c0: 0a 12 6e 07 09 12 7c 07 08 1c 77 07 08 1c 79 07 |..n...|...w...y.|
+000001d0: 08 1c 74 1b 09 1c 7b 07 0f 1e 60 08 00 0d 00 0d |..t...{...`.....|
+000001e0: 00 0d 00 17 00 17 00 27 02 2b 02 2b 05 11 07 2c |.......'.+.+...,|
+000001f0: 77 11 07 2d 74 2b 05 11 07 2d 77 00             |w..-t+...-w.|
 ```
 
 ### WASM

@@ -13,15 +13,11 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=3, closures=3
-    locals (3):
-      [0] total kind=kind#0 level=0 next=0
-      [1] doubled kind=kind#0 level=0 next=0
-      [2] combined kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=3
     closure_vars (3):
-      [0] total -> var#0 [local, kind#0]
-      [1] doubled -> var#1 [local, kind#0]
-      [2] combined -> var#2 [local, kind#0]
+      [0] total -> var#0 [local, const, lexical, kind#0]
+      [1] doubled -> var#1 [local, const, lexical, kind#0]
+      [2] combined -> var#2 [local, const, lexical, kind#0]
     constant_pool (3):
       [0] function <builtin:0>
       [1] function <builtin:0>
@@ -29,42 +25,36 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-fn-basic.ts
-      pc2line_bytes: 15
-      source_length: undefined
+      pc2line_bytes: 18
+      source_length: 0
 
-    opcodes (30):
+    opcodes (24):
       0000: push_this
-      0001: if_false +35 -> 41
-      0006: fclosure8 const[0] function <builtin:0>
-      0008: push_1
-      0009: push_2
-      0010: call 2
-      0013: put_var_ref0
-      0014: fclosure8 const[1] function <builtin:0>
-      0016: get_var_ref0
-      0017: call 1
-      0020: put_var_ref1
-      0021: fclosure8 const[2] function <builtin:0>
-      0023: get_var_ref1
-      0024: call 1
-      0027: put_var_ref2
-      0028: get_var_ref0
-      0029: drop
-      0030: undefined
+      0001: if_false8 +2 -> 5
+      0003: return_undef
+      0004: fclosure8 const[0] function <builtin:0>
+      0006: push_1
+      0007: push_2
+      0008: call2
+      0009: put_var_ref0
+      0010: fclosure8 const[1] function <builtin:0>
+      0012: get_var_ref_check var_ref[0] total
+      0015: call1
+      0016: put_var_ref1
+      0017: fclosure8 const[2] function <builtin:0>
+      0019: get_var_ref_check var_ref[1] doubled
+      0022: call1
+      0023: put_var_ref2
+      0024: get_var_ref_check var_ref[0] total
+      0027: drop
+      0028: get_var_ref_check var_ref[1] doubled
       0031: drop
-      0032: get_var_ref1
-      0033: drop
-      0034: undefined
+      0032: get_var_ref_check var_ref[2] combined
       0035: drop
-      0036: get_var_ref2
-      0037: drop
-      0038: undefined
-      0039: drop
-      0040: return_undef
-      0041: undefined
-      0042: return_async
+      0036: undefined
+      0037: return_async
 
-    function[1] <builtin:0> (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[1] <builtin:0> (const[0]) kind=kind#0 flags=[hasSimpleParameters, argumentsDisallowed, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=2, defined=2, vars=0, closures=0
@@ -74,8 +64,8 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-fn-basic.ts
-        pc2line_bytes: 0
-        source_length: undefined
+        pc2line_bytes: 2
+        source_length: 0
 
       opcodes (4):
         0000: get_arg0
@@ -83,7 +73,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
         0002: add
         0003: return
 
-    function[2] <builtin:0> (const[1]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[2] <builtin:0> (const[1]) kind=kind#0 flags=[hasSimpleParameters, argumentsDisallowed, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=1, defined=1, vars=0, closures=0
@@ -92,8 +82,8 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-fn-basic.ts
-        pc2line_bytes: 3
-        source_length: undefined
+        pc2line_bytes: 2
+        source_length: 0
 
       opcodes (4):
         0000: get_arg0
@@ -101,7 +91,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
         0002: mul
         0003: return
 
-    function[3] <builtin:0> (const[2]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[3] <builtin:0> (const[2]) kind=kind#0 flags=[hasSimpleParameters, argumentsDisallowed, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=1, defined=1, vars=0, closures=0
@@ -112,16 +102,16 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-fn-basic.ts
-        pc2line_bytes: 3
-        source_length: undefined
+        pc2line_bytes: 2
+        source_length: 0
 
       opcodes (4):
         0000: fclosure8 const[0] function <builtin:0>
         0002: push_4
-        0003: call 1
-        0006: return
+        0003: call1
+        0004: return
 
-      function[4] <builtin:0> (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+      function[4] <builtin:0> (const[0]) kind=kind#0 flags=[hasSimpleParameters, argumentsDisallowed, hasDebug]
         mode: sloppy
         stack_size: 3
         args: total=1, defined=1, vars=0, closures=1
@@ -132,8 +122,8 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
         debug:
           filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-fn-basic.ts
-          pc2line_bytes: 3
-          source_length: undefined
+          pc2line_bytes: 2
+          source_length: 0
 
         opcodes (4):
           0000: get_var_ref0

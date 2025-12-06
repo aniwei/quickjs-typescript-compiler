@@ -12,10 +12,7 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=2, closures=2
-    locals (2):
-      [0] MyClass kind=kind#0 level=0 next=0
-      [1] n_obj kind=kind#0 level=0 next=0
+    args: total=0, defined=0, vars=0, closures=2
     closure_vars (2):
       [0] MyClass -> var#0 [local, kind#0]
       [1] n_obj -> var#1 [local, kind#0]
@@ -24,28 +21,28 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/new-operator.ts
-      pc2line_bytes: 9
-      source_length: undefined
+      pc2line_bytes: 4
+      source_length: 0
 
     opcodes (16):
       0000: push_this
-      0001: if_false +29 -> 35
-      0006: fclosure8 const[0] function MyClass
-      0008: put_var_ref0
-      0009: get_var_ref0
-      0010: call_constructor 0
-      0013: put_var_ref1
-      0014: get_var atom#231
-      0019: get_field2 atom#232
-      0024: get_var_ref1
-      0025: get_field atom#233
-      0030: call_method 1
-      0033: drop
-      0034: return_undef
-      0035: undefined
-      0036: return_async
+      0001: if_false8 +5 -> 8
+      0003: fclosure8 const[0] function MyClass
+      0005: put_var_ref0
+      0006: return_undef
+      0007: get_var_ref0
+      0008: call_constructor 0
+      0011: put_var_ref1
+      0012: get_var atom#231
+      0017: get_field2 atom#232
+      0022: get_var_ref1
+      0023: get_field atom#233
+      0028: call_method 1
+      0031: drop
+      0032: undefined
+      0033: return_async
 
-    function[1] MyClass (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[1] MyClass (const[0]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
       args: total=1, defined=1, vars=1, closures=0
@@ -55,8 +52,8 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/new-operator.ts
-        pc2line_bytes: 6
-        source_length: undefined
+        pc2line_bytes: 4
+        source_length: 0
 
       opcodes (8):
         0000: push_this

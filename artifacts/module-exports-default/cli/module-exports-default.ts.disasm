@@ -1,25 +1,91 @@
-; failed to parse bytecode: Unsupported tag: 0
-; fallback hex dump:
-00000000: 05 06 f2 01 2f 55 73 65 72 73 2f 61 6e 69 77 65 |..../Users/aniwe|
-00000010: 69 2f 44 65 73 6b 74 6f 70 2f 77 6f 72 6b 73 70 |i/Desktop/worksp|
-00000020: 61 63 65 73 2f 71 75 69 63 6b 6a 73 2d 74 79 70 |aces/quickjs-typ|
-00000030: 65 73 63 72 69 70 74 2d 63 6f 6d 70 69 6c 65 72 |escript-compiler|
-00000040: 5f 73 65 63 6f 6e 64 2f 5f 5f 74 65 73 74 73 5f |_second/__tests_|
-00000050: 5f 2f 63 6f 6d 70 69 6c 65 72 2f 66 69 78 74 75 |_/compiler/fixtu|
-00000060: 72 65 73 2f 6d 6f 64 75 6c 65 2d 65 78 70 6f 72 |res/module-expor|
-00000070: 74 73 2d 64 65 66 61 75 6c 74 2e 74 73 18 6e 61 |ts-default.ts.na|
-00000080: 6d 65 64 44 65 66 61 75 6c 74 10 6d 75 6c 74 69 |medDefault.multi|
-00000090: 70 6c 79 0c 61 6e 73 77 65 72 1c 75 6c 74 69 6d |ply.answer.ultim|
-000000a0: 61 74 65 41 6e 73 77 65 72 0c 66 61 63 74 6f 72 |ateAnswer.factor|
-000000b0: 0d c8 03 00 03 00 00 00 ca 03 2c cc 03 cc 03 ce |..........,.....|
-000000c0: 03 d0 03 0c 20 06 01 a4 01 00 03 00 03 03 02 15 |.... ...........|
-000000d0: 03 ca 03 00 00 00 cc 03 00 00 00 ce 03 00 00 00 |................|
-000000e0: ca 03 00 01 cc 03 01 01 ce 03 02 01 08 6c 0d 00 |.............l..|
-000000f0: 00 00 c2 00 e3 c2 01 e4 01 2a 00 00 00 e5 29 06 |.........*....).|
-00000100: 2f c8 03 01 09 00 09 02 00 03 04 00 00 02 00 0c |/...............|
-00000110: 00 04 00 ca 03 01 00 01 03 00 00 05 01 84 01 00 |................|
-00000120: 00 00 d3 b8 9f 28 29 c8 03 01 03 00 00 01 00 0c |.....().........|
-00000130: 00 04 00 cc 03 02 00 02 03 00 00 11 02 84 01 00 |................|
-00000140: 00 00 d2 03 00 00 00 d4 11 f4 6c 03 00 00 00 0e |..........l.....|
-00000150: b9 dc 0e d3 d4 9c 28 29 c8 03 01 06 00 09 04 00 |......()........|
-00000160: 03 01 00                                        |...|
+bytecode_version: 5
+atoms (6):
+  [0] @228 = "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/c…"
+  [1] @229 = "namedDefault"
+  [2] @230 = "multiply"
+  [3] @231 = "answer"
+  [4] @232 = "ultimateAnswer"
+  [5] @233 = "factor"
+
+module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/module-exports-default.ts"
+  exports (3):
+    [0] local default -> local#0
+    [1] local multiply -> local#1
+    [2] local ultimateAnswer -> local#2
+
+  function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
+    mode: sloppy
+    stack_size: 3
+    args: total=0, defined=0, vars=0, closures=3
+    closure_vars (3):
+      [0] namedDefault -> var#0 [local, kind#0]
+      [1] multiply -> var#1 [local, kind#0]
+      [2] answer -> var#2 [local, const, lexical, kind#0]
+    constant_pool (2):
+      [0] function namedDefault
+      [1] function multiply
+
+    debug:
+      filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/module-exports-default.ts
+      pc2line_bytes: 4
+      source_length: 0
+
+    opcodes (11):
+      0000: push_this
+      0001: if_false8 +8 -> 11
+      0003: fclosure8 const[0] function namedDefault
+      0005: put_var_ref0
+      0006: fclosure8 const[1] function multiply
+      0008: put_var_ref1
+      0009: return_undef
+      0010: push_i32 42
+      0015: put_var_ref2
+      0016: undefined
+      0017: return_async
+
+    function[1] namedDefault (const[0]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=1, defined=1, vars=0, closures=0
+      locals (1):
+        [0] value kind=kind#0 level=0 next=0
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/module-exports-default.ts
+        pc2line_bytes: 4
+        source_length: 0
+
+      opcodes (5):
+        0000: get_arg0
+        0001: push_1
+        0002: add
+        0003: return
+        0004: return_undef
+
+    function[2] multiply (const[1]) kind=kind#0 flags=[newTarget, hasDebug]
+      mode: sloppy
+      stack_size: 3
+      args: total=2, defined=2, vars=0, closures=0
+      locals (2):
+        [0] value kind=kind#0 level=0 next=0
+        [1] factor kind=kind#0 level=0 next=0
+
+      debug:
+        filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/module-exports-default.ts
+        pc2line_bytes: 6
+        source_length: 0
+
+      opcodes (13):
+        0000: get_arg1
+        0001: dup
+        0002: is_undefined
+        0003: if_false +7 -> 15
+        0008: drop
+        0009: push_2
+        0010: set_arg1
+        0011: drop
+        0012: get_arg0
+        0013: get_arg1
+        0014: mul
+        0015: return
+        0016: return_undef

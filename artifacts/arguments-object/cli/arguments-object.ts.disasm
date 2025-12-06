@@ -10,56 +10,57 @@ module "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__te
   function[0] _eval_ (module body) kind=kind#2 flags=[hasDebug]
     mode: sloppy
     stack_size: 3
-    args: total=0, defined=0, vars=1, closures=1
-    locals (1):
-      [0] testArgs kind=kind#0 level=0 next=0
-    closure_vars (1):
-      [0] testArgs -> var#0 [local, kind#0]
+    args: total=0, defined=0, vars=0, closures=2
+    closure_vars (2):
+      [0] arguments -> var#0 [local, kind#0]
+      [1] testArgs -> var#1 [local, kind#0]
     constant_pool (1):
       [0] function testArgs
 
     debug:
       filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arguments-object.ts
-      pc2line_bytes: 6
-      source_length: undefined
+      pc2line_bytes: 8
+      source_length: 0
 
     opcodes (13):
       0000: push_this
-      0001: if_false +12 -> 18
-      0006: fclosure8 const[0] function testArgs
-      0008: put_var_ref0
-      0009: get_var_ref0
-      0010: push_1
-      0011: push_2
-      0012: push_3
-      0013: call 3
-      0016: drop
-      0017: return_undef
-      0018: undefined
-      0019: return_async
+      0001: if_false8 +5 -> 8
+      0003: fclosure8 const[0] function testArgs
+      0005: put_var_ref1
+      0006: return_undef
+      0007: get_var_ref1
+      0008: push_1
+      0009: push_2
+      0010: push_3
+      0011: call3
+      0012: drop
+      0013: undefined
+      0014: return_async
 
-    function[1] testArgs (const[0]) kind=kind#0 flags=[argumentsDisallowed, hasDebug]
+    function[1] testArgs (const[0]) kind=kind#0 flags=[hasSimpleParameters, newTarget, hasDebug]
       mode: sloppy
       stack_size: 3
-      args: total=0, defined=0, vars=0, closures=0
+      args: total=0, defined=0, vars=0, closures=1
+      closure_vars (1):
+        [0] arguments -> var#0 [kind#0]
 
       debug:
         filename: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arguments-object.ts
-        pc2line_bytes: 6
-        source_length: undefined
+        pc2line_bytes: 10
+        source_length: 0
 
       opcodes (14):
         0000: get_var atom#230
         0005: get_field2 atom#231
-        0010: get_var atom#79
-        0015: get_field atom#48
-        0020: call_method 1
-        0023: drop
-        0024: get_var atom#230
-        0029: get_field2 atom#231
-        0034: get_var atom#79
-        0039: push_0
-        0040: get_array_el
-        0041: call_method 1
-        0044: drop
-        0045: return_undef
+        0010: get_var_ref0
+        0011: get_field atom#48
+        0016: call_method 1
+        0019: drop
+        0020: get_var atom#230
+        0025: get_field2 atom#231
+        0030: get_var_ref0
+        0031: push_0
+        0032: get_array_el
+        0033: call_method 1
+        0036: drop
+        0037: return_undef
