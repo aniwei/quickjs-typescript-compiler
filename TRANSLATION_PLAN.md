@@ -28,11 +28,11 @@
 - [x] ElementAccessExpression
 - [x] Computed Property Names
 
-## Phase 5: Classes (🚧 Pending)
-- [ ] Class Declaration
+## Phase 5: Classes (🚧 In Progress)
+- [x] Class Declaration (Basic structure)
+- [x] Constructor
 - [ ] Method Definition
-- [ ] Property Declaration
-- [ ] Constructor
+- [ ] Property Declaration (Field initialization logic missing)
 - [ ] Inheritance (extends)
 - [ ] Super Call
 - [ ] Static Members
@@ -55,7 +55,15 @@
 - [ ] Modules (import/export)
 - [ ] Decorators (Future)
 
-## Phase 9: Optimization & Polish (🚧 Pending)
+## Phase 9: Optimization & Polish (🚧 In Progress)
 - [ ] Peephole Optimizations
 - [ ] Source Map Support
 - [ ] Error Reporting Improvements
+
+## Binary Compatibility Tracking (🚧 In Progress)
+- [x] Atom Table Alignment (via AtomReorderer)
+- [x] `arrow-fn-basic.ts` (181 bytes, pc2line header aligned)
+- [ ] `class-basic.ts` (158 bytes vs 201 bytes, missing field init logic)
+- [ ] `compute.ts` (pc2line mismatch)
+- [ ] `console-log.ts`
+

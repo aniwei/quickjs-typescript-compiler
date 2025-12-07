@@ -1,30 +1,23 @@
-# Phase 4 Progress: Objects, Arrays, and Infrastructure
+# Phase 4 Progress: Functions & Arrow Functions
 
-## Implemented Features
+## Status
+- **Completed**: Stack calculation logic implemented and verified.
+- **Completed**: Test harness fixed (`compileFileWithArtifacts`).
+- **Completed**: Variable handling aligned with QuickJS.
+- **Completed**: Arrow Functions (`visitArrowFunction`) implemented.
+- **Validation**: 
+    - 15/29 existing fixtures identical.
+    - `arrow-fn-basic.ts`: Bytecode logic matches (`get_arg0`, `get_arg1`, `add`, `return`), but binary differs due to atom order and metadata.
 
-- [x] `ObjectLiteralExpression`
-- [x] `ArrayLiteralExpression`
-- [x] `PropertyAccessExpression`
-- [x] `ElementAccessExpression`
-- [x] `ComputedPropertyName`
-- [x] Dynamic Stack Size Calculation
-    - Implemented `stackLevel` tracking in `FunctionDef`.
-    - Implemented `emitOp` logic to update stack level based on `OPCODE_DEFS`.
-    - Removed hardcoded stack sizes.
-
-## Verified Fixtures
-
-- `__tests__/compiler/fixtures/object-literal.ts`: **Perfect Match**
-- `__tests__/compiler/fixtures/array-literal.ts`: **Perfect Match**
-- `__tests__/compiler/fixtures/do-while.ts`: **Perfect Match**
-
-## Known Issues
-
-- `compute.ts`: Stack size calculated as 2 (TS) vs 1 (WASM). Likely due to bytecode differences in `compute` function.
-- Function size writing: `Compiler.ts` writes instruction size instead of total function size in header. Needs buffering fix.
+## Key Fixes
+1.  **Captured Locals Filtering**: Modified `Compiler.ts` to omit `JSVarDef` for local variables that are also captured as closure variables.
+2.  **Module Variable Handling**: Updated `TypeScriptCompiler.ts` to call `addVar` for module-level `let`/`const`.
+3.  **Stack Adjustment**: Added `adjustStack` to `Compiler.ts`.
+4.  **Arrow Functions**:
+    - Implemented `visitArrowFunction`.
+    - Added `hasSimpleParameterList` and `argumentsAllowed` flags.
+    - Fixed `StackSize` calculation bug in `Compiler.ts` (was using `stackSize` instead of `stackSizeMax`).
 
 ## Next Steps
-
-- [ ] Fix function size writing in `Compiler.ts`.
-- [ ] Investigate `compute.ts` stack size discrepancy.
-- [ ] Implement `SwitchStatement`.
+- Verify complex arrow functions (block body, locals).
+- Proceed to Phase 5 (Objects & Arrays).

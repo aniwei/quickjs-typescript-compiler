@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/number.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/number",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/number/cli/number.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/number/cli/number.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/number/cli/number.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/number/cli/number.pc2line.txt",
+    "bytecodeSize": 146,
+    "pc2lineLength": 0,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": false,
+    "tsSize": 77,
+    "wasmSize": 74,
+    "sizeDiff": 3,
+    "sizeDiffPercent": 4.054054054054054
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}

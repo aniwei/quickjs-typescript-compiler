@@ -274,7 +274,7 @@ class BytecodeComparator {
         reportDiagnostics: true,
         compilerOptions: {
           module: ts.ModuleKind.ESNext,
-          target: ts.ScriptTarget.ES2020,
+          target: ts.ScriptTarget.ESNext,
           jsx: ts.JsxEmit.Preserve,
           importHelpers: false,
           esModuleInterop: false,

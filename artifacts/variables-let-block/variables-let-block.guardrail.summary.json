@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/variables-let-block.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/variables-let-block",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/variables-let-block/cli/variables-let-block.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/variables-let-block/cli/variables-let-block.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/variables-let-block/cli/variables-let-block.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/variables-let-block/cli/variables-let-block.pc2line.txt",
+    "bytecodeSize": 237,
+    "pc2lineLength": 0,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": false,
+    "tsSize": 168,
+    "wasmSize": 169,
+    "sizeDiff": -1,
+    "sizeDiffPercent": -0.591715976331361
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}

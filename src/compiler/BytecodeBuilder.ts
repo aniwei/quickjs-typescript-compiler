@@ -1,11 +1,11 @@
 export class BytecodeBuilder {
-  buf: Uint8Array
+  buffer: Uint8Array
   size: number
   allocatedSize: number
   error: boolean
 
   constructor() {
-    this.buf = new Uint8Array(0)
+    this.buffer = new Uint8Array(0)
     this.size = 0
     this.allocatedSize = 0
     this.error = false
@@ -21,8 +21,8 @@ export class BytecodeBuilder {
       }
       try {
         const newBuf = new Uint8Array(newSize)
-        newBuf.set(this.buf)
-        this.buf = newBuf
+        newBuf.set(this.buffer)
+        this.buffer = newBuf
         this.allocatedSize = newSize
       } catch (e) {
         this.error = true
@@ -33,17 +33,30 @@ export class BytecodeBuilder {
   }
 
   put(data: Uint8Array | number[]): void {
-    if (this.error) return
+    if (this.error) {
+      return
+    }
+    
     const len = data.length
-    if (!this.realloc(this.size + len)) return
-    this.buf.set(data, this.size)
+    
+    if (!this.realloc(this.size + len)) {
+      return
+    }
+    
+    this.buffer.set(data, this.size)
     this.size += len
   }
 
   putByte(c: number): void {
-    if (this.error) return
-    if (!this.realloc(this.size + 1)) return
-    this.buf[this.size++] = c
+    if (this.error) {
+      return
+    }
+
+    if (!this.realloc(this.size + 1)) {
+      return
+    }
+
+    this.buffer[this.size++] = c
   }
 
   putU8(val: number): void {
@@ -51,25 +64,35 @@ export class BytecodeBuilder {
   }
 
   putU16(val: number): void {
-    if (this.error) return
-    if (!this.realloc(this.size + 2)) return
-    this.buf[this.size] = val & 0xff
-    this.buf[this.size + 1] = (val >> 8) & 0xff
+    if (this.error) {
+      return
+    }
+    if (!this.realloc(this.size + 2)) {
+      return
+    }
+    this.buffer[this.size] = val & 0xff
+    this.buffer[this.size + 1] = (val >> 8) & 0xff
     this.size += 2
   }
 
   putU32(val: number): void {
-    if (this.error) return
-    if (!this.realloc(this.size + 4)) return
-    this.buf[this.size] = val & 0xff
-    this.buf[this.size + 1] = (val >> 8) & 0xff
-    this.buf[this.size + 2] = (val >> 16) & 0xff
-    this.buf[this.size + 3] = (val >> 24) & 0xff
+    if (this.error) {
+      return
+    }
+    if (!this.realloc(this.size + 4)) {
+      return
+    }
+    this.buffer[this.size] = val & 0xff
+    this.buffer[this.size + 1] = (val >> 8) & 0xff
+    this.buffer[this.size + 2] = (val >> 16) & 0xff
+    this.buffer[this.size + 3] = (val >> 24) & 0xff
     this.size += 4
   }
 
   putULEB128(val: number): void {
-    if (this.error) return
+    if (this.error) {
+      return
+    }
     do {
       let byte = val & 0x7f
       val >>>= 7
@@ -81,7 +104,9 @@ export class BytecodeBuilder {
   }
 
   putSLEB128(val: number): void {
-    if (this.error) return
+    if (this.error) {
+      return
+    }
     let more = true
     while (more) {
       let byte = val & 0x7f
@@ -96,20 +121,22 @@ export class BytecodeBuilder {
   }
 
   data(): Uint8Array {
-    return this.buf.subarray(0, this.size)
+    return this.buffer.subarray(0, this.size)
   }
 
   putU32At(pos: number, val: number): void {
-    if (this.error) return
+    if (this.error) {
+      return
+    }
     if (pos + 4 > this.size) {
       // Should not happen if used for patching
       this.error = true
       return
     }
-    this.buf[pos] = val & 0xff
-    this.buf[pos + 1] = (val >> 8) & 0xff
-    this.buf[pos + 2] = (val >> 16) & 0xff
-    this.buf[pos + 3] = (val >> 24) & 0xff
+    this.buffer[pos] = val & 0xff
+    this.buffer[pos + 1] = (val >> 8) & 0xff
+    this.buffer[pos + 2] = (val >> 16) & 0xff
+    this.buffer[pos + 3] = (val >> 24) & 0xff
   }
 
   reset(): void {

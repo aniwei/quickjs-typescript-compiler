@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/primitives.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/primitives",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/primitives/cli/primitives.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/primitives/cli/primitives.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/primitives/cli/primitives.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/primitives/cli/primitives.pc2line.txt",
+    "bytecodeSize": 298,
+    "pc2lineLength": 0,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": false,
+    "tsSize": 229,
+    "wasmSize": 231,
+    "sizeDiff": -2,
+    "sizeDiffPercent": -0.8658008658008658
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}

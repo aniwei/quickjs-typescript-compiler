@@ -22,7 +22,7 @@ export class JSVarDef {
   isLexical: boolean = false
   isCaptured: boolean = false
   isStaticPrivate: boolean = false
-  varKind: number = 0 // JSVarKindEnum
+  varKind: JSVarKind = 0 // JSVarKindEnum
   funcPoolIdx: number = 0
 }
 
@@ -31,7 +31,7 @@ export class JSClosureVar {
   isArg: boolean = false
   isConst: boolean = false
   isLexical: boolean = false
-  varKind: number = 0 // JSVarKindEnum
+  varKind: JSVarKind = 0 // JSVarKindEnum
   varIdx: number = 0
   varName: number = 0 // JSAtom
 }
@@ -188,7 +188,7 @@ export class FunctionDef {
   stripDebug: boolean = false
   stripSource: boolean = false
   filename: number = 0 // JSAtom
-  sourcePos: number = 0
+  sourcePos: number = -1
   getLineColCache: any = null
   pc2line: BytecodeBuilder = new BytecodeBuilder()
   pc2column: BytecodeBuilder = new BytecodeBuilder()
