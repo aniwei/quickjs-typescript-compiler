@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/array-literal.ts
-**生成时间**: 2025-12-07T14:47:47.975Z
+**生成时间**: 2025-12-07T15:31:53.722Z
 
 ## 大小对比
 

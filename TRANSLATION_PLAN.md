@@ -17,6 +17,8 @@
 - [x] IfStatement
 - [x] WhileStatement
 - [x] ForStatement
+- [x] ForOfStatement
+- [x] ForInStatement
 - [x] DoWhileStatement
 - [x] SwitchStatement
 - [x] Break/Continue (Label support pending)
@@ -43,9 +45,9 @@
 - [ ] Await Expression
 - [ ] Promise Integration
 
-## Phase 7: Exceptions (🚧 Pending)
-- [ ] Try/Catch/Finally
-- [ ] Throw Statement
+## Phase 7: Exceptions (✅ Completed)
+- [x] Try/Catch/Finally
+- [x] Throw Statement
 - [ ] Error Objects
 
 ## Phase 8: Advanced Features (🚧 Pending)
@@ -70,6 +72,9 @@
 - [x] `object-spread.ts` (167 bytes, Perfect Match)
 - [x] `computed-property.ts` (165 bytes, Perfect Match)
 - [x] `function-call.ts` (191 bytes, Perfect Match)
+- [x] `try-catch.ts` (Structurally Correct, minor atom diffs)
+- [x] `for-of.ts` (Structurally Correct, minor atom diffs)
+- [x] `function-default-params.ts` (Structurally Correct)
 - [ ] `class-basic.ts` (196 bytes vs 201 bytes, -5 bytes diff. Fixed OP_get_var_ref_check encoding)
 - [ ] `primitives.ts` (Minor debug info mismatch)
 - [ ] `labeled-statements.ts` (Minor mismatch)

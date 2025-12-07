@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-07T14:18:02.083Z",
+  "timestamp": "2025-12-07T15:09:05.062Z",
   "inputFile": "__tests__/compiler/fixtures/array-literal.ts",
   "compilation": {
     "typescript": {

@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/class-methods.ts
-**生成时间**: 2025-12-07T14:47:48.053Z
+**生成时间**: 2025-12-07T15:31:53.804Z
 
 ## 大小对比
 

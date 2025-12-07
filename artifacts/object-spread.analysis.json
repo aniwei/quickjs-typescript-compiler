@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-07T03:37:02.880Z",
+  "timestamp": "2025-12-07T15:10:32.481Z",
   "inputFile": "__tests__/compiler/fixtures/object-spread.ts",
   "compilation": {
     "typescript": {

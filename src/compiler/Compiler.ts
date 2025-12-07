@@ -468,7 +468,7 @@ export class Compiler {
     }
 
     if (sourcePos !== -1) {
-        this.addPc2LineInfo(s, s.byteCode.size, sourcePos)
+      this.addPc2LineInfo(s, s.byteCode.size, sourcePos)
     }
     s.byteCode.putByte(val)
 
@@ -476,18 +476,29 @@ export class Compiler {
     const opName = Opcode[val]
     const opInfo = OPCODE_DEFS[opName]
     if (opInfo) {
-      // console.log(`[Stack] ${opName} (${val}): ${s.stackLevel} -> ${s.stackLevel - opInfo.nPop + opInfo.nPush} (Pop: ${opInfo.nPop}, Push: ${opInfo.nPush})`)
+      let nPop = opInfo.nPop
+      let nPush = opInfo.nPush
+
+      // Special handling for for_of_next: it pushes 1 value (the loop variable)
+      // The iterator (3 slots) remains on stack
+      if (val === Opcode.OP_for_of_next) {
+        nPop = 0
+        nPush = 1
+      }
+
+      // console.log(`[Stack] ${opName} (${val}): ${s.stackLevel} -> ${s.stackLevel - nPop + nPush} (Pop: ${nPop}, Push: ${nPush})`)
+      console.log(`[Stack] ${opName} (${val}): ${s.stackLevel} -> ${s.stackLevel - nPop + nPush} (Pop: ${nPop}, Push: ${nPush})`)
       // Pop
-      s.stackLevel -= opInfo.nPop
+      s.stackLevel -= nPop
       if (s.stackLevel < 0) {
         // console.warn(`Stack underflow at op ${opInfo.id}`)
         // s.stackLevel = 0
       }
       
       // Push
-      s.stackLevel += opInfo.nPush
+      s.stackLevel += nPush
       if (s.stackLevel > s.stackSizeMax) {
-          s.stackSizeMax = s.stackLevel
+        s.stackSizeMax = s.stackLevel
       }
     } else {
       console.warn(`Unknown opcode for stack calc: ${val}`)
@@ -622,7 +633,7 @@ export class Compiler {
     let size = 4
     if (op === Opcode.OP_goto8 || op === Opcode.OP_if_true8 || op === Opcode.OP_if_false8) {
       size = 1
-        this.emitU8(fd, 0)
+      this.emitU8(fd, 0)
     } else {
       this.emitU32(fd, 0)
     }

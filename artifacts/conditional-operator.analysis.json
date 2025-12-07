@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-06T15:48:00.972Z",
+  "timestamp": "2025-12-07T15:08:28.669Z",
   "inputFile": "__tests__/compiler/fixtures/conditional-operator.ts",
   "compilation": {
     "typescript": {

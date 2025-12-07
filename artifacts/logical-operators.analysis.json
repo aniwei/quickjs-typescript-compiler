@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-06T16:23:15.102Z",
+  "timestamp": "2025-12-07T15:08:34.136Z",
   "inputFile": "__tests__/compiler/fixtures/logical-operators.ts",
   "compilation": {
     "typescript": {

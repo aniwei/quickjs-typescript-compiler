@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-07T10:22:57.615Z",
+  "timestamp": "2025-12-07T15:07:34.059Z",
   "inputFile": "__tests__/compiler/fixtures/switch-case.ts",
   "compilation": {
     "typescript": {

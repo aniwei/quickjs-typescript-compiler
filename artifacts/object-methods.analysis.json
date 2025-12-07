@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-07T12:40:55.984Z",
+  "timestamp": "2025-12-07T15:10:26.076Z",
   "inputFile": "__tests__/compiler/fixtures/object-methods.ts",
   "compilation": {
     "typescript": {

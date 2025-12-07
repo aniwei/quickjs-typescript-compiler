@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-07T10:49:22.719Z",
+  "timestamp": "2025-12-07T15:33:02.585Z",
   "inputFile": "__tests__/compiler/fixtures/arrow-fn-complex.ts",
   "compilation": {
     "typescript": {

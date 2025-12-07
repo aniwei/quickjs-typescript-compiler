@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-07T14:18:55.975Z",
+  "timestamp": "2025-12-07T15:33:12.372Z",
   "inputFile": "__tests__/compiler/fixtures/variables-let-block.ts",
   "compilation": {
     "typescript": {

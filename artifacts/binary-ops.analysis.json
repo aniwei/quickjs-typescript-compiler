@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-07T14:18:23.506Z",
+  "timestamp": "2025-12-07T15:08:45.644Z",
   "inputFile": "__tests__/compiler/fixtures/binary-ops.ts",
   "compilation": {
     "typescript": {

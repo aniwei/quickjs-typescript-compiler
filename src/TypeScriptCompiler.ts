@@ -33,6 +33,7 @@ export class TypeScriptCompiler {
   private scopeStack: Scope[] = []
   private loopStack: LoopInfo[] = []
   private pendingLabels: string[] = []
+  private isTerminated = false
 
   constructor(options?: any) {
     console.log('TypeScriptCompiler constructor called')
@@ -155,10 +156,10 @@ export class TypeScriptCompiler {
             
             let varIdx: number
             if (isModule) {
-               // For module variables, do NOT add to vars
-               varIdx = -1
+              // For module variables, do NOT add to vars
+              varIdx = -1
             } else {
-               varIdx = this.compiler.addVar(this.funcDef!, name, false, false, scopeLevel)
+              varIdx = this.compiler.addVar(this.funcDef!, name, false, false, scopeLevel)
             }
             
             if (isModule) {
@@ -196,10 +197,10 @@ export class TypeScriptCompiler {
               
               let varIdx: number
               if (isModule) {
-                 // For module variables, do NOT add to vars
-                 varIdx = -1
+                // For module variables, do NOT add to vars
+                varIdx = -1
               } else {
-                 varIdx = this.compiler.addVar(this.funcDef!, name, isConst, isLet || isConst, scopeLevel)
+                varIdx = this.compiler.addVar(this.funcDef!, name, isConst, isLet || isConst, scopeLevel)
               }
               
               if (isModule) {
@@ -242,9 +243,9 @@ export class TypeScriptCompiler {
             
             let varIdx: number
             if (isModule) {
-               varIdx = -1
+              varIdx = -1
             } else {
-               varIdx = this.compiler.addVar(this.funcDef!, name, isConst, isLexical, scopeLevel)
+              varIdx = this.compiler.addVar(this.funcDef!, name, isConst, isLexical, scopeLevel)
             }
              
             if (isModule) {
@@ -305,6 +306,8 @@ export class TypeScriptCompiler {
   }
 
   visit(node: ts.Node) {
+    console.log('VISIT:', node.kind)
+    if (node.kind === 11) console.log('visit called with StringLiteral')
     switch (node.kind) {
       case ts.SyntaxKind.SourceFile:
         this.visitSourceFile(node as ts.SourceFile)
@@ -330,6 +333,12 @@ export class TypeScriptCompiler {
       case ts.SyntaxKind.ForStatement:
         this.visitForStatement(node as ts.ForStatement)
         break
+      case ts.SyntaxKind.ForOfStatement:
+        this.visitForOfStatement(node as ts.ForOfStatement)
+        break
+      case ts.SyntaxKind.ForInStatement:
+        this.visitForInStatement(node as ts.ForInStatement)
+        break
       case ts.SyntaxKind.SwitchStatement:
         this.visitSwitchStatement(node as ts.SwitchStatement)
         break
@@ -341,6 +350,12 @@ export class TypeScriptCompiler {
         break
       case ts.SyntaxKind.ReturnStatement:
         this.visitReturnStatement(node as ts.ReturnStatement)
+        break
+      case ts.SyntaxKind.ThrowStatement:
+        this.visitThrowStatement(node as ts.ThrowStatement)
+        break
+      case ts.SyntaxKind.TryStatement:
+        this.visitTryStatement(node as ts.TryStatement)
         break
       case ts.SyntaxKind.VariableStatement:
         this.visitVariableStatement(node as ts.VariableStatement)
@@ -429,7 +444,9 @@ export class TypeScriptCompiler {
   }
 
   visitStringLiteral(node: ts.StringLiteral) {
+    console.log('Visiting StringLiteral:', node.text)
     if (!this.funcDef) {
+      console.log('funcDef is null!')
       return
     }
     const atom = this.compiler.addAtom(node.text)
@@ -557,7 +574,7 @@ export class TypeScriptCompiler {
       // Use end of property access (position of open parenthesis)
       this.compiler.emitOp(this.funcDef, Opcode.OP_call_method, node.expression.getEnd())
       this.compiler.emitU16(this.funcDef, argCount)
-      this.compiler.adjustStack(this.funcDef, -(argCount + 2))
+      this.compiler.adjustStack(this.funcDef, -argCount)
     } else {
       if (argCount === 0) {
         this.compiler.emitOp(this.funcDef, Opcode.OP_call0, node.expression.getEnd())
@@ -704,9 +721,15 @@ export class TypeScriptCompiler {
     // fd.stackSize = 2 // Hardcoded for compute.ts
     
     // Add arguments
-    for (const param of node.parameters) {
+    for (let i = 0; i < node.parameters.length; i++) {
+      const param = node.parameters[i]
       if (ts.isIdentifier(param.name)) {
         this.compiler.addArg(fd, param.name.text)
+        
+        // If has initializer, add as local var (scope level 1)
+        if (param.initializer) {
+          this.compiler.addVar(fd, param.name.text, false, false, 1)
+        }
       }
     }
     
@@ -726,6 +749,83 @@ export class TypeScriptCompiler {
     
     // Switch context to child function
     this.funcDef = fd
+    
+    // Generate default parameter prologue
+    for (let i = 0; i < node.parameters.length; i++) {
+      const param = node.parameters[i]
+      if (param.initializer && ts.isIdentifier(param.name)) {
+        // Find the local var index
+        let varIdx = -1
+        const atomId = this.compiler.addAtom(param.name.text)
+        for(let v=0; v<fd.vars.length; v++) {
+          if (fd.vars[v].varName === atomId) {
+            varIdx = v
+            break
+          }
+        }
+        
+        if (varIdx !== -1) {
+          // set_loc_uninitialized varIdx
+          this.compiler.emitOp(fd, Opcode.OP_set_loc_uninitialized)
+          this.compiler.emitU16(fd, varIdx)
+          
+          // get_arg i
+          if (i === 0) this.compiler.emitOp(fd, Opcode.OP_get_arg0)
+          else if (i === 1) this.compiler.emitOp(fd, Opcode.OP_get_arg1)
+          else if (i === 2) this.compiler.emitOp(fd, Opcode.OP_get_arg2)
+          else if (i === 3) this.compiler.emitOp(fd, Opcode.OP_get_arg3)
+          else {
+            this.compiler.emitOp(fd, Opcode.OP_get_arg)
+            this.compiler.emitU16(fd, i)
+          }
+          
+          // dup
+          this.compiler.emitOp(fd, Opcode.OP_dup)
+          
+          // is_undefined
+          this.compiler.emitOp(fd, Opcode.OP_is_undefined)
+          
+          // if_false8 label
+          this.compiler.emitOp(fd, Opcode.OP_if_false8)
+          const jumpPos = fd.byteCode.size
+          this.compiler.emitU8(fd, 0)
+          
+          // drop
+          this.compiler.emitOp(fd, Opcode.OP_drop)
+          
+          // Evaluate initializer
+          if (param.initializer.kind === ts.SyntaxKind.StringLiteral) {
+             this.visitStringLiteral(param.initializer as ts.StringLiteral)
+          } else {
+             this.visit(param.initializer)
+          }
+          
+          // set_arg i
+          if (i === 0) this.compiler.emitOp(fd, Opcode.OP_set_arg0)
+          else if (i === 1) this.compiler.emitOp(fd, Opcode.OP_set_arg1)
+          else if (i === 2) this.compiler.emitOp(fd, Opcode.OP_set_arg2)
+          else if (i === 3) this.compiler.emitOp(fd, Opcode.OP_set_arg3)
+          else {
+            this.compiler.emitOp(fd, Opcode.OP_set_arg)
+            this.compiler.emitU16(fd, i)
+          }
+          
+          // Patch jump
+          const jumpDist = fd.byteCode.size - jumpPos - 1
+          fd.byteCode.buffer[jumpPos] = jumpDist
+          
+          // put_loc varIdx
+          if (varIdx === 0) this.compiler.emitOp(fd, Opcode.OP_put_loc0)
+          else if (varIdx === 1) this.compiler.emitOp(fd, Opcode.OP_put_loc1)
+          else if (varIdx === 2) this.compiler.emitOp(fd, Opcode.OP_put_loc2)
+          else if (varIdx === 3) this.compiler.emitOp(fd, Opcode.OP_put_loc3)
+          else {
+            this.compiler.emitOp(fd, Opcode.OP_put_loc)
+            this.compiler.emitU16(fd, varIdx)
+          }
+        }
+      }
+    }
     
     // Visit body
     if (node.body) {
@@ -1519,7 +1619,10 @@ export class TypeScriptCompiler {
       }
     }
 
-    node.statements.forEach(stmt => this.visit(stmt))
+    for (const stmt of node.statements) {
+      this.visit(stmt)
+      if (this.isTerminated) break
+    }
     this.exitScope()
 
     if (loopInfo) {
@@ -1805,6 +1908,253 @@ export class TypeScriptCompiler {
     }
   }
 
+  visitForOfStatement(node: ts.ForOfStatement) {
+    if (!this.funcDef) return
+
+    // 2. Setup iterator
+    let hasScope = false
+    if (node.initializer && ts.isVariableDeclarationList(node.initializer)) {
+      if (node.initializer.flags & (ts.NodeFlags.Let | ts.NodeFlags.Const)) {
+        this.enterScope('block')
+        hasScope = true
+        
+        // Hoist variables
+        const isConst = (node.initializer.flags & ts.NodeFlags.Const) !== 0
+        for (const decl of node.initializer.declarations) {
+          if (ts.isIdentifier(decl.name)) {
+            const name = decl.name.text
+            const currentScope = this.scopeStack[this.scopeStack.length - 1]
+            if (!currentScope.vars.has(name)) {
+              const scopeLevel = this.scopeStack.length
+              const varIdx = this.compiler.addVar(this.funcDef!, name, isConst, true, scopeLevel)
+              currentScope.vars.set(name, {
+                type: 'local',
+                idx: varIdx,
+                isLexical: true,
+                isConst
+              })
+              
+              this.compiler.emitOp(this.funcDef!, Opcode.OP_set_loc_uninitialized)
+              this.compiler.emitU16(this.funcDef!, varIdx)
+            }
+          }
+        }
+      }
+    }
+
+    // 1. Evaluate expression
+    this.visit(node.expression)
+
+    this.compiler.emitOp(this.funcDef, Opcode.OP_for_of_start)
+    
+    // Push loop info
+    const loopInfo: LoopInfo = {
+      type: 'loop',
+      labels: [...this.pendingLabels],
+      breakLabel: this.compiler.newLabel(),
+      continueLabel: this.compiler.newLabel()
+    }
+    this.loopStack.push(loopInfo)
+    this.pendingLabels = []
+
+    // Jump to check
+    this.compiler.emitOp(this.funcDef, Opcode.OP_goto8)
+    const gotoCheckPos = this.funcDef.byteCode.size
+    this.compiler.emitU8(this.funcDef, 0)
+    
+    // Body Label
+    const bodyPos = this.funcDef.byteCode.size
+    
+    // Adjust stack for loop variable (pushed by for_of_next)
+    this.compiler.adjustStack(this.funcDef, 1)
+    
+    // Assign to variable
+    if (node.initializer) {
+      if (ts.isVariableDeclarationList(node.initializer)) {
+        for (const decl of node.initializer.declarations) {
+          if (ts.isIdentifier(decl.name)) {
+            const name = decl.name.text
+            const scopeInfo = this.findVarInScope(name)
+            if (scopeInfo) {
+              const idx = scopeInfo.idx
+              if (idx === 0) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc0)
+              } else if (idx === 1) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc1)
+              } else if (idx === 2) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc2)
+              } else if (idx === 3) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc3)
+              } else {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc)
+                this.compiler.emitU16(this.funcDef, idx)
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    // Visit Body
+    this.visit(node.statement)
+    
+    // Continue Label
+    this.compiler.markLabel(this.funcDef, loopInfo.continueLabel!)
+    
+    // Check Label
+    const checkPos = this.funcDef.byteCode.size
+    
+    // Patch initial goto
+    const offset = checkPos - gotoCheckPos
+    this.funcDef.byteCode.buffer[gotoCheckPos] = offset
+    
+    this.compiler.emitOp(this.funcDef, Opcode.OP_for_of_next)
+    this.compiler.emitU8(this.funcDef, 0)
+    
+    // if_false8 Body
+    this.compiler.emitOp(this.funcDef, Opcode.OP_if_false8)
+    const jumpBackPos = this.funcDef.byteCode.size
+    this.compiler.emitU8(this.funcDef, 0)
+    
+    const jumpBackOffset = bodyPos - jumpBackPos
+    this.funcDef.byteCode.buffer[jumpBackPos] = jumpBackOffset
+    
+    // Drop iterator
+    this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
+    
+    // Iterator Close
+    this.compiler.emitOp(this.funcDef, Opcode.OP_iterator_close)
+    
+    this.loopStack.pop()
+    
+    // Break Label
+    this.compiler.markLabel(this.funcDef, loopInfo.breakLabel)
+    
+    if (hasScope) {
+      this.exitScope()
+    }
+  }
+
+  visitForInStatement(node: ts.ForInStatement) {
+    if (!this.funcDef) return
+
+    // 1. Evaluate expression
+    this.visit(node.expression)
+
+    // 2. Setup iterator
+    let hasScope = false
+    if (node.initializer && ts.isVariableDeclarationList(node.initializer)) {
+      if (node.initializer.flags & (ts.NodeFlags.Let | ts.NodeFlags.Const)) {
+        this.enterScope('block')
+        hasScope = true
+        
+        // Hoist variables
+        const isConst = (node.initializer.flags & ts.NodeFlags.Const) !== 0
+        for (const decl of node.initializer.declarations) {
+          if (ts.isIdentifier(decl.name)) {
+            const name = decl.name.text
+            const currentScope = this.scopeStack[this.scopeStack.length - 1]
+            if (!currentScope.vars.has(name)) {
+              const scopeLevel = this.scopeStack.length
+              const varIdx = this.compiler.addVar(this.funcDef!, name, isConst, true, scopeLevel)
+              currentScope.vars.set(name, {
+                type: 'local',
+                idx: varIdx,
+                isLexical: true,
+                isConst
+              })
+              
+              this.compiler.emitOp(this.funcDef!, Opcode.OP_set_loc_uninitialized)
+              this.compiler.emitU16(this.funcDef!, varIdx)
+            }
+          }
+        }
+      }
+    }
+
+    this.compiler.emitOp(this.funcDef, Opcode.OP_for_in_start)
+    
+    // Push loop info
+    const loopInfo: LoopInfo = {
+      type: 'loop',
+      labels: [...this.pendingLabels],
+      breakLabel: this.compiler.newLabel(),
+      continueLabel: this.compiler.newLabel()
+    }
+    this.loopStack.push(loopInfo)
+    this.pendingLabels = []
+
+    // Jump to check
+    this.compiler.emitOp(this.funcDef, Opcode.OP_goto8)
+    const gotoCheckPos = this.funcDef.byteCode.size
+    this.compiler.emitU8(this.funcDef, 0)
+    
+    // Body Label
+    const bodyPos = this.funcDef.byteCode.size
+    
+    // Assign to variable
+    if (node.initializer) {
+      if (ts.isVariableDeclarationList(node.initializer)) {
+        for (const decl of node.initializer.declarations) {
+          if (ts.isIdentifier(decl.name)) {
+            const name = decl.name.text
+            const scopeInfo = this.findVarInScope(name)
+            if (scopeInfo) {
+              const idx = scopeInfo.idx
+              if (idx === 0) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc0)
+              } else if (idx === 1) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc1)
+              } else if (idx === 2) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc2)
+              } else if (idx === 3) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc3)
+              } else {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc)
+                this.compiler.emitU16(this.funcDef, idx)
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    // Visit Body
+    this.visit(node.statement)
+    
+    // Continue Label
+    this.compiler.markLabel(this.funcDef, loopInfo.continueLabel!)
+    
+    // Check Label
+    const checkPos = this.funcDef.byteCode.size
+    
+    // Patch initial goto
+    const offset = checkPos - gotoCheckPos
+    this.funcDef.byteCode.buffer[gotoCheckPos] = offset
+    
+    this.compiler.emitOp(this.funcDef, Opcode.OP_for_in_next)
+    
+    // if_false8 Body
+    this.compiler.emitOp(this.funcDef, Opcode.OP_if_false8)
+    const jumpBackPos = this.funcDef.byteCode.size
+    this.compiler.emitU8(this.funcDef, 0)
+    
+    const jumpBackOffset = bodyPos - jumpBackPos
+    this.funcDef.byteCode.buffer[jumpBackPos] = jumpBackOffset
+    
+    // Drop iterator
+    this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
+    
+    this.loopStack.pop()
+    
+    // Break Label
+    this.compiler.markLabel(this.funcDef, loopInfo.breakLabel)
+    
+    if (hasScope) {
+      this.exitScope()
+    }
+  }
+
   visitBreakStatement(node: ts.BreakStatement) {
     if (!this.funcDef) {
       return
@@ -1883,6 +2233,253 @@ export class TypeScriptCompiler {
       this.compiler.emitOp(this.funcDef, Opcode.OP_return, node.getStart())
     } else {
       this.compiler.emitOp(this.funcDef, Opcode.OP_return_undef, node.getStart())
+    }
+    this.isTerminated = true
+  }
+
+  visitThrowStatement(node: ts.ThrowStatement) {
+    if (!this.funcDef) {
+      return
+    }
+    if (node.expression) {
+      this.visit(node.expression)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_throw, node.getStart())
+    } else {
+      // Should not happen in valid TS/JS for throw statement, but rethrow is different
+      this.compiler.emitOp(this.funcDef, Opcode.OP_throw, node.getStart())
+    }
+    this.isTerminated = true
+  }
+
+  visitTryStatement(node: ts.TryStatement) {
+    if (!this.funcDef) {
+      return
+    }
+
+    // 1. Setup catch/finally
+    // If we have a finally block, we need to wrap everything in a catch-all to execute finally
+    // But QuickJS uses gosub for finally.
+    
+    // Structure for try-catch-finally:
+    // catch LABEL_CATCH
+    //   TRY_BLOCK
+    //   drop (drop catch handler)
+    //   gosub LABEL_FINALLY (if finally exists)
+    //   goto LABEL_END
+    // LABEL_CATCH:
+    //   put_loc exception_var (if catch exists)
+    //   catch LABEL_CATCH_2 (if finally exists, to catch exceptions in catch block)
+    //     CATCH_BLOCK
+    //     drop (drop catch handler 2)
+    //     gosub LABEL_FINALLY (if finally exists)
+    //     goto LABEL_END
+    // LABEL_CATCH_2:
+    //   gosub LABEL_FINALLY
+    //   throw (rethrow)
+    // LABEL_FINALLY:
+    //   FINALLY_BLOCK
+    //   ret
+    // LABEL_END:
+
+    const hasCatch = !!node.catchClause
+    const hasFinally = !!node.finallyBlock
+
+    // Push catch handler
+    this.compiler.emitOp(this.funcDef, Opcode.OP_catch, node.getStart())
+    const catchOffsetPos = this.funcDef.byteCode.size
+    this.compiler.emitU32(this.funcDef, 0) // Placeholder
+
+    // Visit Try Block
+    this.isTerminated = false
+    this.visit(node.tryBlock)
+    const tryTerminated = this.isTerminated
+    this.isTerminated = false // Reset for catch
+
+    let gotoEndOffsetPos = -1
+
+    if (!tryTerminated) {
+      // End of Try Block
+      this.compiler.emitOp(this.funcDef, Opcode.OP_drop) // Drop catch handler
+      
+      if (hasFinally) {
+        this.compiler.emitOp(this.funcDef, Opcode.OP_gosub)
+        const gosubOffsetPos = this.funcDef.byteCode.size
+        this.compiler.emitU32(this.funcDef, 0) // Placeholder
+        
+        // Patch gosub later
+        this.pendingLabels.push(`gosub_${gosubOffsetPos}`)
+      }
+
+      this.compiler.emitOp(this.funcDef, Opcode.OP_goto8)
+      gotoEndOffsetPos = this.funcDef.byteCode.size
+      this.compiler.emitU8(this.funcDef, 0) // Placeholder
+    }
+
+    // Patch catch offset
+    const catchPos = this.funcDef.byteCode.size
+    const catchOffset = catchPos - catchOffsetPos
+    this.funcDef.byteCode.putU32At(catchOffsetPos, catchOffset)
+
+    // Catch Handler
+    if (hasCatch) {
+      const catchClause = node.catchClause!
+      
+      // Store exception
+      if (catchClause.variableDeclaration) {
+        const name = (catchClause.variableDeclaration.name as ts.Identifier).text
+        // We need to enter a new scope for the catch variable
+        this.enterScope('block')
+        
+        // Add catch variable
+        const scopeLevel = this.scopeStack.length - 1
+        const varIdx = this.compiler.addVar(this.funcDef, name, false, false, scopeLevel)
+        const currentScope = this.scopeStack[this.scopeStack.length - 1]
+        currentScope.vars.set(name, {
+          type: 'local',
+          idx: varIdx,
+          isLexical: false, // Catch variables are initialized immediately, so no TDZ check needed
+          isConst: false
+        })
+        
+        // Emit put_loc
+        if (varIdx === 0) {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc0)
+        } else if (varIdx === 1) {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc1)
+        } else if (varIdx === 2) {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc2)
+        } else if (varIdx === 3) {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc3)
+        } else {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc)
+          this.compiler.emitU16(this.funcDef, varIdx)
+        }
+      } else {
+        this.compiler.emitOp(this.funcDef, Opcode.OP_drop) // Drop exception if no variable
+      }
+
+      // If finally exists, we need another catch for the catch block
+      let catch2OffsetPos = -1
+      if (hasFinally) {
+        this.compiler.emitOp(this.funcDef, Opcode.OP_catch)
+        catch2OffsetPos = this.funcDef.byteCode.size
+        this.compiler.emitU32(this.funcDef, 0) // Placeholder
+      }
+
+      // Visit Catch Block
+      this.visit(catchClause.block)
+      const catchTerminated = this.isTerminated
+      this.isTerminated = false
+
+      if (catchClause.variableDeclaration) {
+        this.exitScope()
+      }
+
+      if (!catchTerminated) {
+        if (hasFinally) {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_drop) // Drop catch handler 2
+        }
+
+        // Emit undefined + drop (to match WASM)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_undefined)
+        
+        if (hasFinally) {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_gosub)
+          const gosubOffsetPos = this.funcDef.byteCode.size
+          this.compiler.emitU32(this.funcDef, 0) // Placeholder
+          this.pendingLabels.push(`gosub_${gosubOffsetPos}`)
+        }
+        
+        this.compiler.emitOp(this.funcDef, Opcode.OP_drop) // Drop undefined
+        
+        this.compiler.emitOp(this.funcDef, Opcode.OP_goto8)
+        const gotoEndOffsetPos2 = this.funcDef.byteCode.size
+        this.compiler.emitU8(this.funcDef, 0) // Placeholder
+        
+        // Patch goto end 2
+        this.pendingLabels.push(`goto8_end_${gotoEndOffsetPos2}`)
+      }
+
+      // Patch catch 2
+      if (hasFinally) {
+        const catch2Pos = this.funcDef.byteCode.size
+        const catch2Offset = catch2Pos - catch2OffsetPos
+        this.funcDef.byteCode.putU32At(catch2OffsetPos, catch2Offset)
+        
+        // Catch 2 Handler (rethrow)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_gosub)
+        const gosubOffsetPos = this.funcDef.byteCode.size
+        this.compiler.emitU32(this.funcDef, 0) // Placeholder
+        this.pendingLabels.push(`gosub_${gosubOffsetPos}`)
+        
+        this.compiler.emitOp(this.funcDef, Opcode.OP_throw)
+      }
+
+    } else {
+      // No catch block, but we are here because of exception (and we have finally)
+      // So we are in the catch handler of the try block
+      
+      // Execute finally
+      this.compiler.emitOp(this.funcDef, Opcode.OP_gosub)
+      const gosubOffsetPos = this.funcDef.byteCode.size
+      this.compiler.emitU32(this.funcDef, 0) // Placeholder
+      this.pendingLabels.push(`gosub_${gosubOffsetPos}`)
+      
+      // Rethrow
+      this.compiler.emitOp(this.funcDef, Opcode.OP_throw)
+    }
+
+    // Finally Block Label
+    if (hasFinally) {
+      const finallyPos = this.funcDef.byteCode.size
+      
+      // Patch all gosubs
+      for (let i = 0; i < this.pendingLabels.length; i++) {
+        const label = this.pendingLabels[i]
+        if (label.startsWith('gosub_')) {
+          const pos = parseInt(label.split('_')[1])
+          const offset = finallyPos - pos
+          this.funcDef.byteCode.putU32At(pos, offset)
+          this.pendingLabels.splice(i, 1)
+          i--
+        }
+      }
+
+      this.visit(node.finallyBlock)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_ret)
+    }
+
+    // End Label
+    const endPos = this.funcDef.byteCode.size
+    
+    // Patch goto end 1
+    if (gotoEndOffsetPos !== -1) {
+      const gotoEndOffset = endPos - gotoEndOffsetPos
+      if (gotoEndOffset > 127 || gotoEndOffset < -128) {
+        throw new Error('Jump offset too large for goto8')
+      }
+      this.funcDef.byteCode.buffer[gotoEndOffsetPos] = gotoEndOffset
+    }
+    
+    // Patch other goto ends
+    for (let i = 0; i < this.pendingLabels.length; i++) {
+      const label = this.pendingLabels[i]
+      if (label.startsWith('goto_end_')) {
+        const pos = parseInt(label.split('_')[2])
+        const offset = endPos - pos
+        this.funcDef.byteCode.putU32At(pos, offset)
+        this.pendingLabels.splice(i, 1)
+        i--
+      } else if (label.startsWith('goto8_end_')) {
+        const pos = parseInt(label.split('_')[2])
+        const offset = endPos - pos
+        if (offset > 127 || offset < -128) {
+          throw new Error('Jump offset too large for goto8')
+        }
+        this.funcDef.byteCode.buffer[pos] = offset
+        this.pendingLabels.splice(i, 1)
+        i--
+      }
     }
   }
 
