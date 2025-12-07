@@ -1,26 +1,22 @@
-__tests__/compiler/fixtures/class-basic.js:1:0: function: <eval>
+__tests__/compiler/fixtures/arrow-fn-complex.js:1:0: function: <eval>
   mode: strict
-  locals:
-    0: const Point [level:2 next:-1]
-    1: const <class_fields_init> [level:3 next:0]
   closure vars:
-    0: Point local loc0 let
-  stack_size: 3
-  opcodes (29 bytes):
+    0: complex local loc0 const
+  stack_size: 4
+  opcodes (33 bytes):
    0 push_this
    1 if_false8  offset=2
    3 return_undef
-   4 set_loc_uninitialized
-   7 undefined
-   8 set_loc_uninitialized
-  11 push_const8
-  13 define_class  atom=472 (Point) flags=0
-  19 undefined
-  20 put_loc1
-  21 drop
-  22 set_loc0
-  23 close_loc
-  26 put_var_ref0
-  27 undefined
-  28 return_async
+   4 fclosure8
+   6 set_name  atom=472 (complex)
+  11 put_var_ref0
+  12 get_var  atom=473 (console)
+  17 get_field2  atom=474 (log)
+  22 get_var_ref_check
+  25 push_5
+  26 call1
+  27 call_method
+  30 drop
+  31 undefined
+  32 return_async
 

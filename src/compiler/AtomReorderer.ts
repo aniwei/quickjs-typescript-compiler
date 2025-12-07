@@ -19,7 +19,7 @@ export class AtomReorderer {
     
     // Add extra atoms (e.g. module name)
     for (const atomIdx of extraAtoms) {
-      console.log(`AtomReorderer: Adding extra atom ${atomIdx}`)
+      // console.log(`AtomReorderer: Adding extra atom ${atomIdx}`)
       this.addAtom(atomIdx)
     }
 
@@ -37,10 +37,10 @@ export class AtomReorderer {
       return oldIdx
     }
     if (this.oldToNew.has(oldIdx)) {
-      console.log(`AtomReorderer: Remapped ${oldIdx} -> ${this.oldToNew.get(oldIdx)}`)
+      // console.log(`AtomReorderer: Remapped ${oldIdx} -> ${this.oldToNew.get(oldIdx)}`)
       return this.oldToNew.get(oldIdx)!
     }
-    console.log(`AtomReorderer: Failed to remap ${oldIdx}`)
+    // console.log(`AtomReorderer: Failed to remap ${oldIdx}`)
     return oldIdx
   }
   private addAtom(oldIdx: number) {
@@ -55,7 +55,7 @@ export class AtomReorderer {
 
     const atomStr = this.compiler.atoms[oldIdx - this.compiler.firstAtomId]
     if (!atomStr) {
-      console.log(`AtomReorderer: Missing atom for oldIdx ${oldIdx}. firstAtomId=${this.compiler.firstAtomId}, atoms.length=${this.compiler.atoms.length}`)
+      // console.log(`AtomReorderer: Missing atom for oldIdx ${oldIdx}. firstAtomId=${this.compiler.firstAtomId}, atoms.length=${this.compiler.atoms.length}`)
       return
     }
     if (!this.atomMap.has(atomStr)) {
@@ -88,14 +88,14 @@ export class AtomReorderer {
     
     for (const v of fd.vars) {
       if (v.varName !== 0) {
-        console.log(`AtomReorderer: Collecting var atom ${v.varName} (${this.compiler.atoms[v.varName - this.compiler.firstAtomId]})`)
+        // console.log(`AtomReorderer: Collecting var atom ${v.varName} (${this.compiler.atoms[v.varName - this.compiler.firstAtomId]})`)
         this.addAtom(v.varName)
       }
     }
     
     for (const cv of fd.closureVar) {
       if (cv.varName !== 0) {
-        console.log(`AtomReorderer: Collecting closure var atom ${cv.varName} (${this.compiler.atoms[cv.varName - this.compiler.firstAtomId]})`)
+        // console.log(`AtomReorderer: Collecting closure var atom ${cv.varName} (${this.compiler.atoms[cv.varName - this.compiler.firstAtomId]})`)
         this.addAtom(cv.varName)
       }
     }
@@ -141,6 +141,18 @@ export class AtomReorderer {
         }
       } else if (op === Opcode.OP_fclosure8) {
         const cpoolIdx = buf[pc + 1]
+        const childFd = fd.cpool[cpoolIdx]
+        if (childFd instanceof FunctionDef) {
+          childFds.push(childFd)
+        }
+      } else if (op === Opcode.OP_push_const8) {
+        const cpoolIdx = buf[pc + 1]
+        const childFd = fd.cpool[cpoolIdx]
+        if (childFd instanceof FunctionDef) {
+          childFds.push(childFd)
+        }
+      } else if (op === Opcode.OP_push_const) {
+        const cpoolIdx = this.readU32(buf, pc + 1)
         const childFd = fd.cpool[cpoolIdx]
         if (childFd instanceof FunctionDef) {
           childFds.push(childFd)

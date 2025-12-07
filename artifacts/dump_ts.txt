@@ -1,1 +1,22 @@
+__tests__/compiler/fixtures/arrow-fn-complex.js:1:0: function: <eval>
+  mode: strict
+  closure vars:
+    0: complex local loc0 const
+  stack_size: 4
+  opcodes (33 bytes):
+   0 push_this
+   1 if_false8  offset=2
+   3 return_undef
+   4 fclosure8
+   6 set_name  atom=472 (complex)
+  11 put_var_ref0
+  12 get_var  atom=473 (console)
+  17 get_field2  atom=474 (log)
+  22 get_var_ref_check
+  25 push_5
+  26 call1
+  27 call_method
+  30 drop
+  31 undefined
+  32 return_async
 

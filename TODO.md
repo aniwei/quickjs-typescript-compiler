@@ -12,3 +12,5 @@ Remaining difference in compute.ts: 4 bytes missing in pc2line table. Bytecode l
   - WASM has extra prologue (13 bytes) involving `put_loc3`, `fclosure`, `call0`, `rest`.
   - TS has `home_object` logic (3 bytes) which might be unnecessary or different.
   - Current state: Functionally correct, but bytecode differs in prologue.
+closure-basic.ts: Identical bytecode size (192 bytes). Instructions match (tail_call optimization implemented).
+closure-basic.ts: Identical bytecode size (192 bytes). Instructions match (tail_call optimization implemented).

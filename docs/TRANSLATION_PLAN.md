@@ -106,6 +106,7 @@
     *   `js_parse_block` -> `visitBlock(node)`
     *   `emit_return` -> `emitReturn(hasVal: boolean)`
     *   `js_parse_return` -> `visitReturnStatement(node)`
+    *   已实现尾调用检测 (`isTailCall`)。
 *   [x] **验证**: `fixtures/if-else.ts` (✅), `fixtures/while.ts` (✅), `fixtures/do-while.ts` (✅), `fixtures/switch-case.ts` (✅)。
 
 ## 阶段 4: 函数与闭包 (Functions & Closures)
@@ -117,9 +118,12 @@
     *   **优化**: 移除了硬编码的 `pc2line` 字节，改用 `computePc2LineInfo` 动态生成。
     *   **修复**: 修正了模块 Prologue 中 `if_false8` 的跳转目标，使其正确跳过 `OP_undefined`。
     *   **修复**: 移除了 `visitFunctionDeclaration` 中重复添加闭包变量的逻辑。
+    *   **修复**: 实现了函数体变量提升 (Hoisting) 逻辑，确保函数声明和 `var` 变量在执行前被提升。
+    *   **修复**: 实现了 `OP_tail_call` 尾调用优化，在 `visitReturnStatement` 和 `visitCallExpression` 中检测并生成尾调用指令。
 *   [ ] **Task 4.2**: 支持函数表达式 (`FunctionExpression`)。
 *   [x] **Task 4.3**: 实现 `OP_call` 相关指令生成。
     *   `js_parse_call` -> `visitCallExpression(node)` (已实现 `OP_call0`...`OP_call3` 优化，及栈调整修复)
+    *   已实现 `OP_tail_call` 和 `OP_tail_call_method` 支持。
 *   [x] **Task 4.4**: 实现参数处理 (`arguments`)。
     *   `add_arg` -> `addArg(name: string)` (已实现)
     *   `add_arguments_var` -> `addArgumentsVar()` (部分实现)
@@ -131,7 +135,7 @@
     *   已验证 `arrow-fn-basic.ts` 和 `arrow-fn-complex.ts` 的字节码逻辑正确性。
     *   **修复**: 修正了 `OP_set_loc_uninitialized` 的操作数大小 (U8 -> U16)，解决了 `arrow-fn-complex.ts` 的字节码缺失问题。
     *   **修复**: 调整了箭头函数体内的变量作用域层级 (强制为 Level 1)，与 QuickJS WASM 行为对齐。
-*   [x] **验证**: `fixtures/compute.ts` (✅), `fixtures/function-call.ts` (✅), `fixtures/variables-var.ts` (✅), `fixtures/variables-let-block.ts` (✅), `fixtures/arrow-fn-complex.ts` (✅)。
+*   [x] **验证**: `fixtures/compute.ts` (✅), `fixtures/function-call.ts` (✅), `fixtures/variables-var.ts` (✅), `fixtures/variables-let-block.ts` (✅), `fixtures/arrow-fn-complex.ts` (✅), `fixtures/closure-basic.ts` (✅)。
 
 ## 阶段 5: 对象与数组 (Objects & Arrays)
 **目标**: 支持复杂数据结构。
@@ -158,10 +162,11 @@
     *   已实现 `OP_define_class` 和 `OP_set_loc_uninitialized` 序列。
     *   **修复**: 修正了 `OP_get_var_ref_check` 的操作数大小 (无参数)，解决了 `class-basic.ts` 的字节码解析错误。
     *   **优化**: 移除了字段初始化块中多余的 `OP_drop`。
-    *   **验证**: `class-basic.ts` (196 bytes vs 201 bytes，-5 bytes 差异，功能正确)。
+    *   **验证**: `class-basic.ts` (✅ 完全二进制对齐)。
 *   [x] **Task 6.2**: 支持 `constructor`。
     *   已实现构造函数生成，包括 `OP_check_ctor` 和字段初始化调用。
-    *   已修复 Atom Table 问题 (使用 `OP_fclosure8`)。
+    *   **修复**: 将类构造函数的发射指令从 `OP_fclosure8` 改为 `OP_push_const8`，与 QuickJS 行为对齐。
+    *   **修复**: 更新 `AtomReorderer` 以支持 `OP_push_const8` 的子函数递归，确保构造函数内的 Atom 被正确收集。
 *   [x] **Task 6.3**: 支持实例方法和静态方法。
     *   `visitClassDeclaration` 增加方法遍历逻辑。
     *   已实现 `OP_define_method`，正确处理 `static` (定义在 ctor) 和 instance (定义在 proto) 方法。

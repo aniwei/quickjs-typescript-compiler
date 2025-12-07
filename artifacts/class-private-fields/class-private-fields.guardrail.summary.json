@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/class-private-fields/cli/class-private-fields.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/class-private-fields/cli/class-private-fields.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/class-private-fields/cli/class-private-fields.pc2line.txt",
-    "bytecodeSize": 442,
+    "bytecodeSize": 456,
     "pc2lineLength": 0,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 373,
+    "tsSize": 387,
     "wasmSize": 436,
-    "sizeDiff": -63,
-    "sizeDiffPercent": -14.449541284403669
+    "sizeDiff": -49,
+    "sizeDiffPercent": -11.238532110091743
   },
   "trace": {
     "differenceCount": 0,

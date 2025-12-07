@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/labeled-statements.ts
-**生成时间**: 2025-12-07T15:31:53.886Z
+**生成时间**: 2025-12-07T18:10:44.440Z
 
 ## 大小对比
 

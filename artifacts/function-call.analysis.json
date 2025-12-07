@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-07T15:10:49.822Z",
+  "timestamp": "2025-12-07T17:34:34.373Z",
   "inputFile": "__tests__/compiler/fixtures/function-call.ts",
   "compilation": {
     "typescript": {
