@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/class-inheritance.ts
-**生成时间**: 2025-12-07T12:00:30.260Z
+**生成时间**: 2025-12-07T14:47:48.046Z
 
 ## 大小对比
 
-- TypeScript编译器: 589 字节
+- TypeScript编译器: 532 字节
 - WASM编译器: 682 字节
-- 差异: -93 字节 (-13.64%)
+- 差异: -150 字节 (-21.99%)
 
 ## 结构分析
 
@@ -16,7 +16,7 @@
 {
   "source": "TypeScript",
   "bcVersion": "0x5",
-  "userAtomCount": 14,
+  "userAtomCount": 10,
   "atoms": [
     {
       "index": 0,
@@ -28,113 +28,81 @@
     },
     {
       "index": 1,
-      "rawLength": 38,
-      "actualLength": 19,
-      "isWideChar": 0,
-      "string": "<class_fields_init>",
-      "offset": 51
-    },
-    {
-      "index": 2,
       "rawLength": 12,
       "actualLength": 6,
       "isWideChar": 0,
       "string": "Animal",
-      "offset": 71
+      "offset": 51
     },
     {
-      "index": 3,
+      "index": 2,
       "rawLength": 6,
       "actualLength": 3,
       "isWideChar": 0,
       "string": "Dog",
-      "offset": 78
+      "offset": 58
     },
     {
-      "index": 4,
+      "index": 3,
       "rawLength": 2,
       "actualLength": 1,
       "isWideChar": 0,
       "string": "d",
-      "offset": 82
+      "offset": 62
     },
     {
-      "index": 5,
+      "index": 4,
       "rawLength": 10,
       "actualLength": 5,
       "isWideChar": 0,
       "string": "speak",
-      "offset": 84
+      "offset": 64
     },
     {
-      "index": 6,
-      "rawLength": 26,
-      "actualLength": 13,
-      "isWideChar": 0,
-      "string": "<home_object>",
-      "offset": 90
-    },
-    {
-      "index": 7,
+      "index": 5,
       "rawLength": 14,
       "actualLength": 7,
       "isWideChar": 0,
       "string": "console",
-      "offset": 104
+      "offset": 70
     },
     {
-      "index": 8,
+      "index": 6,
       "rawLength": 6,
       "actualLength": 3,
       "isWideChar": 0,
       "string": "log",
-      "offset": 112
+      "offset": 78
     },
     {
-      "index": 9,
+      "index": 7,
       "rawLength": 26,
       "actualLength": 13,
       "isWideChar": 0,
       "string": "Animal speaks",
-      "offset": 116
+      "offset": 82
     },
     {
-      "index": 10,
+      "index": 8,
       "rawLength": 10,
       "actualLength": 5,
       "isWideChar": 0,
       "string": "breed",
-      "offset": 130
+      "offset": 96
     },
     {
-      "index": 11,
-      "rawLength": 32,
-      "actualLength": 16,
-      "isWideChar": 0,
-      "string": "this.active_func",
-      "offset": 136
-    },
-    {
-      "index": 12,
-      "rawLength": 20,
-      "actualLength": 10,
-      "isWideChar": 0,
-      "string": "new.target",
-      "offset": 153
-    },
-    {
-      "index": 13,
+      "index": 9,
       "rawLength": 18,
       "actualLength": 9,
       "isWideChar": 0,
       "string": "Dog barks",
-      "offset": 164
+      "offset": 102
     }
   ],
   "functionHeader": {
-    "offset": 174,
+    "offset": 112,
     "tag": "0xd",
-    "remaining": 415
+    "remaining": 420
   }
 }
 ```
@@ -253,71 +221,68 @@
 
 ## 字节级差异
 
-共发现 580 个字节差异:
+共发现 570 个字节差异:
 
-- 偏移量 0x1: TS=0x0e vs WASM=0x0c
-- 偏移量 0x33: TS=0x26 vs WASM=0x0c
-- 偏移量 0x34: TS=0x3c vs WASM=0x41
-- 偏移量 0x35: TS=0x63 vs WASM=0x6e
-- 偏移量 0x36: TS=0x6c vs WASM=0x69
-- 偏移量 0x37: TS=0x61 vs WASM=0x6d
-- 偏移量 0x38: TS=0x73 vs WASM=0x61
-- 偏移量 0x39: TS=0x73 vs WASM=0x6c
-- 偏移量 0x3a: TS=0x5f vs WASM=0x06
-- 偏移量 0x3b: TS=0x66 vs WASM=0x44
-- 偏移量 0x3c: TS=0x69 vs WASM=0x6f
-- 偏移量 0x3d: TS=0x65 vs WASM=0x67
-- 偏移量 0x3e: TS=0x6c vs WASM=0x02
-- 偏移量 0x40: TS=0x73 vs WASM=0x0a
-- 偏移量 0x41: TS=0x5f vs WASM=0x73
-- 偏移量 0x42: TS=0x69 vs WASM=0x70
-- 偏移量 0x43: TS=0x6e vs WASM=0x65
-- 偏移量 0x44: TS=0x69 vs WASM=0x61
-- 偏移量 0x45: TS=0x74 vs WASM=0x6b
-- 偏移量 0x46: TS=0x3e vs WASM=0x06
-- ... (显示前20个差异，总共580个)
+- 偏移量 0x1: TS=0x0a vs WASM=0x0c
+- 偏移量 0x46: TS=0x0e vs WASM=0x06
+- 偏移量 0x47: TS=0x63 vs WASM=0x52
+- 偏移量 0x48: TS=0x6f vs WASM=0x65
+- 偏移量 0x49: TS=0x6e vs WASM=0x78
+- 偏移量 0x4a: TS=0x73 vs WASM=0x1e
+- 偏移量 0x4b: TS=0x6f vs WASM=0x47
+- 偏移量 0x4c: TS=0x6c vs WASM=0x65
+- 偏移量 0x4d: TS=0x65 vs WASM=0x72
+- 偏移量 0x4e: TS=0x06 vs WASM=0x6d
+- 偏移量 0x4f: TS=0x6c vs WASM=0x61
+- 偏移量 0x50: TS=0x6f vs WASM=0x6e
+- 偏移量 0x51: TS=0x67 vs WASM=0x20
+- 偏移量 0x52: TS=0x1a vs WASM=0x53
+- 偏移量 0x53: TS=0x41 vs WASM=0x68
+- 偏移量 0x54: TS=0x6e vs WASM=0x65
+- 偏移量 0x55: TS=0x69 vs WASM=0x70
+- 偏移量 0x56: TS=0x6d vs WASM=0x68
+- 偏移量 0x57: TS=0x61 vs WASM=0x65
+- 偏移量 0x58: TS=0x6c vs WASM=0x72
+- ... (显示前20个差异，总共570个)
 
 ## 十六进制转储对比
 
 ### TypeScript
 ```
-00000000: 05 0e 60 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..`__tests__/com|
+00000000: 05 0a 60 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..`__tests__/com|
 00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 63 |piler/fixtures/c|
 00000020: 6c 61 73 73 2d 69 6e 68 65 72 69 74 61 6e 63 65 |lass-inheritance|
-00000030: 2e 6a 73 26 3c 63 6c 61 73 73 5f 66 69 65 6c 64 |.js&<class_field|
-00000040: 73 5f 69 6e 69 74 3e 0c 41 6e 69 6d 61 6c 06 44 |s_init>.Animal.D|
-00000050: 6f 67 02 64 0a 73 70 65 61 6b 1a 3c 68 6f 6d 65 |og.d.speak.<home|
-00000060: 5f 6f 62 6a 65 63 74 3e 0e 63 6f 6e 73 6f 6c 65 |_object>.console|
-00000070: 06 6c 6f 67 1a 41 6e 69 6d 61 6c 20 73 70 65 61 |.log.Animal spea|
-00000080: 6b 73 0a 62 72 65 65 64 20 74 68 69 73 2e 61 63 |ks.breed this.ac|
-00000090: 74 69 76 65 5f 66 75 6e 63 14 6e 65 77 2e 74 61 |tive_func.new.ta|
-000000a0: 72 67 65 74 12 44 6f 67 20 62 61 72 6b 73 0d c8 |rget.Dog barks..|
-000000b0: 03 00 00 00 00 00 0c 20 06 01 a4 01 00 00 00 04 |....... ........|
-000000c0: 04 04 54 00 cc 03 00 0d ca 03 00 0d ce 03 02 0d |..T.............|
-000000d0: d0 03 03 0d 08 ec 02 29 63 ff ff 06 63 00 00 c2 |.......)c...c...|
-000000e0: 00 58 e6 00 00 00 00 c2 01 56 e9 00 00 00 00 cb |.X.......V......|
-000000f0: 6b 00 00 5c ff ff e3 63 ff ff 06 63 00 00 68 00 |k..\...c...c..h.|
-00000100: 00 c2 02 58 e7 00 00 00 01 c2 03 56 e9 00 00 00 |...X.......V....|
-00000110: 00 cb 6b 00 00 5c ff ff e5 e6 68 03 00 43 e9 00 |..k..\....h..C..|
-00000120: 00 00 24 00 00 0e 06 2f c8 03 0e 00 00 00 2a 12 |..$..../......*.|
-00000130: 24 00 1c 18 23 11 02 1b 0c 00 0c 03 04 01 cc 03 |$...#...........|
-00000140: 01 01 01 02 01 00 1e 02 70 00 01 00 10 00 00 10 |........p.......|
-00000150: ca 03 01 0c 08 cb 2b 68 00 00 11 ec 07 c7 1b 24 |......+h.......$|
-00000160: 00 00 0e 0e 39 38 00 00 00 11 1b 44 38 00 00 00 |....98.....D8...|
-00000170: 0e 29 c8 03 04 00 00 55 28 00 0c 00 00 00 d2 03 |.).....U(.......|
-00000180: 00 02 00 03 00 00 19 02 10 00 00 10 d4 03 00 00 |................|
-00000190: 00 0c 04 cc 08 cb 39 eb 00 00 00 43 ec 00 00 00 |......9....C....|
-000001a0: 04 ed 00 00 00 24 01 00 0e 29 0c 07 04 01 ce 03 |.....$...)......|
-000001b0: 02 03 02 04 01 00 33 05 70 00 01 00 dc 03 00 01 |......3.p.......|
-000001c0: 00 de 03 00 00 00 e0 03 00 00 00 10 00 00 10 ca |................|
-000001d0: 03 01 0c 0c 02 cb 0c 03 cc 63 02 00 2b c7 35 c8 |.........c..+.5.|
-000001e0: 39 38 00 00 00 21 01 00 11 66 02 00 68 00 00 11 |98...!...f..h...|
-000001f0: ec 09 64 02 00 1b 24 00 00 0e 0e 0e d4 11 1b 44 |..d...$........D|
-00000200: ee 00 00 00 0e 29 c8 03 06 09 00 46 1c 8f 0e 00 |.....).....F....|
-00000210: 0c 00 00 00 d2 03 00 02 00 03 00 00 26 02 10 00 |............&...|
-00000220: 00 10 d4 03 00 00 00 0c 04 cc 08 cb c7 c8 35 04 |..............5.|
-00000230: e9 00 00 00 48 24 00 00 0e 39 eb 00 00 00 43 ec |....H$...9....C.|
-00000240: 00 00 00 04 f1 00 00 00 24 01 00 0e 29          |........$...)|
+00000030: 2e 6a 73 0c 41 6e 69 6d 61 6c 06 44 6f 67 02 64 |.js.Animal.Dog.d|
+00000040: 0a 73 70 65 61 6b 0e 63 6f 6e 73 6f 6c 65 06 6c |.speak.console.l|
+00000050: 6f 67 1a 41 6e 69 6d 61 6c 20 73 70 65 61 6b 73 |og.Animal speaks|
+00000060: 0a 62 72 65 65 64 12 44 6f 67 20 62 61 72 6b 73 |.breed.Dog barks|
+00000070: 0d c8 03 00 00 00 00 00 0c 20 06 01 a4 01 00 00 |......... ......|
+00000080: 00 04 04 04 54 00 ca 03 00 0d b8 05 00 0d cc 03 |....T...........|
+00000090: 02 0d ce 03 03 0d 08 ec 02 29 63 ff ff 06 63 00 |.........)c...c.|
+000000a0: 00 c2 00 58 e5 00 00 00 00 c2 01 56 e8 00 00 00 |...X.......V....|
+000000b0: 00 cb 6b 00 00 5c ff ff e3 63 ff ff 06 63 00 00 |..k..\...c...c..|
+000000c0: 68 00 00 c2 02 58 e6 00 00 00 01 c2 03 56 e8 00 |h....X.......V..|
+000000d0: 00 00 00 cb 6b 00 00 5c ff ff e5 e6 68 03 00 43 |....k..\....h..C|
+000000e0: e8 00 00 00 24 00 00 0e 06 2f c8 03 0e 00 00 00 |....$..../......|
+000000f0: 2a 12 24 00 1c 18 23 11 02 1b 0c 00 0c 03 04 01 |*.$...#.........|
+00000100: ca 03 01 01 01 02 01 00 1c 02 70 00 01 00 10 00 |..........p.....|
+00000110: 00 10 b8 05 01 0c 08 cb 2b 68 00 00 11 ec 06 c7 |........+h......|
+00000120: 1b 24 00 00 0e c7 39 38 00 00 00 44 38 00 00 00 |.$....98...D8...|
+00000130: 0e 29 c8 03 06 00 00 50 10 07 18 00 0c 00 00 00 |.).....P........|
+00000140: d0 03 00 02 00 03 00 00 19 02 10 00 00 10 b2 05 |................|
+00000150: 00 00 00 0c 04 cc 08 cb 39 e9 00 00 00 43 ea 00 |........9....C..|
+00000160: 00 00 04 eb 00 00 00 24 01 00 0e 29 0c 07 04 01 |.......$...)....|
+00000170: cc 03 02 03 02 04 01 00 34 05 70 00 01 00 d8 03 |........4.p.....|
+00000180: 00 01 00 b0 05 00 00 00 ae 05 00 00 00 10 00 00 |................|
+00000190: 10 b8 05 01 0c 0c 02 cb 0c 03 cc 63 02 00 2b c7 |...........c..+.|
+000001a0: 35 c8 39 38 00 00 00 21 01 00 11 66 02 00 68 00 |5.98...!...f..h.|
+000001b0: 00 11 ec 09 64 02 00 1b 24 00 00 0e 0e 0e 5a 02 |....d...$.....Z.|
+000001c0: 00 d4 44 ec 00 00 00 0e 29 c8 03 0a 09 00 37 10 |..D.....).....7.|
+000001d0: 11 0c 8f 0b 11 1a 00 0c 00 00 00 d0 03 00 02 00 |................|
+000001e0: 03 00 00 26 02 10 00 00 10 b2 05 00 00 00 0c 04 |...&............|
+000001f0: cc 08 cb c7 c8 35 04 e8 00 00 00 48 24 00 00 0e |.....5.....H$...|
+00000200: 39 e9 00 00 00 43 ea 00 00 00 04 ed 00 00 00 24 |9....C.........$|
+00000210: 01 00 0e 29                                     |...)|
 ```
 
 ### WASM

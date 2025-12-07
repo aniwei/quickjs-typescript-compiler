@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-07T11:57:20.636Z",
+  "timestamp": "2025-12-07T14:18:42.579Z",
   "inputFile": "__tests__/compiler/fixtures/unary-ops.ts",
   "compilation": {
     "typescript": {

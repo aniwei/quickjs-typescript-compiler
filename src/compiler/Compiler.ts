@@ -4,9 +4,16 @@ import { BytecodeBuilder } from './BytecodeBuilder'
 import { AtomReorderer } from './AtomReorderer'
 import ts from 'typescript'
 
+
+interface Jump {
+  fd: FunctionDef
+  pos: number
+  size: number
+}
+
 export class Label {
   addr: number = -1
-  jumps: { fd: FunctionDef, pos: number, size: number }[] = []
+  jumps: Jump[] = []
 }
 
 export class Compiler {
@@ -14,15 +21,16 @@ export class Compiler {
   atomMap: Map<string, number> = new Map()
   firstAtomId: number = env.firstAtomId
   sourceFile: ts.SourceFile | null = null
+  pendingSourcePos: number = -1
 
   constructor(options?: { firstAtomId?: number }) {
     if (options?.firstAtomId) {
       this.firstAtomId = options.firstAtomId
     }
-    this.initBuiltinAtoms()
+    this.ensureInitializedBuiltinAtoms()
   }
 
-  initBuiltinAtoms() {
+  ensureInitializedBuiltinAtoms() {
     this.atomMap.set('null', JSAtom.JS_ATOM_null)
     this.atomMap.set('false', JSAtom.JS_ATOM_false)
     this.atomMap.set('true', JSAtom.JS_ATOM_true)
@@ -93,7 +101,7 @@ export class Compiler {
     this.atomMap.set('set', JSAtom.JS_ATOM_set)
     this.atomMap.set('of', JSAtom.JS_ATOM_of)
     this.atomMap.set('__proto__', JSAtom.JS_ATOM___proto__)
-    this.atomMap.set('undefined', JSAtom.JS_ATOM_undefined)
+    this.atomMap.set('undefined', JSAtom.JS_ATOM_undefined) // Allow undefined as user atom
     this.atomMap.set('number', JSAtom.JS_ATOM_number)
     this.atomMap.set('boolean', JSAtom.JS_ATOM_boolean)
     this.atomMap.set('string', JSAtom.JS_ATOM_string)
@@ -324,7 +332,9 @@ export class Compiler {
     // Check built-in atoms
     const builtInName = 'JS_ATOM_' + s
     // @ts-ignore
-    if (JSAtom[builtInName]) {
+    if (s === 'undefined') console.log('addAtom undefined check:', builtInName, JSAtom[builtInName])
+    // @ts-ignore
+    if (JSAtom[builtInName] && s !== 'undefined') {
       // @ts-ignore
       return JSAtom[builtInName]
     }
@@ -332,6 +342,8 @@ export class Compiler {
     if (this.atomMap.has(s)) {
       return this.atomMap.get(s)! + this.firstAtomId
     }
+
+    if (s === 'undefined') console.log('Adding undefined to atoms list')
 
     const idx = this.atoms.length
     this.atoms.push(s)
@@ -447,6 +459,14 @@ export class Compiler {
   }
 
   emitOp(s: FunctionDef, val: number, sourcePos: number = -1): void {
+    // console.log(`emitOp ${Opcode[val]} (${val}) pos=${sourcePos} pending=${this.pendingSourcePos} size=${s.byteCode.size}`)
+    if (this.pendingSourcePos !== -1) {
+      if (sourcePos === -1) {
+        sourcePos = this.pendingSourcePos
+      }
+      this.pendingSourcePos = -1
+    }
+
     if (sourcePos !== -1) {
         this.addPc2LineInfo(s, s.byteCode.size, sourcePos)
     }
@@ -552,8 +572,10 @@ export class Compiler {
     out.putByte(env.bytecodeVersion)
 
     // Write atom table
+    console.log('Writing atoms:', this.atoms.length)
     out.putULEB128(this.atoms.length)
     for (const atom of this.atoms) {
+      console.log('Writing atom:', atom)
       // Simplified string writing (ASCII only for now)
       const len = atom.length
       out.putULEB128(len << 1)
@@ -784,15 +806,23 @@ export class Compiler {
   writeModule(fd: FunctionDef, moduleNameAtom: number): Uint8Array {
     // Reorder atoms to match QuickJS serialization order
     const reorderer = new AtomReorderer(this)
-    reorderer.reorder(fd, [moduleNameAtom])
+    
+    const extraAtoms = [moduleNameAtom]
+    if (this.atomMap.has('undefined')) {
+      extraAtoms.push(this.atomMap.get('undefined')! + this.firstAtomId)
+    }
+    
+    reorderer.reorder(fd, extraAtoms)
     moduleNameAtom = reorderer.getNewId(moduleNameAtom)
 
     const out = new BytecodeBuilder()
     out.putByte(env.bytecodeVersion)
 
     // Write atom table
+    console.log('writeModule: Writing atoms:', this.atoms.length)
     out.putULEB128(this.atoms.length)
     for (const atom of this.atoms) {
+      console.log('writeModule: Writing atom:', atom)
       const len = atom.length
       out.putULEB128(len << 1)
 

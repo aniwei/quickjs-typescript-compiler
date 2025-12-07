@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-06T14:33:54.002Z",
+  "timestamp": "2025-12-07T14:18:37.622Z",
   "inputFile": "__tests__/compiler/fixtures/comparison-ops.ts",
   "compilation": {
     "typescript": {
