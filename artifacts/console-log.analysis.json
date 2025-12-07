@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-06T16:16:20.781Z",
+  "timestamp": "2025-12-07T10:20:43.515Z",
   "inputFile": "__tests__/compiler/fixtures/console-log.ts",
   "compilation": {
     "typescript": {

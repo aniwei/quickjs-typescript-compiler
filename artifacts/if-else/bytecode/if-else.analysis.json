@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-07T03:50:04.857Z",
+  "timestamp": "2025-12-07T12:00:30.338Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/if-else.ts",
   "compilation": {
     "typescript": {
@@ -143,7 +143,7 @@
         "0x04",
         "0x00",
         "0x11",
-        "0x0a",
+        "0x0c",
         "0x0b",
         "0x1b",
         "0x0e",
@@ -162,7 +162,7 @@
         "00000050: 09 08 ec 02 29 b8 e3 68 00 00 b7 a7 ec 09 b9 11 |....)..h........|",
         "00000060: 69 00 00 0e ee 07 ba 11 69 00 00 0e 39 e6 00 00 |i.......i...9...|",
         "00000070: 00 43 e7 00 00 00 68 00 00 24 01 00 0e 06 2f c8 |.C....h..$..../.|",
-        "00000080: 03 10 00 00 21 08 16 04 00 11 0a 0b 1b 0e 1b 0a |....!...........|",
+        "00000080: 03 10 00 00 21 08 16 04 00 11 0c 0b 1b 0e 1b 0a |....!...........|",
         "00000090: 11 01 00                                        |...|"
       ],
       "structure": {
@@ -449,9 +449,9 @@
     {
       "offset": 138,
       "offsetHex": "0x8a",
-      "typescript": "0x0a",
+      "typescript": "0x0c",
       "wasm": "0x2d",
-      "typescriptDecimal": 10,
+      "typescriptDecimal": 12,
       "wasmDecimal": 45
     },
     {

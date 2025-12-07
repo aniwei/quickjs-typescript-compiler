@@ -87,11 +87,17 @@ export class AtomReorderer {
     }
     
     for (const v of fd.vars) {
-      if (v.varName !== 0) this.addAtom(v.varName)
+      if (v.varName !== 0) {
+        console.log(`AtomReorderer: Collecting var atom ${v.varName} (${this.compiler.atoms[v.varName - this.compiler.firstAtomId]})`)
+        this.addAtom(v.varName)
+      }
     }
     
     for (const cv of fd.closureVar) {
-      if (cv.varName !== 0) this.addAtom(cv.varName)
+      if (cv.varName !== 0) {
+        console.log(`AtomReorderer: Collecting closure var atom ${cv.varName} (${this.compiler.atoms[cv.varName - this.compiler.firstAtomId]})`)
+        this.addAtom(cv.varName)
+      }
     }
 
     const buf = fd.byteCode.data()

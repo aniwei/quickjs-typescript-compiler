@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/primitives/cli/primitives.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/primitives/cli/primitives.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/primitives/cli/primitives.pc2line.txt",
-    "bytecodeSize": 298,
+    "bytecodeSize": 300,
     "pc2lineLength": 0,
     "stackMax": 0
   },
   "bytecode": {
-    "identical": false,
-    "tsSize": 229,
+    "identical": true,
+    "tsSize": 231,
     "wasmSize": 231,
-    "sizeDiff": -2,
-    "sizeDiffPercent": -0.8658008658008658
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
   },
   "trace": {
     "differenceCount": 0,

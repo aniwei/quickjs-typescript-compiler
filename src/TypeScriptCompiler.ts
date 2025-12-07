@@ -1,5 +1,5 @@
 import ts from 'typescript'
-import { Compiler } from './compiler/Compiler'
+import { Compiler, Label } from './compiler/Compiler'
 import { FunctionDef, JSVarKind } from './compiler/FunctionDef'
 import { JSAtom, JSMode, Opcode, FunctionKind } from './env'
 
@@ -19,11 +19,10 @@ interface Scope {
 }
 
 interface LoopInfo {
-  type: 'loop' | 'switch'
-  label?: string
-  breakJumps: number[]
-  continueJumps: number[]
-  continueTarget: number
+  type: 'loop' | 'switch' | 'block'
+  labels: string[]
+  breakLabel: Label
+  continueLabel?: Label
 }
 
 export class TypeScriptCompiler {
@@ -32,6 +31,7 @@ export class TypeScriptCompiler {
   private moduleVarIdx = 0
   private scopeStack: Scope[] = []
   private loopStack: LoopInfo[] = []
+  private pendingLabels: string[] = []
 
   constructor(options?: any) {
     this.compiler = new Compiler(options)
@@ -75,28 +75,23 @@ export class TypeScriptCompiler {
     fd.filename = filenameAtom
     fd.hasDebug = true
     fd.argumentsAllowed = true
-    // fd.sourcePos = 0 // Start of file
+    fd.sourcePos = 0 // Start of file
 
     this.funcDef = fd
 
     // Module prologue
-    if (filename.endsWith('arrow-fn-basic.js')) {
-      // fd.sourcePos = 65
-      this.compiler.emitOp(fd, Opcode.OP_push_this)
-      this.compiler.emitOp(fd, Opcode.OP_if_false8)
-    } else {
-      this.compiler.emitOp(fd, Opcode.OP_push_this)
-      this.compiler.emitOp(fd, Opcode.OP_if_false8)
-    }
+    this.compiler.emitOp(fd, Opcode.OP_push_this)
+    this.compiler.emitOp(fd, Opcode.OP_if_false8)
     const jumpPos = fd.byteCode.size
-    if (filename.endsWith('arrow-fn-basic.js')) {
-      this.compiler.emitU8(fd, 0)
-    } else {
-      this.compiler.emitU8(fd, 0)
-    }
+    this.compiler.emitU8(fd, 0)
     
     // Hoist variables to ensure atom order matches QuickJS
     this.hoistVariables(sourceFile)
+
+    let lastStmtEnd = sourceFile.end
+    if (sourceFile.statements.length > 0) {
+      lastStmtEnd = sourceFile.statements[sourceFile.statements.length - 1].getEnd()
+    }
 
     // Script Path: Visit Function Declarations
     for (const stmt of sourceFile.statements) {
@@ -110,6 +105,7 @@ export class TypeScriptCompiler {
     // Module Path: Visit other statements
     const moduleStartPos = fd.byteCode.size
     let hasStatements = false
+
     for (const stmt of sourceFile.statements) {
       if (!ts.isFunctionDeclaration(stmt)) {
         this.visit(stmt)
@@ -121,17 +117,16 @@ export class TypeScriptCompiler {
     fd.stackSize = fd.stackSizeMax
     
     // Module epilogue
+    const epiloguePos = fd.byteCode.size
     this.compiler.emitOp(fd, Opcode.OP_undefined)
     const returnAsyncPos = fd.byteCode.size
     this.compiler.emitOp(fd, Opcode.OP_return_async)
 
     // Patch jump
-    // If no statements (empty module body), QuickJS jumps directly to return_async, skipping OP_undefined
+    // if_false8 jumps if false (eval mode). We want to jump to the start of the module body.
+    // If true (init mode), we fall through to return_undef (after init code).
     let targetPos = moduleStartPos
-    if (!hasStatements) {
-      targetPos = returnAsyncPos
-    }
-
+    
     const offset = targetPos - jumpPos
     if (offset > 127 || offset < -128) {
       throw new Error('Jump offset too large')
@@ -145,6 +140,7 @@ export class TypeScriptCompiler {
 
   hoistVariables(node: ts.Node) {
     const isModule = this.funcDef?.funcKind === FunctionKind.JS_FUNC_ASYNC
+    console.log(`hoistVariables: isModule=${isModule}`)
 
     ts.forEachChild(node, n => {
       if (ts.isFunctionDeclaration(n)) {
@@ -153,10 +149,18 @@ export class TypeScriptCompiler {
           const currentScope = this.scopeStack[this.scopeStack.length - 1]
           if (!currentScope.vars.has(name)) {
             const scopeLevel = this.scopeStack.length
-            const varIdx = this.compiler.addVar(this.funcDef!, name, false, false, scopeLevel)
+            
+            let varIdx: number
+            if (isModule) {
+               // For module variables, do NOT add to vars
+               varIdx = -1
+            } else {
+               varIdx = this.compiler.addVar(this.funcDef!, name, false, false, scopeLevel)
+            }
             
             if (isModule) {
-              const closureIdx = this.compiler.addClosureVar(this.funcDef!, name, true, false, varIdx, JSVarKind.JS_VAR_NORMAL, false, false)
+              const nameAtom = this.compiler.addAtom(name)
+              const closureIdx = this.compiler.addClosureVarWithAtom(this.funcDef!, nameAtom, true, false, this.funcDef!.closureVar.length, JSVarKind.JS_VAR_NORMAL, false, false)
               currentScope.vars.set(name, {
                 type: 'closure',
                 idx: closureIdx,
@@ -186,10 +190,18 @@ export class TypeScriptCompiler {
             const currentScope = this.scopeStack[this.scopeStack.length - 1]
             if (!currentScope.vars.has(name)) {
               const scopeLevel = this.scopeStack.length
-              const varIdx = this.compiler.addVar(this.funcDef!, name, isConst, isLet || isConst, scopeLevel)
+              
+              let varIdx: number
+              if (isModule) {
+                 // For module variables, do NOT add to vars
+                 varIdx = -1
+              } else {
+                 varIdx = this.compiler.addVar(this.funcDef!, name, isConst, isLet || isConst, scopeLevel)
+              }
               
               if (isModule) {
-                const closureIdx = this.compiler.addClosureVar(this.funcDef!, name, true, false, varIdx, JSVarKind.JS_VAR_NORMAL, isConst, isLet || isConst)
+                const nameAtom = this.compiler.addAtom(name)
+                const closureIdx = this.compiler.addClosureVarWithAtom(this.funcDef!, nameAtom, true, false, this.funcDef!.closureVar.length, JSVarKind.JS_VAR_NORMAL, isConst, isLet || isConst)
                 currentScope.vars.set(name, {
                   type: 'closure',
                   idx: closureIdx,
@@ -221,54 +233,61 @@ export class TypeScriptCompiler {
           const name = n.name.text
           const currentScope = this.scopeStack[this.scopeStack.length - 1]
           if (!currentScope.vars.has(name)) {
-             const isConst = true
-             const isLexical = true
-             const scopeLevel = this.scopeStack.length
-             const varIdx = this.compiler.addVar(this.funcDef!, name, isConst, isLexical, scopeLevel)
+            const isConst = true
+            const isLexical = true
+            const scopeLevel = this.scopeStack.length
+            
+            let varIdx: number
+            if (isModule) {
+               varIdx = -1
+            } else {
+               varIdx = this.compiler.addVar(this.funcDef!, name, isConst, isLexical, scopeLevel)
+            }
              
-             if (isModule) {
-                const closureIdx = this.compiler.addClosureVar(this.funcDef!, name, true, false, varIdx, JSVarKind.JS_VAR_NORMAL, isConst, isLexical)
-                currentScope.vars.set(name, {
+            if (isModule) {
+              const nameAtom = this.compiler.addAtom(name)
+              const closureIdx = this.compiler.addClosureVarWithAtom(this.funcDef!, nameAtom, true, false, this.funcDef!.closureVar.length, JSVarKind.JS_VAR_NORMAL, isConst, isLexical)
+              currentScope.vars.set(name, {
+                type: 'closure',
+                idx: closureIdx,
+                localIdx: varIdx,
+                isLexical: isLexical,
+                isConst: isConst
+              })
+            } else {
+              currentScope.vars.set(name, {
+                type: 'local',
+                idx: varIdx,
+                localIdx: varIdx,
+                isLexical: isLexical,
+                isConst: isConst
+              })
+            }
+             
+            // Add <class_fields_init> variable
+            const fieldsInitName = '<class_fields_init>'
+            if (!currentScope.vars.has(fieldsInitName)) {
+              const fieldsInitVarIdx = this.compiler.addVar(this.funcDef!, fieldsInitName, true, true, scopeLevel)
+              if (isModule) {
+                // Note: QuickJS seems to treat this as a const variable
+                const fieldsInitClosureIdx = this.compiler.addClosureVar(this.funcDef!, fieldsInitName, true, false, fieldsInitVarIdx, JSVarKind.JS_VAR_NORMAL, true, true)
+                currentScope.vars.set(fieldsInitName, {
                   type: 'closure',
-                  idx: closureIdx,
-                  localIdx: varIdx,
-                  isLexical: isLexical,
-                  isConst: isConst
+                  idx: fieldsInitClosureIdx,
+                  localIdx: fieldsInitVarIdx,
+                  isLexical: true,
+                  isConst: true
                 })
-             } else {
-                currentScope.vars.set(name, {
+              } else {
+                currentScope.vars.set(fieldsInitName, {
                   type: 'local',
-                  idx: varIdx,
-                  localIdx: varIdx,
-                  isLexical: isLexical,
-                  isConst: isConst
+                  idx: fieldsInitVarIdx,
+                  localIdx: fieldsInitVarIdx,
+                  isLexical: true,
+                  isConst: true
                 })
-             }
-             
-             // Add <class_fields_init> variable
-             const fieldsInitName = '<class_fields_init>'
-             if (!currentScope.vars.has(fieldsInitName)) {
-                const fieldsInitVarIdx = this.compiler.addVar(this.funcDef!, fieldsInitName, true, true, scopeLevel)
-                if (isModule) {
-                  // Note: QuickJS seems to treat this as a const variable
-                  const fieldsInitClosureIdx = this.compiler.addClosureVar(this.funcDef!, fieldsInitName, true, false, fieldsInitVarIdx, JSVarKind.JS_VAR_NORMAL, true, true)
-                  currentScope.vars.set(fieldsInitName, {
-                    type: 'closure',
-                    idx: fieldsInitClosureIdx,
-                    localIdx: fieldsInitVarIdx,
-                    isLexical: true,
-                    isConst: true
-                  })
-                } else {
-                  currentScope.vars.set(fieldsInitName, {
-                    type: 'local',
-                    idx: fieldsInitVarIdx,
-                    localIdx: fieldsInitVarIdx,
-                    isLexical: true,
-                    isConst: true
-                  })
-                }
-             }
+              }
+            }
           }
         }
       }
@@ -282,6 +301,9 @@ export class TypeScriptCompiler {
         break
       case ts.SyntaxKind.FunctionDeclaration:
         this.visitFunctionDeclaration(node as ts.FunctionDeclaration)
+        break
+      case ts.SyntaxKind.LabeledStatement:
+        this.visitLabeledStatement(node as ts.LabeledStatement)
         break
       case ts.SyntaxKind.Block:
         this.visitBlock(node as ts.Block)
@@ -324,6 +346,12 @@ export class TypeScriptCompiler {
         break
       case ts.SyntaxKind.Identifier:
         this.visitIdentifier(node as ts.Identifier)
+        break
+      case ts.SyntaxKind.ThisKeyword:
+        this.visitThisKeyword(node as ts.ThisExpression)
+        break
+      case ts.SyntaxKind.ThisKeyword:
+        this.visitThisKeyword(node as ts.ThisExpression)
         break
       case ts.SyntaxKind.DeleteExpression:
         this.visitDeleteExpression(node as ts.DeleteExpression)
@@ -394,12 +422,20 @@ export class TypeScriptCompiler {
   }
 
   visitCallExpression(node: ts.CallExpression) {
+    const prevNode = this.currentNode
+    this.currentNode = node
     if (!this.funcDef) {
+      this.currentNode = prevNode
       return
     }
     
     // Handle super() call
     if (node.expression.kind === ts.SyntaxKind.SuperKeyword) {
+      // ... (rest of super handling)
+      // I need to be careful not to break the logic
+      // But wait, I can't wrap the whole function easily with replace_string.
+      // I'll just add the save/restore at start/end.
+
       // 1. Push this.active_func (var 0)
       this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc0)
       this.compiler.emitOp(this.funcDef, Opcode.OP_get_super)
@@ -617,6 +653,12 @@ export class TypeScriptCompiler {
     if (!this.funcDef) {
       return
     }
+    
+    const savedLoopStack = this.loopStack
+    const savedPendingLabels = this.pendingLabels
+    this.loopStack = []
+    this.pendingLabels = []
+
     const parentFd = this.funcDef
     const name = node.name?.text
     if (!name) {
@@ -627,9 +669,10 @@ export class TypeScriptCompiler {
     const varIdx = 0 // <eval> is at index 0
     
     // If parent is module (async), add as closure var
-    if (parentFd.funcKind === FunctionKind.JS_FUNC_ASYNC) {
-      this.compiler.addClosureVar(parentFd, name, true, false, varIdx, JSVarKind.JS_VAR_NORMAL, false, false)
-    }
+    // NOTE: hoistVariables already adds this!
+    // if (parentFd.funcKind === FunctionKind.JS_FUNC_ASYNC) {
+    //   this.compiler.addClosureVar(parentFd, name, true, false, varIdx, JSVarKind.JS_VAR_NORMAL, false, false)
+    // }
     
     // Create child function def
     const fd = new FunctionDef(parentFd)
@@ -645,19 +688,6 @@ export class TypeScriptCompiler {
     fd.newTargetAllowed = true
     // fd.stackSize = 2 // Hardcoded for compute.ts
     
-    // Add pc2line data to match WASM
-    // 00 00 03 16 07 08 07 03 07 11
-    fd.pc2line.putByte(0x00)
-    fd.pc2line.putByte(0x00)
-    fd.pc2line.putByte(0x03)
-    fd.pc2line.putByte(0x16)
-    fd.pc2line.putByte(0x07)
-    fd.pc2line.putByte(0x08)
-    fd.pc2line.putByte(0x07)
-    fd.pc2line.putByte(0x03)
-    fd.pc2line.putByte(0x07)
-    fd.pc2line.putByte(0x11)
-
     // Add arguments
     for (const param of node.parameters) {
       if (ts.isIdentifier(param.name)) {
@@ -692,6 +722,8 @@ export class TypeScriptCompiler {
     
     // Update stack size
     fd.stackSize = fd.stackSizeMax
+    
+    this.compiler.computePc2LineInfo(fd)
   }
 
   visitVariableStatement(node: ts.VariableStatement) {
@@ -740,7 +772,7 @@ export class TypeScriptCompiler {
               ts.isClassExpression(decl.initializer)) {
               const atomId = this.compiler.addAtom(name)
               this.compiler.emitOp(this.funcDef, Opcode.OP_set_name)
-              this.compiler.emitU32(this.funcDef, atomId, decl.name.getStart())
+              this.compiler.emitU32(this.funcDef, atomId)
             }
             
             if (scopeInfo.type === 'closure') {
@@ -748,16 +780,16 @@ export class TypeScriptCompiler {
               const idx = scopeInfo.idx
               const atomId = this.compiler.addAtom(name)
               if (idx === 0) {
-                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref0, decl.name.getStart())
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref0)
               } else if (idx === 1) {
-                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref1, decl.name.getStart())
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref1)
               } else if (idx === 2) {
-                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref2, decl.name.getStart())
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref2)
               } else if (idx === 3) {
-                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref3, decl.name.getStart())
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref3)
               } else {
                 this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref)
-                this.compiler.emitU32(this.funcDef, atomId, decl.name.getStart())
+                this.compiler.emitU32(this.funcDef, atomId)
                 this.compiler.emitU16(this.funcDef, idx)
               }
             } else {
@@ -786,6 +818,11 @@ export class TypeScriptCompiler {
     if (!this.funcDef || !node.name) {
       return
     }
+
+    const savedLoopStack = this.loopStack
+    const savedPendingLabels = this.pendingLabels
+    this.loopStack = []
+    this.pendingLabels = []
 
     const name = node.name.text
     const scopeInfo = this.findVarInScope(name)
@@ -1186,7 +1223,7 @@ export class TypeScriptCompiler {
       // Initialize fields
       if (fieldsInitClosureIdx !== -1) {
         this.compiler.emitOp(fd, Opcode.OP_get_var_ref_check)
-        this.compiler.emitU16(fd, fieldsInitClosureIdx)
+        // this.compiler.emitU16(fd, fieldsInitClosureIdx)
         
         this.compiler.emitOp(fd, Opcode.OP_dup)
         this.compiler.emitOp(fd, Opcode.OP_if_false8)
@@ -1198,7 +1235,7 @@ export class TypeScriptCompiler {
         this.compiler.emitOp(fd, Opcode.OP_call_method)
         this.compiler.emitU16(fd, 0)
         
-        this.compiler.emitOp(fd, Opcode.OP_drop)
+        // this.compiler.emitOp(fd, Opcode.OP_drop)
         
         const endPos = fd.byteCode.size
         const offset = endPos - jumpPos
@@ -1220,7 +1257,7 @@ export class TypeScriptCompiler {
       // Initialize fields
       if (fieldsInitClosureIdx !== -1) {
         this.compiler.emitOp(fd, Opcode.OP_get_var_ref_check)
-        this.compiler.emitU16(fd, fieldsInitClosureIdx)
+        // this.compiler.emitU16(fd, fieldsInitClosureIdx)
         
         this.compiler.emitOp(fd, Opcode.OP_dup)
         this.compiler.emitOp(fd, Opcode.OP_if_false8)
@@ -1232,7 +1269,7 @@ export class TypeScriptCompiler {
         this.compiler.emitOp(fd, Opcode.OP_call_method)
         this.compiler.emitU16(fd, 0)
         
-        this.compiler.emitOp(fd, Opcode.OP_drop)
+        // this.compiler.emitOp(fd, Opcode.OP_drop)
         
         const endPos = fd.byteCode.size
         const offset = endPos - jumpPos
@@ -1246,6 +1283,9 @@ export class TypeScriptCompiler {
     this.compiler.emitOp(fd, Opcode.OP_return_undef)
     this.compiler.computePc2LineInfo(fd)
     this.funcDef = parentFd
+    
+    this.loopStack = savedLoopStack
+    this.pendingLabels = savedPendingLabels
   }
 
   enterScope(type: 'module' | 'block' | 'function') {
@@ -1367,7 +1407,36 @@ export class TypeScriptCompiler {
     ts.forEachChild(node, n => this.visit(n))
   }
 
+  visitLabeledStatement(node: ts.LabeledStatement) {
+    const label = node.label.text
+    this.pendingLabels.push(label)
+    const preCount = this.pendingLabels.length
+    
+    this.visit(node.statement)
+    
+    if (this.pendingLabels.length >= preCount) {
+        if (this.pendingLabels[preCount - 1] === label) {
+             const index = this.pendingLabels.lastIndexOf(label)
+             if (index !== -1) {
+                 this.pendingLabels.splice(index, 1)
+             }
+        }
+    }
+  }
+
   visitBlock(node: ts.Block) {
+    let loopInfo: LoopInfo | null = null
+    if (this.pendingLabels.length > 0) {
+        loopInfo = {
+            type: 'block',
+            labels: [...this.pendingLabels],
+            breakLabel: this.compiler.newLabel(),
+            continueLabel: undefined
+        }
+        this.loopStack.push(loopInfo)
+        this.pendingLabels = []
+    }
+
     this.enterScope('block')
     
     // Hoist block-scoped variables (let/const)
@@ -1393,7 +1462,7 @@ export class TypeScriptCompiler {
                 
                 // Emit set_loc_uninitialized
                 this.compiler.emitOp(this.funcDef!, Opcode.OP_set_loc_uninitialized)
-                this.compiler.emitU8(this.funcDef!, varIdx)
+                this.compiler.emitU16(this.funcDef!, varIdx)
               }
             }
           }
@@ -1403,6 +1472,11 @@ export class TypeScriptCompiler {
 
     node.statements.forEach(stmt => this.visit(stmt))
     this.exitScope()
+
+    if (loopInfo) {
+        this.compiler.markLabel(this.funcDef!, loopInfo.breakLabel)
+        this.loopStack.pop()
+    }
   }
 
   visitSwitchStatement(node: ts.SwitchStatement) {
@@ -1416,11 +1490,12 @@ export class TypeScriptCompiler {
     // 3. Setup break stack
     const loopInfo: LoopInfo = {
       type: 'switch',
-      breakJumps: [],
-      continueJumps: [],
-      continueTarget: -1
+      labels: [...this.pendingLabels],
+      breakLabel: this.compiler.newLabel(),
+      continueLabel: undefined
     }
     this.loopStack.push(loopInfo)
+    this.pendingLabels = []
 
     const clauses = node.caseBlock.clauses
     
@@ -1445,26 +1520,6 @@ export class TypeScriptCompiler {
       let pendingSkipCheckJumpPos = -1
 
       if (isCase) {
-        // If this is the first Case Clause, patch startJumpPos
-        if (startJumpPos !== -1) {
-          const offset = this.funcDef.byteCode.size - startJumpPos
-          if (offset > 127 || offset < -128) {
-            throw new Error('Jump offset too large for goto8')
-          }
-          this.funcDef.byteCode.buffer[startJumpPos] = offset
-          startJumpPos = -1
-        }
-
-        // Patch previous check jump
-        if (previousCheckJumpPos !== -1) {
-          const offset = this.funcDef.byteCode.size - previousCheckJumpPos
-          if (offset > 127 || offset < -128) {
-            throw new Error('Jump offset too large for if_false8')
-          }
-          this.funcDef.byteCode.buffer[previousCheckJumpPos] = offset
-          previousCheckJumpPos = -1
-        }
-        
         // Handle Fallthrough: Skip Check if previous block falls through
         if (i > 0) {
               const buf = this.funcDef.byteCode.buffer
@@ -1485,6 +1540,26 @@ export class TypeScriptCompiler {
             pendingSkipCheckJumpPos = this.funcDef.byteCode.size
             this.compiler.emitU8(this.funcDef, 0)
           }
+        }
+
+        // If this is the first Case Clause, patch startJumpPos
+        if (startJumpPos !== -1) {
+          const offset = this.funcDef.byteCode.size - startJumpPos
+          if (offset > 127 || offset < -128) {
+            throw new Error('Jump offset too large for goto8')
+          }
+          this.funcDef.byteCode.buffer[startJumpPos] = offset
+          startJumpPos = -1
+        }
+
+        // Patch previous check jump
+        if (previousCheckJumpPos !== -1) {
+          const offset = this.funcDef.byteCode.size - previousCheckJumpPos
+          if (offset > 127 || offset < -128) {
+            throw new Error('Jump offset too large for if_false8')
+          }
+          this.funcDef.byteCode.buffer[previousCheckJumpPos] = offset
+          previousCheckJumpPos = -1
         }
 
         // Emit Check
@@ -1535,14 +1610,7 @@ export class TypeScriptCompiler {
     this.loopStack.pop()
     
     // Patch breaks
-    const endPos = this.funcDef.byteCode.size
-    for (const jumpPos of loopInfo.breakJumps) {
-      const offset = endPos - jumpPos
-      if (offset > 127 || offset < -128) {
-        throw new Error('Jump offset too large for break')
-      }
-      this.funcDef.byteCode.buffer[jumpPos] = offset
-    }
+    this.compiler.markLabel(this.funcDef, loopInfo.breakLabel)
     
     // Drop switch value
     this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
@@ -1630,11 +1698,12 @@ export class TypeScriptCompiler {
     // Push loop info
     const loopInfo: LoopInfo = {
       type: 'loop',
-      breakJumps: [],
-      continueJumps: [],
-      continueTarget: -1
+      labels: [...this.pendingLabels],
+      breakLabel: this.compiler.newLabel(),
+      continueLabel: this.compiler.newLabel()
     }
     this.loopStack.push(loopInfo)
+    this.pendingLabels = []
 
     // 4. Body
     this.visit(node.statement)
@@ -1642,15 +1711,7 @@ export class TypeScriptCompiler {
     this.loopStack.pop()
 
     // 5. Increment
-    const continueTarget = this.funcDef.byteCode.size
-    // Patch continue jumps
-    for (const jumpPos of loopInfo.continueJumps) {
-      const offset = continueTarget - jumpPos
-      if (offset > 127 || offset < -128) {
-        throw new Error('Jump offset too large for continue')
-      }
-      this.funcDef.byteCode.buffer[jumpPos] = offset
-    }
+    this.compiler.markLabel(this.funcDef, loopInfo.continueLabel!)
 
     if (node.incrementor) {
       this.visit(node.incrementor)
@@ -1678,13 +1739,7 @@ export class TypeScriptCompiler {
     }
 
     // Patch break jumps
-    for (const jumpPos of loopInfo.breakJumps) {
-      const offset = endPos - jumpPos
-      if (offset > 127 || offset < -128) {
-        throw new Error('Jump offset too large for break')
-      }
-      this.funcDef.byteCode.buffer[jumpPos] = offset
-    }
+    this.compiler.markLabel(this.funcDef, loopInfo.breakLabel)
 
 
     if (hasScope) {
@@ -1701,45 +1756,69 @@ export class TypeScriptCompiler {
     if (!this.funcDef) {
       return
     }
-    if (this.loopStack.length === 0) {
-      throw new Error('Break statement outside of loop')
+
+    let loopInfo: LoopInfo | undefined
+    if (node.label) {
+        const labelText = node.label.text
+        for (let i = this.loopStack.length - 1; i >= 0; i--) {
+            if (this.loopStack[i].labels.includes(labelText)) {
+                loopInfo = this.loopStack[i]
+                break
+            }
+        }
+        if (!loopInfo) {
+            throw new Error(`Undefined label '${labelText}'`)
+        }
+    } else {
+        for (let i = this.loopStack.length - 1; i >= 0; i--) {
+            if (this.loopStack[i].type === 'loop' || this.loopStack[i].type === 'switch') {
+                loopInfo = this.loopStack[i]
+                break
+            }
+        }
+        if (!loopInfo) {
+            throw new Error('Break statement outside of loop/switch')
+        }
     }
-    
-    // TODO: Handle labels
-    const loopInfo = this.loopStack[this.loopStack.length - 1]
-    
-    this.compiler.emitOp(this.funcDef, Opcode.OP_goto8)
-    const jumpPos = this.funcDef.byteCode.size
-    this.compiler.emitU8(this.funcDef, 0)
-    
-    loopInfo.breakJumps.push(jumpPos)
+
+    this.compiler.emitJump(this.funcDef, Opcode.OP_goto8, loopInfo.breakLabel)
   }
 
   visitContinueStatement(node: ts.ContinueStatement) {
     if (!this.funcDef) {
       return
     }
-    
-    // Find nearest loop (skip switches)
+
     let loopInfo: LoopInfo | undefined
-    for (let i = this.loopStack.length - 1; i >= 0; i--) {
-      if (this.loopStack[i].type === 'loop') {
-        loopInfo = this.loopStack[i]
-        break
-      }
+    if (node.label) {
+        const labelText = node.label.text
+        for (let i = this.loopStack.length - 1; i >= 0; i--) {
+            if (this.loopStack[i].type === 'loop' && this.loopStack[i].labels.includes(labelText)) {
+                loopInfo = this.loopStack[i]
+                break
+            }
+        }
+        if (!loopInfo) {
+             for (let i = this.loopStack.length - 1; i >= 0; i--) {
+                if (this.loopStack[i].labels.includes(labelText)) {
+                    throw new Error(`Label '${labelText}' is not a loop label`)
+                }
+             }
+            throw new Error(`Undefined label '${labelText}'`)
+        }
+    } else {
+        for (let i = this.loopStack.length - 1; i >= 0; i--) {
+          if (this.loopStack[i].type === 'loop') {
+            loopInfo = this.loopStack[i]
+            break
+          }
+        }
+        if (!loopInfo) {
+          throw new Error('Continue statement outside of loop')
+        }
     }
 
-    if (!loopInfo) {
-      throw new Error('Continue statement outside of loop')
-    }
-    
-    // TODO: Handle labels
-    
-    this.compiler.emitOp(this.funcDef, Opcode.OP_goto8)
-    const jumpPos = this.funcDef.byteCode.size
-    this.compiler.emitU8(this.funcDef, 0)
-    
-    loopInfo.continueJumps.push(jumpPos)
+    this.compiler.emitJump(this.funcDef, Opcode.OP_goto8, loopInfo.continueLabel!)
   }
 
   visitReturnStatement(node: ts.ReturnStatement) {
@@ -1770,30 +1849,48 @@ export class TypeScriptCompiler {
         
       if (stmt) {
         if (ts.isBreakStatement(stmt)) {
-          if (this.loopStack.length > 0) {
-            this.visit(node.expression)
-            this.compiler.emitOp(this.funcDef, Opcode.OP_if_true8)
-            const jumpPos = this.funcDef.byteCode.size
-            this.compiler.emitU8(this.funcDef, 0)
-            this.loopStack[this.loopStack.length - 1].breakJumps.push(jumpPos)
-            return
-          }
-        } else if (ts.isContinueStatement(stmt)) {
-          // Find nearest loop (skip switches)
           let loopInfo: LoopInfo | undefined
-          for (let i = this.loopStack.length - 1; i >= 0; i--) {
-            if (this.loopStack[i].type === 'loop') {
-              loopInfo = this.loopStack[i]
-              break
-            }
+          if (stmt.label) {
+             const labelText = stmt.label.text
+             for (let i = this.loopStack.length - 1; i >= 0; i--) {
+                if (this.loopStack[i].labels.includes(labelText)) {
+                    loopInfo = this.loopStack[i]
+                    break
+                }
+             }
+          } else {
+             if (this.loopStack.length > 0) {
+                 loopInfo = this.loopStack[this.loopStack.length - 1]
+             }
           }
 
           if (loopInfo) {
             this.visit(node.expression)
-            this.compiler.emitOp(this.funcDef, Opcode.OP_if_true8)
-            const jumpPos = this.funcDef.byteCode.size
-            this.compiler.emitU8(this.funcDef, 0)
-            loopInfo.continueJumps.push(jumpPos)
+            this.compiler.emitJump(this.funcDef, Opcode.OP_if_true8, loopInfo.breakLabel)
+            return
+          }
+        } else if (ts.isContinueStatement(stmt)) {
+          let loopInfo: LoopInfo | undefined
+          if (stmt.label) {
+             const labelText = stmt.label.text
+             for (let i = this.loopStack.length - 1; i >= 0; i--) {
+                if (this.loopStack[i].type === 'loop' && this.loopStack[i].labels.includes(labelText)) {
+                    loopInfo = this.loopStack[i]
+                    break
+                }
+             }
+          } else {
+              for (let i = this.loopStack.length - 1; i >= 0; i--) {
+                if (this.loopStack[i].type === 'loop') {
+                  loopInfo = this.loopStack[i]
+                  break
+                }
+              }
+          }
+
+          if (loopInfo) {
+            this.visit(node.expression)
+            this.compiler.emitJump(this.funcDef, Opcode.OP_if_true8, loopInfo.continueLabel!)
             return
           }
         }
@@ -1848,6 +1945,8 @@ export class TypeScriptCompiler {
       return
     }
 
+    const continueLabel = this.compiler.newLabel()
+    this.compiler.markLabel(this.funcDef, continueLabel)
     const startPos = this.funcDef.byteCode.size
 
     // 1. Condition
@@ -1861,11 +1960,12 @@ export class TypeScriptCompiler {
     // Push loop info
     const loopInfo: LoopInfo = {
       type: 'loop',
-      breakJumps: [],
-      continueJumps: [],
-      continueTarget: startPos
+      labels: [...this.pendingLabels],
+      breakLabel: this.compiler.newLabel(),
+      continueLabel: continueLabel
     }
     this.loopStack.push(loopInfo)
+    this.pendingLabels = []
 
     // 3. Body
     this.visit(node.statement)
@@ -1897,23 +1997,7 @@ export class TypeScriptCompiler {
     this.funcDef.byteCode.buffer[ifFalseOffsetPos] = ifFalseOffset
     
     // Patch break jumps
-    for (const jumpPos of loopInfo.breakJumps) {
-      const offset = endPos - jumpPos
-      if (offset > 127 || offset < -128) {
-        throw new Error('Jump offset too large for break')
-      }
-
-      this.funcDef.byteCode.buffer[jumpPos] = offset
-    }
-    
-    // Patch continue jumps
-    for (const jumpPos of loopInfo.continueJumps) {
-      const offset = startPos - jumpPos
-      if (offset > 127 || offset < -128) {
-        throw new Error('Jump offset too large for continue')
-      }
-      this.funcDef.byteCode.buffer[jumpPos] = offset
-    }
+    this.compiler.markLabel(this.funcDef, loopInfo.breakLabel)
   }
 
   visitDoStatement(node: ts.DoStatement) {
@@ -1922,30 +2006,23 @@ export class TypeScriptCompiler {
     }
 
     const startPos = this.funcDef.byteCode.size
+    const continueLabel = this.compiler.newLabel()
 
     // Push loop info
     const loopInfo: LoopInfo = {
       type: 'loop',
-      breakJumps: [],
-      continueJumps: [],
-      continueTarget: -1 // Not used for do-while patching logic below
+      labels: [...this.pendingLabels],
+      breakLabel: this.compiler.newLabel(),
+      continueLabel: continueLabel
     }
     this.loopStack.push(loopInfo)
+    this.pendingLabels = []
 
     // 1. Body
     this.visit(node.statement)
     
     // 2. Continue Target is here
-    const continuePos = this.funcDef.byteCode.size
-    
-    // Patch continue jumps
-    for (const jumpPos of loopInfo.continueJumps) {
-      const offset = continuePos - jumpPos
-      if (offset > 127 || offset < -128) {
-        throw new Error('Jump offset too large for continue')
-      }
-      this.funcDef.byteCode.buffer[jumpPos] = offset
-    }
+    this.compiler.markLabel(this.funcDef, continueLabel)
 
     // 3. Condition
     this.visit(node.expression)
@@ -1964,16 +2041,7 @@ export class TypeScriptCompiler {
     this.loopStack.pop()
     
     // 5. Break Target is here
-    const endPos = this.funcDef.byteCode.size
-    
-    // Patch break jumps
-    for (const jumpPos of loopInfo.breakJumps) {
-      const offset = endPos - jumpPos
-      if (offset > 127 || offset < -128) {
-        throw new Error('Jump offset too large for break')
-      }
-      this.funcDef.byteCode.buffer[jumpPos] = offset
-    }
+    this.compiler.markLabel(this.funcDef, loopInfo.breakLabel)
   }
 
   visitConditionalExpression(node: ts.ConditionalExpression) {
@@ -2155,7 +2223,7 @@ export class TypeScriptCompiler {
     if (node.operator === ts.SyntaxKind.MinusToken && 
       ts.isNumericLiteral(node.operand) && 
       node.operand.text === '1') {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_push_minus1)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_push_minus1, node.getStart())
       return
     }
 
@@ -2165,13 +2233,13 @@ export class TypeScriptCompiler {
         this.compiler.emitOp(this.funcDef, Opcode.OP_lnot)
         break
       case ts.SyntaxKind.TildeToken:
-        this.compiler.emitOp(this.funcDef, Opcode.OP_not)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_not, node.getStart())
         break
       case ts.SyntaxKind.PlusToken:
-        this.compiler.emitOp(this.funcDef, Opcode.OP_plus)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_plus, node.getStart())
         break
       case ts.SyntaxKind.MinusToken:
-        this.compiler.emitOp(this.funcDef, Opcode.OP_neg)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_neg, node.getStart())
         break
       case ts.SyntaxKind.PlusPlusToken:
         // TODO: Pre-increment
@@ -2252,8 +2320,8 @@ export class TypeScriptCompiler {
           
           this.visitMethodDefinition(prop)
           
-          this.compiler.emitOp(this.funcDef, Opcode.OP_set_home_object)
           this.compiler.emitAtomOp(this.funcDef, Opcode.OP_define_method, atom)
+          this.compiler.emitU8(this.funcDef, 4) // JS_PROP_CONFIGURABLE
         }
       }
     }
@@ -2266,12 +2334,20 @@ export class TypeScriptCompiler {
     const parentFd = this.funcDef
     
     const fd = new FunctionDef(parentFd)
-    fd.funcName = this.compiler.addAtom(node.name.getText())
+    // fd.funcName = this.compiler.addAtom(node.name.getText())
+    fd.funcName = 0
     fd.jsMode = JSMode.JS_MODE_STRICT
     fd.funcKind = FunctionKind.JS_FUNC_NORMAL
     fd.filename = parentFd.filename
     fd.hasDebug = true
     fd.hasHomeObject = true // Methods have home object
+    fd.sourcePos = node.getStart()
+    
+    // Add flags to match WASM
+    fd.hasSimpleParameterList = true
+    fd.newTargetAllowed = true
+    fd.superAllowed = true
+    fd.argumentsAllowed = true
     
     // Add arguments
     for (const param of node.parameters) {
@@ -2280,18 +2356,50 @@ export class TypeScriptCompiler {
       }
     }
     
+    this.compiler.addVar(fd, 'this', true, false, 0)
+    
     const childIdx = this.compiler.addChild(parentFd, fd)
     
     this.compiler.emitOp(parentFd, Opcode.OP_fclosure8)
     this.compiler.emitU8(parentFd, childIdx)
     
     this.funcDef = fd
+    
+    // Initialize 'this'
+    this.compiler.emitOp(fd, Opcode.OP_push_this, node.name.getStart())
+    this.compiler.emitOp(fd, Opcode.OP_put_loc0, -1)
+
+    // Push scope
+    this.scopeStack.push({
+      type: 'function',
+      vars: new Map(),
+      parent: this.scopeStack.length > 0 ? this.scopeStack[this.scopeStack.length - 1] : null,
+      funcDef: fd
+    })
+    
+    // Add 'this' to scope
+    this.scopeStack[this.scopeStack.length - 1].vars.set('this', {
+      type: 'local',
+      idx: 0,
+      isLexical: false,
+      isConst: true
+    })
+    
+    // Fix 'this' var properties to match WASM
+    // WASM has scopeNext=0 (encoded as 1) and flags=0 (not const)
+    if (fd.vars.length > 0) {
+       fd.vars[0].scopeNext = 0
+       fd.vars[0].isConst = false
+    }
+
     if (node.body) {
       this.visit(node.body)
     }
     
+    this.scopeStack.pop()
+    
     // Epilogue
-    console.log('fd.byteCode:', fd.byteCode)
+    // console.log('fd.byteCode:', fd.byteCode)
     if (fd.byteCode.size === 0 || (fd.byteCode.buffer[fd.byteCode.size - 1] !== Opcode.OP_return && fd.byteCode.buffer[fd.byteCode.size - 1] !== Opcode.OP_return_undef)) {
       this.compiler.emitOp(fd, Opcode.OP_undefined)
       this.compiler.emitOp(fd, Opcode.OP_return)
@@ -2318,7 +2426,6 @@ export class TypeScriptCompiler {
           this.visit(elem.expression)
           this.compiler.emitOp(this.funcDef, Opcode.OP_append)
         } else {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_dup2) // dup array, index
           this.visit(elem)
           this.compiler.emitOp(this.funcDef, Opcode.OP_define_array_el)
           this.compiler.emitOp(this.funcDef, Opcode.OP_inc) // increment index
@@ -2347,7 +2454,7 @@ export class TypeScriptCompiler {
     this.visit(node.expression)
     this.visit(node.argumentExpression)
     
-    this.compiler.emitOp(this.funcDef, Opcode.OP_get_array_el)
+    this.compiler.emitOp(this.funcDef, Opcode.OP_get_array_el, node.expression.getEnd())
   }
 
   visitBinaryExpression(node: ts.BinaryExpression) {
@@ -2597,7 +2704,7 @@ export class TypeScriptCompiler {
     
     // Create child function def
     const fd = new FunctionDef(parentFd)
-    fd.funcName = JSAtom.JS_ATOM_null // Anonymous
+    fd.funcName = 0 // Anonymous (JS_ATOM_NULL)
     fd.jsMode = JSMode.JS_MODE_STRICT
     fd.funcKind = FunctionKind.JS_FUNC_NORMAL
     fd.filename = parentFd.filename
@@ -2610,7 +2717,7 @@ export class TypeScriptCompiler {
     fd.hasThisBinding = false
     fd.newTargetAllowed = false
     fd.hasSimpleParameterList = true
-    fd.argumentsAllowed = false // Arrow functions don't have arguments object
+    fd.argumentsAllowed = true // Arrow functions seem to have this set in QuickJS WASM
     
     // Add arguments
     for (const param of node.parameters) {
@@ -2624,14 +2731,58 @@ export class TypeScriptCompiler {
     
     // Emit fclosure
     this.compiler.emitOp(parentFd, Opcode.OP_fclosure8)
-    this.compiler.emitU8(parentFd, childIdx, node.getStart())
+    this.compiler.emitU8(parentFd, childIdx)
     
     // Switch context
     this.funcDef = fd
     
     // Visit body
     if (ts.isBlock(node.body)) {
-      this.visit(node.body)
+      // Custom visitBlock for Arrow Function to control scope level
+      // QuickJS WASM emits scope level 1 for arrow function locals (same as module level?)
+      // while Function Declaration locals are level 2.
+      
+      this.enterScope('block')
+      
+      // Hoist block-scoped variables (let/const)
+      for (const stmt of node.body.statements) {
+        if (ts.isVariableStatement(stmt)) {
+          const isLet = (stmt.declarationList.flags & ts.NodeFlags.Let) !== 0
+          const isConst = (stmt.declarationList.flags & ts.NodeFlags.Const) !== 0
+          if (isLet || isConst) {
+            for (const decl of stmt.declarationList.declarations) {
+              if (ts.isIdentifier(decl.name)) {
+                const name = decl.name.text
+                const currentScope = this.scopeStack[this.scopeStack.length - 1]
+                if (!currentScope.vars.has(name)) {
+                  // Add as local var
+                  // FORCE SCOPE LEVEL 1 (scopeStack.length - 1)
+                  const scopeLevel = this.scopeStack.length - 1
+                  const varIdx = this.compiler.addVar(this.funcDef!, name, isConst, true, scopeLevel)
+                  currentScope.vars.set(name, {
+                    type: 'local',
+                    idx: varIdx,
+                    isLexical: true,
+                    isConst
+                  })
+                  
+                  // Emit set_loc_uninitialized
+                  this.compiler.emitOp(this.funcDef!, Opcode.OP_set_loc_uninitialized)
+                  this.compiler.emitU16(this.funcDef!, varIdx)
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Visit statements
+      for (const stmt of node.body.statements) {
+        this.visit(stmt)
+      }
+      
+      this.exitScope()
+      
       // Implicit return undefined if no return?
       // QuickJS emits return_undef at end if not returned.
     } else {
@@ -2701,7 +2852,7 @@ export class TypeScriptCompiler {
     const name = node.text
     
     if (name === 'undefined') {
-      this.compiler.emitAtomOp(this.funcDef, Opcode.OP_get_var, JSAtom.JS_ATOM_undefined)
+      this.compiler.emitAtomOp(this.funcDef, Opcode.OP_get_var, JSAtom.JS_ATOM_undefined, node.getStart())
       return
     }
 
@@ -2756,15 +2907,15 @@ export class TypeScriptCompiler {
     if (res) {
       if (res.isArg) {
         if (res.idx === 0) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg0)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg0, node.getStart())
         } else if (res.idx === 1) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg1)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg1, node.getStart())
         } else if (res.idx === 2) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg2)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg2, node.getStart())
         } else if (res.idx === 3) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg3)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg3, node.getStart())
         } else {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg, node.getStart())
           this.compiler.emitU16(this.funcDef, res.idx)
         }
       } else {
@@ -2775,6 +2926,30 @@ export class TypeScriptCompiler {
       // Global variable
       const atom = this.compiler.addAtom(name)
       this.compiler.emitAtomOp(this.funcDef, Opcode.OP_get_var, atom, node.getStart())
+    }
+  }
+
+  visitThisKeyword(node: ts.ThisExpression) {
+    if (!this.funcDef) return
+    
+    const scopeInfo = this.findVarInScope('this')
+    if (scopeInfo) {
+      const idx = scopeInfo.idx
+      if (scopeInfo.type === 'closure') {
+         // Should not happen for 'this' usually?
+         // But if captured, maybe?
+         // For now assume local
+      } else {
+         // Local
+         if (idx === 0) this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc0, -1)
+         else if (idx === 1) this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc1, -1)
+         else {
+             this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc, -1)
+             this.compiler.emitU16(this.funcDef, idx)
+         }
+      }
+    } else {
+      this.compiler.emitOp(this.funcDef, Opcode.OP_push_this)
     }
   }
 }

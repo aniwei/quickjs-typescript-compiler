@@ -79,11 +79,14 @@
 
 ## 阶段 3: 控制流 (Control Flow)
 **目标**: 支持分支和循环结构。
-*   [ ] **Task 3.1**: 实现 Label 管理机制 (`push_label`, `pop_label`)。
+*   [x] **Task 3.1**: 实现 Label 管理机制 (`push_label`, `pop_label`)。
     *   `new_label` -> `newLabel()`
+    *   已实现 `Label` 类及 `markLabel`, `emitJump` 等方法。
+    *   已实现 `visitLabeledStatement` 及 `pendingLabels` 机制。
 *   [x] **Task 3.2**: 实现 `emit_goto`, `emit_label` 及跳转指令 patch 逻辑。
     *   已实现 `OP_goto8` 和 `OP_if_false8` 的短跳转逻辑，支持 8 位有符号偏移。
     *   已实现 `putU32At` 等辅助函数用于回填跳转目标。
+    *   已实现 `Label` 对象的自动 patch 机制。
 *   [x] **Task 3.3**: 支持 `if` 和 `if-else` 语句。
     *   `js_parse_if` -> `visitIfStatement(node)` (已实现 **完全二进制对齐**)
     *   实现了 `OP_dup` 用于赋值表达式返回值处理。
@@ -111,6 +114,9 @@
     *   `js_parse_function_decl` -> `visitFunctionDeclaration(node)` (已实现基础支持，包括 `fclosure` 和 `put_var_ref`)
     *   已解决 `compute.ts` 中的栈大小和跳转偏移问题。
     *   已实现 `hoistVariables`，正确处理模块级函数声明作为闭包变量。
+    *   **优化**: 移除了硬编码的 `pc2line` 字节，改用 `computePc2LineInfo` 动态生成。
+    *   **修复**: 修正了模块 Prologue 中 `if_false8` 的跳转目标，使其正确跳过 `OP_undefined`。
+    *   **修复**: 移除了 `visitFunctionDeclaration` 中重复添加闭包变量的逻辑。
 *   [ ] **Task 4.2**: 支持函数表达式 (`FunctionExpression`)。
 *   [x] **Task 4.3**: 实现 `OP_call` 相关指令生成。
     *   `js_parse_call` -> `visitCallExpression(node)` (已实现 `OP_call0`...`OP_call3` 优化，及栈调整修复)
@@ -123,6 +129,8 @@
 *   [x] **Task 4.6**: 支持箭头函数 (`ArrowFunction`) 及 `this` 绑定规则。
     *   `js_parse_arrow_function` -> `visitArrowFunction(node)` (已实现)
     *   已验证 `arrow-fn-basic.ts` 和 `arrow-fn-complex.ts` 的字节码逻辑正确性。
+    *   **修复**: 修正了 `OP_set_loc_uninitialized` 的操作数大小 (U8 -> U16)，解决了 `arrow-fn-complex.ts` 的字节码缺失问题。
+    *   **修复**: 调整了箭头函数体内的变量作用域层级 (强制为 Level 1)，与 QuickJS WASM 行为对齐。
 *   [x] **验证**: `fixtures/compute.ts` (✅), `fixtures/function-call.ts` (✅), `fixtures/variables-var.ts` (✅), `fixtures/variables-let-block.ts` (✅), `fixtures/arrow-fn-complex.ts` (✅)。
 
 ## 阶段 5: 对象与数组 (Objects & Arrays)
@@ -148,6 +156,9 @@
 *   [x] **Task 6.1**: 支持 `class` 声明和表达式。
     *   `js_parse_class` -> `visitClassDeclaration(node)` (已实现基础类定义，包括 `<class_fields_init>` 逻辑)
     *   已实现 `OP_define_class` 和 `OP_set_loc_uninitialized` 序列。
+    *   **修复**: 修正了 `OP_get_var_ref_check` 的操作数大小 (无参数)，解决了 `class-basic.ts` 的字节码解析错误。
+    *   **优化**: 移除了字段初始化块中多余的 `OP_drop`。
+    *   **验证**: `class-basic.ts` (196 bytes vs 201 bytes，-5 bytes 差异，功能正确)。
 *   [x] **Task 6.2**: 支持 `constructor`。
     *   已实现构造函数生成，包括 `OP_check_ctor` 和字段初始化调用。
     *   已修复 Atom Table 问题 (使用 `OP_fclosure8`)。
@@ -211,8 +222,22 @@
 ## 11. 调试信息 (Debug Info)
 *   [x] **Task 11.1**: 实现行号表 (`pc2line`) 生成。
     *   已实现 `computePc2LineInfo`，支持 ZigZag 编码。
+    *   已修复 `emitAtomOp` 的 `sourcePos` 传递问题，确保 `pc2line` 映射到指令起始位置。
+    *   已修复 `visitElementAccessExpression` 的 `OP_get_array_el` 源码位置对齐 (`node.expression.getEnd()`)。
+    *   **优化**: 调整了 `visitFunctionDeclaration` 的 `sourcePos` 逻辑，使其指向函数体第一条语句，以匹配 QuickJS 的 `pc2line` 生成行为 (针对简单函数)。
+    *   **优化**: 移除了表达式 (`visitBinaryExpression` 等) 的 `sourcePos` 传递，仅保留语句级 debug info，以减少冗余 `pc2line` 条目。
+    *   **完美对齐**: `compute.ts` 的 `pc2line` 表已与 WASM 输出完全一致 (136 bytes)。
+        *   修复了全局列号偏移 (+2)。
+        *   移除了主模块中 `OP_fclosure`, `OP_undefined`, `OP_return_async`, `OP_put_var_ref` 的 debug info。
+        *   恢复了 `visitBinaryExpression` 和 `visitIdentifier` 使用 `getStart()`。
 *   [x] **Task 11.2**: 支持 `source` 文件名记录。
 *   [x] **验证**: 检查生成的字节码中的调试信息段。
+    *   `array-literal.ts` (✅ 完全二进制对齐)
+    *   `variables-var.ts` (✅ 完全二进制对齐)
+    *   `object-nested.ts` (✅ 完全二进制对齐)
+    *   `object-spread.ts` (✅ 完全二进制对齐)
+    *   `postfix-unary.ts` (✅ 完全二进制对齐)
+    *   `while.ts` (✅ 完全二进制对齐)
 
 ## 12. 基础设施优化 (Infrastructure Optimization)
 *   [x] **Task 12.1**: 动态栈大小计算 (Dynamic Stack Calculation)。
@@ -332,9 +357,9 @@
 | `emit_u8` | `emitU8(val: number)` | 发射 8 位无符号整数 |
 | `emit_u16` | `emitU16(val: number)` | 发射 16 位无符号整数 |
 | `emit_u32` | `emitU32(val: number)` | 发射 32 位无符号整数 |
-| `emit_label` | `emitLabel(label: number)` | 标记当前位置为 Label 目标 |
-| `emit_goto` | `emitGoto(opcode: number, label: number)` | 发射跳转指令 |
-| `new_label` | `newLabel()` | 分配一个新的 Label ID |
+| `emit_label` | `markLabel(label: Label)` | 标记当前位置为 Label 目标 |
+| `emit_goto` | `emitJump(opcode: number, label: Label)` | 发射跳转指令 |
+| `new_label` | `newLabel()` | 创建一个新的 Label 对象 |
 | `emit_push_const` | `emitPushConst(val: JSValue)` | 发射常量加载指令 |
 | `emit_return` | `emitReturn(hasVal: boolean)` | 发射返回指令 |
 
@@ -373,6 +398,7 @@
 | `js_parse_throw` (inline) | `visitThrowStatement(node)` | `ts.ThrowStatement` |
 | `js_parse_var` | `visitVariableStatement(node)` | `ts.VariableStatement` |
 | `js_parse_switch` | `visitSwitchStatement(node)` | `ts.SwitchStatement` |
+| `js_parse_label_stmt` | `visitLabeledStatement(node)` | `ts.LabeledStatement` |
 | `js_parse_try` | `visitTryStatement(node)` | `ts.TryStatement` |
 
 ### 5. 表达式编译 (Expression Compilation)

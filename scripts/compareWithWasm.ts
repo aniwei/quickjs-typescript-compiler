@@ -88,9 +88,8 @@ class BytecodeComparator {
   }
 
   private async compileWithTypeScript(): Promise<CompilationResult> {
-    const sourceCode = await fs.readFile(this.options.inputTs, 'utf-8')
-
     const reference = await this.resolveReferenceJavaScript({ tolerateErrors: true })
+    const sourceCode = reference ? reference.code : await fs.readFile(this.options.inputTs, 'utf-8')
     
     // 从 WASM 查询 firstAtomId（JS_ATOM_END），用于对齐 用户原子阈值
     let firstAtomId: number | undefined

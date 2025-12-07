@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/array-nested.ts
-**生成时间**: 2025-12-07T03:50:04.734Z
+**生成时间**: 2025-12-07T12:00:30.199Z
 
 ## 大小对比
 
-- TypeScript编译器: 188 字节
+- TypeScript编译器: 194 字节
 - WASM编译器: 194 字节
-- 差异: -6 字节 (-3.09%)
+- 差异: 0 字节 (0.00%)
 
 ## 结构分析
 
@@ -62,7 +62,7 @@
   "functionHeader": {
     "offset": 64,
     "tag": "0xd",
-    "remaining": 124
+    "remaining": 130
   }
 }
 ```
@@ -125,26 +125,8 @@
 
 ## 字节级差异
 
-共发现 18 个字节差异:
+共发现 0 个字节差异:
 
-- 偏移量 0xa4: TS=0x16 vs WASM=0x1c
-- 偏移量 0xaf: TS=0x25 vs WASM=0x16
-- 偏移量 0xb0: TS=0x01 vs WASM=0x06
-- 偏移量 0xb1: TS=0x17 vs WASM=0x0c
-- 偏移量 0xb2: TS=0x15 vs WASM=0x06
-- 偏移量 0xb3: TS=0x1b vs WASM=0x07
-- 偏移量 0xb4: TS=0x0e vs WASM=0x0d
-- 偏移量 0xb5: TS=0x1b vs WASM=0x17
-- 偏移量 0xb6: TS=0x0a vs WASM=0x15
-- 偏移量 0xb8: TS=0x0c vs WASM=0x0e
-- 偏移量 0xba: TS=0x0d vs WASM=0x0a
-- 偏移量 0xbb: TS=0x00 vs WASM=0x16
-- 偏移量 0xbc: TS=EOF vs WASM=0x06
-- 偏移量 0xbd: TS=EOF vs WASM=0x07
-- 偏移量 0xbe: TS=EOF vs WASM=0x06
-- 偏移量 0xbf: TS=EOF vs WASM=0x1b
-- 偏移量 0xc0: TS=EOF vs WASM=0x0d
-- 偏移量 0xc1: TS=EOF vs WASM=0x00
 
 ## 十六进制转储对比
 
@@ -160,8 +142,9 @@
 00000070: 03 00 e3 39 e7 00 00 00 43 e8 00 00 00 68 00 00 |...9....C....h..|
 00000080: b7 48 b8 48 24 01 00 0e 39 e7 00 00 00 43 e8 00 |.H.H$...9....C..|
 00000090: 00 00 68 00 00 b9 48 42 e6 00 00 00 24 01 00 0e |..h...HB....$...|
-000000a0: 06 2f c8 03 16 00 00 00 19 0a 00 1b 0e 1b 0a 25 |./.............%|
-000000b0: 01 17 15 1b 0e 1b 0a 1b 0c 1b 0d 00             |............|
+000000a0: 06 2f c8 03 1c 00 00 00 19 0a 00 1b 0e 1b 0a 16 |./..............|
+000000b0: 06 0c 06 07 0d 17 15 1b 0e 1b 0a 16 06 07 06 1b |................|
+000000c0: 0d 00                                           |..|
 ```
 
 ### WASM

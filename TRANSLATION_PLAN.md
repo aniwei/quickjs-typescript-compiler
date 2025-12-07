@@ -32,7 +32,7 @@
 - [x] Class Declaration (Basic structure)
 - [x] Constructor
 - [ ] Method Definition
-- [ ] Property Declaration (Field initialization logic missing)
+- [x] Property Declaration (Field initialization logic implemented, refining bytecode)
 - [ ] Inheritance (extends)
 - [ ] Super Call
 - [ ] Static Members
@@ -61,9 +61,16 @@
 - [ ] Error Reporting Improvements
 
 ## Binary Compatibility Tracking (🚧 In Progress)
-- [x] Atom Table Alignment (via AtomReorderer)
+- [x] Atom Table Alignment (Full initialization of 227 built-in atoms implemented)
 - [x] `arrow-fn-basic.ts` (181 bytes, pc2line header aligned)
-- [ ] `class-basic.ts` (158 bytes vs 201 bytes, missing field init logic)
-- [ ] `compute.ts` (pc2line mismatch)
-- [ ] `console-log.ts`
+- [x] `compute.ts` (136 bytes, Perfect Match)
+- [x] `console-log.ts` (126 bytes, Perfect Match)
+- [x] `variables-let-block.ts` (169 bytes, Perfect Match - Fixed Module Var Atom Order)
+- [x] `variables-var.ts` (155 bytes, Perfect Match)
+- [x] `object-spread.ts` (167 bytes, Perfect Match)
+- [x] `computed-property.ts` (165 bytes, Perfect Match)
+- [x] `function-call.ts` (191 bytes, Perfect Match)
+- [ ] `class-basic.ts` (196 bytes vs 201 bytes, -5 bytes diff. Fixed OP_get_var_ref_check encoding)
+- [ ] `primitives.ts` (Minor debug info mismatch)
+- [ ] `labeled-statements.ts` (Minor mismatch)
 
