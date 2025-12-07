@@ -359,6 +359,8 @@ export class Compiler {
   }
 
   addVarWithAtom(fd: FunctionDef, atom: number, isConst: boolean = false, isLexical: boolean = false, scopeLevel: number = 0, varKind: JSVarKind = JSVarKind.JS_VAR_NORMAL): number {
+    const atomName = this.atoms[atom - this.firstAtomId]
+    console.log(`addVarWithAtom: ${atomName} (atom=${atom}) isConst=${isConst} isLexical=${isLexical} scopeLevel=${scopeLevel} varKind=${varKind}`)
     const idx = fd.vars.length
     const v = new JSVarDef()
     
@@ -403,6 +405,16 @@ export class Compiler {
   }
 
   addClosureVarWithAtom(fd: FunctionDef, atom: number, isLocal: boolean, isArg: boolean, varIdx: number, varKind: number, isConst: boolean, isLexical: boolean): number {
+    // Check if already exists
+    for (let i = 0; i < fd.closureVar.length; i++) {
+      const cv = fd.closureVar[i]
+      if (cv.varIdx === varIdx && cv.isLocal === isLocal && cv.isArg === isArg) {
+        return i
+      }
+    }
+
+    const atomName = this.atoms[atom - this.firstAtomId]
+    console.log(`addClosureVarWithAtom: ${atomName} (atom=${atom}) isLocal=${isLocal} isArg=${isArg} varIdx=${varIdx} varKind=${varKind} isConst=${isConst} isLexical=${isLexical}`)
     const idx = fd.closureVar.length
     const cv = new JSClosureVar()
 
@@ -748,8 +760,10 @@ export class Compiler {
       }
       
       setLocalFlag(v.varKind, 4)
-      setLocalFlag(v.isConst, 1)
-      setLocalFlag(v.isLexical, 1)
+      if (v.varKind !== JSVarKind.JS_VAR_FUNCTION_DECL && v.varKind !== JSVarKind.JS_VAR_NEW_FUNCTION_DECL) {
+        setLocalFlag(v.isConst, 1)
+        setLocalFlag(v.isLexical, 1)
+      }
       setLocalFlag(v.isCaptured, 1)
       out.putByte(flags)
     }

@@ -267,7 +267,7 @@ export class TypeScriptCompiler {
       } else if (ts.isClassDeclaration(n)) {
         if (n.name) {
           const name = n.name.text
-          // console.log(`hoistVariables class: ${name}`)
+          console.log(`hoistVariables class: ${name} isModule=${isModule}`)
           const currentScope = this.scopeStack[this.scopeStack.length - 1]
           if (!currentScope.vars.has(name)) {
             const isConst = true
@@ -278,12 +278,15 @@ export class TypeScriptCompiler {
             if (isModule && false) { // Class is const, so always add
               varIdx = -1
             } else {
-              varIdx = this.compiler.addVar(this.funcDef!, name, isConst, isLexical, scopeLevel)
+              // Class name is a normal const variable in the block scope (level + 1)
+              varIdx = this.compiler.addVar(this.funcDef!, name, isConst, isLexical, scopeLevel + 1, JSVarKind.JS_VAR_NORMAL)
             }
              
             if (isModule) {
+              console.log(`Adding closure var for class ${name} (module)`)
               const nameAtom = this.compiler.addAtom(name)
-              const closureIdx = this.compiler.addClosureVarWithAtom(this.funcDef!, nameAtom, true, false, this.funcDef!.closureVar.length, JSVarKind.JS_VAR_NORMAL, isConst, isLexical)
+              // QuickJS seems to mark class name closure var as not const (mutable binding?)
+              const closureIdx = this.compiler.addClosureVarWithAtom(this.funcDef!, nameAtom, true, false, this.funcDef!.closureVar.length, JSVarKind.JS_VAR_NORMAL, false, isLexical)
               currentScope.vars.set(name, {
                 type: 'closure',
                 idx: closureIdx,
@@ -302,9 +305,10 @@ export class TypeScriptCompiler {
             }
              
             // Add <class_fields_init> variable
+            // This seems to be in an even deeper scope (class body?)
             const fieldsInitName = '<class_fields_init>'
             if (!currentScope.vars.has(fieldsInitName)) {
-              const fieldsInitVarIdx = this.compiler.addVar(this.funcDef!, fieldsInitName, true, true, scopeLevel)
+              const fieldsInitVarIdx = this.compiler.addVar(this.funcDef!, fieldsInitName, true, true, scopeLevel + 2)
               currentScope.vars.set(fieldsInitName, {
                 type: 'local',
                 idx: fieldsInitVarIdx,
@@ -419,8 +423,15 @@ export class TypeScriptCompiler {
                }
             }
             
-            if (lastOp !== Opcode.OP_tail_call) {
-               this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
+            let shouldDrop = true
+            if (ts.isBinaryExpression(expr) && expr.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
+               if (ts.isPropertyAccessExpression(expr.left)) {
+                  shouldDrop = false
+               }
+            }
+
+            if (shouldDrop && lastOp !== Opcode.OP_tail_call) {
+              this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
             }
           }
         }
@@ -1195,7 +1206,8 @@ export class TypeScriptCompiler {
     // Create constructor function
     const parentFd = this.funcDef
     const fd = new FunctionDef()
-    fd.funcName = this.compiler.addAtom(name)
+    // QuickJS uses atom 0 (anonymous) for class constructors in bytecode
+    fd.funcName = 0
     fd.funcKind = FunctionKind.JS_FUNC_NORMAL
     fd.jsMode = JSMode.JS_MODE_STRICT
     fd.hasDebug = true
@@ -1205,8 +1217,11 @@ export class TypeScriptCompiler {
     
     // Constructor specific flags
     fd.isDerivedClassConstructor = hasExtends
-    fd.hasPrototype = true
+    fd.hasPrototype = false // QuickJS WASM has 0 for class constructors
     fd.hasSimpleParameterList = true // TODO: Check params
+    fd.newTargetAllowed = true
+    fd.superAllowed = true
+    fd.argumentsAllowed = true
     
     // Add variables
     if (fd.isDerivedClassConstructor) {
@@ -1479,30 +1494,20 @@ export class TypeScriptCompiler {
     const fieldsInitScopeInfoCtor = this.findVarInScope(fieldsInitNameCtor)
     let fieldsInitClosureIdx = -1
     
-    // console.log('fieldsInitScopeInfoCtor:', fieldsInitScopeInfoCtor)
-
     if (fieldsInitScopeInfoCtor) {
-      let isLocalInParent = false
-      let parentIdx = -1
-      
-      if (fieldsInitScopeInfoCtor.type === 'local') {
-        isLocalInParent = true
-        parentIdx = fieldsInitScopeInfoCtor.idx
-      } else {
-        isLocalInParent = false
-        parentIdx = fieldsInitScopeInfoCtor.idx
+      if (fieldsInitScopeInfoCtor.type === 'closure') {
+        fieldsInitClosureIdx = fieldsInitScopeInfoCtor.idx
+      } else if (fieldsInitScopeInfoCtor.type === 'local') {
+        // Should not happen for <class_fields_init> in constructor as it is in module scope
+        // But if it did, we would need to capture it?
+        // findVarInScope handles capturing if it's in a parent scope.
+        // If it returns 'local', it means it's in the CURRENT scope (constructor).
+        // In that case, we don't need a closure index, we use local index.
+        // But the code below expects a closure index for OP_get_var_ref_check.
+        // Actually, if it's local, we should use OP_get_loc.
+        // But for now, let's assume it's always closure.
+        console.warn('<class_fields_init> found as local in constructor?')
       }
-      
-      fieldsInitClosureIdx = this.compiler.addClosureVar(
-        fd, 
-        fieldsInitNameCtor, 
-        isLocalInParent, 
-        false, 
-        parentIdx, 
-        JSVarKind.JS_VAR_NORMAL, 
-        true, 
-        true
-      )
     }
       
     // Prologue
@@ -1667,10 +1672,11 @@ export class TypeScriptCompiler {
     }
     
     // Check if already captured in targetFd
-    const atom = this.compiler.atomMap.get(name)
-    if (atom !== undefined) {
+    const atomIdx = this.compiler.atomMap.get(name)
+    if (atomIdx !== undefined) {
+      const atomId = atomIdx + this.compiler.firstAtomId
       for (let k = 0; k < targetFd.closureVar.length; k++) {
-        if (targetFd.closureVar[k].varName === atom) {
+        if (targetFd.closureVar[k].varName === atomId) {
           return k
         }
       }

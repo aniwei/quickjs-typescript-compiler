@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/postfix-unary.ts
-**生成时间**: 2025-12-07T18:10:44.480Z
+**生成时间**: 2025-12-07T19:06:52.702Z
 
 ## 大小对比
 
