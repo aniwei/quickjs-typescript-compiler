@@ -1212,7 +1212,16 @@ export class TypeScriptCompiler {
     fd.jsMode = JSMode.JS_MODE_STRICT
     fd.hasDebug = true
     fd.filename = parentFd.filename
-    fd.sourcePos = node.getStart()
+    
+    // Find constructor node
+    const constructorNode = node.members.find(ts.isConstructorDeclaration)
+    
+    if (constructorNode) {
+      fd.sourcePos = constructorNode.getStart()
+    } else {
+      fd.sourcePos = node.getStart()
+    }
+
     fd.parent = parentFd
     
     // Constructor specific flags
@@ -1223,17 +1232,6 @@ export class TypeScriptCompiler {
     fd.superAllowed = true
     fd.argumentsAllowed = true
     
-    // Add variables
-    if (fd.isDerivedClassConstructor) {
-      this.compiler.addVar(fd, 'this.active_func', false, false, 0)
-      this.compiler.addVar(fd, 'new.target', false, false, 0)
-      this.compiler.addVar(fd, 'this', true, false, 0)
-    } else {
-      this.compiler.addVar(fd, 'this', true, false, 0) // this is var 0
-    }
-    
-    // Find constructor node
-    const constructorNode = node.members.find(ts.isConstructorDeclaration)
     
     if (constructorNode) {
       // Add arguments
@@ -1243,17 +1241,30 @@ export class TypeScriptCompiler {
         }
       }
     }
+
+    // Add variables
+    if (fd.isDerivedClassConstructor) {
+      this.compiler.addVar(fd, 'this.active_func', false, false, 0)
+      this.compiler.addVar(fd, 'new.target', false, false, 0)
+      this.compiler.addVar(fd, 'this', false, false, 0)
+    } else {
+      this.compiler.addVar(fd, 'this', false, false, 0) // this is var 0
+    }
         
     // Add child to parent cpool
     const childIdx = this.compiler.addChild(parentFd, fd)
     
     // Emit push_const8 (QuickJS uses push_const8 for class constructors, not fclosure8)
-    this.compiler.emitOp(parentFd, Opcode.OP_push_const8, node.getStart())
+    let classPos = node.getStart()
+
+    const sourceFile = node.getSourceFile()
+
+    this.compiler.emitOp(parentFd, Opcode.OP_push_const8, classPos)
     this.compiler.emitU8(parentFd, childIdx)
     
     // Emit define_class
     const classAtom = this.compiler.addAtom(name)
-    this.compiler.emitOp(parentFd, Opcode.OP_define_class, node.getStart())
+    this.compiler.emitOp(parentFd, Opcode.OP_define_class, classPos)
     this.compiler.emitU32(parentFd, classAtom)
     this.compiler.emitU8(parentFd, hasExtends ? 1 : 0) // flags
 

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-07T19:06:04.619Z",
+  "timestamp": "2025-12-08T00:26:29.874Z",
   "inputFile": "__tests__/compiler/fixtures/closure-basic.ts",
   "compilation": {
     "typescript": {

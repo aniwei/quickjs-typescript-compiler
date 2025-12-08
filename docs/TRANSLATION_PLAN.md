@@ -167,6 +167,8 @@
     *   已实现构造函数生成，包括 `OP_check_ctor` 和字段初始化调用。
     *   **修复**: 将类构造函数的发射指令从 `OP_fclosure8` 改为 `OP_push_const8`，与 QuickJS 行为对齐。
     *   **修复**: 更新 `AtomReorderer` 以支持 `OP_push_const8` 的子函数递归，确保构造函数内的 Atom 被正确收集。
+    *   **修复**: 修正了 `this` 变量在构造函数中的 Flags (`isConst=false`)，解决了 `class-basic.ts` 的二进制差异。
+    *   **修复**: 修正了函数作用域变量 (`scopeLevel=0`) 的 `scopeNext` 指向 (`0` 而非 `-1`)，与 QuickJS 行为对齐。
 *   [x] **Task 6.3**: 支持实例方法和静态方法。
     *   `visitClassDeclaration` 增加方法遍历逻辑。
     *   已实现 `OP_define_method`，正确处理 `static` (定义在 ctor) 和 instance (定义在 proto) 方法。
@@ -235,6 +237,8 @@
         *   修复了全局列号偏移 (+2)。
         *   移除了主模块中 `OP_fclosure`, `OP_undefined`, `OP_return_async`, `OP_put_var_ref` 的 debug info。
         *   恢复了 `visitBinaryExpression` 和 `visitIdentifier` 使用 `getStart()`。
+    *   **修复**: 修正了 `computePc2LineInfo` 的逻辑，正确跳过 `diffLine=0 && diffCol=0` 的条目，解决了 `class-basic.ts` 的 `pc2line` 长度不匹配问题。
+    *   **修复**: 调整了类定义 (`OP_push_const8`, `OP_define_class`) 的 `sourcePos` 为 `node.getStart()`，与 QuickJS 对齐。
 *   [x] **Task 11.2**: 支持 `source` 文件名记录。
 *   [x] **验证**: 检查生成的字节码中的调试信息段。
     *   `array-literal.ts` (✅ 完全二进制对齐)
@@ -243,6 +247,7 @@
     *   `object-spread.ts` (✅ 完全二进制对齐)
     *   `postfix-unary.ts` (✅ 完全二进制对齐)
     *   `while.ts` (✅ 完全二进制对齐)
+    *   `class-basic.ts` (✅ 完全二进制对齐)
 
 ## 12. 基础设施优化 (Infrastructure Optimization)
 *   [x] **Task 12.1**: 动态栈大小计算 (Dynamic Stack Calculation)。

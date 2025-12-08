@@ -133,6 +133,7 @@ class Parser {
     if (hasDebug) {
       this.readULEB() // filename atom
       const pc2lineLen = this.readULEB()
+      console.log(`[DEBUG] Reading pc2line len=${pc2lineLen}`)
       pc2line = this.buffer.slice(this.offset, this.offset + pc2lineLen)
       this.skip(pc2lineLen)
       this.readULEB() // source length (ignored)

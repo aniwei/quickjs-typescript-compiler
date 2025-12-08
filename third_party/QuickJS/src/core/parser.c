@@ -3276,6 +3276,11 @@ static __exception int js_parse_class(
   /* this scope contains the private fields */
   push_scope(s);
 
+  {
+      int line, col;
+      line = get_line_col(&col, s->buf_start, s->token.ptr - s->buf_start);
+      printf("DEBUG: js_parse_class: emitting OP_push_const at line %d, token=%d\n", line + 1, s->token.val);
+  }
   emit_op(s, OP_push_const);
   ctor_cpool_offset = fd->byte_code.size;
   emit_u32(s, 0); /* will be patched at the end of the class parsing */
@@ -3289,6 +3294,11 @@ static __exception int js_parse_class(
     class_name1 = class_name;
   }
 
+  {
+      int line, col;
+      line = get_line_col(&col, s->buf_start, s->token.ptr - s->buf_start);
+      printf("DEBUG: js_parse_class: emitting OP_define_class at line %d, token=%d\n", line + 1, s->token.val);
+  }
   emit_op(s, OP_define_class);
   emit_atom(s, class_name1);
   emit_u8(s, class_flags);

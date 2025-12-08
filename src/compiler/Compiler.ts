@@ -261,6 +261,11 @@ export class Compiler {
     slot.sourcePos = sourcePos
     fd.lineNumberSlots.push(slot)
     fd.lineNumberCount++
+
+    if (this.sourceFile) {
+      const pos = ts.getLineAndCharacterOfPosition(this.sourceFile, sourcePos)
+      console.log(`[DEBUG] addPc2LineInfo: pc=${pc}, line=${pos.line + 1}, col=${pos.character + 1}`)
+    }
   }
 
   computePc2LineInfo(fd: FunctionDef) {
@@ -359,23 +364,32 @@ export class Compiler {
   }
 
   addVarWithAtom(fd: FunctionDef, atom: number, isConst: boolean = false, isLexical: boolean = false, scopeLevel: number = 0, varKind: JSVarKind = JSVarKind.JS_VAR_NORMAL): number {
-    const atomName = this.atoms[atom - this.firstAtomId]
-    console.log(`addVarWithAtom: ${atomName} (atom=${atom}) isConst=${isConst} isLexical=${isLexical} scopeLevel=${scopeLevel} varKind=${varKind}`)
     const idx = fd.vars.length
     const v = new JSVarDef()
     
     v.varName = atom
     v.scopeLevel = scopeLevel
     
-    // Find scope_next: nearest previous variable with lower scope level
-    let scopeNext = -1
-    for (let i = fd.vars.length - 1; i >= 0; i--) {
-      if (fd.vars[i].scopeLevel < scopeLevel) {
-        scopeNext = i
-        break
-      }
+    // Use linked list for scope_next
+    const localIdx = fd.args.length + idx
+    
+    let next = fd.scopes[scopeLevel].first
+    
+    // Experimental: Link to parent scope if current scope is empty
+    // This fixes class-basic.ts where <class_fields_init> (Scope 3) links to Point (Scope 2)
+    if (next === -1 && scopeLevel > 0) {
+       // Try to find a non-empty parent scope
+       // Only link to scopes > 0 (Scope 0 seems to be isolated for args/vars)
+       for (let s = scopeLevel - 1; s > 0; s--) {
+          if (fd.scopes[s].first !== -1) {
+             next = fd.scopes[s].first
+             break
+          }
+       }
     }
-    v.scopeNext = scopeNext
+
+    v.scopeNext = next
+    fd.scopes[scopeLevel].first = localIdx
 
     v.isConst = isConst
     v.isLexical = isLexical
@@ -392,7 +406,18 @@ export class Compiler {
     const v = new JSVarDef()
 
     v.varName = atom
-    v.scopeNext = 0 // Default to 0 (matches WASM for non-last args?)
+    
+    // Use linked list for scope_next (Args are in scope 0)
+    // Special logic inferred from WASM:
+    // Arguments seem to point to index 0 (scopeNext=0).
+    // And only the first argument updates the scope head.
+    v.scopeNext = 0
+    
+    const scope = 0
+    if (idx === 0) {
+      fd.scopes[scope].first = 0
+    }
+
     fd.args.push(v)
     fd.argCount++
     fd.definedArgCount++
@@ -676,8 +701,8 @@ export class Compiler {
     // and removed from the locals list in the bytecode, even though they occupy stack slots.
     // However, lexical variables (let/const/class) seem to stay in locals even if captured.
     const varsToEmit = fd.vars.filter((v, i) => {
-      const varIdx = fd.argCount + i
-      return !fd.closureVar.some(cv => cv.isLocal && cv.varIdx === varIdx && cv.varName === v.varName && !v.isLexical)
+      // QuickJS removes variables if (vd->is_captured && !vd->is_lexical)
+      return !(v.isCaptured && !v.isLexical)
     })
     const emittedVarCount = varsToEmit.length
 

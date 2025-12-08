@@ -84,7 +84,7 @@ export class ColumnNumberSlot {
 
 export class JSVarScope {
   parent: number = 0
-  first: number = 0
+  first: number = -1
 }
 
 export class FunctionDef {
@@ -206,9 +206,9 @@ export class FunctionDef {
 
   constructor(parent: FunctionDef | null = null) {
     this.parent = parent
-    // Initialize defScopeArray
-    for (let i = 0; i < 4; i++) {
-      this.defScopeArray.push(new JSVarScope())
+    // Initialize scopes
+    for (let i = 0; i < 100; i++) {
+      this.scopes.push(new JSVarScope())
     }
   }
 }
