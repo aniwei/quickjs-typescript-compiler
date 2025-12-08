@@ -209,11 +209,14 @@
 
 ## 阶段 7: ES2020 特性 (ES2020 Features)
 **目标**: 完善对 ES2020 的支持。
-*   [ ] **Task 7.1**: 支持 `BigInt` 字面量及运算。
+*   [x] **Task 7.1**: 支持 `BigInt` 字面量及运算。
+    *   [x] 基础字面量解析 (`10n`)。
+    *   [x] 小整数优化 (`OP_push_bigint_i32`)。
+    *   [x] 大整数支持 (`OP_push_const` + 序列化)。
 *   [ ] **Task 7.2**: 支持空值合并运算符 (`??`)。
 *   [ ] **Task 7.3**: 支持可选链操作符 (`?.`)。
 *   [ ] **Task 7.4**: 确保 `globalThis` 支持。
-*   [ ] **验证**: `fixtures/es2020.ts`。
+*   [ ] **验证**: `fixtures/es2020_bigint.ts` (部分通过), `fixtures/es2020.ts`。
 
 ## 阶段 8: 模块系统 (Modules)
 **目标**: 支持 ESM 模块。
@@ -273,15 +276,15 @@
     *   创建 `src/compiler/ScopeManager.ts`。
     *   移出 `scopeStack`, `enter`, `exit`, `findVar`, `closeScopes` 等逻辑。
     *   `TypeScriptCompiler` 持有 `ScopeManager` 实例。
-*   [ ] **Task 13.2**: 提取标签与循环管理 (`LabelManager`)。
+*   [x] **Task 13.2**: 提取标签与循环管理 (`LabelManager`)。
     *   创建 `src/compiler/LabelManager.ts`。
     *   移出 `pendingLabels`, `loopStack` 及相关的 `break`/`continue` 标签查找逻辑。
 *   [ ] **Task 13.3**: 拆分 AST 遍历器 (Visitor Pattern)。
     *   定义 `CompilerContext` 接口，暴露 `compiler`, `funcDef`, `scopeManager` 等核心状态。
-    *   [ ] **Task 13.3.1**: 提取 `StatementVisitor` (处理 `if`, `while`, `for`, `switch`, `block` 等)。
-    *   [ ] **Task 13.3.2**: 提取 `ExpressionVisitor` (处理 `binary`, `unary`, `call`, `member` 等)。
+    *   [x] **Task 13.3.1**: 提取 `StatementVisitor` (处理 `if`, `while`, `for`, `switch`, `block` 等)。
+    *   [x] **Task 13.3.2**: 提取 `ExpressionVisitor` (处理 `binary`, `unary`, `call`, `member` 等)。
     *   [ ] **Task 13.3.3**: 提取 `ClassVisitor` (处理 `class` 定义及成员)。
-    *   [ ] **Task 13.3.4**: 提取 `FunctionVisitor` (处理函数定义、参数、箭头函数)。
+    *   [x] **Task 13.3.4**: 提取 `FunctionVisitor` (处理函数定义、参数、箭头函数)。
 *   [ ] **Task 13.4**: 统一入口与调度。
     *   `TypeScriptCompiler` 作为外观模式 (Facade) 和调度中心，负责初始化各子模块并分发 `visit` 请求。
 
@@ -384,6 +387,17 @@
 *   [ ] **Task 11.1**: 实现行号表 (`pc2line`) 生成。
 *   [ ] **Task 11.2**: 支持 `source` 文件名记录。
 *   [ ] **验证**: 检查生成的字节码中的调试信息段。
+
+## Phase 13: Refactoring (🚧 In Progress)
+**Goal**: Refactor the monolithic `TypeScriptCompiler` into smaller, specialized visitors to improve maintainability and align with the Visitor Pattern.
+
+*   [x] **Task 13.1**: Extract `StatementVisitor`.
+*   [x] **Task 13.2**: Extract `ExpressionVisitor`.
+*   [ ] **Task 13.3**: Extract specialized visitors.
+    *   [x] **Task 13.3.1**: Extract `FunctionVisitor` (Functions, Arrows, Function Expressions).
+    *   [x] **Task 13.3.2**: Extract `ClassVisitor` (Classes, Methods, Fields).
+    *   [x] **Task 13.3.3**: Fix `ExpressionVisitor` property assignment logic.
+*   [ ] **Task 13.4**: Implement `Facade` pattern to manage visitors and shared state.
 
 ## 附录：函数实现对照表 (Function Implementation Mapping)
 

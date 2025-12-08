@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/try-catch.ts
-**生成时间**: 2025-12-08T11:04:54.855Z
+**生成时间**: 2025-12-08T14:42:14.993Z
 
 ## 大小对比
 

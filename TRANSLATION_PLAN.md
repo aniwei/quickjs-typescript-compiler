@@ -33,10 +33,10 @@
 ## Phase 5: Classes (🚧 In Progress)
 - [x] Class Declaration (Basic structure)
 - [x] Constructor
-- [ ] Method Definition
+- [x] Method Definition
 - [x] Property Declaration (Field initialization logic implemented, refining bytecode)
-- [ ] Inheritance (extends)
-- [ ] Super Call
+- [x] Inheritance (extends) (Implemented, refining bytecode size)
+- [x] Super Call (Implemented, refining bytecode size)
 - [ ] Static Members
 - [ ] Private Fields
 
@@ -62,6 +62,15 @@
 - [ ] Source Map Support
 - [ ] Error Reporting Improvements
 
+## Phase 13: Refactoring (🚧 In Progress)
+- [x] Task 13.1: Extract Scope Management (`ScopeManager`)
+- [x] Task 13.2: Extract Label & Loop Management (`LabelManager`)
+- [x] Task 13.3: Extract Visitors
+    - [x] 13.3.1: StatementVisitor
+    - [x] 13.3.2: ExpressionVisitor
+    - [ ] 13.3.3: FunctionVisitor
+    - [ ] 13.3.4: ClassVisitor
+
 ## Binary Compatibility Tracking (🚧 In Progress)
 - [x] Atom Table Alignment (Full initialization of 227 built-in atoms implemented)
 - [x] `arrow-fn-basic.ts` (181 bytes, pc2line header aligned)
@@ -82,6 +91,8 @@
 - [x] `switch-case.ts` (182 bytes, Perfect Match)
 - [x] `loop-break-continue.ts` (190 bytes, Perfect Match)
 - [x] `function-default-params.ts` (Structurally Correct)
+- [x] `binary-ops.ts` (Perfect Match)
+- [ ] `class-inheritance.ts` (-25 bytes diff. Structure aligned, debugging const capture opcodes)
 - [ ] `class-basic.ts` (196 bytes vs 201 bytes, -5 bytes diff. Fixed OP_get_var_ref_check encoding)
 - [ ] `primitives.ts` (Minor debug info mismatch)
 - [ ] `labeled-statements.ts` (Minor mismatch)

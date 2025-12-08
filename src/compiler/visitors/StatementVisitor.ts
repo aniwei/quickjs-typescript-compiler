@@ -1115,4 +1115,115 @@ export class StatementVisitor {
 
     scopeManager.exit()
   }
+
+  visitVariableStatement(node: ts.VariableStatement) {
+    const { compiler, funcDef, scopeManager } = this.context
+    if (!funcDef) {
+      return
+    }
+    
+    const isLet = (node.declarationList.flags & ts.NodeFlags.Let) !== 0
+    const isConst = (node.declarationList.flags & ts.NodeFlags.Const) !== 0
+    const isLexical = isLet || isConst
+    
+    for (const decl of node.declarationList.declarations) {
+      if (ts.isIdentifier(decl.name)) {
+        const name = decl.name.text
+        
+        // Check if already declared in current scope (hoisted)
+        let scopeInfo = scopeManager.findVar(name, funcDef)
+        
+        if (!scopeInfo) {
+          // Not found (must be module scope var or function scope var)
+          const currentScope = scopeManager.currentScope
+          
+          if (currentScope.type === 'module') {
+            // Add as local var first to reserve slot
+            const scopeLevel = scopeManager.scopeStack.length - funcDef.scopeLevel - 1
+            const varIdx = compiler.addVar(funcDef, name, isConst, isLexical, scopeLevel)
+            
+            // Add as closure var
+            const closureIdx = compiler.addClosureVar(funcDef, name, true, false, varIdx, JSVarKind.JS_VAR_NORMAL, isConst, isLexical)
+            scopeInfo = { type: 'closure', idx: closureIdx, isLexical, isConst }
+            currentScope.vars.set(name, scopeInfo)
+          } else {
+            // Function scope var (var in block)
+            // TODO: Handle var hoisting to function scope
+          }
+        }
+        
+        if (scopeInfo) {
+          // Emit initialization code
+          if (decl.initializer) {
+            this.context.visit(decl.initializer)
+            
+            // Emit OP_set_name for named function expressions/arrows assigned to variables
+            if (ts.isArrowFunction(decl.initializer) || 
+              ts.isFunctionExpression(decl.initializer) || 
+              ts.isClassExpression(decl.initializer)) {
+              const atomId = compiler.addAtom(name)
+              compiler.emitOp(funcDef, Opcode.OP_set_name)
+              compiler.emitU32(funcDef, atomId)
+            }
+            
+            if (scopeInfo.type === 'closure') {
+              // Emit put_var_ref
+              const idx = scopeInfo.idx
+              if (idx === 0) {
+                compiler.emitOp(funcDef, Opcode.OP_put_var_ref0)
+              } else if (idx === 1) {
+                compiler.emitOp(funcDef, Opcode.OP_put_var_ref1)
+              } else if (idx === 2) {
+                compiler.emitOp(funcDef, Opcode.OP_put_var_ref2)
+              } else if (idx === 3) {
+                compiler.emitOp(funcDef, Opcode.OP_put_var_ref3)
+              } else {
+                compiler.emitOp(funcDef, Opcode.OP_put_var_ref)
+                compiler.emitU16(funcDef, idx)
+              }
+            } else {
+              // Local var
+              const varIdx = scopeInfo.idx
+              const idx = funcDef.vars[varIdx].localIdx
+              if (idx === -1) {
+                 // Should be closure?
+                 throw new Error(`Variable ${name} is captured but accessed as local`)
+              }
+              
+              if (idx === 0) {
+                compiler.emitOp(funcDef, Opcode.OP_put_loc0)
+              } else if (idx === 1) {
+                compiler.emitOp(funcDef, Opcode.OP_put_loc1)
+              } else if (idx === 2) {
+                compiler.emitOp(funcDef, Opcode.OP_put_loc2)
+              } else if (idx === 3) {
+                compiler.emitOp(funcDef, Opcode.OP_put_loc3)
+              } else {
+                compiler.emitOp(funcDef, Opcode.OP_put_loc)
+                compiler.emitU16(funcDef, idx)
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  visitLabeledStatement(node: ts.LabeledStatement) {
+    const { labelManager } = this.context
+    const label = node.label.text
+    labelManager.currentPendingLabels.push(label)
+    const preCount = labelManager.currentPendingLabels.length
+    
+    this.context.visit(node.statement)
+    
+    if (labelManager.currentPendingLabels.length >= preCount) {
+      if (labelManager.currentPendingLabels[preCount - 1] === label) {
+        const index = labelManager.currentPendingLabels.lastIndexOf(label)
+        if (index !== -1) {
+          labelManager.currentPendingLabels.splice(index, 1)
+        }
+      }
+    }
+  }
 }

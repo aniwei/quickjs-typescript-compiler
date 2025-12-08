@@ -849,9 +849,39 @@ export class Compiler {
       for(let i=0; i<8; i++) {
         out.putByte(u8[i])
       }
+    } else if (typeof item === 'bigint') {
+      this.serializeBigInt(out, item)
     } else {
       // TODO: Support other CPool types
       throw new Error('Unsupported CPool item type: ' + typeof item)
+    }
+  }
+
+  serializeBigInt(out: BytecodeBuilder, val: bigint): void {
+    out.putByte(BytecodeTag.TC_TAG_BIG_INT)
+    
+    if (val === 0n) {
+      out.putULEB128(0)
+      return
+    }
+
+    const bytes: number[] = []
+    let temp = val
+    while (true) {
+      const byte = Number(temp & 0xFFn)
+      bytes.push(byte)
+      temp >>= 8n
+      
+      if (val >= 0n) {
+        if (temp === 0n && (byte & 0x80) === 0) break
+      } else {
+        if (temp === -1n && (byte & 0x80) !== 0) break
+      }
+    }
+    
+    out.putULEB128(bytes.length)
+    for (const b of bytes) {
+      out.putByte(b)
     }
   }
 

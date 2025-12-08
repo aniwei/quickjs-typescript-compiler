@@ -138,6 +138,7 @@ export class FunctionDef {
   thisActiveFuncVarIdx: number = -1
   homeObjectVarIdx: number = 0
   needHomeObject: boolean = false
+  fieldsInitClosureIdx: number = -1
 
   stackSize: number = 0
   stackLevel: number = 0

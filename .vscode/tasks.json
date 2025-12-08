@@ -312,6 +312,20 @@
 			"isBackground": false,
 			"problemMatcher": [],
 			"group": "build"
+		},
+		{
+			"label": "compare-object-literal",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/object-literal.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-array-literal",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/array-literal.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
 		}
 	]
 }

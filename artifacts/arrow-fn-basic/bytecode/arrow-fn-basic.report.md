@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/arrow-fn-basic.ts
-**生成时间**: 2025-12-08T11:04:54.650Z
+**生成时间**: 2025-12-08T14:42:14.767Z
 
 ## 大小对比
 
