@@ -259,17 +259,15 @@
     *   **修复**: 修正了 `pc2line` 编码格式 (ZigZag -> SLEB128)，与 QuickJS 引擎对齐。
     *   **修复**: 在 `FunctionVisitor` 中添加了 `computePc2LineInfo` 调用，确保函数声明生成 debug info。
     *   **修复**: 修正了模块 Prologue/Epilogue 的 `sourcePos` 归属，解决了 `compute.ts` 的 `pc2line` 差异。
+    *   **修复**: 移除了 `TypeScriptCompiler.ts` 中模块 Epilogue (`return_undef`, `return_async`) 的 `sourcePos` 传递，消除了多余的 debug info 条目。
+    *   **修复**: 恢复了 `Compiler.ts` 中 `computePc2LineInfo` 的正确初始化逻辑 (使用 `fd.sourcePos`)，移除了硬编码 Hack。
 *   [x] **Task 11.2**: 支持 `source` 文件名记录。
 *   [x] **验证**: 检查生成的字节码中的调试信息段。
-    *   `compute.ts` (✅ 大小对齐 136 bytes)
-    *   `array-literal.ts` (✅ 完全二进制对齐)
-    *   `variables-var.ts` (✅ 完全二进制对齐)
-    *   `object-nested.ts` (✅ 完全二进制对齐)
-    *   `object-spread.ts` (✅ 完全二进制对齐)
-    *   `postfix-unary.ts` (✅ 完全二进制对齐)
-    *   `while.ts` (✅ 完全二进制对齐)
-    *   `class-basic.ts` (✅ 完全二进制对齐)
-    *   `compute.ts` (✅ 逻辑对齐，pc2line 仅差 2 字节)
+    *   `compute.ts` (✅ 完全二进制对齐 136 bytes)
+    *   `console-log.ts` (✅ 完全二进制对齐)
+    *   `empty.ts` (✅ 完全二进制对齐)
+    *   `number.ts` (✅ 完全二进制对齐)
+    *   大多数 Fixtures 现已实现 0 字节大小差异。
 
 ## 12. 基础设施优化 (Infrastructure Optimization)
 *   [x] **Task 12.1**: 动态栈大小计算 (Dynamic Stack Calculation)。
