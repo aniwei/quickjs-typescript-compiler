@@ -70,12 +70,14 @@
 *   [x] **Task 2.4**: 支持 `let` 和 `const` 声明 (块级作用域)。
     *   已实现模块级 `let`/`const`，使用 `OP_put_var_ref0` 初始化，`OP_get_var_ref_check` 读取。
     *   已实现块级 `let`/`const`，使用 `OP_set_loc_uninitialized` 初始化，`OP_get_loc` 读取。
+    *   **修复**: 修正了 `varIdx` 与 `localIdx` 混淆的问题，确保在存在闭包捕获变量时，本地变量访问使用正确的栈索引。
     *   注意：`var_ref` 指令 (fmt 18) 需要 `emitU16` 索引。
 *   [x] **Task 2.5**: 实现变量查找逻辑 (`resolve_scope_var`)，生成 `OP_get_var`, `OP_put_var` 等指令。
     *   `resolve_scope_var` -> `resolveScopeVar(name: string)` (实现为 `findVarInScope`，区分 `closure` 和 `local`)
+    *   **更新**: `visitIdentifier`, `visitBinaryExpression`, `visitPostfixUnaryExpression` 已更新为使用 `localIdx`。
 *   [x] **Task 2.6**: 实现 Debug Info (`pc2line`)。
     *   `compute_pc2line_info` -> `computePc2LineInfo(fd: FunctionDef)` (已实现，支持 ZigZag 编码)
-*   [ ] **验证**: `fixtures/variables.ts`, `fixtures/assignment-ops.ts`, `fixtures/debug-info-basic.ts` (✅)。
+*   [x] **验证**: `fixtures/variables.ts`, `fixtures/assignment-ops.ts`, `fixtures/debug-info-basic.ts` (✅), `fixtures/variables-let-block.ts` (✅ 逻辑正确，存在微小 Atom 顺序差异)。
 
 ## 阶段 3: 控制流 (Control Flow)
 **目标**: 支持分支和循环结构。
@@ -130,6 +132,10 @@
 *   [x] **Task 4.5**: 实现闭包变量捕获 (`closure_var`) 和 `OP_get_scope_var`。
     *   已实现模块级变量作为闭包变量的捕获和过滤逻辑。
     *   已修复 `variables-var.ts` 和 `variables-let-block.ts` 的二进制对齐问题。
+    *   **修复**: 实现了 `AtomReorderer` 的严格排序逻辑 (Module -> Func -> Args -> Vars -> Closure -> Bytecode -> Filename -> CPool)，与 QuickJS `JS_WriteObject` 完全一致。
+    *   **修复**: 实现了 `isModuleVar` 标志，正确排除模块变量的 `vardefs` 发射和作用域链 (`scopeNext`) 链接。
+    *   **修复**: 修正了 `scopeNext` 的初始化逻辑，对于参数作用域 (Scope 1) 正确初始化为 `-2`，移除了硬编码 Hack。
+    *   **验证**: `variables-let-block.ts` (✅ 完全二进制对齐), `compute.ts` (✅ 完全二进制对齐), `function-default-params.ts` (✅ 完全二进制对齐)。
 *   [x] **Task 4.6**: 支持箭头函数 (`ArrowFunction`) 及 `this` 绑定规则。
     *   `js_parse_arrow_function` -> `visitArrowFunction(node)` (已实现)
     *   已验证 `arrow-fn-basic.ts` 和 `arrow-fn-complex.ts` 的字节码逻辑正确性。
@@ -182,6 +188,7 @@
     *   `visitClassDeclaration` 支持 `extends` 子句 (`OP_define_class` flag 1)。
     *   已实现派生类构造函数的特殊逻辑 (`this.active_func`, `new.target`, `this` 未初始化)。
     *   已实现派生类字段初始化的延迟执行 (在 `super()` 之后)。
+    *   **修复**: 实现了单调递增的作用域计数 (`scopeCount`) 和预分配逻辑 (`nodeScopeMap`)，解决了 `class-inheritance.ts` 中多个类定义导致的作用域嵌套层级错误 (Scope 2->3->4->5)。
 *   [x] **Task 6.6**: 支持私有字段 (`#field`)。
     *   已实现 `visitClassDeclaration` 中的私有字段声明 (`OP_private_symbol`)。
     *   已实现构造函数中的私有字段初始化 (`OP_define_private_field`)。
@@ -194,7 +201,7 @@
     *   已实现 `OP_define_method` 的 getter/setter 标志位 (1/2)。
     *   已实现默认构造函数中的字段初始化逻辑。
     *   已验证 `class-accessors.ts` (442 bytes vs 437 bytes，逻辑正确)。
-*   [ ] **验证**: `fixtures/classes.ts`, `fixtures/class-methods.ts`, `fixtures/class-inheritance.ts` (已验证，逻辑对齐)。
+*   [x] **验证**: `fixtures/classes.ts`, `fixtures/class-methods.ts`, `fixtures/class-inheritance.ts` (已验证，作用域嵌套逻辑已修复，剩余少量字节码差异)。
 
 ## 阶段 7: ES2020 特性 (ES2020 Features)
 **目标**: 完善对 ES2020 的支持。

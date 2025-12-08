@@ -335,6 +335,8 @@ export class Compiler {
   }
 
   addAtom(s: string): number {
+    if (s === 'a') console.trace(`addAtom: ${s}`)
+    else console.log(`addAtom: ${s}`)
     // Check built-in atoms
     if (this.builtInAtoms.has(s)) {
       return this.builtInAtoms.get(s)!
@@ -358,38 +360,35 @@ export class Compiler {
     return idx + this.firstAtomId
   }
 
-  addVar(fd: FunctionDef, name: string, isConst: boolean = false, isLexical: boolean = false, scopeLevel: number = 0, varKind: JSVarKind = JSVarKind.JS_VAR_NORMAL): number {
+  addVar(fd: FunctionDef, name: string, isConst: boolean = false, isLexical: boolean = false, scopeLevel: number = 0, varKind: JSVarKind = JSVarKind.JS_VAR_NORMAL, isCaptured: boolean = false, isModuleVar: boolean = false): number {
     const atom = this.addAtom(name)
-    return this.addVarWithAtom(fd, atom, isConst, isLexical, scopeLevel, varKind)
+    return this.addVarWithAtom(fd, atom, isConst, isLexical, scopeLevel, varKind, isCaptured, isModuleVar)
   }
 
-  addVarWithAtom(fd: FunctionDef, atom: number, isConst: boolean = false, isLexical: boolean = false, scopeLevel: number = 0, varKind: JSVarKind = JSVarKind.JS_VAR_NORMAL): number {
+  addVarWithAtom(fd: FunctionDef, atom: number, isConst: boolean = false, isLexical: boolean = false, scopeLevel: number = 0, varKind: JSVarKind = JSVarKind.JS_VAR_NORMAL, isCaptured: boolean = false, isModuleVar: boolean = false): number {
     const idx = fd.vars.length
     const v = new JSVarDef()
     
     v.varName = atom
     v.scopeLevel = scopeLevel
+    v.isCaptured = isCaptured
+    v.isModuleVar = isModuleVar
+    
+    if (isCaptured) {
+      v.localIdx = -1
+    } else {
+      v.localIdx = fd.localCount++
+    }
     
     // Use linked list for scope_next
-    const localIdx = fd.args.length + idx
+    // scope_next is index in vars array (not locals)
+    const varListIdx = idx 
     
     let next = fd.scopes[scopeLevel].first
     
-    // Experimental: Link to parent scope if current scope is empty
-    // This fixes class-basic.ts where <class_fields_init> (Scope 3) links to Point (Scope 2)
-    if (next === -1 && scopeLevel > 0) {
-       // Try to find a non-empty parent scope
-       // Only link to scopes > 0 (Scope 0 seems to be isolated for args/vars)
-       for (let s = scopeLevel - 1; s > 0; s--) {
-          if (fd.scopes[s].first !== -1) {
-             next = fd.scopes[s].first
-             break
-          }
-       }
-    }
-
     v.scopeNext = next
-    fd.scopes[scopeLevel].first = localIdx
+    console.log(`addVar: atom=${atom} scope=${scopeLevel} next=${next} isModuleVar=${isModuleVar} varListIdx=${varListIdx}`)
+    fd.scopes[scopeLevel].first = varListIdx
 
     v.isConst = isConst
     v.isLexical = isLexical
@@ -702,6 +701,8 @@ export class Compiler {
     // However, lexical variables (let/const/class) seem to stay in locals even if captured.
     const varsToEmit = fd.vars.filter((v, i) => {
       // QuickJS removes variables if (vd->is_captured && !vd->is_lexical)
+      // Also remove module variables (they are in module context, not stack)
+      if (v.isModuleVar) return false
       return !(v.isCaptured && !v.isLexical)
     })
     const emittedVarCount = varsToEmit.length
@@ -771,6 +772,7 @@ export class Compiler {
     for (const v of varsToEmit) {
       this.putAtom(out, v.varName)
       out.putULEB128(v.scopeLevel)
+      if (v.varName === 120) console.log(`writeFunctionBytecode: <class_fields_init> scopeNext=${v.scopeNext}`)
       out.putULEB128(v.scopeNext + 1)
       
       let flags = 0

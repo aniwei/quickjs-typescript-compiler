@@ -303,6 +303,15 @@
 			"command": "echo \"closure-basic.ts: Identical bytecode size (192 bytes). Instructions match (tail_call optimization implemented).\" >> TODO.md",
 			"args": [],
 			"group": "build"
+		},
+		{
+			"label": "compare-class-inheritance",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/compiler/fixtures/class-inheritance.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts --show-diff",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
 		}
 	]
 }

@@ -14,15 +14,15 @@ export class AtomReorderer {
   }
 
   reorder(rootFd: FunctionDef, extraAtoms: number[] = []) {
-    // 1. Collect atoms in usage order
-    this.collectAtoms(rootFd)
-    
-    // Add extra atoms (e.g. module name)
+    // Add extra atoms (e.g. module name) FIRST
     for (const atomIdx of extraAtoms) {
       // console.log(`AtomReorderer: Adding extra atom ${atomIdx}`)
       this.addAtom(atomIdx)
     }
 
+    // 1. Collect atoms in usage order
+    this.collectAtoms(rootFd)
+    
     // 2. Rewrite bytecode and function definitions with new atom IDs
     this.visitedFunctions.clear()
     this.rewriteFunction(rootFd)
@@ -78,15 +78,16 @@ export class AtomReorderer {
     if (fd.funcName !== 0) {
       this.addAtom(fd.funcName)
     }
-    if (fd.filename !== 0) {
-      this.addAtom(fd.filename)
-    }
     
     for (const arg of fd.args) {
       if (arg.varName !== 0) this.addAtom(arg.varName)
     }
     
     for (const v of fd.vars) {
+      // Skip module variables and non-lexical captured variables (matching Compiler.ts writeFunctionBytecode)
+      if (v.isModuleVar) continue
+      if (v.isCaptured && !v.isLexical) continue
+
       if (v.varName !== 0) {
         // console.log(`AtomReorderer: Collecting var atom ${v.varName} (${this.compiler.atoms[v.varName - this.compiler.firstAtomId]})`)
         this.addAtom(v.varName)
@@ -101,7 +102,6 @@ export class AtomReorderer {
     }
 
     const buf = fd.byteCode.data()
-    const childFds: FunctionDef[] = []
     let pc = 0
 
     while (pc < buf.length) {
@@ -132,39 +132,18 @@ export class AtomReorderer {
         this.addAtom(atomIdx)
       }
 
-      // Queue child functions for recursion (QuickJS writes CPool after bytecode)
-      if (op === Opcode.OP_fclosure) {
-        const cpoolIdx = this.readU32(buf, pc + 1)
-        const childFd = fd.cpool[cpoolIdx]
-        if (childFd instanceof FunctionDef) {
-          childFds.push(childFd)
-        }
-      } else if (op === Opcode.OP_fclosure8) {
-        const cpoolIdx = buf[pc + 1]
-        const childFd = fd.cpool[cpoolIdx]
-        if (childFd instanceof FunctionDef) {
-          childFds.push(childFd)
-        }
-      } else if (op === Opcode.OP_push_const8) {
-        const cpoolIdx = buf[pc + 1]
-        const childFd = fd.cpool[cpoolIdx]
-        if (childFd instanceof FunctionDef) {
-          childFds.push(childFd)
-        }
-      } else if (op === Opcode.OP_push_const) {
-        const cpoolIdx = this.readU32(buf, pc + 1)
-        const childFd = fd.cpool[cpoolIdx]
-        if (childFd instanceof FunctionDef) {
-          childFds.push(childFd)
-        }
-      }
-
       pc += opDef.size
     }
 
-    // Recurse into child functions
-    for (const childFd of childFds) {
-      this.collectAtoms(childFd)
+    if (fd.filename !== 0) {
+      this.addAtom(fd.filename)
+    }
+
+    // Recurse into child functions (cpool)
+    for (const item of fd.cpool) {
+      if (item instanceof FunctionDef) {
+        this.collectAtoms(item)
+      }
     }
   }
 

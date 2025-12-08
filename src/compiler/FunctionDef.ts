@@ -17,13 +17,15 @@ export enum JSVarKind {
 export class JSVarDef {
   varName: number = 0 // JSAtom
   scopeLevel: number = 0
-  scopeNext: number = 0
+  scopeNext: number = -1
   isConst: boolean = false
   isLexical: boolean = false
   isCaptured: boolean = false
   isStaticPrivate: boolean = false
   varKind: JSVarKind = 0 // JSVarKindEnum
   funcPoolIdx: number = 0
+  localIdx: number = -1 // Stack slot index (if not captured)
+  isModuleVar: boolean = false
 }
 
 export class JSClosureVar {
@@ -120,6 +122,7 @@ export class FunctionDef {
   vars: JSVarDef[] = []
   varSize: number = 0
   varCount: number = 0
+  localCount: number = 0 // Number of stack slots used by locals
   args: JSVarDef[] = []
   argSize: number = 0
   argCount: number = 0
@@ -206,6 +209,10 @@ export class FunctionDef {
 
   constructor(parent: FunctionDef | null = null) {
     this.parent = parent
+    this.scopeCount = 1
+    if (parent) {
+      this.parentCpoolIdx = parent.cpoolCount
+    }
     // Initialize scopes
     for (let i = 0; i < 100; i++) {
       this.scopes.push(new JSVarScope())
