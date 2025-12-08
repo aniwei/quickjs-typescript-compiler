@@ -1,0 +1,3 @@
+- [x] **Refactor**: Extract Label & Loop Management into `LabelManager` (Task 13.2).
+- [x] **Refactor**: Extract Statement Visitors into  (Task 13.3).
+- [x] **Refactor**: Extract Statement Visitors into `StatementVisitor` (Task 13.3).

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-07T15:43:37.601Z",
+  "timestamp": "2025-12-08T10:44:58.199Z",
   "inputFile": "__tests__/compiler/fixtures/for-of.ts",
   "compilation": {
     "typescript": {

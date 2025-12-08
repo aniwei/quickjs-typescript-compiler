@@ -62,7 +62,7 @@
     *   `find_var` -> `findVar(name: string)`
     *   `add_global_var` -> `addGlobalVar(ctx: Context, name: string)`
 *   [x] **Task 2.2**: 实现 `BlockEnv` 结构，管理词法作用域。
-    *   `push_scope` -> `pushScope(el: ts.Node)` (实现为 `enterScope`/`exitScope` 和 `scopeStack`)
+    *   `push_scope` -> `pushScope(el: ts.Node)` (实现为 `enter`/`exit` 和 `scopeStack`)
     *   `pop_scope` -> `popScope()`
     *   `close_scopes` -> `closeScopes(scope: Scope)`
 *   [x] **Task 2.3**: 支持 `var` 声明 (函数作用域)。
@@ -73,8 +73,9 @@
     *   **修复**: 修正了 `varIdx` 与 `localIdx` 混淆的问题，确保在存在闭包捕获变量时，本地变量访问使用正确的栈索引。
     *   注意：`var_ref` 指令 (fmt 18) 需要 `emitU16` 索引。
 *   [x] **Task 2.5**: 实现变量查找逻辑 (`resolve_scope_var`)，生成 `OP_get_var`, `OP_put_var` 等指令。
-    *   `resolve_scope_var` -> `resolveScopeVar(name: string)` (实现为 `findVarInScope`，区分 `closure` 和 `local`)
+    *   `resolve_scope_var` -> `resolveScopeVar(name: string)` (实现为 `findVar`，区分 `closure` 和 `local`)
     *   **更新**: `visitIdentifier`, `visitBinaryExpression`, `visitPostfixUnaryExpression` 已更新为使用 `localIdx`。
+    *   **重构**: `visitBinaryExpression` 中的本地变量赋值逻辑已重构为使用 `emitPutLoc`，提高了代码健壮性。
 *   [x] **Task 2.6**: 实现 Debug Info (`pc2line`)。
     *   `compute_pc2line_info` -> `computePc2LineInfo(fd: FunctionDef)` (已实现，支持 ZigZag 编码)
 *   [x] **验证**: `fixtures/variables.ts`, `fixtures/assignment-ops.ts`, `fixtures/debug-info-basic.ts` (✅), `fixtures/variables-let-block.ts` (✅ 逻辑正确，存在微小 Atom 顺序差异)。
@@ -97,6 +98,9 @@
     *   `js_parse_do` -> `visitDoStatement(node)` (已实现 **完全二进制对齐**)
 *   [x] **Task 3.5**: 支持 `for` 循环 (包括 `for(init; test; update)`).
     *   `js_parse_for` -> `visitForStatement(node)` (已实现 **完全二进制对齐**)
+    *   `js_parse_for_in_of` -> `visitForOfStatement(node)` / `visitForInStatement(node)` (已实现 **完全二进制对齐**)
+    *   **修复**: 修正了 `for-of` 循环中迭代变量赋值的 opcode 选择逻辑 (`put_loc0` vs `put_loc1`)，现已与 WASM 完全一致。
+    *   **重构**: 实现了 `emitPutLoc`, `emitGetLoc`, `emitSetLoc` 辅助方法，统一管理本地变量的 opcode 发射，避免手动选择错误。
 *   [x] **Task 3.6**: 支持 `break` 和 `continue`。
     *   `js_parse_break` -> `visitBreakStatement(node)` (已实现 **完全二进制对齐**)
     *   `js_parse_continue` -> `visitContinueStatement(node)` (已实现 **完全二进制对齐**)
@@ -194,7 +198,7 @@
     *   已实现构造函数中的私有字段初始化 (`OP_define_private_field`)。
     *   已实现 `visitPropertyAccessExpression` 中的私有字段读取 (`OP_get_private_field`)。
     *   已实现 `visitBinaryExpression` 中的私有字段赋值 (`OP_put_private_field`)。
-    *   已修复闭包变量捕获逻辑 (`findVarInScope` + `captureVariable`)，支持跨函数捕获。
+    *   已修复闭包变量捕获逻辑 (`findVar` + `captureVariable`)，支持跨函数捕获。
     *   已验证 `class-private-fields.ts` (404 bytes vs 436 bytes，逻辑对齐)。
 *   [x] **Task 6.7**: 支持存取器 (`get`/`set`)。
     *   已实现 `visitClassDeclaration` 中的存取器遍历。
@@ -262,6 +266,24 @@
     *   在 `emitOp` 中根据 `OPCODE_DEFS` 自动更新栈深度。
     *   移除了硬编码的栈大小设置。
 
+## 阶段 13: 重构与模块化 (Refactoring & Modularization)
+**目标**: 将庞大的 `TypeScriptCompiler` 拆分为职责单一的模块，提高代码可维护性。
+
+*   [x] **Task 13.1**: 提取作用域管理 (`ScopeManager`)。
+    *   创建 `src/compiler/ScopeManager.ts`。
+    *   移出 `scopeStack`, `enter`, `exit`, `findVar`, `closeScopes` 等逻辑。
+    *   `TypeScriptCompiler` 持有 `ScopeManager` 实例。
+*   [ ] **Task 13.2**: 提取标签与循环管理 (`LabelManager`)。
+    *   创建 `src/compiler/LabelManager.ts`。
+    *   移出 `pendingLabels`, `loopStack` 及相关的 `break`/`continue` 标签查找逻辑。
+*   [ ] **Task 13.3**: 拆分 AST 遍历器 (Visitor Pattern)。
+    *   定义 `CompilerContext` 接口，暴露 `compiler`, `funcDef`, `scopeManager` 等核心状态。
+    *   [ ] **Task 13.3.1**: 提取 `StatementVisitor` (处理 `if`, `while`, `for`, `switch`, `block` 等)。
+    *   [ ] **Task 13.3.2**: 提取 `ExpressionVisitor` (处理 `binary`, `unary`, `call`, `member` 等)。
+    *   [ ] **Task 13.3.3**: 提取 `ClassVisitor` (处理 `class` 定义及成员)。
+    *   [ ] **Task 13.3.4**: 提取 `FunctionVisitor` (处理函数定义、参数、箭头函数)。
+*   [ ] **Task 13.4**: 统一入口与调度。
+    *   `TypeScriptCompiler` 作为外观模式 (Facade) 和调度中心，负责初始化各子模块并分发 `visit` 请求。
 
 ## 阶段 0: 基础设施搭建 (Infrastructure)
 **目标**: 建立编译器的核心类结构，能够生成空的函数字节码。

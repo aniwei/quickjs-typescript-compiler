@@ -1,0 +1,2018 @@
+[
+  {
+    "name": "invalid",
+    "code": 0,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "push_i32",
+    "code": 1,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 20,
+    "size": 5
+  },
+  {
+    "name": "push_const",
+    "code": 2,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 21,
+    "size": 5
+  },
+  {
+    "name": "fclosure",
+    "code": 3,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 21,
+    "size": 5
+  },
+  {
+    "name": "push_atom_value",
+    "code": 4,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 23,
+    "size": 5
+  },
+  {
+    "name": "private_symbol",
+    "code": 5,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 23,
+    "size": 5
+  },
+  {
+    "name": "undefined",
+    "code": 6,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "null",
+    "code": 7,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "push_this",
+    "code": 8,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "push_false",
+    "code": 9,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "push_true",
+    "code": 10,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "object",
+    "code": 11,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "special_object",
+    "code": 12,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 5,
+    "size": 2
+  },
+  {
+    "name": "rest",
+    "code": 13,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 10,
+    "size": 3
+  },
+  {
+    "name": "drop",
+    "code": 14,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "nip",
+    "code": 15,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "nip1",
+    "code": 16,
+    "nPop": 3,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "dup",
+    "code": 17,
+    "nPop": 1,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "dup1",
+    "code": 18,
+    "nPop": 2,
+    "nPush": 3,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "dup2",
+    "code": 19,
+    "nPop": 2,
+    "nPush": 4,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "dup3",
+    "code": 20,
+    "nPop": 3,
+    "nPush": 6,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "insert2",
+    "code": 21,
+    "nPop": 2,
+    "nPush": 3,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "insert3",
+    "code": 22,
+    "nPop": 3,
+    "nPush": 4,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "insert4",
+    "code": 23,
+    "nPop": 4,
+    "nPush": 5,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "perm3",
+    "code": 24,
+    "nPop": 3,
+    "nPush": 3,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "perm4",
+    "code": 25,
+    "nPop": 4,
+    "nPush": 4,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "perm5",
+    "code": 26,
+    "nPop": 5,
+    "nPush": 5,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "swap",
+    "code": 27,
+    "nPop": 2,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "swap2",
+    "code": 28,
+    "nPop": 4,
+    "nPush": 4,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "rot3l",
+    "code": 29,
+    "nPop": 3,
+    "nPush": 3,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "rot3r",
+    "code": 30,
+    "nPop": 3,
+    "nPush": 3,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "rot4l",
+    "code": 31,
+    "nPop": 4,
+    "nPush": 4,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "rot5l",
+    "code": 32,
+    "nPop": 5,
+    "nPush": 5,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "call_constructor",
+    "code": 33,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 13,
+    "size": 3
+  },
+  {
+    "name": "call",
+    "code": 34,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 13,
+    "size": 3
+  },
+  {
+    "name": "tail_call",
+    "code": 35,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 13,
+    "size": 3
+  },
+  {
+    "name": "call_method",
+    "code": 36,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 13,
+    "size": 3
+  },
+  {
+    "name": "tail_call_method",
+    "code": 37,
+    "nPop": 2,
+    "nPush": 0,
+    "fmt": 13,
+    "size": 3
+  },
+  {
+    "name": "array_from",
+    "code": 38,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 13,
+    "size": 3
+  },
+  {
+    "name": "apply",
+    "code": 39,
+    "nPop": 3,
+    "nPush": 1,
+    "fmt": 10,
+    "size": 3
+  },
+  {
+    "name": "return",
+    "code": 40,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "return_undef",
+    "code": 41,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "check_ctor_return",
+    "code": 42,
+    "nPop": 1,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "check_ctor",
+    "code": 43,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "init_ctor",
+    "code": 44,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "check_brand",
+    "code": 45,
+    "nPop": 2,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "add_brand",
+    "code": 46,
+    "nPop": 2,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "return_async",
+    "code": 47,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "throw",
+    "code": 48,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "throw_error",
+    "code": 49,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 24,
+    "size": 6
+  },
+  {
+    "name": "eval",
+    "code": 50,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 15,
+    "size": 5
+  },
+  {
+    "name": "apply_eval",
+    "code": 51,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 10,
+    "size": 3
+  },
+  {
+    "name": "regexp",
+    "code": 52,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "get_super",
+    "code": 53,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "import",
+    "code": 54,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "check_var",
+    "code": 55,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 23,
+    "size": 5
+  },
+  {
+    "name": "get_var_undef",
+    "code": 56,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 23,
+    "size": 5
+  },
+  {
+    "name": "get_var",
+    "code": 57,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 23,
+    "size": 5
+  },
+  {
+    "name": "put_var",
+    "code": 58,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 23,
+    "size": 5
+  },
+  {
+    "name": "put_var_init",
+    "code": 59,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 23,
+    "size": 5
+  },
+  {
+    "name": "put_var_strict",
+    "code": 60,
+    "nPop": 2,
+    "nPush": 0,
+    "fmt": 23,
+    "size": 5
+  },
+  {
+    "name": "get_ref_value",
+    "code": 61,
+    "nPop": 2,
+    "nPush": 3,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "put_ref_value",
+    "code": 62,
+    "nPop": 3,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "define_var",
+    "code": 63,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 24,
+    "size": 6
+  },
+  {
+    "name": "check_define_var",
+    "code": 64,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 24,
+    "size": 6
+  },
+  {
+    "name": "define_func",
+    "code": 65,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 24,
+    "size": 6
+  },
+  {
+    "name": "get_field",
+    "code": 66,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 23,
+    "size": 5
+  },
+  {
+    "name": "get_field2",
+    "code": 67,
+    "nPop": 1,
+    "nPush": 2,
+    "fmt": 23,
+    "size": 5
+  },
+  {
+    "name": "put_field",
+    "code": 68,
+    "nPop": 2,
+    "nPush": 0,
+    "fmt": 23,
+    "size": 5
+  },
+  {
+    "name": "get_private_field",
+    "code": 69,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "put_private_field",
+    "code": 70,
+    "nPop": 3,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "define_private_field",
+    "code": 71,
+    "nPop": 3,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "get_array_el",
+    "code": 72,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "get_array_el2",
+    "code": 73,
+    "nPop": 2,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "get_array_el3",
+    "code": 74,
+    "nPop": 2,
+    "nPush": 3,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "put_array_el",
+    "code": 75,
+    "nPop": 3,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "get_super_value",
+    "code": 76,
+    "nPop": 3,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "put_super_value",
+    "code": 77,
+    "nPop": 4,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "define_field",
+    "code": 78,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 23,
+    "size": 5
+  },
+  {
+    "name": "set_name",
+    "code": 79,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 23,
+    "size": 5
+  },
+  {
+    "name": "set_name_computed",
+    "code": 80,
+    "nPop": 2,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "set_proto",
+    "code": 81,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "set_home_object",
+    "code": 82,
+    "nPop": 2,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "define_array_el",
+    "code": 83,
+    "nPop": 3,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "append",
+    "code": 84,
+    "nPop": 3,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "copy_data_properties",
+    "code": 85,
+    "nPop": 3,
+    "nPush": 3,
+    "fmt": 5,
+    "size": 2
+  },
+  {
+    "name": "define_method",
+    "code": 86,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 24,
+    "size": 6
+  },
+  {
+    "name": "define_method_computed",
+    "code": 87,
+    "nPop": 3,
+    "nPush": 1,
+    "fmt": 5,
+    "size": 2
+  },
+  {
+    "name": "define_class",
+    "code": 88,
+    "nPop": 2,
+    "nPush": 2,
+    "fmt": 24,
+    "size": 6
+  },
+  {
+    "name": "define_class_computed",
+    "code": 89,
+    "nPop": 3,
+    "nPush": 3,
+    "fmt": 24,
+    "size": 6
+  },
+  {
+    "name": "get_loc",
+    "code": 90,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 16,
+    "size": 3
+  },
+  {
+    "name": "put_loc",
+    "code": 91,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 16,
+    "size": 3
+  },
+  {
+    "name": "set_loc",
+    "code": 92,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 16,
+    "size": 3
+  },
+  {
+    "name": "get_arg",
+    "code": 93,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 17,
+    "size": 3
+  },
+  {
+    "name": "put_arg",
+    "code": 94,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 17,
+    "size": 3
+  },
+  {
+    "name": "set_arg",
+    "code": 95,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 17,
+    "size": 3
+  },
+  {
+    "name": "get_var_ref",
+    "code": 96,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 18,
+    "size": 3
+  },
+  {
+    "name": "put_var_ref",
+    "code": 97,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 18,
+    "size": 3
+  },
+  {
+    "name": "set_var_ref",
+    "code": 98,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 18,
+    "size": 3
+  },
+  {
+    "name": "set_loc_uninitialized",
+    "code": 99,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 16,
+    "size": 3
+  },
+  {
+    "name": "get_loc_check",
+    "code": 100,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 16,
+    "size": 3
+  },
+  {
+    "name": "put_loc_check",
+    "code": 101,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 16,
+    "size": 3
+  },
+  {
+    "name": "put_loc_check_init",
+    "code": 102,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 16,
+    "size": 3
+  },
+  {
+    "name": "get_loc_checkthis",
+    "code": 103,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 16,
+    "size": 3
+  },
+  {
+    "name": "get_var_ref_check",
+    "code": 104,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 18,
+    "size": 3
+  },
+  {
+    "name": "put_var_ref_check",
+    "code": 105,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 18,
+    "size": 3
+  },
+  {
+    "name": "put_var_ref_check_init",
+    "code": 106,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 18,
+    "size": 3
+  },
+  {
+    "name": "close_loc",
+    "code": 107,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 16,
+    "size": 3
+  },
+  {
+    "name": "if_false",
+    "code": 108,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 22,
+    "size": 5
+  },
+  {
+    "name": "if_true",
+    "code": 109,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 22,
+    "size": 5
+  },
+  {
+    "name": "goto",
+    "code": 110,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 22,
+    "size": 5
+  },
+  {
+    "name": "catch",
+    "code": 111,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 22,
+    "size": 5
+  },
+  {
+    "name": "gosub",
+    "code": 112,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 22,
+    "size": 5
+  },
+  {
+    "name": "ret",
+    "code": 113,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "nip_catch",
+    "code": 114,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "to_object",
+    "code": 115,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "to_propkey",
+    "code": 116,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "with_get_var",
+    "code": 117,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 26,
+    "size": 10
+  },
+  {
+    "name": "with_put_var",
+    "code": 118,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 26,
+    "size": 10
+  },
+  {
+    "name": "with_delete_var",
+    "code": 119,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 26,
+    "size": 10
+  },
+  {
+    "name": "with_make_ref",
+    "code": 120,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 26,
+    "size": 10
+  },
+  {
+    "name": "with_get_ref",
+    "code": 121,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 26,
+    "size": 10
+  },
+  {
+    "name": "make_loc_ref",
+    "code": 122,
+    "nPop": 0,
+    "nPush": 2,
+    "fmt": 25,
+    "size": 7
+  },
+  {
+    "name": "make_arg_ref",
+    "code": 123,
+    "nPop": 0,
+    "nPush": 2,
+    "fmt": 25,
+    "size": 7
+  },
+  {
+    "name": "make_var_ref_ref",
+    "code": 124,
+    "nPop": 0,
+    "nPush": 2,
+    "fmt": 25,
+    "size": 7
+  },
+  {
+    "name": "make_var_ref",
+    "code": 125,
+    "nPop": 0,
+    "nPush": 2,
+    "fmt": 23,
+    "size": 5
+  },
+  {
+    "name": "for_in_start",
+    "code": 126,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "for_of_start",
+    "code": 127,
+    "nPop": 1,
+    "nPush": 3,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "for_await_of_start",
+    "code": 128,
+    "nPop": 1,
+    "nPush": 3,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "for_in_next",
+    "code": 129,
+    "nPop": 1,
+    "nPush": 3,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "for_of_next",
+    "code": 130,
+    "nPop": 3,
+    "nPush": 5,
+    "fmt": 5,
+    "size": 2
+  },
+  {
+    "name": "for_await_of_next",
+    "code": 131,
+    "nPop": 3,
+    "nPush": 4,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "iterator_check_object",
+    "code": 132,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "iterator_get_value_done",
+    "code": 133,
+    "nPop": 2,
+    "nPush": 3,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "iterator_close",
+    "code": 134,
+    "nPop": 3,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "iterator_next",
+    "code": 135,
+    "nPop": 4,
+    "nPush": 4,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "iterator_call",
+    "code": 136,
+    "nPop": 4,
+    "nPush": 5,
+    "fmt": 5,
+    "size": 2
+  },
+  {
+    "name": "initial_yield",
+    "code": 137,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "yield",
+    "code": 138,
+    "nPop": 1,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "yield_star",
+    "code": 139,
+    "nPop": 1,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "async_yield_star",
+    "code": 140,
+    "nPop": 1,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "await",
+    "code": 141,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "neg",
+    "code": 142,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "plus",
+    "code": 143,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "dec",
+    "code": 144,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "inc",
+    "code": 145,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "post_dec",
+    "code": 146,
+    "nPop": 1,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "post_inc",
+    "code": 147,
+    "nPop": 1,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "dec_loc",
+    "code": 148,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 7,
+    "size": 2
+  },
+  {
+    "name": "inc_loc",
+    "code": 149,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 7,
+    "size": 2
+  },
+  {
+    "name": "add_loc",
+    "code": 150,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 7,
+    "size": 2
+  },
+  {
+    "name": "not",
+    "code": 151,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "lnot",
+    "code": 152,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "typeof",
+    "code": 153,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "delete",
+    "code": 154,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "delete_var",
+    "code": 155,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 23,
+    "size": 5
+  },
+  {
+    "name": "mul",
+    "code": 156,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "div",
+    "code": 157,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "mod",
+    "code": 158,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "add",
+    "code": 159,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "sub",
+    "code": 160,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "pow",
+    "code": 161,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "shl",
+    "code": 162,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "sar",
+    "code": 163,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "shr",
+    "code": 164,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "lt",
+    "code": 165,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "lte",
+    "code": 166,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "gt",
+    "code": 167,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "gte",
+    "code": 168,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "instanceof",
+    "code": 169,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "in",
+    "code": 170,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "eq",
+    "code": 171,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "neq",
+    "code": 172,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "strict_eq",
+    "code": 173,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "strict_neq",
+    "code": 174,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "and",
+    "code": 175,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "xor",
+    "code": 176,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "or",
+    "code": 177,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "is_undefined_or_null",
+    "code": 178,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "private_in",
+    "code": 179,
+    "nPop": 2,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "push_bigint_i32",
+    "code": 180,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 20,
+    "size": 5
+  },
+  {
+    "name": "nop",
+    "code": 181,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "push_minus1",
+    "code": 182,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 1,
+    "size": 1
+  },
+  {
+    "name": "push_0",
+    "code": 183,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 1,
+    "size": 1
+  },
+  {
+    "name": "push_1",
+    "code": 184,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 1,
+    "size": 1
+  },
+  {
+    "name": "push_2",
+    "code": 185,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 1,
+    "size": 1
+  },
+  {
+    "name": "push_3",
+    "code": 186,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 1,
+    "size": 1
+  },
+  {
+    "name": "push_4",
+    "code": 187,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 1,
+    "size": 1
+  },
+  {
+    "name": "push_5",
+    "code": 188,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 1,
+    "size": 1
+  },
+  {
+    "name": "push_6",
+    "code": 189,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 1,
+    "size": 1
+  },
+  {
+    "name": "push_7",
+    "code": 190,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 1,
+    "size": 1
+  },
+  {
+    "name": "push_i8",
+    "code": 191,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 6,
+    "size": 2
+  },
+  {
+    "name": "push_i16",
+    "code": 192,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 11,
+    "size": 3
+  },
+  {
+    "name": "push_const8",
+    "code": 193,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 8,
+    "size": 2
+  },
+  {
+    "name": "fclosure8",
+    "code": 194,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 8,
+    "size": 2
+  },
+  {
+    "name": "push_empty_string",
+    "code": 195,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "get_loc8",
+    "code": 196,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 7,
+    "size": 2
+  },
+  {
+    "name": "put_loc8",
+    "code": 197,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 7,
+    "size": 2
+  },
+  {
+    "name": "set_loc8",
+    "code": 198,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 7,
+    "size": 2
+  },
+  {
+    "name": "get_loc0",
+    "code": 199,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 2,
+    "size": 1
+  },
+  {
+    "name": "get_loc1",
+    "code": 200,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 2,
+    "size": 1
+  },
+  {
+    "name": "get_loc2",
+    "code": 201,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 2,
+    "size": 1
+  },
+  {
+    "name": "get_loc3",
+    "code": 202,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 2,
+    "size": 1
+  },
+  {
+    "name": "put_loc0",
+    "code": 203,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 2,
+    "size": 1
+  },
+  {
+    "name": "put_loc1",
+    "code": 204,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 2,
+    "size": 1
+  },
+  {
+    "name": "put_loc2",
+    "code": 205,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 2,
+    "size": 1
+  },
+  {
+    "name": "put_loc3",
+    "code": 206,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 2,
+    "size": 1
+  },
+  {
+    "name": "set_loc0",
+    "code": 207,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 2,
+    "size": 1
+  },
+  {
+    "name": "set_loc1",
+    "code": 208,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 2,
+    "size": 1
+  },
+  {
+    "name": "set_loc2",
+    "code": 209,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 2,
+    "size": 1
+  },
+  {
+    "name": "set_loc3",
+    "code": 210,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 2,
+    "size": 1
+  },
+  {
+    "name": "get_arg0",
+    "code": 211,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 3,
+    "size": 1
+  },
+  {
+    "name": "get_arg1",
+    "code": 212,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 3,
+    "size": 1
+  },
+  {
+    "name": "get_arg2",
+    "code": 213,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 3,
+    "size": 1
+  },
+  {
+    "name": "get_arg3",
+    "code": 214,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 3,
+    "size": 1
+  },
+  {
+    "name": "put_arg0",
+    "code": 215,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 3,
+    "size": 1
+  },
+  {
+    "name": "put_arg1",
+    "code": 216,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 3,
+    "size": 1
+  },
+  {
+    "name": "put_arg2",
+    "code": 217,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 3,
+    "size": 1
+  },
+  {
+    "name": "put_arg3",
+    "code": 218,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 3,
+    "size": 1
+  },
+  {
+    "name": "set_arg0",
+    "code": 219,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 3,
+    "size": 1
+  },
+  {
+    "name": "set_arg1",
+    "code": 220,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 3,
+    "size": 1
+  },
+  {
+    "name": "set_arg2",
+    "code": 221,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 3,
+    "size": 1
+  },
+  {
+    "name": "set_arg3",
+    "code": 222,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 3,
+    "size": 1
+  },
+  {
+    "name": "get_var_ref0",
+    "code": 223,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 4,
+    "size": 1
+  },
+  {
+    "name": "get_var_ref1",
+    "code": 224,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 4,
+    "size": 1
+  },
+  {
+    "name": "get_var_ref2",
+    "code": 225,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 4,
+    "size": 1
+  },
+  {
+    "name": "get_var_ref3",
+    "code": 226,
+    "nPop": 0,
+    "nPush": 1,
+    "fmt": 4,
+    "size": 1
+  },
+  {
+    "name": "put_var_ref0",
+    "code": 227,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 4,
+    "size": 1
+  },
+  {
+    "name": "put_var_ref1",
+    "code": 228,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 4,
+    "size": 1
+  },
+  {
+    "name": "put_var_ref2",
+    "code": 229,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 4,
+    "size": 1
+  },
+  {
+    "name": "put_var_ref3",
+    "code": 230,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 4,
+    "size": 1
+  },
+  {
+    "name": "set_var_ref0",
+    "code": 231,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 4,
+    "size": 1
+  },
+  {
+    "name": "set_var_ref1",
+    "code": 232,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 4,
+    "size": 1
+  },
+  {
+    "name": "set_var_ref2",
+    "code": 233,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 4,
+    "size": 1
+  },
+  {
+    "name": "set_var_ref3",
+    "code": 234,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 4,
+    "size": 1
+  },
+  {
+    "name": "get_length",
+    "code": 235,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "if_false8",
+    "code": 236,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 9,
+    "size": 2
+  },
+  {
+    "name": "if_true8",
+    "code": 237,
+    "nPop": 1,
+    "nPush": 0,
+    "fmt": 9,
+    "size": 2
+  },
+  {
+    "name": "goto8",
+    "code": 238,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 9,
+    "size": 2
+  },
+  {
+    "name": "goto16",
+    "code": 239,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 12,
+    "size": 3
+  },
+  {
+    "name": "call0",
+    "code": 240,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 14,
+    "size": 1
+  },
+  {
+    "name": "call1",
+    "code": 241,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 14,
+    "size": 1
+  },
+  {
+    "name": "call2",
+    "code": 242,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 14,
+    "size": 1
+  },
+  {
+    "name": "call3",
+    "code": 243,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 14,
+    "size": 1
+  },
+  {
+    "name": "is_undefined",
+    "code": 244,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "is_null",
+    "code": 245,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "typeof_is_undefined",
+    "code": 246,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "typeof_is_function",
+    "code": 247,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 1
+  },
+  {
+    "name": "get_field_ic",
+    "code": 248,
+    "nPop": 1,
+    "nPush": 1,
+    "fmt": 0,
+    "size": 5
+  },
+  {
+    "name": "get_field2_ic",
+    "code": 249,
+    "nPop": 1,
+    "nPush": 2,
+    "fmt": 0,
+    "size": 5
+  },
+  {
+    "name": "put_field_ic",
+    "code": 250,
+    "nPop": 2,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 5
+  },
+  {
+    "name": "debugger",
+    "code": 251,
+    "nPop": 0,
+    "nPush": 0,
+    "fmt": 0,
+    "size": 1
+  }
+]

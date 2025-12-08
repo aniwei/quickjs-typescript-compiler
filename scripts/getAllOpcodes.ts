@@ -2,7 +2,7 @@ import { QuickJSLib } from './QuickJSLib'
 
 async function main() {
   const opcodes = await QuickJSLib.getAllOpcodes()
-  console.log('QuickJS Opcodes:', opcodes)
+  console.log(JSON.stringify(opcodes, null, 2))
 }
 
 main().catch(e => {

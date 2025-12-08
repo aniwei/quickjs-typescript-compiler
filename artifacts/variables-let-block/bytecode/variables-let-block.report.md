@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/variables-let-block.ts
-**生成时间**: 2025-12-08T08:58:52.216Z
+**生成时间**: 2025-12-08T11:04:54.863Z
 
 ## 大小对比
 

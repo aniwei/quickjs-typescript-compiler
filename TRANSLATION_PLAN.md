@@ -21,7 +21,7 @@
 - [x] ForInStatement
 - [x] DoWhileStatement
 - [x] SwitchStatement
-- [x] Break/Continue (Label support pending)
+- [x] Break/Continue (Label support implemented)
 
 ## Phase 4: Objects & Arrays (✅ Completed)
 - [x] ObjectLiteral
@@ -72,8 +72,15 @@
 - [x] `object-spread.ts` (167 bytes, Perfect Match)
 - [x] `computed-property.ts` (165 bytes, Perfect Match)
 - [x] `function-call.ts` (191 bytes, Perfect Match)
-- [x] `try-catch.ts` (Structurally Correct, minor atom diffs)
-- [x] `for-of.ts` (Structurally Correct, minor atom diffs)
+- [x] `try-catch.ts` (216 bytes, Perfect Match)
+- [x] `if-else.ts` (149 bytes, Perfect Match)
+- [x] `switch-fallthrough.ts` (189 bytes, Perfect Match)
+- [x] `for-of.ts` (151 bytes, Perfect Match)
+- [x] `while.ts` (143 bytes, Perfect Match)
+- [x] `do-while.ts` (144 bytes, Perfect Match)
+- [x] `for-loop.ts` (150 bytes, Perfect Match)
+- [x] `switch-case.ts` (182 bytes, Perfect Match)
+- [x] `loop-break-continue.ts` (190 bytes, Perfect Match)
 - [x] `function-default-params.ts` (Structurally Correct)
 - [ ] `class-basic.ts` (196 bytes vs 201 bytes, -5 bytes diff. Fixed OP_get_var_ref_check encoding)
 - [ ] `primitives.ts` (Minor debug info mismatch)

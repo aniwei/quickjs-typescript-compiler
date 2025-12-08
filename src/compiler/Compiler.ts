@@ -855,6 +855,72 @@ export class Compiler {
     }
   }
 
+  emitPutLoc(fd: FunctionDef, varIdx: number, sourcePos: number = -1) {
+    const localIdx = fd.vars[varIdx].localIdx
+    if (localIdx === -1) {
+      throw new Error(`Cannot emit put_loc for captured variable ${varIdx}`)
+    }
+    if (localIdx === 0) {
+      this.emitOp(fd, Opcode.OP_put_loc0, sourcePos)
+    } else if (localIdx === 1) {
+      this.emitOp(fd, Opcode.OP_put_loc1, sourcePos)
+    } else if (localIdx === 2) {
+      this.emitOp(fd, Opcode.OP_put_loc2, sourcePos)
+    } else if (localIdx === 3) {
+      this.emitOp(fd, Opcode.OP_put_loc3, sourcePos)
+    } else if (localIdx < 256) {
+      this.emitOp(fd, Opcode.OP_put_loc8, sourcePos)
+      this.emitU8(fd, localIdx)
+    } else {
+      this.emitOp(fd, Opcode.OP_put_loc, sourcePos)
+      this.emitU16(fd, localIdx)
+    }
+  }
+
+  emitGetLoc(fd: FunctionDef, varIdx: number) {
+    const localIdx = fd.vars[varIdx].localIdx
+    if (localIdx === -1) {
+      throw new Error(`Cannot emit get_loc for captured variable ${varIdx}`)
+    }
+    if (localIdx === 0) {
+      this.emitOp(fd, Opcode.OP_get_loc0)
+    } else if (localIdx === 1) {
+      this.emitOp(fd, Opcode.OP_get_loc1)
+    } else if (localIdx === 2) {
+      this.emitOp(fd, Opcode.OP_get_loc2)
+    } else if (localIdx === 3) {
+      this.emitOp(fd, Opcode.OP_get_loc3)
+    } else if (localIdx < 256) {
+      this.emitOp(fd, Opcode.OP_get_loc8)
+      this.emitU8(fd, localIdx)
+    } else {
+      this.emitOp(fd, Opcode.OP_get_loc)
+      this.emitU16(fd, localIdx)
+    }
+  }
+
+  emitSetLoc(fd: FunctionDef, varIdx: number) {
+    const localIdx = fd.vars[varIdx].localIdx
+    if (localIdx === -1) {
+      throw new Error(`Cannot emit set_loc for captured variable ${varIdx}`)
+    }
+    if (localIdx === 0) {
+      this.emitOp(fd, Opcode.OP_set_loc0)
+    } else if (localIdx === 1) {
+      this.emitOp(fd, Opcode.OP_set_loc1)
+    } else if (localIdx === 2) {
+      this.emitOp(fd, Opcode.OP_set_loc2)
+    } else if (localIdx === 3) {
+      this.emitOp(fd, Opcode.OP_set_loc3)
+    } else if (localIdx < 256) {
+      this.emitOp(fd, Opcode.OP_set_loc8)
+      this.emitU8(fd, localIdx)
+    } else {
+      this.emitOp(fd, Opcode.OP_set_loc)
+      this.emitU16(fd, localIdx)
+    }
+  }
+
   writeModule(fd: FunctionDef, moduleNameAtom: number): Uint8Array {
     // Reorder atoms to match QuickJS serialization order
     const reorderer = new AtomReorderer(this)
