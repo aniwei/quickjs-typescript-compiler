@@ -326,6 +326,8 @@ export class FunctionVisitor {
     
     scopeManager.exit()
 
+    compiler.computePc2LineInfo(fd)
+
     // Restore context
     this.context.setFuncDef(parentFd)
     

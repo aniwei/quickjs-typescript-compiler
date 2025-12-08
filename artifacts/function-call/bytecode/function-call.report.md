@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/function-call.ts
-**生成时间**: 2025-12-08T14:42:14.914Z
+**生成时间**: 2025-12-08T15:56:10.176Z
 
 ## 大小对比
 
-- TypeScript编译器: 181 字节
+- TypeScript编译器: 191 字节
 - WASM编译器: 191 字节
-- 差异: -10 字节 (-5.24%)
+- 差异: 0 字节 (0.00%)
 
 ## 结构分析
 
@@ -70,7 +70,7 @@
   "functionHeader": {
     "offset": 70,
     "tag": "0xd",
-    "remaining": 111
+    "remaining": 121
   }
 }
 ```
@@ -141,19 +141,18 @@
 
 ## 字节级差异
 
-共发现 11 个字节差异:
+共发现 10 个字节差异:
 
-- 偏移量 0xb3: TS=0x00 vs WASM=0x0a
-- 偏移量 0xb5: TS=EOF vs WASM=0x00
-- 偏移量 0xb6: TS=EOF vs WASM=0x03
-- 偏移量 0xb7: TS=EOF vs WASM=0x16
-- 偏移量 0xb8: TS=EOF vs WASM=0x07
-- 偏移量 0xb9: TS=EOF vs WASM=0x08
-- 偏移量 0xba: TS=EOF vs WASM=0x07
-- 偏移量 0xbb: TS=EOF vs WASM=0x03
-- 偏移量 0xbc: TS=EOF vs WASM=0x07
-- 偏移量 0xbd: TS=EOF vs WASM=0x11
-- 偏移量 0xbe: TS=EOF vs WASM=0x00
+- 偏移量 0x89: TS=0x0d vs WASM=0x1a
+- 偏移量 0x8b: TS=0x03 vs WASM=0x06
+- 偏移量 0x8d: TS=0x70 vs WASM=0x1f
+- 偏移量 0x8f: TS=0x07 vs WASM=0x0e
+- 偏移量 0x91: TS=0x05 vs WASM=0x0a
+- 偏移量 0x93: TS=0x7f vs WASM=0x01
+- 偏移量 0xb7: TS=0x0b vs WASM=0x16
+- 偏移量 0xb9: TS=0x04 vs WASM=0x08
+- 偏移量 0xbb: TS=0x7e vs WASM=0x03
+- 偏移量 0xbd: TS=0x77 vs WASM=0x11
 
 ## 十六进制转储对比
 
@@ -167,10 +166,10 @@
 00000050: 06 01 a4 01 00 00 00 03 02 01 1f 00 d4 01 00 01 |................|
 00000060: ca 03 01 09 08 ec 05 c2 00 e3 29 df b8 b9 f2 e4 |..........).....|
 00000070: 39 e6 00 00 00 43 e7 00 00 00 68 01 00 24 01 00 |9....C....h..$..|
-00000080: 0e 06 2f c8 03 0e 00 00 28 1a 11 06 0d 1f 1b 0e |../.....(.......|
-00000090: 1b 0a 11 01 00 0c 43 06 01 d4 01 02 00 02 02 00 |......C.........|
+00000080: 0e 06 2f c8 03 0e 00 00 28 0d 11 03 0d 70 1b 07 |../.....(....p..|
+00000090: 1b 05 11 7f 00 0c 43 06 01 d4 01 02 00 02 02 00 |......C.........|
 000000a0: 00 04 02 d0 03 00 01 00 d2 03 00 01 00 d3 d4 9f |................|
-000000b0: 28 c8 03 00 00                                  |(....|
+000000b0: 28 c8 03 0a 00 00 03 0b 07 04 07 7e 07 77 00    |(..........~.w.|
 ```
 
 ### WASM

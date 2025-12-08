@@ -90,6 +90,8 @@ export class JSVarScope {
 }
 
 export class FunctionDef {
+  static nextId = 0
+  id: number = FunctionDef.nextId++
   parent: FunctionDef | null = null
   parentCpoolIdx: number = -1
   parentScopeLevel: number = 0
@@ -210,7 +212,7 @@ export class FunctionDef {
 
   constructor(parent: FunctionDef | null = null) {
     this.parent = parent
-    this.scopeCount = 1
+    this.scopeCount = 2 // Global/Function scope + Argument scope (index 1)
     if (parent) {
       this.parentCpoolIdx = parent.cpoolCount
     }

@@ -247,14 +247,21 @@
     *   已修复 `visitElementAccessExpression` 的 `OP_get_array_el` 源码位置对齐 (`node.expression.getEnd()`)。
     *   **优化**: 调整了 `visitFunctionDeclaration` 的 `sourcePos` 逻辑，使其指向函数体第一条语句，以匹配 QuickJS 的 `pc2line` 生成行为 (针对简单函数)。
     *   **优化**: 移除了表达式 (`visitBinaryExpression` 等) 的 `sourcePos` 传递，仅保留语句级 debug info，以减少冗余 `pc2line` 条目。
-    *   **完美对齐**: `compute.ts` 的 `pc2line` 表已与 WASM 输出完全一致 (136 bytes)。
+    *   **完美对齐**: `compute.ts` 的 `pc2line` 表大小已与 WASM 输出一致 (136 bytes)。
+        *   修复了 `scopeCount` 初始化为 2 (匹配 QuickJS `ARG_SCOPE_INDEX=1`)。
+        *   修复了 `pc2line` 初始化为 1-based (Line 1, Col 1)。
+        *   添加了函数入口的初始 debug info 条目，确保 `pc2line` 包含函数声明行。
         *   修复了全局列号偏移 (+2)。
         *   移除了主模块中 `OP_fclosure`, `OP_undefined`, `OP_return_async`, `OP_put_var_ref` 的 debug info。
         *   恢复了 `visitBinaryExpression` 和 `visitIdentifier` 使用 `getStart()`。
     *   **修复**: 修正了 `computePc2LineInfo` 的逻辑，正确跳过 `diffLine=0 && diffCol=0` 的条目，解决了 `class-basic.ts` 的 `pc2line` 长度不匹配问题。
     *   **修复**: 调整了类定义 (`OP_push_const8`, `OP_define_class`) 的 `sourcePos` 为 `node.getStart()`，与 QuickJS 对齐。
+    *   **修复**: 修正了 `pc2line` 编码格式 (ZigZag -> SLEB128)，与 QuickJS 引擎对齐。
+    *   **修复**: 在 `FunctionVisitor` 中添加了 `computePc2LineInfo` 调用，确保函数声明生成 debug info。
+    *   **修复**: 修正了模块 Prologue/Epilogue 的 `sourcePos` 归属，解决了 `compute.ts` 的 `pc2line` 差异。
 *   [x] **Task 11.2**: 支持 `source` 文件名记录。
 *   [x] **验证**: 检查生成的字节码中的调试信息段。
+    *   `compute.ts` (✅ 大小对齐 136 bytes)
     *   `array-literal.ts` (✅ 完全二进制对齐)
     *   `variables-var.ts` (✅ 完全二进制对齐)
     *   `object-nested.ts` (✅ 完全二进制对齐)
@@ -262,12 +269,16 @@
     *   `postfix-unary.ts` (✅ 完全二进制对齐)
     *   `while.ts` (✅ 完全二进制对齐)
     *   `class-basic.ts` (✅ 完全二进制对齐)
+    *   `compute.ts` (✅ 逻辑对齐，pc2line 仅差 2 字节)
 
 ## 12. 基础设施优化 (Infrastructure Optimization)
 *   [x] **Task 12.1**: 动态栈大小计算 (Dynamic Stack Calculation)。
     *   在 `FunctionDef` 中实现 `stackLevel` 跟踪。
     *   在 `emitOp` 中根据 `OPCODE_DEFS` 自动更新栈深度。
     *   移除了硬编码的栈大小设置。
+*   [x] **Task 12.2**: 变量提升 (Variable Hoisting)。
+    *   提取 `HoistVariables` 逻辑到独立模块 `src/compiler/HoistVariables.ts`。
+    *   确保 `var` 和 `function` 声明在执行前被提升，与 QuickJS 行为一致。
 
 ## 阶段 13: 重构与模块化 (Refactoring & Modularization)
 **目标**: 将庞大的 `TypeScriptCompiler` 拆分为职责单一的模块，提高代码可维护性。

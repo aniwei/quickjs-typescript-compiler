@@ -10,7 +10,6 @@ export interface CompilerContext {
   labelManager: LabelManager
   funcDef: FunctionDef | null
   currentNode: ts.Node | null
-  moduleVarIdx: number
   isTerminated: boolean
   
   visit(node: ts.Node): void

@@ -264,7 +264,7 @@ export class Compiler {
 
     if (this.sourceFile) {
       const pos = ts.getLineAndCharacterOfPosition(this.sourceFile, sourcePos)
-      console.log(`[DEBUG] addPc2LineInfo: pc=${pc}, line=${pos.line + 1}, col=${pos.character + 1}`)
+    // console.log(`[DEBUG] addPc2LineInfo: pc=${pc}, line=${pos.line + 1}, col=${pos.character + 1}`)
     }
   }
 
@@ -320,12 +320,12 @@ export class Compiler {
                     PC2Line.PC2LINE_OP_FIRST
         
         fd.pc2line.putByte(op)
-        fd.pc2line.putULEB128((diffCol << 1) ^ (diffCol >> 31))
+        fd.pc2line.putSLEB128(diffCol)
       } else {
         fd.pc2line.putByte(0)
         fd.pc2line.putULEB128(diffPc)
-        fd.pc2line.putULEB128((diffLine << 1) ^ (diffLine >> 31))
-        fd.pc2line.putULEB128((diffCol << 1) ^ (diffCol >> 31))
+        fd.pc2line.putSLEB128(diffLine)
+        fd.pc2line.putSLEB128(diffCol)
       }
       
       lastPc = pc
@@ -335,18 +335,14 @@ export class Compiler {
   }
 
   addAtom(s: string): number {
-    if (s === 'a') console.trace(`addAtom: ${s}`)
-    else console.log(`addAtom: ${s}`)
     // Check built-in atoms
     if (this.builtInAtoms.has(s)) {
       return this.builtInAtoms.get(s)!
     }
 
     const builtInName = 'JS_ATOM_' + s
-    // @ts-ignore
-    if (JSAtom[builtInName] && s !== 'undefined') {
-      // @ts-ignore
-      return JSAtom[builtInName]
+    if (JSAtom[builtInName as any] && s !== 'undefined') {
+      return JSAtom[builtInName as any] as JSAtom
     }
 
     if (this.atomMap.has(s)) {

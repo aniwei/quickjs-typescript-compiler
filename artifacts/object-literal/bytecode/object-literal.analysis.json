@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-08T14:42:14.950Z",
+  "timestamp": "2025-12-08T15:56:10.245Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/object-literal.ts",
   "compilation": {
     "typescript": {
@@ -149,13 +149,13 @@
         "0x5d",
         "0x00",
         "0x1b",
-        "0x0e",
-        "0x1b",
-        "0x0a",
-        "0x11",
-        "0x06",
-        "0x1b",
         "0x07",
+        "0x1b",
+        "0x05",
+        "0x11",
+        "0x03",
+        "0x1b",
+        "0x7c",
         "0x00"
       ],
       "hexDump": [
@@ -168,7 +168,7 @@
         "00000060: 02 29 0b b8 4e e6 00 00 00 b9 4e e7 00 00 00 e3 |.)..N.....N.....|",
         "00000070: 39 e8 00 00 00 43 e9 00 00 00 68 00 00 42 e6 00 |9....C....h..B..|",
         "00000080: 00 00 24 01 00 0e 06 2f c8 03 0c 00 00 5d 00 1b |..$..../.....]..|",
-        "00000090: 0e 1b 0a 11 06 1b 07 00                         |........|"
+        "00000090: 07 1b 05 11 03 1b 7c 00                         |......|.|"
       ],
       "structure": {
         "source": "TypeScript",
@@ -461,7 +461,40 @@
       }
     }
   },
-  "differences": [],
+  "differences": [
+    {
+      "offset": 144,
+      "offsetHex": "0x90",
+      "typescript": "0x07",
+      "wasm": "0x0e",
+      "typescriptDecimal": 7,
+      "wasmDecimal": 14
+    },
+    {
+      "offset": 146,
+      "offsetHex": "0x92",
+      "typescript": "0x05",
+      "wasm": "0x0a",
+      "typescriptDecimal": 5,
+      "wasmDecimal": 10
+    },
+    {
+      "offset": 148,
+      "offsetHex": "0x94",
+      "typescript": "0x03",
+      "wasm": "0x06",
+      "typescriptDecimal": 3,
+      "wasmDecimal": 6
+    },
+    {
+      "offset": 150,
+      "offsetHex": "0x96",
+      "typescript": "0x7c",
+      "wasm": "0x07",
+      "typescriptDecimal": 124,
+      "wasmDecimal": 7
+    }
+  ],
   "sizeDifference": {
     "absolute": 0,
     "percentage": "0.00"

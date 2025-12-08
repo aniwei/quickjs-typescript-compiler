@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/es2020_bigint.ts
-**生成时间**: 2025-12-08T14:42:14.888Z
+**生成时间**: 2025-12-08T15:56:10.136Z
 
 ## 大小对比
 
@@ -173,29 +173,29 @@
 
 ## 字节级差异
 
-共发现 37 个字节差异:
+共发现 39 个字节差异:
 
 - 偏移量 0xcd: TS=0x2c vs WASM=0x2a
 - 偏移量 0xd0: TS=0x16 vs WASM=0x54
+- 偏移量 0xd1: TS=0x0a vs WASM=0x14
 - 偏移量 0xd2: TS=0x21 vs WASM=0x11
 - 偏移量 0xd3: TS=0x00 vs WASM=0x08
 - 偏移量 0xd4: TS=0x21 vs WASM=0x11
 - 偏移量 0xd5: TS=0x00 vs WASM=0x03
 - 偏移量 0xd6: TS=0x11 vs WASM=0x0d
-- 偏移量 0xd7: TS=0x08 vs WASM=0x03
-- 偏移量 0xd9: TS=0x03 vs WASM=0x08
+- 偏移量 0xd7: TS=0x04 vs WASM=0x03
+- 偏移量 0xd9: TS=0x7e vs WASM=0x08
 - 偏移量 0xda: TS=0x0d vs WASM=0x11
+- 偏移量 0xdb: TS=0x7e vs WASM=0x03
 - 偏移量 0xdc: TS=0x11 vs WASM=0x0d
-- 偏移量 0xdd: TS=0x08 vs WASM=0x01
-- 偏移量 0xdf: TS=0x03 vs WASM=0x01
+- 偏移量 0xdd: TS=0x04 vs WASM=0x01
+- 偏移量 0xdf: TS=0x7e vs WASM=0x01
 - 偏移量 0xe0: TS=0x0d vs WASM=0x17
-- 偏移量 0xe1: TS=0x01 vs WASM=0x13
+- 偏移量 0xe1: TS=0x7f vs WASM=0x13
 - 偏移量 0xe2: TS=0x26 vs WASM=0x1b
-- 偏移量 0xe3: TS=0x15 vs WASM=0x0e
-- 偏移量 0xe5: TS=0x0e vs WASM=0x0a
-- 偏移量 0xe6: TS=0x1b vs WASM=0x11
-- 偏移量 0xe7: TS=0x0a vs WASM=0x01
-- ... (显示前20个差异，总共37个)
+- 偏移量 0xe3: TS=0x75 vs WASM=0x0e
+- 偏移量 0xe5: TS=0x07 vs WASM=0x0a
+- ... (显示前20个差异，总共39个)
 
 ## 十六进制转储对比
 
@@ -214,9 +214,9 @@
 000000a0: 68 02 00 24 01 00 0e 39 ea 00 00 00 43 eb 00 00 |h..$...9....C...|
 000000b0: 00 68 03 00 24 01 00 0e 39 ea 00 00 00 43 eb 00 |.h..$...9....C..|
 000000c0: 00 00 68 04 00 24 01 00 0e 06 2f c8 03 2c 00 00 |..h..$..../..,..|
-000000d0: 16 14 21 00 21 00 11 08 11 03 0d 03 11 08 11 03 |..!.!...........|
-000000e0: 0d 01 26 15 1b 0e 1b 0a 11 01 17 15 1b 0e 1b 0a |..&.............|
-000000f0: 11 01 17 15 1b 0e 1b 0a 11 01 00                |...........|
+000000d0: 16 0a 21 00 21 00 11 04 11 7e 0d 7e 11 04 11 7e |..!.!....~.~...~|
+000000e0: 0d 7f 26 75 1b 07 1b 05 11 7f 17 75 1b 07 1b 05 |..&u.......u....|
+000000f0: 11 7f 17 75 1b 07 1b 05 11 7f 00                |...u.......|
 ```
 
 ### WASM

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-08T14:42:14.855Z",
+  "timestamp": "2025-12-08T15:56:10.106Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/conditional-operator.ts",
   "compilation": {
     "typescript": {
@@ -148,15 +148,15 @@
         "0x00",
         "0x00",
         "0x2f",
-        "0x0e",
+        "0x07",
         "0x1b",
-        "0x0a",
+        "0x05",
         "0x1b",
-        "0x08",
+        "0x04",
         "0x1b",
-        "0x08",
+        "0x04",
         "0x4d",
-        "0x11",
+        "0x77",
         "0x00"
       ],
       "hexDump": [
@@ -168,8 +168,8 @@
         "00000050: 06 01 a4 01 00 00 00 04 00 00 2d 00 08 ec 02 29 |..........-....)|",
         "00000060: 39 e5 00 00 00 43 e6 00 00 00 39 a7 00 00 00 43 |9....C....9....C|",
         "00000070: e7 00 00 00 24 00 00 6c 00 00 00 06 b8 6e 00 00 |....$..l.....n..|",
-        "00000080: 00 01 b9 24 01 00 0e 06 2f c8 03 0c 00 00 2f 0e |...$..../...../.|",
-        "00000090: 1b 0a 1b 08 1b 08 4d 11 00                      |......M..|"
+        "00000080: 00 01 b9 24 01 00 0e 06 2f c8 03 0c 00 00 2f 07 |...$..../...../.|",
+        "00000090: 1b 05 1b 04 1b 04 4d 77 00                      |......Mw.|"
       ],
       "structure": {
         "source": "TypeScript",
@@ -613,9 +613,9 @@
     {
       "offset": 143,
       "offsetHex": "0x8f",
-      "typescript": "0x0e",
+      "typescript": "0x07",
       "wasm": "0x08",
-      "typescriptDecimal": 14,
+      "typescriptDecimal": 7,
       "wasmDecimal": 8
     },
     {
@@ -629,9 +629,9 @@
     {
       "offset": 145,
       "offsetHex": "0x91",
-      "typescript": "0x0a",
+      "typescript": "0x05",
       "wasm": "0x11",
-      "typescriptDecimal": 10,
+      "typescriptDecimal": 5,
       "wasmDecimal": 17
     },
     {
@@ -645,9 +645,9 @@
     {
       "offset": 147,
       "offsetHex": "0x93",
-      "typescript": "0x08",
+      "typescript": "0x04",
       "wasm": "EOF",
-      "typescriptDecimal": 8
+      "typescriptDecimal": 4
     },
     {
       "offset": 148,
@@ -659,9 +659,9 @@
     {
       "offset": 149,
       "offsetHex": "0x95",
-      "typescript": "0x08",
+      "typescript": "0x04",
       "wasm": "EOF",
-      "typescriptDecimal": 8
+      "typescriptDecimal": 4
     },
     {
       "offset": 150,
@@ -673,9 +673,9 @@
     {
       "offset": 151,
       "offsetHex": "0x97",
-      "typescript": "0x11",
+      "typescript": "0x77",
       "wasm": "EOF",
-      "typescriptDecimal": 17
+      "typescriptDecimal": 119
     },
     {
       "offset": 152,

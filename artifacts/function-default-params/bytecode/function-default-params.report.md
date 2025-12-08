@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/function-default-params.ts
-**生成时间**: 2025-12-08T14:42:14.918Z
+**生成时间**: 2025-12-08T15:56:10.191Z
 
 ## 大小对比
 
-- TypeScript编译器: 221 字节
+- TypeScript编译器: 231 字节
 - WASM编译器: 231 字节
-- 差异: -10 字节 (-4.33%)
+- 差异: 0 字节 (0.00%)
 
 ## 结构分析
 
@@ -78,7 +78,7 @@
   "functionHeader": {
     "offset": 95,
     "tag": "0xd",
-    "remaining": 126
+    "remaining": 136
   }
 }
 ```
@@ -157,19 +157,15 @@
 
 ## 字节级差异
 
-共发现 11 个字节差异:
+共发现 7 个字节差异:
 
-- 偏移量 0xdb: TS=0x00 vs WASM=0x0a
-- 偏移量 0xdd: TS=EOF vs WASM=0x00
-- 偏移量 0xde: TS=EOF vs WASM=0x53
-- 偏移量 0xdf: TS=EOF vs WASM=0x08
-- 偏移量 0xe0: TS=EOF vs WASM=0x1b
-- 偏移量 0xe1: TS=EOF vs WASM=0x0e
-- 偏移量 0xe2: TS=EOF vs WASM=0x34
-- 偏移量 0xe3: TS=EOF vs WASM=0x1c
-- 偏移量 0xe4: TS=EOF vs WASM=0x07
-- 偏移量 0xe5: TS=EOF vs WASM=0x13
-- 偏移量 0xe6: TS=EOF vs WASM=0x00
+- 偏移量 0x95: TS=0x05 vs WASM=0x0a
+- 偏移量 0x97: TS=0x7b vs WASM=0x09
+- 偏移量 0x99: TS=0x05 vs WASM=0x0a
+- 偏移量 0xdf: TS=0x04 vs WASM=0x08
+- 偏移量 0xe1: TS=0x07 vs WASM=0x0e
+- 偏移量 0xe3: TS=0x0e vs WASM=0x1c
+- 偏移量 0xe5: TS=0x76 vs WASM=0x13
 
 ## 十六进制转储对比
 
@@ -184,11 +180,12 @@
 00000060: c8 03 00 00 00 00 00 0c 20 06 01 a4 01 00 00 00 |........ .......|
 00000070: 02 01 01 14 00 ca 03 00 01 08 ec 05 c2 00 e3 29 |...............)|
 00000080: df f0 0e df 04 e6 00 00 00 f1 0e 06 2f c8 03 0a |............/...|
-00000090: 00 00 28 00 07 0a 0d 09 20 0a 00 0c 41 06 01 ca |..(..... ...A...|
+00000090: 00 00 28 00 07 05 0d 7b 20 05 00 0c 41 06 01 ca |..(....{ ...A...|
 000000a0: 03 01 01 00 04 00 00 24 02 70 00 01 00 70 01 ff |.......$.p...p..|
 000000b0: ff ff ff 0f 20 63 00 00 d3 11 f4 ec 08 0e 04 e7 |.... c..........|
 000000c0: 00 00 00 db cb 39 e8 00 00 00 43 e9 00 00 00 04 |.....9....C.....|
-000000d0: ea 00 00 00 d3 24 02 00 29 c8 03 00 00          |.....$..)....|
+000000d0: ea 00 00 00 d3 24 02 00 29 c8 03 0a 00 00 53 04 |.....$..).....S.|
+000000e0: 1b 07 34 0e 07 76 00                            |..4..v.|
 ```
 
 ### WASM
