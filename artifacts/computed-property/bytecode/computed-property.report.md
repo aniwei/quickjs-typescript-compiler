@@ -1,7 +1,7 @@
 # 字节码分析报告
 
-**输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/computed-property.ts
-**生成时间**: 2025-12-09T08:27:11.633Z
+**输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/computed-property.ts
+**生成时间**: 2025-12-09T08:59:51.451Z
 
 ## 大小对比
 
@@ -141,9 +141,8 @@
 
 ## 字节级差异
 
-共发现 32 个字节差异:
+共发现 31 个字节差异:
 
-- 偏移量 0x52: TS=0x00 vs WASM=0x20
 - 偏移量 0x69: TS=0x26 vs WASM=0x02
 - 偏移量 0x6a: TS=0x04 vs WASM=0x29
 - 偏移量 0x6b: TS=0xe7 vs WASM=0x04
@@ -163,7 +162,8 @@
 - 偏移量 0x7e: TS=0x43 vs WASM=0x00
 - 偏移量 0x7f: TS=0xe9 vs WASM=0x43
 - 偏移量 0x80: TS=0x00 vs WASM=0xe9
-- ... (显示前20个差异，总共32个)
+- 偏移量 0x83: TS=0x68 vs WASM=0x00
+- ... (显示前20个差异，总共31个)
 
 ## 十六进制转储对比
 
@@ -174,7 +174,7 @@
 00000020: 6f 6d 70 75 74 65 64 2d 70 72 6f 70 65 72 74 79 |omputed-property|
 00000030: 2e 6a 73 06 6b 65 79 06 6f 62 6a 02 61 0e 63 6f |.js.key.obj.a.co|
 00000040: 6e 73 6f 6c 65 06 6c 6f 67 0d c8 03 00 00 00 00 |nsole.log.......|
-00000050: 00 0c 00 06 01 a4 01 00 00 00 04 02 00 2a 00 ca |.............*..|
+00000050: 00 0c 20 06 01 a4 01 00 00 00 04 02 00 2a 00 ca |.. ..........*..|
 00000060: 03 00 0d cc 03 01 0d 08 ec 26 04 e7 00 00 00 e3 |.........&......|
 00000070: 0b 68 00 00 74 b8 53 0e e4 39 e8 00 00 00 43 e9 |.h..t.S..9....C.|
 00000080: 00 00 00 68 01 00 68 00 00 48 24 01 00 0e 29 06 |...h..h..H$...).|

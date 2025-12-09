@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/for-loop.ts
-**生成时间**: 2025-12-09T07:55:06.994Z
+**生成时间**: 2025-12-09T08:59:51.492Z
 
 ## 大小对比
 
@@ -109,29 +109,29 @@
 
 ## 字节级差异
 
-共发现 36 个字节差异:
+共发现 59 个字节差异:
 
 - 偏移量 0x4c: TS=0x29 vs WASM=0x2d
-- 偏移量 0x62: TS=0x18 vs WASM=0x1c
-- 偏移量 0x74: TS=0xc7 vs WASM=0x64
-- 偏移量 0x75: TS=0x93 vs WASM=0x00
-- 偏移量 0x76: TS=0xcb vs WASM=0x00
-- 偏移量 0x77: TS=0x0e vs WASM=0x93
-- 偏移量 0x78: TS=0xee vs WASM=0x65
-- 偏移量 0x79: TS=0xe3 vs WASM=0x00
-- 偏移量 0x7a: TS=0x06 vs WASM=0x00
-- 偏移量 0x7b: TS=0x2f vs WASM=0x0e
-- 偏移量 0x7c: TS=0xc8 vs WASM=0xee
-- 偏移量 0x7d: TS=0x03 vs WASM=0xdf
-- 偏移量 0x7e: TS=0x12 vs WASM=0x06
-- 偏移量 0x7f: TS=0x00 vs WASM=0x2f
-- 偏移量 0x80: TS=0x00 vs WASM=0xc8
-- 偏移量 0x81: TS=0x2f vs WASM=0x03
-- 偏移量 0x82: TS=0x20 vs WASM=0x12
-- 偏移量 0x83: TS=0x16 vs WASM=0x00
-- 偏移量 0x84: TS=0x04 vs WASM=0x00
-- 偏移量 0x85: TS=0x12 vs WASM=0x2f
-- ... (显示前20个差异，总共36个)
+- 偏移量 0x55: TS=0x25 vs WASM=0x02
+- 偏移量 0x56: TS=0x63 vs WASM=0x29
+- 偏移量 0x57: TS=0x00 vs WASM=0x63
+- 偏移量 0x59: TS=0xb7 vs WASM=0x00
+- 偏移量 0x5a: TS=0xcb vs WASM=0xb7
+- 偏移量 0x5b: TS=0x64 vs WASM=0xcb
+- 偏移量 0x5c: TS=0x00 vs WASM=0x64
+- 偏移量 0x5e: TS=0xba vs WASM=0x00
+- 偏移量 0x5f: TS=0xa5 vs WASM=0xba
+- 偏移量 0x60: TS=0xec vs WASM=0xa5
+- 偏移量 0x61: TS=0x18 vs WASM=0xec
+- 偏移量 0x62: TS=0x39 vs WASM=0x1c
+- 偏移量 0x63: TS=0xe6 vs WASM=0x39
+- 偏移量 0x64: TS=0x00 vs WASM=0xe6
+- 偏移量 0x67: TS=0x43 vs WASM=0x00
+- 偏移量 0x68: TS=0xe7 vs WASM=0x43
+- 偏移量 0x69: TS=0x00 vs WASM=0xe7
+- 偏移量 0x6c: TS=0x64 vs WASM=0x00
+- 偏移量 0x6d: TS=0x00 vs WASM=0x64
+- ... (显示前20个差异，总共59个)
 
 ## 十六进制转储对比
 
@@ -142,10 +142,10 @@
 00000020: 6f 72 2d 6c 6f 6f 70 2e 6a 73 02 69 0e 63 6f 6e |or-loop.js.i.con|
 00000030: 73 6f 6c 65 06 6c 6f 67 0d c8 03 00 00 00 00 00 |sole.log........|
 00000040: 0c 20 06 01 a4 01 00 01 00 03 00 00 29 01 ca 03 |. ..........)...|
-00000050: 02 00 20 08 ec 02 29 63 00 00 b7 cb 64 00 00 ba |.. ...)c....d...|
-00000060: a5 ec 18 39 e6 00 00 00 43 e7 00 00 00 64 00 00 |...9....C....d..|
-00000070: 24 01 00 0e c7 93 cb 0e ee e3 06 2f c8 03 12 00 |$........../....|
-00000080: 00 2f 20 16 04 12 1b 1b 0e 1b 0a 11 01 15 10 07 |./ .............|
+00000050: 02 00 20 08 ec 25 63 00 00 b7 cb 64 00 00 ba a5 |.. ..%c....d....|
+00000060: ec 18 39 e6 00 00 00 43 e7 00 00 00 64 00 00 24 |..9....C....d..$|
+00000070: 01 00 0e c7 93 cb 0e ee e3 29 06 2f c8 03 12 00 |.........)./....|
+00000080: 00 2a 20 16 04 12 1b 1b 0e 1b 0a 11 01 15 10 07 |.* .............|
 00000090: 02 00                                           |..|
 ```
 

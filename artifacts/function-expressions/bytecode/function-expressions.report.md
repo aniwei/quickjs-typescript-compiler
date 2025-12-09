@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/function-expressions.ts
-**生成时间**: 2025-12-09T07:55:07.010Z
+**生成时间**: 2025-12-09T08:59:51.507Z
 
 ## 大小对比
 
@@ -157,29 +157,29 @@
 
 ## 字节级差异
 
-共发现 116 个字节差异:
+共发现 143 个字节差异:
 
 - 偏移量 0x66: TS=0x3f vs WASM=0x3a
-- 偏移量 0x92: TS=0x4f vs WASM=0xe4
-- 偏移量 0x93: TS=0xe5 vs WASM=0x39
-- 偏移量 0x94: TS=0x00 vs WASM=0xe6
-- 偏移量 0x97: TS=0xe4 vs WASM=0x00
-- 偏移量 0x98: TS=0x39 vs WASM=0x43
-- 偏移量 0x99: TS=0xe6 vs WASM=0xe7
-- 偏移量 0x9d: TS=0x43 vs WASM=0x68
-- 偏移量 0x9e: TS=0xe7 vs WASM=0x01
-- 偏移量 0xa0: TS=0x00 vs WASM=0xbf
-- 偏移量 0xa1: TS=0x00 vs WASM=0x0a
-- 偏移量 0xa2: TS=0x68 vs WASM=0xb9
-- 偏移量 0xa3: TS=0x01 vs WASM=0xf2
-- 偏移量 0xa4: TS=0x00 vs WASM=0x24
-- 偏移量 0xa5: TS=0xbf vs WASM=0x01
-- 偏移量 0xa6: TS=0x0a vs WASM=0x00
-- 偏移量 0xa7: TS=0xb9 vs WASM=0x0e
-- 偏移量 0xa8: TS=0xf2 vs WASM=0x06
-- 偏移量 0xa9: TS=0x24 vs WASM=0x2f
-- 偏移量 0xaa: TS=0x01 vs WASM=0xc8
-- ... (显示前20个差异，总共116个)
+- 偏移量 0x72: TS=0x3b vs WASM=0x02
+- 偏移量 0x73: TS=0xc2 vs WASM=0x29
+- 偏移量 0x74: TS=0x00 vs WASM=0xc2
+- 偏移量 0x75: TS=0x4f vs WASM=0x00
+- 偏移量 0x76: TS=0x6a vs WASM=0x4f
+- 偏移量 0x77: TS=0x00 vs WASM=0x6a
+- 偏移量 0x7a: TS=0xe3 vs WASM=0x00
+- 偏移量 0x7b: TS=0x39 vs WASM=0xe3
+- 偏移量 0x7c: TS=0xe6 vs WASM=0x39
+- 偏移量 0x7d: TS=0x00 vs WASM=0xe6
+- 偏移量 0x80: TS=0x43 vs WASM=0x00
+- 偏移量 0x81: TS=0xe7 vs WASM=0x43
+- 偏移量 0x82: TS=0x00 vs WASM=0xe7
+- 偏移量 0x85: TS=0x68 vs WASM=0x00
+- 偏移量 0x86: TS=0x00 vs WASM=0x68
+- 偏移量 0x88: TS=0xba vs WASM=0x00
+- 偏移量 0x89: TS=0xbb vs WASM=0xba
+- 偏移量 0x8a: TS=0xf2 vs WASM=0xbb
+- 偏移量 0x8b: TS=0x24 vs WASM=0xf2
+- ... (显示前20个差异，总共143个)
 
 ## 十六进制转储对比
 
@@ -192,11 +192,11 @@
 00000040: 6c 65 06 6c 6f 67 02 61 02 62 0e 73 75 62 4e 61 |le.log.a.b.subNa|
 00000050: 6d 65 0d c8 03 00 00 00 00 00 0c 20 06 01 a4 01 |me......... ....|
 00000060: 00 00 00 05 02 02 3f 00 d4 01 00 0d ca 03 01 0d |......?.........|
-00000070: 08 ec 02 29 c2 00 4f 6a 00 00 00 e3 39 e6 00 00 |...)..Oj....9...|
-00000080: 00 43 e7 00 00 00 68 00 00 ba bb f2 24 01 00 0e |.C....h.....$...|
-00000090: c2 01 4f e5 00 00 00 e4 39 e6 00 00 00 43 e7 00 |..O.....9....C..|
-000000a0: 00 00 68 01 00 bf 0a b9 f2 24 01 00 0e 06 2f c8 |..h......$..../.|
-000000b0: 03 18 00 00 41 00 1b 0e 1b 0a 1b 06 07 07 00 0c |....A...........|
+00000070: 08 ec 3b c2 00 4f 6a 00 00 00 e3 39 e6 00 00 00 |..;..Oj....9....|
+00000080: 43 e7 00 00 00 68 00 00 ba bb f2 24 01 00 0e c2 |C....h.....$....|
+00000090: 01 4f e5 00 00 00 e4 39 e6 00 00 00 43 e7 00 00 |.O.....9....C...|
+000000a0: 00 68 01 00 bf 0a b9 f2 24 01 00 0e 29 06 2f c8 |.h......$...)./.|
+000000b0: 03 18 00 00 3c 00 1b 0e 1b 0a 1b 06 07 07 00 0c |....<...........|
 000000c0: 08 15 1b 0e 1b 0a 20 06 07 07 00 0c 43 06 01 00 |...... .....C...|
 000000d0: 02 00 02 02 00 00 04 02 d0 03 00 01 00 d2 03 00 |................|
 000000e0: 01 00 d3 d4 9f 28 c8 03 00 00 0c 43 06 01 d4 03 |.....(.....C....|

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-09T07:55:06.959Z",
+  "timestamp": "2025-12-09T08:59:51.458Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/console-log.ts",
   "compilation": {
     "typescript": {
@@ -98,8 +98,7 @@
         "0x00",
         "0x08",
         "0xec",
-        "0x02",
-        "0x29",
+        "0x15",
         "0x39",
         "0xe5",
         "0x00",
@@ -119,6 +118,7 @@
         "0x01",
         "0x00",
         "0x0e",
+        "0x29",
         "0x06",
         "0x2f",
         "0xc8",
@@ -126,7 +126,7 @@
         "0x06",
         "0x00",
         "0x00",
-        "0x2f",
+        "0x2a",
         "0x0e",
         "0x34",
         "0x08",
@@ -138,9 +138,9 @@
         "00000020: 6f 6e 73 6f 6c 65 2d 6c 6f 67 2e 6a 73 0e 63 6f |onsole-log.js.co|",
         "00000030: 6e 73 6f 6c 65 06 6c 6f 67 16 48 65 6c 6c 6f 20 |nsole.log.Hello |",
         "00000040: 57 6f 72 6c 64 0d c8 03 00 00 00 00 00 0c 20 06 |World......... .|",
-        "00000050: 01 a4 01 00 00 00 03 00 00 19 00 08 ec 02 29 39 |..............)9|",
-        "00000060: e5 00 00 00 43 e6 00 00 00 04 e7 00 00 00 24 01 |....C.........$.|",
-        "00000070: 00 0e 06 2f c8 03 06 00 00 2f 0e 34 08 00       |.../...../.4..|"
+        "00000050: 01 a4 01 00 00 00 03 00 00 19 00 08 ec 15 39 e5 |..............9.|",
+        "00000060: 00 00 00 43 e6 00 00 00 04 e7 00 00 00 24 01 00 |...C.........$..|",
+        "00000070: 0e 29 06 2f c8 03 06 00 00 2a 0e 34 08 00       |.)./.....*.4..|"
       ],
       "structure": {
         "source": "TypeScript",
@@ -373,7 +373,136 @@
       }
     }
   },
-  "differences": [],
+  "differences": [
+    {
+      "offset": 93,
+      "offsetHex": "0x5d",
+      "typescript": "0x15",
+      "wasm": "0x02",
+      "typescriptDecimal": 21,
+      "wasmDecimal": 2
+    },
+    {
+      "offset": 94,
+      "offsetHex": "0x5e",
+      "typescript": "0x39",
+      "wasm": "0x29",
+      "typescriptDecimal": 57,
+      "wasmDecimal": 41
+    },
+    {
+      "offset": 95,
+      "offsetHex": "0x5f",
+      "typescript": "0xe5",
+      "wasm": "0x39",
+      "typescriptDecimal": 229,
+      "wasmDecimal": 57
+    },
+    {
+      "offset": 96,
+      "offsetHex": "0x60",
+      "typescript": "0x00",
+      "wasm": "0xe5",
+      "typescriptDecimal": 0,
+      "wasmDecimal": 229
+    },
+    {
+      "offset": 99,
+      "offsetHex": "0x63",
+      "typescript": "0x43",
+      "wasm": "0x00",
+      "typescriptDecimal": 67,
+      "wasmDecimal": 0
+    },
+    {
+      "offset": 100,
+      "offsetHex": "0x64",
+      "typescript": "0xe6",
+      "wasm": "0x43",
+      "typescriptDecimal": 230,
+      "wasmDecimal": 67
+    },
+    {
+      "offset": 101,
+      "offsetHex": "0x65",
+      "typescript": "0x00",
+      "wasm": "0xe6",
+      "typescriptDecimal": 0,
+      "wasmDecimal": 230
+    },
+    {
+      "offset": 104,
+      "offsetHex": "0x68",
+      "typescript": "0x04",
+      "wasm": "0x00",
+      "typescriptDecimal": 4,
+      "wasmDecimal": 0
+    },
+    {
+      "offset": 105,
+      "offsetHex": "0x69",
+      "typescript": "0xe7",
+      "wasm": "0x04",
+      "typescriptDecimal": 231,
+      "wasmDecimal": 4
+    },
+    {
+      "offset": 106,
+      "offsetHex": "0x6a",
+      "typescript": "0x00",
+      "wasm": "0xe7",
+      "typescriptDecimal": 0,
+      "wasmDecimal": 231
+    },
+    {
+      "offset": 109,
+      "offsetHex": "0x6d",
+      "typescript": "0x24",
+      "wasm": "0x00",
+      "typescriptDecimal": 36,
+      "wasmDecimal": 0
+    },
+    {
+      "offset": 110,
+      "offsetHex": "0x6e",
+      "typescript": "0x01",
+      "wasm": "0x24",
+      "typescriptDecimal": 1,
+      "wasmDecimal": 36
+    },
+    {
+      "offset": 111,
+      "offsetHex": "0x6f",
+      "typescript": "0x00",
+      "wasm": "0x01",
+      "typescriptDecimal": 0,
+      "wasmDecimal": 1
+    },
+    {
+      "offset": 112,
+      "offsetHex": "0x70",
+      "typescript": "0x0e",
+      "wasm": "0x00",
+      "typescriptDecimal": 14,
+      "wasmDecimal": 0
+    },
+    {
+      "offset": 113,
+      "offsetHex": "0x71",
+      "typescript": "0x29",
+      "wasm": "0x0e",
+      "typescriptDecimal": 41,
+      "wasmDecimal": 14
+    },
+    {
+      "offset": 121,
+      "offsetHex": "0x79",
+      "typescript": "0x2a",
+      "wasm": "0x2f",
+      "typescriptDecimal": 42,
+      "wasmDecimal": 47
+    }
+  ],
   "sizeDifference": {
     "absolute": 0,
     "percentage": "0.00"

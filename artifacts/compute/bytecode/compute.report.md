@@ -1,7 +1,7 @@
 # 字节码分析报告
 
-**输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/compute.ts
-**生成时间**: 2025-12-09T08:27:11.611Z
+**输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/compute.ts
+**生成时间**: 2025-12-09T08:59:51.448Z
 
 ## 大小对比
 
@@ -109,9 +109,8 @@
 
 ## 字节级差异
 
-共发现 1 个字节差异:
+共发现 0 个字节差异:
 
-- 偏移量 0x3e: TS=0x00 vs WASM=0x20
 
 ## 十六进制转储对比
 
@@ -120,7 +119,7 @@
 00000000: 05 04 4c 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..L__tests__/com|
 00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 63 |piler/fixtures/c|
 00000020: 6f 6d 70 75 74 65 2e 6a 73 0e 63 6f 6d 70 75 74 |ompute.js.comput|
-00000030: 65 02 61 02 62 0d c8 03 00 00 00 00 00 0c 00 06 |e.a.b...........|
+00000030: 65 02 61 02 62 0d c8 03 00 00 00 00 00 0c 20 06 |e.a.b......... .|
 00000040: 01 a4 01 00 00 00 01 01 01 09 00 ca 03 00 01 08 |................|
 00000050: ec 05 c2 00 e3 29 06 2f c8 03 02 00 00 00 0c 43 |.....)./.......C|
 00000060: 06 01 ca 03 02 00 02 02 00 00 04 02 cc 03 00 01 |................|

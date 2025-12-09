@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/logical-assignment/cli/logical-assignment.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/logical-assignment/cli/logical-assignment.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/logical-assignment/cli/logical-assignment.pc2line.txt",
-    "bytecodeSize": 517,
+    "bytecodeSize": 520,
     "pc2lineLength": 0,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 448,
+    "tsSize": 451,
     "wasmSize": 460,
-    "sizeDiff": -12,
-    "sizeDiffPercent": -2.608695652173913
+    "sizeDiff": -9,
+    "sizeDiffPercent": -1.956521739130435
   },
   "trace": {
     "differenceCount": 0,

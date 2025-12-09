@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/labeled-statements.ts
-**生成时间**: 2025-12-09T07:55:07.018Z
+**生成时间**: 2025-12-09T08:59:51.515Z
 
 ## 大小对比
 
@@ -125,29 +125,29 @@
 
 ## 字节级差异
 
-共发现 75 个字节差异:
+共发现 136 个字节差异:
 
 - 偏移量 0x58: TS=0x5a vs WASM=0x62
 - 偏移量 0x62: TS=0x00 vs WASM=0x01
-- 偏移量 0x73: TS=0x49 vs WASM=0x51
-- 偏移量 0x7f: TS=0x37 vs WASM=0x3b
-- 偏移量 0x8d: TS=0x29 vs WASM=0x2d
-- 偏移量 0x9b: TS=0x1b vs WASM=0x1f
-- 偏移量 0xb0: TS=0xc8 vs WASM=0x64
-- 偏移量 0xb1: TS=0x93 vs WASM=0x01
-- 偏移量 0xb2: TS=0xcc vs WASM=0x00
-- 偏移量 0xb3: TS=0x0e vs WASM=0x93
-- 偏移量 0xb4: TS=0xee vs WASM=0x65
-- 偏移量 0xb5: TS=0xc4 vs WASM=0x01
-- 偏移量 0xb6: TS=0xc7 vs WASM=0x00
-- 偏移量 0xb7: TS=0x93 vs WASM=0x0e
-- 偏移量 0xb8: TS=0xcb vs WASM=0xee
-- 偏移量 0xb9: TS=0x0e vs WASM=0xc0
-- 偏移量 0xba: TS=0xee vs WASM=0x64
-- 偏移量 0xbb: TS=0xb2 vs WASM=0x00
-- 偏移量 0xbc: TS=0x06 vs WASM=0x00
-- 偏移量 0xbd: TS=0x2f vs WASM=0x93
-- ... (显示前20个差异，总共75个)
+- 偏移量 0x66: TS=0x56 vs WASM=0x02
+- 偏移量 0x67: TS=0x63 vs WASM=0x29
+- 偏移量 0x68: TS=0x00 vs WASM=0x63
+- 偏移量 0x6a: TS=0xb7 vs WASM=0x00
+- 偏移量 0x6b: TS=0xcb vs WASM=0xb7
+- 偏移量 0x6c: TS=0x64 vs WASM=0xcb
+- 偏移量 0x6d: TS=0x00 vs WASM=0x64
+- 偏移量 0x6f: TS=0xba vs WASM=0x00
+- 偏移量 0x70: TS=0xa5 vs WASM=0xba
+- 偏移量 0x71: TS=0xec vs WASM=0xa5
+- 偏移量 0x72: TS=0x49 vs WASM=0xec
+- 偏移量 0x73: TS=0x63 vs WASM=0x51
+- 偏移量 0x74: TS=0x01 vs WASM=0x63
+- 偏移量 0x75: TS=0x00 vs WASM=0x01
+- 偏移量 0x76: TS=0xb7 vs WASM=0x00
+- 偏移量 0x77: TS=0xcc vs WASM=0xb7
+- 偏移量 0x78: TS=0x64 vs WASM=0xcc
+- 偏移量 0x79: TS=0x01 vs WASM=0x64
+- ... (显示前20个差异，总共136个)
 
 ## 十六进制转储对比
 
@@ -159,13 +159,13 @@
 00000030: 73 2e 6a 73 02 69 02 6a 0e 63 6f 6e 73 6f 6c 65 |s.js.i.j.console|
 00000040: 06 6c 6f 67 0d c8 03 00 00 00 00 00 0c 20 06 01 |.log......... ..|
 00000050: a4 01 00 02 00 04 00 00 5a 02 ca 03 02 00 20 cc |........Z..... .|
-00000060: 03 04 00 20 08 ec 02 29 63 00 00 b7 cb 64 00 00 |... ...)c....d..|
-00000070: ba a5 ec 49 63 01 00 b7 cc 64 01 00 ba a5 ec 37 |...Ic....d.....7|
-00000080: 64 00 00 b8 ad ec 08 64 01 00 b8 ad ed 29 64 00 |d......d.....)d.|
-00000090: 00 b9 ad ec 08 64 01 00 b9 ad ed 1b 39 e7 00 00 |.....d......9...|
-000000a0: 00 43 e8 00 00 00 64 00 00 64 01 00 24 02 00 0e |.C....d..d..$...|
-000000b0: c8 93 cc 0e ee c4 c7 93 cb 0e ee b2 06 2f c8 03 |............./..|
-000000c0: 32 00 00 2f 2e 16 04 2b 04 16 04 12 21 16 04 12 |2../...+....!...|
+00000060: 03 04 00 20 08 ec 56 63 00 00 b7 cb 64 00 00 ba |... ..Vc....d...|
+00000070: a5 ec 49 63 01 00 b7 cc 64 01 00 ba a5 ec 37 64 |..Ic....d.....7d|
+00000080: 00 00 b8 ad ec 08 64 01 00 b8 ad ed 29 64 00 00 |......d.....)d..|
+00000090: b9 ad ec 08 64 01 00 b9 ad ed 1b 39 e7 00 00 00 |....d......9....|
+000000a0: 43 e8 00 00 00 64 00 00 64 01 00 24 02 00 0e c8 |C....d..d..$....|
+000000b0: 93 cc 0e ee c4 c7 93 cb 0e ee b2 29 06 2f c8 03 |...........)./..|
+000000c0: 32 00 00 2a 2e 16 04 2b 04 16 04 12 21 16 04 12 |2..*...+....!...|
 000000d0: 04 16 04 00 03 08 0b 16 04 12 04 16 04 00 03 08 |................|
 000000e0: 13 1b 0e 1b 0a 11 06 11 07 00 04 15 1e 07 02 1a |................|
 000000f0: 09 07 02 00                                     |....|

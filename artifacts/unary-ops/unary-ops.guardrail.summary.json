@@ -11,7 +11,7 @@
     "stackMax": 0
   },
   "bytecode": {
-    "identical": true,
+    "identical": false,
     "tsSize": 223,
     "wasmSize": 223,
     "sizeDiff": 0,
