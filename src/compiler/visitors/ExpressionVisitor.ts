@@ -31,8 +31,20 @@ export class ExpressionVisitor {
     return this.context.labelManager
   }
 
-  private isOptionalChainNode(node: ts.Expression): boolean {
+  private hasQuestionDot(node: ts.Node): boolean {
     return Boolean((node as any).questionDotToken)
+  }
+
+  private isOptionalChainNode(node: ts.Expression): boolean {
+    if (!node) {
+      return false
+    }
+
+    if (this.hasQuestionDot(node)) {
+      return true
+    }
+
+    return (node.flags & ts.NodeFlags.OptionalChain) !== 0
   }
 
   private registerOptionalChild(
@@ -1032,14 +1044,15 @@ export class ExpressionVisitor {
       this.registerOptionalChild(node.expression as ts.Expression, callCtx)
 
       if (ts.isPropertyAccessExpression(node.expression)) {
+        const propExpr = node.expression
         // Method call: obj.method(...)
-        if (node.expression.expression.kind === ts.SyntaxKind.SuperKeyword) {
+        if (propExpr.expression.kind === ts.SyntaxKind.SuperKeyword) {
             // super.method(...)
           this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc0) // this
           this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc1) // <home_object>
           this.compiler.emitOp(this.funcDef, Opcode.OP_get_super)
           
-          const propName = node.expression.name.text
+          const propName = propExpr.name.text
           this.compiler.emitAtomOp(this.funcDef, Opcode.OP_push_atom_value, this.compiler.addAtom(propName))
           
           this.compiler.emitOp(this.funcDef, Opcode.OP_get_array_el)
@@ -1056,41 +1069,92 @@ export class ExpressionVisitor {
         }
 
         const [propCtx] = trackContext(
-          this.enterOptionalChain(node.expression as ts.Expression),
+          this.enterOptionalChain(propExpr as ts.Expression),
         )
-        this.registerOptionalChild(
-          node.expression.expression as ts.Expression,
-          propCtx,
-        )
+        this.registerOptionalChild(propExpr.expression as ts.Expression, propCtx)
 
         // 1. Visit object
-        this.context.visit(node.expression.expression)
+        this.context.visit(propExpr.expression)
 
         // Optional guard for obj?.method
-        this.emitOptionalChainGuard(propCtx, 1)
+        if (this.hasQuestionDot(propExpr)) {
+          this.emitOptionalChainGuard(propCtx, 1)
+        }
         
         // 2. Emit get_field2 (pushes this + func)
-        const propName = node.expression.name.text
+        const propName = propExpr.name.text
         const atom = this.compiler.addAtom(propName)
         // Use end of object expression (position of dot)
         this.compiler.emitAtomOp(
           this.funcDef,
           Opcode.OP_get_field2,
           atom,
-          node.expression.expression.getEnd(),
+          propExpr.expression.getEnd(),
         )
         
         isMethodCall = true
 
         // Guard for obj.method?.()
-        if (callCtx) {
+        if (callCtx && this.hasQuestionDot(node)) {
+          this.emitOptionalChainGuard(callCtx, 2)
+        }
+      } else if (ts.isElementAccessExpression(node.expression)) {
+        const elementExpr = node.expression
+        if (!elementExpr.argumentExpression) {
+          throw new Error('Element access requires an argument expression')
+        }
+
+        if (elementExpr.expression.kind === ts.SyntaxKind.SuperKeyword) {
+          // super[expr](...)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc0)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc1)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_super)
+
+          this.context.visit(elementExpr.argumentExpression)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_array_el)
+
+          for (const arg of node.arguments) {
+            this.context.visit(arg)
+          }
+
+          this.compiler.emitOp(this.funcDef, Opcode.OP_call_method)
+          this.compiler.emitU16(this.funcDef, argCount)
+          this.compiler.adjustStack(this.funcDef, -(argCount + 1))
+
+          return
+        }
+
+        const [elementCtx] = trackContext(
+          this.enterOptionalChain(elementExpr as ts.Expression),
+        )
+        this.registerOptionalChild(
+          elementExpr.expression as ts.Expression,
+          elementCtx,
+        )
+
+        this.context.visit(elementExpr.expression)
+
+        if (this.hasQuestionDot(elementExpr)) {
+          this.emitOptionalChainGuard(elementCtx, 1)
+        }
+
+        this.context.visit(elementExpr.argumentExpression)
+        this.compiler.emitOp(
+          this.funcDef,
+          Opcode.OP_get_array_el2,
+          elementExpr.expression.getEnd(),
+        )
+
+        isMethodCall = true
+
+        if (callCtx && this.hasQuestionDot(node)) {
           this.emitOptionalChainGuard(callCtx, 2)
         }
       } else {
         // Regular call: func(...)
         this.context.visit(node.expression)
 
-        if (callCtx) {
+        if (callCtx && this.hasQuestionDot(node)) {
           this.emitOptionalChainGuard(callCtx, 1)
         }
       }
@@ -1149,7 +1213,9 @@ export class ExpressionVisitor {
     this.withOptionalChain(node, ctx => {
       this.registerOptionalChild(node.expression as ts.Expression, ctx)
       this.context.visit(node.expression)
-      this.emitOptionalChainGuard(ctx, 1)
+      if (this.hasQuestionDot(node)) {
+        this.emitOptionalChainGuard(ctx, 1)
+      }
       const propName = node.name.text
       const atom = this.compiler.addAtom(propName)
       this.compiler.emitAtomOp(
@@ -1169,7 +1235,9 @@ export class ExpressionVisitor {
     this.withOptionalChain(node, ctx => {
       this.registerOptionalChild(node.expression as ts.Expression, ctx)
       this.context.visit(node.expression)
-      this.emitOptionalChainGuard(ctx, 1)
+      if (this.hasQuestionDot(node)) {
+        this.emitOptionalChainGuard(ctx, 1)
+      }
       if (!node.argumentExpression) {
         throw new Error('Element access requires an argument expression')
       }
