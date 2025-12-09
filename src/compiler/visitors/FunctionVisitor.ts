@@ -5,6 +5,7 @@ import { FunctionDef, JSVarKind } from '../FunctionDef'
 
 export class FunctionVisitor {
   private context: CompilerContext
+  private hoisted: Map<ts.FunctionDeclaration, { fd: FunctionDef, childIdx: number }> = new Map()
 
   constructor(context: CompilerContext) {
     this.context = context
@@ -27,87 +28,101 @@ export class FunctionVisitor {
       throw new Error('Function declaration must have a name')
     }
 
-    // Add variable to parent scope
-    const varIdx = 0 // <eval> is at index 0
-    
-    // Create child function def
-    const fd = new FunctionDef(parentFd)
-    fd.scopeLevel = scopeManager.stackDepth
-    fd.funcName = compiler.addAtom(name)
-    fd.jsMode = JSMode.JS_MODE_STRICT
-    fd.funcKind = FunctionKind.JS_FUNC_NORMAL
-    fd.filename = parentFd.filename
-    fd.hasDebug = true
-    fd.sourcePos = node.getStart()
-    fd.lineNumberLast = fd.sourcePos
-    fd.lineNumberLastPc = 0
-    fd.lineNumberLast = fd.sourcePos
-    fd.lineNumberLastPc = 0
-    fd.argumentsAllowed = true
-    fd.hasPrototype = true
-    fd.hasSimpleParameterList = true
-    fd.newTargetAllowed = true
-    
-    // Add arguments
-    for (let i = 0; i < node.parameters.length; i++) {
-      const param = node.parameters[i]
-      if (ts.isIdentifier(param.name)) {
-        compiler.addArg(fd, param.name.text)
+    // 若已在 hoist 阶段创建，直接复用
+    let hoisted = this.hoisted.get(node)
+
+    if (!hoisted) {
+      // 定义 lexical 变量（对应 QuickJS define_var）
+      let varInfo = scopeManager.findVar(name, parentFd)
+      if (!varInfo) {
+        const currentScope = scopeManager.currentScope
+        const scopeLevel = scopeManager.stackDepth - parentFd.scopeLevel - 1
+        const varIdx = compiler.addVar(parentFd, name, false, true, scopeLevel, JSVarKind.JS_VAR_FUNCTION_DECL)
+        currentScope.vars.set(name, {
+          type: 'local',
+          idx: varIdx,
+          isLexical: true,
+          isConst: false
+        })
+        varInfo = currentScope.vars.get(name)!
       }
+
+      const fd = new FunctionDef(parentFd)
+      fd.scopeLevel = scopeManager.stackDepth
+      fd.funcName = compiler.addAtom(name)
+      fd.jsMode = JSMode.JS_MODE_STRICT
+      fd.funcKind = FunctionKind.JS_FUNC_NORMAL
+      fd.filename = parentFd.filename
+      fd.hasDebug = true
+      fd.sourcePos = node.getStart()
+      fd.lineNumberLast = fd.sourcePos
+      fd.lineNumberLastPc = 0
+      fd.argumentsAllowed = true
+      fd.hasPrototype = true
+      fd.hasSimpleParameterList = true
+      fd.newTargetAllowed = true
+
+      for (let i = 0; i < node.parameters.length; i++) {
+        const param = node.parameters[i]
+        if (ts.isIdentifier(param.name)) {
+          compiler.addArg(fd, param.name.text)
+        }
+      }
+
+      const childIdx = compiler.addChild(parentFd, fd)
+      // 记录 func_pool_idx 供后续丢弃 fclosure 或赋值
+      const latestVar = scopeManager.findVar(name, parentFd)
+      if (latestVar && latestVar.type === 'local') {
+        parentFd.vars[latestVar.idx].funcPoolIdx = childIdx
+      }
+      hoisted = { fd, childIdx }
+      this.hoisted.set(node, hoisted)
     }
-    
-    // Add child to parent cpool
-    const childIdx = compiler.addChild(parentFd, fd)
-    
-    // Emit fclosure
-    compiler.emitOp(parentFd, Opcode.OP_fclosure8)
-    compiler.emitU8(parentFd, childIdx)
-    
-    // Emit put_var/put_loc
-    let varInfo = scopeManager.findVar(name, funcDef!)
-    
-    if (varInfo) {
-      if (varInfo.type === 'closure') {
-        const idx = varInfo.idx
-        const atomId = compiler.addAtom(name)
-        if (idx === 0) {
-          compiler.emitOp(parentFd, Opcode.OP_put_var_ref0)
-        } else if (idx === 1) {
-          compiler.emitOp(parentFd, Opcode.OP_put_var_ref1)
-        } else if (idx === 2) {
-          compiler.emitOp(parentFd, Opcode.OP_put_var_ref2)
-        } else if (idx === 3) {
-          compiler.emitOp(parentFd, Opcode.OP_put_var_ref3)
-        } else {
-          compiler.emitOp(parentFd, Opcode.OP_put_var_ref)
-          compiler.emitU32(parentFd, atomId)
-          compiler.emitU16(parentFd, idx)
-        }
+
+    const childIdx = hoisted.childIdx
+    const fd = hoisted.fd
+
+    // 发出 fclosure（8/32 根据索引选择）
+    if (childIdx < 256) {
+      compiler.emitOp(parentFd, Opcode.OP_fclosure8)
+      compiler.emitU8(parentFd, childIdx)
+    } else {
+      compiler.emitOp(parentFd, Opcode.OP_fclosure)
+      compiler.emitU32(parentFd, childIdx)
+    }
+
+    // 写入目标：lexical/global -> drop；否则 put_loc / put_var_ref
+    const targetInfo = scopeManager.findVar(name, parentFd)
+    if (targetInfo && targetInfo.type === 'local') {
+      const jsVar = parentFd.vars[targetInfo.idx]
+      jsVar.funcPoolIdx = childIdx
+      if (jsVar.isLexical || parentFd.isGlobalVar) {
+        compiler.emitOp(parentFd, Opcode.OP_drop)
       } else {
-        // Local
-        const varIdx = varInfo.idx
-        const idx = parentFd.vars[varIdx].localIdx
-        if (idx === -1) {
-            throw new Error(`Function ${name} is captured but accessed as local`)
-        }
-        
-        if (idx === 0) {
-          compiler.emitOp(parentFd, Opcode.OP_put_loc0)
-        } else if (idx === 1) {
-          compiler.emitOp(parentFd, Opcode.OP_put_loc1)
-        } else if (idx === 2) {
-          compiler.emitOp(parentFd, Opcode.OP_put_loc2)
-        } else if (idx === 3) {
-          compiler.emitOp(parentFd, Opcode.OP_put_loc3)
-        } else {
-          compiler.emitOp(parentFd, Opcode.OP_put_loc)
-          compiler.emitU16(parentFd, idx)
-        }
+        compiler.emitPutLoc(parentFd, targetInfo.idx)
+      }
+    } else if (targetInfo && targetInfo.type === 'closure') {
+      const atomId = compiler.addAtom(name)
+      const idx = targetInfo.idx
+      if (idx === 0) {
+        compiler.emitOp(parentFd, Opcode.OP_put_var_ref0)
+      } else if (idx === 1) {
+        compiler.emitOp(parentFd, Opcode.OP_put_var_ref1)
+      } else if (idx === 2) {
+        compiler.emitOp(parentFd, Opcode.OP_put_var_ref2)
+      } else if (idx === 3) {
+        compiler.emitOp(parentFd, Opcode.OP_put_var_ref3)
+      } else {
+        compiler.emitOp(parentFd, Opcode.OP_put_var_ref)
+        compiler.emitU32(parentFd, atomId)
+        compiler.emitU16(parentFd, idx)
       }
     } else {
-      if (varIdx === 0) {
-        compiler.emitOp(parentFd, Opcode.OP_put_var_ref0)
-      }
+      // 兜底：按 var_ref 处理
+      const atomId = compiler.addAtom(name)
+      compiler.emitOp(parentFd, Opcode.OP_put_var_ref)
+      compiler.emitU32(parentFd, atomId)
+      compiler.emitU16(parentFd, 0)
     }
     
     // Switch context to child function
