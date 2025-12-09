@@ -101,18 +101,20 @@ export class ExpressionVisitor {
   private emitOptionalChainGuard(
     ctx: OptionalChainContext | null,
     dropCount: number,
+    fallbackOp: Opcode = Opcode.OP_undefined,
+    sourcePos: number = -1,
   ) {
     if (!this.funcDef || !ctx) {
       return
     }
     const nextLabel = this.compiler.newLabel(this.funcDef)
-    this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
+    this.compiler.emitOp(this.funcDef, Opcode.OP_dup, sourcePos)
     this.compiler.emitOp(this.funcDef, Opcode.OP_is_undefined_or_null)
     this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, nextLabel)
     for (let i = 0; i < dropCount; i++) {
       this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
     }
-    this.compiler.emitOp(this.funcDef, Opcode.OP_undefined)
+    this.compiler.emitOp(this.funcDef, fallbackOp)
     this.compiler.emitJump(this.funcDef, Opcode.OP_goto, ctx.exitLabel)
     this.compiler.markLabel(this.funcDef, nextLabel)
   }
@@ -1053,25 +1055,28 @@ export class ExpressionVisitor {
 
         // Optional guard for obj?.method
         if (this.hasQuestionDot(propExpr)) {
-          this.emitOptionalChainGuard(propCtx, 1)
+          const guardPos = propExpr.questionDotToken?.getStart() ?? propExpr.getStart()
+          this.emitOptionalChainGuard(propCtx, 1, Opcode.OP_undefined, guardPos)
         }
         
         // 2. Emit get_field2 (pushes this + func)
         const propName = propExpr.name.text
         const atom = this.compiler.addAtom(propName)
         // Use end of object expression (position of dot)
+        const accessPos = propExpr.questionDotToken?.getStart() ?? propExpr.expression.getEnd()
         this.compiler.emitAtomOp(
           this.funcDef,
           Opcode.OP_get_field2,
           atom,
-          propExpr.expression.getEnd(),
+          accessPos,
         )
         
         isMethodCall = true
 
         // Guard for obj.method?.()
         if (callCtx && this.hasQuestionDot(node)) {
-          this.emitOptionalChainGuard(callCtx, 2)
+          // Align with QuickJS: skip pc2line entry on the call guard and rely on call_method mapping
+          this.emitOptionalChainGuard(callCtx, 2, Opcode.OP_undefined, -1)
         }
       } else if (ts.isElementAccessExpression(node.expression)) {
         const elementExpr = node.expression
@@ -1110,27 +1115,29 @@ export class ExpressionVisitor {
         this.context.visit(elementExpr.expression)
 
         if (this.hasQuestionDot(elementExpr)) {
-          this.emitOptionalChainGuard(elementCtx, 1)
+          // QuickJS maps the access itself, not the guard, so omit a pc2line entry here
+          this.emitOptionalChainGuard(elementCtx, 1, Opcode.OP_undefined, -1)
         }
 
         this.context.visit(elementExpr.argumentExpression)
+        const accessPos = elementExpr.questionDotToken?.getStart() ?? elementExpr.expression.getEnd()
         this.compiler.emitOp(
           this.funcDef,
           Opcode.OP_get_array_el2,
-          elementExpr.expression.getEnd(),
+          accessPos,
         )
 
         isMethodCall = true
 
         if (callCtx && this.hasQuestionDot(node)) {
-          this.emitOptionalChainGuard(callCtx, 2)
+          this.emitOptionalChainGuard(callCtx, 2, Opcode.OP_undefined, -1)
         }
       } else {
         // Regular call: func(...)
         this.context.visit(node.expression)
 
         if (callCtx && this.hasQuestionDot(node)) {
-          this.emitOptionalChainGuard(callCtx, 1)
+          this.emitOptionalChainGuard(callCtx, 1, Opcode.OP_undefined, -1)
         }
       }
 
@@ -1147,7 +1154,8 @@ export class ExpressionVisitor {
           this.compiler.emitU16(this.funcDef, argCount)
           this.compiler.adjustStack(this.funcDef, -argCount)
         } else {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_call_method, node.expression.getEnd())
+          const callPos = node.questionDotToken?.getEnd() ?? node.expression.getEnd()
+          this.compiler.emitOp(this.funcDef, Opcode.OP_call_method, callPos)
           this.compiler.emitU16(this.funcDef, argCount)
           this.compiler.adjustStack(this.funcDef, -argCount)
         }
@@ -1189,7 +1197,8 @@ export class ExpressionVisitor {
       this.registerOptionalChild(node.expression as ts.Expression, ctx)
       this.context.visit(node.expression)
       if (this.hasQuestionDot(node)) {
-        this.emitOptionalChainGuard(ctx, 1)
+        const guardPos = node.questionDotToken?.getStart() ?? node.getStart()
+        this.emitOptionalChainGuard(ctx, 1, Opcode.OP_undefined, guardPos)
       }
       const propName = node.name.text
       const atom = this.compiler.addAtom(propName)
@@ -1197,7 +1206,7 @@ export class ExpressionVisitor {
         this.funcDef!,
         Opcode.OP_get_field,
         atom,
-        node.expression.getEnd(),
+        -1,
       )
     })
   }
@@ -1211,7 +1220,8 @@ export class ExpressionVisitor {
       this.registerOptionalChild(node.expression as ts.Expression, ctx)
       this.context.visit(node.expression)
       if (this.hasQuestionDot(node)) {
-        this.emitOptionalChainGuard(ctx, 1)
+        const guardPos = node.questionDotToken?.getStart() ?? node.getStart()
+        this.emitOptionalChainGuard(ctx, 1, Opcode.OP_undefined, guardPos)
       }
       if (!node.argumentExpression) {
         throw new Error('Element access requires an argument expression')
@@ -1220,7 +1230,7 @@ export class ExpressionVisitor {
       this.compiler.emitOp(
         this.funcDef!,
         Opcode.OP_get_array_el,
-        node.expression.getEnd(),
+        -1,
       )
     })
   }
@@ -1312,7 +1322,7 @@ export class ExpressionVisitor {
           const atom = this.compiler.addAtom(name)
           this.compiler.emitOp(this.funcDef, Opcode.OP_define_method)
           this.compiler.emitU32(this.funcDef, atom)
-          this.compiler.emitU8(this.funcDef, 0) // flags: 0=method
+          this.compiler.emitU8(this.funcDef, 4) // flags: home object
         } else {
            // Computed property name for method?
            // QuickJS supports OP_define_method with computed name?
@@ -1373,19 +1383,43 @@ export class ExpressionVisitor {
     }
     
     if (ts.isPropertyAccessExpression(node.expression)) {
-      this.context.visit(node.expression.expression) // obj
-      const propName = node.expression.name.text
+      const expr = node.expression as ts.PropertyAccessChain
+      const [ctx, created] = this.enterOptionalChain(expr)
+      this.registerOptionalChild(expr.expression as ts.Expression, ctx)
+
+      this.context.visit(expr.expression) // obj
+      const guardPos = expr.questionDotToken?.getStart() ?? expr.getStart()
+      this.emitOptionalChainGuard(ctx, 1, Opcode.OP_push_true, guardPos)
+
+      const propName = expr.name.text
       const atom = this.compiler.addAtom(propName)
-      this.compiler.emitAtomOp(this.funcDef, Opcode.OP_push_atom_value, atom, node.expression.expression.getEnd())
-      this.compiler.emitOp(this.funcDef, Opcode.OP_delete, node.expression.expression.getEnd())
+      this.compiler.emitAtomOp(
+        this.funcDef,
+        Opcode.OP_push_atom_value,
+        atom,
+        expr.expression.getEnd(),
+      )
+      this.compiler.emitOp(this.funcDef, Opcode.OP_delete, expr.expression.getEnd())
+
+      this.leaveOptionalChain(ctx, created)
+      return
     } else if (ts.isElementAccessExpression(node.expression)) {
-      this.context.visit(node.expression.expression) // obj
-      this.context.visit(node.expression.argumentExpression) // prop
-      // OP_delete expects value, key. No need for to_propkey if it's already a value?
-      // QuickJS emits to_propkey usually?
-      // Let's assume yes for safety or check WASM later.
-      // this.compiler.emitOp(this.funcDef, Opcode.OP_to_propkey) 
-      this.compiler.emitOp(this.funcDef, Opcode.OP_delete, node.expression.expression.getEnd())
+      const expr = node.expression as ts.ElementAccessChain
+      if (!expr.argumentExpression) {
+        throw new Error('Element access requires an argument expression')
+      }
+      const [ctx, created] = this.enterOptionalChain(expr)
+      this.registerOptionalChild(expr.expression as ts.Expression, ctx)
+
+      this.context.visit(expr.expression) // obj
+      const guardPos = expr.questionDotToken?.getStart() ?? expr.getStart()
+      this.emitOptionalChainGuard(ctx, 1, Opcode.OP_push_true, guardPos)
+
+      this.context.visit(expr.argumentExpression) // prop
+      this.compiler.emitOp(this.funcDef, Opcode.OP_delete, expr.expression.getEnd())
+
+      this.leaveOptionalChain(ctx, created)
+      return
     } else if (ts.isIdentifier(node.expression)) {
       // delete var
       const name = node.expression.text

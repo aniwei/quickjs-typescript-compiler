@@ -592,8 +592,6 @@ export class FunctionVisitor {
       }
     }
     
-    compiler.addVar(fd, 'this', true, false, 0)
-    
     const childIdx = compiler.addChild(parentFd, fd)
     
     compiler.emitOp(parentFd, Opcode.OP_fclosure8)
@@ -601,27 +599,8 @@ export class FunctionVisitor {
     
     this.context.setFuncDef(fd)
 
-    // Initialize 'this'
-    compiler.emitOp(fd, Opcode.OP_push_this, node.name.getStart())
-    compiler.emitOp(fd, Opcode.OP_put_loc0, -1)
-
     // Push scope
     scopeManager.enter('function', fd, 0)
-    
-    // Add 'this' to scope
-    scopeManager.currentScope.vars.set('this', {
-      type: 'local',
-      idx: 0,
-      isLexical: false,
-      isConst: true
-    })
-    
-    // Fix 'this' var properties to match WASM
-    // WASM has scopeNext=0 (encoded as 1) and flags=0 (not const)
-    if (fd.vars.length > 0) {
-      fd.vars[0].scopeNext = 0
-      fd.vars[0].isConst = false
-    }
 
     if (node.body) {
       this.context.visit(node.body)

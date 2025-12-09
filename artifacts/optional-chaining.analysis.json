@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-12-09T09:46:45.434Z",
-  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/optional-chaining.ts",
+  "timestamp": "2025-12-09T10:05:23.212Z",
+  "inputFile": "__tests__/compiler/fixtures/optional-chaining.ts",
   "compilation": {
     "typescript": {
       "size": 602,
@@ -535,12 +535,12 @@
         "0x0a",
         "0x39",
         "0x08",
-        "0x43",
+        "0x1b",
         "0x12",
-        "0x48",
-        "0x0e",
+        "0x70",
+        "0x12",
         "0x11",
-        "0x29",
+        "0x2d",
         "0x95",
         "0x15",
         "0x1b",
@@ -642,7 +642,7 @@
         "000001e0: f1 00 00 00 11 b2 ec 05 0e 06 ee 06 42 f2 00 00 |............B...|",
         "000001f0: 00 24 01 00 0e 06 2f c8 03 44 00 00 00 2e 12 00 |.$..../..D......|",
         "00000200: 1b 0e 1b 0a 39 08 43 12 1b 1b 17 15 1b 0e 1b 0a |....9.C.........|",
-        "00000210: 39 08 43 12 48 0e 11 29 95 15 1b 0e 1b 0a 3e 08 |9.C.H..)......>.|",
+        "00000210: 39 08 1b 12 70 12 11 2d 95 15 1b 0e 1b 0a 3e 08 |9...p..-......>.|",
         "00000220: 2f 0a 4d 13 17 15 1b 0e 1b 0a 3e 08 2f 0a 43 10 |/.M.......>./.C.|",
         "00000230: 39 23 17 15 1b 0e 1b 0a 39 08 43 12 1b 1b 00 0c |9#......9.C.....|",
         "00000240: 42 07 01 00 00 00 00 01 00 00 06 00 04 f3 00 00 |B...............|",
@@ -1603,28 +1603,12 @@
       "wasmDecimal": 17
     },
     {
-      "offset": 532,
-      "offsetHex": "0x214",
-      "typescript": "0x48",
-      "wasm": "0x70",
-      "typescriptDecimal": 72,
-      "wasmDecimal": 112
-    },
-    {
-      "offset": 533,
-      "offsetHex": "0x215",
-      "typescript": "0x0e",
-      "wasm": "0x12",
-      "typescriptDecimal": 14,
-      "wasmDecimal": 18
-    },
-    {
-      "offset": 535,
-      "offsetHex": "0x217",
-      "typescript": "0x29",
-      "wasm": "0x2d",
-      "typescriptDecimal": 41,
-      "wasmDecimal": 45
+      "offset": 530,
+      "offsetHex": "0x212",
+      "typescript": "0x1b",
+      "wasm": "0x43",
+      "typescriptDecimal": 27,
+      "wasmDecimal": 67
     },
     {
       "offset": 544,

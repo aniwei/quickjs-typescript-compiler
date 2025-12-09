@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/loop-break-continue.ts
-**生成时间**: 2025-12-09T09:32:11.521Z
+**生成时间**: 2025-12-09T09:46:45.401Z
 
 ## 大小对比
 
