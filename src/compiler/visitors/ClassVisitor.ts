@@ -49,18 +49,20 @@ export class ClassVisitor {
     let fieldsInitScopeInfo = scopeManager.findVar(fieldsInitName, funcDef!)
     
     // Check if we have any instance fields to initialize
-    const hasInstanceFields = node.members.some(m => 
+    const needsInstanceFieldInit = node.members.some(m => 
       ts.isPropertyDeclaration(m) && 
       !m.modifiers?.some(mod => mod.kind === ts.SyntaxKind.StaticKeyword)
     )
 
     console.log(`visitClassDeclaration: finding ${fieldsInitName} -> ${fieldsInitScopeInfo ? 'found' : 'not found'}`)
-    if (!fieldsInitScopeInfo && hasInstanceFields) {
+    if (!fieldsInitScopeInfo) {
       const varIdx = compiler.addVar(funcDef, fieldsInitName, true, false, bodyScopeIndex)
+      const localIdx = funcDef.vars[varIdx]?.localIdx
       const currentScope = scopeManager.currentScope
       currentScope.vars.set(fieldsInitName, {
         type: 'local',
         idx: varIdx,
+        localIdx,
         isLexical: true,
         isConst: true
       })
@@ -119,6 +121,9 @@ export class ClassVisitor {
     fd.jsMode = JSMode.JS_MODE_STRICT
     fd.hasDebug = true
     fd.filename = parentFd.filename
+    fd.hasHomeObject = true
+    fd.hasThisBinding = true
+    fd.hasArgumentsBinding = true
     
     const constructorNode = node.members.find(ts.isConstructorDeclaration)
     
@@ -135,6 +140,7 @@ export class ClassVisitor {
     fd.parent = parentFd
     
     fd.isDerivedClassConstructor = hasExtends
+    fd.superCallAllowed = hasExtends
     fd.hasPrototype = false
     fd.hasSimpleParameterList = true
     fd.newTargetAllowed = true
@@ -308,8 +314,34 @@ export class ClassVisitor {
       compiler.emitOp(parentFd, Opcode.OP_swap)
     }
 
+    const storeFieldsInitValue = () => {
+      if (!fieldsInitScopeInfo) {
+        compiler.emitOp(parentFd, Opcode.OP_drop)
+        return
+      }
+
+      const localIdx = fieldsInitScopeInfo.localIdx
+      if (localIdx === undefined) {
+        compiler.emitOp(parentFd, Opcode.OP_drop)
+        return
+      }
+
+      if (localIdx === 0) {
+        compiler.emitOp(parentFd, Opcode.OP_put_loc0)
+      } else if (localIdx === 1) {
+        compiler.emitOp(parentFd, Opcode.OP_put_loc1)
+      } else if (localIdx === 2) {
+        compiler.emitOp(parentFd, Opcode.OP_put_loc2)
+      } else if (localIdx === 3) {
+        compiler.emitOp(parentFd, Opcode.OP_put_loc3)
+      } else {
+        compiler.emitOp(parentFd, Opcode.OP_put_loc)
+        compiler.emitU16(parentFd, localIdx)
+      }
+    }
+
     // Handle <class_fields_init> assignment
-    if (fieldsInitScopeInfo) {
+    if (fieldsInitScopeInfo && needsInstanceFieldInit) {
       const fieldsInitFd = new FunctionDef()
       fieldsInitFd.parent = parentFd
       fieldsInitFd.funcName = 0 
@@ -373,25 +405,14 @@ export class ClassVisitor {
       compiler.emitU8(parentFd, childIdx)
       
       compiler.emitOp(parentFd, Opcode.OP_set_home_object)
-
-      if (fieldsInitScopeInfo.localIdx !== undefined) {
-        const idx = fieldsInitScopeInfo.localIdx
-        if (idx === 0) {
-          compiler.emitOp(parentFd, Opcode.OP_put_loc0)
-        } else if (idx === 1) {
-          compiler.emitOp(parentFd, Opcode.OP_put_loc1)
-        } else if (idx === 2) {
-          compiler.emitOp(parentFd, Opcode.OP_put_loc2)
-        } else if (idx === 3) {
-          compiler.emitOp(parentFd, Opcode.OP_put_loc3)
-        } else {
-          compiler.emitOp(parentFd, Opcode.OP_put_loc)
-          compiler.emitU16(parentFd, idx)
-        }
-      } else {
-          compiler.emitOp(parentFd, Opcode.OP_drop)
-      }
+      storeFieldsInitValue()
+    } else if (fieldsInitScopeInfo) {
+      compiler.emitOp(parentFd, Opcode.OP_undefined)
+      storeFieldsInitValue()
     }
+
+    // Drop prototype emitted by OP_define_class to match QuickJS semantics
+    compiler.emitOp(parentFd, Opcode.OP_drop)
       
     let closureIdx = -1
     if (scopeInfo.type === 'closure') {
@@ -484,6 +505,24 @@ export class ClassVisitor {
     if (fieldsInitScopeInfo && fieldsInitScopeInfo.localIdx !== undefined) {
         fieldsInitClosureIdx = compiler.addClosureVar(fd, fieldsInitNameCtor, true, false, fieldsInitScopeInfo.localIdx, JSVarKind.JS_VAR_NORMAL, true, true)
     }
+
+    const emitInstanceFieldInit = () => {
+      if (fieldsInitClosureIdx === -1) {
+        return
+      }
+
+      compiler.emitOp(fd, Opcode.OP_get_var_ref_check)
+      compiler.emitU16(fd, fieldsInitClosureIdx)
+      const skipInitLabel = compiler.newLabel(fd)
+      compiler.emitOp(fd, Opcode.OP_dup)
+      compiler.emitJump(fd, Opcode.OP_if_false, skipInitLabel)
+      compiler.emitOp(fd, Opcode.OP_get_loc0)
+      compiler.emitOp(fd, Opcode.OP_swap)
+      compiler.emitOp(fd, Opcode.OP_call_method)
+      compiler.emitU16(fd, 0)
+      compiler.markLabel(fd, skipInitLabel)
+      compiler.emitOp(fd, Opcode.OP_drop)
+    }
       
     if (fd.isDerivedClassConstructor) {
       compiler.emitOp(fd, Opcode.OP_special_object)
@@ -502,6 +541,7 @@ export class ClassVisitor {
       compiler.emitOp(fd, Opcode.OP_push_this)
       compiler.emitOp(fd, Opcode.OP_put_loc0) // this
       compiler.emitOp(fd, Opcode.OP_check_ctor)
+      emitInstanceFieldInit()
 
       for (const member of node.members) {
         if (member.kind === ts.SyntaxKind.PropertyDeclaration) {
@@ -537,45 +577,11 @@ export class ClassVisitor {
           }
         }
       }
-
-      if (fieldsInitClosureIdx !== -1) {
-        compiler.emitOp(fd, Opcode.OP_get_var_ref_check)
-        compiler.emitU16(fd, fieldsInitClosureIdx)
-        
-        const skipInitLabel = compiler.newLabel(fd)
-        compiler.emitOp(fd, Opcode.OP_dup)
-        compiler.emitJump(fd, Opcode.OP_if_false, skipInitLabel)
-        
-        compiler.emitOp(fd, Opcode.OP_get_loc0) // this
-        compiler.emitOp(fd, Opcode.OP_swap)
-        compiler.emitOp(fd, Opcode.OP_call_method)
-        compiler.emitU16(fd, 0)
-
-        compiler.markLabel(fd, skipInitLabel)
-        compiler.emitOp(fd, Opcode.OP_drop)
-      }
     }
       
     if (constructorNode && constructorNode.body) {
       if (fd.isDerivedClassConstructor) {
         fd.fieldsInitClosureIdx = fieldsInitClosureIdx
-      } else {
-        if (fieldsInitClosureIdx !== -1) {
-          compiler.emitOp(fd, Opcode.OP_get_var_ref_check)
-          compiler.emitU16(fd, fieldsInitClosureIdx)
-          
-          const skipInitLabel = compiler.newLabel(fd)
-          compiler.emitOp(fd, Opcode.OP_dup)
-          compiler.emitJump(fd, Opcode.OP_if_false, skipInitLabel)
-          
-          compiler.emitOp(fd, Opcode.OP_get_loc0) // this
-          compiler.emitOp(fd, Opcode.OP_swap)
-          compiler.emitOp(fd, Opcode.OP_call_method)
-          compiler.emitU16(fd, 0)
-
-          compiler.markLabel(fd, skipInitLabel)
-          compiler.emitOp(fd, Opcode.OP_drop)
-        }
       }
       this.context.visit(constructorNode.body)
     } else {
@@ -583,21 +589,23 @@ export class ClassVisitor {
         // TODO: Call super()
       }
 
-      if (fieldsInitClosureIdx !== -1) {
-        compiler.emitOp(fd, Opcode.OP_get_var_ref_check)
-        compiler.emitU16(fd, fieldsInitClosureIdx)
-        
-        const skipInitLabel = compiler.newLabel(fd)
-        compiler.emitOp(fd, Opcode.OP_dup)
-        compiler.emitJump(fd, Opcode.OP_if_false, skipInitLabel)
-        
-        compiler.emitOp(fd, Opcode.OP_get_loc0) // this
-        compiler.emitOp(fd, Opcode.OP_swap)
-        compiler.emitOp(fd, Opcode.OP_call_method)
-        compiler.emitU16(fd, 0)
+      if (fd.isDerivedClassConstructor) {
+        if (fieldsInitClosureIdx !== -1) {
+          compiler.emitOp(fd, Opcode.OP_get_var_ref_check)
+          compiler.emitU16(fd, fieldsInitClosureIdx)
 
-        compiler.markLabel(fd, skipInitLabel)
-        compiler.emitOp(fd, Opcode.OP_drop)
+          const skipInitLabel = compiler.newLabel(fd)
+          compiler.emitOp(fd, Opcode.OP_dup)
+          compiler.emitJump(fd, Opcode.OP_if_false, skipInitLabel)
+
+          compiler.emitOp(fd, Opcode.OP_get_loc0)
+          compiler.emitOp(fd, Opcode.OP_swap)
+          compiler.emitOp(fd, Opcode.OP_call_method)
+          compiler.emitU16(fd, 0)
+
+          compiler.markLabel(fd, skipInitLabel)
+          compiler.emitOp(fd, Opcode.OP_drop)
+        }
       }
     }
       

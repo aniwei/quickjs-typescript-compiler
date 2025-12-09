@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/class-accessors/cli/class-accessors.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/class-accessors/cli/class-accessors.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/class-accessors/cli/class-accessors.pc2line.txt",
-    "bytecodeSize": 522,
+    "bytecodeSize": 511,
     "pc2lineLength": 0,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 453,
+    "tsSize": 442,
     "wasmSize": 470,
-    "sizeDiff": -17,
-    "sizeDiffPercent": -3.6170212765957444
+    "sizeDiff": -28,
+    "sizeDiffPercent": -5.957446808510639
   },
   "trace": {
     "differenceCount": 0,

@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/function-expressions.ts
-**生成时间**: 2025-12-09T04:25:00.302Z
+**生成时间**: 2025-12-09T07:55:07.010Z
 
 ## 大小对比
 
