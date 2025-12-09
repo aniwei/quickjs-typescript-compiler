@@ -2,6 +2,7 @@ import ts from 'typescript'
 import { CompilerContext } from '../CompilerContext'
 import { Opcode, FunctionKind, JSMode } from '../../env'
 import { FunctionDef, JSVarKind } from '../FunctionDef'
+import { DefineMethodFlag } from '../DefineMethodFlags'
 
 export class ClassVisitor {
   private context: CompilerContext
@@ -299,11 +300,11 @@ export class ClassVisitor {
           compiler.emitOp(parentFd, Opcode.OP_define_method)
           compiler.emitU32(parentFd, methodAtom)
           
-          let flags = 0
+          let flags = DefineMethodFlag.Method
           if (isGetter) {
-            flags = 1
+            flags = DefineMethodFlag.Getter
           } else if (isSetter) {
-            flags = 2
+            flags = DefineMethodFlag.Setter
           }
           compiler.emitU8(parentFd, flags)
         }
@@ -513,7 +514,7 @@ export class ClassVisitor {
 
       compiler.emitOp(fd, Opcode.OP_get_var_ref_check)
       compiler.emitU16(fd, fieldsInitClosureIdx)
-      const skipInitLabel = compiler.newLabel(fd)
+      const skipInitLabel = compiler.createLabel(fd)
       compiler.emitOp(fd, Opcode.OP_dup)
       compiler.emitJump(fd, Opcode.OP_if_false, skipInitLabel)
       compiler.emitOp(fd, Opcode.OP_get_loc0)
@@ -594,7 +595,7 @@ export class ClassVisitor {
           compiler.emitOp(fd, Opcode.OP_get_var_ref_check)
           compiler.emitU16(fd, fieldsInitClosureIdx)
 
-          const skipInitLabel = compiler.newLabel(fd)
+          const skipInitLabel = compiler.createLabel(fd)
           compiler.emitOp(fd, Opcode.OP_dup)
           compiler.emitJump(fd, Opcode.OP_if_false, skipInitLabel)
 

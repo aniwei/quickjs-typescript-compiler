@@ -5,6 +5,7 @@ import { Opcode } from '../../env'
 import { ScopeManager, VarInfo } from '../ScopeManager'
 import { LabelManager } from '../LabelManager'
 import { CompilerContext } from '../CompilerContext'
+import { DefineMethodFlag } from '../DefineMethodFlags'
 
 interface OptionalChainContext {
   exitLabel: Label
@@ -79,7 +80,7 @@ export class ExpressionVisitor {
     let created = false
 
     if (!ctx) {
-      ctx = { exitLabel: this.compiler.newLabel(this.funcDef) }
+      ctx = { exitLabel: this.compiler.createLabel(this.funcDef) }
       this.optionalChainMap.set(node, ctx)
       created = true
     }
@@ -105,13 +106,16 @@ export class ExpressionVisitor {
     if (!this.funcDef || !ctx) {
       return
     }
-    const nextLabel = this.compiler.newLabel(this.funcDef)
+
+    const nextLabel = this.compiler.createLabel(this.funcDef)
     this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
     this.compiler.emitOp(this.funcDef, Opcode.OP_is_undefined_or_null)
     this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, nextLabel)
+    
     for (let i = 0; i < dropCount; i++) {
       this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
     }
+
     this.compiler.emitOp(this.funcDef, Opcode.OP_undefined)
     this.compiler.emitJump(this.funcDef, Opcode.OP_goto, ctx.exitLabel)
     this.compiler.markLabel(this.funcDef, nextLabel)
@@ -427,8 +431,8 @@ export class ExpressionVisitor {
     }
 
     const opKind = node.operatorToken.kind
-    const skipLabel = this.compiler.newLabel(this.funcDef)
-    const endLabel = this.compiler.newLabel(this.funcDef)
+    const skipLabel = this.compiler.createLabel(this.funcDef)
+    const endLabel = this.compiler.createLabel(this.funcDef)
 
     const emitConditionJump = () => {
       if (opKind === ts.SyntaxKind.QuestionQuestionEqualsToken) {
@@ -639,7 +643,7 @@ export class ExpressionVisitor {
 
     // Handle Logical Operators (&&, ||, ??)
     if (node.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) { // &&
-      const endLabel = this.compiler.newLabel(this.funcDef)
+      const endLabel = this.compiler.createLabel(this.funcDef)
       this.context.visit(node.left)
       this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
       this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, endLabel)
@@ -650,7 +654,7 @@ export class ExpressionVisitor {
     }
     
     if (node.operatorToken.kind === ts.SyntaxKind.BarBarToken) { // ||
-      const endLabel = this.compiler.newLabel(this.funcDef)
+      const endLabel = this.compiler.createLabel(this.funcDef)
       this.context.visit(node.left)
       this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
       this.compiler.emitJump(this.funcDef, Opcode.OP_if_true, endLabel)
@@ -661,7 +665,7 @@ export class ExpressionVisitor {
     }
 
     if (node.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken) { // ??
-      const endLabel = this.compiler.newLabel(this.funcDef)
+      const endLabel = this.compiler.createLabel(this.funcDef)
       this.context.visit(node.left)
       this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
       this.compiler.emitOp(this.funcDef, Opcode.OP_is_undefined_or_null)
@@ -946,8 +950,8 @@ export class ExpressionVisitor {
       return
     }
 
-    const falseLabel = this.compiler.newLabel(this.funcDef)
-    const endLabel = this.compiler.newLabel(this.funcDef)
+    const falseLabel = this.compiler.createLabel(this.funcDef)
+    const endLabel = this.compiler.createLabel(this.funcDef)
 
     this.context.visit(node.condition)
     this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, falseLabel)
@@ -1018,7 +1022,7 @@ export class ExpressionVisitor {
           this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref_check)
           this.compiler.emitU16(this.funcDef, this.funcDef.fieldsInitClosureIdx)
           
-          const skipInitLabel = this.compiler.newLabel(this.funcDef)
+          const skipInitLabel = this.compiler.createLabel(this.funcDef)
           this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
           this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, skipInitLabel)
           
@@ -1328,25 +1332,36 @@ export class ExpressionVisitor {
 
         this.compiler.emitOp(this.funcDef, Opcode.OP_drop) // drop exclude list
         this.compiler.emitOp(this.funcDef, Opcode.OP_drop) // drop spread source
-      } else if (ts.isMethodDeclaration(prop)) {
-        // Method definition
+      } else if (
+        ts.isMethodDeclaration(prop) ||
+        ts.isGetAccessorDeclaration(prop) ||
+        ts.isSetAccessorDeclaration(prop)
+      ) {
+        // 方法/访问器：先编译名称（若计算属性），再编译闭包，最后按 QuickJS 规则发射 define_method
+
+        if (ts.isComputedPropertyName(prop.name)) {
+          this.context.visit(prop.name.expression)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_to_propkey)
+        }
+
         this.context.visit(prop)
-        
+
+        let flags = DefineMethodFlag.Method | DefineMethodFlag.Enumerable
+        if (ts.isGetAccessorDeclaration(prop)) {
+          flags = DefineMethodFlag.Getter | DefineMethodFlag.Enumerable
+        } else if (ts.isSetAccessorDeclaration(prop)) {
+          flags = DefineMethodFlag.Setter | DefineMethodFlag.Enumerable
+        }
+
         if (ts.isIdentifier(prop.name) || ts.isStringLiteral(prop.name)) {
           const name = prop.name.text
           const atom = this.compiler.addAtom(name)
           this.compiler.emitOp(this.funcDef, Opcode.OP_define_method)
           this.compiler.emitU32(this.funcDef, atom)
-          this.compiler.emitU8(this.funcDef, 0) // flags: 0=method
-        } else {
-           // Computed property name for method?
-           // QuickJS supports OP_define_method with computed name?
-           // OP_define_method takes atom.
-           // If computed, we might need OP_define_array_el or similar, but that's for values.
-           // For methods, maybe we need to define it as a property with value=closure.
-           // But methods have home object set.
-           
-           // For now, only support non-computed names for methods in object literals
+          this.compiler.emitU8(this.funcDef, flags)
+        } else if (ts.isComputedPropertyName(prop.name)) {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_define_method_computed)
+          this.compiler.emitU8(this.funcDef, flags)
         }
       }
     }

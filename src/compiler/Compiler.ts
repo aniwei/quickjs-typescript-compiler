@@ -674,7 +674,7 @@ export class Compiler {
     return out.data()
   }
 
-  newLabel(fd: FunctionDef): Label {
+  createLabel(fd: FunctionDef): Label {
     const label = new Label()
     label.fd = fd
     this.labelsFor(fd).push(label)

@@ -45,13 +45,13 @@ export class LabelManager {
     const userLabels = this.pendingLabels.filter(l => !l.startsWith('goto_end_') && !l.startsWith('goto8_end_'))
     
     if (type === 'loop' && !continueLabel) {
-      continueLabel = this.compiler.newLabel(funcDef)
+      continueLabel = this.compiler.createLabel(funcDef)
     }
 
     const loopInfo: LoopInfo = {
       type,
       labels: userLabels,
-      breakLabel: this.compiler.newLabel(funcDef),
+      breakLabel: this.compiler.createLabel(funcDef),
       continueLabel
     }
     this.loopStack.push(loopInfo)
