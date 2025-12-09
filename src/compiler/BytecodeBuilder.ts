@@ -107,17 +107,10 @@ export class BytecodeBuilder {
     if (this.error) {
       return
     }
-    let more = true
-    while (more) {
-      let byte = val & 0x7f
-      val >>= 7
-      if ((val === 0 && (byte & 0x40) === 0) || (val === -1 && (byte & 0x40) !== 0)) {
-        more = false
-      } else {
-        byte |= 0x80
-      }
-      this.putByte(byte)
-    }
+    const signed = val | 0
+    const zigZag = (signed << 1) ^ (signed >> 31)
+    // QuickJS stores signed deltas as ZigZag-encoded varints.
+    this.putULEB128(zigZag >>> 0)
   }
 
   data(): Uint8Array {

@@ -97,15 +97,15 @@ export class HoistVariables {
             // console.log(`hoistVariables var: ${name} isLet=${isLet} level=${targetScopeLevel}`)
 
             if (!isLet && !isConst && !treatAsContextVar) {
-               // var: hoist to function scope
-               for (let i = this.scopeManager.stackDepth - 1; i >= 0; i--) {
-                  const scope = this.scopeManager.getScope(i)
-                  if (scope.type === 'function' || scope.type === 'module') {
-                    targetScope = scope
-                    targetScopeLevel = i - this.funcDef!.scopeLevel
-                    break
-                  }
-               }
+              // var: hoist to function scope
+              for (let i = this.scopeManager.stackDepth - 1; i >= 0; i--) {
+                const scope = this.scopeManager.getScope(i)
+                if (scope.type === 'function' || scope.type === 'module') {
+                  targetScope = scope
+                  targetScopeLevel = i - this.funcDef!.scopeLevel
+                  break
+                }
+              }
             }
 
             if (!targetScope.vars.has(name)) {
@@ -117,27 +117,25 @@ export class HoistVariables {
                 varIdx = this.compiler.addVar(this.funcDef!, name, isConst, isLet || isConst, targetScopeLevel)
               }
               
-              if (treatAsContextVar) {
-                const nameAtom = this.compiler.addAtom(name)
-                const closureIdx = this.compiler.addClosureVarWithAtom(this.funcDef!, nameAtom, true, false, varIdx, JSVarKind.JS_VAR_NORMAL, isConst, isLet || isConst)
-                targetScope.vars.set(name, {
-                  type: 'closure',
-                  idx: closureIdx,
-                  localIdx: varIdx,
-                  isLexical: isLet || isConst,
-                  isConst: isConst
-                })
-              } else {
-                targetScope.vars.set(name, {
-                  type: 'local',
-                  idx: varIdx,
-                  localIdx: varIdx,
-                  isLexical: isLet || isConst,
-                  isConst: isConst
-                })
-              }
-              
-              // Emit set_loc_uninitialized for let/const
+            if (treatAsContextVar) {
+              const nameAtom = this.compiler.addAtom(name)
+              const closureIdx = this.compiler.addClosureVarWithAtom(this.funcDef!, nameAtom, true, false, varIdx, JSVarKind.JS_VAR_NORMAL, isConst, isLet || isConst)
+              targetScope.vars.set(name, {
+                type: 'closure',
+                idx: closureIdx,
+                localIdx: varIdx,
+                isLexical: isLet || isConst,
+                isConst: isConst
+              })
+            } else {
+              targetScope.vars.set(name, {
+                type: 'local',
+                idx: varIdx,
+                localIdx: varIdx,
+                isLexical: isLet || isConst,
+                isConst: isConst
+              })
+            }              // Emit set_loc_uninitialized for let/const
               // QuickJS WASM does not emit this for top-level eval variables?
               // if (isLet || isConst) {
               //    this.compiler.emitOp(this.funcDef!, Opcode.OP_set_loc_uninitialized)
@@ -229,16 +227,23 @@ export class HoistVariables {
           */
 
           // 2. Add <class_fields_init> to Body Scope
-          const fieldsInitName = '<class_fields_init>'
-          const fieldsInitIdx = this.compiler.addVar(this.funcDef!, fieldsInitName, true, true, bodyScopeIndex, JSVarKind.JS_VAR_NORMAL)
-          
-          this.scopeManager.addPreHoistedVar(bodyScopeIndex, fieldsInitName, {
-            type: 'local',
-            idx: fieldsInitIdx,
-            localIdx: fieldsInitIdx,
-            isLexical: true,
-            isConst: true
-          })
+          const hasInstanceFields = n.members.some(m => 
+            ts.isPropertyDeclaration(m) && 
+            !m.modifiers?.some(mod => mod.kind === ts.SyntaxKind.StaticKeyword)
+          )
+
+          if (hasInstanceFields) {
+            const fieldsInitName = '<class_fields_init>'
+            const fieldsInitIdx = this.compiler.addVar(this.funcDef!, fieldsInitName, true, true, bodyScopeIndex, JSVarKind.JS_VAR_NORMAL)
+            
+            this.scopeManager.addPreHoistedVar(bodyScopeIndex, fieldsInitName, {
+              type: 'local',
+              idx: fieldsInitIdx,
+              localIdx: fieldsInitIdx,
+              isLexical: true,
+              isConst: true
+            })
+          }
           console.log('DEBUG: End of ClassDeclaration handling in hoistVariables')
         }
       }

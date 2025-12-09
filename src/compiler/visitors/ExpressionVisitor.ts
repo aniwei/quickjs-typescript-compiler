@@ -26,11 +26,15 @@ export class ExpressionVisitor {
   }
 
   visitBigIntLiteral(node: ts.BigIntLiteral) {
-    if (!this.funcDef) return
+    if (!this.funcDef) {
+      return
+    }
 
     const text = node.text.replace('n', '')
+
     try {
       const val = BigInt(text)
+
       // Check if it fits in int32
       if (val >= -2147483648n && val <= 2147483647n) {
         this.compiler.emitOp(this.funcDef, Opcode.OP_push_bigint_i32, node.getStart())
@@ -80,9 +84,11 @@ export class ExpressionVisitor {
         
         if (varInfo) {
           // Emit OP_set_name for named function expressions/arrows assigned to variables
-          if (ts.isArrowFunction(node.right) || 
-              ts.isFunctionExpression(node.right) || 
-              ts.isClassExpression(node.right)) {
+          if (
+            ts.isArrowFunction(node.right) || 
+            ts.isFunctionExpression(node.right) || 
+            ts.isClassExpression(node.right)
+          ) {
             const atomId = this.compiler.addAtom(name)
             this.compiler.emitOp(this.funcDef, Opcode.OP_set_name)
             this.compiler.emitU32(this.funcDef, atomId)
@@ -93,19 +99,22 @@ export class ExpressionVisitor {
             // Duplicate value for result of assignment expression
             this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
             
-            if (idx === 0) {
-              this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref0)
-            } else if (idx === 1) {
-              this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref1)
-            } else if (idx === 2) {
-              this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref2)
-            } else if (idx === 3) {
-              this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref3)
-            } else {
-              const atomId = this.compiler.addAtom(name)
-              this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref)
-              this.compiler.emitU32(this.funcDef, atomId)
+            if (varInfo.isLexical) {
+              this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref_check)
               this.compiler.emitU16(this.funcDef, idx)
+            } else {
+              if (idx === 0) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref0)
+              } else if (idx === 1) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref1)
+              } else if (idx === 2) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref2)
+              } else if (idx === 3) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref3)
+              } else {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref)
+                this.compiler.emitU16(this.funcDef, idx)
+              }
             }
           } else {
             // Local
@@ -150,13 +159,14 @@ export class ExpressionVisitor {
         this.compiler.emitAtomOp(this.funcDef, Opcode.OP_put_field, atom)
         // Stack: [val]
       } else if (ts.isElementAccessExpression(node.left)) {
-          // obj[key] = val
-          // 1. Visit obj
-          this.context.visit(node.left.expression)
-          // 2. Visit key
-          this.context.visit(node.left.argumentExpression)
-          // 3. Visit val (RHS) - wait, we visited RHS at top!
+        // obj[key] = val
+        // 1. Visit obj
+        this.context.visit(node.left.expression)
+        // 2. Visit key
+        this.context.visit(node.left.argumentExpression)
+        // 3. Visit val (RHS) - wait, we visited RHS at top!
       }
+
       return
     }
     
@@ -165,54 +175,36 @@ export class ExpressionVisitor {
 
     // Handle Logical Operators (&&, ||, ??)
     if (node.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) { // &&
+      const endLabel = this.compiler.newLabel(this.funcDef)
       this.context.visit(node.left)
       this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
-      this.compiler.emitOp(this.funcDef, Opcode.OP_if_false)
-      const jumpPos = this.funcDef.byteCode.size
-      this.compiler.emitU32(this.funcDef, 0)
+      this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, endLabel)
       this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
       this.context.visit(node.right)
-      const endPos = this.funcDef.byteCode.size
-      const offset = endPos - jumpPos - 4
-      this.funcDef.byteCode.buffer[jumpPos] = offset >>> 24
-      this.funcDef.byteCode.buffer[jumpPos + 1] = (offset >>> 16) & 0xff
-      this.funcDef.byteCode.buffer[jumpPos + 2] = (offset >>> 8) & 0xff
-      this.funcDef.byteCode.buffer[jumpPos + 3] = offset & 0xff
+      this.compiler.markLabel(this.funcDef, endLabel)
       return
     }
     
     if (node.operatorToken.kind === ts.SyntaxKind.BarBarToken) { // ||
+      const endLabel = this.compiler.newLabel(this.funcDef)
       this.context.visit(node.left)
       this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
-      this.compiler.emitOp(this.funcDef, Opcode.OP_if_true)
-      const jumpPos = this.funcDef.byteCode.size
-      this.compiler.emitU32(this.funcDef, 0)
+      this.compiler.emitJump(this.funcDef, Opcode.OP_if_true, endLabel)
       this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
       this.context.visit(node.right)
-      const endPos = this.funcDef.byteCode.size
-      const offset = endPos - jumpPos - 4
-      this.funcDef.byteCode.buffer[jumpPos] = offset >>> 24
-      this.funcDef.byteCode.buffer[jumpPos + 1] = (offset >>> 16) & 0xff
-      this.funcDef.byteCode.buffer[jumpPos + 2] = (offset >>> 8) & 0xff
-      this.funcDef.byteCode.buffer[jumpPos + 3] = offset & 0xff
+      this.compiler.markLabel(this.funcDef, endLabel)
       return
     }
 
     if (node.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken) { // ??
+      const endLabel = this.compiler.newLabel(this.funcDef)
       this.context.visit(node.left)
       this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
       this.compiler.emitOp(this.funcDef, Opcode.OP_is_undefined_or_null)
-      this.compiler.emitOp(this.funcDef, Opcode.OP_if_false) // Jump if NOT null/undefined (i.e. have value)
-      const jumpPos = this.funcDef.byteCode.size
-      this.compiler.emitU32(this.funcDef, 0)
-      this.compiler.emitOp(this.funcDef, Opcode.OP_drop) // Drop null/undefined
+      this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, endLabel)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
       this.context.visit(node.right)
-      const endPos = this.funcDef.byteCode.size
-      const offset = endPos - jumpPos - 4
-      this.funcDef.byteCode.buffer[jumpPos] = offset >>> 24
-      this.funcDef.byteCode.buffer[jumpPos + 1] = (offset >>> 16) & 0xff
-      this.funcDef.byteCode.buffer[jumpPos + 2] = (offset >>> 8) & 0xff
-      this.funcDef.byteCode.buffer[jumpPos + 3] = offset & 0xff
+      this.compiler.markLabel(this.funcDef, endLabel)
       return
     }
 
@@ -296,6 +288,9 @@ export class ExpressionVisitor {
       return
     }
 
+    const operandPos = node.operand.getStart()
+    const opPos = node.getStart()
+
     // Handle update expressions (++i, --i)
     if (node.operator === ts.SyntaxKind.PlusPlusToken || node.operator === ts.SyntaxKind.MinusMinusToken) {
       if (ts.isIdentifier(node.operand)) {
@@ -307,60 +302,66 @@ export class ExpressionVisitor {
             // Closure var
             const idx = varInfo.idx
             // Get value
-            if (idx === 0) this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref0)
-            else if (idx === 1) this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref1)
-            else if (idx === 2) this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref2)
-            else if (idx === 3) this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref3)
-            else {
-              const atomId = this.compiler.addAtom(name)
-              this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref)
-              this.compiler.emitU32(this.funcDef, atomId)
+            if (varInfo.isLexical) {
+              this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref_check, operandPos)
               this.compiler.emitU16(this.funcDef, idx)
+            } else {
+              if (idx === 0) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref0, operandPos)
+              } else if (idx === 1) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref1, operandPos)
+              } else if (idx === 2) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref2, operandPos)
+              } else if (idx === 3) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref3, operandPos)
+              } else {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref, operandPos)
+                this.compiler.emitU16(this.funcDef, idx)
+              }
             }
             
-            // Inc/Dec
+            // Inc/Dec (the only op that should carry the source position)
             if (node.operator === ts.SyntaxKind.PlusPlusToken) {
-              this.compiler.emitOp(this.funcDef, Opcode.OP_inc)
+              this.compiler.emitOp(this.funcDef, Opcode.OP_inc, opPos)
             } else {
-              this.compiler.emitOp(this.funcDef, Opcode.OP_dec)
+              this.compiler.emitOp(this.funcDef, Opcode.OP_dec, opPos)
             }
             
             // Put value
-            if (idx === 0) this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref0)
-            else if (idx === 1) this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref1)
-            else if (idx === 2) this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref2)
-            else if (idx === 3) this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref3)
-            else {
-              const atomId = this.compiler.addAtom(name)
-              this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref)
-              this.compiler.emitU32(this.funcDef, atomId)
-              this.compiler.emitU16(this.funcDef, idx)
-            }
-            
-            // Result is new value (already on stack from inc/dec? No, inc/dec modifies TOS)
-            // Wait, OP_inc takes value, increments it, pushes result?
-            // QuickJS: OP_inc: val -> val+1
-            // So stack has new value.
+            // Result is new value (already on stack from inc/dec)
             // put_var_ref consumes it.
             // So we need to dup before put if we want to return it.
-            // Prefix: returns new value.
-            
-            // Correct sequence:
-            // get_var
-            // inc
-            // dup
-            // put_var
+            this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
+
+            if (varInfo.isLexical) {
+              this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref_check)
+              this.compiler.emitU16(this.funcDef, idx)
+            } else {
+              if (idx === 0) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref0)
+              } else if (idx === 1) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref1)
+              } else if (idx === 2) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref2)
+              } else if (idx === 3) {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref3)
+              } else {
+                this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref)
+                this.compiler.emitU16(this.funcDef, idx)
+              }
+            }
           } else {
             // Local
             const varIdx = varInfo.idx
             const idx = this.funcDef.vars[varIdx].localIdx
             
+            this.compiler.pendingSourcePos = operandPos
             this.compiler.emitGetLoc(this.funcDef, idx)
             
             if (node.operator === ts.SyntaxKind.PlusPlusToken) {
-              this.compiler.emitOp(this.funcDef, Opcode.OP_inc)
+              this.compiler.emitOp(this.funcDef, Opcode.OP_inc, opPos)
             } else {
-              this.compiler.emitOp(this.funcDef, Opcode.OP_dec)
+              this.compiler.emitOp(this.funcDef, Opcode.OP_dec, opPos)
             }
             
             this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
@@ -368,12 +369,13 @@ export class ExpressionVisitor {
           }
         }
       }
+      
       return
     }
 
     // Optimization for -1
     if (node.operator === ts.SyntaxKind.MinusToken && ts.isNumericLiteral(node.operand) && node.operand.text === '1') {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_push_minus1)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_push_minus1, opPos)
       return
     }
 
@@ -382,11 +384,11 @@ export class ExpressionVisitor {
     if (node.operator === ts.SyntaxKind.ExclamationToken) {
       this.compiler.emitOp(this.funcDef, Opcode.OP_lnot)
     } else if (node.operator === ts.SyntaxKind.TildeToken) {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_not)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_not, opPos)
     } else if (node.operator === ts.SyntaxKind.PlusToken) {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_plus)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_plus, opPos)
     } else if (node.operator === ts.SyntaxKind.MinusToken) {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_neg)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_neg, opPos)
     } else if (node.operator === ts.SyntaxKind.TypeOfKeyword) {
       this.compiler.emitOp(this.funcDef, Opcode.OP_typeof)
     } else if (node.operator === ts.SyntaxKind.VoidKeyword) {
@@ -400,6 +402,10 @@ export class ExpressionVisitor {
       return
     }
 
+    const operatorLength = node.operator === ts.SyntaxKind.PlusPlusToken || node.operator === ts.SyntaxKind.MinusMinusToken ? 2 : 1
+    const opPos = node.getEnd() - operatorLength
+    const operandPos = node.operand.getStart()
+
     if (ts.isIdentifier(node.operand)) {
       const name = node.operand.text
       const varInfo = this.scopeManager.findVar(name, this.funcDef)
@@ -408,46 +414,61 @@ export class ExpressionVisitor {
         if (varInfo.type === 'closure') {
           const idx = varInfo.idx
           // Get value
-          if (idx === 0) this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref0)
-          else if (idx === 1) this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref1)
-          else if (idx === 2) this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref2)
-          else if (idx === 3) this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref3)
-          else {
-            const atomId = this.compiler.addAtom(name)
-            this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref)
-            this.compiler.emitU32(this.funcDef, atomId)
+          if (varInfo.isLexical) {
+            this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref_check, operandPos)
             this.compiler.emitU16(this.funcDef, idx)
+          } else {
+            if (idx === 0) {
+              this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref0, operandPos)
+            } else if (idx === 1) {
+              this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref1, operandPos)
+            } else if (idx === 2) {
+              this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref2, operandPos)
+            } else if (idx === 3) {
+              this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref3, operandPos)
+            } else {
+              this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref, operandPos)
+              this.compiler.emitU16(this.funcDef, idx)
+            }
           }
           
           // Postfix: return OLD value
           if (node.operator === ts.SyntaxKind.PlusPlusToken) {
-            this.compiler.emitOp(this.funcDef, Opcode.OP_post_inc)
+            this.compiler.emitOp(this.funcDef, Opcode.OP_post_inc, opPos)
           } else {
-            this.compiler.emitOp(this.funcDef, Opcode.OP_post_dec)
+            this.compiler.emitOp(this.funcDef, Opcode.OP_post_dec, opPos)
           }
           
           // Put new value
-          if (idx === 0) this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref0)
-          else if (idx === 1) this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref1)
-          else if (idx === 2) this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref2)
-          else if (idx === 3) this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref3)
-          else {
-            const atomId = this.compiler.addAtom(name)
-            this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref)
-            this.compiler.emitU32(this.funcDef, atomId)
+          if (varInfo.isLexical) {
+            this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref_check)
             this.compiler.emitU16(this.funcDef, idx)
+          } else {
+            if (idx === 0) {
+              this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref0)
+            } else if (idx === 1) {
+              this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref1)
+            } else if (idx === 2) {
+              this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref2)
+            } else if (idx === 3) {
+              this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref3)
+            } else {
+              this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref)
+              this.compiler.emitU16(this.funcDef, idx)
+            }
           }
         } else {
           // Local
           const varIdx = varInfo.idx
           const idx = this.funcDef.vars[varIdx].localIdx
           
+          this.compiler.pendingSourcePos = operandPos
           this.compiler.emitGetLoc(this.funcDef, idx)
           
           if (node.operator === ts.SyntaxKind.PlusPlusToken) {
-            this.compiler.emitOp(this.funcDef, Opcode.OP_post_inc)
+            this.compiler.emitOp(this.funcDef, Opcode.OP_post_inc, opPos)
           } else {
-            this.compiler.emitOp(this.funcDef, Opcode.OP_post_dec)
+            this.compiler.emitOp(this.funcDef, Opcode.OP_post_dec, opPos)
           }
           
           this.compiler.emitPutLoc(this.funcDef, idx)
@@ -461,31 +482,18 @@ export class ExpressionVisitor {
       return
     }
 
+    const falseLabel = this.compiler.newLabel(this.funcDef)
+    const endLabel = this.compiler.newLabel(this.funcDef)
+
     this.context.visit(node.condition)
-    this.compiler.emitOp(this.funcDef, Opcode.OP_if_false)
-    const jumpPos1 = this.funcDef.byteCode.size
-    this.compiler.emitU32(this.funcDef, 0)
-    
+    this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, falseLabel)
+
     this.context.visit(node.whenTrue)
-    this.compiler.emitOp(this.funcDef, Opcode.OP_goto)
-    const jumpPos2 = this.funcDef.byteCode.size
-    this.compiler.emitU32(this.funcDef, 0)
-    
-    const elsePos = this.funcDef.byteCode.size
-    const offset1 = elsePos - jumpPos1 - 4
-    this.funcDef.byteCode.buffer[jumpPos1] = offset1 >>> 24
-    this.funcDef.byteCode.buffer[jumpPos1 + 1] = (offset1 >>> 16) & 0xff
-    this.funcDef.byteCode.buffer[jumpPos1 + 2] = (offset1 >>> 8) & 0xff
-    this.funcDef.byteCode.buffer[jumpPos1 + 3] = offset1 & 0xff
-    
+    this.compiler.emitJump(this.funcDef, Opcode.OP_goto, endLabel)
+
+    this.compiler.markLabel(this.funcDef, falseLabel)
     this.context.visit(node.whenFalse)
-    
-    const endPos = this.funcDef.byteCode.size
-    const offset2 = endPos - jumpPos2 - 4
-    this.funcDef.byteCode.buffer[jumpPos2] = offset2 >>> 24
-    this.funcDef.byteCode.buffer[jumpPos2 + 1] = (offset2 >>> 16) & 0xff
-    this.funcDef.byteCode.buffer[jumpPos2 + 2] = (offset2 >>> 8) & 0xff
-    this.funcDef.byteCode.buffer[jumpPos2 + 3] = offset2 & 0xff
+    this.compiler.markLabel(this.funcDef, endLabel)
   }
 
   visitCallExpression(node: ts.CallExpression, isTailCall: boolean = false, tailCallPos: number = -1) {
@@ -528,10 +536,9 @@ export class ExpressionVisitor {
         this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref_check)
         this.compiler.emitU16(this.funcDef, this.funcDef.fieldsInitClosureIdx)
         
+        const skipInitLabel = this.compiler.newLabel(this.funcDef)
         this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
-        this.compiler.emitOp(this.funcDef, Opcode.OP_if_false8)
-        const jumpPos = this.funcDef.byteCode.size
-        this.compiler.emitU8(this.funcDef, 0)
+        this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, skipInitLabel)
         
         this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc_check) // get 'this' (checked)
         this.compiler.emitU16(this.funcDef, 2) // var 2
@@ -542,10 +549,7 @@ export class ExpressionVisitor {
         
         this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
         
-        const endPos = this.funcDef.byteCode.size
-        const offset = endPos - jumpPos
-        this.funcDef.byteCode.buffer[jumpPos] = offset
-        
+        this.compiler.markLabel(this.funcDef, skipInitLabel)
         this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
       }
         
@@ -710,6 +714,7 @@ export class ExpressionVisitor {
           this.compiler.emitU32(this.funcDef, atom)
         } else if (ts.isComputedPropertyName(prop.name)) {
           this.context.visit(prop.name.expression)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_to_propkey)
           this.context.visit(prop.initializer)
           this.compiler.emitOp(this.funcDef, Opcode.OP_define_array_el)
           this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
@@ -723,9 +728,18 @@ export class ExpressionVisitor {
         this.compiler.emitU32(this.funcDef, atom)
       } else if (ts.isSpreadAssignment(prop)) {
         this.context.visit(prop.expression)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_null)
+
+        const targetSlot = 2 // target object sits two entries below TOS
+        const sourceSlot = 1
+        const excludeSlot = 0
+        const copyMask = (targetSlot & 0b11) | ((sourceSlot & 0b111) << 2) | ((excludeSlot & 0b111) << 5)
+
         this.compiler.emitOp(this.funcDef, Opcode.OP_copy_data_properties)
-        this.compiler.emitU8(this.funcDef, 0) // exclude_proto = 0
-        this.compiler.emitU8(this.funcDef, 0) // exclude_source = 0
+        this.compiler.emitU8(this.funcDef, copyMask)
+
+        this.compiler.emitOp(this.funcDef, Opcode.OP_drop) // drop exclude list
+        this.compiler.emitOp(this.funcDef, Opcode.OP_drop) // drop spread source
       } else if (ts.isMethodDeclaration(prop)) {
         // Method definition
         this.context.visit(prop)
@@ -751,7 +765,9 @@ export class ExpressionVisitor {
   }
 
   visitNewExpression(node: ts.NewExpression) {
-    if (!this.funcDef) return
+    if (!this.funcDef) {
+      return
+    }
 
     this.context.visit(node.expression)
     this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
@@ -772,11 +788,13 @@ export class ExpressionVisitor {
     }
 
     // Optimization: void literal -> undefined (skip evaluation and drop)
-    if (ts.isNumericLiteral(node.expression) || 
+    if (
+      ts.isNumericLiteral(node.expression) || 
       ts.isStringLiteral(node.expression) ||
       node.expression.kind === ts.SyntaxKind.NullKeyword ||
       node.expression.kind === ts.SyntaxKind.TrueKeyword ||
-      node.expression.kind === ts.SyntaxKind.FalseKeyword) {
+      node.expression.kind === ts.SyntaxKind.FalseKeyword
+    ) {
       this.compiler.emitOp(this.funcDef, Opcode.OP_undefined)
       return
     }
@@ -822,6 +840,7 @@ export class ExpressionVisitor {
     if (!this.funcDef) {
       return
     }
+
     this.context.visit(node.expression)
     this.compiler.emitOp(this.funcDef, Opcode.OP_typeof)
   }

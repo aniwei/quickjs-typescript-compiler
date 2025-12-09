@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-08T15:56:10.013Z",
+  "timestamp": "2025-12-09T04:25:00.134Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/array-nested.ts",
   "compilation": {
     "typescript": {
@@ -174,30 +174,30 @@
         "0x00",
         "0x00",
         "0x19",
-        "0x05",
+        "0x0a",
         "0x00",
         "0x1b",
-        "0x07",
+        "0x0e",
         "0x1b",
-        "0x05",
+        "0x0a",
         "0x16",
-        "0x03",
+        "0x06",
         "0x0c",
-        "0x03",
+        "0x06",
         "0x07",
-        "0x79",
+        "0x0d",
         "0x17",
-        "0x75",
+        "0x15",
         "0x1b",
-        "0x07",
+        "0x0e",
         "0x1b",
-        "0x05",
+        "0x0a",
         "0x16",
-        "0x03",
+        "0x06",
         "0x07",
-        "0x03",
+        "0x06",
         "0x1b",
-        "0x79",
+        "0x0d",
         "0x00"
       ],
       "hexDump": [
@@ -211,9 +211,9 @@
         "00000070: 03 00 e3 39 e7 00 00 00 43 e8 00 00 00 68 00 00 |...9....C....h..|",
         "00000080: b7 48 b8 48 24 01 00 0e 39 e7 00 00 00 43 e8 00 |.H.H$...9....C..|",
         "00000090: 00 00 68 00 00 b9 48 42 e6 00 00 00 24 01 00 0e |..h...HB....$...|",
-        "000000a0: 06 2f c8 03 1c 00 00 00 19 05 00 1b 07 1b 05 16 |./..............|",
-        "000000b0: 03 0c 03 07 79 17 75 1b 07 1b 05 16 03 07 03 1b |....y.u.........|",
-        "000000c0: 79 00                                           |y.|"
+        "000000a0: 06 2f c8 03 1c 00 00 00 19 0a 00 1b 0e 1b 0a 16 |./..............|",
+        "000000b0: 06 0c 06 07 0d 17 15 1b 0e 1b 0a 16 06 07 06 1b |................|",
+        "000000c0: 0d 00                                           |..|"
       ],
       "structure": {
         "source": "TypeScript",
@@ -535,104 +535,7 @@
       }
     }
   },
-  "differences": [
-    {
-      "offset": 169,
-      "offsetHex": "0xa9",
-      "typescript": "0x05",
-      "wasm": "0x0a",
-      "typescriptDecimal": 5,
-      "wasmDecimal": 10
-    },
-    {
-      "offset": 172,
-      "offsetHex": "0xac",
-      "typescript": "0x07",
-      "wasm": "0x0e",
-      "typescriptDecimal": 7,
-      "wasmDecimal": 14
-    },
-    {
-      "offset": 174,
-      "offsetHex": "0xae",
-      "typescript": "0x05",
-      "wasm": "0x0a",
-      "typescriptDecimal": 5,
-      "wasmDecimal": 10
-    },
-    {
-      "offset": 176,
-      "offsetHex": "0xb0",
-      "typescript": "0x03",
-      "wasm": "0x06",
-      "typescriptDecimal": 3,
-      "wasmDecimal": 6
-    },
-    {
-      "offset": 178,
-      "offsetHex": "0xb2",
-      "typescript": "0x03",
-      "wasm": "0x06",
-      "typescriptDecimal": 3,
-      "wasmDecimal": 6
-    },
-    {
-      "offset": 180,
-      "offsetHex": "0xb4",
-      "typescript": "0x79",
-      "wasm": "0x0d",
-      "typescriptDecimal": 121,
-      "wasmDecimal": 13
-    },
-    {
-      "offset": 182,
-      "offsetHex": "0xb6",
-      "typescript": "0x75",
-      "wasm": "0x15",
-      "typescriptDecimal": 117,
-      "wasmDecimal": 21
-    },
-    {
-      "offset": 184,
-      "offsetHex": "0xb8",
-      "typescript": "0x07",
-      "wasm": "0x0e",
-      "typescriptDecimal": 7,
-      "wasmDecimal": 14
-    },
-    {
-      "offset": 186,
-      "offsetHex": "0xba",
-      "typescript": "0x05",
-      "wasm": "0x0a",
-      "typescriptDecimal": 5,
-      "wasmDecimal": 10
-    },
-    {
-      "offset": 188,
-      "offsetHex": "0xbc",
-      "typescript": "0x03",
-      "wasm": "0x06",
-      "typescriptDecimal": 3,
-      "wasmDecimal": 6
-    },
-    {
-      "offset": 190,
-      "offsetHex": "0xbe",
-      "typescript": "0x03",
-      "wasm": "0x06",
-      "typescriptDecimal": 3,
-      "wasmDecimal": 6
-    },
-    {
-      "offset": 192,
-      "offsetHex": "0xc0",
-      "typescript": "0x79",
-      "wasm": "0x0d",
-      "typescriptDecimal": 121,
-      "wasmDecimal": 13
-    }
-  ],
+  "differences": [],
   "sizeDifference": {
     "absolute": 0,
     "percentage": "0.00"

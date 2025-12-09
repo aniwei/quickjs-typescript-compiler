@@ -26,7 +26,6 @@ export class LiteralVisitor {
     if (!this.funcDef) {
       return
     }
-
     this.compiler.emitOp(this.funcDef, Opcode.OP_null)
   }
 
@@ -34,7 +33,6 @@ export class LiteralVisitor {
     if (!this.funcDef) {
       return
     }
-
     this.compiler.emitOp(this.funcDef, Opcode.OP_push_true)
   }
 
@@ -42,7 +40,6 @@ export class LiteralVisitor {
     if (!this.funcDef) {
       return
     }
-
     this.compiler.emitOp(this.funcDef, Opcode.OP_push_false)
   }
 
@@ -51,7 +48,6 @@ export class LiteralVisitor {
       return
     }
     const val = Number(node.text)
-    
     if (Number.isInteger(val)) {
       if (val === 0) { 
         this.compiler.emitOp(this.funcDef, Opcode.OP_push_0) 

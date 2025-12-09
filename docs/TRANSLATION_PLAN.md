@@ -288,11 +288,11 @@
 *   [x] **Task 13.2**: 提取标签与循环管理 (`LabelManager`)。
     *   创建 `src/compiler/LabelManager.ts`。
     *   移出 `pendingLabels`, `loopStack` 及相关的 `break`/`continue` 标签查找逻辑。
-*   [ ] **Task 13.3**: 拆分 AST 遍历器 (Visitor Pattern)。
+*   [x] **Task 13.3**: 拆分 AST 遍历器 (Visitor Pattern)。
     *   定义 `CompilerContext` 接口，暴露 `compiler`, `funcDef`, `scopeManager` 等核心状态。
     *   [x] **Task 13.3.1**: 提取 `StatementVisitor` (处理 `if`, `while`, `for`, `switch`, `block` 等)。
     *   [x] **Task 13.3.2**: 提取 `ExpressionVisitor` (处理 `binary`, `unary`, `call`, `member` 等)。
-    *   [ ] **Task 13.3.3**: 提取 `ClassVisitor` (处理 `class` 定义及成员)。
+    *   [x] **Task 13.3.3**: 提取 `ClassVisitor` (处理 `class` 定义及成员)。
     *   [x] **Task 13.3.4**: 提取 `FunctionVisitor` (处理函数定义、参数、箭头函数)。
 *   [ ] **Task 13.4**: 统一入口与调度。
     *   `TypeScriptCompiler` 作为外观模式 (Facade) 和调度中心，负责初始化各子模块并分发 `visit` 请求。

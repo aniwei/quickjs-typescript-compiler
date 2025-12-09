@@ -5,15 +5,24 @@ import { AtomReorderer } from './AtomReorderer'
 import ts from 'typescript'
 
 
-interface Jump {
+interface PendingJump {
   fd: FunctionDef
   pos: number
   size: number
 }
 
+interface RecordedJump {
+  fd: FunctionDef
+  pos: number
+  size: number
+  op: number
+  label: Label
+}
+
 export class Label {
   addr: number = -1
-  jumps: Jump[] = []
+  jumps: PendingJump[] = []
+  fd: FunctionDef | null = null
 }
 
 export class Compiler {
@@ -23,12 +32,32 @@ export class Compiler {
   firstAtomId: number = env.firstAtomId
   sourceFile: ts.SourceFile | null = null
   pendingSourcePos: number = -1
+  private labelMap: WeakMap<FunctionDef, Label[]> = new WeakMap()
+  private jumpMap: WeakMap<FunctionDef, RecordedJump[]> = new WeakMap()
 
   constructor(options?: { firstAtomId?: number }) {
     if (options?.firstAtomId) {
       this.firstAtomId = options.firstAtomId
     }
     this.ensureInitializedBuiltinAtoms()
+  }
+
+  private labelsFor(fd: FunctionDef): Label[] {
+    let labels = this.labelMap.get(fd)
+    if (!labels) {
+      labels = []
+      this.labelMap.set(fd, labels)
+    }
+    return labels
+  }
+
+  private jumpsFor(fd: FunctionDef): RecordedJump[] {
+    let jumps = this.jumpMap.get(fd)
+    if (!jumps) {
+      jumps = []
+      this.jumpMap.set(fd, jumps)
+    }
+    return jumps
   }
 
   ensureInitializedBuiltinAtoms() {
@@ -252,6 +281,16 @@ export class Compiler {
   }
 
   addPc2LineInfo(fd: FunctionDef, pc: number, sourcePos: number) {
+    if (sourcePos === -1) {
+      return
+    }
+
+    // Mirror QuickJS add_pc2line_info: only record monotonically increasing PCs
+    // and skip identical source positions to avoid noisy entries.
+    if (pc < fd.lineNumberLastPc || sourcePos === fd.lineNumberLast) {
+      return
+    }
+
     if (fd.sourcePos === -1) {
       fd.sourcePos = sourcePos
     }
@@ -261,10 +300,12 @@ export class Compiler {
     slot.sourcePos = sourcePos
     fd.lineNumberSlots.push(slot)
     fd.lineNumberCount++
+    fd.lineNumberLastPc = pc
+    fd.lineNumberLast = sourcePos
 
     if (this.sourceFile) {
       const pos = ts.getLineAndCharacterOfPosition(this.sourceFile, sourcePos)
-    // console.log(`[DEBUG] addPc2LineInfo: pc=${pc}, line=${pos.line + 1}, col=${pos.character + 1}`)
+      // console.log(`[DEBUG] addPc2LineInfo: pc=${pc}, line=${pos.line + 1}, col=${pos.character + 1}`)
     }
   }
 
@@ -633,11 +674,17 @@ export class Compiler {
     return out.data()
   }
 
-  newLabel(): Label {
-    return new Label()
+  newLabel(fd: FunctionDef): Label {
+    const label = new Label()
+    label.fd = fd
+    this.labelsFor(fd).push(label)
+    return label
   }
 
   markLabel(fd: FunctionDef, label: Label): void {
+    if (label.fd && label.fd !== fd) {
+      throw new Error('Label cross function boundary')
+    }
     label.addr = fd.byteCode.size
     // Patch existing jumps
     for (const jump of label.jumps) {
@@ -660,6 +707,31 @@ export class Compiler {
     label.jumps = []
   }
 
+  markLabelAt(fd: FunctionDef, label: Label, offset: number): void {
+    if (label.fd && label.fd !== fd) {
+      throw new Error('Label cross function boundary')
+    }
+    label.addr = offset
+    for (const jump of label.jumps) {
+      if (jump.fd !== fd) {
+        throw new Error('Jump cross function boundary')
+      }
+      const delta = label.addr - jump.pos
+      if (jump.size === 1) {
+        if (delta > 127 || delta < -128) {
+          throw new Error('Jump offset too large for 8-bit jump')
+        }
+        fd.byteCode.buffer[jump.pos] = delta
+      } else if (jump.size === 4) {
+        fd.byteCode.buffer[jump.pos] = delta & 0xff
+        fd.byteCode.buffer[jump.pos + 1] = (delta >> 8) & 0xff
+        fd.byteCode.buffer[jump.pos + 2] = (delta >> 16) & 0xff
+        fd.byteCode.buffer[jump.pos + 3] = (delta >> 24) & 0xff
+      }
+    }
+    label.jumps = []
+  }
+
   emitJump(fd: FunctionDef, op: number, label: Label): void {
     this.emitOp(fd, op)
     const jumpPos = fd.byteCode.size
@@ -671,6 +743,9 @@ export class Compiler {
     } else {
       this.emitU32(fd, 0)
     }
+
+    const recordedJump: RecordedJump = { fd, pos: jumpPos, size, op, label }
+    this.jumpsFor(fd).push(recordedJump)
 
     if (label.addr !== -1) {
       const offset = label.addr - jumpPos
@@ -690,7 +765,165 @@ export class Compiler {
     }
   }
 
+  private optimizeJumps(fd: FunctionDef): void {
+    const recordedJumps = this.jumpMap.get(fd)
+    const labels = this.labelMap.get(fd) ?? []
+    if (!recordedJumps || recordedJumps.length === 0) {
+      this.jumpMap.delete(fd)
+      this.labelMap.delete(fd)
+      return
+    }
+
+    let changed = false
+
+    for (let i = 0; i < recordedJumps.length; i++) {
+      const jump = recordedJumps[i]
+      const labelAddr = jump.label.addr
+      if (labelAddr === -1) {
+        continue
+      }
+      const op = jump.op
+      const isConditional = op === Opcode.OP_if_false || op === Opcode.OP_if_true
+      const isGoto = op === Opcode.OP_goto || op === Opcode.OP_goto16
+      if (!isConditional && !isGoto) {
+        continue
+      }
+
+      const delta = op === Opcode.OP_goto16 ? 1 : 3
+      const diff = labelAddr - jump.pos
+      if (diff >= -128 && diff <= 127 + delta) {
+        const newOp = isGoto
+          ? Opcode.OP_goto8
+          : Opcode.OP_if_false8 + (op - Opcode.OP_if_false)
+        this.shrinkRecordedJump(fd, jump, newOp, 1, labels, recordedJumps, i)
+        changed = true
+        continue
+      }
+
+      if (
+        op === Opcode.OP_goto &&
+        diff >= -0x8000 &&
+        diff <= 0x7fff
+      ) {
+        this.shrinkRecordedJump(fd, jump, Opcode.OP_goto16, 2, labels, recordedJumps, i)
+        changed = true
+      }
+    }
+
+    if (changed) {
+      this.patchRecordedJumps(fd, recordedJumps)
+      if (fd.pc2line.size > 0) {
+        fd.pc2line.reset()
+      }
+      this.computePc2LineInfo(fd)
+    }
+
+    this.jumpMap.delete(fd)
+    this.labelMap.delete(fd)
+  }
+
+  private shrinkRecordedJump(
+    fd: FunctionDef,
+    jump: RecordedJump,
+    newOp: number,
+    newSize: number,
+    labels: Label[],
+    recordedJumps: RecordedJump[],
+    jumpIndex: number
+  ): void {
+    const builder = fd.byteCode
+    const oldSize = jump.size
+    const removeBytes = oldSize - newSize
+
+    builder.buffer[jump.pos - 1] = newOp
+    jump.op = newOp
+    jump.size = newSize
+
+    if (removeBytes <= 0) {
+      return
+    }
+
+    const start = jump.pos + newSize
+    builder.buffer.copyWithin(start, start + removeBytes, builder.size)
+    builder.size -= removeBytes
+
+    this.adjustPositionsAfterShrink(fd, jump.pos, removeBytes, labels, recordedJumps, jumpIndex)
+  }
+
+  private adjustPositionsAfterShrink(
+    fd: FunctionDef,
+    pos: number,
+    delta: number,
+    labels: Label[],
+    recordedJumps: RecordedJump[],
+    jumpIndex: number
+  ): void {
+    for (const label of labels) {
+      if (label.addr > pos) {
+        label.addr -= delta
+      }
+    }
+
+    for (let j = jumpIndex + 1; j < recordedJumps.length; j++) {
+      if (recordedJumps[j].pos > pos) {
+        recordedJumps[j].pos -= delta
+      }
+    }
+
+    for (const slot of fd.lineNumberSlots) {
+      if (slot.pc > pos) {
+        slot.pc -= delta
+      }
+    }
+
+    for (const slot of fd.columnNumberSlots) {
+      if (slot.pc > pos) {
+        slot.pc -= delta
+      }
+    }
+
+    if (fd.lastOpcodePos > pos) {
+      fd.lastOpcodePos -= delta
+    }
+  }
+
+  private patchRecordedJumps(fd: FunctionDef, recordedJumps: RecordedJump[]): void {
+    for (const jump of recordedJumps) {
+      const labelAddr = jump.label.addr
+      if (labelAddr === -1) {
+        throw new Error('Cannot patch jump with unresolved label')
+      }
+      const diff = labelAddr - jump.pos
+      switch (jump.size) {
+        case 1:
+          if (diff < -128 || diff > 127) {
+            throw new Error('Jump offset too large for 8-bit jump')
+          }
+          fd.byteCode.buffer[jump.pos] = diff & 0xff
+          break
+        case 2:
+          if (diff < -0x8000 || diff > 0x7fff) {
+            throw new Error('Jump offset too large for 16-bit jump')
+          }
+          fd.byteCode.buffer[jump.pos] = diff & 0xff
+          fd.byteCode.buffer[jump.pos + 1] = (diff >> 8) & 0xff
+          break
+        case 4: {
+          const value = diff | 0
+          fd.byteCode.buffer[jump.pos] = value & 0xff
+          fd.byteCode.buffer[jump.pos + 1] = (value >> 8) & 0xff
+          fd.byteCode.buffer[jump.pos + 2] = (value >> 16) & 0xff
+          fd.byteCode.buffer[jump.pos + 3] = (value >> 24) & 0xff
+          break
+        }
+        default:
+          throw new Error(`Unsupported jump size ${jump.size}`)
+      }
+    }
+  }
+
   writeFunctionBytecode(out: BytecodeBuilder, fd: FunctionDef) {
+    this.optimizeJumps(fd)
     // Filter vars that are self-captured (in closureVar as local)
     // This mimics QuickJS behavior where module/eval vars are promoted to closure vars
     // and removed from the locals list in the bytecode, even though they occupy stack slots.

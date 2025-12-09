@@ -182,7 +182,7 @@ export class FunctionDef {
   lineNumberSlots: LineNumberSlot[] = []
   lineNumberSize: number = 0
   lineNumberCount: number = 0
-  lineNumberLast: number = 0
+  lineNumberLast: number = -1
   lineNumberLastPc: number = 0
 
   columnNumberSlots: ColumnNumberSlot[] = []

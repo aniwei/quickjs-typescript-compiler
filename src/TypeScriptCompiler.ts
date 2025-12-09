@@ -93,6 +93,8 @@ export class TypeScriptCompiler implements CompilerContext {
     fd.hasDebug = true
     fd.argumentsAllowed = true
     fd.sourcePos = 0 // Start of file
+    fd.lineNumberLast = fd.sourcePos
+    fd.lineNumberLastPc = 0
 
     this.funcDef = fd
     // QuickJS WASM seems to use Scope 2 for top-level module variables.
@@ -107,9 +109,8 @@ export class TypeScriptCompiler implements CompilerContext {
 
     // Module prologue
     this.compiler.emitOp(fd, Opcode.OP_push_this)
-    this.compiler.emitOp(fd, Opcode.OP_if_false8)
-    const jumpPos = fd.byteCode.size
-    this.compiler.emitU8(fd, 0)
+    const moduleBodyLabel = this.compiler.newLabel(fd)
+    this.compiler.emitJump(fd, Opcode.OP_if_false, moduleBodyLabel)
     
     // Hoist variables to ensure atom order matches QuickJS
     this.variableHoister.hoistVariables(sourceFile)
@@ -128,8 +129,8 @@ export class TypeScriptCompiler implements CompilerContext {
 
     this.compiler.emitOp(fd, Opcode.OP_return_undef)
 
-    // Module Path: Visit other statements
-    const moduleStartPos = fd.byteCode.size
+    // Module path: Visit other statements
+    this.compiler.markLabel(fd, moduleBodyLabel)
     let hasStatements = false
 
     for (const stmt of sourceFile.statements) {
@@ -148,22 +149,9 @@ export class TypeScriptCompiler implements CompilerContext {
     fd.stackSize = fd.stackSizeMax
     
     // Module epilogue
-    const epiloguePos = fd.byteCode.size
     this.compiler.emitOp(fd, Opcode.OP_undefined)
-    const returnAsyncPos = fd.byteCode.size
     this.compiler.emitOp(fd, Opcode.OP_return_async)
 
-    // Patch jump
-    // if_false8 jumps if false (eval mode). We want to jump to the start of the module body.
-    // If true (init mode), we fall through to return_undef (after init code).
-    let targetPos = moduleStartPos
-    
-    const offset = targetPos - jumpPos
-    if (offset > 127 || offset < -128) {
-      throw new Error('Jump offset too large')
-    }
-
-    fd.byteCode.buffer[jumpPos] = offset
     this.compiler.computePc2LineInfo(fd)
 
     this.scopeManager.exit() // Exit function scope

@@ -42,22 +42,22 @@ export class LabelManager {
 
   pushLoop(type: 'loop' | 'switch' | 'block', funcDef: FunctionDef, continueLabel?: Label): LoopInfo {
     // Filter user labels
-    const userLabels = this.pendingLabels.filter(l => !l.startsWith('goto_end_') && !l.startsWith('goto8_end_') && !l.startsWith('gosub_'))
+    const userLabels = this.pendingLabels.filter(l => !l.startsWith('goto_end_') && !l.startsWith('goto8_end_'))
     
     if (type === 'loop' && !continueLabel) {
-      continueLabel = this.compiler.newLabel()
+      continueLabel = this.compiler.newLabel(funcDef)
     }
 
     const loopInfo: LoopInfo = {
       type,
       labels: userLabels,
-      breakLabel: this.compiler.newLabel(),
+      breakLabel: this.compiler.newLabel(funcDef),
       continueLabel
     }
     this.loopStack.push(loopInfo)
     
     // Remove user labels from pendingLabels
-    this.pendingLabels = this.pendingLabels.filter(l => l.startsWith('goto_end_') || l.startsWith('goto8_end_') || l.startsWith('gosub_'))
+    this.pendingLabels = this.pendingLabels.filter(l => l.startsWith('goto_end_') || l.startsWith('goto8_end_'))
 
     return loopInfo
   }

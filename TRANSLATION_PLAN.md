@@ -68,8 +68,8 @@
 - [x] Task 13.3: Extract Visitors
     - [x] 13.3.1: StatementVisitor
     - [x] 13.3.2: ExpressionVisitor
-    - [ ] 13.3.3: FunctionVisitor
-    - [ ] 13.3.4: ClassVisitor
+    - [x] 13.3.3: FunctionVisitor
+    - [x] 13.3.4: ClassVisitor
 
 ## Binary Compatibility Tracking (🚧 In Progress)
 - [x] Atom Table Alignment (Full initialization of 227 built-in atoms implemented)
@@ -92,8 +92,10 @@
 - [x] `loop-break-continue.ts` (190 bytes, Perfect Match)
 - [x] `function-default-params.ts` (Structurally Correct)
 - [x] `binary-ops.ts` (Perfect Match)
+- [x] `closure-short.ts` (279 bytes, Perfect Match - Short Opcodes Implemented)
+- [x] `closure-vars.ts` (Structurally Correct, Short Opcodes Verified)
 - [ ] `class-inheritance.ts` (-25 bytes diff. Structure aligned, debugging const capture opcodes)
 - [ ] `class-basic.ts` (196 bytes vs 201 bytes, -5 bytes diff. Fixed OP_get_var_ref_check encoding)
-- [ ] `primitives.ts` (Minor debug info mismatch)
+- [x] `primitives.ts` (Perfect Match - pc2line zigzag encoding fixed)
 - [ ] `labeled-statements.ts` (Minor mismatch)
 

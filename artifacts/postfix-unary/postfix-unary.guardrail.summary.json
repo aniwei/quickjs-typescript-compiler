@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/postfix-unary/cli/postfix-unary.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/postfix-unary/cli/postfix-unary.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/postfix-unary/cli/postfix-unary.pc2line.txt",
-    "bytecodeSize": 241,
+    "bytecodeSize": 257,
     "pc2lineLength": 0,
     "stackMax": 0
   },
   "bytecode": {
-    "identical": false,
-    "tsSize": 172,
+    "identical": true,
+    "tsSize": 188,
     "wasmSize": 188,
-    "sizeDiff": -16,
-    "sizeDiffPercent": -8.51063829787234
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
   },
   "trace": {
     "differenceCount": 0,

@@ -48,8 +48,14 @@ export class ClassVisitor {
     const fieldsInitName = '<class_fields_init>'
     let fieldsInitScopeInfo = scopeManager.findVar(fieldsInitName, funcDef!)
     
+    // Check if we have any instance fields to initialize
+    const hasInstanceFields = node.members.some(m => 
+      ts.isPropertyDeclaration(m) && 
+      !m.modifiers?.some(mod => mod.kind === ts.SyntaxKind.StaticKeyword)
+    )
+
     console.log(`visitClassDeclaration: finding ${fieldsInitName} -> ${fieldsInitScopeInfo ? 'found' : 'not found'}`)
-    if (!fieldsInitScopeInfo) {
+    if (!fieldsInitScopeInfo && hasInstanceFields) {
       const varIdx = compiler.addVar(funcDef, fieldsInitName, true, false, bodyScopeIndex)
       const currentScope = scopeManager.currentScope
       currentScope.vars.set(fieldsInitName, {
@@ -118,8 +124,12 @@ export class ClassVisitor {
     
     if (constructorNode) {
       fd.sourcePos = constructorNode.getStart()
+      fd.lineNumberLast = fd.sourcePos
+      fd.lineNumberLastPc = 0
     } else {
       fd.sourcePos = node.getStart()
+      fd.lineNumberLast = fd.sourcePos
+      fd.lineNumberLastPc = 0
     }
 
     fd.parent = parentFd
@@ -532,20 +542,16 @@ export class ClassVisitor {
         compiler.emitOp(fd, Opcode.OP_get_var_ref_check)
         compiler.emitU16(fd, fieldsInitClosureIdx)
         
+        const skipInitLabel = compiler.newLabel(fd)
         compiler.emitOp(fd, Opcode.OP_dup)
-        compiler.emitOp(fd, Opcode.OP_if_false8)
-        const jumpPos = fd.byteCode.size
-        compiler.emitU8(fd, 0)
+        compiler.emitJump(fd, Opcode.OP_if_false, skipInitLabel)
         
         compiler.emitOp(fd, Opcode.OP_get_loc0) // this
         compiler.emitOp(fd, Opcode.OP_swap)
         compiler.emitOp(fd, Opcode.OP_call_method)
         compiler.emitU16(fd, 0)
-        
-        const endPos = fd.byteCode.size
-        const offset = endPos - jumpPos
-        fd.byteCode.buffer[jumpPos] = offset
-        
+
+        compiler.markLabel(fd, skipInitLabel)
         compiler.emitOp(fd, Opcode.OP_drop)
       }
     }
@@ -558,20 +564,16 @@ export class ClassVisitor {
           compiler.emitOp(fd, Opcode.OP_get_var_ref_check)
           compiler.emitU16(fd, fieldsInitClosureIdx)
           
+          const skipInitLabel = compiler.newLabel(fd)
           compiler.emitOp(fd, Opcode.OP_dup)
-          compiler.emitOp(fd, Opcode.OP_if_false8)
-          const jumpPos = fd.byteCode.size
-          compiler.emitU8(fd, 0)
+          compiler.emitJump(fd, Opcode.OP_if_false, skipInitLabel)
           
           compiler.emitOp(fd, Opcode.OP_get_loc0) // this
           compiler.emitOp(fd, Opcode.OP_swap)
           compiler.emitOp(fd, Opcode.OP_call_method)
           compiler.emitU16(fd, 0)
-          
-          const endPos = fd.byteCode.size
-          const offset = endPos - jumpPos
-          fd.byteCode.buffer[jumpPos] = offset
-          
+
+          compiler.markLabel(fd, skipInitLabel)
           compiler.emitOp(fd, Opcode.OP_drop)
         }
       }
@@ -585,20 +587,16 @@ export class ClassVisitor {
         compiler.emitOp(fd, Opcode.OP_get_var_ref_check)
         compiler.emitU16(fd, fieldsInitClosureIdx)
         
+        const skipInitLabel = compiler.newLabel(fd)
         compiler.emitOp(fd, Opcode.OP_dup)
-        compiler.emitOp(fd, Opcode.OP_if_false8)
-        const jumpPos = fd.byteCode.size
-        compiler.emitU8(fd, 0)
+        compiler.emitJump(fd, Opcode.OP_if_false, skipInitLabel)
         
         compiler.emitOp(fd, Opcode.OP_get_loc0) // this
         compiler.emitOp(fd, Opcode.OP_swap)
         compiler.emitOp(fd, Opcode.OP_call_method)
         compiler.emitU16(fd, 0)
-        
-        const endPos = fd.byteCode.size
-        const offset = endPos - jumpPos
-        fd.byteCode.buffer[jumpPos] = offset
-        
+
+        compiler.markLabel(fd, skipInitLabel)
         compiler.emitOp(fd, Opcode.OP_drop)
       }
     }
@@ -607,11 +605,9 @@ export class ClassVisitor {
     compiler.computePc2LineInfo(fd)
     
     scopeManager.exit()
-
-        this.context.setFuncDef(prevFd)
-        
-        scopeManager.exit()
-        if (nameScopeIndex !== -1) scopeManager.exit()
+    this.context.setFuncDef(prevFd)  
+    scopeManager.exit()
+      if (nameScopeIndex !== -1) scopeManager.exit()
     })
 
     this.context.setFuncDef(parentFd)

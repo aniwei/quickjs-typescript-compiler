@@ -1,5 +1,6 @@
 import ts from 'typescript'
 import { CompilerContext } from '../CompilerContext'
+import { Label } from '../Compiler'
 import { Opcode } from '../../env'
 import { JSVarKind } from '../FunctionDef'
 import { LoopInfo } from '../LabelManager'
@@ -20,7 +21,7 @@ export class StatementVisitor {
     let loopInfo: LoopInfo | undefined
     
     // Check for user labels
-    const hasUserLabels = labelManager.currentPendingLabels.some(l => !l.startsWith('goto_end_') && !l.startsWith('goto8_end_') && !l.startsWith('gosub_'))
+    const hasUserLabels = labelManager.currentPendingLabels.some(l => !l.startsWith('goto_end_') && !l.startsWith('goto8_end_'))
     
     if (hasUserLabels) {
       loopInfo = labelManager.pushLoop('block', funcDef)
@@ -110,7 +111,7 @@ export class StatementVisitor {
 
           if (loopInfo) {
             this.context.visit(node.expression)
-            compiler.emitJump(funcDef, Opcode.OP_if_true8, loopInfo.breakLabel)
+            compiler.emitJump(funcDef, Opcode.OP_if_true, loopInfo.breakLabel)
             return
           }
         } else if (ts.isContinueStatement(stmt)) {
@@ -134,60 +135,28 @@ export class StatementVisitor {
 
           if (loopInfo) {
             this.context.visit(node.expression)
-            compiler.emitJump(funcDef, Opcode.OP_if_true8, loopInfo.continueLabel!)
+            compiler.emitJump(funcDef, Opcode.OP_if_true, loopInfo.continueLabel!)
             return
           }
         }
       }
     }
 
-    // 1. Condition
+    const endLabel = compiler.newLabel(funcDef)
+    const elseLabel = node.elseStatement ? compiler.newLabel(funcDef) : endLabel
+
     this.context.visit(node.expression)
-    
-    // 2. Jump if false
-    compiler.emitOp(funcDef, Opcode.OP_if_false8)
-    const ifFalseOffsetPos = funcDef.byteCode.size
-    compiler.emitU8(funcDef, 0) // Placeholder
-    
-    // 3. Then block
+    compiler.emitJump(funcDef, Opcode.OP_if_false, elseLabel)
+
     this.context.visit(node.thenStatement)
-    
+
     if (node.elseStatement) {
-      // 4. Jump to end (skip else)
-      compiler.emitOp(funcDef, Opcode.OP_goto8)
-      const gotoOffsetPos = funcDef.byteCode.size
-      compiler.emitU8(funcDef, 0) // Placeholder
-      
-      // 5. Patch if_false
-      const elsePos = funcDef.byteCode.size
-      const ifFalseOffset = elsePos - ifFalseOffsetPos
-      
-      if (ifFalseOffset > 127 || ifFalseOffset < -128) {
-        throw new Error('Jump offset too large for if_false8')
-      }
-      funcDef.byteCode.buffer[ifFalseOffsetPos] = ifFalseOffset
-      
-      // 6. Else block
+      compiler.emitJump(funcDef, Opcode.OP_goto, endLabel)
+      compiler.markLabel(funcDef, elseLabel)
       this.context.visit(node.elseStatement)
-      
-      // 7. Patch goto
-      const endPos = funcDef.byteCode.size
-      const gotoOffset = endPos - gotoOffsetPos
-      
-      if (gotoOffset > 127 || gotoOffset < -128) {
-        throw new Error('Jump offset too large for goto8')
-      }
-      funcDef.byteCode.buffer[gotoOffsetPos] = gotoOffset
-    } else {
-      // 5. Patch if_false
-      const endPos = funcDef.byteCode.size
-      const ifFalseOffset = endPos - ifFalseOffsetPos
-      
-      if (ifFalseOffset > 127 || ifFalseOffset < -128) {
-        throw new Error('Jump offset too large for if_false8')
-      }
-      funcDef.byteCode.buffer[ifFalseOffsetPos] = ifFalseOffset
     }
+
+    compiler.markLabel(funcDef, endLabel)
   }
 
   visitWhileStatement(node: ts.WhileStatement) {
@@ -196,51 +165,18 @@ export class StatementVisitor {
       return
     }
 
-    const continueLabel = compiler.newLabel()
-    compiler.markLabel(funcDef, continueLabel)
-    const startPos = funcDef.byteCode.size
-
-    // 1. Condition
-    this.context.visit(node.expression)
-
-    // 2. Jump if false to end
-    compiler.emitOp(funcDef, Opcode.OP_if_false8)
-    const ifFalseOffsetPos = funcDef.byteCode.size
-    compiler.emitU8(funcDef, 0) // Placeholder
-
-    // Push loop info
+    const continueLabel = compiler.newLabel(funcDef)
     const loopInfo = labelManager.pushLoop('loop', funcDef, continueLabel)
+    compiler.markLabel(funcDef, continueLabel)
 
-    // 3. Body
+    this.context.visit(node.expression)
+    compiler.emitJump(funcDef, Opcode.OP_if_false, loopInfo.breakLabel)
+
     this.context.visit(node.statement)
     
     labelManager.popLoop()
 
-    // 4. Jump back to start
-    compiler.emitOp(funcDef, Opcode.OP_goto8)
-    const gotoOffsetPos = funcDef.byteCode.size
-    compiler.emitU8(funcDef, 0) // Placeholder
-    const gotoOffset = startPos - gotoOffsetPos
-
-    if (gotoOffset > 127 || gotoOffset < -128) {
-      // TODO: Handle long jumps
-      throw new Error('Jump offset too large for goto8')
-    }
-
-    funcDef.byteCode.buffer[gotoOffsetPos] = gotoOffset
-
-    // 5. Patch if_false
-    const endPos = funcDef.byteCode.size
-    const ifFalseOffset = endPos - ifFalseOffsetPos
-
-    if (ifFalseOffset > 127 || ifFalseOffset < -128) {
-      // TODO: Handle long jumps
-      throw new Error('Jump offset too large for if_false8')
-    }
-
-    funcDef.byteCode.buffer[ifFalseOffsetPos] = ifFalseOffset
-    
-    // Patch break jumps
+    compiler.emitJump(funcDef, Opcode.OP_goto, continueLabel)
     compiler.markLabel(funcDef, loopInfo.breakLabel)
   }
 
@@ -250,35 +186,18 @@ export class StatementVisitor {
       return
     }
 
-    const startPos = funcDef.byteCode.size
-    const continueLabel = compiler.newLabel()
-
-    // Push loop info
+    const startLabel = compiler.newLabel(funcDef)
+    const continueLabel = compiler.newLabel(funcDef)
     const loopInfo = labelManager.pushLoop('loop', funcDef, continueLabel)
 
-    // 1. Body
+    compiler.markLabel(funcDef, startLabel)
     this.context.visit(node.statement)
-    
-    // 2. Continue Target is here
     compiler.markLabel(funcDef, continueLabel)
 
-    // 3. Condition
     this.context.visit(node.expression)
+    compiler.emitJump(funcDef, Opcode.OP_if_true, startLabel)
 
-    // 4. Jump if true to start
-    compiler.emitOp(funcDef, Opcode.OP_if_true8)
-    const ifTrueOffsetPos = funcDef.byteCode.size
-    compiler.emitU8(funcDef, 0) // Placeholder
-    
-    const ifTrueOffset = startPos - ifTrueOffsetPos
-    if (ifTrueOffset > 127 || ifTrueOffset < -128) {
-      throw new Error('Jump offset too large for if_true8')
-    }
-    funcDef.byteCode.buffer[ifTrueOffsetPos] = ifTrueOffset
-    
     labelManager.popLoop()
-    
-    // 5. Break Target is here
     compiler.markLabel(funcDef, loopInfo.breakLabel)
   }
 
@@ -357,24 +276,18 @@ export class StatementVisitor {
       }
     }
 
-    const startPos = funcDef.byteCode.size
+    const loopInfo = labelManager.pushLoop('loop', funcDef)
+    const startLabel = compiler.newLabel(funcDef)
+    compiler.markLabel(funcDef, startLabel)
 
     // 3. Condition
-    let ifFalseOffsetPos = -1
     if (node.condition) {
       this.context.visit(node.condition)
-      compiler.emitOp(funcDef, Opcode.OP_if_false8)
-      ifFalseOffsetPos = funcDef.byteCode.size
-      compiler.emitU8(funcDef, 0)
+      compiler.emitJump(funcDef, Opcode.OP_if_false, loopInfo.breakLabel)
     }
-
-    // Push loop info
-    const loopInfo = labelManager.pushLoop('loop', funcDef)
 
     // 4. Body
     this.context.visit(node.statement)
-
-    labelManager.popLoop()
 
     // 5. Increment
     compiler.markLabel(funcDef, loopInfo.continueLabel!)
@@ -385,29 +298,9 @@ export class StatementVisitor {
     }
 
     // 6. Loop
-    compiler.emitOp(funcDef, Opcode.OP_goto8)
-    const gotoOffsetPos = funcDef.byteCode.size
-    compiler.emitU8(funcDef, 0)
-    const gotoOffset = startPos - gotoOffsetPos
+    compiler.emitJump(funcDef, Opcode.OP_goto, startLabel)
 
-    if (gotoOffset > 127 || gotoOffset < -128) {
-      throw new Error('Jump offset too large for goto8')
-    }
-
-    funcDef.byteCode.buffer[gotoOffsetPos] = gotoOffset
-    
-    // 7. Patch exit
-    const endPos = funcDef.byteCode.size
-    if (ifFalseOffsetPos !== -1) {
-      const offset = endPos - ifFalseOffsetPos
-
-      if (offset > 127 || offset < -128) {
-        throw new Error('Jump offset too large for if_false8')
-      }
-      funcDef.byteCode.buffer[ifFalseOffsetPos] = offset
-    }
-
-    // Patch break jumps
+    labelManager.popLoop()
     compiler.markLabel(funcDef, loopInfo.breakLabel)
 
 
@@ -466,68 +359,40 @@ export class StatementVisitor {
 
     compiler.emitOp(funcDef, Opcode.OP_for_of_start)
     
-    // Push loop info
     const loopInfo = labelManager.pushLoop('loop', funcDef)
+    const bodyLabel = compiler.newLabel(funcDef)
+    const checkLabel = compiler.newLabel(funcDef)
 
-    // Jump to check
-    compiler.emitOp(funcDef, Opcode.OP_goto8)
-    const gotoCheckPos = funcDef.byteCode.size
-    compiler.emitU8(funcDef, 0)
-    
-    // Body Label
-    const bodyPos = funcDef.byteCode.size
-    
-    // Adjust stack for loop variable (pushed by for_of_next)
+    compiler.emitJump(funcDef, Opcode.OP_goto, checkLabel)
+
+    compiler.markLabel(funcDef, bodyLabel)
     compiler.adjustStack(funcDef, 1)
-    
-    // Assign to variable
-    if (node.initializer) {
-      if (ts.isVariableDeclarationList(node.initializer)) {
-        for (const decl of node.initializer.declarations) {
-          if (ts.isIdentifier(decl.name)) {
-            const name = decl.name.text
-            const scopeInfo = scopeManager.findVar(name, funcDef!)
-            if (scopeInfo) {
-              compiler.emitPutLoc(funcDef, scopeInfo.idx)
-            }
+
+    if (node.initializer && ts.isVariableDeclarationList(node.initializer)) {
+      for (const decl of node.initializer.declarations) {
+        if (ts.isIdentifier(decl.name)) {
+          const name = decl.name.text
+          const scopeInfo = scopeManager.findVar(name, funcDef!)
+          if (scopeInfo) {
+            compiler.emitPutLoc(funcDef, scopeInfo.idx)
           }
         }
       }
     }
     
-    // Visit Body
     this.context.visit(node.statement)
     
-    // Continue Label
     compiler.markLabel(funcDef, loopInfo.continueLabel!)
-    
-    // Check Label
-    const checkPos = funcDef.byteCode.size
-    
-    // Patch initial goto
-    const offset = checkPos - gotoCheckPos
-    funcDef.byteCode.buffer[gotoCheckPos] = offset
+    compiler.markLabel(funcDef, checkLabel)
     
     compiler.emitOp(funcDef, Opcode.OP_for_of_next)
     compiler.emitU8(funcDef, 0)
+    compiler.emitJump(funcDef, Opcode.OP_if_false, bodyLabel)
     
-    // if_false8 Body
-    compiler.emitOp(funcDef, Opcode.OP_if_false8)
-    const jumpBackPos = funcDef.byteCode.size
-    compiler.emitU8(funcDef, 0)
-    
-    const jumpBackOffset = bodyPos - jumpBackPos
-    funcDef.byteCode.buffer[jumpBackPos] = jumpBackOffset
-    
-    // Drop iterator
     compiler.emitOp(funcDef, Opcode.OP_drop)
-    
-    // Iterator Close
     compiler.emitOp(funcDef, Opcode.OP_iterator_close)
     
     labelManager.popLoop()
-    
-    // Break Label
     compiler.markLabel(funcDef, loopInfo.breakLabel)
     
     if (hasScope) {
@@ -580,73 +445,43 @@ export class StatementVisitor {
 
     compiler.emitOp(funcDef, Opcode.OP_for_in_start)
     
-    // Push loop info
-    // Filter user labels
-    const userLabels = labelManager.currentPendingLabels.filter(l => !l.startsWith('goto_end_') && !l.startsWith('goto8_end_') && !l.startsWith('gosub_'))
-
+    const userLabels = labelManager.currentPendingLabels.filter(l => !l.startsWith('goto_end_') && !l.startsWith('goto8_end_'))
     const loopInfo: LoopInfo = {
       type: 'loop',
       labels: userLabels,
-      breakLabel: compiler.newLabel(),
-      continueLabel: compiler.newLabel()
+      breakLabel: compiler.newLabel(funcDef),
+      continueLabel: compiler.newLabel(funcDef)
     }
     labelManager.currentLoopStack.push(loopInfo)
-    
-    // Remove user labels from pendingLabels
-    labelManager.currentPendingLabels = labelManager.currentPendingLabels.filter(l => l.startsWith('goto_end_') || l.startsWith('goto8_end_') || l.startsWith('gosub_'))
+    labelManager.currentPendingLabels = labelManager.currentPendingLabels.filter(l => l.startsWith('goto_end_') || l.startsWith('goto8_end_'))
 
-    // Jump to check
-    compiler.emitOp(funcDef, Opcode.OP_goto8)
-    const gotoCheckPos = funcDef.byteCode.size
-    compiler.emitU8(funcDef, 0)
+    const bodyLabel = compiler.newLabel(funcDef)
+    const checkLabel = compiler.newLabel(funcDef)
+    compiler.emitJump(funcDef, Opcode.OP_goto, checkLabel)
     
-    // Body Label
-    const bodyPos = funcDef.byteCode.size
-    
-    // Assign to variable
-    if (node.initializer) {
-      if (ts.isVariableDeclarationList(node.initializer)) {
-        for (const decl of node.initializer.declarations) {
-          if (ts.isIdentifier(decl.name)) {
-            const name = decl.name.text
-            const scopeInfo = scopeManager.findVar(name, funcDef!)
-            if (scopeInfo) {
-              compiler.emitPutLoc(funcDef, scopeInfo.idx)
-            }
+    compiler.markLabel(funcDef, bodyLabel)
+    if (node.initializer && ts.isVariableDeclarationList(node.initializer)) {
+      for (const decl of node.initializer.declarations) {
+        if (ts.isIdentifier(decl.name)) {
+          const name = decl.name.text
+          const scopeInfo = scopeManager.findVar(name, funcDef!)
+          if (scopeInfo) {
+            compiler.emitPutLoc(funcDef, scopeInfo.idx)
           }
         }
       }
     }
     
-    // Visit Body
     this.context.visit(node.statement)
-    
-    // Continue Label
     compiler.markLabel(funcDef, loopInfo.continueLabel!)
-    
-    // Check Label
-    const checkPos = funcDef.byteCode.size
-    
-    // Patch initial goto
-    const offset = checkPos - gotoCheckPos
-    funcDef.byteCode.buffer[gotoCheckPos] = offset
-    
+
+    compiler.markLabel(funcDef, checkLabel)
     compiler.emitOp(funcDef, Opcode.OP_for_in_next)
-    
-    // if_false8 Body
-    compiler.emitOp(funcDef, Opcode.OP_if_false8)
-    const jumpBackPos = funcDef.byteCode.size
-    compiler.emitU8(funcDef, 0)
-    
-    const jumpBackOffset = bodyPos - jumpBackPos
-    funcDef.byteCode.buffer[jumpBackPos] = jumpBackOffset
-    
-    // Drop iterator
+    compiler.emitJump(funcDef, Opcode.OP_if_false, bodyLabel)
+
     compiler.emitOp(funcDef, Opcode.OP_drop)
     
     labelManager.popLoop()
-    
-    // Break Label
     compiler.markLabel(funcDef, loopInfo.breakLabel)
     
     if (hasScope) {
@@ -660,128 +495,103 @@ export class StatementVisitor {
       return
     }
 
-    // 1. Evaluate expression
     this.context.visit(node.expression)
-    
-    // 3. Setup break stack
     const loopInfo = labelManager.pushLoop('switch', funcDef)
-
+    
     const clauses = node.caseBlock.clauses
-    
-    // Handle "Default First" case: Jump to first Case Check
-    let startJumpPos = -1
-    const hasCaseClauses = clauses.some(c => ts.isCaseClause(c))
-    if (clauses.length > 0 && ts.isDefaultClause(clauses[0]) && hasCaseClauses) {
-      compiler.emitOp(funcDef, Opcode.OP_goto8)
-      startJumpPos = funcDef.byteCode.size
-      compiler.emitU8(funcDef, 0)
-    }
+    let labelCase: Label | null = null
+    let defaultOffset: number | null = null
+    let previousClauseFallsThrough = false
 
-    let previousCheckJumpPos = -1
-    let defaultBodyLabelPos = -1
-    
-    // Iterate clauses
     for (let i = 0; i < clauses.length; i++) {
       const clause = clauses[i]
-      const isCase = ts.isCaseClause(clause)
-      const isDefault = ts.isDefaultClause(clause)
+      if (ts.isCaseClause(clause)) {
+        let bodyLabel: Label | null = null
 
-      let pendingSkipCheckJumpPos = -1
+        if (labelCase) {
+          if (previousClauseFallsThrough) {
+            bodyLabel = compiler.newLabel(funcDef)
+            compiler.emitJump(funcDef, Opcode.OP_goto, bodyLabel)
+          }
+          compiler.markLabel(funcDef, labelCase)
+          labelCase = null
+        } else if (previousClauseFallsThrough) {
+          bodyLabel = compiler.newLabel(funcDef)
+          compiler.emitJump(funcDef, Opcode.OP_goto, bodyLabel)
+        }
 
-      if (isCase) {
-        // Handle Fallthrough: Skip Check if previous block falls through
-        if (i > 0) {
-          const buf = funcDef.byteCode.buffer
-          const len = funcDef.byteCode.size
-          let isTerminated = false
-          if (len >= 1 && (buf[len-1] === Opcode.OP_return || buf[len-1] === Opcode.OP_return_undef || buf[len-1] === Opcode.OP_return_async)) {
-            isTerminated = true
-          }
-          if (len >= 2 && buf[len-2] === Opcode.OP_goto8) {
-            isTerminated = true
-          }
-          if (len >= 3 && buf[len-3] === Opcode.OP_goto16) {
-            isTerminated = true
-          }
-          
-          if (!isTerminated) {
-            compiler.emitOp(funcDef, Opcode.OP_goto8)
-            pendingSkipCheckJumpPos = funcDef.byteCode.size
-            compiler.emitU8(funcDef, 0)
+        const expressions: ts.Expression[] = [clause.expression]
+        let lastClause = clause
+        let j = i + 1
+        while (lastClause.statements.length === 0 && j < clauses.length && ts.isCaseClause(clauses[j])) {
+          const nextCase = clauses[j] as ts.CaseClause
+          expressions.push(nextCase.expression)
+          lastClause = nextCase
+          i = j
+          j++
+        }
+
+        for (let exprIdx = 0; exprIdx < expressions.length; exprIdx++) {
+          compiler.emitOp(funcDef, Opcode.OP_dup)
+          this.context.visit(expressions[exprIdx])
+          compiler.emitOp(funcDef, Opcode.OP_strict_eq)
+
+          const isLastExpr = exprIdx === expressions.length - 1
+          if (!isLastExpr) {
+            if (!bodyLabel) {
+              bodyLabel = compiler.newLabel(funcDef)
+            }
+            compiler.emitJump(funcDef, Opcode.OP_if_true, bodyLabel)
+          } else {
+            if (!bodyLabel) {
+              bodyLabel = compiler.newLabel(funcDef)
+            }
+            labelCase = compiler.newLabel(funcDef)
+            compiler.emitJump(funcDef, Opcode.OP_if_false, labelCase)
+            compiler.markLabel(funcDef, bodyLabel)
           }
         }
 
-        // If this is the first Case Clause, patch startJumpPos
-        if (startJumpPos !== -1) {
-          const offset = funcDef.byteCode.size - startJumpPos
-          if (offset > 127 || offset < -128) {
-            throw new Error('Jump offset too large for goto8')
-          }
-          funcDef.byteCode.buffer[startJumpPos] = offset
-          startJumpPos = -1
+        for (const stmt of lastClause.statements) {
+          this.context.visit(stmt)
         }
 
-        // Patch previous check jump
-        if (previousCheckJumpPos !== -1) {
-          const offset = funcDef.byteCode.size - previousCheckJumpPos
-          if (offset > 127 || offset < -128) {
-            throw new Error('Jump offset too large for if_false8')
-          }
-          funcDef.byteCode.buffer[previousCheckJumpPos] = offset
-          previousCheckJumpPos = -1
-        }
-
-        // Emit Check
-        compiler.emitOp(funcDef, Opcode.OP_dup)
-        this.context.visit(clause.expression)
-        compiler.emitOp(funcDef, Opcode.OP_strict_eq)
-        compiler.emitOp(funcDef, Opcode.OP_if_false8)
-        previousCheckJumpPos = funcDef.byteCode.size
-        compiler.emitU8(funcDef, 0)
-      }
-      
-      // Patch skip check jump
-      if (pendingSkipCheckJumpPos !== -1) {
-        const offset = funcDef.byteCode.size - pendingSkipCheckJumpPos
-        if (offset > 127 || offset < -128) {
-          throw new Error('Jump offset too large for goto8')
-        }
-        funcDef.byteCode.buffer[pendingSkipCheckJumpPos] = offset
-      }
-
-      if (isDefault) {
-        defaultBodyLabelPos = funcDef.byteCode.size
-      }
-      
-      // Visit Body
-      for (const stmt of clause.statements) {
-        this.context.visit(stmt)
-      }
-    }
-    
-    // Patch the LAST check failure
-    if (previousCheckJumpPos !== -1) {
-      let target = -1
-      if (defaultBodyLabelPos !== -1) {
-        target = defaultBodyLabelPos
+        previousClauseFallsThrough = !this.context.isTerminated
+        this.context.isTerminated = false
       } else {
-        target = funcDef.byteCode.size // End
+        const defaultClause = clause as ts.DefaultClause
+        if (defaultOffset !== null) {
+          throw new Error('Duplicate default clause in switch statement')
+        }
+
+        if (!labelCase) {
+          labelCase = compiler.newLabel(funcDef)
+          compiler.emitJump(funcDef, Opcode.OP_goto, labelCase)
+        }
+
+        defaultOffset = funcDef.byteCode.size
+        for (const stmt of defaultClause.statements) {
+          this.context.visit(stmt)
+        }
+
+        previousClauseFallsThrough = !this.context.isTerminated
+        this.context.isTerminated = false
       }
-      
-      const offset = target - previousCheckJumpPos
-      if (offset > 127 || offset < -128) {
-        throw new Error('Jump offset too large for if_false8')
-      }
-      funcDef.byteCode.buffer[previousCheckJumpPos] = offset
     }
-    
-    // Pop break stack
+
+    if (defaultOffset !== null) {
+      if (!labelCase) {
+        labelCase = compiler.newLabel(funcDef)
+      }
+      compiler.markLabelAt(funcDef, labelCase, defaultOffset)
+      labelCase = null
+    } else if (labelCase) {
+      compiler.markLabel(funcDef, labelCase)
+      labelCase = null
+    }
+
     labelManager.popLoop()
-    
-    // Patch breaks
     compiler.markLabel(funcDef, loopInfo.breakLabel)
-    
-    // Drop switch value
     compiler.emitOp(funcDef, Opcode.OP_drop)
   }
 
@@ -805,7 +615,8 @@ export class StatementVisitor {
       }
     }
 
-    compiler.emitJump(funcDef, Opcode.OP_goto8, loopInfo.breakLabel)
+    compiler.emitJump(funcDef, Opcode.OP_goto, loopInfo.breakLabel)
+    this.context.isTerminated = true
   }
 
   visitContinueStatement(node: ts.ContinueStatement) {
@@ -843,7 +654,8 @@ export class StatementVisitor {
       }
     }
 
-    compiler.emitJump(funcDef, Opcode.OP_goto8, loopInfo.continueLabel!)
+    compiler.emitJump(funcDef, Opcode.OP_goto, loopInfo.continueLabel!)
+    this.context.isTerminated = true
   }
 
   visitReturnStatement(node: ts.ReturnStatement) {
@@ -914,11 +726,13 @@ export class StatementVisitor {
 
     const hasCatch = !!node.catchClause
     const hasFinally = !!node.finallyBlock
+    const endLabel = compiler.newLabel(funcDef)
+    const finallyLabel = hasFinally ? compiler.newLabel(funcDef) : null
+    const catchLabel = compiler.newLabel(funcDef)
+    const catch2Label = hasFinally ? compiler.newLabel(funcDef) : null
 
     // Push catch handler
-    compiler.emitOp(funcDef, Opcode.OP_catch, node.getStart())
-    const catchOffsetPos = funcDef.byteCode.size
-    compiler.emitU32(funcDef, 0) // Placeholder
+    compiler.emitJump(funcDef, Opcode.OP_catch, catchLabel)
 
     // Visit Try Block
     this.context.isTerminated = false
@@ -928,30 +742,18 @@ export class StatementVisitor {
     const tryTerminated = this.context.isTerminated
     this.context.isTerminated = false // Reset for catch
 
-    let gotoEndOffsetPos = -1
-
     if (!tryTerminated) {
       // End of Try Block
       compiler.emitOp(funcDef, Opcode.OP_drop) // Drop catch handler
       
-      if (hasFinally) {
-        compiler.emitOp(funcDef, Opcode.OP_gosub)
-        const gosubOffsetPos = funcDef.byteCode.size
-        compiler.emitU32(funcDef, 0) // Placeholder
-        
-        // Patch gosub later
-        labelManager.currentPendingLabels.push(`gosub_${gosubOffsetPos}`)
+      if (hasFinally && finallyLabel) {
+        compiler.emitJump(funcDef, Opcode.OP_gosub, finallyLabel)
       }
 
-      compiler.emitOp(funcDef, Opcode.OP_goto8)
-      gotoEndOffsetPos = funcDef.byteCode.size
-      compiler.emitU8(funcDef, 0) // Placeholder
+      compiler.emitJump(funcDef, Opcode.OP_goto, endLabel)
     }
 
-    // Patch catch offset
-    const catchPos = funcDef.byteCode.size
-    const catchOffset = catchPos - catchOffsetPos
-    funcDef.byteCode.putU32At(catchOffsetPos, catchOffset)
+    compiler.markLabel(funcDef, catchLabel)
 
     // Catch Handler
     if (hasCatch) {
@@ -995,11 +797,8 @@ export class StatementVisitor {
       }
 
       // If finally exists, we need another catch for the catch block
-      let catch2OffsetPos = -1
-      if (hasFinally) {
-        compiler.emitOp(funcDef, Opcode.OP_catch)
-        catch2OffsetPos = funcDef.byteCode.size
-        compiler.emitU32(funcDef, 0) // Placeholder
+      if (hasFinally && catch2Label) {
+        compiler.emitJump(funcDef, Opcode.OP_catch, catch2Label)
       }
 
       // Visit Catch Block
@@ -1019,100 +818,40 @@ export class StatementVisitor {
         // Emit undefined + drop (to match WASM)
         compiler.emitOp(funcDef, Opcode.OP_undefined)
         
-        if (hasFinally) {
-          compiler.emitOp(funcDef, Opcode.OP_gosub)
-          const gosubOffsetPos = funcDef.byteCode.size
-          compiler.emitU32(funcDef, 0) // Placeholder
-          labelManager.currentPendingLabels.push(`gosub_${gosubOffsetPos}`)
+        if (hasFinally && finallyLabel) {
+          compiler.emitJump(funcDef, Opcode.OP_gosub, finallyLabel)
         }
         
         compiler.emitOp(funcDef, Opcode.OP_drop) // Drop undefined
-        
-        compiler.emitOp(funcDef, Opcode.OP_goto8)
-        const gotoEndOffsetPos2 = funcDef.byteCode.size
-        compiler.emitU8(funcDef, 0) // Placeholder
-        
-        // Patch goto end 2
-        // console.log(`Pushing goto8_end_${gotoEndOffsetPos2}`)
-        labelManager.currentPendingLabels.push(`goto8_end_${gotoEndOffsetPos2}`)
+        compiler.emitJump(funcDef, Opcode.OP_goto, endLabel)
       }
 
-      // Patch catch 2
-      if (hasFinally) {
-        const catch2Pos = funcDef.byteCode.size
-        const catch2Offset = catch2Pos - catch2OffsetPos
-        funcDef.byteCode.putU32At(catch2OffsetPos, catch2Offset)
-        
-        // Catch 2 Handler (rethrow)
-        compiler.emitOp(funcDef, Opcode.OP_gosub)
-        const gosubOffsetPos = funcDef.byteCode.size
-        compiler.emitU32(funcDef, 0) // Placeholder
-        labelManager.currentPendingLabels.push(`gosub_${gosubOffsetPos}`)
-        
+      // Catch 2 Handler (rethrow)
+      if (hasFinally && finallyLabel && catch2Label) {
+        compiler.markLabel(funcDef, catch2Label)
+        compiler.emitJump(funcDef, Opcode.OP_gosub, finallyLabel)
         compiler.emitOp(funcDef, Opcode.OP_throw)
       }
 
-    } else {
+    } else if (hasFinally && finallyLabel) {
       // No catch block, but we are here because of exception (and we have finally)
       // So we are in the catch handler of the try block
       
       // Execute finally
-      compiler.emitOp(funcDef, Opcode.OP_gosub)
-      const gosubOffsetPos = funcDef.byteCode.size
-      compiler.emitU32(funcDef, 0) // Placeholder
-      labelManager.currentPendingLabels.push(`gosub_${gosubOffsetPos}`)
+      compiler.emitJump(funcDef, Opcode.OP_gosub, finallyLabel)
       
       // Rethrow
       compiler.emitOp(funcDef, Opcode.OP_throw)
     }
 
     // Finally Block Label
-    if (hasFinally) {
-      const finallyPos = funcDef.byteCode.size
-      
-      // Patch all gosubs
-      for (let i = 0; i < labelManager.currentPendingLabels.length; i++) {
-        const label = labelManager.currentPendingLabels[i]
-        if (label.startsWith('gosub_')) {
-          const pos = parseInt(label.split('_')[1])
-          const offset = finallyPos - pos
-          funcDef.byteCode.putU32At(pos, offset)
-          labelManager.currentPendingLabels.splice(i, 1)
-          i--
-        }
-      }
-
+    if (hasFinally && finallyLabel) {
+      compiler.markLabel(funcDef, finallyLabel)
       this.context.visit(node.finallyBlock)
       compiler.emitOp(funcDef, Opcode.OP_ret)
     }
 
-    // End Label
-    const endPos = funcDef.byteCode.size
-    
-    // Patch goto end 1
-    if (gotoEndOffsetPos !== -1) {
-      const gotoEndOffset = endPos - gotoEndOffsetPos
-      if (gotoEndOffset > 127 || gotoEndOffset < -128) {
-        throw new Error('Jump offset too large for goto8')
-      }
-      funcDef.byteCode.buffer[gotoEndOffsetPos] = gotoEndOffset
-    }
-    
-    // Patch other goto ends
-    for (let i = 0; i < labelManager.currentPendingLabels.length; i++) {
-      const label = labelManager.currentPendingLabels[i]
-      if (label.startsWith('goto8_end_')) {
-        const pos = parseInt(label.split('_')[2])
-        const offset = endPos - pos
-        if (offset > 127 || offset < -128) {
-          throw new Error('Jump offset too large for goto8')
-        }
-        funcDef.byteCode.buffer[pos] = offset
-        labelManager.currentPendingLabels.splice(i, 1)
-        i--
-      }
-    }
-
+    compiler.markLabel(funcDef, endLabel)
     scopeManager.exit()
   }
 

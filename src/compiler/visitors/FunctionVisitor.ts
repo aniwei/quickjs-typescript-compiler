@@ -39,6 +39,10 @@ export class FunctionVisitor {
     fd.filename = parentFd.filename
     fd.hasDebug = true
     fd.sourcePos = node.getStart()
+    fd.lineNumberLast = fd.sourcePos
+    fd.lineNumberLastPc = 0
+    fd.lineNumberLast = fd.sourcePos
+    fd.lineNumberLastPc = 0
     fd.argumentsAllowed = true
     fd.hasPrototype = true
     fd.hasSimpleParameterList = true
@@ -196,16 +200,15 @@ export class FunctionVisitor {
             compiler.emitU16(fd, i)
           }
           
+          const skipInitLabel = compiler.newLabel(fd)
+
           // dup
           compiler.emitOp(fd, Opcode.OP_dup)
           
           // is_undefined
           compiler.emitOp(fd, Opcode.OP_is_undefined)
           
-          // if_false8 label
-          compiler.emitOp(fd, Opcode.OP_if_false8)
-          const jumpPos = fd.byteCode.size
-          compiler.emitU8(fd, 0)
+          compiler.emitJump(fd, Opcode.OP_if_false, skipInitLabel)
           
           // drop
           compiler.emitOp(fd, Opcode.OP_drop)
@@ -241,9 +244,7 @@ export class FunctionVisitor {
             compiler.emitU16(fd, varIdx)
           }
           
-          // Patch jump
-          const jumpDist = fd.byteCode.size - jumpPos - 1
-          fd.byteCode.buffer[jumpPos] = jumpDist
+          compiler.markLabel(fd, skipInitLabel)
         }
       }
     }
@@ -354,7 +355,9 @@ export class FunctionVisitor {
     fd.filename = parentFd.filename
     fd.hasDebug = true
     fd.sourcePos = node.getStart()
-    
+    fd.lineNumberLast = fd.sourcePos
+    fd.lineNumberLastPc = 0
+
     fd.hasPrototype = false
     fd.hasArgumentsBinding = false
     fd.hasThisBinding = false
@@ -451,6 +454,8 @@ export class FunctionVisitor {
     fd.filename = parentFd.filename
     fd.hasDebug = true
     fd.sourcePos = node.getStart()
+    fd.lineNumberLast = fd.sourcePos
+    fd.lineNumberLastPc = 0
     fd.argumentsAllowed = true
     fd.hasPrototype = true
     fd.hasSimpleParameterList = true
@@ -556,7 +561,9 @@ export class FunctionVisitor {
     fd.hasDebug = true
     fd.hasHomeObject = true // Methods have home object
     fd.sourcePos = node.getStart()
-    
+    fd.lineNumberLast = fd.sourcePos
+    fd.lineNumberLastPc = 0
+
     // Add flags to match WASM
     fd.hasSimpleParameterList = true
     fd.newTargetAllowed = true
