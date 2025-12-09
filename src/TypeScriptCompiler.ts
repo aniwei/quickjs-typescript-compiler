@@ -107,7 +107,7 @@ export class TypeScriptCompiler implements CompilerContext {
 
     // 模块前置：push_this / if_false 与 QuickJS 对齐（falsy -> 进入模块主体，truthy -> 直接 return_undef）
     this.compiler.emitOp(fd, Opcode.OP_push_this)
-    const moduleBodyLabel = this.compiler.newLabel(fd)
+    const moduleBodyLabel = this.compiler.createLabel(fd)
     this.compiler.emitJump(fd, Opcode.OP_if_false, moduleBodyLabel)
 
     // 初始化区：先处理函数声明（func_pool/atom 顺序与 QuickJS 对齐），在 return_undef 之前执行

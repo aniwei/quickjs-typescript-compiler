@@ -215,7 +215,7 @@ export class FunctionVisitor {
             compiler.emitU16(fd, i)
           }
           
-          const skipInitLabel = compiler.newLabel(fd)
+          const skipInitLabel = compiler.createLabel(fd)
 
           // dup
           compiler.emitOp(fd, Opcode.OP_dup)

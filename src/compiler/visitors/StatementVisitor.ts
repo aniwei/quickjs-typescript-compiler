@@ -142,8 +142,8 @@ export class StatementVisitor {
       }
     }
 
-    const endLabel = compiler.newLabel(funcDef)
-    const elseLabel = node.elseStatement ? compiler.newLabel(funcDef) : endLabel
+    const endLabel = compiler.createLabel(funcDef)
+    const elseLabel = node.elseStatement ? compiler.createLabel(funcDef) : endLabel
 
     this.context.visit(node.expression)
     compiler.emitJump(funcDef, Opcode.OP_if_false, elseLabel)
@@ -165,7 +165,7 @@ export class StatementVisitor {
       return
     }
 
-    const continueLabel = compiler.newLabel(funcDef)
+    const continueLabel = compiler.createLabel(funcDef)
     const loopInfo = labelManager.pushLoop('loop', funcDef, continueLabel)
     compiler.markLabel(funcDef, continueLabel)
 
@@ -186,8 +186,8 @@ export class StatementVisitor {
       return
     }
 
-    const startLabel = compiler.newLabel(funcDef)
-    const continueLabel = compiler.newLabel(funcDef)
+    const startLabel = compiler.createLabel(funcDef)
+    const continueLabel = compiler.createLabel(funcDef)
     const loopInfo = labelManager.pushLoop('loop', funcDef, continueLabel)
 
     compiler.markLabel(funcDef, startLabel)
@@ -277,7 +277,7 @@ export class StatementVisitor {
     }
 
     const loopInfo = labelManager.pushLoop('loop', funcDef)
-    const startLabel = compiler.newLabel(funcDef)
+    const startLabel = compiler.createLabel(funcDef)
     compiler.markLabel(funcDef, startLabel)
 
     // 3. Condition
@@ -360,8 +360,8 @@ export class StatementVisitor {
     compiler.emitOp(funcDef, Opcode.OP_for_of_start)
     
     const loopInfo = labelManager.pushLoop('loop', funcDef)
-    const bodyLabel = compiler.newLabel(funcDef)
-    const checkLabel = compiler.newLabel(funcDef)
+    const bodyLabel = compiler.createLabel(funcDef)
+    const checkLabel = compiler.createLabel(funcDef)
 
     compiler.emitJump(funcDef, Opcode.OP_goto, checkLabel)
 
@@ -449,14 +449,14 @@ export class StatementVisitor {
     const loopInfo: LoopInfo = {
       type: 'loop',
       labels: userLabels,
-      breakLabel: compiler.newLabel(funcDef),
-      continueLabel: compiler.newLabel(funcDef)
+      breakLabel: compiler.createLabel(funcDef),
+      continueLabel: compiler.createLabel(funcDef)
     }
     labelManager.currentLoopStack.push(loopInfo)
     labelManager.currentPendingLabels = labelManager.currentPendingLabels.filter(l => l.startsWith('goto_end_') || l.startsWith('goto8_end_'))
 
-    const bodyLabel = compiler.newLabel(funcDef)
-    const checkLabel = compiler.newLabel(funcDef)
+    const bodyLabel = compiler.createLabel(funcDef)
+    const checkLabel = compiler.createLabel(funcDef)
     compiler.emitJump(funcDef, Opcode.OP_goto, checkLabel)
     
     compiler.markLabel(funcDef, bodyLabel)
@@ -510,13 +510,13 @@ export class StatementVisitor {
 
         if (labelCase) {
           if (previousClauseFallsThrough) {
-            bodyLabel = compiler.newLabel(funcDef)
+            bodyLabel = compiler.createLabel(funcDef)
             compiler.emitJump(funcDef, Opcode.OP_goto, bodyLabel)
           }
           compiler.markLabel(funcDef, labelCase)
           labelCase = null
         } else if (previousClauseFallsThrough) {
-          bodyLabel = compiler.newLabel(funcDef)
+          bodyLabel = compiler.createLabel(funcDef)
           compiler.emitJump(funcDef, Opcode.OP_goto, bodyLabel)
         }
 
@@ -539,14 +539,14 @@ export class StatementVisitor {
           const isLastExpr = exprIdx === expressions.length - 1
           if (!isLastExpr) {
             if (!bodyLabel) {
-              bodyLabel = compiler.newLabel(funcDef)
+              bodyLabel = compiler.createLabel(funcDef)
             }
             compiler.emitJump(funcDef, Opcode.OP_if_true, bodyLabel)
           } else {
             if (!bodyLabel) {
-              bodyLabel = compiler.newLabel(funcDef)
+              bodyLabel = compiler.createLabel(funcDef)
             }
-            labelCase = compiler.newLabel(funcDef)
+            labelCase = compiler.createLabel(funcDef)
             compiler.emitJump(funcDef, Opcode.OP_if_false, labelCase)
             compiler.markLabel(funcDef, bodyLabel)
           }
@@ -565,7 +565,7 @@ export class StatementVisitor {
         }
 
         if (!labelCase) {
-          labelCase = compiler.newLabel(funcDef)
+          labelCase = compiler.createLabel(funcDef)
           compiler.emitJump(funcDef, Opcode.OP_goto, labelCase)
         }
 
@@ -581,7 +581,7 @@ export class StatementVisitor {
 
     if (defaultOffset !== null) {
       if (!labelCase) {
-        labelCase = compiler.newLabel(funcDef)
+        labelCase = compiler.createLabel(funcDef)
       }
       compiler.markLabelAt(funcDef, labelCase, defaultOffset)
       labelCase = null
@@ -726,10 +726,10 @@ export class StatementVisitor {
 
     const hasCatch = !!node.catchClause
     const hasFinally = !!node.finallyBlock
-    const endLabel = compiler.newLabel(funcDef)
-    const finallyLabel = hasFinally ? compiler.newLabel(funcDef) : null
-    const catchLabel = compiler.newLabel(funcDef)
-    const catch2Label = hasFinally ? compiler.newLabel(funcDef) : null
+    const endLabel = compiler.createLabel(funcDef)
+    const finallyLabel = hasFinally ? compiler.createLabel(funcDef) : null
+    const catchLabel = compiler.createLabel(funcDef)
+    const catch2Label = hasFinally ? compiler.createLabel(funcDef) : null
 
     // Push catch handler
     compiler.emitJump(funcDef, Opcode.OP_catch, catchLabel)
