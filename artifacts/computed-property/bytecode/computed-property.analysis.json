@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-12-09T08:23:08.883Z",
-  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/computed-property.ts",
+  "timestamp": "2025-12-09T08:27:11.633Z",
+  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/computed-property.ts",
   "compilation": {
     "typescript": {
       "size": 165,

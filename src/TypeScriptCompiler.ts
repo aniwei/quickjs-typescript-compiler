@@ -85,7 +85,8 @@ export class TypeScriptCompiler implements CompilerContext {
     fd.scopeLevel = 0
     fd.jsMode = JSMode.JS_MODE_STRICT
     fd.funcName = JSAtom.JS_ATOM__eval_
-    fd.funcKind = FunctionKind.JS_FUNC_NORMAL
+    // QuickJS marks module init functions as async regardless of TLA so func_kind bits match
+    fd.funcKind = FunctionKind.JS_FUNC_ASYNC
     fd.isGlobalVar = true
     
     const filenameAtom = this.compiler.addAtom(filename)
