@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/computed-property.ts
-**生成时间**: 2025-12-09T08:19:21.121Z
+**生成时间**: 2025-12-09T08:23:18.798Z
 
 ## 大小对比
 
-- TypeScript编译器: 160 字节
+- TypeScript编译器: 165 字节
 - WASM编译器: 165 字节
-- 差异: -5 字节 (-3.03%)
+- 差异: 0 字节 (0.00%)
 
 ## 结构分析
 
@@ -70,7 +70,7 @@
   "functionHeader": {
     "offset": 73,
     "tag": "0xd",
-    "remaining": 87
+    "remaining": 92
   }
 }
 ```
@@ -141,29 +141,29 @@
 
 ## 字节级差异
 
-共发现 59 个字节差异:
+共发现 32 个字节差异:
 
 - 偏移量 0x52: TS=0x00 vs WASM=0x20
-- 偏移量 0x5d: TS=0x25 vs WASM=0x2a
-- 偏移量 0x67: TS=0x04 vs WASM=0x08
-- 偏移量 0x68: TS=0xe7 vs WASM=0xec
-- 偏移量 0x69: TS=0x00 vs WASM=0x02
-- 偏移量 0x6a: TS=0x00 vs WASM=0x29
-- 偏移量 0x6b: TS=0x00 vs WASM=0x04
-- 偏移量 0x6c: TS=0xe3 vs WASM=0xe7
-- 偏移量 0x6d: TS=0x0b vs WASM=0x00
-- 偏移量 0x6e: TS=0x68 vs WASM=0x00
-- 偏移量 0x70: TS=0x00 vs WASM=0xe3
-- 偏移量 0x71: TS=0x74 vs WASM=0x0b
-- 偏移量 0x72: TS=0xb8 vs WASM=0x68
-- 偏移量 0x73: TS=0x53 vs WASM=0x00
-- 偏移量 0x74: TS=0x0e vs WASM=0x00
-- 偏移量 0x75: TS=0xe4 vs WASM=0x74
-- 偏移量 0x76: TS=0x39 vs WASM=0xb8
-- 偏移量 0x77: TS=0xe8 vs WASM=0x53
-- 偏移量 0x78: TS=0x00 vs WASM=0x0e
-- 偏移量 0x79: TS=0x00 vs WASM=0xe4
-- ... (显示前20个差异，总共59个)
+- 偏移量 0x69: TS=0x26 vs WASM=0x02
+- 偏移量 0x6a: TS=0x04 vs WASM=0x29
+- 偏移量 0x6b: TS=0xe7 vs WASM=0x04
+- 偏移量 0x6c: TS=0x00 vs WASM=0xe7
+- 偏移量 0x6f: TS=0xe3 vs WASM=0x00
+- 偏移量 0x70: TS=0x0b vs WASM=0xe3
+- 偏移量 0x71: TS=0x68 vs WASM=0x0b
+- 偏移量 0x72: TS=0x00 vs WASM=0x68
+- 偏移量 0x74: TS=0x74 vs WASM=0x00
+- 偏移量 0x75: TS=0xb8 vs WASM=0x74
+- 偏移量 0x76: TS=0x53 vs WASM=0xb8
+- 偏移量 0x77: TS=0x0e vs WASM=0x53
+- 偏移量 0x78: TS=0xe4 vs WASM=0x0e
+- 偏移量 0x79: TS=0x39 vs WASM=0xe4
+- 偏移量 0x7a: TS=0xe8 vs WASM=0x39
+- 偏移量 0x7b: TS=0x00 vs WASM=0xe8
+- 偏移量 0x7e: TS=0x43 vs WASM=0x00
+- 偏移量 0x7f: TS=0xe9 vs WASM=0x43
+- 偏移量 0x80: TS=0x00 vs WASM=0xe9
+- ... (显示前20个差异，总共32个)
 
 ## 十六进制转储对比
 
@@ -174,11 +174,12 @@
 00000020: 6f 6d 70 75 74 65 64 2d 70 72 6f 70 65 72 74 79 |omputed-property|
 00000030: 2e 6a 73 06 6b 65 79 06 6f 62 6a 02 61 0e 63 6f |.js.key.obj.a.co|
 00000040: 6e 73 6f 6c 65 06 6c 6f 67 0d c8 03 00 00 00 00 |nsole.log.......|
-00000050: 00 0c 00 06 01 a4 01 00 00 00 04 02 00 25 00 ca |.............%..|
-00000060: 03 00 0d cc 03 01 0d 04 e7 00 00 00 e3 0b 68 00 |..............h.|
-00000070: 00 74 b8 53 0e e4 39 e8 00 00 00 43 e9 00 00 00 |.t.S..9....C....|
-00000080: 68 01 00 68 00 00 48 24 01 00 0e 29 c8 03 10 00 |h..h..H$...)....|
-00000090: 00 26 1e 2b 1d 1b 0e 1b 0a 11 08 11 01 07 07 00 |.&.+............|
+00000050: 00 0c 00 06 01 a4 01 00 00 00 04 02 00 2a 00 ca |.............*..|
+00000060: 03 00 0d cc 03 01 0d 08 ec 26 04 e7 00 00 00 e3 |.........&......|
+00000070: 0b 68 00 00 74 b8 53 0e e4 39 e8 00 00 00 43 e9 |.h..t.S..9....C.|
+00000080: 00 00 00 68 01 00 68 00 00 48 24 01 00 0e 29 06 |...h..h..H$...).|
+00000090: 2f c8 03 10 00 00 35 1e 2b 1d 1b 0e 1b 0a 11 08 |/.....5.+.......|
+000000a0: 11 01 07 07 00                                  |.....|
 ```
 
 ### WASM

@@ -86,6 +86,7 @@ export class TypeScriptCompiler implements CompilerContext {
     fd.jsMode = JSMode.JS_MODE_STRICT
     fd.funcName = JSAtom.JS_ATOM__eval_
     fd.funcKind = FunctionKind.JS_FUNC_NORMAL
+    fd.isGlobalVar = true
     
     const filenameAtom = this.compiler.addAtom(filename)
     fd.filename = filenameAtom
@@ -102,6 +103,11 @@ export class TypeScriptCompiler implements CompilerContext {
     
     // Hoist variables to ensure atom order matches QuickJS
     this.variableHoister.hoistVariables(sourceFile)
+
+    // 模块前置：push_this / if_false 与 QuickJS 对齐
+    this.compiler.emitOp(fd, Opcode.OP_push_this)
+    const moduleBodyLabel = this.compiler.newLabel(fd)
+    this.compiler.emitJump(fd, Opcode.OP_if_false, moduleBodyLabel)
 
     // 第一遍：先处理函数声明（确保 func_pool/atom 顺序与 QuickJS 对齐）
     for (const stmt of sourceFile.statements) {
@@ -125,8 +131,13 @@ export class TypeScriptCompiler implements CompilerContext {
     // Update stack size for module
     fd.stackSize = fd.stackSizeMax
     
-    // 模块结尾：与 QuickJS 模块一致，返回 undefined
+    // 主路径结束
     this.compiler.emitOp(fd, Opcode.OP_return_undef)
+
+    // 早退路径（push_this 为假）：与 QuickJS 相同
+    this.compiler.markLabel(fd, moduleBodyLabel)
+    this.compiler.emitOp(fd, Opcode.OP_undefined)
+    this.compiler.emitOp(fd, Opcode.OP_return_async)
 
     this.compiler.computePc2LineInfo(fd)
 
