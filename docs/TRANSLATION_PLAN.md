@@ -11,6 +11,50 @@
 ### 2. 核心结构 (Core Structures)
 *   **JSContext & JSValue**: 需要编译并实现 `JSContext` 和 `JSValue` 相关的运行时结构，保持与 QuickJS 的逻辑对应，但字段名需转换为驼峰风格。
 
+## QuickJS 差距清单与实施计划 (2025-12-09)
+
+### 当前主要差距（按语法域）
+* 模块/全局：缺少按 QuickJS `js_parse_function_decl2` 的 func_pool 提前 hoist，模块 prologue/epilogue 与 `return_undef`、`<ret>` 变量处理不一致，`scopeLevel/scopeCount` 偏移。
+* 表达式：未实现可选链 `?.`、逻辑赋值 `&&= ||= ??=`, 复合赋值属性/元素路径缺失，`new`/构造调用未对齐 QuickJS 流程。
+* 语句与异常：`try/catch/finally` 未生成异常表/`exception_frames`，`with` 语义缺失，`throw`/`return await`/for-of 迭代异常收尾需对齐。
+* 函数与闭包：函数声明存储路径未按 func_pool hoist + 丢弃 fclosure，参数作用域/`has_parameter_expressions`/尾调用规则未全量对齐；async/generator/for-await-of 状态机缺失；`arguments`/`this`/`new.target`/`super` 规则未完整复刻。
+* 类与私有：派生类 `super()` 时机、字段初始化延迟、static block、私有 brand/静态私有方法尚未按 QuickJS 全量对齐。
+* ES2020/模块：模块 import/export 管线缺失；可选链/逻辑赋值/globalThis/import.meta/async generator 等未覆盖。
+* 调试/pc2line：行列映射策略与 QuickJS 仍有差异（仅语句级打点），异常路径未验证。
+
+### 实施计划（优先顺序）
+1) **函数/模块 hoist 对齐**（高优先）
+    - 复刻 `js_parse_function_decl2`：先 hoist define_var，生成 func_pool_idx，lexical/global 路径 drop fclosure，保留 put_var_ref fallback。
+    - 修正模块 prologue/epilogue：移除 `push_this` 早退，使用 `return_undef`，补 `<ret>` 变量和 `eval_ret` 处理。
+    - 调整 scopeLevel/scopeCount/vardefs 写出，确保与 QuickJS 写表一致。
+
+2) **表达式补全**
+    - 实现 `?.`（属性/元素/可选调用）按 QuickJS 短路跳转生成。
+    - 实现逻辑赋值 `&&= ||= ??=` 与复合赋值属性/元素路径，与 `js_parse_assign_expr` 对齐。
+    - 校正 `new`/构造调用，加入 `OP_check_ctor`/`OP_call_constructor` 等匹配行为。
+
+3) **异常与异常表**
+    - 在 `try/catch/finally` 生成异常帧，按 QuickJS gosub 布局补全 `close_loc`/`leave_scope`，对齐 rethrow 路径。
+    - 确认 for-of/for-await-of 迭代关闭与异常落地一致。
+
+4) **异步与生成器**
+    - 增加 generator/async/async generator：`initial_yield`、`await`、`async_yield`、`yield*`，对应 func_kind 设置与状态机。
+    - 对齐 `return await`/尾调用检测规则。
+
+5) **模块系统**
+    - 实现 import/export 表、模块记录写出（`js_parse_module` 等），确保 cpool/closure_var 处理符合 QuickJS。
+
+6) **类与私有/静态块**
+    - 对齐派生类构造、`home_object` 注入、字段初始化顺序、static block、私有 brand/静态私有方法。
+
+7) **调试信息与验证**
+    - 复核 `pc2line` 生成策略（行/列/短格式选择），补异常路径打点；
+    - 持续用 `scripts/compareAllFixtures.ts` 与新 ES2020 fixtures（可选链/逻辑赋值/for-await-of/async-await/static block 等）做二进制/行为对齐。
+
+### 最近新增验证 Fixtures（已存在）
+* `optional-chaining.ts`, `logical-assignment.ts`, `numeric-separators.ts`, `class-static-block.ts`, `async-await.ts`, `for-await-of.ts`, `optional-catch-binding.ts` —— 用于覆盖可选链、逻辑赋值、static block、async/for-await-of、可选 catch。
+
+
 ---
 
 本计划旨在分阶段将 QuickJS C 编译器转译为 TypeScript，最终支持 ES2020 标准。

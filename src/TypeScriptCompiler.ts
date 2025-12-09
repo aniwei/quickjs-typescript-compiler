@@ -80,13 +80,12 @@ export class TypeScriptCompiler implements CompilerContext {
     )
     this.compiler.setSourceFile(sourceFile)
 
-    // Create top-level function definition (module)
+    // Create顶层函数定义（模块）
     const fd = new FunctionDef()
-    // fd.scopeLevel = this.scopeManager.tack.length
-    fd.scopeLevel = 0 // Module function seems to be level 0 in QuickJS WASM
+    fd.scopeLevel = 0
     fd.jsMode = JSMode.JS_MODE_STRICT
     fd.funcName = JSAtom.JS_ATOM__eval_
-    fd.funcKind = FunctionKind.JS_FUNC_ASYNC // Module is async
+    fd.funcKind = FunctionKind.JS_FUNC_NORMAL
     
     const filenameAtom = this.compiler.addAtom(filename)
     fd.filename = filenameAtom
@@ -96,47 +95,25 @@ export class TypeScriptCompiler implements CompilerContext {
     fd.lineNumberLast = fd.sourcePos
     fd.lineNumberLastPc = 0
 
-    this.funcDef = fd
-    // QuickJS WASM seems to use Scope 2 for top-level module variables.
-    // Scope 0 is arguments. Scope 1 is ??? (maybe var scope separate from lexical scope?)
-    // So we skip Scope 1.
-    if (fd.scopeCount === 1) {
-       fd.scopeCount = 2
-    }
-    
-    console.log(`compile: before enter scopeCount=${fd.scopeCount}`)
-    this.scopeManager.enter('function', this.funcDef) // Push function scope for module body
+     this.funcDef = fd
 
-    // Module prologue
-    this.compiler.emitOp(fd, Opcode.OP_push_this)
-    const moduleBodyLabel = this.compiler.newLabel(fd)
-    this.compiler.emitJump(fd, Opcode.OP_if_false, moduleBodyLabel)
+     // 进入模块函数作用域（对应 QuickJS 顶层）
+     this.scopeManager.enter('function', this.funcDef)
     
     // Hoist variables to ensure atom order matches QuickJS
     this.variableHoister.hoistVariables(sourceFile)
 
-    let lastStmtEnd = sourceFile.end
-    if (sourceFile.statements.length > 0) {
-      lastStmtEnd = sourceFile.statements[sourceFile.statements.length - 1].getEnd()
-    }
-
-    // Script Path: Visit Function Declarations
+    // 第一遍：先处理函数声明（确保 func_pool/atom 顺序与 QuickJS 对齐）
     for (const stmt of sourceFile.statements) {
       if (ts.isFunctionDeclaration(stmt)) {
         this.visit(stmt)
       }
     }
 
-    this.compiler.emitOp(fd, Opcode.OP_return_undef)
-
-    // Module path: Visit other statements
-    this.compiler.markLabel(fd, moduleBodyLabel)
-    let hasStatements = false
-
+    // 第二遍：其他语句
     for (const stmt of sourceFile.statements) {
       if (!ts.isFunctionDeclaration(stmt)) {
         this.visit(stmt)
-        hasStatements = true
       }
     }
 
@@ -148,9 +125,8 @@ export class TypeScriptCompiler implements CompilerContext {
     // Update stack size for module
     fd.stackSize = fd.stackSizeMax
     
-    // Module epilogue
-    this.compiler.emitOp(fd, Opcode.OP_undefined)
-    this.compiler.emitOp(fd, Opcode.OP_return_async)
+    // 模块结尾：与 QuickJS 模块一致，返回 undefined
+    this.compiler.emitOp(fd, Opcode.OP_return_undef)
 
     this.compiler.computePc2LineInfo(fd)
 
