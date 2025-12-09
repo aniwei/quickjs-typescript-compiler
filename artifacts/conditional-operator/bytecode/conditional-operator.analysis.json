@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-12-09T07:55:06.956Z",
-  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/conditional-operator.ts",
+  "timestamp": "2025-12-09T09:00:06.158Z",
+  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/conditional-operator.ts",
   "compilation": {
     "typescript": {
       "size": 147,

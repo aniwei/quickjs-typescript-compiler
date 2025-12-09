@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-12-09T07:55:07.084Z",
-  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/switch-default-middle.ts",
+  "timestamp": "2025-12-09T09:00:06.293Z",
+  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/switch-default-middle.ts",
   "compilation": {
     "typescript": {
       "size": 190,

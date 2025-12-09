@@ -1,12 +1,12 @@
 {
-  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/object-literal.ts",
-  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/object-literal",
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/object-literal.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-literal",
   "cli": {
-    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/object-literal/cli/object-literal.ts.qbc",
-    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/object-literal/cli/object-literal.ts.disasm",
-    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/object-literal/cli/object-literal.pc2line.bin",
-    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/object-literal/cli/object-literal.pc2line.txt",
-    "bytecodeSize": 221,
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-literal/cli/object-literal.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-literal/cli/object-literal.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-literal/cli/object-literal.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-literal/cli/object-literal.pc2line.txt",
+    "bytecodeSize": 214,
     "pc2lineLength": 0,
     "stackMax": 0
   },

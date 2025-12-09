@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-12-09T07:55:06.922Z",
-  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/closure-basic.ts",
+  "timestamp": "2025-12-09T09:00:06.124Z",
+  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/closure-basic.ts",
   "compilation": {
     "typescript": {
       "size": 179,

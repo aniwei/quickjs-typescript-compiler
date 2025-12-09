@@ -105,19 +105,25 @@ export class TypeScriptCompiler implements CompilerContext {
     // Hoist variables to ensure atom order matches QuickJS
     this.variableHoister.hoistVariables(sourceFile)
 
-    // 模块前置：push_this / if_false 与 QuickJS 对齐
+    // 模块前置：push_this / if_false 与 QuickJS 对齐（falsy -> 进入模块主体，truthy -> 直接 return_undef）
     this.compiler.emitOp(fd, Opcode.OP_push_this)
     const moduleBodyLabel = this.compiler.newLabel(fd)
     this.compiler.emitJump(fd, Opcode.OP_if_false, moduleBodyLabel)
 
-    // 第一遍：先处理函数声明（确保 func_pool/atom 顺序与 QuickJS 对齐）
+    // 初始化区：先处理函数声明（func_pool/atom 顺序与 QuickJS 对齐），在 return_undef 之前执行
     for (const stmt of sourceFile.statements) {
       if (ts.isFunctionDeclaration(stmt)) {
         this.visit(stmt)
       }
     }
 
-    // 第二遍：其他语句
+    // 真值分支结束（脚本路径）
+    this.compiler.emitOp(fd, Opcode.OP_return_undef)
+
+    // 模块主体起点
+    this.compiler.markLabel(fd, moduleBodyLabel)
+
+    // 模块主体：其余语句在 label 之后执行
     for (const stmt of sourceFile.statements) {
       if (!ts.isFunctionDeclaration(stmt)) {
         this.visit(stmt)
@@ -132,11 +138,7 @@ export class TypeScriptCompiler implements CompilerContext {
     // Update stack size for module
     fd.stackSize = fd.stackSizeMax
     
-    // 主路径结束
-    this.compiler.emitOp(fd, Opcode.OP_return_undef)
-
-    // 早退路径（push_this 为假）：与 QuickJS 相同
-    this.compiler.markLabel(fd, moduleBodyLabel)
+    // 模块路径结束：返回 undefined + return_async
     this.compiler.emitOp(fd, Opcode.OP_undefined)
     this.compiler.emitOp(fd, Opcode.OP_return_async)
 

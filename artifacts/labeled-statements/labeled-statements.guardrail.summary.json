@@ -1,12 +1,12 @@
 {
-  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/labeled-statements.ts",
-  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/labeled-statements",
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/labeled-statements.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/labeled-statements",
   "cli": {
-    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/labeled-statements/cli/labeled-statements.ts.qbc",
-    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/labeled-statements/cli/labeled-statements.ts.disasm",
-    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/labeled-statements/cli/labeled-statements.pc2line.bin",
-    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/labeled-statements/cli/labeled-statements.pc2line.txt",
-    "bytecodeSize": 313,
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/labeled-statements/cli/labeled-statements.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/labeled-statements/cli/labeled-statements.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/labeled-statements/cli/labeled-statements.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/labeled-statements/cli/labeled-statements.pc2line.txt",
+    "bytecodeSize": 306,
     "pc2lineLength": 0,
     "stackMax": 0
   },

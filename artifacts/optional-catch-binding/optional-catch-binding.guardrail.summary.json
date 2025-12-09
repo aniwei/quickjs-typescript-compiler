@@ -1,12 +1,12 @@
 {
-  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/optional-catch-binding.ts",
-  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/optional-catch-binding",
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/optional-catch-binding.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/optional-catch-binding",
   "cli": {
-    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/optional-catch-binding/cli/optional-catch-binding.ts.qbc",
-    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/optional-catch-binding/cli/optional-catch-binding.ts.disasm",
-    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/optional-catch-binding/cli/optional-catch-binding.pc2line.bin",
-    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/optional-catch-binding/cli/optional-catch-binding.pc2line.txt",
-    "bytecodeSize": 253,
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/optional-catch-binding/cli/optional-catch-binding.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/optional-catch-binding/cli/optional-catch-binding.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/optional-catch-binding/cli/optional-catch-binding.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/optional-catch-binding/cli/optional-catch-binding.pc2line.txt",
+    "bytecodeSize": 246,
     "pc2lineLength": 0,
     "stackMax": 0
   },

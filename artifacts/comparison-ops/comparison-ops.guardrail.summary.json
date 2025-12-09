@@ -1,12 +1,12 @@
 {
-  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/comparison-ops.ts",
-  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/comparison-ops",
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/comparison-ops.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/comparison-ops",
   "cli": {
-    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/comparison-ops/cli/comparison-ops.ts.qbc",
-    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/comparison-ops/cli/comparison-ops.ts.disasm",
-    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/comparison-ops/cli/comparison-ops.pc2line.bin",
-    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/comparison-ops/cli/comparison-ops.pc2line.txt",
-    "bytecodeSize": 362,
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/comparison-ops/cli/comparison-ops.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/comparison-ops/cli/comparison-ops.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/comparison-ops/cli/comparison-ops.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/comparison-ops/cli/comparison-ops.pc2line.txt",
+    "bytecodeSize": 355,
     "pc2lineLength": 0,
     "stackMax": 0
   },

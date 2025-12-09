@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-12-09T07:55:07.004Z",
-  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/function-default-params.ts",
+  "timestamp": "2025-12-09T09:00:06.209Z",
+  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/function-default-params.ts",
   "compilation": {
     "typescript": {
       "size": 231,

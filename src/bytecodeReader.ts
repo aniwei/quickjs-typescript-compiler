@@ -76,7 +76,7 @@ export function parseBytecodeModule(buffer: Uint8Array): any {
   }
 
   const moduleTag = readU8() // TC_TAG_MODULE
-  const moduleNameAtom = readU32() // Atom index
+  const moduleNameAtom = readULEB128() // Atom index
   
   // Skip dependencies, exports, etc.
   readULEB128() // dependencies
@@ -102,7 +102,7 @@ export function parseBytecodeModule(buffer: Uint8Array): any {
 
     const flags = readU16()
     const jsMode = readU8()
-    const nameAtom = readU32() // Atom index
+    const nameAtom = readULEB128() // Atom index
     const argCount = readULEB128()
     const varCount = readULEB128()
     const definedArgCount = readULEB128()
@@ -114,7 +114,7 @@ export function parseBytecodeModule(buffer: Uint8Array): any {
 
     const locals: any[] = []
     for (let i = 0; i < localCount; i++) {
-      const nameAtom = readU32()
+      const nameAtom = readULEB128()
       const scopeLevel = readULEB128()
       const scopeNext = readULEB128()
       const flags = readU8()
@@ -123,7 +123,7 @@ export function parseBytecodeModule(buffer: Uint8Array): any {
 
     const closureVars: any[] = []
     for (let i = 0; i < closureVarCount; i++) {
-      const nameAtom = readU32()
+      const nameAtom = readULEB128()
       const varIdx = readULEB128()
       const flags = readU8()
       closureVars.push({ name: atoms[nameAtom], varIdx, flags })
@@ -136,7 +136,7 @@ export function parseBytecodeModule(buffer: Uint8Array): any {
 
     let debugInfo
     if (flags & 0x0200) { // has_debug
-      const filenameAtom = readU32()
+      const filenameAtom = readULEB128()
       const pc2lineLen = readULEB128()
       const pc2lineBuf = []
       for (let i = 0; i < pc2lineLen; i++) {
@@ -204,11 +204,11 @@ export function parseBytecodeModule(buffer: Uint8Array): any {
          pos--
          cpool.push(readFunction())
        } else if (tag === BytecodeTag.TC_TAG_FLOAT64) {
-         const val = view.getFloat64(pos, true)
+        const val = view.getFloat64(pos, true)
          pos += 8
          cpool.push(val)
        } else if (tag === BytecodeTag.TC_TAG_STRING) {
-         const atom = readU32()
+        const atom = readULEB128()
          cpool.push(atoms[atom])
        } else {
          cpool.push({ tag, unknown: true })

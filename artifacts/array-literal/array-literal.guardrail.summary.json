@@ -1,12 +1,12 @@
 {
-  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/array-literal.ts",
-  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/array-literal",
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/array-literal.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/array-literal",
   "cli": {
-    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/array-literal/cli/array-literal.ts.qbc",
-    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/array-literal/cli/array-literal.ts.disasm",
-    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/array-literal/cli/array-literal.pc2line.bin",
-    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/artifacts/array-literal/cli/array-literal.pc2line.txt",
-    "bytecodeSize": 206,
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/array-literal/cli/array-literal.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/array-literal/cli/array-literal.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/array-literal/cli/array-literal.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/array-literal/cli/array-literal.pc2line.txt",
+    "bytecodeSize": 199,
     "pc2lineLength": 0,
     "stackMax": 0
   },

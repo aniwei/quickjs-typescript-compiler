@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-12-09T07:55:07.097Z",
-  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/variables-let-block.ts",
+  "timestamp": "2025-12-09T09:00:06.309Z",
+  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/variables-let-block.ts",
   "compilation": {
     "typescript": {
       "size": 169,

@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-12-09T07:55:07.023Z",
-  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/logical-assignment.ts",
+  "timestamp": "2025-12-09T09:00:06.229Z",
+  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/logical-assignment.ts",
   "compilation": {
     "typescript": {
       "size": 448,
