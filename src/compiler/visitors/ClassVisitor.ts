@@ -1,8 +1,7 @@
 import ts from 'typescript'
 import { CompilerContext } from '../CompilerContext'
-import { Opcode, FunctionKind, JSMode } from '../../env'
+import { Opcode, FunctionKind, JSMode, DefineMethodFlag } from '../../env'
 import { FunctionDef, JSVarKind } from '../FunctionDef'
-import { DefineMethodFlag } from '../DefineMethodFlags'
 
 export class ClassVisitor {
   private context: CompilerContext

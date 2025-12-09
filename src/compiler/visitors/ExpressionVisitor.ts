@@ -5,7 +5,7 @@ import { Opcode } from '../../env'
 import { ScopeManager, VarInfo } from '../ScopeManager'
 import { LabelManager } from '../LabelManager'
 import { CompilerContext } from '../CompilerContext'
-import { DefineMethodFlag } from '../DefineMethodFlags'
+import { DefineMethodFlag } from '../../env'
 
 interface OptionalChainContext {
   exitLabel: Label
@@ -382,18 +382,16 @@ export class ExpressionVisitor {
 
     const atom = this.compiler.addAtom(target.name.text)
 
-    this.context.visit(target.expression)
-    this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
+    this.context.visit(target.expression) // obj
     this.compiler.emitAtomOp(
       this.funcDef,
-      Opcode.OP_get_field,
+      Opcode.OP_get_field2,
       atom,
       target.expression.getEnd(),
     )
     this.context.visit(rhs)
     this.compiler.emitOp(this.funcDef, opcode, opPos)
-    this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
-    this.compiler.emitOp(this.funcDef, Opcode.OP_rot3r)
+    this.compiler.emitOp(this.funcDef, Opcode.OP_insert2)
     this.compiler.emitAtomOp(this.funcDef, Opcode.OP_put_field, atom, opPos)
   }
 
@@ -411,12 +409,11 @@ export class ExpressionVisitor {
       throw new Error('Element access requires an argument expression')
     }
 
-    this.context.visit(target.expression)
-    this.context.visit(target.argumentExpression)
-    this.compiler.emitOp(this.funcDef, Opcode.OP_dup2)
+    this.context.visit(target.expression) // obj
+    this.context.visit(target.argumentExpression) // prop
     this.compiler.emitOp(
       this.funcDef,
-      Opcode.OP_get_array_el,
+      Opcode.OP_get_array_el3,
       target.expression.getEnd(),
     )
     this.context.visit(rhs)
@@ -447,14 +444,6 @@ export class ExpressionVisitor {
       }
     }
 
-    const cleanup = (depth: number) => {
-      this.compiler.markLabel(this.funcDef, skipLabel)
-      for (let i = 0; i < depth; i++) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_nip)
-      }
-      this.compiler.markLabel(this.funcDef, endLabel)
-    }
-
     if (ts.isIdentifier(node.left)) {
       const varInfo = this.scopeManager.findVar(node.left.text, this.funcDef)
       this.emitLoadIdentifier(node.left, varInfo)
@@ -464,7 +453,8 @@ export class ExpressionVisitor {
       this.context.visit(node.right)
       this.emitStoreIdentifier(node.left, varInfo, true)
       this.compiler.emitJump(this.funcDef, Opcode.OP_goto, endLabel)
-      cleanup(0)
+      this.compiler.markLabel(this.funcDef, skipLabel)
+      this.compiler.markLabel(this.funcDef, endLabel)
       return
     }
 
@@ -473,11 +463,10 @@ export class ExpressionVisitor {
         throw new Error('Optional chaining cannot be used on assignment target')
       }
       const atom = this.compiler.addAtom(node.left.name.text)
-      this.context.visit(node.left.expression)
-      this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
+      this.context.visit(node.left.expression) // obj
       this.compiler.emitAtomOp(
         this.funcDef,
-        Opcode.OP_get_field,
+        Opcode.OP_get_field2,
         atom,
         node.left.expression.getEnd(),
       )
@@ -485,11 +474,12 @@ export class ExpressionVisitor {
       emitConditionJump()
       this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
       this.context.visit(node.right)
-      this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
-      this.compiler.emitOp(this.funcDef, Opcode.OP_rot3r)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_insert2)
       this.compiler.emitAtomOp(this.funcDef, Opcode.OP_put_field, atom)
       this.compiler.emitJump(this.funcDef, Opcode.OP_goto, endLabel)
-      cleanup(1)
+      this.compiler.markLabel(this.funcDef, skipLabel)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_nip)
+      this.compiler.markLabel(this.funcDef, endLabel)
       return
     }
 
@@ -500,12 +490,11 @@ export class ExpressionVisitor {
       if ((node.left as ts.ElementAccessChain).questionDotToken) {
         throw new Error('Optional chaining cannot be used on assignment target')
       }
-      this.context.visit(node.left.expression)
-      this.context.visit(node.left.argumentExpression)
-      this.compiler.emitOp(this.funcDef, Opcode.OP_dup2)
+      this.context.visit(node.left.expression) // obj
+      this.context.visit(node.left.argumentExpression) // prop
       this.compiler.emitOp(
         this.funcDef,
-        Opcode.OP_get_array_el,
+        Opcode.OP_get_array_el3,
         node.left.expression.getEnd(),
       )
       this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
@@ -515,7 +504,10 @@ export class ExpressionVisitor {
       this.compiler.emitOp(this.funcDef, Opcode.OP_insert3)
       this.compiler.emitOp(this.funcDef, Opcode.OP_put_array_el)
       this.compiler.emitJump(this.funcDef, Opcode.OP_goto, endLabel)
-      cleanup(2)
+      this.compiler.markLabel(this.funcDef, skipLabel)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_nip)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_nip)
+      this.compiler.markLabel(this.funcDef, endLabel)
       return
     }
 
@@ -571,12 +563,10 @@ export class ExpressionVisitor {
 
     // Assignment: a = b
     if (node.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
-      // 1. Evaluate RHS
-      this.context.visit(node.right)
-
-      // 2. Assign to LHS
       if (ts.isIdentifier(node.left)) {
         const varInfo = this.scopeManager.findVar(node.left.text, this.funcDef)
+
+        this.context.visit(node.right)
 
         if (
           ts.isArrowFunction(node.right) ||
@@ -590,40 +580,25 @@ export class ExpressionVisitor {
 
         this.emitStoreIdentifier(node.left, varInfo, true)
       } else if (ts.isPropertyAccessExpression(node.left)) {
-        // obj.prop = val
-        // Stack: [val] (RHS visited)
-        
-        // 1. Visit obj
+        if ((node.left as ts.PropertyAccessChain).questionDotToken) {
+          throw new Error('Optional chaining cannot be used on assignment target')
+        }
+        const atom = this.compiler.addAtom(node.left.name.text)
         this.context.visit(node.left.expression)
-        // Stack: [val, obj]
-        
-        // 2. Swap
-        this.compiler.emitOp(this.funcDef, Opcode.OP_swap)
-        // Stack: [obj, val]
-        
-        // 3. Duplicate val for result
-        this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
-        // Stack: [obj, val, val]
-        
-        // 4. Rotate to get [val, obj, val]
-        // A B C -> C A B
-        this.compiler.emitOp(this.funcDef, Opcode.OP_rot3r)
-        // Stack: [val, obj, val]
-        
-        // 5. Put field
-        const propName = node.left.name.text
-        const atom = this.compiler.addAtom(propName)
+        this.context.visit(node.right)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_insert2)
         this.compiler.emitAtomOp(this.funcDef, Opcode.OP_put_field, atom)
-        // Stack: [val]
       } else if (ts.isElementAccessExpression(node.left)) {
-        // obj[key] = val
         if (!node.left.argumentExpression) {
           throw new Error('Element access requires an argument expression')
+        }
+        if ((node.left as ts.ElementAccessChain).questionDotToken) {
+          throw new Error('Optional chaining cannot be used on assignment target')
         }
 
         this.context.visit(node.left.expression)
         this.context.visit(node.left.argumentExpression)
-        this.compiler.emitOp(this.funcDef, Opcode.OP_rot3l)
+        this.context.visit(node.right)
         this.compiler.emitOp(this.funcDef, Opcode.OP_insert3)
         this.compiler.emitOp(this.funcDef, Opcode.OP_put_array_el)
       }
