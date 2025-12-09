@@ -102,13 +102,20 @@ export class ExpressionVisitor {
   private emitOptionalChainGuard(
     ctx: OptionalChainContext | null,
     dropCount: number,
+    sourcePos: number = -1,
   ) {
     if (!this.funcDef || !ctx) {
       return
     }
 
     const nextLabel = this.compiler.createLabel(this.funcDef)
-    this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
+
+    if (sourcePos === -1) {
+      // Avoid inheriting a pending source position when we intentionally skip mapping
+      this.compiler.pendingSourcePos = -1
+    }
+
+    this.compiler.emitOp(this.funcDef, Opcode.OP_dup, sourcePos)
     this.compiler.emitOp(this.funcDef, Opcode.OP_is_undefined_or_null)
     this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, nextLabel)
     
@@ -121,36 +128,43 @@ export class ExpressionVisitor {
     this.compiler.markLabel(this.funcDef, nextLabel)
   }
 
+  private getQuestionDotPos(node: ts.Node): number {
+    const token = (node as any).questionDotToken
+    if (token && typeof token.getStart === 'function') {
+      return token.getStart()
+    }
+    return node.getStart()
+  }
+
   private emitLoadIdentifier(node: ts.Identifier, varInfo: VarInfo | null) {
     if (!this.funcDef) {
       return
     }
 
-    const pos = node.getStart()
     const name = node.text
 
     if (!varInfo) {
       const atomId = this.compiler.addAtom(name)
-      this.compiler.emitAtomOp(this.funcDef, Opcode.OP_get_var, atomId, pos)
+      this.compiler.emitAtomOp(this.funcDef, Opcode.OP_get_var, atomId)
       return
     }
 
     if (varInfo.type === 'closure') {
       const idx = varInfo.idx
       if (varInfo.isLexical) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref_check, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref_check)
         this.compiler.emitU16(this.funcDef, idx)
       } else {
         if (idx === 0) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref0, pos)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref0)
         } else if (idx === 1) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref1, pos)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref1)
         } else if (idx === 2) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref2, pos)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref2)
         } else if (idx === 3) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref3, pos)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref3)
         } else {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref, pos)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref)
           this.compiler.emitU16(this.funcDef, idx)
         }
       }
@@ -166,37 +180,37 @@ export class ExpressionVisitor {
     if (varInfo.isArg) {
       const idx = localIdx >= 0 ? localIdx : varIdx
       if (idx === 0) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg0, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg0)
       } else if (idx === 1) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg1, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg1)
       } else if (idx === 2) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg2, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg2)
       } else if (idx === 3) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg3, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg3)
       } else {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_get_arg)
         this.compiler.emitU16(this.funcDef, idx)
       }
       return
     }
 
     if (varInfo.isLexical && !varInfo.isCatchVar) {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc_check, pos)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc_check)
       this.compiler.emitU16(this.funcDef, localIdx)
     } else {
       if (localIdx === 0) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc0, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc0)
       } else if (localIdx === 1) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc1, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc1)
       } else if (localIdx === 2) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc2, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc2)
       } else if (localIdx === 3) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc3, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc3)
       } else if (localIdx >= 0 && localIdx < 256) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc8, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc8)
         this.compiler.emitU8(this.funcDef, localIdx)
       } else {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc)
         this.compiler.emitU16(this.funcDef, localIdx)
       }
     }
@@ -211,7 +225,6 @@ export class ExpressionVisitor {
       return
     }
 
-    const pos = node.getStart()
     const name = node.text
 
     if (!varInfo) {
@@ -219,7 +232,7 @@ export class ExpressionVisitor {
         this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
       }
       const atomId = this.compiler.addAtom(name)
-      this.compiler.emitAtomOp(this.funcDef, Opcode.OP_put_var, atomId, pos)
+      this.compiler.emitAtomOp(this.funcDef, Opcode.OP_put_var, atomId)
       return
     }
 
@@ -229,19 +242,19 @@ export class ExpressionVisitor {
         this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
       }
       if (varInfo.isLexical) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref_check, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref_check)
         this.compiler.emitU16(this.funcDef, idx)
       } else {
         if (idx === 0) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref0, pos)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref0)
         } else if (idx === 1) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref1, pos)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref1)
         } else if (idx === 2) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref2, pos)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref2)
         } else if (idx === 3) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref3, pos)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref3)
         } else {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref, pos)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref)
           this.compiler.emitU16(this.funcDef, idx)
         }
       }
@@ -260,15 +273,15 @@ export class ExpressionVisitor {
         this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
       }
       if (idx === 0) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_put_arg0, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_put_arg0)
       } else if (idx === 1) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_put_arg1, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_put_arg1)
       } else if (idx === 2) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_put_arg2, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_put_arg2)
       } else if (idx === 3) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_put_arg3, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_put_arg3)
       } else {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_put_arg, pos)
+        this.compiler.emitOp(this.funcDef, Opcode.OP_put_arg)
         this.compiler.emitU16(this.funcDef, idx)
       }
       return
@@ -279,18 +292,18 @@ export class ExpressionVisitor {
     }
 
     if (localIdx === 0) {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc0, pos)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc0)
     } else if (localIdx === 1) {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc1, pos)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc1)
     } else if (localIdx === 2) {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc2, pos)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc2)
     } else if (localIdx === 3) {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc3, pos)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc3)
     } else if (localIdx >= 0 && localIdx < 256) {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc8, pos)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc8)
       this.compiler.emitU8(this.funcDef, localIdx)
     } else {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc, pos)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc)
       this.compiler.emitU16(this.funcDef, localIdx)
     }
   }
@@ -426,43 +439,87 @@ export class ExpressionVisitor {
     if (!this.funcDef) {
       return
     }
-
     const opKind = node.operatorToken.kind
-    const skipLabel = this.compiler.createLabel(this.funcDef)
-    const endLabel = this.compiler.createLabel(this.funcDef)
 
-    const emitConditionJump = () => {
-      if (opKind === ts.SyntaxKind.QuestionQuestionEqualsToken) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_is_undefined_or_null)
-        this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, skipLabel)
-      } else {
-        const branchOp =
-          opKind === ts.SyntaxKind.BarBarEqualsToken
-            ? Opcode.OP_if_true
-            : Opcode.OP_if_false
-        this.compiler.emitJump(this.funcDef, branchOp, skipLabel)
+    const emitNipCleanup = (depth: number) => {
+      for (let i = 0; i < depth; i++) {
+        this.compiler.emitOp(this.funcDef, Opcode.OP_nip)
       }
     }
 
+    // Identifier: use ref value + insert3/put_ref_value (depth 2)
     if (ts.isIdentifier(node.left)) {
+      const skipLabel = this.compiler.createLabel(this.funcDef)
+      const endLabel = this.compiler.createLabel(this.funcDef)
       const varInfo = this.scopeManager.findVar(node.left.text, this.funcDef)
-      this.emitLoadIdentifier(node.left, varInfo)
+      const atomId = this.compiler.addAtom(node.left.text)
+      let scopeLevel = this.funcDef.scopeLevel
+      if (varInfo) {
+        if (varInfo.type === 'closure') {
+          const captured = this.funcDef.closureVar[varInfo.idx]
+          const varIdx = captured?.varIdx
+          if (typeof varIdx === 'number') {
+            scopeLevel = varIdx
+          }
+        } else {
+          const varDef = this.funcDef.vars[varInfo.idx]
+          if (varDef) {
+            scopeLevel = varDef.scopeLevel
+          }
+        }
+      }
+      const emitConditionJump = () => {
+        if (opKind === ts.SyntaxKind.QuestionQuestionEqualsToken) {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_is_undefined_or_null)
+          this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, skipLabel)
+        } else {
+          const branchOp =
+            opKind === ts.SyntaxKind.BarBarEqualsToken
+              ? Opcode.OP_if_true
+              : Opcode.OP_if_false
+          this.compiler.emitJump(this.funcDef, branchOp, skipLabel)
+        }
+      }
+
+      // make_var_ref_ref(atom, scope_level)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_make_var_ref_ref)
+      this.compiler.emitU32(this.funcDef, atomId)
+      this.compiler.emitU16(this.funcDef, scopeLevel)
+
+      this.compiler.emitOp(this.funcDef, Opcode.OP_get_ref_value)
       this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
       emitConditionJump()
       this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
       this.context.visit(node.right)
-      this.emitStoreIdentifier(node.left, varInfo, true)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_insert3)
+      this.compiler.emitOp(this.funcDef, Opcode.OP_put_ref_value)
       this.compiler.emitJump(this.funcDef, Opcode.OP_goto, endLabel)
       this.compiler.markLabel(this.funcDef, skipLabel)
+      emitNipCleanup(2)
       this.compiler.markLabel(this.funcDef, endLabel)
       return
     }
 
+    // obj.prop assignment (depth 1)
     if (ts.isPropertyAccessExpression(node.left)) {
       if ((node.left as ts.PropertyAccessChain).questionDotToken) {
         throw new Error('Optional chaining cannot be used on assignment target')
       }
+      const skipLabel = this.compiler.createLabel(this.funcDef)
+      const endLabel = this.compiler.createLabel(this.funcDef)
       const atom = this.compiler.addAtom(node.left.name.text)
+      const emitConditionJump = () => {
+        if (opKind === ts.SyntaxKind.QuestionQuestionEqualsToken) {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_is_undefined_or_null)
+          this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, skipLabel)
+        } else {
+          const branchOp =
+            opKind === ts.SyntaxKind.BarBarEqualsToken
+              ? Opcode.OP_if_true
+              : Opcode.OP_if_false
+          this.compiler.emitJump(this.funcDef, branchOp, skipLabel)
+        }
+      }
       this.context.visit(node.left.expression) // obj
       this.compiler.emitAtomOp(
         this.funcDef,
@@ -478,11 +535,12 @@ export class ExpressionVisitor {
       this.compiler.emitAtomOp(this.funcDef, Opcode.OP_put_field, atom)
       this.compiler.emitJump(this.funcDef, Opcode.OP_goto, endLabel)
       this.compiler.markLabel(this.funcDef, skipLabel)
-      this.compiler.emitOp(this.funcDef, Opcode.OP_nip)
+      emitNipCleanup(1)
       this.compiler.markLabel(this.funcDef, endLabel)
       return
     }
 
+    // obj[idx] assignment (depth 2)
     if (ts.isElementAccessExpression(node.left)) {
       if (!node.left.argumentExpression) {
         throw new Error('Element access requires an argument expression')
@@ -490,6 +548,21 @@ export class ExpressionVisitor {
       if ((node.left as ts.ElementAccessChain).questionDotToken) {
         throw new Error('Optional chaining cannot be used on assignment target')
       }
+      const skipLabel = this.compiler.createLabel(this.funcDef)
+      const endLabel = this.compiler.createLabel(this.funcDef)
+      const emitConditionJump = () => {
+        if (opKind === ts.SyntaxKind.QuestionQuestionEqualsToken) {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_is_undefined_or_null)
+          this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, skipLabel)
+        } else {
+          const branchOp =
+            opKind === ts.SyntaxKind.BarBarEqualsToken
+              ? Opcode.OP_if_true
+              : Opcode.OP_if_false
+          this.compiler.emitJump(this.funcDef, branchOp, skipLabel)
+        }
+      }
+
       this.context.visit(node.left.expression) // obj
       this.context.visit(node.left.argumentExpression) // prop
       this.compiler.emitOp(
@@ -505,8 +578,7 @@ export class ExpressionVisitor {
       this.compiler.emitOp(this.funcDef, Opcode.OP_put_array_el)
       this.compiler.emitJump(this.funcDef, Opcode.OP_goto, endLabel)
       this.compiler.markLabel(this.funcDef, skipLabel)
-      this.compiler.emitOp(this.funcDef, Opcode.OP_nip)
-      this.compiler.emitOp(this.funcDef, Opcode.OP_nip)
+      emitNipCleanup(2)
       this.compiler.markLabel(this.funcDef, endLabel)
       return
     }
@@ -1057,24 +1129,24 @@ export class ExpressionVisitor {
 
         // Optional guard for obj?.method
         if (this.hasQuestionDot(propExpr)) {
-          this.emitOptionalChainGuard(propCtx, 1)
+          this.emitOptionalChainGuard(propCtx, 1, this.getQuestionDotPos(propExpr))
         }
         
         // 2. Emit get_field2 (pushes this + func)
         const propName = propExpr.name.text
         const atom = this.compiler.addAtom(propName)
-        // Use end of object expression (position of dot)
+        // QuickJS 对 get_field2 的 pc2line 记录发生在语句级 pendingSourcePos，这里不传 sourcePos
         this.compiler.emitAtomOp(
           this.funcDef,
           Opcode.OP_get_field2,
           atom,
-          propExpr.expression.getEnd(),
         )
         
         isMethodCall = true
 
         // Guard for obj.method?.()
         if (callCtx && this.hasQuestionDot(node)) {
+          // QuickJS records line info on the call site, not on the optional guard
           this.emitOptionalChainGuard(callCtx, 2)
         }
       } else if (ts.isElementAccessExpression(node.expression)) {
@@ -1114,6 +1186,7 @@ export class ExpressionVisitor {
         this.context.visit(elementExpr.expression)
 
         if (this.hasQuestionDot(elementExpr)) {
+          // Let the array access carry the source location
           this.emitOptionalChainGuard(elementCtx, 1)
         }
 
@@ -1121,12 +1194,12 @@ export class ExpressionVisitor {
         this.compiler.emitOp(
           this.funcDef,
           Opcode.OP_get_array_el2,
-          elementExpr.expression.getEnd(),
         )
 
         isMethodCall = true
 
         if (callCtx && this.hasQuestionDot(node)) {
+          // Leave mapping to the ensuing call opcode
           this.emitOptionalChainGuard(callCtx, 2)
         }
       } else {
@@ -1144,36 +1217,39 @@ export class ExpressionVisitor {
       }
 
       // 4. Emit call
+      // QuickJS 将 pc2line 记录交给 pendingSourcePos（语句级），call 本身不再携带 sourcePos
+      const callPos = -1
+
       if (isMethodCall) {
         // Use end of property access (position of open parenthesis)
         if (isTailCall) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_tail_call_method, tailCallPos !== -1 ? tailCallPos : node.expression.getEnd())
+          this.compiler.emitOp(this.funcDef, Opcode.OP_tail_call_method, tailCallPos !== -1 ? tailCallPos : callPos)
           this.compiler.emitU16(this.funcDef, argCount)
           this.compiler.adjustStack(this.funcDef, -argCount)
         } else {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_call_method, node.expression.getEnd())
+          this.compiler.emitOp(this.funcDef, Opcode.OP_call_method, callPos)
           this.compiler.emitU16(this.funcDef, argCount)
           this.compiler.adjustStack(this.funcDef, -argCount)
         }
       } else {
         if (isTailCall) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_tail_call, tailCallPos !== -1 ? tailCallPos : node.expression.getEnd())
+          this.compiler.emitOp(this.funcDef, Opcode.OP_tail_call, tailCallPos !== -1 ? tailCallPos : callPos)
           this.compiler.emitU16(this.funcDef, argCount)
           this.compiler.adjustStack(this.funcDef, -(argCount + 1))
         } else {
           if (argCount === 0) {
-            this.compiler.emitOp(this.funcDef, Opcode.OP_call0, node.expression.getEnd())
+            this.compiler.emitOp(this.funcDef, Opcode.OP_call0, callPos)
           } else if (argCount === 1) {
-            this.compiler.emitOp(this.funcDef, Opcode.OP_call1, node.expression.getEnd())
+            this.compiler.emitOp(this.funcDef, Opcode.OP_call1, callPos)
             this.compiler.adjustStack(this.funcDef, -1)
           } else if (argCount === 2) {
-            this.compiler.emitOp(this.funcDef, Opcode.OP_call2, node.expression.getEnd())
+            this.compiler.emitOp(this.funcDef, Opcode.OP_call2, callPos)
             this.compiler.adjustStack(this.funcDef, -2)
           } else if (argCount === 3) {
-            this.compiler.emitOp(this.funcDef, Opcode.OP_call3, node.expression.getEnd())
+            this.compiler.emitOp(this.funcDef, Opcode.OP_call3, callPos)
             this.compiler.adjustStack(this.funcDef, -3)
           } else {
-            this.compiler.emitOp(this.funcDef, Opcode.OP_call, node.expression.getEnd())
+            this.compiler.emitOp(this.funcDef, Opcode.OP_call, callPos)
             this.compiler.emitU16(this.funcDef, argCount)
             this.compiler.adjustStack(this.funcDef, -(argCount + 1))
           }
@@ -1193,7 +1269,7 @@ export class ExpressionVisitor {
       this.registerOptionalChild(node.expression as ts.Expression, ctx)
       this.context.visit(node.expression)
       if (this.hasQuestionDot(node)) {
-        this.emitOptionalChainGuard(ctx, 1)
+        this.emitOptionalChainGuard(ctx, 1, this.getQuestionDotPos(node))
       }
       const propName = node.name.text
       const atom = this.compiler.addAtom(propName)
@@ -1224,7 +1300,7 @@ export class ExpressionVisitor {
       this.compiler.emitOp(
         this.funcDef!,
         Opcode.OP_get_array_el,
-        node.expression.getEnd(),
+        this.getQuestionDotPos(node),
       )
     })
   }
@@ -1237,7 +1313,8 @@ export class ExpressionVisitor {
     const hasSpread = node.elements.some(e => ts.isSpreadElement(e))
 
     if (hasSpread) {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_array_from)
+      const literalPos = node.getStart()
+      this.compiler.emitOp(this.funcDef, Opcode.OP_array_from, literalPos)
       this.compiler.emitU16(this.funcDef, 0)
       this.compiler.emitOp(this.funcDef, Opcode.OP_push_0) // Index counter
 
@@ -1258,7 +1335,8 @@ export class ExpressionVisitor {
       for (const element of node.elements) {
         this.context.visit(element)
       }
-      this.compiler.emitOp(this.funcDef, Opcode.OP_array_from)
+      const literalPos = node.getStart()
+      this.compiler.emitOp(this.funcDef, Opcode.OP_array_from, literalPos)
       this.compiler.emitU16(this.funcDef, node.elements.length)
       this.compiler.adjustStack(this.funcDef, -node.elements.length)
     }

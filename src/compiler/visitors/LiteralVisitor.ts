@@ -100,6 +100,10 @@ export class LiteralVisitor {
     if (!this.funcDef) {
       return
     }
+    if (node.text === '') {
+      this.compiler.emitOp(this.funcDef, Opcode.OP_push_empty_string)
+      return
+    }
     const atom = this.compiler.addAtom(node.text)
     this.compiler.emitAtomOp(this.funcDef, Opcode.OP_push_atom_value, atom)
   }

@@ -329,6 +329,32 @@ namespace quickjs {
     return kinds;
   }
 
+  std::vector<JSVarKind> QuickJSBinding::getJSVarKinds() {
+    std::vector<JSVarKind> kinds;
+
+    kinds.push_back(JSVarKind{ id: JS_VAR_NORMAL, name: "JS_VAR_NORMAL" });
+    kinds.push_back(JSVarKind{ id: JS_VAR_FUNCTION_DECL, name: "JS_VAR_FUNCTION_DECL" });
+    kinds.push_back(JSVarKind{ id: JS_VAR_NEW_FUNCTION_DECL, name: "JS_VAR_NEW_FUNCTION_DECL" });
+    kinds.push_back(JSVarKind{ id: JS_VAR_CATCH, name: "JS_VAR_CATCH" });
+    kinds.push_back(JSVarKind{ id: JS_VAR_FUNCTION_NAME, name: "JS_VAR_FUNCTION_NAME" });
+    kinds.push_back(JSVarKind{ id: JS_VAR_PRIVATE_FIELD, name: "JS_VAR_PRIVATE_FIELD" });
+    kinds.push_back(JSVarKind{ id: JS_VAR_PRIVATE_METHOD, name: "JS_VAR_PRIVATE_METHOD" });
+    kinds.push_back(JSVarKind{ id: JS_VAR_PRIVATE_GETTER, name: "JS_VAR_PRIVATE_GETTER" });
+    kinds.push_back(JSVarKind{ id: JS_VAR_PRIVATE_SETTER, name: "JS_VAR_PRIVATE_SETTER" });
+    kinds.push_back(JSVarKind{ id: JS_VAR_PRIVATE_GETTER_SETTER, name: "JS_VAR_PRIVATE_GETTER_SETTER" });
+
+    return kinds;
+  }
+
+  std::vector<DefineMethodFlag> QuickJSBinding::getDefineMethodFlags() {
+    std::vector<DefineMethodFlag> flags;
+    flags.push_back(DefineMethodFlag{ id: OP_DEFINE_METHOD_METHOD, name: "Method" });
+    flags.push_back(DefineMethodFlag{ id: OP_DEFINE_METHOD_GETTER, name: "Getter" });
+    flags.push_back(DefineMethodFlag{ id: OP_DEFINE_METHOD_SETTER, name: "Setter" });
+    flags.push_back(DefineMethodFlag{ id: OP_DEFINE_METHOD_ENUMERABLE, name: "Enumerable" });
+    return flags;
+  }
+
   std::vector<BytecodeTag> QuickJSBinding::getBytecodeTags() {
     std::vector<BytecodeTag> tags;
 

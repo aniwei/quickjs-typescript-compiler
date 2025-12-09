@@ -942,6 +942,42 @@ export class StatementVisitor {
                 compiler.emitU16(funcDef, idx)
               }
             }
+          } else if (isLexical) {
+            // let/const without initializer: initialize to undefined at execution time
+            compiler.emitOp(funcDef, Opcode.OP_undefined)
+            if (scopeInfo.type === 'closure') {
+              const idx = scopeInfo.idx
+              if (idx === 0) {
+                compiler.emitOp(funcDef, Opcode.OP_put_var_ref0)
+              } else if (idx === 1) {
+                compiler.emitOp(funcDef, Opcode.OP_put_var_ref1)
+              } else if (idx === 2) {
+                compiler.emitOp(funcDef, Opcode.OP_put_var_ref2)
+              } else if (idx === 3) {
+                compiler.emitOp(funcDef, Opcode.OP_put_var_ref3)
+              } else {
+                compiler.emitOp(funcDef, Opcode.OP_put_var_ref)
+                compiler.emitU16(funcDef, idx)
+              }
+            } else {
+              const varIdx = scopeInfo.idx
+              const idx = funcDef.vars[varIdx].localIdx
+              if (idx === -1) {
+                throw new Error(`Variable ${name} is captured but accessed as local`)
+              }
+              if (idx === 0) {
+                compiler.emitOp(funcDef, Opcode.OP_put_loc0)
+              } else if (idx === 1) {
+                compiler.emitOp(funcDef, Opcode.OP_put_loc1)
+              } else if (idx === 2) {
+                compiler.emitOp(funcDef, Opcode.OP_put_loc2)
+              } else if (idx === 3) {
+                compiler.emitOp(funcDef, Opcode.OP_put_loc3)
+              } else {
+                compiler.emitOp(funcDef, Opcode.OP_put_loc)
+                compiler.emitU16(funcDef, idx)
+              }
+            }
           }
         }
       }

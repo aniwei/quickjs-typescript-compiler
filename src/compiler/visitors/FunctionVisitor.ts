@@ -285,7 +285,7 @@ export class FunctionVisitor {
       
       // I'll implement a local hoistVariables helper.
       this.hoistVariables(node.body)
-      
+
       // 1. Visit function declarations (hoisted)
       for (const stmt of node.body.statements) {
         if (ts.isFunctionDeclaration(stmt)) {
@@ -326,13 +326,13 @@ export class FunctionVisitor {
       if (fd.lastOpcodePos !== -1) {
         lastOp = fd.byteCode.buffer[fd.lastOpcodePos]
       }
-      
+
       // Optimization: Remove trailing drop before return_undef
       if (lastOp === Opcode.OP_drop) {
         fd.byteCode.size--
         lastOp = 0 // Force return_undef
       }
-  
+
       if (fd.byteCode.size === 0 || (lastOp !== Opcode.OP_return && lastOp !== Opcode.OP_return_undef && lastOp !== Opcode.OP_throw && lastOp !== Opcode.OP_return_async && lastOp !== Opcode.OP_tail_call)) {
         compiler.emitOp(fd, Opcode.OP_return_undef)
       }
@@ -591,9 +591,13 @@ export class FunctionVisitor {
         compiler.addArg(fd, param.name.text)
       }
     }
-    
-    compiler.addVar(fd, 'this', true, false, 0)
-    
+
+    const usesThis = this.containsLexicalThis(node.body) || node.parameters.some(p => this.containsLexicalThis(p.initializer))
+
+    if (usesThis) {
+      compiler.addVar(fd, 'this', true, false, 0)
+    }
+
     const childIdx = compiler.addChild(parentFd, fd)
     
     compiler.emitOp(parentFd, Opcode.OP_fclosure8)
@@ -601,26 +605,30 @@ export class FunctionVisitor {
     
     this.context.setFuncDef(fd)
 
-    // Initialize 'this'
-    compiler.emitOp(fd, Opcode.OP_push_this, node.name.getStart())
-    compiler.emitOp(fd, Opcode.OP_put_loc0, -1)
+    if (usesThis) {
+      // Initialize 'this' only when used so locals mirror QuickJS
+      compiler.emitOp(fd, Opcode.OP_push_this, node.name.getStart())
+      compiler.emitOp(fd, Opcode.OP_put_loc0, -1)
+    }
 
     // Push scope
     scopeManager.enter('function', fd, 0)
     
-    // Add 'this' to scope
-    scopeManager.currentScope.vars.set('this', {
-      type: 'local',
-      idx: 0,
-      isLexical: false,
-      isConst: true
-    })
-    
-    // Fix 'this' var properties to match WASM
-    // WASM has scopeNext=0 (encoded as 1) and flags=0 (not const)
-    if (fd.vars.length > 0) {
-      fd.vars[0].scopeNext = 0
-      fd.vars[0].isConst = false
+    if (usesThis) {
+      // Add 'this' to scope when it exists
+      scopeManager.currentScope.vars.set('this', {
+        type: 'local',
+        idx: 0,
+        isLexical: false,
+        isConst: true
+      })
+      
+      // Fix 'this' var properties to match WASM
+      // WASM has scopeNext=0 (encoded as 1) and flags=0 (not const)
+      if (fd.vars.length > 0) {
+        fd.vars[0].scopeNext = 0
+        fd.vars[0].isConst = false
+      }
     }
 
     if (node.body) {
@@ -640,56 +648,67 @@ export class FunctionVisitor {
     this.context.setFuncDef(parentFd)
   }
 
+  private containsLexicalThis(node?: ts.Node): boolean {
+    if (!node) return false
+    let found = false
+    const visit = (n: ts.Node) => {
+      if (found) return
+      if (n.kind === ts.SyntaxKind.ThisKeyword) {
+        found = true
+        return
+      }
+      // Do not dive into non-arrow function bodies; their 'this' is not lexical
+      if (ts.isFunctionDeclaration(n) || ts.isFunctionExpression(n) || ts.isMethodDeclaration(n) || ts.isConstructorDeclaration(n)) {
+        return
+      }
+      ts.forEachChild(n, visit)
+    }
+    visit(node)
+    return found
+  }
+
   private hoistVariables(node: ts.Block) {
     const { compiler, scopeManager, funcDef } = this.context
     if (!funcDef) return
 
+    const currentScope = scopeManager.currentScope
+    const scopeLevel = scopeManager.stackDepth - funcDef.scopeLevel - 1
+
     for (const stmt of node.statements) {
-      if (ts.isFunctionDeclaration(stmt)) {
-        if (stmt.name) {
-          const name = stmt.name.text
-          // Add to function scope (var)
-          // Note: In QuickJS, function declarations in blocks are block-scoped in strict mode?
-          // But here we are treating them as var-scoped (hoisted) for now or following QuickJS logic.
-          // QuickJS treats them as block scoped in strict mode but hoisted to block top.
-          // But `visitFunctionDeclaration` adds them to `parentFd` (which is `funcDef`).
-          // So they are added to the function scope.
-          
-          // We need to add them to the scope manager so `visitFunctionDeclaration` can find them.
-          // `visitFunctionDeclaration` calls `scopeManager.findVar`.
-          
-          // Actually, `visitFunctionDeclaration` expects the variable to be already added?
-          // No, `visitFunctionDeclaration` adds the variable to the parent scope?
-          // Let's check `visitFunctionDeclaration` again.
-          // It says: `let varInfo = this.scopeManager.findVar(name, this.funcDef!)`
-          // So it expects it to be there.
-          
-          // So `hoistVariables` MUST add the variable.
-          
-          const varIdx = compiler.addVar(funcDef, name, false, false, 0) // Scope level 0 (function)
-          scopeManager.currentScope.vars.set(name, {
+      if (ts.isVariableStatement(stmt)) {
+        const isLet = (stmt.declarationList.flags & ts.NodeFlags.Let) !== 0
+        const isConst = (stmt.declarationList.flags & ts.NodeFlags.Const) !== 0
+        const isVar = !isLet && !isConst
+
+        for (const decl of stmt.declarationList.declarations) {
+          if (!ts.isIdentifier(decl.name)) continue
+          const name = decl.name.text
+          if (currentScope.vars.has(name)) continue
+
+          const targetScopeLevel = isVar ? 0 : scopeLevel
+          const varIdx = compiler.addVar(funcDef, name, isConst, !isVar, targetScopeLevel)
+          currentScope.vars.set(name, {
             type: 'local',
             idx: varIdx,
-            isLexical: false,
-            isConst: false
+            isLexical: !isVar,
+            isConst
           })
         }
-      } else if (ts.isVariableStatement(stmt)) {
-        if ((stmt.declarationList.flags & (ts.NodeFlags.Let | ts.NodeFlags.Const)) === 0) {
-          // var declaration
-          for (const decl of stmt.declarationList.declarations) {
-            if (ts.isIdentifier(decl.name)) {
-              const name = decl.name.text
-              const varIdx = compiler.addVar(funcDef, name, false, false, 0)
-              scopeManager.currentScope.vars.set(name, {
-                type: 'local',
-                idx: varIdx,
-                isLexical: false,
-                isConst: false
-              })
-            }
-          }
-        }
+      } else if (ts.isFunctionDeclaration(stmt) && stmt.name) {
+        const name = stmt.name.text
+        const funcScope = scopeManager.scopeStack.find(scope => scope.funcDef === funcDef && scope.type === 'function')
+          || scopeManager.currentScope
+
+        if (funcScope.vars.has(name)) continue
+
+        // QuickJS 将函数声明视为函数作用域的 var 绑定（非 lexical），序列化 scope_level=0
+        const varIdx = compiler.addVar(funcDef, name, false, false, 0, JSVarKind.JS_VAR_NORMAL)
+        funcScope.vars.set(name, {
+          type: 'local',
+          idx: varIdx,
+          isLexical: false,
+          isConst: false
+        })
       }
     }
   }

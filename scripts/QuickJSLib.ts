@@ -37,6 +37,11 @@ interface WasmInstance {
   getEnvironmentAtoms: () => Atom[]
   getOpcodes: () => OpcodeMeta[]
   getBytecodeTags: () => BytecodeTag[]
+  getPC2LineCodes: () => any
+  getJSModes: () => any
+  getFunctionKinds: () => any
+  getJSVarKinds: () => any
+  getDefineMethodFlags: () => any
   getCompileFlags: () => number
   getCompileEnums: () => Record<string, number>
 }
@@ -158,6 +163,17 @@ export class QuickJSLib {
     return map
   }
 
+  static async getDefineMethodFlags() {
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const vec = WasmInstance.QuickJSBinding.getDefineMethodFlags()
+    const map: Record<string, number> = {}
+    for (let i = 0; i < vec.size(); i++) {
+      const o = vec.get(i)
+      map[o.name] = o.id
+    }
+    return map
+  }
+
   static async getJSModes() {
     const WasmInstance = await QuickJSLib.getWasmInstance()
     const vec = WasmInstance.QuickJSBinding.getJSModes()
@@ -176,6 +192,17 @@ export class QuickJSLib {
     for (let i = 0; i < vec.size(); i++) {
       const t = vec.get(i)
       map[t.name] = t.id
+    }
+    return map
+  }
+
+  static async getJSVarKinds() {
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const vec = WasmInstance.QuickJSBinding.getJSVarKinds()
+    const map: Record<string, number> = {}
+    for (let i = 0; i < vec.size(); i++) {
+      const v = vec.get(i)
+      map[v.name] = v.id
     }
     return map
   }

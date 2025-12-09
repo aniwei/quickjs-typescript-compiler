@@ -135,7 +135,9 @@ export class TypeScriptCompiler implements CompilerContext {
       task()
     }
     
-    // Update stack size for module
+    // Update stack size for module (locals are part of the stack frame)
+    const baseStack = fd.localCount + fd.argCount
+    fd.stackSizeMax = Math.max(fd.stackSizeMax, baseStack + 1)
     fd.stackSize = fd.stackSizeMax
     
     // 模块路径结束：返回 undefined + return_async

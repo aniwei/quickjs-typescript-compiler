@@ -14,8 +14,10 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
   register_vector<OpFmt>("OpFormatArray");
   register_vector<BytecodeTag>("BytecodeTagArray");
   register_vector<FunctionKind>("FunctionKindArray");
+  register_vector<JSVarKind>("JSVarKindArray");
   register_vector<JSMode>("JSModeArray");
   register_vector<PC2Line>("PC2LineArray");
+  register_vector<DefineMethodFlag>("DefineMethodFlagArray");
 
   enum_<CompileFlags>("CompileFlags")
     .value("COMPILE_FLAG_NONE", COMPILE_FLAG_NONE)
@@ -54,6 +56,11 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .property("id", &FunctionKind::id)
     .property("name", &FunctionKind::name);
 
+  class_<JSVarKind>("JSVarKind")
+    .constructor<>()
+    .property("id", &JSVarKind::id)
+    .property("name", &JSVarKind::name);
+
   class_<PC2Line>("PC2Line")
     .constructor<>()
     .property("id", &PC2Line::id)
@@ -63,6 +70,11 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .constructor<>()
     .property("id", &JSMode::id)
     .property("name", &JSMode::name);
+
+  class_<DefineMethodFlag>("DefineMethodFlag")
+    .constructor<>()
+    .property("id", &DefineMethodFlag::id)
+    .property("name", &DefineMethodFlag::name);
 
   class_<QuickJSBinding>("QuickJSBinding")
     .constructor<>()
@@ -78,7 +90,9 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .class_function("getOpcodes", &QuickJSBinding::getOpcodes)
     .class_function("getBytecodeTags", &QuickJSBinding::getBytecodeTags)
     .class_function("getFunctionKinds", &QuickJSBinding::getFunctionKinds)
+    .class_function("getJSVarKinds", &QuickJSBinding::getJSVarKinds)
     .class_function("getJSModes", &QuickJSBinding::getJSModes)
     .class_function("getPC2LineCodes", &QuickJSBinding::getPC2LineCodes)
+    .class_function("getDefineMethodFlags", &QuickJSBinding::getDefineMethodFlags)
     .smart_ptr<std::shared_ptr<QuickJSBinding>>("shared_ptr<QuickJSBinding>");
 }

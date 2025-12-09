@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include "QuickJS/quickjs.h"
+#include "../src/core/function.h"
 
 using namespace emscripten;
 
@@ -44,6 +45,11 @@ struct FunctionKind {
   std::string name;
 };
 
+struct JSVarKind {
+  uint32_t id;
+  std::string name;
+};
+
 struct JSMode {
   uint32_t id;
   std::string name;
@@ -51,6 +57,11 @@ struct JSMode {
 
 struct PC2Line {
   int32_t id;
+  std::string name;
+};
+
+struct DefineMethodFlag {
+  uint32_t id;
   std::string name;
 };
 
@@ -81,8 +92,10 @@ class QuickJSBinding {
 
   static std::vector<BytecodeTag> getBytecodeTags();
   static std::vector<FunctionKind> getFunctionKinds();
+  static std::vector<JSVarKind> getJSVarKinds();
   static std::vector<JSMode> getJSModes();
   static std::vector<PC2Line> getPC2LineCodes();
+  static std::vector<DefineMethodFlag> getDefineMethodFlags();
 
   static std::vector<Atom> getAtoms();
   static std::vector<Atom> getEnvironmentAtoms();

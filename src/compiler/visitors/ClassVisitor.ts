@@ -16,17 +16,6 @@ export class ClassVisitor {
       return
     }
 
-    // We need to access nodeScopeMap from context, but it's private in TypeScriptCompiler.
-    // We should probably expose it or pass the indices differently.
-    // For now, let's assume we can access it via a getter or public property if we change TypeScriptCompiler.
-    // Or better, let's move the map to CompilerContext or ScopeManager?
-    // Actually, TypeScriptCompiler has `nodeScopeMap`.
-    // I'll cast context to any to access it for now, or add it to interface.
-    // Let's check CompilerContext interface.
-    
-    // Assuming context has nodeScopeMap or we can get it.
-    // Since I can't easily change the interface right now without editing multiple files,
-    // I will use `(this.context as any).nodeScopeMap`.
     const nodeScopeMap = (this.context as any).nodeScopeMap as Map<ts.Node, number[]>
     
     const scopeIndices = nodeScopeMap.get(node)

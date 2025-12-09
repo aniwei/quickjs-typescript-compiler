@@ -1,18 +1,7 @@
 import { BytecodeBuilder } from './BytecodeBuilder'
-import { JSAtom } from '../env'
+import { JSAtom, JSVarKind } from '../env'
 
-export enum JSVarKind {
-  JS_VAR_NORMAL = 0,
-  JS_VAR_FUNCTION_DECL = 1,
-  JS_VAR_NEW_FUNCTION_DECL = 2,
-  JS_VAR_CATCH = 3,
-  JS_VAR_FUNCTION_NAME = 4,
-  JS_VAR_PRIVATE_FIELD = 5,
-  JS_VAR_PRIVATE_METHOD = 6,
-  JS_VAR_PRIVATE_GETTER = 7,
-  JS_VAR_PRIVATE_SETTER = 8,
-  JS_VAR_PRIVATE_GETTER_SETTER = 9,
-}
+export { JSVarKind } from '../env'
 
 export class JSVarDef {
   varName: number = 0 // JSAtom
