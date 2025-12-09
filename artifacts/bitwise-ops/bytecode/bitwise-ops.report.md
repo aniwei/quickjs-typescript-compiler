@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler_second/__tests__/compiler/fixtures/bitwise-ops.ts
-**生成时间**: 2025-12-09T04:25:00.167Z
+**生成时间**: 2025-12-09T07:55:06.870Z
 
 ## 大小对比
 

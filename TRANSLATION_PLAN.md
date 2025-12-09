@@ -95,7 +95,7 @@
 - [x] `closure-short.ts` (279 bytes, Perfect Match - Short Opcodes Implemented)
 - [x] `closure-vars.ts` (Structurally Correct, Short Opcodes Verified)
 - [ ] `class-inheritance.ts` (-25 bytes diff. Structure aligned, debugging const capture opcodes)
-- [ ] `class-basic.ts` (196 bytes vs 201 bytes, -5 bytes diff. Fixed OP_get_var_ref_check encoding)
+- [ ] `class-basic.ts` (205 bytes vs 201 bytes, +4 bytes diff. Constructor bytecode aligned; remaining delta isolated to metadata)
 - [x] `primitives.ts` (Perfect Match - pc2line zigzag encoding fixed)
 - [ ] `labeled-statements.ts` (Minor mismatch)
 
