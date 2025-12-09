@@ -51,21 +51,39 @@ export class ExpressionVisitor {
     node: ts.Expression,
     emit: (ctx: OptionalChainContext | null) => void,
   ) {
+    const [ctx, created] = this.enterOptionalChain(node)
+    emit(ctx)
+    this.leaveOptionalChain(ctx, created)
+  }
+
+  private enterOptionalChain(
+    node: ts.Expression,
+  ): [OptionalChainContext | null, boolean] {
     if (!this.funcDef || !this.isOptionalChainNode(node)) {
-      emit(null)
-      return
+      return [null, false]
     }
-    let ctx = this.optionalChainMap.get(node)
+
+    let ctx = this.optionalChainMap.get(node) ?? null
     let created = false
+
     if (!ctx) {
       ctx = { exitLabel: this.compiler.newLabel(this.funcDef) }
       this.optionalChainMap.set(node, ctx)
       created = true
     }
-    emit(ctx)
-    if (created) {
-      this.compiler.markLabel(this.funcDef, ctx.exitLabel)
+
+    return [ctx, created]
+  }
+
+  private leaveOptionalChain(
+    ctx: OptionalChainContext | null,
+    created: boolean,
+  ) {
+    if (!this.funcDef || !ctx || !created) {
+      return
     }
+
+    this.compiler.markLabel(this.funcDef, ctx.exitLabel)
   }
 
   private emitOptionalChainGuard(
@@ -935,143 +953,191 @@ export class ExpressionVisitor {
       return
     }
 
-    // Handle super() call
-    if (node.expression.kind === ts.SyntaxKind.SuperKeyword) {
-      // 1. Get constructor
-      // In derived constructor, var 0 is 'this.active_func'
-      this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc0)
-      
-      this.compiler.emitOp(this.funcDef, Opcode.OP_get_super) // super proto
-      
-      // 2. Push new.target
-      this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc_check)
-      this.compiler.emitU16(this.funcDef, 1) // var 1 is new.target
-      
-      // 3. Push args
-      for (const arg of node.arguments) {
-        this.context.visit(arg)
+    const optionalContexts: Array<[OptionalChainContext | null, boolean]> = []
+    const trackContext = (
+      info: [OptionalChainContext | null, boolean],
+    ): [OptionalChainContext | null, boolean] => {
+      if (info[1]) {
+        optionalContexts.push(info)
       }
-      
-      // 4. Call constructor
-      this.compiler.emitOp(this.funcDef, Opcode.OP_call_constructor)
-      this.compiler.emitU16(this.funcDef, node.arguments.length)
-      
-      // 5. Store result in 'this'
-      this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
-      
-      const thisVar = this.context.scopeManager.findVar('this', this.funcDef)
-      const thisIdx = thisVar && thisVar.localIdx !== undefined ? thisVar.localIdx : 0
-      
-      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc_check_init)
-      this.compiler.emitU16(this.funcDef, thisIdx)
-      
-      // 6. Initialize fields
-      if (this.funcDef.fieldsInitClosureIdx !== -1) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref_check)
-        this.compiler.emitU16(this.funcDef, this.funcDef.fieldsInitClosureIdx)
-        
-        const skipInitLabel = this.compiler.newLabel(this.funcDef)
-        this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
-        this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, skipInitLabel)
-        
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc_check) // get 'this' (checked)
-        this.compiler.emitU16(this.funcDef, 2) // var 2
-        
-        this.compiler.emitOp(this.funcDef, Opcode.OP_swap)
-        this.compiler.emitOp(this.funcDef, Opcode.OP_call_method)
-        this.compiler.emitU16(this.funcDef, 0)
-        
-        this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
-        
-        this.compiler.markLabel(this.funcDef, skipInitLabel)
-        this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
+      return info
+    }
+    const [callCtx] = trackContext(this.enterOptionalChain(node))
+
+    const finalizeOptionalContexts = () => {
+      for (const [ctx, created] of optionalContexts) {
+        this.leaveOptionalChain(ctx, created)
       }
-        
-      return
     }
 
-    let isMethodCall = false
-    const argCount = node.arguments.length
-
-    if (ts.isPropertyAccessExpression(node.expression)) {
-      // Method call: obj.method(...)
-      if (node.expression.expression.kind === ts.SyntaxKind.SuperKeyword) {
-          // super.method(...)
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc0) // this
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc1) // <home_object>
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_super)
+    try {
+      // Handle super() call
+      if (node.expression.kind === ts.SyntaxKind.SuperKeyword) {
+        // 1. Get constructor
+        // In derived constructor, var 0 is 'this.active_func'
+        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc0)
         
-        const propName = node.expression.name.text
-        this.compiler.emitAtomOp(this.funcDef, Opcode.OP_push_atom_value, this.compiler.addAtom(propName))
+        this.compiler.emitOp(this.funcDef, Opcode.OP_get_super) // super proto
         
-        this.compiler.emitOp(this.funcDef, Opcode.OP_get_array_el)
+        // 2. Push new.target
+        this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc_check)
+        this.compiler.emitU16(this.funcDef, 1) // var 1 is new.target
         
+        // 3. Push args
         for (const arg of node.arguments) {
           this.context.visit(arg)
         }
         
-        this.compiler.emitOp(this.funcDef, Opcode.OP_call_method)
-        this.compiler.emitU16(this.funcDef, argCount)
-        this.compiler.adjustStack(this.funcDef, -(argCount + 1)) // TODO: Verify stack adjustment
+        // 4. Call constructor
+        this.compiler.emitOp(this.funcDef, Opcode.OP_call_constructor)
+        this.compiler.emitU16(this.funcDef, node.arguments.length)
         
+        // 5. Store result in 'this'
+        this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
+        
+        const thisVar = this.context.scopeManager.findVar('this', this.funcDef)
+        const thisIdx = thisVar && thisVar.localIdx !== undefined ? thisVar.localIdx : 0
+        
+        this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc_check_init)
+        this.compiler.emitU16(this.funcDef, thisIdx)
+        
+        // 6. Initialize fields
+        if (this.funcDef.fieldsInitClosureIdx !== -1) {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_var_ref_check)
+          this.compiler.emitU16(this.funcDef, this.funcDef.fieldsInitClosureIdx)
+          
+          const skipInitLabel = this.compiler.newLabel(this.funcDef)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
+          this.compiler.emitJump(this.funcDef, Opcode.OP_if_false, skipInitLabel)
+          
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc_check) // get 'this' (checked)
+          this.compiler.emitU16(this.funcDef, 2) // var 2
+          
+          this.compiler.emitOp(this.funcDef, Opcode.OP_swap)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_call_method)
+          this.compiler.emitU16(this.funcDef, 0)
+          
+          this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
+          
+          this.compiler.markLabel(this.funcDef, skipInitLabel)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
+        }
+          
         return
       }
 
-      // 1. Visit object
-      this.context.visit(node.expression.expression)
-      
-      // 2. Emit get_field2 (pushes this + func)
-      const propName = node.expression.name.text
-      const atom = this.compiler.addAtom(propName)
-      // Use end of object expression (position of dot)
-      this.compiler.emitAtomOp(this.funcDef, Opcode.OP_get_field2, atom, node.expression.expression.getEnd())
-      
-      isMethodCall = true
-    } else {
-      // Regular call: func(...)
-      this.context.visit(node.expression)
-    }
+      let isMethodCall = false
+      const argCount = node.arguments.length
 
-    // 3. Visit arguments
-    for (const arg of node.arguments) {
-      this.context.visit(arg)
-    }
+      this.registerOptionalChild(node.expression as ts.Expression, callCtx)
 
-    // 4. Emit call
-    if (isMethodCall) {
-      // Use end of property access (position of open parenthesis)
-      if (isTailCall) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_tail_call_method, tailCallPos !== -1 ? tailCallPos : node.expression.getEnd())
-        this.compiler.emitU16(this.funcDef, argCount)
-        this.compiler.adjustStack(this.funcDef, -argCount)
-      } else {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_call_method, node.expression.getEnd())
-        this.compiler.emitU16(this.funcDef, argCount)
-        this.compiler.adjustStack(this.funcDef, -argCount)
-      }
-    } else {
-      if (isTailCall) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_tail_call, tailCallPos !== -1 ? tailCallPos : node.expression.getEnd())
-        this.compiler.emitU16(this.funcDef, argCount)
-        this.compiler.adjustStack(this.funcDef, -(argCount + 1))
-      } else {
-        if (argCount === 0) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_call0, node.expression.getEnd())
-        } else if (argCount === 1) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_call1, node.expression.getEnd())
-          this.compiler.adjustStack(this.funcDef, -1)
-        } else if (argCount === 2) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_call2, node.expression.getEnd())
-          this.compiler.adjustStack(this.funcDef, -2)
-        } else if (argCount === 3) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_call3, node.expression.getEnd())
-          this.compiler.adjustStack(this.funcDef, -3)
-        } else {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_call, node.expression.getEnd())
+      if (ts.isPropertyAccessExpression(node.expression)) {
+        // Method call: obj.method(...)
+        if (node.expression.expression.kind === ts.SyntaxKind.SuperKeyword) {
+            // super.method(...)
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc0) // this
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_loc1) // <home_object>
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_super)
+          
+          const propName = node.expression.name.text
+          this.compiler.emitAtomOp(this.funcDef, Opcode.OP_push_atom_value, this.compiler.addAtom(propName))
+          
+          this.compiler.emitOp(this.funcDef, Opcode.OP_get_array_el)
+          
+          for (const arg of node.arguments) {
+            this.context.visit(arg)
+          }
+          
+          this.compiler.emitOp(this.funcDef, Opcode.OP_call_method)
           this.compiler.emitU16(this.funcDef, argCount)
-          this.compiler.adjustStack(this.funcDef, -(argCount + 1))
+          this.compiler.adjustStack(this.funcDef, -(argCount + 1)) // TODO: Verify stack adjustment
+          
+          return
+        }
+
+        const [propCtx] = trackContext(
+          this.enterOptionalChain(node.expression as ts.Expression),
+        )
+        this.registerOptionalChild(
+          node.expression.expression as ts.Expression,
+          propCtx,
+        )
+
+        // 1. Visit object
+        this.context.visit(node.expression.expression)
+
+        // Optional guard for obj?.method
+        this.emitOptionalChainGuard(propCtx, 1)
+        
+        // 2. Emit get_field2 (pushes this + func)
+        const propName = node.expression.name.text
+        const atom = this.compiler.addAtom(propName)
+        // Use end of object expression (position of dot)
+        this.compiler.emitAtomOp(
+          this.funcDef,
+          Opcode.OP_get_field2,
+          atom,
+          node.expression.expression.getEnd(),
+        )
+        
+        isMethodCall = true
+
+        // Guard for obj.method?.()
+        if (callCtx) {
+          this.emitOptionalChainGuard(callCtx, 2)
+        }
+      } else {
+        // Regular call: func(...)
+        this.context.visit(node.expression)
+
+        if (callCtx) {
+          this.emitOptionalChainGuard(callCtx, 1)
         }
       }
+
+      // 3. Visit arguments
+      for (const arg of node.arguments) {
+        this.context.visit(arg)
+      }
+
+      // 4. Emit call
+      if (isMethodCall) {
+        // Use end of property access (position of open parenthesis)
+        if (isTailCall) {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_tail_call_method, tailCallPos !== -1 ? tailCallPos : node.expression.getEnd())
+          this.compiler.emitU16(this.funcDef, argCount)
+          this.compiler.adjustStack(this.funcDef, -argCount)
+        } else {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_call_method, node.expression.getEnd())
+          this.compiler.emitU16(this.funcDef, argCount)
+          this.compiler.adjustStack(this.funcDef, -argCount)
+        }
+      } else {
+        if (isTailCall) {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_tail_call, tailCallPos !== -1 ? tailCallPos : node.expression.getEnd())
+          this.compiler.emitU16(this.funcDef, argCount)
+          this.compiler.adjustStack(this.funcDef, -(argCount + 1))
+        } else {
+          if (argCount === 0) {
+            this.compiler.emitOp(this.funcDef, Opcode.OP_call0, node.expression.getEnd())
+          } else if (argCount === 1) {
+            this.compiler.emitOp(this.funcDef, Opcode.OP_call1, node.expression.getEnd())
+            this.compiler.adjustStack(this.funcDef, -1)
+          } else if (argCount === 2) {
+            this.compiler.emitOp(this.funcDef, Opcode.OP_call2, node.expression.getEnd())
+            this.compiler.adjustStack(this.funcDef, -2)
+          } else if (argCount === 3) {
+            this.compiler.emitOp(this.funcDef, Opcode.OP_call3, node.expression.getEnd())
+            this.compiler.adjustStack(this.funcDef, -3)
+          } else {
+            this.compiler.emitOp(this.funcDef, Opcode.OP_call, node.expression.getEnd())
+            this.compiler.emitU16(this.funcDef, argCount)
+            this.compiler.adjustStack(this.funcDef, -(argCount + 1))
+          }
+        }
+      }
+    } finally {
+      finalizeOptionalContexts()
     }
   }
 
