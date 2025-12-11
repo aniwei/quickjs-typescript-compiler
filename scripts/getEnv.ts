@@ -14,7 +14,6 @@ async function main() {
   const opcodes = await QuickJSLib.getAllOpcodes()
   const atoms = await QuickJSLib.getAllAtoms()
   const envAtoms = await QuickJSLib.getEnvironmentAtoms()
-  writeFileSync('env_atoms.json', JSON.stringify(envAtoms, null, 2))
   const bytecodeVersion = await QuickJSLib.getBytecodeVersion()
   const compileOptions = await QuickJSLib.getCompileOptions()
   const firstAtomId = await QuickJSLib.getFirstAtomId()

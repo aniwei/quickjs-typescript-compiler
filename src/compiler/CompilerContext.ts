@@ -15,7 +15,6 @@ export interface CompilerContext {
   isTerminated: boolean
   
   visit(node: ts.Node): void
-  visitCallExpression(node: ts.CallExpression, isTailCall?: boolean, position?: number): void
   setFuncDef(funcDef: FunctionDef | null): void
   setIsTerminated(value: boolean): void
 }

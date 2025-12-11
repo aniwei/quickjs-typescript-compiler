@@ -109,7 +109,6 @@ export class BytecodeBuilder {
     }
     const signed = val | 0
     const zigZag = (signed << 1) ^ (signed >> 31)
-    // QuickJS stores signed deltas as ZigZag-encoded varints.
     this.putULEB128(zigZag >>> 0)
   }
 

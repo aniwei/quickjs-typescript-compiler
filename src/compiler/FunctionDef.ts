@@ -116,109 +116,100 @@ export class FunctionDef {
   argumentsAllowed: boolean = false
   isDerivedClassConstructor: boolean = false
   inFunctionBody: boolean = false
-  funcKind: number = 0 // JSFunctionKindEnum
-  funcType: number = 0 // JSParseFunctionEnum
-  jsMode: number = 0
-  funcName: number = 0 // JSAtom
+  funcKind: number
+  funcType: number
+  jsMode: number
+  funcName: number
 
-  vars: JSVarDef[] = []
-  varSize: number = 0
-  varCount: number = 0
-  localCount: number = 0 // Number of stack slots used by locals
-  args: JSVarDef[] = []
-  argSize: number = 0
-  argCount: number = 0
-  definedArgCount: number = 0
-  varObjectIdx: number = -1
-  argVarObjectIdx: number = -1
-  argumentsVarIdx: number = -1
-  argumentsArgIdx: number = -1
-  funcVarIdx: number = -1
-  evalRetIdx: number = -1
-  thisVarIdx: number = -1
-  newTargetVarIdx: number = -1
-  thisActiveFuncVarIdx: number = -1
-  homeObjectVarIdx: number = 0
-  needHomeObject: boolean = false
-  fieldsInitClosureIdx: number = -1
+  vars: JSVarDef[]
+  varSize: number
+  varCount: number
+  localCount: number
+  args: JSVarDef[]
+  argSize: number
+  argCount: number
+  definedArgCount: number
+  varObjectIdx: number
+  argVarObjectIdx: number
+  argumentsVarIdx: number
+  argumentsArgIdx: number
+  funcVarIdx: number
+  evalRetIdx: number
+  thisVarIdx: number
+  newTargetVarIdx: number
+  thisActiveFuncVarIdx: number
+  homeObjectVarIdx: number
+  needHomeObject: boolean
+  fieldsInitClosureIdx: number
 
-  stackSize: number = 0
-  stackLevel: number = 0
-  stackSizeMax: number = 0
-  scopeLevel: number = 0
-  scopeFirst: number = 0
-  scopeSize: number = 0
-  scopeCount: number = 0
-  scopes: JSVarScope[] = []
-  defScopeArray: JSVarScope[] = [] // JSVarScope[4]
-  bodyScope: number = 0
+  stackSize: number
+  stackLevel: number
+  stackSizeMax: number
+  scopeLevel: number
+  scopeFirst: number
+  scopeSize: number
+  scopeCount: number
+  scopes: JSVarScope[]
+  defScopeArray: JSVarScope[] 
+  bodyScope: number
+  globalVarCount: number
+  globalVarSize: number
+  globalVars: JSGlobalVar[]
 
-  globalVarCount: number = 0
-  globalVarSize: number = 0
-  globalVars: JSGlobalVar[] = []
+  byteCode: BytecodeBuilder
+  lastOpcodePos: number
+  lastOpcodeSourcePtr: any
+  useShortOpcodes: boolean
 
-  byteCode: BytecodeBuilder = new BytecodeBuilder()
-  lastOpcodePos: number = -1
-  lastOpcodeSourcePtr: any = null
-  useShortOpcodes: boolean = false
+  labelSlots: LabelSlot[]
+  labelSize: number
+  labelCount: number
+  topBreak: BlockEnv | null
 
-  labelSlots: LabelSlot[] = []
-  labelSize: number = 0
-  labelCount: number = 0
-  topBreak: BlockEnv | null = null
+  cpool: any[]
+  cpoolCount: number
+  cpoolSize: number
 
-  cpool: any[] = []
-  cpoolCount: number = 0
-  cpoolSize: number = 0
+  closureVarCount: number
+  closureVarSize: number
+  closureVar: JSClosureVar[]
 
-  closureVarCount: number = 0
-  closureVarSize: number = 0
-  closureVar: JSClosureVar[] = []
+  jumpSlots: JumpSlot[]
+  jumpSize: number
+  jumpCount: number
+  lineNumberSlots: LineNumberSlot[]
+  lineNumberSize: number
+  lineNumberCount: number
+  lineNumberLast: number
+  lineNumberLastPc: number
 
-  jumpSlots: JumpSlot[] = []
-  jumpSize: number = 0
-  jumpCount: number = 0
+  columnNumberSlots: ColumnNumberSlot[]
+  columnNumberSize: number
+  columnNumberCount: number
+  columnNumberLast: number
+  columnNumberLastPc: number
 
-  lineNumberSlots: LineNumberSlot[] = []
-  lineNumberSize: number = 0
-  lineNumberCount: number = 0
-  lineNumberLast: number = -1
-  lineNumberLastPc: number = 0
-
-  columnNumberSlots: ColumnNumberSlot[] = []
-  columnNumberSize: number = 0
-  columnNumberCount: number = 0
-  columnNumberLast: number = 0
-  columnNumberLastPc: number = 0
-
-  stripDebug: boolean = false
-  stripSource: boolean = false
-  filename: number = 0 // JSAtom
-  sourcePos: number = -1
-  getLineColCache: any = null
+  stripDebug: boolean
+  stripSource: boolean
+  filename: number
+  sourcePos: number
+  getLineColCache: any
   pc2line: BytecodeBuilder = new BytecodeBuilder()
   pc2column: BytecodeBuilder = new BytecodeBuilder()
 
-  source: string = ""
-  sourceLen: number = 0
+  source: string
+  sourceLen: number
 
-  module: any = null // JSModuleDef*
-  hasAwait: boolean = false
+  module: any
+  hasAwait: boolean
 
-  hasDebug: boolean = false
-  isDirectOrIndirectEval: boolean = false
+  hasDebug: boolean
+  isDirectOrIndirectEval: boolean
 
-  ic: any = null // InlineCache*
+  ic: any
 
   constructor(parent: FunctionDef | null = null) {
     this.parent = parent
-    this.scopeCount = 2 // Global/Function scope + Argument scope (index 1)
-    if (parent) {
-      this.parentCpoolIdx = parent.cpoolCount
-    }
-    // Initialize scopes
-    for (let i = 0; i < 100; i++) {
-      this.scopes.push(new JSVarScope())
-    }
+    
   }
 }

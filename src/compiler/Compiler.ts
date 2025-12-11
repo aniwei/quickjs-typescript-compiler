@@ -1,7 +1,7 @@
 import { FunctionDef, JSVarDef, JSClosureVar, LineNumberSlot, JSVarKind } from './FunctionDef'
 import { Opcode, env, BytecodeTag, JSAtom, PC2Line, OPCODE_DEFS } from '../env'
 import { BytecodeBuilder } from './BytecodeBuilder'
-import { AtomReorderer } from './AtomReorderer'
+import { AtomTable } from './AtomTable'
 import ts from 'typescript'
 
 
@@ -27,37 +27,16 @@ export class Label {
 
 export class Compiler {
   atoms: string[] = []
-  atomMap: Map<string, number> = new Map()
   builtInAtoms: Map<string, number> = new Map()
   firstAtomId: number = env.firstAtomId
   sourceFile: ts.SourceFile | null = null
-  pendingSourcePos: number = -1
-  private labelMap: WeakMap<FunctionDef, Label[]> = new WeakMap()
-  private jumpMap: WeakMap<FunctionDef, RecordedJump[]> = new WeakMap()
-
+  
+  
   constructor(options?: { firstAtomId?: number }) {
     if (options?.firstAtomId) {
       this.firstAtomId = options.firstAtomId
     }
     this.ensureInitializedBuiltinAtoms()
-  }
-
-  labelsFor(fd: FunctionDef): Label[] {
-    let labels = this.labelMap.get(fd)
-    if (!labels) {
-      labels = []
-      this.labelMap.set(fd, labels)
-    }
-    return labels
-  }
-
-  jumpsFor(fd: FunctionDef): RecordedJump[] {
-    let jumps = this.jumpMap.get(fd)
-    if (!jumps) {
-      jumps = []
-      this.jumpMap.set(fd, jumps)
-    }
-    return jumps
   }
 
   ensureInitializedBuiltinAtoms() {
@@ -375,635 +354,94 @@ export class Compiler {
     }
   }
 
-  addAtom(s: string): number {
-    // Check built-in atoms
-    if (this.builtInAtoms.has(s)) {
-      return this.builtInAtoms.get(s)!
-    }
-
-    const builtInName = 'JS_ATOM_' + s
-    if (JSAtom[builtInName as any] && s !== 'undefined') {
-      return JSAtom[builtInName as any] as unknown as JSAtom
-    }
-
-    if (this.atomMap.has(s)) {
-      return this.atomMap.get(s)! + this.firstAtomId
-    }
-
-    const idx = this.atoms.length
-    this.atoms.push(s)
-    this.atomMap.set(s, idx)
-
-    return idx + this.firstAtomId
-  }
-
   addVar(fd: FunctionDef, name: string, isConst: boolean = false, isLexical: boolean = false, scopeLevel: number = 0, varKind: JSVarKind = JSVarKind.JS_VAR_NORMAL, isCaptured: boolean = false, isModuleVar: boolean = false): number {
-    const atom = this.addAtom(name)
-    return this.addVarWithAtom(fd, atom, isConst, isLexical, scopeLevel, varKind, isCaptured, isModuleVar)
+    throw new Error('Not implemented')
   }
 
   addVarWithAtom(fd: FunctionDef, atom: number, isConst: boolean = false, isLexical: boolean = false, scopeLevel: number = 0, varKind: JSVarKind = JSVarKind.JS_VAR_NORMAL, isCaptured: boolean = false, isModuleVar: boolean = false): number {
-    const idx = fd.vars.length
-    const v = new JSVarDef()
-    
-    v.varName = atom
-    v.scopeLevel = scopeLevel
-    v.isCaptured = isCaptured
-    v.isModuleVar = isModuleVar
-    
-    if (isCaptured) {
-      v.localIdx = -1
-    } else {
-      v.localIdx = fd.localCount++
-    }
-    
-    // Use linked list for scope_next
-    // scope_next is index in vars array (not locals)
-    const varListIdx = idx 
-    
-    let next = fd.scopes[scopeLevel].first
-    
-    v.scopeNext = next
-    console.log(`addVar: atom=${atom} scope=${scopeLevel} next=${next} isModuleVar=${isModuleVar} varListIdx=${varListIdx}`)
-    fd.scopes[scopeLevel].first = varListIdx
-
-    v.isConst = isConst
-    v.isLexical = isLexical
-    v.varKind = varKind
-    fd.vars.push(v)
-    fd.varCount++
-
-    return idx
+    throw new Error('Not implemented')
   }
 
   addArg(fd: FunctionDef, name: string): number {
-    const atom = this.addAtom(name)
-    const idx = fd.args.length
-    const v = new JSVarDef()
-
-    v.varName = atom
-    
-    // Use linked list for scope_next (Args are in scope 0)
-    // Special logic inferred from WASM:
-    // Arguments seem to point to index 0 (scopeNext=0).
-    // And only the first argument updates the scope head.
-    v.scopeNext = 0
-    
-    const scope = 0
-    if (idx === 0) {
-      fd.scopes[scope].first = 0
-    }
-
-    fd.args.push(v)
-    fd.argCount++
-    fd.definedArgCount++
-    return idx
+    throw new Error('Not implemented')
   }
 
   addClosureVar(fd: FunctionDef, name: string, isLocal: boolean, isArg: boolean, varIdx: number, varKind: number, isConst: boolean, isLexical: boolean): number {
-    const atom = this.addAtom(name)
-    return this.addClosureVarWithAtom(fd, atom, isLocal, isArg, varIdx, varKind, isConst, isLexical)
+    throw new Error('Not implemented')
   }
 
   addClosureVarWithAtom(fd: FunctionDef, atom: number, isLocal: boolean, isArg: boolean, varIdx: number, varKind: number, isConst: boolean, isLexical: boolean): number {
-    // Check if already exists
-    for (let i = 0; i < fd.closureVar.length; i++) {
-      const cv = fd.closureVar[i]
-      if (cv.varIdx === varIdx && cv.isLocal === isLocal && cv.isArg === isArg) {
-        return i
-      }
-    }
-
-    const atomName = this.atoms[atom - this.firstAtomId]
-    console.log(`addClosureVarWithAtom: ${atomName} (atom=${atom}) isLocal=${isLocal} isArg=${isArg} varIdx=${varIdx} varKind=${varKind} isConst=${isConst} isLexical=${isLexical}`)
-    const idx = fd.closureVar.length
-    const cv = new JSClosureVar()
-
-    cv.varName = atom
-    cv.isLocal = isLocal
-    cv.isArg = isArg
-    cv.varIdx = varIdx
-    cv.varKind = varKind
-    cv.isConst = isConst
-    cv.isLexical = isLexical
-    fd.closureVar.push(cv)
-    fd.closureVarCount++
-
-    return idx
+    throw new Error('Not implemented')
   }
 
   findVar(fd: FunctionDef, name: string): { idx: number, isArg: boolean } | null {
-    const atomIdx = this.atomMap.get(name)
-    if (atomIdx === undefined) {
-      return null
-    }
-    const atomId = atomIdx + this.firstAtomId
-    
-    for (let i = 0; i < fd.args.length; i++) {
-      if (fd.args[i].varName === atomId) {
-        return { idx: i, isArg: true }
-      }
-    }
-    
-    for (let i = 0; i < fd.vars.length; i++) {
-      if (fd.vars[i].varName === atomId) {
-        return { idx: i, isArg: false }
-      }
-    }
-    
-    return null
+    throw new Error('Not implemented')
   }
 
   addChild(parent: FunctionDef, child: FunctionDef): number {
-    const idx = parent.cpool.length
-    parent.cpool.push(child)
-    parent.cpoolCount++
-    console.error(`addChild: parent=${parent.funcName}, child=${child.funcName}, new count=${parent.cpoolCount}`)
-    return idx
+    throw new Error('Not implemented')
   }
 
   addConst(fd: FunctionDef, val: any): number {
-    // Check if already exists
-    for (let i = 0; i < fd.cpool.length; i++) {
-      if (fd.cpool[i] === val) return i
-    }
-    const idx = fd.cpool.length
-    fd.cpool.push(val)
-    fd.cpoolCount++
-    return idx
+    throw new Error('Not implemented')
   }
 
   emitOp(s: FunctionDef, val: number, sourcePos: number = -1): void {
-    // console.log(`emitOp ${Opcode[val]} (${val}) pos=${sourcePos} pending=${this.pendingSourcePos} size=${s.byteCode.size}`)
-    if (this.pendingSourcePos !== -1) {
-      if (sourcePos === -1) {
-        sourcePos = this.pendingSourcePos
-      }
-      this.pendingSourcePos = -1
-    }
-
-    if (sourcePos !== -1) {
-      this.addPc2LineInfo(s, s.byteCode.size, sourcePos)
-    }
-    s.byteCode.putByte(val)
-    s.lastOpcodePos = s.byteCode.size - 1
-
-    // Update stack level
-    const opName = Opcode[val]
-    const opInfo = OPCODE_DEFS[opName]
-    if (opInfo) {
-      let nPop = opInfo.nPop
-      let nPush = opInfo.nPush
-
-      // Special handling for for_of_next: it pushes 1 value (the loop variable)
-      // The iterator (3 slots) remains on stack
-      if (val === Opcode.OP_for_of_next) {
-        nPop = 0
-        nPush = 1
-      }
-
-      // console.log(`[Stack] ${opName} (${val}): ${s.stackLevel} -> ${s.stackLevel - nPop + nPush} (Pop: ${nPop}, Push: ${nPush})`)
-      // Pop
-      s.stackLevel -= nPop
-      if (s.stackLevel < 0) {
-        // console.warn(`Stack underflow at op ${opInfo.id}`)
-        // s.stackLevel = 0
-      }
-      
-      // Push
-      s.stackLevel += nPush
-      if (s.stackLevel > s.stackSizeMax) {
-        s.stackSizeMax = s.stackLevel
-      }
-    } else {
-      console.warn(`Unknown opcode for stack calc: ${val}`)
-    }
-  }
-
-  adjustStack(s: FunctionDef, delta: number) {
-    s.stackLevel += delta
-    if (s.stackLevel < 0) {
-      // console.warn('Stack underflow')
-    }
-    if (s.stackLevel > s.stackSizeMax) {
-      s.stackSizeMax = s.stackLevel
-    }
+    throw new Error('Not implemented')
   }
 
   emitU8(s: FunctionDef, val: number, sourcePos: number = -1): void {
-    if (sourcePos !== -1) {
-      this.addPc2LineInfo(s, s.byteCode.size, sourcePos)
-    }
-    s.byteCode.putByte(val)
+    throw new Error('Not implemented')
   }
 
   emitU16(s: FunctionDef, val: number): void {
-    s.byteCode.putU16(val)
+    throw new Error('Not implemented')
   }
 
   emitU32(s: FunctionDef, val: number, sourcePos: number = -1): void {
-    if (sourcePos !== -1) {
-      this.addPc2LineInfo(s, s.byteCode.size, sourcePos)
-    }
-    s.byteCode.putU32(val)
+    throw new Error('Not implemented')
   }
 
   emitPushConst(s: FunctionDef, val: any, asAtom: boolean = false): void {
-    if (val === null) {
-      this.emitOp(s, Opcode.OP_null)
-      return
-    }
-    if (val === undefined) {
-      this.emitOp(s, Opcode.OP_undefined)
-      return
-    }
-    if (val === false) {
-      this.emitOp(s, Opcode.OP_push_false)
-      return
-    }
-    if (val === true) {
-      this.emitOp(s, Opcode.OP_push_true)
-      return
-    }
-
-    if (typeof val === 'number') {
-      if (Number.isInteger(val)) {
-        if (val === 0) { this.emitOp(s, Opcode.OP_push_0); return }
-        if (val === 1) { this.emitOp(s, Opcode.OP_push_1); return }
-        if (val >= -2147483648 && val <= 2147483647) {
-          this.emitOp(s, Opcode.OP_push_i32)
-          this.emitU32(s, val)
-          return
-        }
-      }
-      // Fallback to cpool
-      const idx = this.addConst(s, val)
-      if (idx < 256) {
-        this.emitOp(s, Opcode.OP_push_const8)
-        this.emitU8(s, idx)
-      } else {
-        this.emitOp(s, Opcode.OP_push_const)
-        this.emitU32(s, idx)
-      }
-      return
-    }
-
-    if (typeof val === 'string') {
-      if (asAtom) {
-        const atom = this.addAtom(val)
-        this.emitOp(s, Opcode.OP_push_atom_value)
-        this.emitU32(s, atom)
-        return
-      }
-      const idx = this.addConst(s, val)
-      if (idx < 256) {
-        this.emitOp(s, Opcode.OP_push_const8)
-        this.emitU8(s, idx)
-      } else {
-        this.emitOp(s, Opcode.OP_push_const)
-        this.emitU32(s, idx)
-      }
-      return
-    }
-
-    if (typeof val === 'bigint') {
-      const idx = this.addConst(s, val)
-      if (idx < 256) {
-        this.emitOp(s, Opcode.OP_push_const8)
-        this.emitU8(s, idx)
-      } else {
-        this.emitOp(s, Opcode.OP_push_const)
-        this.emitU32(s, idx)
-      }
-      return
-    }
-
-    throw new Error('Unsupported constant type in emitPushConst: ' + typeof val)
+    throw new Error('Not implemented')
   }
 
   emitAtomOp(s: FunctionDef, val: number, atom: number, sourcePos: number = -1): void {
-    this.emitOp(s, val, sourcePos)
-    s.byteCode.putU32(atom)
+    throw new Error('Not implemented')
   }
 
   emitReturn(s: FunctionDef, hasVal: boolean): void {
-    if (hasVal) {
-      this.emitOp(s, Opcode.OP_return)
-    } else {
-      this.emitOp(s, Opcode.OP_return_undef)
-    }
+    throw new Error('Not implemented')
   }
 
   putAtom(out: BytecodeBuilder, atomId: number): void {
-    // QuickJS serialization logic:
-    // If atom < JS_ATOM_END (228), use atomId directly.
-    // If atom >= JS_ATOM_END, map to index in serialized table + 228.
-    // Finally, shift left by 1 (bit 0 is for tagged ints).
-    
-    let v: number
-    if (atomId < env.firstAtomId) {
-      v = atomId
-    } else {
-      const idx = atomId - this.firstAtomId
-      v = env.firstAtomId + idx
-    }
-    out.putULEB128(v << 1)
+    throw new Error('Not implemented')
   }
 
   writeOutput(fd: FunctionDef): Uint8Array {
-    const out = new BytecodeBuilder()
-    out.putByte(env.bytecodeVersion)
-
-    // Write atom table
-    console.log('Writing atoms:', this.atoms.length)
-    out.putULEB128(this.atoms.length)
-    for (const atom of this.atoms) {
-      console.log('Writing atom:', atom)
-      // Simplified string writing (ASCII only for now)
-      const len = atom.length
-      out.putULEB128(len << 1)
-      for (let i = 0; i < len; i++) {
-        out.putByte(atom.charCodeAt(i))
-      }
-    }
-
-    this.writeFunctionBytecode(out, fd)
-    return out.data()
+    throw new Error('Not implemented')
   }
 
   newLabel(fd: FunctionDef): Label {
-    const label = new Label()
-    label.fd = fd
-    this.labelsFor(fd).push(label)
-    return label
+    throw new Error('Not implemented')
   }
 
   markLabel(fd: FunctionDef, label: Label): void {
-    if (label.fd && label.fd !== fd) {
-      throw new Error('Label cross function boundary')
-    }
-    label.addr = fd.byteCode.size
-    // Patch existing jumps
-    for (const jump of label.jumps) {
-      if (jump.fd !== fd) {
-        throw new Error('Jump cross function boundary')
-      }
-      const offset = label.addr - jump.pos
-      if (jump.size === 1) {
-        if (offset > 127 || offset < -128) {
-          throw new Error('Jump offset too large for 8-bit jump')
-        }
-        fd.byteCode.buffer[jump.pos] = offset
-      } else if (jump.size === 4) {
-        fd.byteCode.buffer[jump.pos] = offset & 0xff
-        fd.byteCode.buffer[jump.pos + 1] = (offset >> 8) & 0xff
-        fd.byteCode.buffer[jump.pos + 2] = (offset >> 16) & 0xff
-        fd.byteCode.buffer[jump.pos + 3] = (offset >> 24) & 0xff
-      }
-    }
-    label.jumps = []
+    throw new Error('Not implemented')
   }
 
   markLabelAt(fd: FunctionDef, label: Label, offset: number): void {
-    if (label.fd && label.fd !== fd) {
-      throw new Error('Label cross function boundary')
-    }
-    label.addr = offset
-    for (const jump of label.jumps) {
-      if (jump.fd !== fd) {
-        throw new Error('Jump cross function boundary')
-      }
-      const delta = label.addr - jump.pos
-      if (jump.size === 1) {
-        if (delta > 127 || delta < -128) {
-          throw new Error('Jump offset too large for 8-bit jump')
-        }
-        fd.byteCode.buffer[jump.pos] = delta
-      } else if (jump.size === 4) {
-        fd.byteCode.buffer[jump.pos] = delta & 0xff
-        fd.byteCode.buffer[jump.pos + 1] = (delta >> 8) & 0xff
-        fd.byteCode.buffer[jump.pos + 2] = (delta >> 16) & 0xff
-        fd.byteCode.buffer[jump.pos + 3] = (delta >> 24) & 0xff
-      }
-    }
-    label.jumps = []
+    throw new Error('Not implemented')
   }
 
   emitJump(fd: FunctionDef, op: number, label: Label): void {
-    this.emitOp(fd, op)
-    const jumpPos = fd.byteCode.size
-    
-    let size = 4
-    if (op === Opcode.OP_goto8 || op === Opcode.OP_if_true8 || op === Opcode.OP_if_false8) {
-      size = 1
-      this.emitU8(fd, 0)
-    } else {
-      this.emitU32(fd, 0)
-    }
-
-    const recordedJump: RecordedJump = { fd, pos: jumpPos, size, op, label }
-    this.jumpsFor(fd).push(recordedJump)
-
-    if (label.addr !== -1) {
-      const offset = label.addr - jumpPos
-      if (size === 1) {
-        if (offset > 127 || offset < -128) {
-          throw new Error('Jump offset too large for 8-bit jump')
-        }
-        fd.byteCode.buffer[jumpPos] = offset
-      } else {
-        fd.byteCode.buffer[jumpPos] = offset & 0xff
-        fd.byteCode.buffer[jumpPos + 1] = (offset >> 8) & 0xff
-        fd.byteCode.buffer[jumpPos + 2] = (offset >> 16) & 0xff
-        fd.byteCode.buffer[jumpPos + 3] = (offset >> 24) & 0xff
-      }
-    } else {
-      label.jumps.push({ fd, pos: jumpPos, size })
-    }
-  }
-
-  private optimizeJumps(fd: FunctionDef): void {
-    const recordedJumps = this.jumpMap.get(fd)
-    const labels = this.labelMap.get(fd) ?? []
-    if (!recordedJumps || recordedJumps.length === 0) {
-      this.jumpMap.delete(fd)
-      this.labelMap.delete(fd)
-      return
-    }
-
-    let changed = false
-
-    for (let i = 0; i < recordedJumps.length; i++) {
-      const jump = recordedJumps[i]
-      const labelAddr = jump.label.addr
-      if (labelAddr === -1) {
-        continue
-      }
-      const op = jump.op
-      const isConditional = op === Opcode.OP_if_false || op === Opcode.OP_if_true
-      const isGoto = op === Opcode.OP_goto || op === Opcode.OP_goto16
-      if (!isConditional && !isGoto) {
-        continue
-      }
-
-      const delta = op === Opcode.OP_goto16 ? 1 : 3
-      const diff = labelAddr - jump.pos
-      if (diff >= -128 && diff <= 127 + delta) {
-        const newOp = isGoto
-          ? Opcode.OP_goto8
-          : Opcode.OP_if_false8 + (op - Opcode.OP_if_false)
-        this.shrinkRecordedJump(fd, jump, newOp, 1, labels, recordedJumps, i)
-        changed = true
-        continue
-      }
-
-      if (
-        op === Opcode.OP_goto &&
-        diff >= -0x8000 &&
-        diff <= 0x7fff
-      ) {
-        this.shrinkRecordedJump(fd, jump, Opcode.OP_goto16, 2, labels, recordedJumps, i)
-        changed = true
-      }
-    }
-
-    if (changed) {
-      this.patchRecordedJumps(fd, recordedJumps)
-      if (fd.pc2line.size > 0) {
-        fd.pc2line.reset()
-      }
-      this.computePc2LineInfo(fd)
-    }
-
-    this.jumpMap.delete(fd)
-    this.labelMap.delete(fd)
-  }
-
-  private shrinkRecordedJump(
-    fd: FunctionDef,
-    jump: RecordedJump,
-    newOp: number,
-    newSize: number,
-    labels: Label[],
-    recordedJumps: RecordedJump[],
-    jumpIndex: number
-  ): void {
-    const builder = fd.byteCode
-    const oldSize = jump.size
-    const removeBytes = oldSize - newSize
-
-    builder.buffer[jump.pos - 1] = newOp
-    jump.op = newOp
-    jump.size = newSize
-
-    if (removeBytes <= 0) {
-      return
-    }
-
-    const start = jump.pos + newSize
-    builder.buffer.copyWithin(start, start + removeBytes, builder.size)
-    builder.size -= removeBytes
-
-    this.adjustPositionsAfterShrink(fd, jump.pos, removeBytes, labels, recordedJumps, jumpIndex)
-  }
-
-  private adjustPositionsAfterShrink(
-    fd: FunctionDef,
-    pos: number,
-    delta: number,
-    labels: Label[],
-    recordedJumps: RecordedJump[],
-    jumpIndex: number
-  ): void {
-    for (const label of labels) {
-      if (label.addr > pos) {
-        label.addr -= delta
-      }
-    }
-
-    for (let j = jumpIndex + 1; j < recordedJumps.length; j++) {
-      if (recordedJumps[j].pos > pos) {
-        recordedJumps[j].pos -= delta
-      }
-    }
-
-    for (const slot of fd.lineNumberSlots) {
-      if (slot.pc > pos) {
-        slot.pc -= delta
-      }
-    }
-
-    for (const slot of fd.columnNumberSlots) {
-      if (slot.pc > pos) {
-        slot.pc -= delta
-      }
-    }
-
-    if (fd.lastOpcodePos > pos) {
-      fd.lastOpcodePos -= delta
-    }
-  }
-
-  private patchRecordedJumps(fd: FunctionDef, recordedJumps: RecordedJump[]): void {
-    for (const jump of recordedJumps) {
-      const labelAddr = jump.label.addr
-      if (labelAddr === -1) {
-        throw new Error('Cannot patch jump with unresolved label')
-      }
-      const diff = labelAddr - jump.pos
-      switch (jump.size) {
-        case 1:
-          if (diff < -128 || diff > 127) {
-            throw new Error('Jump offset too large for 8-bit jump')
-          }
-          fd.byteCode.buffer[jump.pos] = diff & 0xff
-          break
-        case 2:
-          if (diff < -0x8000 || diff > 0x7fff) {
-            throw new Error('Jump offset too large for 16-bit jump')
-          }
-          fd.byteCode.buffer[jump.pos] = diff & 0xff
-          fd.byteCode.buffer[jump.pos + 1] = (diff >> 8) & 0xff
-          break
-        case 4: {
-          const value = diff | 0
-          fd.byteCode.buffer[jump.pos] = value & 0xff
-          fd.byteCode.buffer[jump.pos + 1] = (value >> 8) & 0xff
-          fd.byteCode.buffer[jump.pos + 2] = (value >> 16) & 0xff
-          fd.byteCode.buffer[jump.pos + 3] = (value >> 24) & 0xff
-          break
-        }
-        default:
-          throw new Error(`Unsupported jump size ${jump.size}`)
-      }
-    }
+    throw new Error('Not implemented')
   }
 
   writeFunctionBytecode(out: BytecodeBuilder, fd: FunctionDef) {
-    this.optimizeJumps(fd)
-    // Filter vars that are self-captured (in closureVar as local)
-    // This mimics QuickJS behavior where module/eval vars are promoted to closure vars
-    // and removed from the locals list in the bytecode, even though they occupy stack slots.
-    // However, lexical variables (let/const/class) seem to stay in locals even if captured.
-    const varsToEmit = fd.vars.filter((v, i) => {
-      // QuickJS removes variables if (vd->is_captured && !vd->is_lexical)
-      // Also remove module variables (they are in module context, not stack)
-      if (v.isModuleVar) return false
-      return !(v.isCaptured && !v.isLexical)
-    })
-    const emittedVarCount = varsToEmit.length
-
-    out.putByte(BytecodeTag.TC_TAG_FUNCTION_BYTECODE)
     
-    let flags = 0
-    let idx = 0
     const setFlag = (val: boolean | number, n: number) => {
-      if (typeof val === 'boolean') {
-        if (val) flags |= (1 << idx)
-      } else {
-        flags |= (val << idx)
-      }
-      idx += n
+      
     }
 
     setFlag(fd.hasPrototype, 1)
@@ -1017,20 +455,6 @@ export class Compiler {
     setFlag(fd.argumentsAllowed, 1)
     setFlag(fd.hasDebug, 1)
     setFlag(fd.isDirectOrIndirectEval, 1)
-
-    out.putU16(flags)
-    out.putByte(fd.jsMode)
-    this.putAtom(out, fd.funcName)
-    out.putULEB128(fd.argCount)
-    out.putULEB128(emittedVarCount)
-    out.putULEB128(fd.definedArgCount)
-    out.putULEB128(fd.stackSizeMax)
-    out.putULEB128(fd.closureVarCount)
-    out.putULEB128(fd.cpoolCount)
-    out.putULEB128(fd.byteCode.size)
-
-    // Locals (arg_count + var_count)
-    out.putULEB128(fd.argCount + emittedVarCount)
     
     for (const arg of fd.args) {
       this.putAtom(out, arg.varName)
@@ -1040,12 +464,7 @@ export class Compiler {
       let flags = 0
       let idx = 0
       const setLocalFlag = (val: boolean | number, n: number) => {
-        if (typeof val === 'boolean') {
-          if (val) flags |= (1 << idx)
-        } else {
-          flags |= (val << idx)
-        }
-        idx += n
+        
       }
       
       setLocalFlag(arg.varKind, 4)
@@ -1055,255 +474,14 @@ export class Compiler {
       out.putByte(flags)
     }
     
-    for (const v of varsToEmit) {
-      this.putAtom(out, v.varName)
-      out.putULEB128(v.scopeLevel)
-      if (v.varName === 120) console.log(`writeFunctionBytecode: <class_fields_init> scopeNext=${v.scopeNext}`)
-      out.putULEB128(v.scopeNext + 1)
-      
-      let flags = 0
-      let idx = 0
-      const setLocalFlag = (val: boolean | number, n: number) => {
-        if (typeof val === 'boolean') {
-          if (val) flags |= (1 << idx)
-        } else {
-          flags |= (val << idx)
-        }
-        idx += n
-      }
-      
-      setLocalFlag(v.varKind, 4)
-      if (v.varKind !== JSVarKind.JS_VAR_FUNCTION_DECL && v.varKind !== JSVarKind.JS_VAR_NEW_FUNCTION_DECL) {
-        setLocalFlag(v.isConst, 1)
-        setLocalFlag(v.isLexical, 1)
-      }
-      setLocalFlag(v.isCaptured, 1)
-      out.putByte(flags)
-    }
-
-    // Closure vars
-    // out.putULEB128(fd.closureVarCount) // Already written in header
-    for (const cv of fd.closureVar) {
-      this.putAtom(out, cv.varName)
-      out.putULEB128(cv.varIdx)
-      let flags = 0
-      if (cv.isLocal) {
-        flags |= 1
-      }
-      if (cv.isArg) {
-        flags |= 2
-      }
-      if (cv.isConst) {
-        flags |= 4
-      }
-      if (cv.isLexical) {
-        flags |= 8
-      }
-      if (cv.varKind !== JSVarKind.JS_VAR_NORMAL) {
-        flags |= 16
-      }
-      // flags |= (cv.varKind << 4) // This was wrong, varKind is not directly shifted
-      out.putByte(flags)
-    }
-
-    out.put(fd.byteCode.data())
-
-    // debug_info
-    if (fd.hasDebug) {
-      this.putAtom(out, fd.filename)
-      out.putULEB128(fd.pc2line.size)
-      out.put(fd.pc2line.data())
-      out.putULEB128(fd.sourceLen)
-      // out.put(fd.source) // TODO: Write source if present
-    }
-
-    // CPool
-    for (const item of fd.cpool) {
-      this.writeObjectRec(out, item)
-    }
+    
   }
 
-  writeObjectRec(out: BytecodeBuilder, item: any): void {
-    if (item instanceof FunctionDef) {
-      this.writeFunctionBytecode(out, item)
-    } else if (typeof item === 'number') {
-      // Handle float64
-      out.putByte(BytecodeTag.TC_TAG_FLOAT64)
-      const buf = new ArrayBuffer(8)
-      const view = new DataView(buf)
-      
-      view.setFloat64(0, item, true) // Little endian
-      
-      const u8 = new Uint8Array(buf)
-      for(let i=0; i<8; i++) {
-        out.putByte(u8[i])
-      }
-    } else if (typeof item === 'bigint') {
-      this.serializeBigInt(out, item)
-    } else {
-      // TODO: Support other CPool types
-      throw new Error('Unsupported CPool item type: ' + typeof item)
-    }
+  writeUnitOfWork(out: BytecodeBuilder, unitOfWork: any): void {
+    
   }
 
-  serializeBigInt(out: BytecodeBuilder, val: bigint): void {
-    out.putByte(BytecodeTag.TC_TAG_BIG_INT)
-    
-    if (val === 0n) {
-      out.putULEB128(0)
-      return
-    }
 
-    const bytes: number[] = []
-    let temp = val
-    while (true) {
-      const byte = Number(temp & 0xFFn)
-      bytes.push(byte)
-      temp >>= 8n
-      
-      if (val >= 0n) {
-        if (temp === 0n && (byte & 0x80) === 0) break
-      } else {
-        if (temp === -1n && (byte & 0x80) !== 0) break
-      }
-    }
-    
-    out.putULEB128(bytes.length)
-    for (const b of bytes) {
-      out.putByte(b)
-    }
-  }
-
-  emitPutLoc(fd: FunctionDef, varIdx: number, sourcePos: number = -1) {
-    const localIdx = fd.vars[varIdx].localIdx
-    if (localIdx === -1) {
-      throw new Error(`Cannot emit put_loc for captured variable ${varIdx}`)
-    }
-    if (localIdx === 0) {
-      this.emitOp(fd, Opcode.OP_put_loc0, sourcePos)
-    } else if (localIdx === 1) {
-      this.emitOp(fd, Opcode.OP_put_loc1, sourcePos)
-    } else if (localIdx === 2) {
-      this.emitOp(fd, Opcode.OP_put_loc2, sourcePos)
-    } else if (localIdx === 3) {
-      this.emitOp(fd, Opcode.OP_put_loc3, sourcePos)
-    } else if (localIdx < 256) {
-      this.emitOp(fd, Opcode.OP_put_loc8, sourcePos)
-      this.emitU8(fd, localIdx)
-    } else {
-      this.emitOp(fd, Opcode.OP_put_loc, sourcePos)
-      this.emitU16(fd, localIdx)
-    }
-  }
-
-  emitGetLoc(fd: FunctionDef, varIdx: number) {
-    const localIdx = fd.vars[varIdx].localIdx
-    if (localIdx === -1) {
-      throw new Error(`Cannot emit get_loc for captured variable ${varIdx}`)
-    }
-    if (localIdx === 0) {
-      this.emitOp(fd, Opcode.OP_get_loc0)
-    } else if (localIdx === 1) {
-      this.emitOp(fd, Opcode.OP_get_loc1)
-    } else if (localIdx === 2) {
-      this.emitOp(fd, Opcode.OP_get_loc2)
-    } else if (localIdx === 3) {
-      this.emitOp(fd, Opcode.OP_get_loc3)
-    } else if (localIdx < 256) {
-      this.emitOp(fd, Opcode.OP_get_loc8)
-      this.emitU8(fd, localIdx)
-    } else {
-      this.emitOp(fd, Opcode.OP_get_loc)
-      this.emitU16(fd, localIdx)
-    }
-  }
-
-  emitSetLoc(fd: FunctionDef, varIdx: number) {
-    const localIdx = fd.vars[varIdx].localIdx
-    if (localIdx === -1) {
-      throw new Error(`Cannot emit set_loc for captured variable ${varIdx}`)
-    }
-    if (localIdx === 0) {
-      this.emitOp(fd, Opcode.OP_set_loc0)
-    } else if (localIdx === 1) {
-      this.emitOp(fd, Opcode.OP_set_loc1)
-    } else if (localIdx === 2) {
-      this.emitOp(fd, Opcode.OP_set_loc2)
-    } else if (localIdx === 3) {
-      this.emitOp(fd, Opcode.OP_set_loc3)
-    } else if (localIdx < 256) {
-      this.emitOp(fd, Opcode.OP_set_loc8)
-      this.emitU8(fd, localIdx)
-    } else {
-      this.emitOp(fd, Opcode.OP_set_loc)
-      this.emitU16(fd, localIdx)
-    }
-  }
-
-  writeModule(fd: FunctionDef, moduleNameAtom: number): Uint8Array {
-    // Reorder atoms to match QuickJS serialization order
-    const reorderer = new AtomReorderer(this)
-    
-    const extraAtoms = [moduleNameAtom]
-    if (this.atomMap.has('undefined')) {
-      extraAtoms.push(this.atomMap.get('undefined')! + this.firstAtomId)
-    }
-    
-    reorderer.reorder(fd, extraAtoms)
-    moduleNameAtom = reorderer.getNewId(moduleNameAtom)
-
-    const out = new BytecodeBuilder()
-    out.putByte(env.bytecodeVersion)
-
-    // Write atom table
-    // console.log('writeModule: Writing atoms:', this.atoms.length)
-    out.putULEB128(this.atoms.length)
-    for (const atom of this.atoms) {
-      // Check if wide char
-      let isWide = false
-      for (let i = 0; i < atom.length; i++) {
-        if (atom.charCodeAt(i) > 255) {
-          isWide = true
-          break
-        }
-      }
-
-      const len = atom.length
-      out.putULEB128((len << 1) | (isWide ? 1 : 0))
-
-      if (isWide) {
-        for (let i = 0; i < len; i++) {
-          out.putU16(atom.charCodeAt(i))
-        }
-      } else {
-        for (let i = 0; i < len; i++) {
-          out.putByte(atom.charCodeAt(i))
-        }
-      }
-    }
-
-    // Write module structure
-    out.putByte(BytecodeTag.TC_TAG_MODULE)
-    this.putAtom(out, moduleNameAtom)
-    
-    // Dependencies (none for now)
-    out.putULEB128(0) 
-    
-    // Exports (none for now)
-    out.putULEB128(0)
-    
-    // Star exports (none for now)
-    out.putULEB128(0)
-
-    // Import entries (none for now)
-    out.putULEB128(0)
-
-    // has_tla (false)
-    out.putByte(0)
-
-    // Module init function
-    this.writeFunctionBytecode(out, fd)
-
-    return out.data()
-  }
+  
+  
 }
