@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/function-default-params.ts
-**生成时间**: 2025-12-09T09:46:45.373Z
+**生成时间**: 2025-12-11T11:32:28.078Z
 
 ## 大小对比
 
@@ -16,7 +16,7 @@
 {
   "source": "TypeScript",
   "bcVersion": "0x5",
-  "userAtomCount": 7,
+  "userAtomCount": 6,
   "atoms": [
     {
       "index": 0,
@@ -36,49 +36,41 @@
     },
     {
       "index": 2,
-      "rawLength": 14,
-      "actualLength": 7,
-      "isWideChar": 0,
-      "string": "QuickJS",
-      "offset": 63
-    },
-    {
-      "index": 3,
       "rawLength": 10,
       "actualLength": 5,
       "isWideChar": 0,
       "string": "world",
-      "offset": 71
+      "offset": 63
     },
     {
-      "index": 4,
+      "index": 3,
       "rawLength": 14,
       "actualLength": 7,
       "isWideChar": 0,
       "string": "console",
-      "offset": 77
+      "offset": 69
     },
     {
-      "index": 5,
+      "index": 4,
       "rawLength": 6,
       "actualLength": 3,
       "isWideChar": 0,
       "string": "log",
-      "offset": 85
+      "offset": 77
     },
     {
-      "index": 6,
+      "index": 5,
       "rawLength": 10,
       "actualLength": 5,
       "isWideChar": 0,
       "string": "Hello",
-      "offset": 89
+      "offset": 81
     }
   ],
   "functionHeader": {
-    "offset": 95,
+    "offset": 87,
     "tag": "0xd",
-    "remaining": 136
+    "remaining": 144
   }
 }
 ```
@@ -157,29 +149,49 @@
 
 ## 字节级差异
 
-共发现 1 个字节差异:
+共发现 135 个字节差异:
 
-- 偏移量 0xbc: TS=0x09 vs WASM=0x08
+- 偏移量 0x1: TS=0x06 vs WASM=0x07
+- 偏移量 0x3f: TS=0x0a vs WASM=0x0e
+- 偏移量 0x40: TS=0x77 vs WASM=0x51
+- 偏移量 0x41: TS=0x6f vs WASM=0x75
+- 偏移量 0x42: TS=0x72 vs WASM=0x69
+- 偏移量 0x43: TS=0x6c vs WASM=0x63
+- 偏移量 0x44: TS=0x64 vs WASM=0x6b
+- 偏移量 0x45: TS=0x0e vs WASM=0x4a
+- 偏移量 0x46: TS=0x63 vs WASM=0x53
+- 偏移量 0x47: TS=0x6f vs WASM=0x0a
+- 偏移量 0x48: TS=0x6e vs WASM=0x77
+- 偏移量 0x49: TS=0x73 vs WASM=0x6f
+- 偏移量 0x4a: TS=0x6f vs WASM=0x72
+- 偏移量 0x4c: TS=0x65 vs WASM=0x64
+- 偏移量 0x4d: TS=0x06 vs WASM=0x0e
+- 偏移量 0x4e: TS=0x6c vs WASM=0x63
+- 偏移量 0x50: TS=0x67 vs WASM=0x6e
+- 偏移量 0x51: TS=0x0a vs WASM=0x73
+- 偏移量 0x52: TS=0x48 vs WASM=0x6f
+- 偏移量 0x53: TS=0x65 vs WASM=0x6c
+- ... (显示前20个差异，总共135个)
 
 ## 十六进制转储对比
 
 ### TypeScript
 ```
-00000000: 05 07 6c 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..l__tests__/com|
+00000000: 05 06 6c 5f 5f 74 65 73 74 73 5f 5f 2f 63 6f 6d |..l__tests__/com|
 00000010: 70 69 6c 65 72 2f 66 69 78 74 75 72 65 73 2f 66 |piler/fixtures/f|
 00000020: 75 6e 63 74 69 6f 6e 2d 64 65 66 61 75 6c 74 2d |unction-default-|
-00000030: 70 61 72 61 6d 73 2e 6a 73 0a 67 72 65 65 74 0e |params.js.greet.|
-00000040: 51 75 69 63 6b 4a 53 0a 77 6f 72 6c 64 0e 63 6f |QuickJS.world.co|
-00000050: 6e 73 6f 6c 65 06 6c 6f 67 0a 48 65 6c 6c 6f 0d |nsole.log.Hello.|
-00000060: c8 03 00 00 00 00 00 0c 20 06 01 a4 01 00 00 00 |........ .......|
-00000070: 02 01 01 14 00 ca 03 00 01 08 ec 05 c2 00 e3 29 |...............)|
-00000080: df f0 0e df 04 e6 00 00 00 f1 0e 06 2f c8 03 0a |............/...|
-00000090: 00 00 28 00 07 0a 0d 09 20 0a 00 0c 41 06 01 ca |..(..... ...A...|
-000000a0: 03 01 01 00 04 00 00 24 02 70 00 01 00 70 01 ff |.......$.p...p..|
-000000b0: ff ff ff 0f 20 63 00 00 d3 11 f4 ec 09 0e 04 e7 |.... c..........|
-000000c0: 00 00 00 db cb 39 e8 00 00 00 43 e9 00 00 00 04 |.....9....C.....|
-000000d0: ea 00 00 00 d3 24 02 00 29 c8 03 0a 00 00 53 08 |.....$..).....S.|
-000000e0: 1b 0e 34 1c 07 13 00                            |..4....|
+00000030: 70 61 72 61 6d 73 2e 6a 73 0a 67 72 65 65 74 0a |params.js.greet.|
+00000040: 77 6f 72 6c 64 0e 63 6f 6e 73 6f 6c 65 06 6c 6f |world.console.lo|
+00000050: 67 0a 48 65 6c 6c 6f 0d c8 03 00 00 00 00 00 0c |g.Hello.........|
+00000060: 20 06 01 a4 01 00 00 00 02 01 01 1a 00 ca 03 00 | ...............|
+00000070: 01 08 ff 02 29 5a 00 00 03 0e ba e5 00 00 00 02 |....)Z..........|
+00000080: 00 04 ea 00 00 00 04 0e 06 2f 00 c8 03 0a 00 00 |........./......|
+00000090: 19 00 25 0a 0d 09 3e 0a 00 0c 41 06 01 ca 03 01 |..%...>...A.....|
+000000a0: 01 00 04 00 00 26 02 70 00 01 00 70 01 ff ff ff |.....&.p...p....|
+000000b0: ff 0f 20 63 00 00 e6 11 07 ff 09 0e 04 e6 00 00 |.. c............|
+000000c0: 00 ee de 39 e7 00 00 00 43 e8 00 00 00 04 e9 00 |...9....C.......|
+000000d0: 00 00 64 00 00 24 02 00 29 c8 03 0a 00 00 53 08 |..d..$..).....S.|
+000000e0: 25 0e 34 1c 25 13 00                            |%.4.%..|
 ```
 
 ### WASM

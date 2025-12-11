@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-nested/cli/object-nested.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-nested/cli/object-nested.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-nested/cli/object-nested.pc2line.txt",
-    "bytecodeSize": 341,
+    "bytecodeSize": 331,
     "pc2lineLength": 0,
     "stackMax": 0
   },
   "bytecode": {
-    "identical": true,
-    "tsSize": 279,
+    "identical": false,
+    "tsSize": 269,
     "wasmSize": 279,
-    "sizeDiff": 0,
-    "sizeDiffPercent": 0
+    "sizeDiff": -10,
+    "sizeDiffPercent": -3.584229390681003
   },
   "trace": {
     "differenceCount": 0,

@@ -206,6 +206,11 @@ export class QuickJSLib {
     return WasmInstance.QuickJSBinding.getOpcodeName(opcode);
   }
 
+  static async getOpcodeId(name: string): Promise<number> {
+    const WasmInstance = await this.getWasmInstance();
+    return WasmInstance.QuickJSBinding.getOpcodeId(name);
+  }
+
   static async getAllAtoms() {
     const WasmInstance = await QuickJSLib.getWasmInstance()
     const vec = WasmInstance.QuickJSBinding.getAtoms()

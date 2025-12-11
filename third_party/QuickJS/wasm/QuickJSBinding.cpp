@@ -392,21 +392,12 @@ namespace quickjs {
     enum {
       #define FMT(f)
       #define DEF(id, size, n_pop, n_push, f) OP_LOCAL_##id,
-      #define def(id, size, n_pop, n_push, f)
-      #include "QuickJS/quickjs-opcode.h"
-      #undef def
-      #undef DEF
-      #undef FMT
-      OP_LOCAL_COUNT,
-      OP_LOCAL_TEMP_START = OP_LOCAL_nop + 1,
-      #define FMT(f)
-      #define DEF(id, size, n_pop, n_push, f)
       #define def(id, size, n_pop, n_push, f) OP_LOCAL_##id,
       #include "QuickJS/quickjs-opcode.h"
       #undef def
       #undef DEF
       #undef FMT
-      OP_LOCAL_TEMP_END,
+      OP_LOCAL_COUNT,
     };
 
     // 同步构造格式枚举以获得格式码
@@ -430,12 +421,46 @@ namespace quickjs {
       static_cast<uint8_t>(OPFMT_##f), \
       static_cast<uint8_t>(size) \
     });
-    #define def(id, size, n_pop, n_push, f)
+    #define def(id, size, n_pop, n_push, f) opcodes.push_back(Op{ \
+      static_cast<uint32_t>(OP_LOCAL_##id), \
+      #id, \
+      static_cast<uint8_t>(n_pop), \
+      static_cast<uint8_t>(n_push), \
+      static_cast<uint8_t>(OPFMT_##f), \
+      static_cast<uint8_t>(size) \
+    });
     #include "QuickJS/quickjs-opcode.h"
     #undef def
     #undef DEF
     #undef FMT
 
     return opcodes;
+  }
+
+  int QuickJSBinding::getOpcodeId(std::string name) {
+    #ifndef SHORT_OPCODES
+    #define SHORT_OPCODES 1
+    #endif
+
+    enum {
+      #define FMT(f)
+      #define DEF(id, size, n_pop, n_push, f) OP_LOCAL_##id,
+      #define def(id, size, n_pop, n_push, f) OP_LOCAL_##id,
+      #include "QuickJS/quickjs-opcode.h"
+      #undef def
+      #undef DEF
+      #undef FMT
+      OP_LOCAL_COUNT,
+    };
+
+    #define FMT(f)
+    #define DEF(id, size, n_pop, n_push, f) if (name == #id || name == "OP_" #id) return OP_LOCAL_##id;
+    #define def(id, size, n_pop, n_push, f) if (name == #id || name == "OP_" #id) return OP_LOCAL_##id;
+    #include "QuickJS/quickjs-opcode.h"
+    #undef def
+    #undef DEF
+    #undef FMT
+
+    return -1;
   }
 }

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-09T09:46:45.408Z",
+  "timestamp": "2025-12-11T11:32:28.114Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/compiler/fixtures/numeric-separators.ts",
   "compilation": {
     "typescript": {
@@ -152,21 +152,21 @@
         "0x05",
         "0x0d",
         "0x08",
-        "0xec",
+        "0xff",
         "0x02",
         "0x29",
-        "0xc1",
+        "0xd4",
         "0x00",
-        "0xe3",
-        "0xc1",
+        "0xf6",
+        "0xd4",
         "0x01",
-        "0xe4",
-        "0xc1",
+        "0xf7",
+        "0xd4",
         "0x02",
-        "0xe5",
-        "0xc1",
+        "0xf8",
+        "0xd4",
         "0x03",
-        "0xe6",
+        "0xf9",
         "0xb4",
         "0x15",
         "0xcd",
@@ -193,16 +193,16 @@
         "0x00",
         "0x00",
         "0x00",
-        "0x68",
+        "0x64",
         "0x00",
         "0x00",
-        "0x68",
+        "0x64",
         "0x01",
         "0x00",
-        "0x68",
+        "0x64",
         "0x02",
         "0x00",
-        "0x68",
+        "0x64",
         "0x03",
         "0x00",
         "0x24",
@@ -219,10 +219,10 @@
         "0x00",
         "0x00",
         "0x00",
-        "0x68",
+        "0x64",
         "0x04",
         "0x00",
-        "0x68",
+        "0x64",
         "0x05",
         "0x00",
         "0x24",
@@ -244,27 +244,27 @@
         "0x06",
         "0x2b",
         "0x1d",
-        "0x1b",
+        "0x25",
         "0x0e",
         "0x1b",
         "0x0a",
-        "0x11",
+        "0x25",
         "0x12",
-        "0x11",
+        "0x25",
         "0x10",
-        "0x11",
+        "0x25",
         "0x0a",
-        "0x11",
+        "0x25",
         "0x2d",
         "0x17",
         "0x15",
-        "0x1b",
+        "0x25",
         "0x0e",
         "0x1b",
         "0x0a",
-        "0x11",
+        "0x25",
         "0x0a",
-        "0x11",
+        "0x25",
         "0x0b",
         "0x00",
         "0x06",
@@ -314,14 +314,14 @@
         "00000060: 06 6c 6f 67 0d c8 03 00 00 00 00 00 0c 20 06 01 |.log......... ..|",
         "00000070: a4 01 00 00 00 06 06 04 50 00 ca 03 00 0d cc 03 |........P.......|",
         "00000080: 01 0d ce 03 02 0d d0 03 03 0d d2 03 04 0d d4 03 |................|",
-        "00000090: 05 0d 08 ec 02 29 c1 00 e3 c1 01 e4 c1 02 e5 c1 |.....)..........|",
-        "000000a0: 03 e6 b4 15 cd 5b 07 61 04 00 b4 ff 01 00 00 61 |.....[.a.......a|",
-        "000000b0: 05 00 39 eb 00 00 00 43 ec 00 00 00 68 00 00 68 |..9....C....h..h|",
-        "000000c0: 01 00 68 02 00 68 03 00 24 04 00 0e 39 eb 00 00 |..h..h..$...9...|",
-        "000000d0: 00 43 ec 00 00 00 68 04 00 68 05 00 24 02 00 0e |.C....h..h..$...|",
-        "000000e0: 06 2f c8 03 20 00 00 00 10 08 18 2b 06 2b 1d 1b |./.. ......+.+..|",
-        "000000f0: 0e 1b 0a 11 12 11 10 11 0a 11 2d 17 15 1b 0e 1b |..........-.....|",
-        "00000100: 0a 11 0a 11 0b 00 06 00 00 00 00 80 84 2e 41 06 |..............A.|",
+        "00000090: 05 0d 08 ff 02 29 d4 00 f6 d4 01 f7 d4 02 f8 d4 |.....)..........|",
+        "000000a0: 03 f9 b4 15 cd 5b 07 61 04 00 b4 ff 01 00 00 61 |.....[.a.......a|",
+        "000000b0: 05 00 39 eb 00 00 00 43 ec 00 00 00 64 00 00 64 |..9....C....d..d|",
+        "000000c0: 01 00 64 02 00 64 03 00 24 04 00 0e 39 eb 00 00 |..d..d..$...9...|",
+        "000000d0: 00 43 ec 00 00 00 64 04 00 64 05 00 24 02 00 0e |.C....d..d..$...|",
+        "000000e0: 06 2f c8 03 20 00 00 00 10 08 18 2b 06 2b 1d 25 |./.. ......+.+.%|",
+        "000000f0: 0e 1b 0a 25 12 25 10 25 0a 25 2d 17 15 25 0e 1b |...%.%.%.%-..%..|",
+        "00000100: 0a 25 0a 25 0b 00 06 00 00 00 00 80 84 2e 41 06 |.%.%..........A.|",
         "00000110: 00 00 00 00 00 40 65 40 06 00 00 00 00 e0 ff ef |.....@e@........|",
         "00000120: 40 06 00 00 00 00 00 f0 7f 40                   |@........@|"
       ],
@@ -803,11 +803,19 @@
       "wasmDecimal": 88
     },
     {
+      "offset": 147,
+      "offsetHex": "0x93",
+      "typescript": "0xff",
+      "wasm": "0xec",
+      "typescriptDecimal": 255,
+      "wasmDecimal": 236
+    },
+    {
       "offset": 150,
       "offsetHex": "0x96",
-      "typescript": "0xc1",
+      "typescript": "0xd4",
       "wasm": "0x01",
-      "typescriptDecimal": 193,
+      "typescriptDecimal": 212,
       "wasmDecimal": 1
     },
     {
@@ -821,17 +829,17 @@
     {
       "offset": 152,
       "offsetHex": "0x98",
-      "typescript": "0xe3",
+      "typescript": "0xf6",
       "wasm": "0x42",
-      "typescriptDecimal": 227,
+      "typescriptDecimal": 246,
       "wasmDecimal": 66
     },
     {
       "offset": 153,
       "offsetHex": "0x99",
-      "typescript": "0xc1",
+      "typescript": "0xd4",
       "wasm": "0x0f",
-      "typescriptDecimal": 193,
+      "typescriptDecimal": 212,
       "wasmDecimal": 15
     },
     {
@@ -845,17 +853,17 @@
     {
       "offset": 155,
       "offsetHex": "0x9b",
-      "typescript": "0xe4",
+      "typescript": "0xf7",
       "wasm": "0xe3",
-      "typescriptDecimal": 228,
+      "typescriptDecimal": 247,
       "wasmDecimal": 227
     },
     {
       "offset": 156,
       "offsetHex": "0x9c",
-      "typescript": "0xc1",
+      "typescript": "0xd4",
       "wasm": "0xc0",
-      "typescriptDecimal": 193,
+      "typescriptDecimal": 212,
       "wasmDecimal": 192
     },
     {
@@ -869,17 +877,17 @@
     {
       "offset": 158,
       "offsetHex": "0x9e",
-      "typescript": "0xe5",
+      "typescript": "0xf8",
       "wasm": "0x00",
-      "typescriptDecimal": 229,
+      "typescriptDecimal": 248,
       "wasmDecimal": 0
     },
     {
       "offset": 159,
       "offsetHex": "0x9f",
-      "typescript": "0xc1",
+      "typescript": "0xd4",
       "wasm": "0xe4",
-      "typescriptDecimal": 193,
+      "typescriptDecimal": 212,
       "wasmDecimal": 228
     },
     {
@@ -893,9 +901,9 @@
     {
       "offset": 161,
       "offsetHex": "0xa1",
-      "typescript": "0xe6",
+      "typescript": "0xf9",
       "wasm": "0xff",
-      "typescriptDecimal": 230,
+      "typescriptDecimal": 249,
       "wasmDecimal": 255
     },
     {
@@ -1061,17 +1069,17 @@
     {
       "offset": 188,
       "offsetHex": "0xbc",
-      "typescript": "0x68",
+      "typescript": "0x64",
       "wasm": "0x00",
-      "typescriptDecimal": 104,
+      "typescriptDecimal": 100,
       "wasmDecimal": 0
     },
     {
       "offset": 191,
       "offsetHex": "0xbf",
-      "typescript": "0x68",
+      "typescript": "0x64",
       "wasm": "0x43",
-      "typescriptDecimal": 104,
+      "typescriptDecimal": 100,
       "wasmDecimal": 67
     },
     {
@@ -1085,9 +1093,9 @@
     {
       "offset": 194,
       "offsetHex": "0xc2",
-      "typescript": "0x68",
+      "typescript": "0x64",
       "wasm": "0x00",
-      "typescriptDecimal": 104,
+      "typescriptDecimal": 100,
       "wasmDecimal": 0
     },
     {
@@ -1109,9 +1117,9 @@
     {
       "offset": 197,
       "offsetHex": "0xc5",
-      "typescript": "0x68",
+      "typescript": "0x64",
       "wasm": "0x00",
-      "typescriptDecimal": 104,
+      "typescriptDecimal": 100,
       "wasmDecimal": 0
     },
     {
@@ -1237,9 +1245,9 @@
     {
       "offset": 214,
       "offsetHex": "0xd6",
-      "typescript": "0x68",
+      "typescript": "0x64",
       "wasm": "0x00",
-      "typescriptDecimal": 104,
+      "typescriptDecimal": 100,
       "wasmDecimal": 0
     },
     {
@@ -1253,9 +1261,9 @@
     {
       "offset": 217,
       "offsetHex": "0xd9",
-      "typescript": "0x68",
+      "typescript": "0x64",
       "wasm": "0x43",
-      "typescriptDecimal": 104,
+      "typescriptDecimal": 100,
       "wasmDecimal": 67
     },
     {
@@ -1413,9 +1421,9 @@
     {
       "offset": 239,
       "offsetHex": "0xef",
-      "typescript": "0x1b",
+      "typescript": "0x25",
       "wasm": "0x00",
-      "typescriptDecimal": 27,
+      "typescriptDecimal": 37,
       "wasmDecimal": 0
     },
     {
@@ -1445,9 +1453,9 @@
     {
       "offset": 243,
       "offsetHex": "0xf3",
-      "typescript": "0x11",
+      "typescript": "0x25",
       "wasm": "0x1b",
-      "typescriptDecimal": 17,
+      "typescriptDecimal": 37,
       "wasmDecimal": 27
     },
     {
@@ -1461,9 +1469,9 @@
     {
       "offset": 245,
       "offsetHex": "0xf5",
-      "typescript": "0x11",
+      "typescript": "0x25",
       "wasm": "0x1b",
-      "typescriptDecimal": 17,
+      "typescriptDecimal": 37,
       "wasmDecimal": 27
     },
     {
@@ -1475,12 +1483,28 @@
       "wasmDecimal": 10
     },
     {
+      "offset": 247,
+      "offsetHex": "0xf7",
+      "typescript": "0x25",
+      "wasm": "0x11",
+      "typescriptDecimal": 37,
+      "wasmDecimal": 17
+    },
+    {
       "offset": 248,
       "offsetHex": "0xf8",
       "typescript": "0x0a",
       "wasm": "0x12",
       "typescriptDecimal": 10,
       "wasmDecimal": 18
+    },
+    {
+      "offset": 249,
+      "offsetHex": "0xf9",
+      "typescript": "0x25",
+      "wasm": "0x11",
+      "typescriptDecimal": 37,
+      "wasmDecimal": 17
     },
     {
       "offset": 250,
@@ -1509,9 +1533,9 @@
     {
       "offset": 253,
       "offsetHex": "0xfd",
-      "typescript": "0x1b",
+      "typescript": "0x25",
       "wasm": "0x11",
-      "typescriptDecimal": 27,
+      "typescriptDecimal": 37,
       "wasmDecimal": 17
     },
     {
@@ -1541,9 +1565,9 @@
     {
       "offset": 257,
       "offsetHex": "0x101",
-      "typescript": "0x11",
+      "typescript": "0x25",
       "wasm": "0x1b",
-      "typescriptDecimal": 17,
+      "typescriptDecimal": 37,
       "wasmDecimal": 27
     },
     {
@@ -1557,9 +1581,9 @@
     {
       "offset": 259,
       "offsetHex": "0x103",
-      "typescript": "0x11",
+      "typescript": "0x25",
       "wasm": "0x1b",
-      "typescriptDecimal": 17,
+      "typescriptDecimal": 37,
       "wasmDecimal": 27
     },
     {

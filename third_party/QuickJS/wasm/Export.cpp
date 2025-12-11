@@ -76,6 +76,7 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .class_function("getEnvironmentAtoms", &QuickJSBinding::getEnvironmentAtoms)
     .class_function("getOpcodeFormats", &QuickJSBinding::getOpcodeFormats)
     .class_function("getOpcodes", &QuickJSBinding::getOpcodes)
+    .class_function("getOpcodeId", &QuickJSBinding::getOpcodeId)
     .class_function("getBytecodeTags", &QuickJSBinding::getBytecodeTags)
     .class_function("getFunctionKinds", &QuickJSBinding::getFunctionKinds)
     .class_function("getJSModes", &QuickJSBinding::getJSModes)

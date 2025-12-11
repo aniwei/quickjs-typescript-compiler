@@ -282,6 +282,7 @@ export class ClassVisitor {
             if (lastOp !== Opcode.OP_return && lastOp !== Opcode.OP_return_undef) {
               compiler.emitOp(methodFd, Opcode.OP_return_undef)
             }
+            this.context.variableResolver.resolveVariables(methodFd)
             compiler.computePc2LineInfo(methodFd)
             
             this.context.setFuncDef(prevFd)
@@ -392,6 +393,7 @@ export class ClassVisitor {
         }
 
         compiler.emitOp(fieldsInitFd, Opcode.OP_return_undef)
+        this.context.variableResolver.resolveVariables(fieldsInitFd)
         compiler.computePc2LineInfo(fieldsInitFd)
 
         this.context.setFuncDef(prevFd)
@@ -610,6 +612,7 @@ export class ClassVisitor {
     }
       
     compiler.emitOp(fd, Opcode.OP_return_undef)
+    this.context.variableResolver.resolveVariables(fd)
     compiler.computePc2LineInfo(fd)
     
     scopeManager.exit()

@@ -5,7 +5,7 @@ import { FunctionDef, JSVarKind } from '../FunctionDef'
 
 export class FunctionVisitor {
   private context: CompilerContext
-  private hoisted: Map<ts.FunctionDeclaration, { fd: FunctionDef, childIdx: number }> = new Map()
+  private hoisted: Map<ts.FunctionDeclaration, { fd: FunctionDef, childIdx: number, cpoolIdx: number }> = new Map()
 
   constructor(context: CompilerContext) {
     this.context = context
@@ -70,38 +70,47 @@ export class FunctionVisitor {
       }
 
       const childIdx = compiler.addChild(parentFd, fd)
+      // Add to cpool (QuickJS logic)
+      const cpoolIdx = compiler.addConst(parentFd, fd)
+      
       // 记录 func_pool_idx 供后续丢弃 fclosure 或赋值
       const latestVar = scopeManager.findVar(name, parentFd)
       if (latestVar && latestVar.type === 'local') {
-        parentFd.vars[latestVar.idx].funcPoolIdx = childIdx
+        parentFd.vars[latestVar.idx].funcPoolIdx = cpoolIdx
       }
-      hoisted = { fd, childIdx }
+      hoisted = { fd, childIdx, cpoolIdx }
       this.hoisted.set(node, hoisted)
     }
 
-    const childIdx = hoisted.childIdx
+    const cpoolIdx = hoisted.cpoolIdx
     const fd = hoisted.fd
 
     // 发出 fclosure（8/32 根据索引选择）
-    if (childIdx < 256) {
+    // Hoisted functions are initialized in VariableResolver (OP_enter_scope)
+    /*
+    if (cpoolIdx < 256) {
       compiler.emitOp(parentFd, Opcode.OP_fclosure8)
-      compiler.emitU8(parentFd, childIdx)
+      compiler.emitU8(parentFd, cpoolIdx)
     } else {
       compiler.emitOp(parentFd, Opcode.OP_fclosure)
-      compiler.emitU32(parentFd, childIdx)
+      compiler.emitU32(parentFd, cpoolIdx)
     }
+    */
 
     // 写入目标：lexical/global -> drop；否则 put_loc / put_var_ref
     const targetInfo = scopeManager.findVar(name, parentFd)
     if (targetInfo && targetInfo.type === 'local') {
       const jsVar = parentFd.vars[targetInfo.idx]
-      jsVar.funcPoolIdx = childIdx
+      jsVar.funcPoolIdx = cpoolIdx
+      /*
       if (jsVar.isLexical || parentFd.isGlobalVar) {
         compiler.emitOp(parentFd, Opcode.OP_drop)
       } else {
         compiler.emitPutLoc(parentFd, targetInfo.idx)
       }
+      */
     } else if (targetInfo && targetInfo.type === 'closure') {
+      /*
       const atomId = compiler.addAtom(name)
       const idx = targetInfo.idx
       if (idx === 0) {
@@ -117,12 +126,15 @@ export class FunctionVisitor {
         compiler.emitU32(parentFd, atomId)
         compiler.emitU16(parentFd, idx)
       }
+      */
     } else {
       // 兜底：按 var_ref 处理
+      /*
       const atomId = compiler.addAtom(name)
       compiler.emitOp(parentFd, Opcode.OP_put_var_ref)
       compiler.emitU32(parentFd, atomId)
       compiler.emitU16(parentFd, 0)
+      */
     }
     
     // Switch context to child function
@@ -342,6 +354,7 @@ export class FunctionVisitor {
     
     scopeManager.exit()
 
+    this.context.variableResolver.resolveVariables(fd)
     compiler.computePc2LineInfo(fd)
 
     // Restore context
@@ -449,6 +462,7 @@ export class FunctionVisitor {
       compiler.emitOp(fd, Opcode.OP_return)
     }
     
+    this.context.variableResolver.resolveVariables(fd)
     compiler.computePc2LineInfo(fd)
     this.context.setFuncDef(parentFd)
   }
@@ -615,6 +629,7 @@ export class FunctionVisitor {
       compiler.emitOp(fd, Opcode.OP_return)
     }
     
+    this.context.variableResolver.resolveVariables(fd)
     compiler.computePc2LineInfo(fd)
     this.context.setFuncDef(parentFd)
   }

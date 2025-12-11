@@ -27,6 +27,8 @@ export class HoistVariables {
   }
 
   hoistVariables(node: ts.Node) {
+    // In Phase 0 (Script mode), we treat top-level vars as global/context vars
+    // QuickJS marks them as JS_VAR_NORMAL in the top-level function scope
     const isModule = this.funcDef?.funcKind === FunctionKind.JS_FUNC_ASYNC
     const isScriptRoot = !this.funcDef?.parent && !isModule
     const treatAsContextVar = isModule || isScriptRoot
@@ -56,21 +58,40 @@ export class HoistVariables {
             let varIdx: number
             if (treatAsContextVar) {
               // For module/script variables, add as captured var (no stack slot)
-              varIdx = this.compiler.addVar(this.funcDef!, name, false, false, targetScopeLevel, JSVarKind.JS_VAR_NORMAL, true, true)
+              // QuickJS: add_var(ctx, fd, name) -> returns index in vars array
+              // For script root, it seems they are just normal vars in scope 0
+              // isModuleVar=true prevents them from being emitted in locals list, but they are locals.
+              // Wait, QuickJS script vars ARE locals.
+              varIdx = this.compiler.addVar(this.funcDef!, name, false, false, targetScopeLevel, JSVarKind.JS_VAR_FUNCTION_DECL, false, isModule)
             } else {
-              varIdx = this.compiler.addVar(this.funcDef!, name, false, false, targetScopeLevel)
+              varIdx = this.compiler.addVar(this.funcDef!, name, false, false, targetScopeLevel, JSVarKind.JS_VAR_FUNCTION_DECL)
             }
             
             if (treatAsContextVar) {
-              const nameAtom = this.compiler.addAtom(name)
-              const closureIdx = this.compiler.addClosureVarWithAtom(this.funcDef!, nameAtom, true, false, varIdx, JSVarKind.JS_VAR_NORMAL, false, false)
-              targetScope.vars.set(name, {
-                type: 'closure',
-                idx: closureIdx,
-                localIdx: varIdx,
-                isLexical: false,
-                isConst: false
-              })
+              // For module variables, we also need to add them as closure variables (self-reference)
+              // This allows them to be accessed via OP_get_var_ref/put_var_ref
+              if (isModule) {
+                const nameAtom = this.compiler.addAtom(name)
+                // QuickJS: cv->is_local = TRUE
+                // QuickJS uses JS_VAR_NORMAL for module variables in the closure definition
+                const closureIdx = this.compiler.addClosureVarWithAtom(this.funcDef!, nameAtom, true, false, varIdx, JSVarKind.JS_VAR_NORMAL, false, false)
+                
+                targetScope.vars.set(name, {
+                  type: 'closure',
+                  idx: closureIdx,
+                  localIdx: varIdx,
+                  isLexical: false,
+                  isConst: false
+                })
+              } else {
+                targetScope.vars.set(name, {
+                  type: 'local',
+                  idx: varIdx,
+                  localIdx: varIdx,
+                  isLexical: false,
+                  isConst: false
+                })
+              }
             } else {
               targetScope.vars.set(name, {
                 type: 'local',

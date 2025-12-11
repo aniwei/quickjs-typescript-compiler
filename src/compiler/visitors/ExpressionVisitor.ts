@@ -212,85 +212,16 @@ export class ExpressionVisitor {
     const pos = node.getStart()
     const name = node.text
 
-    if (!varInfo) {
-      if (keepValue) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
-      }
-      const atomId = this.compiler.addAtom(name)
-      this.compiler.emitAtomOp(this.funcDef, Opcode.OP_put_var, atomId, pos)
-      return
-    }
-
-    if (varInfo.type === 'closure') {
-      const idx = varInfo.idx
-      if (keepValue) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
-      }
-      if (varInfo.isLexical) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref_check, pos)
-        this.compiler.emitU16(this.funcDef, idx)
-      } else {
-        if (idx === 0) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref0, pos)
-        } else if (idx === 1) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref1, pos)
-        } else if (idx === 2) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref2, pos)
-        } else if (idx === 3) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref3, pos)
-        } else {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_put_var_ref, pos)
-          this.compiler.emitU16(this.funcDef, idx)
-        }
-      }
-      return
-    }
-
-    const varIdx = varInfo.idx
-    const localIdx =
-      typeof varInfo.localIdx === 'number'
-        ? varInfo.localIdx
-        : this.funcDef.vars[varIdx]?.localIdx ?? -1
-
-    if (varInfo.isArg) {
-      const idx = localIdx >= 0 ? localIdx : varIdx
-      if (keepValue) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
-      }
-      if (idx === 0) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_put_arg0, pos)
-      } else if (idx === 1) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_put_arg1, pos)
-      } else if (idx === 2) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_put_arg2, pos)
-      } else if (idx === 3) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_put_arg3, pos)
-      } else {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_put_arg, pos)
-        this.compiler.emitU16(this.funcDef, idx)
-      }
-      return
-    }
-
     if (keepValue) {
       this.compiler.emitOp(this.funcDef, Opcode.OP_dup)
     }
 
-    if (localIdx === 0) {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc0, pos)
-    } else if (localIdx === 1) {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc1, pos)
-    } else if (localIdx === 2) {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc2, pos)
-    } else if (localIdx === 3) {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc3, pos)
-    } else if (localIdx >= 0 && localIdx < 256) {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc8, pos)
-      this.compiler.emitU8(this.funcDef, localIdx)
-    } else {
-      this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc, pos)
-      this.compiler.emitU16(this.funcDef, localIdx)
-    }
+    const atom = this.compiler.addAtom(name)
+    const scopeLevel = this.scopeManager.currentScopeLevel
+
+    this.compiler.emitOp(this.funcDef, Opcode.OP_scope_put_var, pos)
+    this.compiler.emitU32(this.funcDef, atom)
+    this.compiler.emitU16(this.funcDef, scopeLevel)
   }
 
   private getCompoundOpcode(kind: ts.SyntaxKind): Opcode | null {

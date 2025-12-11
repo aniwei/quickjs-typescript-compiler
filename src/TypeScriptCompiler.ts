@@ -14,11 +14,13 @@ import { LiteralVisitor } from './compiler/visitors/LiteralVisitor'
 import { IdentifierVisitor } from './compiler/visitors/IdentifierVisitor'
 import { ThisVisitor } from './compiler/visitors/ThisVisitor'
 import { HoistVariables } from './compiler/HoistVariables'
+import { VariableResolver } from './compiler/VariableResolver'
 
 export class TypeScriptCompiler implements CompilerContext {
   public compiler: Compiler
   public scopeManager: ScopeManager
   public labelManager: LabelManager
+  public variableResolver: VariableResolver
   public funcDef: FunctionDef | null = null
   public currentNode: ts.Node | null = null
   public deferredTasks: (() => void)[] = []
@@ -38,6 +40,7 @@ export class TypeScriptCompiler implements CompilerContext {
     this.compiler = new Compiler(options)
     this.scopeManager = new ScopeManager(this.compiler)
     this.labelManager = new LabelManager(this.compiler)
+    this.variableResolver = new VariableResolver(this)
     this.statementVisitor = new StatementVisitor(this)
     this.expressionVisitor = new ExpressionVisitor(this)
     this.functionVisitor = new FunctionVisitor(this)
@@ -86,6 +89,8 @@ export class TypeScriptCompiler implements CompilerContext {
     fd.jsMode = JSMode.JS_MODE_STRICT
     fd.funcName = JSAtom.JS_ATOM__eval_
     // QuickJS marks module init functions as async regardless of TLA so func_kind bits match
+    // For Script mode (Phase 0), we use JS_FUNC_NORMAL
+    // But to match compareWithWasm (which uses JS_EVAL_TYPE_MODULE), we must use JS_FUNC_ASYNC
     fd.funcKind = FunctionKind.JS_FUNC_ASYNC
     fd.isGlobalVar = true
     
@@ -105,26 +110,67 @@ export class TypeScriptCompiler implements CompilerContext {
     // Hoist variables to ensure atom order matches QuickJS
     this.variableHoister.hoistVariables(sourceFile)
 
-    // 模块前置：push_this / if_false 与 QuickJS 对齐（falsy -> 进入模块主体，truthy -> 直接 return_undef）
+    // Module initialization block (QuickJS logic)
+    // if (this) { initialize global vars; return; }
+    // But wait, QuickJS parser.c says:
+    // if (this) { initialize; }
+    // It does NOT return. It falls through if this is true?
+    // No, OP_if_false jumps if false.
+    // So if true, it executes initialization.
+    // If false, it jumps over initialization.
+    
+    // Wait, if it's a module, we need to emit this block.
+    // And we need to emit initialization code for hoisted functions.
+    
+    const labelNext = this.compiler.newLabel(fd)
     this.compiler.emitOp(fd, Opcode.OP_push_this)
-    const moduleBodyLabel = this.compiler.newLabel(fd)
-    this.compiler.emitJump(fd, Opcode.OP_if_false, moduleBodyLabel)
-
-    // 初始化区：先处理函数声明（func_pool/atom 顺序与 QuickJS 对齐），在 return_undef 之前执行
+    // Jump to end of init if already evaluated
+    this.compiler.emitJump(fd, Opcode.OP_if_false8, labelNext)
+    
+    // Initialization code for hoisted functions
+    // Iterate over hoisted variables (which are in fd.vars)
+    // But we need to know which ones are functions.
+    // HoistVariables adds them.
+    // We can iterate sourceFile statements to find FunctionDeclarations again?
+    // Or iterate fd.vars?
+    // fd.vars doesn't store the function definition index (cpoolIdx).
+    // We need to store cpoolIdx in fd.vars or somewhere.
+    
+    // Let's iterate sourceFile statements for now, as HoistVariables does.
     for (const stmt of sourceFile.statements) {
-      if (ts.isFunctionDeclaration(stmt)) {
-        this.visit(stmt)
+      if (ts.isFunctionDeclaration(stmt) && stmt.name) {
+        const name = stmt.name.text
+        // Find the variable
+        // It should be in scope.
+        const scope = this.scopeManager.currentScope
+        const varInfo = scope.vars.get(name)
+        if (varInfo && varInfo.type === 'closure') {
+           // We need the function definition.
+           // FunctionVisitor creates it.
+           // But we haven't visited it yet.
+           // We need to create the function definition NOW.
+           
+           // This means we need to visit the function declaration here?
+           // If we visit it here, we shouldn't visit it in the main loop.
+           
+           this.visit(stmt)
+           
+           // FunctionVisitor emits OP_fclosure and OP_put_loc/put_var_ref.
+           // We need to ensure it emits put_var_ref for module vars.
+        }
       }
     }
+    
+    // End of initialization block
+    // QuickJS emits OP_return_undef (41) for the init block
+    this.compiler.emitReturn(fd, false)
+    
+    // Label target
+    this.compiler.markLabel(fd, labelNext)
 
-    // 真值分支结束（脚本路径）
-    this.compiler.emitOp(fd, Opcode.OP_return_undef)
-
-    // 模块主体起点
-    this.compiler.markLabel(fd, moduleBodyLabel)
-
-    // 模块主体：其余语句在 label 之后执行
+    // Visit all statements in order
     for (const stmt of sourceFile.statements) {
+      // Skip function declarations as they are already handled
       if (!ts.isFunctionDeclaration(stmt)) {
         this.visit(stmt)
       }
@@ -138,10 +184,11 @@ export class TypeScriptCompiler implements CompilerContext {
     // Update stack size for module
     fd.stackSize = fd.stackSizeMax
     
-    // 模块路径结束：返回 undefined + return_async
+    // Module epilogue: return undefined (async)
     this.compiler.emitOp(fd, Opcode.OP_undefined)
     this.compiler.emitOp(fd, Opcode.OP_return_async)
 
+    this.variableResolver.resolveVariables(fd)
     this.compiler.computePc2LineInfo(fd)
 
     this.scopeManager.exit() // Exit function scope

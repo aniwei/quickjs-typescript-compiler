@@ -11,7 +11,7 @@ interface PendingJump {
   size: number
 }
 
-interface RecordedJump {
+export interface RecordedJump {
   fd: FunctionDef
   pos: number
   size: number
@@ -42,7 +42,7 @@ export class Compiler {
     this.ensureInitializedBuiltinAtoms()
   }
 
-  private labelsFor(fd: FunctionDef): Label[] {
+  labelsFor(fd: FunctionDef): Label[] {
     let labels = this.labelMap.get(fd)
     if (!labels) {
       labels = []
@@ -51,7 +51,7 @@ export class Compiler {
     return labels
   }
 
-  private jumpsFor(fd: FunctionDef): RecordedJump[] {
+  jumpsFor(fd: FunctionDef): RecordedJump[] {
     let jumps = this.jumpMap.get(fd)
     if (!jumps) {
       jumps = []
@@ -383,7 +383,7 @@ export class Compiler {
 
     const builtInName = 'JS_ATOM_' + s
     if (JSAtom[builtInName as any] && s !== 'undefined') {
-      return JSAtom[builtInName as any] as JSAtom
+      return JSAtom[builtInName as any] as unknown as JSAtom
     }
 
     if (this.atomMap.has(s)) {
@@ -608,20 +608,77 @@ export class Compiler {
     s.byteCode.putU32(val)
   }
 
-  emitPushConst(s: FunctionDef, val: any): void {
-    // TODO: Implement full constant pushing logic (integers, floats, strings, etc.)
-    // For now, just handle simple cases or throw
+  emitPushConst(s: FunctionDef, val: any, asAtom: boolean = false): void {
     if (val === null) {
       this.emitOp(s, Opcode.OP_null)
-    } else if (val === undefined) {
-      this.emitOp(s, Opcode.OP_undefined)
-    } else if (val === false) {
-      this.emitOp(s, Opcode.OP_push_false)
-    } else if (val === true) {
-      this.emitOp(s, Opcode.OP_push_true)
-    } else {
-      throw new Error('Unsupported constant type in emitPushConst')
+      return
     }
+    if (val === undefined) {
+      this.emitOp(s, Opcode.OP_undefined)
+      return
+    }
+    if (val === false) {
+      this.emitOp(s, Opcode.OP_push_false)
+      return
+    }
+    if (val === true) {
+      this.emitOp(s, Opcode.OP_push_true)
+      return
+    }
+
+    if (typeof val === 'number') {
+      if (Number.isInteger(val)) {
+        if (val === 0) { this.emitOp(s, Opcode.OP_push_0); return }
+        if (val === 1) { this.emitOp(s, Opcode.OP_push_1); return }
+        if (val >= -2147483648 && val <= 2147483647) {
+          this.emitOp(s, Opcode.OP_push_i32)
+          this.emitU32(s, val)
+          return
+        }
+      }
+      // Fallback to cpool
+      const idx = this.addConst(s, val)
+      if (idx < 256) {
+        this.emitOp(s, Opcode.OP_push_const8)
+        this.emitU8(s, idx)
+      } else {
+        this.emitOp(s, Opcode.OP_push_const)
+        this.emitU32(s, idx)
+      }
+      return
+    }
+
+    if (typeof val === 'string') {
+      if (asAtom) {
+        const atom = this.addAtom(val)
+        this.emitOp(s, Opcode.OP_push_atom_value)
+        this.emitU32(s, atom)
+        return
+      }
+      const idx = this.addConst(s, val)
+      if (idx < 256) {
+        this.emitOp(s, Opcode.OP_push_const8)
+        this.emitU8(s, idx)
+      } else {
+        this.emitOp(s, Opcode.OP_push_const)
+        this.emitU32(s, idx)
+      }
+      return
+    }
+
+    if (typeof val === 'bigint') {
+      const idx = this.addConst(s, val)
+      if (idx < 256) {
+        this.emitOp(s, Opcode.OP_push_const8)
+        this.emitU8(s, idx)
+      } else {
+        this.emitOp(s, Opcode.OP_push_const)
+        this.emitU32(s, idx)
+      }
+      return
+    }
+
+    throw new Error('Unsupported constant type in emitPushConst: ' + typeof val)
   }
 
   emitAtomOp(s: FunctionDef, val: number, atom: number, sourcePos: number = -1): void {
@@ -1042,7 +1099,10 @@ export class Compiler {
       if (cv.isLexical) {
         flags |= 8
       }
-      flags |= (cv.varKind << 4)
+      if (cv.varKind !== JSVarKind.JS_VAR_NORMAL) {
+        flags |= 16
+      }
+      // flags |= (cv.varKind << 4) // This was wrong, varKind is not directly shifted
       out.putByte(flags)
     }
 
@@ -1199,12 +1259,26 @@ export class Compiler {
     // console.log('writeModule: Writing atoms:', this.atoms.length)
     out.putULEB128(this.atoms.length)
     for (const atom of this.atoms) {
-      // console.log('writeModule: Writing atom:', atom)
-      const len = atom.length
-      out.putULEB128(len << 1)
+      // Check if wide char
+      let isWide = false
+      for (let i = 0; i < atom.length; i++) {
+        if (atom.charCodeAt(i) > 255) {
+          isWide = true
+          break
+        }
+      }
 
-      for (let i = 0; i < len; i++) {
-        out.putByte(atom.charCodeAt(i))
+      const len = atom.length
+      out.putULEB128((len << 1) | (isWide ? 1 : 0))
+
+      if (isWide) {
+        for (let i = 0; i < len; i++) {
+          out.putU16(atom.charCodeAt(i))
+        }
+      } else {
+        for (let i = 0; i < len; i++) {
+          out.putByte(atom.charCodeAt(i))
+        }
       }
     }
 

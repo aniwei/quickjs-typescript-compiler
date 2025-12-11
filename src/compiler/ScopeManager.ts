@@ -35,6 +35,11 @@ export class ScopeManager {
     return this.stack
   }
 
+  get currentScopeLevel() {
+    if (this.stack.length === 0) return 0
+    return this.stack[this.stack.length - 1].scopeIndex
+  }
+
   reset() {
     this.stack = []
     this.vars = new Map()
