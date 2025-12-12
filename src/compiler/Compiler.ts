@@ -1,9 +1,26 @@
-import { FunctionDef, JSVarDef, JSClosureVar, LineNumberSlot, JSVarKind } from './FunctionDef'
+import { 
+  FunctionDef, 
+  JSVarDef, 
+  JSClosureVar, 
+  LineNumberSlot, 
+  JSVarKind,
+  JSVarKindEnum,
+  LabelSlot,
+  RelocEntry,
+  JSGlobalVar,
+  BlockEnv,
+  ARGUMENT_VAR_OFFSET,
+  ARG_SCOPE_INDEX,
+  JS_MAX_LOCAL_VARS,
+} from './FunctionDef'
 import { Opcode, env, BytecodeTag, JSAtom, PC2Line, OPCODE_DEFS } from '../env'
 import { BytecodeBuilder } from './BytecodeBuilder'
 import { AtomTable } from './AtomTable'
 import ts from 'typescript'
 
+// ============================================================================
+// 类型定义
+// ============================================================================
 
 interface PendingJump {
   fd: FunctionDef
@@ -19,11 +36,36 @@ export interface RecordedJump {
   label: Label
 }
 
+/**
+ * 标签类 - 用于跳转目标管理
+ */
 export class Label {
   addr: number = -1
   jumps: PendingJump[] = []
   fd: FunctionDef | null = null
 }
+
+/**
+ * 变量定义类型枚举 - 对应 parser.c:JSVarDefEnum
+ * 
+ * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:2207-2215
+ */
+export enum JSVarDefEnum {
+  JS_VAR_DEF_WITH = 0,
+  JS_VAR_DEF_LET = 1,
+  JS_VAR_DEF_CONST = 2,
+  JS_VAR_DEF_FUNCTION_DECL = 3,      // function declaration
+  JS_VAR_DEF_NEW_FUNCTION_DECL = 4,  // async/generator function declaration
+  JS_VAR_DEF_CATCH = 5,
+  JS_VAR_DEF_VAR = 6,
+}
+
+// ============================================================================
+// 全局变量偏移常量
+// ============================================================================
+
+/** 全局变量偏移量 - 用于区分全局变量和局部变量 */
+export const GLOBAL_VAR_OFFSET = 0x40000000
 
 export class Compiler {
   atoms: string[] = []
@@ -259,6 +301,82 @@ export class Compiler {
     this.sourceFile = sourceFile
   }
 
+  // ============================================================================
+  // Atom 管理方法
+  // ============================================================================
+
+  /**
+   * 获取字符串对应的 Atom ID
+   * 
+   * 首先检查内置 atoms，然后检查用户定义的 atoms
+   * 
+   * @param name 字符串名称
+   * @returns Atom ID，如果不存在返回 null
+   */
+  getAtom(name: string): number | null {
+    // 首先检查内置 atoms
+    const builtIn = this.builtInAtoms.get(name)
+    if (builtIn !== undefined) {
+      return builtIn
+    }
+    
+    // 检查用户定义的 atoms
+    const idx = this.atoms.indexOf(name)
+    if (idx >= 0) {
+      return this.firstAtomId + idx
+    }
+    
+    return null
+  }
+
+  /**
+   * 添加新的 Atom
+   * 
+   * 如果字符串已存在于内置 atoms 或用户定义的 atoms 中，返回已有的 ID
+   * 
+   * @param name 字符串名称
+   * @returns Atom ID
+   */
+  addAtom(name: string): number {
+    // 首先检查内置 atoms
+    const builtIn = this.builtInAtoms.get(name)
+    if (builtIn !== undefined) {
+      return builtIn
+    }
+    
+    // 检查用户定义的 atoms
+    const idx = this.atoms.indexOf(name)
+    if (idx >= 0) {
+      return this.firstAtomId + idx
+    }
+    
+    // 添加新的 atom
+    this.atoms.push(name)
+    return this.firstAtomId + this.atoms.length - 1
+  }
+
+  /**
+   * 通过 Atom ID 获取字符串
+   * 
+   * @param atom Atom ID
+   * @returns 字符串，如果不存在返回 null
+   */
+  getAtomString(atom: number): string | null {
+    // 检查是否为内置 atom
+    for (const [name, id] of this.builtInAtoms.entries()) {
+      if (id === atom) {
+        return name
+      }
+    }
+    
+    // 检查用户定义的 atoms
+    if (atom >= this.firstAtomId && atom < this.firstAtomId + this.atoms.length) {
+      return this.atoms[atom - this.firstAtomId]
+    }
+    
+    return null
+  }
+
   addPc2LineInfo(fd: FunctionDef, pc: number, sourcePos: number) {
     if (sourcePos === -1) {
       return
@@ -354,88 +472,672 @@ export class Compiler {
     }
   }
 
-  addVar(fd: FunctionDef, name: string, isConst: boolean = false, isLexical: boolean = false, scopeLevel: number = 0, varKind: JSVarKind = JSVarKind.JS_VAR_NORMAL, isCaptured: boolean = false, isModuleVar: boolean = false): number {
-    throw new Error('Not implemented')
+  // ============================================================================
+  // 字节码发射方法 - 对应 parser.c:1765-1810
+  // ============================================================================
+
+  /**
+   * 发射 8 位无符号整数 - 对应 parser.c:emit_u8
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1765-1767
+   */
+  emitU8(fd: FunctionDef, val: number): void {
+    fd.byteCode.putByte(val)
   }
 
-  addVarWithAtom(fd: FunctionDef, atom: number, isConst: boolean = false, isLexical: boolean = false, scopeLevel: number = 0, varKind: JSVarKind = JSVarKind.JS_VAR_NORMAL, isCaptured: boolean = false, isModuleVar: boolean = false): number {
-    throw new Error('Not implemented')
+  /**
+   * 发射 16 位无符号整数 (小端序) - 对应 parser.c:emit_u16
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1769-1771
+   */
+  emitU16(fd: FunctionDef, val: number): void {
+    fd.byteCode.putU16(val)
   }
 
-  addArg(fd: FunctionDef, name: string): number {
-    throw new Error('Not implemented')
+  /**
+   * 发射 32 位无符号整数 (小端序) - 对应 parser.c:emit_u32
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1773-1775
+   */
+  emitU32(fd: FunctionDef, val: number): void {
+    fd.byteCode.putU32(val)
   }
 
-  addClosureVar(fd: FunctionDef, name: string, isLocal: boolean, isArg: boolean, varIdx: number, varKind: number, isConst: boolean, isLexical: boolean): number {
-    throw new Error('Not implemented')
+  /**
+   * 发射源码位置信息 - 对应 parser.c:emit_source_pos
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1777-1786
+   * 
+   * 注意: 如果源码位置与上次不同，则发射 OP_line_num 指令
+   */
+  emitSourcePos(fd: FunctionDef, sourcePos: number): void {
+    if (fd.lastOpcodeSourcePtr !== sourcePos) {
+      fd.byteCode.putByte(Opcode.OP_line_num)
+      fd.byteCode.putU32(sourcePos)
+      fd.lastOpcodeSourcePtr = sourcePos
+    }
   }
 
-  addClosureVarWithAtom(fd: FunctionDef, atom: number, isLocal: boolean, isArg: boolean, varIdx: number, varKind: number, isConst: boolean, isLexical: boolean): number {
-    throw new Error('Not implemented')
+  /**
+   * 发射操作码 - 对应 parser.c:emit_op
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1788-1794
+   */
+  emitOp(fd: FunctionDef, val: number, sourcePos: number = -1): void {
+    fd.lastOpcodePos = fd.byteCode.size
+    fd.byteCode.putByte(val)
+    
+    // 如果提供了源码位置，添加 pc2line 信息
+    if (sourcePos !== -1) {
+      this.addPc2LineInfo(fd, fd.lastOpcodePos, sourcePos)
+    }
   }
 
-  findVar(fd: FunctionDef, name: string): { idx: number, isArg: boolean } | null {
-    throw new Error('Not implemented')
+  /**
+   * 发射 Atom - 对应 parser.c:emit_atom
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1796-1803
+   * 
+   * 注意: QuickJS 中会复制 atom，但在 TypeScript 中我们直接使用 atom 值
+   */
+  emitAtom(fd: FunctionDef, atom: number): void {
+    fd.byteCode.putU32(atom)
   }
 
+  /**
+   * 发射带 Atom 的操作码 - 组合 emitOp 和 emitAtom
+   */
+  emitAtomOp(fd: FunctionDef, op: number, atom: number, sourcePos: number = -1): void {
+    this.emitOp(fd, op, sourcePos)
+    this.emitAtom(fd, atom)
+  }
+
+  /**
+   * 发射 IC (内联缓存) 槽位 - 对应 parser.c:emit_ic
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1805-1807
+   * 
+   * 注意: 当前 TypeScript 版本中暂不实现 IC 优化
+   */
+  emitIc(fd: FunctionDef, atom: number): void {
+    // TODO: 实现内联缓存支持
+    // add_ic_slot1(fd->ic, atom)
+  }
+
+  // ============================================================================
+  // 标签管理方法 - 对应 parser.c:1809-1875
+  // ============================================================================
+
+  /**
+   * 更新标签引用计数 - 对应 parser.c:update_label
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1809-1818
+   */
+  updateLabel(fd: FunctionDef, label: number, delta: number): number {
+    if (label < 0 || label >= fd.labelCount) {
+      throw new Error(`Invalid label index: ${label}`)
+    }
+    const ls = fd.labelSlots[label]
+    ls.refCount += delta
+    if (ls.refCount < 0) {
+      throw new Error(`Label ref count went negative: ${ls.refCount}`)
+    }
+    return ls.refCount
+  }
+
+  /**
+   * 创建新标签 (FunctionDef 版本) - 对应 parser.c:new_label_fd
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1820-1835
+   */
+  newLabelFd(fd: FunctionDef): number {
+    const label = fd.labelCount++
+    const ls = new LabelSlot()
+    ls.refCount = 0
+    ls.pos = -1
+    ls.pos2 = -1
+    ls.addr = -1
+    ls.firstReloc = null
+    fd.labelSlots.push(ls)
+    return label
+  }
+
+  /**
+   * 创建新标签 (整数版本) - 对应 parser.c:new_label
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1837-1844
+   */
+  newLabelInt(fd: FunctionDef): number {
+    return this.newLabelFd(fd)
+  }
+
+  /**
+   * 发射原始标签 (不更新 last_opcode) - 对应 parser.c:emit_label_raw
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1847-1851
+   */
+  emitLabelRaw(fd: FunctionDef, label: number): void {
+    this.emitU8(fd, Opcode.OP_label)
+    this.emitU32(fd, label)
+    fd.labelSlots[label].pos = fd.byteCode.size
+  }
+
+  /**
+   * 发射标签 - 对应 parser.c:emit_label
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1854-1863
+   * 
+   * @returns 标签 ID 偏移量，如果标签无效返回 -1
+   */
+  emitLabelInt(fd: FunctionDef, label: number): number {
+    if (label >= 0) {
+      this.emitOp(fd, Opcode.OP_label)
+      this.emitU32(fd, label)
+      fd.labelSlots[label].pos = fd.byteCode.size
+      return fd.byteCode.size - 4
+    } else {
+      return -1
+    }
+  }
+
+  /**
+   * 检查代码是否可达 (非死代码) - 简化版本
+   * 
+   * QuickJS 中使用 js_is_live_code 检查，这里简化为总是返回 true
+   */
+  isLiveCode(fd: FunctionDef): boolean {
+    // TODO: 实现更完整的死代码检测
+    return true
+  }
+
+  /**
+   * 发射跳转指令 (整数标签版本) - 对应 parser.c:emit_goto
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1866-1879
+   * 
+   * @returns 标签索引，如果是死代码返回 -1
+   */
+  emitGotoInt(fd: FunctionDef, opcode: number, label: number): number {
+    if (this.isLiveCode(fd)) {
+      if (label < 0) {
+        label = this.newLabelInt(fd)
+        if (label < 0) return -1
+      }
+      this.emitOp(fd, opcode)
+      this.emitU32(fd, label)
+      fd.labelSlots[label].refCount++
+      return label
+    }
+    return -1
+  }
+
+  // ============================================================================
+  // 常量池方法 - 对应 parser.c:1881-1922
+  // ============================================================================
+
+  /**
+   * 添加常量到常量池 - 对应 parser.c:cpool_add
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1881-1892
+   * 
+   * @returns 常量池索引
+   */
+  cpoolAdd(fd: FunctionDef, val: any): number {
+    const idx = fd.cpoolCount++
+    fd.cpool.push(val)
+    return idx
+  }
+
+  /**
+   * 发射推送常量指令 - 对应 parser.c:emit_push_const
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1894-1920
+   */
+  emitPushConst(fd: FunctionDef, val: any, asAtom: boolean = false): number {
+    // 如果是字符串且需要作为 atom
+    if (typeof val === 'string' && asAtom) {
+      const atom = this.getAtom(val)
+      if (atom !== null && atom > 0) {
+        this.emitOp(fd, Opcode.OP_push_atom_value)
+        this.emitU32(fd, atom)
+        this.emitIc(fd, atom)
+        return 0
+      }
+    }
+
+    const idx = this.cpoolAdd(fd, val)
+    this.emitOp(fd, Opcode.OP_push_const)
+    this.emitU32(fd, idx)
+    return 0
+  }
+
+  // ============================================================================
+  // 变量查找方法 - 对应 parser.c:1922-2000
+  // ============================================================================
+
+  /**
+   * 查找参数 - 对应 parser.c:find_arg
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1925-1932
+   * 
+   * @returns 参数索引 + ARGUMENT_VAR_OFFSET，未找到返回 -1
+   */
+  findArg(fd: FunctionDef, name: number): number {
+    for (let i = fd.argCount - 1; i >= 0; i--) {
+      if (fd.args[i].varName === name) {
+        return i | ARGUMENT_VAR_OFFSET
+      }
+    }
+    return -1
+  }
+
+  /**
+   * 查找变量 - 对应 parser.c:find_var
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1934-1942
+   */
+  findVarByAtom(fd: FunctionDef, name: number): number {
+    for (let i = fd.varCount - 1; i >= 0; i--) {
+      if (fd.vars[i].varName === name && fd.vars[i].scopeLevel === 0) {
+        return i
+      }
+    }
+    return this.findArg(fd, name)
+  }
+
+  /**
+   * 在指定作用域中查找变量 - 对应 parser.c:find_var_in_scope
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1945-1956
+   */
+  findVarInScope(fd: FunctionDef, name: number, scopeLevel: number): number {
+    for (let scopeIdx = fd.scopes[scopeLevel].first; scopeIdx >= 0; scopeIdx = fd.vars[scopeIdx].scopeNext) {
+      if (fd.vars[scopeIdx].scopeLevel !== scopeLevel) {
+        break
+      }
+      if (fd.vars[scopeIdx].varName === name) {
+        return scopeIdx
+      }
+    }
+    return -1
+  }
+
+  /**
+   * 检查作用域是否为父作用域的子作用域 - 对应 parser.c:is_child_scope
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1960-1968
+   */
+  isChildScope(fd: FunctionDef, scope: number, parentScope: number): boolean {
+    while (scope >= 0) {
+      if (scope === parentScope) {
+        return true
+      }
+      scope = fd.scopes[scope].parent
+    }
+    return false
+  }
+
+  /**
+   * 查找全局变量 - 对应 parser.c:find_global_var
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1984-1992
+   */
+  findGlobalVar(fd: FunctionDef, name: number): JSGlobalVar | null {
+    for (let i = 0; i < fd.globalVarCount; i++) {
+      if (fd.globalVars[i].varName === name) {
+        return fd.globalVars[i]
+      }
+    }
+    return null
+  }
+
+  /**
+   * 查找词法全局变量 - 对应 parser.c:find_lexical_global_var
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1994-2000
+   */
+  findLexicalGlobalVar(fd: FunctionDef, name: number): JSGlobalVar | null {
+    const hf = this.findGlobalVar(fd, name)
+    if (hf && hf.isLexical) {
+      return hf
+    }
+    return null
+  }
+
+  /**
+   * 查找词法声明 - 对应 parser.c:find_lexical_decl
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:2002-2022
+   */
+  findLexicalDecl(fd: FunctionDef, name: number, scopeIdx: number, checkCatchVar: boolean): number {
+    while (scopeIdx >= 0) {
+      const vd = fd.vars[scopeIdx]
+      if (vd.varName === name &&
+          (vd.isLexical || (vd.varKind === JSVarKindEnum.JS_VAR_CATCH && checkCatchVar))) {
+        return scopeIdx
+      }
+      scopeIdx = vd.scopeNext
+    }
+
+    // 检查全局词法变量
+    if (fd.isEval && fd.evalType === 0 /* JS_EVAL_TYPE_GLOBAL */) {
+      if (this.findLexicalGlobalVar(fd, name)) {
+        return GLOBAL_VAR_OFFSET
+      }
+    }
+    return -1
+  }
+
+  // ============================================================================
+  // 作用域管理方法 - 对应 parser.c:2024-2093
+  // ============================================================================
+
+  /**
+   * 压入新作用域 - 对应 parser.c:push_scope
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:2024-2065
+   */
+  pushScope(fd: FunctionDef): number {
+    const scope = fd.scopeCount
+
+    // 扩展 scopes 数组
+    if ((fd.scopeCount + 1) > fd.scopeSize) {
+      const newSize = Math.max(fd.scopeCount + 1, Math.floor(fd.scopeSize * 1.5))
+      // 如果还在使用默认数组，需要复制
+      if (fd.scopes === fd.defScopeArray) {
+        fd.scopes = [...fd.defScopeArray]
+      }
+      fd.scopeSize = newSize
+    }
+
+    fd.scopeCount++
+    
+    // 确保 scopes 数组有足够空间
+    while (fd.scopes.length < fd.scopeCount) {
+      fd.scopes.push({ parent: -1, first: -1 })
+    }
+
+    fd.scopes[scope].parent = fd.scopeLevel
+    fd.scopes[scope].first = fd.scopeFirst
+    
+    this.emitOp(fd, Opcode.OP_enter_scope)
+    this.emitU16(fd, scope)
+    
+    fd.scopeLevel = scope
+    return scope
+  }
+
+  /**
+   * 获取第一个词法变量 - 对应 parser.c:get_first_lexical_var
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:2067-2076
+   */
+  getFirstLexicalVar(fd: FunctionDef, scope: number): number {
+    while (scope >= 0) {
+      const scopeIdx = fd.scopes[scope].first
+      if (scopeIdx >= 0) {
+        return scopeIdx
+      }
+      scope = fd.scopes[scope].parent
+    }
+    return -1
+  }
+
+  /**
+   * 弹出作用域 - 对应 parser.c:pop_scope
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:2078-2087
+   */
+  popScope(fd: FunctionDef): void {
+    const scope = fd.scopeLevel
+    this.emitOp(fd, Opcode.OP_leave_scope)
+    this.emitU16(fd, scope)
+    fd.scopeLevel = fd.scopes[scope].parent
+    fd.scopeFirst = this.getFirstLexicalVar(fd, fd.scopeLevel)
+  }
+
+  /**
+   * 关闭多个作用域 - 对应 parser.c:close_scopes
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:2089-2094
+   */
+  closeScopes(fd: FunctionDef, scope: number, scopeStop: number): void {
+    while (scope > scopeStop) {
+      this.emitOp(fd, Opcode.OP_leave_scope)
+      this.emitU16(fd, scope)
+      scope = fd.scopes[scope].parent
+    }
+  }
+
+  // ============================================================================
+  // 变量添加方法 - 对应 parser.c:2096-2205
+  // ============================================================================
+
+  /**
+   * 添加变量 - 对应 parser.c:add_var
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:2097-2115
+   */
+  addVar(fd: FunctionDef, name: number): number {
+    // 检查局部变量数量限制
+    if (fd.varCount >= JS_MAX_LOCAL_VARS) {
+      throw new Error('too many local variables')
+    }
+
+    const vd = new JSVarDef()
+    vd.varName = name
+    vd.funcPoolIdx = -1
+    
+    fd.vars.push(vd)
+    return fd.varCount++
+  }
+
+  /**
+   * 添加作用域变量 - 对应 parser.c:add_scope_var
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:2117-2130
+   */
+  addScopeVar(fd: FunctionDef, name: number, varKind: JSVarKindEnum): number {
+    const idx = this.addVar(fd, name)
+    if (idx >= 0) {
+      const vd = fd.vars[idx]
+      vd.varKind = varKind
+      vd.scopeLevel = fd.scopeLevel
+      vd.scopeNext = fd.scopeFirst
+      fd.scopes[fd.scopeLevel].first = idx
+      fd.scopeFirst = idx
+    }
+    return idx
+  }
+
+  /**
+   * 添加函数变量 - 对应 parser.c:add_func_var
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:2132-2142
+   */
+  addFuncVar(fd: FunctionDef, name: number): number {
+    let idx = fd.funcVarIdx
+    if (idx < 0) {
+      idx = this.addVar(fd, name)
+      if (idx >= 0) {
+        fd.funcVarIdx = idx
+        fd.vars[idx].varKind = JSVarKindEnum.JS_VAR_FUNCTION_NAME
+        // 严格模式下，函数名是 const
+        if (fd.jsMode & 0x01 /* JS_MODE_STRICT */) {
+          fd.vars[idx].isConst = true
+        }
+      }
+    }
+    return idx
+  }
+
+  /**
+   * 添加 arguments 变量 - 对应 parser.c:add_arguments_var
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:2144-2151
+   */
+  addArgumentsVar(fd: FunctionDef, argumentsAtom: number): number {
+    let idx = fd.argumentsVarIdx
+    if (idx < 0) {
+      idx = this.addVar(fd, argumentsAtom)
+      if (idx >= 0) {
+        fd.argumentsVarIdx = idx
+      }
+    }
+    return idx
+  }
+
+  /**
+   * 添加参数作用域的 arguments - 对应 parser.c:add_arguments_arg
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:2155-2175
+   */
+  addArgumentsArg(fd: FunctionDef, argumentsAtom: number): number {
+    if (fd.argumentsArgIdx < 0) {
+      let idx = this.findVarInScope(fd, argumentsAtom, ARG_SCOPE_INDEX)
+      if (idx < 0) {
+        idx = this.addVar(fd, argumentsAtom)
+        if (idx < 0) return -1
+        
+        fd.vars[idx].scopeNext = fd.scopes[ARG_SCOPE_INDEX].first
+        fd.scopes[ARG_SCOPE_INDEX].first = idx
+        fd.vars[idx].scopeLevel = ARG_SCOPE_INDEX
+        fd.vars[idx].isLexical = true
+        
+        fd.argumentsArgIdx = idx
+      }
+    }
+    return 0
+  }
+
+  /**
+   * 添加参数 - 对应 parser.c:add_arg
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:2177-2193
+   */
+  addArg(fd: FunctionDef, name: number): number {
+    // 检查参数数量限制
+    if (fd.argCount >= JS_MAX_LOCAL_VARS) {
+      throw new Error('too many arguments')
+    }
+
+    const vd = new JSVarDef()
+    vd.varName = name
+    vd.funcPoolIdx = -1
+    
+    fd.args.push(vd)
+    return fd.argCount++
+  }
+
+  /**
+   * 添加全局变量 - 对应 parser.c:add_global_var
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:2196-2212
+   */
+  addGlobalVar(fd: FunctionDef, name: number): JSGlobalVar | null {
+    const hf = new JSGlobalVar()
+    hf.cpoolIdx = -1
+    hf.forceInit = false
+    hf.isLexical = false
+    hf.isConst = false
+    hf.scopeLevel = fd.scopeLevel
+    hf.varName = name
+    
+    fd.globalVars.push(hf)
+    fd.globalVarCount++
+    return hf
+  }
+
+  // ============================================================================
+  // 子函数管理方法
+  // ============================================================================
+
+  /**
+   * 添加子函数到父函数
+   */
   addChild(parent: FunctionDef, child: FunctionDef): number {
-    throw new Error('Not implemented')
+    child.parent = parent
+    child.parentScopeLevel = parent.scopeLevel
+    parent.childList.push(child)
+    return parent.childList.length - 1
   }
 
+  /**
+   * 添加常量到常量池 (别名)
+   */
   addConst(fd: FunctionDef, val: any): number {
-    throw new Error('Not implemented')
+    return this.cpoolAdd(fd, val)
   }
 
-  emitOp(s: FunctionDef, val: number, sourcePos: number = -1): void {
-    throw new Error('Not implemented')
+  /**
+   * 发射 return 指令
+   */
+  emitReturn(fd: FunctionDef, hasVal: boolean): void {
+    if (hasVal) {
+      this.emitOp(fd, Opcode.OP_return)
+    } else {
+      this.emitOp(fd, Opcode.OP_return_undef)
+    }
   }
 
-  emitU8(s: FunctionDef, val: number, sourcePos: number = -1): void {
-    throw new Error('Not implemented')
-  }
-
-  emitU16(s: FunctionDef, val: number): void {
-    throw new Error('Not implemented')
-  }
-
-  emitU32(s: FunctionDef, val: number, sourcePos: number = -1): void {
-    throw new Error('Not implemented')
-  }
-
-  emitPushConst(s: FunctionDef, val: any, asAtom: boolean = false): void {
-    throw new Error('Not implemented')
-  }
-
-  emitAtomOp(s: FunctionDef, val: number, atom: number, sourcePos: number = -1): void {
-    throw new Error('Not implemented')
-  }
-
-  emitReturn(s: FunctionDef, hasVal: boolean): void {
-    throw new Error('Not implemented')
-  }
-
+  /**
+   * 写入 Atom 到输出缓冲区
+   */
   putAtom(out: BytecodeBuilder, atomId: number): void {
-    throw new Error('Not implemented')
+    out.putU32(atomId)
+  }
+
+  /**
+   * 创建 Label 对象 (用于旧式跳转管理)
+   */
+  newLabel(fd: FunctionDef): Label {
+    const label = new Label()
+    label.fd = fd
+    return label
+  }
+
+  /**
+   * 标记 Label 位置
+   */
+  markLabel(fd: FunctionDef, label: Label): void {
+    label.addr = fd.byteCode.size
+    // 回填所有待处理的跳转
+    for (const jump of label.jumps) {
+      const offset = label.addr - (jump.pos + jump.size)
+      if (jump.size === 4) {
+        fd.byteCode.putU32At(jump.pos, offset)
+      }
+    }
+    label.jumps = []
+  }
+
+  /**
+   * 在指定偏移处标记 Label
+   */
+  markLabelAt(fd: FunctionDef, label: Label, offset: number): void {
+    label.addr = offset
+  }
+
+  /**
+   * 发射跳转到 Label
+   */
+  emitJump(fd: FunctionDef, op: number, label: Label): void {
+    this.emitOp(fd, op)
+    const pos = fd.byteCode.size
+    this.emitU32(fd, 0) // placeholder
+    
+    if (label.addr >= 0) {
+      // Label 已定义，直接计算偏移
+      const offset = label.addr - (pos + 4)
+      fd.byteCode.putU32At(pos, offset)
+    } else {
+      // Label 未定义，记录待回填
+      label.jumps.push({ fd, pos, size: 4 })
+    }
   }
 
   writeOutput(fd: FunctionDef): Uint8Array {
-    throw new Error('Not implemented')
-  }
-
-  newLabel(fd: FunctionDef): Label {
-    throw new Error('Not implemented')
-  }
-
-  markLabel(fd: FunctionDef, label: Label): void {
-    throw new Error('Not implemented')
-  }
-
-  markLabelAt(fd: FunctionDef, label: Label, offset: number): void {
-    throw new Error('Not implemented')
-  }
-
-  emitJump(fd: FunctionDef, op: number, label: Label): void {
-    throw new Error('Not implemented')
+    throw new Error('Not implemented - use BytecodeBuilder')
   }
 
   writeFunctionBytecode(out: BytecodeBuilder, fd: FunctionDef) {
@@ -479,6 +1181,458 @@ export class Compiler {
 
   writeUnitOfWork(out: BytecodeBuilder, unitOfWork: any): void {
     
+  }
+
+  // ============================================================================
+  // 阶段 3: 变量定义方法 - 对应 parser.c:2217-2360
+  // ============================================================================
+
+  /**
+   * 在子作用域中查找变量 - 对应 parser.c:find_var_in_child_scope
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1970-1982
+   */
+  findVarInChildScope(fd: FunctionDef, name: number, scopeLevel: number): number {
+    for (let i = 0; i < fd.varCount; i++) {
+      const vd = fd.vars[i]
+      if (vd.varName === name && vd.scopeLevel === 0) {
+        if (this.isChildScope(fd, vd.scopeNext, scopeLevel)) {
+          return i
+        }
+      }
+    }
+    return -1
+  }
+
+  /**
+   * 定义变量 - 对应 parser.c:define_var
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:2217-2360
+   * 
+   * 这是 QuickJS 中最核心的变量定义函数，处理所有类型的变量声明
+   */
+  defineVar(fd: FunctionDef, name: number, varDefType: JSVarDefEnum): number {
+    let idx: number
+
+    switch (varDefType) {
+      case JSVarDefEnum.JS_VAR_DEF_WITH:
+        idx = this.addScopeVar(fd, name, JSVarKindEnum.JS_VAR_NORMAL)
+        break
+
+      case JSVarDefEnum.JS_VAR_DEF_LET:
+      case JSVarDefEnum.JS_VAR_DEF_CONST:
+      case JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL:
+      case JSVarDefEnum.JS_VAR_DEF_NEW_FUNCTION_DECL:
+        // 检查词法声明是否重复
+        idx = this.findLexicalDecl(fd, name, fd.scopeFirst, true)
+        if (idx >= 0) {
+          if (idx < GLOBAL_VAR_OFFSET) {
+            if (fd.vars[idx].scopeLevel === fd.scopeLevel) {
+              // 同一作用域: 非严格模式下函数可以重定义 (annex B.3.3.4)
+              if (!((fd.jsMode & 0x01) === 0 &&  // !JS_MODE_STRICT
+                    varDefType === JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL &&
+                    fd.vars[idx].varKind === JSVarKindEnum.JS_VAR_FUNCTION_DECL)) {
+                throw new Error('invalid redefinition of lexical identifier')
+              }
+            } else if (fd.vars[idx].varKind === JSVarKindEnum.JS_VAR_CATCH &&
+                       (fd.vars[idx].scopeLevel + 2) === fd.scopeLevel) {
+              throw new Error('invalid redefinition of lexical identifier')
+            }
+          } else {
+            if (fd.scopeLevel === fd.bodyScope) {
+              throw new Error('invalid redefinition of lexical identifier')
+            }
+          }
+        }
+
+        // 检查是否重定义参数名
+        if (varDefType !== JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL &&
+            varDefType !== JSVarDefEnum.JS_VAR_DEF_NEW_FUNCTION_DECL &&
+            fd.scopeLevel === fd.bodyScope && 
+            this.findArg(fd, name) >= 0) {
+          throw new Error('invalid redefinition of parameter name')
+        }
+
+        // 检查子作用域中是否有同名变量
+        if (this.findVarInChildScope(fd, name, fd.scopeLevel) >= 0) {
+          throw new Error('invalid redefinition of a variable')
+        }
+
+        // 检查全局变量冲突
+        if (fd.isGlobalVar) {
+          const hf = this.findGlobalVar(fd, name)
+          if (hf && this.isChildScope(fd, hf.scopeLevel, fd.scopeLevel)) {
+            throw new Error('invalid redefinition of global identifier')
+          }
+        }
+
+        // eval 全局/模块作用域的特殊处理
+        if (fd.isEval &&
+            (fd.evalType === 0 /* JS_EVAL_TYPE_GLOBAL */ ||
+             fd.evalType === 1 /* JS_EVAL_TYPE_MODULE */) &&
+            fd.scopeLevel === fd.bodyScope) {
+          const hf = this.addGlobalVar(fd, name)
+          if (!hf) return -1
+          hf.isLexical = true
+          hf.isConst = (varDefType === JSVarDefEnum.JS_VAR_DEF_CONST)
+          idx = GLOBAL_VAR_OFFSET
+        } else {
+          let varKind: JSVarKindEnum
+          if (varDefType === JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL) {
+            varKind = JSVarKindEnum.JS_VAR_FUNCTION_DECL
+          } else if (varDefType === JSVarDefEnum.JS_VAR_DEF_NEW_FUNCTION_DECL) {
+            varKind = JSVarKindEnum.JS_VAR_NEW_FUNCTION_DECL
+          } else {
+            varKind = JSVarKindEnum.JS_VAR_NORMAL
+          }
+          idx = this.addScopeVar(fd, name, varKind)
+          if (idx >= 0) {
+            const vd = fd.vars[idx]
+            vd.isLexical = true
+            vd.isConst = (varDefType === JSVarDefEnum.JS_VAR_DEF_CONST)
+          }
+        }
+        break
+
+      case JSVarDefEnum.JS_VAR_DEF_CATCH:
+        idx = this.addScopeVar(fd, name, JSVarKindEnum.JS_VAR_CATCH)
+        break
+
+      case JSVarDefEnum.JS_VAR_DEF_VAR:
+        // 检查是否与词法变量冲突
+        if (this.findLexicalDecl(fd, name, fd.scopeFirst, false) >= 0) {
+          throw new Error('invalid redefinition of lexical identifier')
+        }
+
+        if (fd.isGlobalVar) {
+          const hf = this.findGlobalVar(fd, name)
+          if (hf && hf.isLexical && hf.scopeLevel === fd.scopeLevel &&
+              fd.evalType === 1 /* JS_EVAL_TYPE_MODULE */) {
+            throw new Error('invalid redefinition of lexical identifier')
+          }
+          const newHf = this.addGlobalVar(fd, name)
+          if (!newHf) return -1
+          idx = GLOBAL_VAR_OFFSET
+        } else {
+          // 如果变量已存在，不再添加
+          idx = this.findVarByAtom(fd, name)
+          if (idx >= 0) break
+          
+          idx = this.addVar(fd, name)
+          if (idx >= 0) {
+            // 对于 arguments 变量的特殊处理
+            if (name === JSAtom.JS_ATOM_arguments && fd.hasArgumentsBinding) {
+              fd.argumentsVarIdx = idx
+            }
+            fd.vars[idx].scopeNext = fd.scopeLevel
+          }
+        }
+        break
+
+      default:
+        throw new Error('Invalid var_def_type')
+    }
+
+    return idx
+  }
+
+  /**
+   * 添加私有类字段 - 对应 parser.c:add_private_class_field
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:2363-2378
+   */
+  addPrivateClassField(fd: FunctionDef, name: number, varKind: JSVarKindEnum, isStatic: boolean): number {
+    const idx = this.addScopeVar(fd, name, varKind)
+    if (idx < 0) return idx
+    
+    const vd = fd.vars[idx]
+    vd.isLexical = true
+    vd.isConst = true
+    vd.isStaticPrivate = isStatic
+    return idx
+  }
+
+  // ============================================================================
+  // 阶段 3: 闭包变量方法 - 对应 parser.c:8812-8900
+  // ============================================================================
+
+  /**
+   * 添加闭包变量 - 对应 parser.c:add_closure_var
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:8812-8848
+   */
+  addClosureVar(
+    fd: FunctionDef,
+    isLocal: boolean,
+    isArg: boolean,
+    varIdx: number,
+    varName: number,
+    isConst: boolean,
+    isLexical: boolean,
+    varKind: JSVarKindEnum
+  ): number {
+    // 闭包变量索引使用 16 位存储
+    if (fd.closureVarCount >= JS_MAX_LOCAL_VARS) {
+      throw new Error('too many closure variables')
+    }
+
+    const cv = new JSClosureVar()
+    cv.isLocal = isLocal
+    cv.isArg = isArg
+    cv.isConst = isConst
+    cv.isLexical = isLexical
+    cv.varKind = varKind
+    cv.varIdx = varIdx
+    cv.varName = varName
+    
+    fd.closureVar.push(cv)
+    return fd.closureVarCount++
+  }
+
+  /**
+   * 查找闭包变量 - 对应 parser.c:find_closure_var
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:8850-8858
+   */
+  findClosureVar(fd: FunctionDef, varName: number): number {
+    for (let i = 0; i < fd.closureVarCount; i++) {
+      if (fd.closureVar[i].varName === varName) {
+        return i
+      }
+    }
+    return -1
+  }
+
+  /**
+   * 获取闭包变量 (递归版本) - 对应 parser.c:get_closure_var2
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:8863-8900
+   * 
+   * 'fd' 必须是 's' 的父函数。在 's' 中创建一个闭包引用
+   * 引用 'fd' 中的局部变量 (isLocal = true) 或闭包 (isLocal = false)
+   */
+  getClosureVar2(
+    s: FunctionDef,
+    fd: FunctionDef,
+    isLocal: boolean,
+    isArg: boolean,
+    varIdx: number,
+    varName: number,
+    isConst: boolean,
+    isLexical: boolean,
+    varKind: JSVarKindEnum
+  ): number {
+    // 如果 fd 不是 s 的直接父函数，需要递归
+    if (fd !== s.parent) {
+      if (!s.parent) {
+        throw new Error('Invalid parent function')
+      }
+      varIdx = this.getClosureVar2(
+        s.parent,
+        fd,
+        isLocal,
+        isArg,
+        varIdx,
+        varName,
+        isConst,
+        isLexical,
+        varKind
+      )
+      if (varIdx < 0) return -1
+      isLocal = false
+    }
+
+    // 检查是否已存在相同的闭包变量
+    for (let i = 0; i < s.closureVarCount; i++) {
+      const cv = s.closureVar[i]
+      if (cv.varIdx === varIdx && cv.isArg === isArg && cv.isLocal === isLocal) {
+        return i
+      }
+    }
+
+    // 添加新的闭包变量
+    return this.addClosureVar(
+      s,
+      isLocal,
+      isArg,
+      varIdx,
+      varName,
+      isConst,
+      isLexical,
+      varKind
+    )
+  }
+
+  /**
+   * 获取闭包变量 - 对应 parser.c:get_closure_var
+   * 
+   * 简化版本，从父函数获取闭包变量
+   */
+  getClosureVar(
+    s: FunctionDef,
+    fd: FunctionDef,
+    isLocal: boolean,
+    isArg: boolean,
+    varIdx: number,
+    varName: number,
+    isConst: boolean,
+    isLexical: boolean,
+    varKind: JSVarKindEnum
+  ): number {
+    return this.getClosureVar2(s, fd, isLocal, isArg, varIdx, varName, isConst, isLexical, varKind)
+  }
+
+  // ============================================================================
+  // 阶段 3: Break/Continue 管理方法 - 对应 parser.c:6309-6380
+  // ============================================================================
+
+  /**
+   * 压入 break 条目 - 对应 parser.c:push_break_entry
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:6309-6326
+   */
+  pushBreakEntry(
+    fd: FunctionDef,
+    be: BlockEnv,
+    labelName: number,
+    labelBreak: number,
+    labelCont: number,
+    dropCount: number
+  ): void {
+    be.prev = fd.topBreak
+    fd.topBreak = be
+    be.labelName = labelName
+    be.labelBreak = labelBreak
+    be.labelCont = labelCont
+    be.dropCount = dropCount
+    be.labelFinally = -1
+    be.scopeLevel = fd.scopeLevel
+    be.hasIterator = false
+    be.isRegularStmt = false
+  }
+
+  /**
+   * 弹出 break 条目 - 对应 parser.c:pop_break_entry
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:6328-6332
+   */
+  popBreakEntry(fd: FunctionDef): void {
+    const be = fd.topBreak
+    if (be) {
+      fd.topBreak = be.prev
+    }
+  }
+
+  /**
+   * 发射 break/continue - 对应 parser.c:emit_break
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:6334-6380
+   * 
+   * @param fd 函数定义
+   * @param name 标签名 (0 表示 JS_ATOM_NULL)
+   * @param isCont true 表示 continue，false 表示 break
+   */
+  emitBreak(fd: FunctionDef, name: number, isCont: boolean): void {
+    let scopeLevel = fd.scopeLevel
+    let top = fd.topBreak
+
+    while (top !== null) {
+      // 关闭作用域
+      this.closeScopes(fd, scopeLevel, top.scopeLevel)
+      scopeLevel = top.scopeLevel
+
+      // continue: 查找匹配的循环
+      if (isCont && top.labelCont !== -1 &&
+          (name === 0 || top.labelName === name)) {
+        this.emitGotoInt(fd, Opcode.OP_goto, top.labelCont)
+        return
+      }
+
+      // break: 查找匹配的循环或 switch
+      if (!isCont && top.labelBreak !== -1 &&
+          ((name === 0 && !top.isRegularStmt) ||
+           top.labelName === name)) {
+        this.emitGotoInt(fd, Opcode.OP_goto, top.labelBreak)
+        return
+      }
+
+      // 处理迭代器和栈清理
+      let i = 0
+      if (top.hasIterator) {
+        this.emitOp(fd, Opcode.OP_iterator_close)
+        i += 3
+      }
+      for (; i < top.dropCount; i++) {
+        this.emitOp(fd, Opcode.OP_drop)
+      }
+
+      // 处理 finally
+      if (top.labelFinally !== -1) {
+        this.emitOp(fd, Opcode.OP_undefined)
+        this.emitGotoInt(fd, Opcode.OP_gosub, top.labelFinally)
+        this.emitOp(fd, Opcode.OP_drop)
+      }
+
+      top = top.prev
+    }
+
+    // 错误: 找不到匹配的循环或标签
+    if (name === 0) {
+      if (isCont) {
+        throw new Error('continue must be inside loop')
+      } else {
+        throw new Error('break must be inside loop or switch')
+      }
+    } else {
+      throw new Error('break/continue label not found')
+    }
+  }
+
+  /**
+   * 执行 finally 块后返回 - 对应 parser.c:emit_return
+   * 
+   * 注意: 这是增强版的 return，处理 finally 块
+   */
+  emitReturnWithFinally(fd: FunctionDef, hasReturnValue: boolean): void {
+    let scopeLevel = fd.scopeLevel
+    let top = fd.topBreak
+
+    while (top !== null) {
+      // 关闭作用域
+      this.closeScopes(fd, scopeLevel, top.scopeLevel)
+      scopeLevel = top.scopeLevel
+
+      // 处理迭代器和栈清理
+      let i = 0
+      if (top.hasIterator) {
+        // 使用 OP_iterator_close 加额外参数表示 return 模式
+        this.emitOp(fd, Opcode.OP_iterator_close)
+        i += 3
+      }
+      for (; i < top.dropCount; i++) {
+        this.emitOp(fd, Opcode.OP_drop)
+      }
+
+      // 处理 finally
+      if (top.labelFinally !== -1) {
+        // 保存返回值，执行 finally，然后恢复
+        if (hasReturnValue) {
+          this.emitOp(fd, Opcode.OP_nip) // 保存返回值
+        }
+        this.emitGotoInt(fd, Opcode.OP_gosub, top.labelFinally)
+        if (hasReturnValue) {
+          this.emitOp(fd, Opcode.OP_drop)
+        }
+      }
+
+      top = top.prev
+    }
+
+    // 关闭到函数作用域
+    this.closeScopes(fd, scopeLevel, 0)
+    
+    // 发射 return
+    this.emitReturn(fd, hasReturnValue)
   }
 
 

@@ -6,6 +6,7 @@ async function main() {
   const envPath = resolve(process.cwd(), 'src/env.ts')
   
   const compileFlags = await QuickJSLib.getCompileEnums()
+  const putLValueEnum = await QuickJSLib.getPutLValueEnum()
   const bytecodeTags = await QuickJSLib.getAllBytecodeTags()
   const functionKinds = await QuickJSLib.getFunctionKinds()
   const jsModes = await QuickJSLib.getJSModes()
@@ -17,6 +18,7 @@ async function main() {
   const bytecodeVersion = await QuickJSLib.getBytecodeVersion()
   const compileOptions = await QuickJSLib.getCompileOptions()
   const firstAtomId = await QuickJSLib.getFirstAtomId()
+  const globalVarOffset = await QuickJSLib.getGlobalVarOffset()
   const argumentVarOffset = await QuickJSLib.getArgumentVarOffset()
   const argScopeIndex = await QuickJSLib.getArgScopeIndex()
   const argScopeEnd = await QuickJSLib.getArgScopeEnd()
@@ -31,6 +33,7 @@ async function main() {
   lines.push(``)
 
   // Constants
+  lines.push(`export const GLOBAL_VAR_OFFSET = ${globalVarOffset}`)
   lines.push(`export const ARGUMENT_VAR_OFFSET = ${argumentVarOffset}`)
   lines.push(`export const ARG_SCOPE_INDEX = ${argScopeIndex}`)
   lines.push(`export const ARG_SCOPE_END = ${argScopeEnd}`)
@@ -42,6 +45,14 @@ async function main() {
   // CompileFlags
   lines.push(`export enum CompileFlags {`)
   for (const [key, value] of Object.entries(compileFlags)) {
+    lines.push(`  ${key} = ${value},`)
+  }
+  lines.push(`}`)
+  lines.push(``)
+
+  // PutLValueEnum
+  lines.push(`export enum PutLValueEnum {`)
+  for (const [key, value] of Object.entries(putLValueEnum)) {
     lines.push(`  ${key} = ${value},`)
   }
   lines.push(`}`)
@@ -192,6 +203,13 @@ async function main() {
   lines.push(`  compileOptions: number`)
   lines.push(`  firstAtomId: number`)
   lines.push(`  supportsShortOpcodes: boolean`)
+  lines.push(`  globalVarOffset: number`)
+  lines.push(`  argumentVarOffset: number`)
+  lines.push(`  argScopeIndex: number`)
+  lines.push(`  argScopeEnd: number`)
+  lines.push(`  debugScopeIndex: number`)
+  lines.push(`  maxLocalVars: number`)
+  lines.push(`  stackSizeMax: number`)
   lines.push(`}`)
   lines.push(``)
 
@@ -201,6 +219,13 @@ async function main() {
   lines.push(`  compileOptions: ${compileOptions},`)
   lines.push(`  firstAtomId: ${firstAtomId},`)
   lines.push(`  supportsShortOpcodes: true,`)
+  lines.push(`  globalVarOffset: ${globalVarOffset},`)
+  lines.push(`  argumentVarOffset: ${argumentVarOffset},`)
+  lines.push(`  argScopeIndex: ${argScopeIndex},`)
+  lines.push(`  argScopeEnd: ${argScopeEnd},`)
+  lines.push(`  debugScopeIndex: ${debugScopeIndex},`)
+  lines.push(`  maxLocalVars: ${maxLocalVars},`)
+  lines.push(`  stackSizeMax: ${stackSizeMax},`)
   lines.push(`} as const`)
   lines.push(``)
 

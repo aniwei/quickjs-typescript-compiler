@@ -1,17 +1,27 @@
 import { BytecodeBuilder } from './BytecodeBuilder'
-import { 
-  JSAtom,
-  ARGUMENT_VAR_OFFSET,
-  ARG_SCOPE_INDEX,
-  ARG_SCOPE_END,
-  DEBUG_SCOPE_INDEX,
-  JS_MAX_LOCAL_VARS,
-  JS_STACK_SIZE_MAX
-} from '../env'
+import { JSAtom } from '../env'
 
 // ============================================================================
 // 常量定义 - 对应 QuickJS types.h / parser.h
 // ============================================================================
+
+/** 参数变量偏移量，用于区分参数和局部变量 */
+export const ARGUMENT_VAR_OFFSET = 0x10000
+
+/** 参数作用域索引 - parser.h:ARG_SCOPE_INDEX */
+export const ARG_SCOPE_INDEX = 1
+
+/** 参数作用域结束标记 - parser.h:ARG_SCOPE_END */
+export const ARG_SCOPE_END = -2
+
+/** 调试作用域索引 - parser.h:DEBUG_SCOP_INDEX */
+export const DEBUG_SCOPE_INDEX = -3
+
+/** 最大局部变量数 - types.h:JS_MAX_LOCAL_VARS */
+export const JS_MAX_LOCAL_VARS = 65534
+
+/** 最大栈大小 - types.h:JS_STACK_SIZE_MAX */
+export const JS_STACK_SIZE_MAX = 65534
 
 // ============================================================================
 // 枚举定义 - 对应 QuickJS types.h / parser.h

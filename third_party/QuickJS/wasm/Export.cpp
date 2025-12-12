@@ -23,6 +23,13 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .value("COMPILE_FLAG_BIGNUM", COMPILE_FLAG_BIGNUM)
     .value("COMPILE_FLAG_SHORT_OPCODES", COMPILE_FLAG_SHORT_OPCODES);
 
+  enum_<PutLValueEnum>("PutLValueEnum")
+    .value("PUT_LVALUE_NOKEEP", PUT_LVALUE_NOKEEP)
+    .value("PUT_LVALUE_NOKEEP_DEPTH", PUT_LVALUE_NOKEEP_DEPTH)
+    .value("PUT_LVALUE_KEEP_TOP", PUT_LVALUE_KEEP_TOP)
+    .value("PUT_LVALUE_KEEP_SECOND", PUT_LVALUE_KEEP_SECOND)
+    .value("PUT_LVALUE_NOKEEP_BOTTOM", PUT_LVALUE_NOKEEP_BOTTOM);
+
   class_<Op>("Op")
     .constructor<>()
     .property("id", &Op::id)
@@ -72,6 +79,7 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .class_function("getBytecodeVersion", &QuickJSBinding::getBytecodeVersion)
     .class_function("getCompileOptions", &QuickJSBinding::getCompileOptions)
     .class_function("getFirstAtomId", &QuickJSBinding::getFirstAtomId)
+    .class_function("getGlobalVarOffset", &QuickJSBinding::getGlobalVarOffset)
     .class_function("getArgumentVarOffset", &QuickJSBinding::getArgumentVarOffset)
     .class_function("getArgScopeIndex", &QuickJSBinding::getArgScopeIndex)
     .class_function("getArgScopeEnd", &QuickJSBinding::getArgScopeEnd)

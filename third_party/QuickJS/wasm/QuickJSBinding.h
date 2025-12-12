@@ -15,6 +15,14 @@ enum CompileFlags {
   COMPILE_FLAG_SHORT_OPCODES = 1 << 2,
 };
 
+enum PutLValueEnum {
+  PUT_LVALUE_NOKEEP = 0,
+  PUT_LVALUE_NOKEEP_DEPTH = 1,
+  PUT_LVALUE_KEEP_TOP = 2,
+  PUT_LVALUE_KEEP_SECOND = 3,
+  PUT_LVALUE_NOKEEP_BOTTOM = 4,
+};
+
 struct Op {
   uint32_t id;
   std::string name;
@@ -79,6 +87,7 @@ class QuickJSBinding {
   static uint32_t getCompileOptions();
   static uint32_t getFirstAtomId();
 
+  static uint32_t getGlobalVarOffset();
   static uint32_t getArgumentVarOffset();
   static int32_t getArgScopeIndex();
   static int32_t getArgScopeEnd();

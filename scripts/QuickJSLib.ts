@@ -136,6 +136,19 @@ export class QuickJSLib {
     return enums
   }
 
+  static async getPutLValueEnum(): Promise<Record<string, number>> {
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const enums: Record<string, number> = {}
+
+    enums['PUT_LVALUE_NOKEEP'] = WasmInstance.PutLValueEnum.PUT_LVALUE_NOKEEP.value
+    enums['PUT_LVALUE_NOKEEP_DEPTH'] = WasmInstance.PutLValueEnum.PUT_LVALUE_NOKEEP_DEPTH.value
+    enums['PUT_LVALUE_KEEP_TOP'] = WasmInstance.PutLValueEnum.PUT_LVALUE_KEEP_TOP.value
+    enums['PUT_LVALUE_KEEP_SECOND'] = WasmInstance.PutLValueEnum.PUT_LVALUE_KEEP_SECOND.value
+    enums['PUT_LVALUE_NOKEEP_BOTTOM'] = WasmInstance.PutLValueEnum.PUT_LVALUE_NOKEEP_BOTTOM.value
+
+    return enums
+  }
+
   static async getOpcodes() {
     const WasmInstance = await QuickJSLib.getWasmInstance()
     const vec = WasmInstance.QuickJSBinding.getOpcodes()
@@ -199,6 +212,11 @@ export class QuickJSLib {
   static async getFirstAtomId(): Promise<number> {
     const WasmInstance = await this.getWasmInstance();
     return WasmInstance.QuickJSBinding.getFirstAtomId();
+  }
+
+  static async getGlobalVarOffset(): Promise<number> {
+    const WasmInstance = await this.getWasmInstance();
+    return WasmInstance.QuickJSBinding.getGlobalVarOffset();
   }
 
   static async getArgumentVarOffset(): Promise<number> {

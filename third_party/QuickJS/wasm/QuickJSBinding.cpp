@@ -299,6 +299,10 @@ namespace quickjs {
     return JS_ATOM_END;
   }
 
+  uint32_t QuickJSBinding::getGlobalVarOffset() {
+    return GLOBAL_VAR_OFFSET;
+  }
+
   uint32_t QuickJSBinding::getArgumentVarOffset() {
     return ARGUMENT_VAR_OFFSET;
   }
