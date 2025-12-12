@@ -201,6 +201,36 @@ export class QuickJSLib {
     return WasmInstance.QuickJSBinding.getFirstAtomId();
   }
 
+  static async getArgumentVarOffset(): Promise<number> {
+    const WasmInstance = await this.getWasmInstance();
+    return WasmInstance.QuickJSBinding.getArgumentVarOffset();
+  }
+
+  static async getArgScopeIndex(): Promise<number> {
+    const WasmInstance = await this.getWasmInstance();
+    return WasmInstance.QuickJSBinding.getArgScopeIndex();
+  }
+
+  static async getArgScopeEnd(): Promise<number> {
+    const WasmInstance = await this.getWasmInstance();
+    return WasmInstance.QuickJSBinding.getArgScopeEnd();
+  }
+
+  static async getDebugScopeIndex(): Promise<number> {
+    const WasmInstance = await this.getWasmInstance();
+    return WasmInstance.QuickJSBinding.getDebugScopeIndex();
+  }
+
+  static async getMaxLocalVars(): Promise<number> {
+    const WasmInstance = await this.getWasmInstance();
+    return WasmInstance.QuickJSBinding.getMaxLocalVars();
+  }
+
+  static async getStackSizeMax(): Promise<number> {
+    const WasmInstance = await this.getWasmInstance();
+    return WasmInstance.QuickJSBinding.getStackSizeMax();
+  }
+
   static async getOpcodeName(opcode: number): Promise<string> {
     const WasmInstance = await this.getWasmInstance();
     return WasmInstance.QuickJSBinding.getOpcodeName(opcode);

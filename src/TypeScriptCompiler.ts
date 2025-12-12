@@ -48,7 +48,7 @@ export class TypeScriptCompiler implements CompilerContext {
     this.literalVisitor = new LiteralVisitor(this)
     this.identifierVisitor = new IdentifierVisitor(this)
     this.thisVisitor = new ThisVisitor(this)
-    this.variableHoister = new HoistVariables(this)
+    this.variableHoister = new HoistVariablesVisitor(this)
     // this.compiler.addAtom('undefined')
   }
 

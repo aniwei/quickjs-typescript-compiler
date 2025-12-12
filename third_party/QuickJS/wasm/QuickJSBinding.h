@@ -79,6 +79,13 @@ class QuickJSBinding {
   static uint32_t getCompileOptions();
   static uint32_t getFirstAtomId();
 
+  static uint32_t getArgumentVarOffset();
+  static int32_t getArgScopeIndex();
+  static int32_t getArgScopeEnd();
+  static int32_t getDebugScopeIndex();
+  static int32_t getMaxLocalVars();
+  static int32_t getStackSizeMax();
+
   static std::vector<BytecodeTag> getBytecodeTags();
   static std::vector<FunctionKind> getFunctionKinds();
   static std::vector<JSMode> getJSModes();

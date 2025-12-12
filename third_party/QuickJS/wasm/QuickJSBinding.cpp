@@ -4,6 +4,8 @@
 #include "QuickJS/extension/taro_js_bytecode.h"
 #include "QuickJS/extension/taro_js_types.h"
 #include "QuickJSBinding.h"
+#include "../src/core/types.h"
+#include "../src/core/builtins/js-function.h"
 
 namespace quickjs {
   std::string getException(JSContext *context, JSValue module) {
@@ -295,6 +297,30 @@ namespace quickjs {
 
   uint32_t QuickJSBinding::getFirstAtomId() {
     return JS_ATOM_END;
+  }
+
+  uint32_t QuickJSBinding::getArgumentVarOffset() {
+    return ARGUMENT_VAR_OFFSET;
+  }
+
+  int32_t QuickJSBinding::getArgScopeIndex() {
+    return ARG_SCOPE_INDEX;
+  }
+
+  int32_t QuickJSBinding::getArgScopeEnd() {
+    return ARG_SCOPE_END;
+  }
+
+  int32_t QuickJSBinding::getDebugScopeIndex() {
+    return DEBUG_SCOP_INDEX;
+  }
+
+  int32_t QuickJSBinding::getMaxLocalVars() {
+    return JS_MAX_LOCAL_VARS;
+  }
+
+  int32_t QuickJSBinding::getStackSizeMax() {
+    return JS_STACK_SIZE_MAX;
   }
 
   std::vector<JSMode> QuickJSBinding::getJSModes() {

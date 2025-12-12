@@ -1,5 +1,5 @@
 import ts from 'typescript'
-import { VisitorContext } from './VisitorContext'
+import { VisitorContext } from './visitors/VisitorContext'
 import { CompilerContext } from './CompilerContext'
 import { FunctionKind } from '../env'
 import { JSVarKind } from './FunctionDef'
