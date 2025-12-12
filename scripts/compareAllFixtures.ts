@@ -124,7 +124,7 @@ async function main() {
 
 function parseArgs(args: string[]): RunnerOptions {
   const options: RunnerOptions = {
-    fixturesDir: path.resolve('__tests__/compiler/fixtures'),
+    fixturesDir: path.resolve('__tests__/fixtures'),
     disasm: false,
     asm: false,
     sideBySide: false,

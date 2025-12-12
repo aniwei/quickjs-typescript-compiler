@@ -8,7 +8,7 @@ import {
   JSVarKindEnum,
   JS_STACK_SIZE_MAX,
 } from './FunctionDef'
-import { Opcode, OPCODE_DEFS, JSAtom, OpFormat } from '../env'
+import { Opcode, OPCODE_DEFS, OPCODE_BY_CODE, JSAtom, OpFormat } from '../env'
 import { BytecodeBuilder } from './BytecodeBuilder'
 import { Compiler } from './Compiler'
 
@@ -125,7 +125,7 @@ export class LabelResolver {
     let pos = 0
     while (pos < bcLen) {
       const op = bcBuf[pos]
-      const opDef = OPCODE_DEFS[op]
+      const opDef = OPCODE_BY_CODE[op]
       if (!opDef) {
         throw new Error(`Unknown opcode: ${op} at position ${pos}`)
       }
@@ -772,7 +772,7 @@ export class LabelResolver {
         const op = bcBuf[pos]
         
         if (op === Opcode.OP_line_num || op === Opcode.OP_label) {
-          pos += OPCODE_DEFS[op]?.size ?? 5
+          pos += OPCODE_BY_CODE[op]?.size ?? 5
           continue
         }
         
@@ -850,7 +850,7 @@ export class LabelResolver {
   ): number {
     while (pos < bcLen) {
       const op = bcBuf[pos]
-      const opDef = OPCODE_DEFS[op]
+      const opDef = OPCODE_BY_CODE[op]
       if (!opDef) break
       
       const len = opDef.size
@@ -911,7 +911,7 @@ export class LabelResolver {
       }
       
       // 读取操作码参数
-      const opDef = OPCODE_DEFS[op]
+      const opDef = OPCODE_BY_CODE[op]
       if (!opDef) return false
       
       cc.op = op

@@ -3,7 +3,7 @@ import {
   FunctionDef, 
   JS_STACK_SIZE_MAX,
 } from './FunctionDef'
-import { Opcode, OPCODE_DEFS, OpFormat } from '../env'
+import { Opcode, OPCODE_DEFS, OPCODE_BY_CODE, OpFormat } from '../env'
 import { Compiler } from './Compiler'
 
 // ============================================================================
@@ -87,7 +87,7 @@ export class StackSizeComputer {
         throw new Error(`Invalid opcode: ${op} at position ${pos}`)
       }
       
-      const opDef = OPCODE_DEFS[op]
+      const opDef = OPCODE_BY_CODE[op]
       if (!opDef) {
         throw new Error(`Unknown opcode: ${op} at position ${pos}`)
       }

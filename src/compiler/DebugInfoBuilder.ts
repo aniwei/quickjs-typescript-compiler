@@ -20,16 +20,17 @@ import {
   LineNumberSlot,
   GetLineColCache,
 } from './FunctionDef'
+import { PC2Line } from '../env'
 
 // ============================================================================
-// 常量定义 - 对应 QuickJS taro_js_types.h
+// 常量定义 - 从 env.ts 的 PC2Line 枚举导入
 // ============================================================================
 
 /** PC2LINE 编码常量 */
-export const PC2LINE_BASE = -1
-export const PC2LINE_RANGE = 5
-export const PC2LINE_OP_FIRST = 1
-export const PC2LINE_DIFF_PC_MAX = Math.floor((255 - PC2LINE_OP_FIRST) / PC2LINE_RANGE)
+export const PC2LINE_BASE = PC2Line.PC2LINE_BASE
+export const PC2LINE_RANGE = PC2Line.PC2LINE_RANGE
+export const PC2LINE_OP_FIRST = PC2Line.PC2LINE_OP_FIRST
+export const PC2LINE_DIFF_PC_MAX = PC2Line.PC2LINE_DIFF_PC_MAX
 
 // ============================================================================
 // DebugInfoBuilder 类

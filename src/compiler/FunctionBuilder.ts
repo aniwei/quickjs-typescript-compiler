@@ -23,42 +23,24 @@ import {
   ARG_SCOPE_INDEX,
   ARG_SCOPE_END,
 } from './FunctionDef'
+import {
+  BytecodeTag,
+  PC2Line,
+  env,
+} from '../env'
 
 // ============================================================================
-// 常量定义 - 对应 QuickJS bytecode.cpp / taro_js_types.h
+// 常量定义 - 从 env.ts 导入
 // ============================================================================
 
-/** BC_VERSION - 字节码版本号 */
-export const BC_VERSION = 0x45
+/** BC_VERSION - 字节码版本号 (从 env 读取) */
+export const BC_VERSION = env.bytecodeVersion
 
-/** BC_TAG - 字节码标签 */
-export enum BCTag {
-  BC_TAG_NULL = 1,
-  BC_TAG_UNDEFINED = 2,
-  BC_TAG_BOOL_FALSE = 3,
-  BC_TAG_BOOL_TRUE = 4,
-  BC_TAG_INT32 = 5,
-  BC_TAG_FLOAT64 = 6,
-  BC_TAG_STRING = 7,
-  BC_TAG_OBJECT = 8,
-  BC_TAG_ARRAY = 9,
-  BC_TAG_BIG_INT = 10,
-  BC_TAG_TEMPLATE_OBJECT = 11,
-  BC_TAG_FUNCTION_BYTECODE = 12,
-  BC_TAG_MODULE = 13,
-  BC_TAG_TYPED_ARRAY = 14,
-  BC_TAG_ARRAY_BUFFER = 15,
-  BC_TAG_SHARED_ARRAY_BUFFER = 16,
-  BC_TAG_DATE = 17,
-  BC_TAG_OBJECT_VALUE = 18,
-  BC_TAG_OBJECT_REFERENCE = 19,
-}
-
-/** PC2LINE 编码常量 - 对应 taro_js_types.h */
-export const PC2LINE_BASE = -1
-export const PC2LINE_RANGE = 5
-export const PC2LINE_OP_FIRST = 1
-export const PC2LINE_DIFF_PC_MAX = Math.floor((255 - PC2LINE_OP_FIRST) / PC2LINE_RANGE)
+/** PC2LINE 编码常量 - 从 env.ts 的 PC2Line 枚举导入 */
+export const PC2LINE_BASE = PC2Line.PC2LINE_BASE
+export const PC2LINE_RANGE = PC2Line.PC2LINE_RANGE
+export const PC2LINE_OP_FIRST = PC2Line.PC2LINE_OP_FIRST
+export const PC2LINE_DIFF_PC_MAX = PC2Line.PC2LINE_DIFF_PC_MAX
 
 // ============================================================================
 // JSFunctionBytecode 结构 - 对应 types.h:464-510
@@ -298,6 +280,8 @@ export class FunctionBuilder {
 // BytecodeWriter 类 - 序列化字节码
 // ============================================================================
 
+import { Compiler } from './Compiler'
+
 /**
  * BytecodeWriter - 将 JSFunctionBytecode 序列化为二进制格式
  * 
@@ -307,11 +291,13 @@ export class BytecodeWriter {
   private out: BytecodeBuilder
   private atomToIdx: Map<number, number>
   private idxToAtom: number[]
+  private compiler: Compiler | null
   
-  constructor() {
+  constructor(compiler?: Compiler) {
     this.out = new BytecodeBuilder()
     this.atomToIdx = new Map()
     this.idxToAtom = []
+    this.compiler = compiler || null
   }
   
   /**
@@ -341,7 +327,7 @@ export class BytecodeWriter {
    */
   private writeFunctionBytecode(b: JSFunctionBytecode): void {
     // 写入标签 - bytecode.cpp:453
-    this.out.putByte(BCTag.BC_TAG_FUNCTION_BYTECODE)
+    this.out.putByte(BytecodeTag.TC_TAG_FUNCTION_BYTECODE)
     
     // 构建标志位 - bytecode.cpp:455-470
     let flags = 0
@@ -459,28 +445,28 @@ export class BytecodeWriter {
    */
   private writeConstant(val: any): void {
     if (val === null) {
-      this.out.putByte(BCTag.BC_TAG_NULL)
+      this.out.putByte(BytecodeTag.TC_TAG_NULL)
     } else if (val === undefined) {
-      this.out.putByte(BCTag.BC_TAG_UNDEFINED)
+      this.out.putByte(BytecodeTag.TC_TAG_UNDEFINED)
     } else if (typeof val === 'boolean') {
-      this.out.putByte(val ? BCTag.BC_TAG_BOOL_TRUE : BCTag.BC_TAG_BOOL_FALSE)
+      this.out.putByte(val ? BytecodeTag.TC_TAG_BOOL_TRUE : BytecodeTag.TC_TAG_BOOL_FALSE)
     } else if (typeof val === 'number') {
       if (Number.isInteger(val) && val >= -2147483648 && val <= 2147483647) {
-        this.out.putByte(BCTag.BC_TAG_INT32)
+        this.out.putByte(BytecodeTag.TC_TAG_INT32)
         this.out.putU32(val | 0)
       } else {
-        this.out.putByte(BCTag.BC_TAG_FLOAT64)
+        this.out.putByte(BytecodeTag.TC_TAG_FLOAT64)
         this.putFloat64(val)
       }
     } else if (typeof val === 'string') {
-      this.out.putByte(BCTag.BC_TAG_STRING)
+      this.out.putByte(BytecodeTag.TC_TAG_STRING)
       this.writeString(val)
     } else if (val instanceof JSFunctionBytecode) {
       // 嵌套函数
       this.writeFunctionBytecode(val)
     } else {
       // 其他类型暂不支持
-      this.out.putByte(BCTag.BC_TAG_NULL)
+      this.out.putByte(BytecodeTag.TC_TAG_NULL)
     }
   }
   
@@ -559,12 +545,14 @@ export class BytecodeWriter {
     atomsOut.putULEB128(this.idxToAtom.length)
     
     // 写入每个 atom 字符串
-    // 注意: 这里需要 AtomTable 来获取 atom 对应的字符串
-    // 简化实现：假设 atom 就是索引
+    const encoder = new TextEncoder()
     for (const atom of this.idxToAtom) {
-      // 需要从 AtomTable 获取字符串
-      // 这里暂时写入空字符串占位
-      atomsOut.putULEB128(0) // 空字符串
+      // 从 Compiler 获取 atom 对应的字符串
+      const str = this.compiler?.getAtomString(atom) || ''
+      const bytes = encoder.encode(str)
+      // 长度 << 1 | is_wide_char (UTF-8 不是 wide char)
+      atomsOut.putULEB128(bytes.length << 1)
+      atomsOut.put(bytes)
     }
     
     // 合并: atoms 头部 + 函数体

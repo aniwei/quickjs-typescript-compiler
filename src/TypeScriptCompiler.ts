@@ -1,7 +1,7 @@
 import ts from 'typescript'
 import { Compiler, Label } from './compiler/Compiler'
-import { FunctionDef, JSVarKind, JSVarDef, JSClosureVar } from './compiler/FunctionDef'
-import { JSAtom, JSMode, Opcode, FunctionKind } from './env'
+import { FunctionDef, JSVarKind, JSVarDef, JSClosureVar, JSVarScope } from './compiler/FunctionDef'
+import { JSAtom, JSMode, Opcode, FunctionKind, OPCODE_BY_CODE } from './env'
 import { ScopeManager, VarInfo, Scope } from './compiler/ScopeManager'
 import { LabelManager, LoopInfo } from './compiler/LabelManager'
 
@@ -15,6 +15,9 @@ import { IdentifierVisitor } from './compiler/visitors/IdentifierVisitor'
 import { ThisVisitor } from './compiler/visitors/ThisVisitor'
 import { HoistVariablesVisitor } from './compiler/HoistVariablesVisitor'
 import { VariableResolver } from './compiler/VariableResolver'
+import { LabelResolver } from './compiler/LabelResolver'
+import { StackSizeComputer } from './compiler/StackSizeComputer'
+import { FunctionBuilder, BytecodeWriter } from './compiler/FunctionBuilder'
 
 export class TypeScriptCompiler implements CompilerContext {
   public compiler: Compiler
@@ -69,7 +72,148 @@ export class TypeScriptCompiler implements CompilerContext {
   }
 
   compile(source: string, filename: string = 'input.ts'): Uint8Array {
-    throw new Error('Not implemented yet')
+    /**
+     * 编译入口 - 对应 QuickJS parser.c:13579-13697 (__JS_EvalInternal)
+     * 
+     * 流程:
+     * 1. 创建 FunctionDef (js_new_function_def)
+     * 2. 初始化作用域 (push_scope for body scope)
+     * 3. 遍历 TypeScript AST 并发射字节码
+     * 4. 发射 return 指令
+     * 5. 调用 VariableResolver.resolve() (resolve_variables)
+     * 6. 调用 LabelResolver.resolve() (resolve_labels)
+     * 7. 调用 StackSizeComputer.compute() (compute_stack_size)
+     * 8. 调用 FunctionBuilder.build() 和 BytecodeWriter.write() 序列化
+     */
+    
+    // 1. 解析 TypeScript 源码
+    const sourceFile = ts.createSourceFile(
+      filename,
+      source,
+      ts.ScriptTarget.ESNext,
+      true,
+      ts.ScriptKind.TS
+    )
+    
+    // 设置 sourceFile 到 compiler
+    this.compiler.setSourceFile(sourceFile)
+    
+    // 2. 创建根 FunctionDef - 对应 js_new_function_def (parser.c:8215-8285)
+    const fd = new FunctionDef()
+    fd.isEval = true
+    fd.evalType = 1 // JS_EVAL_TYPE_GLOBAL
+    fd.isGlobalVar = true
+    fd.hasThisBinding = true
+    fd.newTargetAllowed = false
+    fd.superCallAllowed = false
+    fd.superAllowed = false
+    fd.argumentsAllowed = true
+    fd.funcName = this.compiler.addAtom('<eval>')
+    fd.filename = this.compiler.addAtom(filename)
+    fd.source = source
+    fd.sourceLen = source.length
+    fd.sourcePos = 0
+    
+    // 初始化作用域数组 - parser.c:8261-8268
+    fd.scopes = [new JSVarScope(), new JSVarScope(), new JSVarScope(), new JSVarScope()]
+    fd.scopeSize = 4
+    fd.scopeCount = 1
+    fd.scopes[0].first = -1
+    fd.scopes[0].parent = -1
+    fd.scopeLevel = 0
+    fd.scopeFirst = -1
+    fd.bodyScope = -1
+    
+    // 设置当前函数定义
+    this.setFuncDef(fd)
+    
+    // 3. 推入 body scope - 对应 push_scope(s) (parser.c:13659)
+    this.compiler.pushScope(fd)
+    fd.bodyScope = fd.scopeLevel
+    
+    // 4. 添加隐藏变量 _ret_ 用于返回值 - 对应 parser.c:13499-13502
+    const retAtom = this.compiler.addAtom('_ret_')
+    const retIdx = this.compiler.addVar(fd, retAtom)
+    fd.evalRetIdx = retIdx
+    
+    // 5. 遍历源文件的每个语句并发射字节码
+    for (const statement of sourceFile.statements) {
+      this.visitStatement(statement)
+    }
+    
+    // 6. 发射 return 指令 - 对应 parser.c:13504-13533
+    // 对于全局 eval，返回 _ret_ 变量的值
+    this.compiler.emitOp(fd, Opcode.OP_get_loc)
+    this.compiler.emitU16(fd, fd.evalRetIdx)
+    this.compiler.emitReturn(fd, true)
+    
+    // 7. 调用后端处理 - 对应 js_create_function (parser.c:12439-12705)
+    
+    // 7.1 解析变量 - resolve_variables (parser.c:10456-10800)
+    this.variableResolver.resolve(fd)
+    
+    // 7.2 解析标签 - resolve_labels (parser.c:11088-12120)
+    const labelResolver = new LabelResolver(this)
+    labelResolver.resolve(fd)
+    
+    // 7.3 计算栈大小 - compute_stack_size (parser.c:12191-12380)
+    const stackComputer = new StackSizeComputer(this)
+    const stackSize = stackComputer.compute(fd)
+    if (stackSize < 0) {
+      throw new Error('Stack size computation failed')
+    }
+    fd.stackSize = stackSize
+    
+    // 7.4 计算 pc2line 调试信息
+    this.compiler.computePc2LineInfo(fd)
+    
+    // 8. 构建最终字节码 - 对应 parser.c:12572-12700
+    const builder = new FunctionBuilder()
+    const bytecode = builder.build(fd)
+    
+    // 9. 序列化字节码 - 对应 bytecode.cpp:450-530
+    const writer = new BytecodeWriter(this.compiler)
+    const result = writer.write(bytecode)
+    
+    return result
+  }
+
+  /**
+   * 访问语句节点
+   */
+  private visitStatement(node: ts.Statement): void {
+    // 记录源码位置
+    if (this.funcDef) {
+      const sourcePos = node.getStart()
+      this.compiler.addPc2LineInfo(this.funcDef, this.funcDef.byteCode.size, sourcePos)
+    }
+    
+    // 处理表达式语句
+    if (ts.isExpressionStatement(node)) {
+      // 先执行表达式 (将结果压栈)
+      this.visitExpression(node.expression)
+      
+      // 将结果存储到 _ret_ 变量
+      if (this.funcDef && this.funcDef.evalRetIdx >= 0) {
+        this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc)
+        this.compiler.emitU16(this.funcDef, this.funcDef.evalRetIdx)
+      } else {
+        // 丢弃表达式结果
+        if (this.funcDef) {
+          this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
+        }
+      }
+    } else {
+      // 其他语句类型
+      this.visit(node)
+    }
+  }
+  
+  /**
+   * 访问表达式节点
+   */
+  private visitExpression(node: ts.Expression): void {
+    this.visit(node)
   }
 
   visit(node: ts.Node) {

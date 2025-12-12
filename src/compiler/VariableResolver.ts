@@ -8,7 +8,7 @@ import {
   ARG_SCOPE_END,
   LabelSlot,
 } from './FunctionDef'
-import { Opcode, OPCODE_DEFS, JSAtom } from '../env'
+import { Opcode, OPCODE_DEFS, OPCODE_BY_CODE, JSAtom } from '../env'
 import { BytecodeBuilder } from './BytecodeBuilder'
 import { Compiler } from './Compiler'
 
@@ -152,7 +152,7 @@ export class VariableResolver {
     while (pos < bcLen) {
       const startPos = pos
       const op = bcBuf[pos++]
-      const opDef = OPCODE_DEFS[op]
+      const opDef = OPCODE_BY_CODE[op]
       
       if (!opDef) {
         // 未知操作码，直接复制
