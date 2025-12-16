@@ -249,21 +249,29 @@ export class StackSizeComputer {
           break
         
         // === drop/nip 检查 catch ===
+        // 注意: QuickJS 中 catch_level 使用的是指令执行后的栈深度
         case Opcode.OP_drop: {
-          const catchLevel = stackLen
+          const catchLevel = newStackLen  // drop 后的深度
           catchPos = this.checkCatch(s, bcBuf, catchPos, catchLevel)
           break
         }
         
-        case Opcode.OP_nip:
+        case Opcode.OP_nip: {
+          const catchLevel = newStackLen  // nip 后的深度
+          catchPos = this.checkCatch(s, bcBuf, catchPos, catchLevel)
+          break
+        }
+        
         case Opcode.OP_nip1: {
-          const catchLevel = stackLen - 1
+          const catchLevel = newStackLen  // nip1 后的深度
           catchPos = this.checkCatch(s, bcBuf, catchPos, catchLevel)
           break
         }
         
         case Opcode.OP_iterator_close: {
-          const catchLevel = stackLen + 2
+          // iterator_close: nPop=3, nPush=0，但 check 使用 stack_len + 2
+          // 在 QuickJS 中: catch_level = stack_len + 2 (执行后的 stack_len + 2)
+          const catchLevel = newStackLen + 2
           catchPos = this.checkCatch(s, bcBuf, catchPos, catchLevel)
           break
         }

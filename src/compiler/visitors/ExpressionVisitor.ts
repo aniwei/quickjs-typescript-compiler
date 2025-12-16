@@ -1,6 +1,6 @@
 import * as ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
-import { Opcode, JSAtom, PutLValueEnum } from '../../env'
+import { Opcode, TempOpcode, JSAtom, PutLValueEnum } from '../../env'
 import { CompilerContext } from '../CompilerContext'
 import { FunctionDef, ARGUMENT_VAR_OFFSET } from '../FunctionDef'
 import { Label } from '../Compiler'
@@ -165,7 +165,7 @@ export class ExpressionVisitor extends VisitorContext {
     const fd = this.funcDef!
     const sourcePos = node.getStart()
 
-    this.compiler.emitOp(fd, Opcode.OP_scope_get_var, sourcePos)
+    this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var, sourcePos)
     this.compiler.emitAtom(fd, JSAtom.JS_ATOM_this)
     this.compiler.emitU16(fd, 0)
   }
@@ -184,7 +184,7 @@ export class ExpressionVisitor extends VisitorContext {
     const atom = this.compiler.addAtom(name)
 
     // 发射 scope_get_var 指令
-    this.compiler.emitOp(fd, Opcode.OP_scope_get_var, sourcePos)
+    this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var, sourcePos)
     this.compiler.emitU32(fd, atom)
     this.compiler.emitU16(fd, fd.scopeLevel)
   }
@@ -266,54 +266,199 @@ export class ExpressionVisitor extends VisitorContext {
    * 发射前缀递增/递减 - 对应 parser.c:5623-5643
    * 
    * 逻辑: 
-   * 1. 获取 lvalue
+   * 1. 获取 lvalue 并保持值在栈上
    * 2. 发射 OP_inc/OP_dec
    * 3. put_lvalue 保留栈顶值
+   * 
+   * QuickJS 源码: 
+   * - parser.c:5626-5639 (prefix ++/--)
+   * - parser.c:3888-4012 (get_lvalue)
+   * - parser.c:4026-4135 (put_lvalue)
    */
   private emitPrefixIncDec(operand: ts.Expression, opcode: Opcode, sourcePos: number): void {
     const fd = this.funcDef!
 
-    // 先访问操作数以生成 get_var/get_field/get_array_el
-    this.context.visit(operand)
-
-    // 获取 lvalue 信息并准备修改
-    const lvalue = this.getLValue(operand, true)
-    if (!lvalue) {
+    if (ts.isIdentifier(operand)) {
+      // 变量: 使用 scope_make_ref + get_ref_value 模式
+      const name = this.compiler.addAtom(operand.text)
+      const label = this.compiler.newLabelInt(fd)
+      
+      // 发射 OP_scope_make_ref - parser.c:3953-3963
+      // 栈效果: [] -> [ref_obj, ref_prop]
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_make_ref)
+      this.compiler.emitU32(fd, name)
+      this.compiler.emitU32(fd, label)
+      this.compiler.emitU16(fd, fd.scopeLevel)
+      this.compiler.updateLabel(fd, label, 1)
+      
+      // 发射 OP_get_ref_value - parser.c:3964
+      // 栈效果: [ref_obj, ref_prop] -> [ref_obj, ref_prop, value]
+      this.compiler.emitOp(fd, Opcode.OP_get_ref_value)
+      
+      // 发射递增/递减操作
+      // 栈效果: [ref_obj, ref_prop, value] -> [ref_obj, ref_prop, value+1]
+      this.compiler.emitOp(fd, opcode, sourcePos)
+      
+      // put_lvalue 使用 PUT_LVALUE_KEEP_TOP - parser.c:4054-4078
+      // 对于 OP_get_ref_value (depth=2)，先 emit_label
+      this.compiler.emitLabelInt(fd, label)
+      
+      // insert3: [ref_obj, ref_prop, value+1] -> [value+1, ref_obj, ref_prop, value+1]
+      this.compiler.emitOp(fd, Opcode.OP_insert3)
+      
+      // put_ref_value: [value+1, ref_obj, ref_prop, value+1] -> [value+1]
+      this.compiler.emitOp(fd, Opcode.OP_put_ref_value)
+      
+    } else if (ts.isPropertyAccessExpression(operand)) {
+      // 属性访问: obj.prop
+      const name = this.compiler.addAtom(operand.name.text)
+      
+      // 访问对象
+      this.context.visit(operand.expression)
+      
+      // 发射 OP_get_field2 - 获取值但保留对象在栈上
+      // 栈效果: [obj] -> [obj, value]
+      this.compiler.emitOp(fd, Opcode.OP_get_field2)
+      this.compiler.emitU32(fd, name)
+      this.compiler.emitIc(fd, name)
+      
+      // 发射递增/递减操作
+      // 栈效果: [obj, value] -> [obj, value+1]
+      this.compiler.emitOp(fd, opcode, sourcePos)
+      
+      // put_lvalue 使用 PUT_LVALUE_KEEP_TOP (depth=1)
+      // insert2: [obj, value+1] -> [value+1, obj, value+1]
+      this.compiler.emitOp(fd, Opcode.OP_insert2)
+      
+      // put_field: [value+1, obj, value+1] -> [value+1]
+      this.compiler.emitOp(fd, Opcode.OP_put_field)
+      this.compiler.emitU32(fd, name)
+      this.compiler.emitIc(fd, name)
+      
+    } else if (ts.isElementAccessExpression(operand)) {
+      // 数组元素访问: arr[idx]
+      // 访问对象和索引
+      this.context.visit(operand.expression)
+      this.context.visit(operand.argumentExpression)
+      
+      // 发射 OP_get_array_el3 - 获取值但保留对象和索引在栈上
+      // 栈效果: [obj, idx] -> [obj, idx, value]
+      this.compiler.emitOp(fd, Opcode.OP_get_array_el3)
+      
+      // 发射递增/递减操作
+      // 栈效果: [obj, idx, value] -> [obj, idx, value+1]
+      this.compiler.emitOp(fd, opcode, sourcePos)
+      
+      // put_lvalue 使用 PUT_LVALUE_KEEP_TOP (depth=2)
+      // insert3: [obj, idx, value+1] -> [value+1, obj, idx, value+1]
+      this.compiler.emitOp(fd, Opcode.OP_insert3)
+      
+      // put_array_el: [value+1, obj, idx, value+1] -> [value+1]
+      this.compiler.emitOp(fd, Opcode.OP_put_array_el)
+      
+    } else {
       throw new Error('Invalid prefix increment/decrement operand')
     }
-
-    // 发射递增/递减操作
-    this.compiler.emitOp(fd, opcode, sourcePos)
-
-    // 存回并保留值在栈顶
-    this.putLValue(lvalue, PutLValueEnum.PUT_LVALUE_KEEP_TOP, false)
   }
 
   /**
    * 发射后缀递增/递减 - 对应 parser.c:5678-5697
    * 
    * 逻辑:
-   * 1. 获取 lvalue
-   * 2. 发射 OP_post_inc/OP_post_dec (会保留原值)
-   * 3. put_lvalue 保留第二个值
+   * 1. 获取 lvalue 并保持值在栈上
+   * 2. 发射 OP_post_inc/OP_post_dec (会在栈上产生两个值: 原值 和 新值)
+   * 3. put_lvalue 保留原值 (第二个值)
+   * 
+   * OP_post_inc/OP_post_dec 的栈效果: [value] -> [new_value, old_value]
+   * 注意: old_value 在栈顶，new_value 在下面
+   * 
+   * QuickJS 源码:
+   * - parser.c:5678-5697
    */
   private emitPostfixIncDec(operand: ts.Expression, opcode: Opcode, sourcePos: number): void {
     const fd = this.funcDef!
 
-    // 先访问操作数
-    this.context.visit(operand)
-
-    // 获取 lvalue 信息
-    const lvalue = this.getLValue(operand, true)
-    if (!lvalue) {
+    if (ts.isIdentifier(operand)) {
+      // 变量: 使用 scope_make_ref + get_ref_value 模式
+      const name = this.compiler.addAtom(operand.text)
+      const label = this.compiler.newLabelInt(fd)
+      
+      // 发射 OP_scope_make_ref
+      // 栈效果: [] -> [ref_obj, ref_prop]
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_make_ref)
+      this.compiler.emitU32(fd, name)
+      this.compiler.emitU32(fd, label)
+      this.compiler.emitU16(fd, fd.scopeLevel)
+      this.compiler.updateLabel(fd, label, 1)
+      
+      // 发射 OP_get_ref_value
+      // 栈效果: [ref_obj, ref_prop] -> [ref_obj, ref_prop, value]
+      this.compiler.emitOp(fd, Opcode.OP_get_ref_value)
+      
+      // 发射后缀递增/递减操作
+      // 栈效果: [ref_obj, ref_prop, value] -> [ref_obj, ref_prop, new_value, old_value]
+      this.compiler.emitOp(fd, opcode, sourcePos)
+      
+      // put_lvalue 使用 PUT_LVALUE_KEEP_SECOND (depth=2)
+      // 先 emit_label
+      this.compiler.emitLabelInt(fd, label)
+      
+      // perm4: [ref_obj, ref_prop, new_value, old_value] -> [old_value, ref_obj, ref_prop, new_value]
+      this.compiler.emitOp(fd, Opcode.OP_perm4)
+      
+      // put_ref_value: [old_value, ref_obj, ref_prop, new_value] -> [old_value]
+      this.compiler.emitOp(fd, Opcode.OP_put_ref_value)
+      
+    } else if (ts.isPropertyAccessExpression(operand)) {
+      // 属性访问: obj.prop
+      const name = this.compiler.addAtom(operand.name.text)
+      
+      // 访问对象
+      this.context.visit(operand.expression)
+      
+      // 发射 OP_get_field2
+      // 栈效果: [obj] -> [obj, value]
+      this.compiler.emitOp(fd, Opcode.OP_get_field2)
+      this.compiler.emitU32(fd, name)
+      this.compiler.emitIc(fd, name)
+      
+      // 发射后缀递增/递减操作
+      // 栈效果: [obj, value] -> [obj, new_value, old_value]
+      this.compiler.emitOp(fd, opcode, sourcePos)
+      
+      // put_lvalue 使用 PUT_LVALUE_KEEP_SECOND (depth=1)
+      // perm3: [obj, new_value, old_value] -> [old_value, obj, new_value]
+      this.compiler.emitOp(fd, Opcode.OP_perm3)
+      
+      // put_field: [old_value, obj, new_value] -> [old_value]
+      this.compiler.emitOp(fd, Opcode.OP_put_field)
+      this.compiler.emitU32(fd, name)
+      this.compiler.emitIc(fd, name)
+      
+    } else if (ts.isElementAccessExpression(operand)) {
+      // 数组元素访问: arr[idx]
+      // 访问对象和索引
+      this.context.visit(operand.expression)
+      this.context.visit(operand.argumentExpression)
+      
+      // 发射 OP_get_array_el3
+      // 栈效果: [obj, idx] -> [obj, idx, value]
+      this.compiler.emitOp(fd, Opcode.OP_get_array_el3)
+      
+      // 发射后缀递增/递减操作
+      // 栈效果: [obj, idx, value] -> [obj, idx, new_value, old_value]
+      this.compiler.emitOp(fd, opcode, sourcePos)
+      
+      // put_lvalue 使用 PUT_LVALUE_KEEP_SECOND (depth=2)
+      // perm4: [obj, idx, new_value, old_value] -> [old_value, obj, idx, new_value]
+      this.compiler.emitOp(fd, Opcode.OP_perm4)
+      
+      // put_array_el: [old_value, obj, idx, new_value] -> [old_value]
+      this.compiler.emitOp(fd, Opcode.OP_put_array_el)
+      
+    } else {
       throw new Error('Invalid postfix increment/decrement operand')
     }
-
-    // 发射后缀递增/递减操作
-    this.compiler.emitOp(fd, opcode, sourcePos)
-
-    // 存回并保留原值
-    this.putLValue(lvalue, PutLValueEnum.PUT_LVALUE_KEEP_SECOND, false)
   }
 
   // ============================================================================
@@ -591,7 +736,7 @@ export class ExpressionVisitor extends VisitorContext {
 
       // 发射 scope_put_var
       const name = this.compiler.addAtom(node.left.text)
-      this.compiler.emitOp(fd, Opcode.OP_scope_put_var)
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var)
       this.compiler.emitU32(fd, name)
       this.compiler.emitU16(fd, fd.scopeLevel)
       return
@@ -812,7 +957,7 @@ export class ExpressionVisitor extends VisitorContext {
     }
 
     // 发射调用指令
-    this.compiler.emitOp(fd, Opcode.OP_line_num, sourcePos)
+    this.compiler.emitOp(fd, TempOpcode.OP_line_num, sourcePos)
     this.compiler.emitU32(fd, sourcePos)
 
     if (isMethodCall) {
@@ -984,7 +1129,7 @@ export class ExpressionVisitor extends VisitorContext {
         const atom = this.compiler.addAtom(name)
         
         // 获取变量值
-        this.compiler.emitOp(fd, Opcode.OP_scope_get_var, prop.getStart())
+        this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var, prop.getStart())
         this.compiler.emitU32(fd, atom)
         this.compiler.emitU16(fd, fd.scopeLevel)
         
@@ -993,11 +1138,27 @@ export class ExpressionVisitor extends VisitorContext {
         this.compiler.emitAtom(fd, atom)
       } else if (ts.isSpreadAssignment(prop)) {
         // 展开属性: { ...obj }
+        // QuickJS 源码: parser.c:2928-2937
+        // 栈状态: [dest] -> 需要 [dest, src, excludeList]
+        
+        // 发射 OP_null 作为 excludeList
+        this.compiler.emitOp(fd, Opcode.OP_null)
+        
+        // 访问 spread 表达式 (src)
         this.context.visit(prop.expression)
+        
+        // 发射 OP_copy_data_properties
+        // 参数格式: (copy_flags) | (exclude_first_idx << 2) | (exclude_second_idx << 5)
+        // copy_flags = 2: copy enumerable only
+        // exclude_first_idx = 1: excludeList 在 src 下面
+        // exclude_second_idx = 0: no second exclude
         this.compiler.emitOp(fd, Opcode.OP_copy_data_properties, prop.getStart())
-        this.compiler.emitU8(fd, 0) // flags = 0
-        this.compiler.emitU8(fd, 0) // exclude first
-        this.compiler.emitU8(fd, 0) // exclude second
+        this.compiler.emitU8(fd, 2 | (1 << 2) | (0 << 5))
+        
+        // 弹出 excludeList
+        this.compiler.emitOp(fd, Opcode.OP_drop)
+        // 弹出 src
+        this.compiler.emitOp(fd, Opcode.OP_drop)
       } else if (ts.isMethodDeclaration(prop)) {
         // 方法声明
         // TODO: 实现方法声明
@@ -1092,7 +1253,7 @@ export class ExpressionVisitor extends VisitorContext {
       // delete variable - 在严格模式下是错误的
       // 非严格模式下使用 scope_delete_var
       const name = this.compiler.addAtom(expr.text)
-      this.compiler.emitOp(fd, Opcode.OP_scope_delete_var, node.getStart())
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_delete_var, node.getStart())
       this.compiler.emitU32(fd, name)
       this.compiler.emitU16(fd, fd.scopeLevel)
     } else {
@@ -1115,7 +1276,7 @@ export class ExpressionVisitor extends VisitorContext {
     // 特殊处理标识符: 使用 scope_get_var_undef 避免 ReferenceError
     if (ts.isIdentifier(expr)) {
       const name = this.compiler.addAtom(expr.text)
-      this.compiler.emitOp(fd, Opcode.OP_scope_get_var_undef, expr.getStart())
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var_undef, expr.getStart())
       this.compiler.emitU32(fd, name)
       this.compiler.emitU16(fd, fd.scopeLevel)
     } else {
@@ -1144,7 +1305,7 @@ export class ExpressionVisitor extends VisitorContext {
       const name = this.compiler.addAtom(node.text)
       const label = keep ? this.compiler.newLabelInt(fd) : -1
       return {
-        opcode: Opcode.OP_scope_get_var,
+        opcode: TempOpcode.OP_scope_get_var,
         scope: fd.scopeLevel,
         name: name,
         label: label,
@@ -1228,12 +1389,12 @@ export class ExpressionVisitor extends VisitorContext {
         this.compiler.emitOp(fd, Opcode.OP_put_array_el)
         break
 
-      case Opcode.OP_scope_get_var:
+      case TempOpcode.OP_scope_get_var:
         // 简单变量赋值
         if (lvalue.label >= 0) {
           this.compiler.emitLabelInt(fd, lvalue.label)
         }
-        this.compiler.emitOp(fd, isLet ? Opcode.OP_scope_put_var_init : Opcode.OP_scope_put_var)
+        this.compiler.emitOp(fd, isLet ? TempOpcode.OP_scope_put_var_init : TempOpcode.OP_scope_put_var)
         this.compiler.emitU32(fd, lvalue.name)
         this.compiler.emitU16(fd, lvalue.scope)
         break

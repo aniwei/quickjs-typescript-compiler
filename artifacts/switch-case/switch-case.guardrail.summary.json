@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-case/cli/switch-case.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-case/cli/switch-case.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-case/cli/switch-case.pc2line.txt",
-    "bytecodeSize": 195,
-    "pc2lineLength": 0,
+    "bytecodeSize": 257,
+    "pc2lineLength": 30,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 133,
-    "wasmSize": 173,
-    "sizeDiff": -40,
-    "sizeDiffPercent": -23.121387283236995
+    "tsSize": 195,
+    "wasmSize": 182,
+    "sizeDiff": 13,
+    "sizeDiffPercent": 7.142857142857142
   },
   "trace": {
     "differenceCount": 0,

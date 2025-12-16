@@ -296,13 +296,13 @@ async function runCliStage(fixturePath: string, outDir: string): Promise<CliStag
   const disassemblyPath = path.join(outDir, `${baseName}.ts.disasm`)
   await fs.writeFile(disassemblyPath, createAdvancedDisassembly(bytecode), 'utf8')
 
-  const pc2lineBytes = functionDef.pc2line?.toArray?.() ?? []
+  const pc2lineBytes = functionDef.pc2line?.buffer?.subarray(0, functionDef.pc2line?.size ?? 0) ?? new Uint8Array(0)
   const pc2lineBinary = Uint8Array.from(pc2lineBytes)
   const pc2lineBinaryPath = path.join(outDir, `${baseName}.pc2line.bin`)
   await fs.writeFile(pc2lineBinaryPath, pc2lineBinary)
 
   const pc2lineTablePath = path.join(outDir, `${baseName}.pc2line.txt`)
-  await fs.writeFile(pc2lineTablePath, formatPc2lineTable(pc2lineBytes), 'utf8')
+  await fs.writeFile(pc2lineTablePath, formatPc2lineTable(Array.from(pc2lineBytes)), 'utf8')
 
   return {
     bytecodePath,

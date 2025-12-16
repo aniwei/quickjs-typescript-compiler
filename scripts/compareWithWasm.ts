@@ -354,7 +354,8 @@ class BytecodeComparator {
   }
 
   private async compileJavaScriptWithWasm(jsCode: string, jsPath?: string): Promise<Uint8Array> {
-    const result = await QuickJSLib.compileSource(jsCode, jsPath);
+    // Use script mode (global eval) to match TypeScript compiler output
+    const result = await QuickJSLib.compileSourceAsScript(jsCode, jsPath);
     return result
   }
 

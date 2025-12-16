@@ -16,6 +16,7 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
   register_vector<FunctionKind>("FunctionKindArray");
   register_vector<JSMode>("JSModeArray");
   register_vector<PC2Line>("PC2LineArray");
+  register_vector<SpecialObject>("SpecialObjectArray");
 
   enum_<CompileFlags>("CompileFlags")
     .value("COMPILE_FLAG_NONE", COMPILE_FLAG_NONE)
@@ -37,7 +38,8 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .property("nPop", &Op::nPop)
     .property("nPush", &Op::nPush)
     .property("fmt", &Op::fmt)
-    .property("size", &Op::size);
+    .property("size", &Op::size)
+    .property("isTemp", &Op::isTemp);
   
 
   class_<Atom>("Atom")
@@ -71,9 +73,15 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .property("id", &JSMode::id)
     .property("name", &JSMode::name);
 
+  class_<SpecialObject>("SpecialObject")
+    .constructor<>()
+    .property("id", &SpecialObject::id)
+    .property("name", &SpecialObject::name);
+
   class_<QuickJSBinding>("QuickJSBinding")
     .constructor<>()
     .class_function("compile", &QuickJSBinding::compile)
+    .class_function("compileScript", &QuickJSBinding::compileScript)
     .class_function("dumpWithBinary", &QuickJSBinding::dumpWithBinary)
     .class_function("runWithBinary", &QuickJSBinding::runWithBinary)
     .class_function("getBytecodeVersion", &QuickJSBinding::getBytecodeVersion)
@@ -95,5 +103,6 @@ EMSCRIPTEN_BINDINGS(quickjs_wasm) {
     .class_function("getFunctionKinds", &QuickJSBinding::getFunctionKinds)
     .class_function("getJSModes", &QuickJSBinding::getJSModes)
     .class_function("getPC2LineCodes", &QuickJSBinding::getPC2LineCodes)
+    .class_function("getSpecialObjects", &QuickJSBinding::getSpecialObjects)
     .smart_ptr<std::shared_ptr<QuickJSBinding>>("shared_ptr<QuickJSBinding>");
 }

@@ -340,6 +340,53 @@ export class JSVarScope {
 }
 
 /**
+ * 内联缓存 (InlineCache) - 对应 types.h:InlineCache
+ * 
+ * QuickJS 源码位置: third_party/QuickJS/src/core/ic.h
+ * 
+ * 用于优化属性访问，编译期间只需要存储 atom 信息，
+ * 运行时的缓存由 QuickJS 运行时管理。
+ * 
+ * 注意：在纯 TypeScript 编译器中，只需跟踪已添加的属性名 atoms，
+ * 实际的 IC 缓存查找在 QuickJS 运行时完成。
+ */
+export class InlineCache {
+  /** 已添加的 atom 槽位 */
+  slots: Map<number, number> = new Map() // atom -> index
+  
+  /** 槽位计数 */
+  count: number = 0
+
+  /**
+   * 添加一个 IC 槽位 - 对应 add_ic_slot1
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/ic.h:108-127
+   * 
+   * @param atom 属性名原子
+   * @returns 槽位索引，如果已存在返回 -1
+   */
+  addSlot(atom: number): number {
+    if (this.slots.has(atom)) {
+      // 已存在，返回 -1 (fail)
+      return -1
+    }
+    const index = this.count++
+    this.slots.set(atom, index)
+    return index
+  }
+
+  /**
+   * 获取 atom 的 IC 索引
+   * 
+   * @param atom 属性名原子
+   * @returns 索引，如果不存在返回 -1
+   */
+  getSlotIndex(atom: number): number {
+    return this.slots.get(atom) ?? -1
+  }
+}
+
+/**
  * 函数定义 - 对应 parser.h:JSFunctionDef
  * 
  * QuickJS 源码位置: third_party/QuickJS/src/core/parser.h:222-320
@@ -650,7 +697,7 @@ export class FunctionDef {
 
   // ========== 内联缓存 - parser.h:357 ==========
   /** inline cache for field op */
-  ic: any = null
+  ic: InlineCache = new InlineCache()
 
   // ========== 输出相关 (用于最终字节码生成) ==========
   /** 是否有调试信息 */

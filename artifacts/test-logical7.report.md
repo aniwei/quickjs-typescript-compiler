@@ -1,0 +1,115 @@
+# 字节码分析报告
+
+**输入文件**: /tmp/test-logical7.ts
+**生成时间**: 2025-12-16T14:01:14.960Z
+
+## 大小对比
+
+- TypeScript编译器: 108 字节
+- WASM编译器: 104 字节
+- 差异: 4 字节 (3.85%)
+
+## 结构分析
+
+### TypeScript编译器输出
+```json
+{
+  "source": "TypeScript",
+  "bcVersion": "0x5",
+  "userAtomCount": 2,
+  "atoms": [
+    {
+      "index": 0,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "b",
+      "offset": 2
+    },
+    {
+      "index": 1,
+      "rawLength": 70,
+      "actualLength": 35,
+      "isWideChar": 0,
+      "string": "../../../../../tmp/test-logical7.js",
+      "offset": 4
+    }
+  ],
+  "functionHeader": {
+    "offset": 40,
+    "tag": "0xc",
+    "remaining": 68
+  }
+}
+```
+
+### WASM编译器输出
+```json
+{
+  "source": "WASM",
+  "bcVersion": "0x5",
+  "userAtomCount": 2,
+  "atoms": [
+    {
+      "index": 0,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "b",
+      "offset": 2
+    },
+    {
+      "index": 1,
+      "rawLength": 70,
+      "actualLength": 35,
+      "isWideChar": 0,
+      "string": "../../../../../tmp/test-logical7.js",
+      "offset": 4
+    }
+  ],
+  "functionHeader": {
+    "offset": 40,
+    "tag": "0xc",
+    "remaining": 64
+  }
+}
+```
+
+## 字节级差异
+
+共发现 10 个字节差异:
+
+- 偏移量 0x40: TS=0x00 vs WASM=0x80
+- 偏移量 0x46: TS=0x12 vs WASM=0x82
+- 偏移量 0x62: TS=0x08 vs WASM=0x04
+- 偏移量 0x65: TS=0x3e vs WASM=0x5d
+- 偏移量 0x66: TS=0x10 vs WASM=0x00
+- 偏移量 0x67: TS=0x07 vs WASM=0x00
+- 偏移量 0x68: TS=0x07 vs WASM=EOF
+- 偏移量 0x69: TS=0x4e vs WASM=EOF
+- 偏移量 0x6a: TS=0x04 vs WASM=EOF
+- 偏移量 0x6b: TS=0x00 vs WASM=EOF
+
+## 十六进制转储对比
+
+### TypeScript
+```
+00000000: 05 02 02 62 46 2e 2e 2f 2e 2e 2f 2e 2e 2f 2e 2e |...bF../../../..|
+00000010: 2f 2e 2e 2f 74 6d 70 2f 74 65 73 74 2d 6c 6f 67 |/../tmp/test-log|
+00000020: 69 63 61 6c 37 2e 6a 73 0c 00 06 00 a4 01 00 01 |ical7.js........|
+00000030: 00 04 00 00 25 01 a6 01 00 00 00 40 e4 00 00 00 |....%......@....|
+00000040: 00 3f e4 00 00 00 12 b8 3b e4 00 00 00 7d e4 00 |.?......;....}..|
+00000050: 00 00 3d 11 ec 07 0e b9 16 3e ee 03 0f 0f cf 28 |..=......>.....(|
+00000060: ca 03 08 00 00 3e 10 07 07 4e 04 00             |.....>...N..|
+```
+
+### WASM
+```
+00000000: 05 02 02 62 46 2e 2e 2f 2e 2e 2f 2e 2e 2f 2e 2e |...bF../../../..|
+00000010: 2f 2e 2e 2f 74 6d 70 2f 74 65 73 74 2d 6c 6f 67 |/../tmp/test-log|
+00000020: 69 63 61 6c 37 2e 6a 73 0c 00 06 00 a4 01 00 01 |ical7.js........|
+00000030: 00 04 00 00 25 01 a6 01 00 00 00 40 e4 00 00 00 |....%......@....|
+00000040: 80 3f e4 00 00 00 82 b8 3b e4 00 00 00 7d e4 00 |.?......;....}..|
+00000050: 00 00 3d 11 ec 07 0e b9 16 3e ee 03 0f 0f cf 28 |..=......>.....(|
+00000060: ca 03 04 00 00 5d 00 00                         |.....]..|
+```

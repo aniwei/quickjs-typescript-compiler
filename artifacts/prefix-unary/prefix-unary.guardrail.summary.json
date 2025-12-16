@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/prefix-unary.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/prefix-unary",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/prefix-unary/cli/prefix-unary.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/prefix-unary/cli/prefix-unary.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/prefix-unary/cli/prefix-unary.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/prefix-unary/cli/prefix-unary.pc2line.txt",
+    "bytecodeSize": 244,
+    "pc2lineLength": 24,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": false,
+    "tsSize": 182,
+    "wasmSize": 194,
+    "sizeDiff": -12,
+    "sizeDiffPercent": -6.185567010309279
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}

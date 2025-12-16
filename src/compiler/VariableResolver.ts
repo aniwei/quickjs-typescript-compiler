@@ -8,7 +8,7 @@ import {
   ARG_SCOPE_END,
   LabelSlot,
 } from './FunctionDef'
-import { Opcode, OPCODE_DEFS, OPCODE_BY_CODE, JSAtom } from '../env'
+import { Opcode, TempOpcode, OPCODE_DEFS, OPCODE_BY_CODE, TEMP_OPCODE_BY_CODE, TEMP_OPCODE_DEFS, JSAtom } from '../env'
 import { BytecodeBuilder } from './BytecodeBuilder'
 import { Compiler } from './Compiler'
 
@@ -61,6 +61,17 @@ export class VariableResolver {
 
   private get compiler(): Compiler {
     return this.context.compiler
+  }
+
+  /**
+   * 查找 opcode 定义，支持临时 opcodes
+   */
+  private getOpcodeDef(op: number) {
+    // 检查是否是临时 opcode（182-200 范围）
+    if (op >= 182 && op <= 200 && TEMP_OPCODE_BY_CODE[op]) {
+      return TEMP_OPCODE_BY_CODE[op]
+    }
+    return OPCODE_BY_CODE[op]
   }
 
   // ============================================================================
@@ -152,7 +163,7 @@ export class VariableResolver {
     while (pos < bcLen) {
       const startPos = pos
       const op = bcBuf[pos++]
-      const opDef = OPCODE_BY_CODE[op]
+      const opDef = this.getOpcodeDef(op)
       
       if (!opDef) {
         // 未知操作码，直接复制
@@ -163,14 +174,14 @@ export class VariableResolver {
       // 根据操作码类型处理
       switch (op) {
         // === Scope 变量访问操作码 ===
-        case Opcode.OP_scope_get_var:
-        case Opcode.OP_scope_get_var_undef:
-        case Opcode.OP_scope_get_var_checkthis:
-        case Opcode.OP_scope_put_var:
-        case Opcode.OP_scope_put_var_init:
-        case Opcode.OP_scope_delete_var:
-        case Opcode.OP_scope_get_ref:
-        case Opcode.OP_scope_make_ref: {
+        case TempOpcode.OP_scope_get_var:
+        case TempOpcode.OP_scope_get_var_undef:
+        case TempOpcode.OP_scope_get_var_checkthis:
+        case TempOpcode.OP_scope_put_var:
+        case TempOpcode.OP_scope_put_var_init:
+        case TempOpcode.OP_scope_delete_var:
+        case TempOpcode.OP_scope_get_ref:
+        case TempOpcode.OP_scope_make_ref: {
           // 格式: OP atom:u32 scope:u16 [label:u32]
           const atom = this.getU32(bcBuf, pos)
           pos += 4
@@ -179,7 +190,7 @@ export class VariableResolver {
           
           // OP_scope_make_ref 有额外的 label
           let label = -1
-          if (op === Opcode.OP_scope_make_ref) {
+          if (op === TempOpcode.OP_scope_make_ref) {
             label = this.getU32(bcBuf, pos)
             pos += 4
           }
@@ -190,10 +201,10 @@ export class VariableResolver {
         }
         
         // === Scope 私有字段操作码 ===
-        case Opcode.OP_scope_get_private_field:
-        case Opcode.OP_scope_get_private_field2:
-        case Opcode.OP_scope_put_private_field:
-        case Opcode.OP_scope_in_private_field: {
+        case TempOpcode.OP_scope_get_private_field:
+        case TempOpcode.OP_scope_get_private_field2:
+        case TempOpcode.OP_scope_put_private_field:
+        case TempOpcode.OP_scope_in_private_field: {
           // 格式: OP atom:u32 scope:u16
           const atom = this.getU32(bcBuf, pos)
           pos += 4
@@ -205,31 +216,108 @@ export class VariableResolver {
           break
         }
         
-        // === 作用域控制操作码 ===
-        case Opcode.OP_enter_scope: {
-          // 格式: OP scope:u16
-          const scopeLevel = this.getU16(bcBuf, pos)
+        // === OP_eval 操作码 - 对应 parser.c:10519-10527 ===
+        case Opcode.OP_eval: {
+          // 格式: OP call_argc:u16 scope:u16
+          const callArgc = this.getU16(bcBuf, pos)
+          pos += 2
+          const scope = this.getU16(bcBuf, pos)
           pos += 2
           
-          // enter_scope 在解析后可能被优化掉
-          // 但我们仍然输出它以保持正确性
-          bcOut.putU8(Opcode.OP_enter_scope)
-          bcOut.putU16(scopeLevel)
+          // 标记 eval 捕获的变量
+          this.markEvalCapturedVariables(fd, scope)
+          
+          // 发射转换后的 OP_eval
+          bcOut.putU8(Opcode.OP_eval)
+          bcOut.putU16(callArgc)
+          // 转换 scope 索引为调整后的变量索引
+          const firstVarIdx = (fd.scopes[scope]?.first ?? -1) - ARG_SCOPE_END
+          bcOut.putU16(firstVarIdx)
           break
         }
         
-        case Opcode.OP_leave_scope: {
+        // === OP_apply_eval 操作码 - 对应 parser.c:10528-10531 ===
+        case Opcode.OP_apply_eval: {
           // 格式: OP scope:u16
-          const scopeLevel = this.getU16(bcBuf, pos)
+          const scope = this.getU16(bcBuf, pos)
           pos += 2
           
-          bcOut.putU8(Opcode.OP_leave_scope)
-          bcOut.putU16(scopeLevel)
+          // 标记 eval 捕获的变量
+          this.markEvalCapturedVariables(fd, scope)
+          
+          // 发射转换后的 OP_apply_eval
+          bcOut.putU8(Opcode.OP_apply_eval)
+          // 转换 scope 索引为调整后的变量索引
+          const firstVarIdx = (fd.scopes[scope]?.first ?? -1) - ARG_SCOPE_END
+          bcOut.putU16(firstVarIdx)
+          break
+        }
+        
+        // === 作用域控制操作码 ===
+        case TempOpcode.OP_enter_scope: {
+          // 格式: OP scope:u16
+          // 对应 QuickJS parser.c:10691-10722
+          const scope = this.getU16(bcBuf, pos)
+          pos += 2
+          
+          // 如果是 body_scope，实例化提升的定义
+          if (scope === fd.bodyScope) {
+            this.instantiateHoistedDefinitions(fd, bcOut)
+          }
+          
+          // 遍历当前作用域的变量，初始化它们
+          let scopeIdx = fd.scopes[scope]?.first ?? -1
+          while (scopeIdx >= 0) {
+            const vd = fd.vars[scopeIdx]
+            if (vd.scopeLevel === scope) {
+              // 跳过 arguments 参数
+              if (scopeIdx !== fd.argumentsArgIdx) {
+                if (vd.varKind === JSVarKindEnum.JS_VAR_FUNCTION_DECL ||
+                    vd.varKind === JSVarKindEnum.JS_VAR_NEW_FUNCTION_DECL) {
+                  // 函数声明: 用 fclosure 初始化
+                  bcOut.putU8(Opcode.OP_fclosure)
+                  bcOut.putU32(vd.funcPoolIdx)
+                  bcOut.putU8(Opcode.OP_put_loc)
+                  bcOut.putU16(scopeIdx)
+                } else {
+                  // 其他词法变量: 标记为未初始化
+                  bcOut.putU8(Opcode.OP_set_loc_uninitialized)
+                  bcOut.putU16(scopeIdx)
+                }
+              }
+              scopeIdx = vd.scopeNext
+            } else {
+              break
+            }
+          }
+          break
+        }
+        
+        case TempOpcode.OP_leave_scope: {
+          // 格式: OP scope:u16
+          // 对应 QuickJS parser.c:10723-10738
+          const scope = this.getU16(bcBuf, pos)
+          pos += 2
+          
+          // 遍历当前作用域的变量，关闭被捕获的变量
+          let scopeIdx = fd.scopes[scope]?.first ?? -1
+          while (scopeIdx >= 0) {
+            const vd = fd.vars[scopeIdx]
+            if (vd.scopeLevel === scope) {
+              if (vd.isCaptured) {
+                bcOut.putU8(Opcode.OP_close_loc)
+                bcOut.putU16(scopeIdx)
+              }
+              scopeIdx = vd.scopeNext
+            } else {
+              break
+            }
+          }
           break
         }
         
         // === 标签操作码 ===
-        case Opcode.OP_label: {
+        case TempOpcode.OP_label: {
           // 格式: OP label:u32
           const labelIdx = this.getU32(bcBuf, pos)
           pos += 4
@@ -239,7 +327,7 @@ export class VariableResolver {
             fd.labelSlots[labelIdx].pos2 = bcOut.size
           }
           
-          bcOut.putU8(Opcode.OP_label)
+          bcOut.putU8(TempOpcode.OP_label)
           bcOut.putU32(labelIdx)
           break
         }
@@ -257,6 +345,92 @@ export class VariableResolver {
           }
           break
         }
+      }
+    }
+  }
+
+  // ============================================================================
+  // 提升定义实例化 - 对应 parser.c:instantiate_hoisted_definitions
+  // 
+  // QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:9623-9800
+  // ============================================================================
+
+  /**
+   * 实例化提升的定义（全局函数和变量）
+   * 
+   * 对应 QuickJS parser.c:10245-10400 instantiate_hoisted_definitions
+   * 
+   * 对于全局作用域:
+   * 1. 初始化参数中的提升函数
+   * 2. 初始化局部变量中的提升函数  
+   * 3. 定义全局变量和函数 (OP_define_var / OP_define_func)
+   */
+  private instantiateHoistedDefinitions(fd: FunctionDef, bcOut: BytecodeBuilder): void {
+    // 1. 处理参数中的提升函数
+    for (let i = 0; i < fd.argCount; i++) {
+      const vd = fd.args[i]
+      if (vd && vd.funcPoolIdx >= 0) {
+        bcOut.putU8(Opcode.OP_fclosure)
+        bcOut.putU32(vd.funcPoolIdx)
+        bcOut.putU8(Opcode.OP_put_arg)
+        bcOut.putU16(i)
+      }
+    }
+    
+    // 2. 处理局部变量中的提升函数 (scope_level == 0)
+    for (let i = 0; i < fd.vars.length; i++) {
+      const vd = fd.vars[i]
+      if (vd.scopeLevel === 0 && vd.funcPoolIdx >= 0) {
+        bcOut.putU8(Opcode.OP_fclosure)
+        bcOut.putU32(vd.funcPoolIdx)
+        bcOut.putU8(Opcode.OP_put_loc)
+        bcOut.putU16(i)
+      }
+    }
+    
+    // 3. 处理全局变量 (只有 isGlobalVar 模式)
+    if (!fd.isGlobalVar) {
+      return
+    }
+    
+    for (const hf of fd.globalVars) {
+      // 计算 flags
+      let flags = 0
+      if (fd.evalType !== 1) { // JS_EVAL_TYPE_GLOBAL = 1
+        flags |= 0x01 // JS_PROP_CONFIGURABLE
+      }
+      
+      if (hf.cpoolIdx >= 0 && !hf.isLexical) {
+        // 全局函数定义: fclosure + define_func
+        bcOut.putU8(Opcode.OP_fclosure)
+        bcOut.putU32(hf.cpoolIdx)
+        
+        bcOut.putU8(Opcode.OP_define_func)
+        bcOut.putU32(hf.varName)
+        bcOut.putU8(flags)
+      } else {
+        // 变量定义
+        if (hf.isLexical) {
+          flags |= 0x10 // DEFINE_GLOBAL_LEX_VAR
+          if (!hf.isConst) {
+            flags |= 0x02 // JS_PROP_WRITABLE
+          }
+        }
+        bcOut.putU8(Opcode.OP_define_var)
+        bcOut.putU32(hf.varName)
+        bcOut.putU8(flags)
+      }
+      
+      // 如果是函数或需要强制初始化，需要额外的初始化
+      if (hf.cpoolIdx >= 0 || hf.forceInit) {
+        if (hf.cpoolIdx >= 0) {
+          bcOut.putU8(Opcode.OP_fclosure)
+          bcOut.putU32(hf.cpoolIdx)
+        } else {
+          bcOut.putU8(Opcode.OP_undefined)
+        }
+        bcOut.putU8(Opcode.OP_put_var_init)
+        bcOut.putU32(hf.varName)
       }
     }
   }
@@ -585,7 +759,7 @@ export class VariableResolver {
     op: number,
     bcOut: BytecodeBuilder
   ): boolean {
-    const isPut = (op === Opcode.OP_scope_put_var || op === Opcode.OP_scope_make_ref)
+    const isPut = (op === TempOpcode.OP_scope_put_var || op === TempOpcode.OP_scope_make_ref)
     
     if (isPut && !(varIdx & ARGUMENT_VAR_OFFSET)) {
       const vd = fd.vars[varIdx]
@@ -615,12 +789,12 @@ export class VariableResolver {
     op: number,
     bcOut: BytecodeBuilder
   ): void {
-    const isPut = (op === Opcode.OP_scope_put_var || op === Opcode.OP_scope_put_var_init)
+    const isPut = (op === TempOpcode.OP_scope_put_var || op === TempOpcode.OP_scope_put_var_init)
     const isArg = (varIdx & ARGUMENT_VAR_OFFSET) !== 0
     const realIdx = isArg ? varIdx - ARGUMENT_VAR_OFFSET : varIdx
     
     switch (op) {
-      case Opcode.OP_scope_make_ref: {
+      case TempOpcode.OP_scope_make_ref: {
         // 创建引用
         if (isArg) {
           bcOut.putU8(Opcode.OP_make_arg_ref)
@@ -634,14 +808,14 @@ export class VariableResolver {
         break
       }
       
-      case Opcode.OP_scope_get_ref:
+      case TempOpcode.OP_scope_get_ref:
         bcOut.putU8(Opcode.OP_undefined)
         // fall through
-      case Opcode.OP_scope_get_var_checkthis:
-      case Opcode.OP_scope_get_var_undef:
-      case Opcode.OP_scope_get_var:
-      case Opcode.OP_scope_put_var:
-      case Opcode.OP_scope_put_var_init: {
+      case TempOpcode.OP_scope_get_var_checkthis:
+      case TempOpcode.OP_scope_get_var_undef:
+      case TempOpcode.OP_scope_get_var:
+      case TempOpcode.OP_scope_put_var:
+      case TempOpcode.OP_scope_put_var_init: {
         if (isArg) {
           // 参数访问
           bcOut.putU8(isPut ? Opcode.OP_put_arg : Opcode.OP_get_arg)
@@ -652,7 +826,7 @@ export class VariableResolver {
           
           if (isPut) {
             if (vd.isLexical) {
-              if (op === Opcode.OP_scope_put_var_init) {
+              if (op === TempOpcode.OP_scope_put_var_init) {
                 // this 只能初始化一次
                 if (varName === JSAtom.JS_ATOM_this) {
                   bcOut.putU8(Opcode.OP_put_loc_check_init)
@@ -667,7 +841,7 @@ export class VariableResolver {
             }
           } else {
             if (vd.isLexical) {
-              if (op === Opcode.OP_scope_get_var_checkthis) {
+              if (op === TempOpcode.OP_scope_get_var_checkthis) {
                 bcOut.putU8(Opcode.OP_get_loc_checkthis)
               } else {
                 bcOut.putU8(Opcode.OP_get_loc_check)
@@ -681,7 +855,7 @@ export class VariableResolver {
         break
       }
       
-      case Opcode.OP_scope_delete_var:
+      case TempOpcode.OP_scope_delete_var:
         // delete 局部变量始终返回 false
         bcOut.putU8(Opcode.OP_push_false)
         break
@@ -703,10 +877,10 @@ export class VariableResolver {
     bcOut: BytecodeBuilder
   ): void {
     const cv = fd.closureVar[closureIdx]
-    const isPut = (op === Opcode.OP_scope_put_var || op === Opcode.OP_scope_put_var_init)
+    const isPut = (op === TempOpcode.OP_scope_put_var || op === TempOpcode.OP_scope_put_var_init)
     
     // 检查 const 赋值
-    if ((op === Opcode.OP_scope_put_var || op === Opcode.OP_scope_make_ref) && cv.isConst) {
+    if ((op === TempOpcode.OP_scope_put_var || op === TempOpcode.OP_scope_make_ref) && cv.isConst) {
       bcOut.putU8(Opcode.OP_throw_error)
       bcOut.putU32(varName)
       bcOut.putU8(JS_THROW_VAR_RO)
@@ -714,7 +888,7 @@ export class VariableResolver {
     }
     
     switch (op) {
-      case Opcode.OP_scope_make_ref: {
+      case TempOpcode.OP_scope_make_ref: {
         // 创建闭包引用
         if (cv.varKind === JSVarKindEnum.JS_VAR_FUNCTION_NAME) {
           // 函数名特殊处理
@@ -733,16 +907,16 @@ export class VariableResolver {
         break
       }
       
-      case Opcode.OP_scope_get_ref:
+      case TempOpcode.OP_scope_get_ref:
         bcOut.putU8(Opcode.OP_undefined)
         // fall through
-      case Opcode.OP_scope_get_var_undef:
-      case Opcode.OP_scope_get_var:
-      case Opcode.OP_scope_put_var:
-      case Opcode.OP_scope_put_var_init: {
+      case TempOpcode.OP_scope_get_var_undef:
+      case TempOpcode.OP_scope_get_var:
+      case TempOpcode.OP_scope_put_var:
+      case TempOpcode.OP_scope_put_var_init: {
         if (isPut) {
           if (cv.isLexical) {
-            if (op === Opcode.OP_scope_put_var_init) {
+            if (op === TempOpcode.OP_scope_put_var_init) {
               if (varName === JSAtom.JS_ATOM_this) {
                 bcOut.putU8(Opcode.OP_put_var_ref_check_init)
               } else {
@@ -765,7 +939,7 @@ export class VariableResolver {
         break
       }
       
-      case Opcode.OP_scope_delete_var:
+      case TempOpcode.OP_scope_delete_var:
         bcOut.putU8(Opcode.OP_push_false)
         break
     }
@@ -784,39 +958,39 @@ export class VariableResolver {
     bcOut: BytecodeBuilder
   ): void {
     switch (op) {
-      case Opcode.OP_scope_make_ref:
+      case TempOpcode.OP_scope_make_ref:
         bcOut.putU8(Opcode.OP_make_var_ref)
         bcOut.putU32(varName)
         break
         
-      case Opcode.OP_scope_get_ref:
+      case TempOpcode.OP_scope_get_ref:
         bcOut.putU8(Opcode.OP_undefined)
         bcOut.putU8(Opcode.OP_get_var)
         bcOut.putU32(varName)
         break
         
-      case Opcode.OP_scope_get_var_undef:
+      case TempOpcode.OP_scope_get_var_undef:
         bcOut.putU8(Opcode.OP_get_var_undef)
         bcOut.putU32(varName)
         break
         
-      case Opcode.OP_scope_get_var:
-      case Opcode.OP_scope_get_var_checkthis:
+      case TempOpcode.OP_scope_get_var:
+      case TempOpcode.OP_scope_get_var_checkthis:
         bcOut.putU8(Opcode.OP_get_var)
         bcOut.putU32(varName)
         break
         
-      case Opcode.OP_scope_put_var:
+      case TempOpcode.OP_scope_put_var:
         bcOut.putU8(Opcode.OP_put_var)
         bcOut.putU32(varName)
         break
         
-      case Opcode.OP_scope_put_var_init:
+      case TempOpcode.OP_scope_put_var_init:
         bcOut.putU8(Opcode.OP_put_var_init)
         bcOut.putU32(varName)
         break
         
-      case Opcode.OP_scope_delete_var:
+      case TempOpcode.OP_scope_delete_var:
         bcOut.putU8(Opcode.OP_delete_var)
         bcOut.putU32(varName)
         break
@@ -849,11 +1023,11 @@ export class VariableResolver {
     const { idx, isRef, varKind } = result
     
     switch (op) {
-      case Opcode.OP_scope_get_private_field:
-      case Opcode.OP_scope_get_private_field2: {
+      case TempOpcode.OP_scope_get_private_field:
+      case TempOpcode.OP_scope_get_private_field2: {
         switch (varKind) {
           case JSVarKindEnum.JS_VAR_PRIVATE_FIELD:
-            if (op === Opcode.OP_scope_get_private_field2) {
+            if (op === TempOpcode.OP_scope_get_private_field2) {
               bcOut.putU8(Opcode.OP_dup)
             }
             this.emitGetLocOrRef(bcOut, isRef, idx)
@@ -863,14 +1037,14 @@ export class VariableResolver {
           case JSVarKindEnum.JS_VAR_PRIVATE_METHOD:
             this.emitGetLocOrRef(bcOut, isRef, idx)
             bcOut.putU8(Opcode.OP_check_brand)
-            if (op !== Opcode.OP_scope_get_private_field2) {
+            if (op !== TempOpcode.OP_scope_get_private_field2) {
               bcOut.putU8(Opcode.OP_nip)
             }
             break
             
           case JSVarKindEnum.JS_VAR_PRIVATE_GETTER:
           case JSVarKindEnum.JS_VAR_PRIVATE_GETTER_SETTER:
-            if (op === Opcode.OP_scope_get_private_field2) {
+            if (op === TempOpcode.OP_scope_get_private_field2) {
               bcOut.putU8(Opcode.OP_dup)
             }
             this.emitGetLocOrRef(bcOut, isRef, idx)
@@ -889,7 +1063,7 @@ export class VariableResolver {
         break
       }
       
-      case Opcode.OP_scope_put_private_field: {
+      case TempOpcode.OP_scope_put_private_field: {
         switch (varKind) {
           case JSVarKindEnum.JS_VAR_PRIVATE_FIELD:
             this.emitGetLocOrRef(bcOut, isRef, idx)
@@ -920,7 +1094,7 @@ export class VariableResolver {
         break
       }
       
-      case Opcode.OP_scope_in_private_field:
+      case TempOpcode.OP_scope_in_private_field:
         this.emitGetLocOrRef(bcOut, isRef, idx)
         bcOut.putU8(Opcode.OP_private_in)
         break
@@ -1007,6 +1181,31 @@ export class VariableResolver {
       bcOut.putU8(Opcode.OP_get_loc)
     }
     bcOut.putU16(idx)
+  }
+
+  // ============================================================================
+  // Eval 变量捕获 - 对应 parser.c:mark_eval_captured_variables
+  // 
+  // QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:9821-9832
+  // ============================================================================
+
+  /**
+   * 标记 eval 可能捕获的变量
+   * 
+   * eval 调用可能访问当前作用域的所有变量，因此需要将它们标记为被捕获，
+   * 以便在运行时将它们放入闭包中。
+   * 
+   * @param fd 函数定义
+   * @param scopeLevel 作用域级别
+   */
+  private markEvalCapturedVariables(fd: FunctionDef, scopeLevel: number): void {
+    // 遍历作用域中的所有变量，标记为被捕获
+    let idx = fd.scopes[scopeLevel]?.first ?? -1
+    while (idx >= 0) {
+      const vd = fd.vars[idx]
+      vd.isCaptured = true
+      idx = vd.scopeNext
+    }
   }
 
   // ============================================================================

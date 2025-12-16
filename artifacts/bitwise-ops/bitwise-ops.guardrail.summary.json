@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/bitwise-ops/cli/bitwise-ops.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/bitwise-ops/cli/bitwise-ops.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/bitwise-ops/cli/bitwise-ops.pc2line.txt",
-    "bytecodeSize": 307,
-    "pc2lineLength": 0,
+    "bytecodeSize": 270,
+    "pc2lineLength": 34,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 245,
-    "wasmSize": 230,
-    "sizeDiff": 15,
-    "sizeDiffPercent": 6.521739130434782
+    "tsSize": 208,
+    "wasmSize": 222,
+    "sizeDiff": -14,
+    "sizeDiffPercent": -6.306306306306306
   },
   "trace": {
     "differenceCount": 0,

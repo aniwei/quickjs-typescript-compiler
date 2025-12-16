@@ -11,6 +11,7 @@ async function main() {
   const functionKinds = await QuickJSLib.getFunctionKinds()
   const jsModes = await QuickJSLib.getJSModes()
   const pc2LineCodes = await QuickJSLib.getPC2LineCodes()
+  const specialObjects = await QuickJSLib.getSpecialObjects()
   const opFormats = await QuickJSLib.getAllOpcodeFormats()
   const opcodes = await QuickJSLib.getAllOpcodes()
   const atoms = await QuickJSLib.getAllAtoms()
@@ -40,6 +41,18 @@ async function main() {
   lines.push(`export const DEBUG_SCOPE_INDEX = ${debugScopeIndex}`)
   lines.push(`export const JS_MAX_LOCAL_VARS = ${maxLocalVars}`)
   lines.push(`export const JS_STACK_SIZE_MAX = ${stackSizeMax}`)
+  lines.push(``)
+  
+  // Derived constants from compileOptions
+  const COMPILE_FLAG_SHORT_OPCODES = compileFlags['COMPILE_FLAG_SHORT_OPCODES'] || 4
+  const JS_MODE_STRICT_VALUE = jsModes['JS_MODE_STRICT'] || 1
+  const hasShortOpcodes = (compileOptions & COMPILE_FLAG_SHORT_OPCODES) !== 0
+  lines.push(`// Compile options derived constants`)
+  lines.push(`export const compileOptions = ${compileOptions}`)
+  lines.push(`export const SHORT_OPCODES = ${hasShortOpcodes}`)
+  lines.push(`export const JS_MODE_STRICT_DEFAULT = ${JS_MODE_STRICT_VALUE}`)
+  lines.push(`export const bytecodeVersion = ${bytecodeVersion}`)
+  lines.push(`export const firstAtomId = ${firstAtomId}`)
   lines.push(``)
 
   // CompileFlags
@@ -90,6 +103,14 @@ async function main() {
   lines.push(`}`)
   lines.push(``)
 
+  // OPSpecialObjectEnum
+  lines.push(`export enum OPSpecialObjectEnum {`)
+  for (const [key, value] of Object.entries(specialObjects)) {
+    lines.push(`  ${key} = ${value},`)
+  }
+  lines.push(`}`)
+  lines.push(``)
+
   // OpFormat
   lines.push(`export enum OpFormat {`)
   for (const [key, value] of Object.entries(opFormats)) {
@@ -98,17 +119,38 @@ async function main() {
   lines.push(`}`)
   lines.push(``)
 
-  // Opcode Enum
+  // Opcode Enum (只包含最终字节码中的 opcodes)
+  const finalOpcodes = opcodes.filter(op => !op.isTemp)
+  const tempOpcodes = opcodes.filter(op => op.isTemp)
+  
   lines.push(`export enum Opcode {`)
-  for (const op of opcodes) {
+  for (const op of finalOpcodes) {
     lines.push(`  OP_${op.name} = ${op.code},`)
   }
   lines.push(`}`)
   lines.push(``)
 
-  // OPCODE_NAME_TO_CODE
+  // TempOpcode Enum (临时 opcodes，只在编译阶段使用，ID 与 SHORT_OPCODES 重叠)
+  lines.push(`// 临时 opcodes: 只在编译阶段使用，ID 与 SHORT_OPCODES 重叠，最终字节码中不会出现`)
+  lines.push(`export enum TempOpcode {`)
+  for (const op of tempOpcodes) {
+    lines.push(`  OP_${op.name} = ${op.code},`)
+  }
+  lines.push(`}`)
+  lines.push(``)
+
+  // OPCODE_NAME_TO_CODE (只包含最终 opcodes)
   lines.push(`export const OPCODE_NAME_TO_CODE: Record<string, number> = {`)
-  for (const op of opcodes) {
+  for (const op of finalOpcodes) {
+    lines.push(`  "${op.name}": ${op.code},`)
+  }
+  lines.push(`}`)
+  lines.push(``)
+
+  // TEMP_OPCODE_NAME_TO_CODE (临时 opcodes，用于编译阶段)
+  lines.push(`// 临时 opcodes: 只在编译阶段使用，ID 与 SHORT_OPCODES 重叠`)
+  lines.push(`export const TEMP_OPCODE_NAME_TO_CODE: Record<string, number> = {`)
+  for (const op of tempOpcodes) {
     lines.push(`  "${op.name}": ${op.code},`)
   }
   lines.push(`}`)
@@ -146,7 +188,8 @@ async function main() {
     if (key === 'empty_string') {
       lines.push(`  ${id}: "",`)
     } else if (key === '<private_brand>') {
-      lines.push(`  ${id}: "Private_brand",`)
+      // QuickJS quickjs-atom.h: DEF(Private_brand, "<brand>")
+      lines.push(`  ${id}: "<brand>",`)
     } else {
       lines.push(`  ${id}: "${key}",`)
     }
@@ -164,33 +207,38 @@ async function main() {
   lines.push(`}`)
   lines.push(``)
 
-  // OPCODE_DEFS
+  // OPCODE_DEFS - 按名称索引 (只包含最终 opcodes)
   lines.push(`export const OPCODE_DEFS: Record<string, OpcodeDefinition> = {`)
   const fmtMap = new Map(Object.entries(opFormats).map(([k, v]) => [v, k]))
-  for (const op of opcodes) {
+  for (const op of finalOpcodes) {
     const fmtName = fmtMap.get(op.fmt) || 'none'
     lines.push(`  OP_${op.name}: { id: "${op.name}", size: ${op.size}, nPop: ${op.nPop}, nPush: ${op.nPush}, format: OpFormat.${fmtName} },`)
   }
   lines.push(`}`)
   lines.push(``)
 
-  // SHORT_OPCODE_DEFS
+  // OPCODE_BY_CODE - 按数字索引（用于 VariableResolver）(只包含最终 opcodes)
+  lines.push(`export const OPCODE_BY_CODE: Record<number, OpcodeDefinition> = {`)
+  for (const op of finalOpcodes) {
+    const fmtName = fmtMap.get(op.fmt) || 'none'
+    lines.push(`  ${op.code}: { id: "${op.name}", size: ${op.size}, nPop: ${op.nPop}, nPush: ${op.nPush}, format: OpFormat.${fmtName} },`)
+  }
+  lines.push(`}`)
+  lines.push(``)
+
+  // TEMP_OPCODE_DEFS - 临时 opcodes (用于编译阶段)
+  lines.push(`// 临时 opcodes: 只在编译阶段使用，不会出现在最终字节码中`)
+  lines.push(`export const TEMP_OPCODE_DEFS: Record<string, OpcodeDefinition> = {`)
+  for (const op of tempOpcodes) {
+    const fmtName = fmtMap.get(op.fmt) || 'none'
+    lines.push(`  OP_${op.name}: { id: "${op.name}", size: ${op.size}, nPop: ${op.nPop}, nPush: ${op.nPush}, format: OpFormat.${fmtName} },`)
+  }
+  lines.push(`}`)
+  lines.push(``)
+
+  // SHORT_OPCODE_DEFS - 保持兼容性
   lines.push(`export const SHORT_OPCODE_DEFS: Record<string, OpcodeDefinition> = {`)
-  // Assuming short opcodes are those with size < 5 or specific range?
-  // Actually, the C++ code defines SHORT_OPCODES.
-  // But here we can just dump all of them or filter if we knew which are short.
-  // The previous file had a subset.
-  // For now, let's just dump the same set as OPCODE_DEFS but maybe filtered?
-  // The previous file had a specific list.
-  // Let's just replicate OPCODE_DEFS for now, or maybe we can detect short opcodes?
-  // In QuickJS, short opcodes are aliases.
-  // But getOpcodes returns all of them.
-  // Let's just use the same list for now, or maybe filter by name?
-  // The previous list seemed to be a subset.
-  // Let's just include all for now to be safe.
-  for (const op of opcodes) {
-     // Heuristic: if it's a short opcode, it usually has a suffix or is in a specific range.
-     // But let's just dump all.
+  for (const op of finalOpcodes) {
      const fmtName = fmtMap.get(op.fmt) || 'none'
      lines.push(`  OP_${op.name}: { id: "${op.name}", size: ${op.size}, nPop: ${op.nPop}, nPush: ${op.nPush}, format: OpFormat.${fmtName} },`)
   }

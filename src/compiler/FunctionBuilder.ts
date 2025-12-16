@@ -168,8 +168,15 @@ export class FunctionBuilder {
     // 1. 重新计算作用域链接 - parser.c:12448-12471
     this.recomputeScopeLinkage(fd)
     
-    // 2. 递归创建子函数 (在 TypeScript 中由调用方处理)
-    // 对应 parser.c:12485-12497
+    // 2. 递归创建子函数 - 对应 parser.c:12485-12497
+    // 先递归构建所有子函数，然后将它们放入 cpool
+    for (const childFd of fd.childList) {
+      const cpoolIdx = childFd.parentCpoolIdx
+      if (cpoolIdx >= 0 && cpoolIdx < fd.cpool.length) {
+        const childBytecode = this.build(childFd)
+        fd.cpool[cpoolIdx] = childBytecode
+      }
+    }
     
     // 3. 复制字节码 - parser.c:12572-12577
     b.byteCodeBuf = fd.byteCode.data()
@@ -281,23 +288,35 @@ export class FunctionBuilder {
 // ============================================================================
 
 import { Compiler } from './Compiler'
+import { OpFormat, OPCODE_BY_CODE, firstAtomId } from '../env'
 
 /**
  * BytecodeWriter - 将 JSFunctionBytecode 序列化为二进制格式
  * 
  * 对应 QuickJS bytecode.cpp:450-530 的 JS_WriteFunctionTag
+ * 
+ * 关键点:
+ * 1. 内置 atoms (< firstAtomId=228) 直接使用原值，不加入 atoms 表
+ * 2. 用户 atoms (>= 228) 需要加入 atoms 表，并使用映射索引
+ * 3. bc_put_atom 使用 LEB128 编码，值左移1位
+ * 4. 字节码中的 atom 需要转换为索引
  */
 export class BytecodeWriter {
   private out: BytecodeBuilder
+  /** atom -> 序列化后的索引 (对于 >= firstAtomId 的 atom) */
   private atomToIdx: Map<number, number>
+  /** 用户 atoms 列表 (只包含 >= firstAtomId 的 atom) */
   private idxToAtom: number[]
   private compiler: Compiler | null
+  /** firstAtomId = 228, 内置 atoms 阈值 */
+  private firstAtom: number
   
   constructor(compiler?: Compiler) {
     this.out = new BytecodeBuilder()
     this.atomToIdx = new Map()
     this.idxToAtom = []
     this.compiler = compiler || null
+    this.firstAtom = firstAtomId // 228
   }
   
   /**
@@ -422,6 +441,8 @@ export class BytecodeWriter {
    * 
    * 对应 bytecode.cpp:337-380 的 JS_WriteFunctionBytecode
    * 
+   * 关键逻辑: 遍历字节码，将 atom 格式的操作码中的 atom 值转换为序列化索引
+   * 
    * @param bcBuf 字节码缓冲区
    * @param bcLen 字节码长度
    */
@@ -431,11 +452,53 @@ export class BytecodeWriter {
     buf.set(bcBuf.subarray(0, bcLen))
     
     // 遍历字节码，转换 atom 索引
-    // 注意: 这里需要根据操作码格式来处理
-    // 简化实现：直接写入原始字节码
-    // 完整实现应该遍历操作码，将 atom 转换为索引
+    let pos = 0
+    while (pos < bcLen) {
+      const op = buf[pos]
+      const opDef = OPCODE_BY_CODE[op]
+      
+      if (!opDef) {
+        // 未知操作码，跳过1字节
+        pos++
+        continue
+      }
+      
+      const fmt = opDef.format
+      
+      // 检查是否包含 atom
+      switch (fmt) {
+        case OpFormat.atom:
+        case OpFormat.atom_u8:
+        case OpFormat.atom_u16:
+        case OpFormat.atom_label_u8:
+        case OpFormat.atom_label_u16: {
+          // atom 在 pos+1 位置，占4字节
+          const atom = this.getU32(buf, pos + 1)
+          const idx = this.bcAtomToIdx(atom)
+          this.putU32(buf, pos + 1, idx)
+          break
+        }
+        default:
+          break
+      }
+      
+      pos += opDef.size
+    }
     
     this.out.put(buf)
+  }
+  
+  /** 从缓冲区读取 little-endian U32 */
+  private getU32(buf: Uint8Array, pos: number): number {
+    return buf[pos] | (buf[pos + 1] << 8) | (buf[pos + 2] << 16) | (buf[pos + 3] << 24)
+  }
+  
+  /** 向缓冲区写入 little-endian U32 */
+  private putU32(buf: Uint8Array, pos: number, val: number): void {
+    buf[pos] = val & 0xff
+    buf[pos + 1] = (val >> 8) & 0xff
+    buf[pos + 2] = (val >> 16) & 0xff
+    buf[pos + 3] = (val >> 24) & 0xff
   }
   
   /**
@@ -498,18 +561,59 @@ export class BytecodeWriter {
   }
   
   /**
-   * 写入 Atom (转换为索引)
+   * 写入 Atom (转换为索引) - 对应 bytecode.cpp:268-278 的 bc_put_atom
+   * 
+   * 关键逻辑:
+   * 1. 如果 atom < firstAtom (228)，直接使用原值
+   * 2. 如果 atom >= firstAtom，需要映射到用户 atom 索引
+   * 3. 使用 LEB128 编码，值左移1位 (v <<= 1)
    * 
    * @param atom Atom 值
    */
   private putAtom(atom: number): void {
-    let idx = this.atomToIdx.get(atom)
-    if (idx === undefined) {
-      idx = this.idxToAtom.length
-      this.atomToIdx.set(atom, idx)
-      this.idxToAtom.push(atom)
+    let v: number
+    
+    // 检查是否为 tagged int (QuickJS 特有，这里暂不处理)
+    // if (__JS_AtomIsTaggedInt(atom)) { v = (atom << 1) | 1; }
+    
+    if (atom < this.firstAtom) {
+      // 内置 atom，直接使用原值
+      v = atom
+    } else {
+      // 用户 atom，需要映射
+      v = this.bcAtomToIdx(atom)
     }
-    this.out.putU32(idx)
+    
+    // 左移1位后使用 LEB128 编码
+    this.out.putULEB128(v << 1)
+  }
+  
+  /**
+   * 将 atom 转换为序列化索引 - 对应 bytecode.cpp:225-264 的 bc_atom_to_idx
+   * 
+   * @param atom 原始 atom 值
+   * @returns 序列化后的索引值
+   */
+  private bcAtomToIdx(atom: number): number {
+    // 如果是内置 atom，直接返回
+    if (atom < this.firstAtom) {
+      return atom
+    }
+    
+    // 检查是否已经映射
+    const cached = this.atomToIdx.get(atom)
+    if (cached !== undefined) {
+      return cached
+    }
+    
+    // 添加新的用户 atom
+    const v = this.idxToAtom.length
+    this.idxToAtom.push(atom)
+    // 索引需要加上 firstAtom 偏移
+    const idx = v + this.firstAtom
+    this.atomToIdx.set(atom, idx)
+    
+    return idx
   }
   
   /**

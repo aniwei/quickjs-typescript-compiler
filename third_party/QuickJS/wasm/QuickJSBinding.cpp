@@ -6,6 +6,7 @@
 #include "QuickJSBinding.h"
 #include "../src/core/types.h"
 #include "../src/core/builtins/js-function.h"
+#include "../src/core/function.h"
 
 namespace quickjs {
   std::string getException(JSContext *context, JSValue module) {
@@ -73,11 +74,30 @@ namespace quickjs {
     return context;
   }
 
-  /// @brief
+  /// @brief Compile as module (default)
   std::vector<uint8_t> QuickJSBinding::compile(
     std::string input, 
     std::string sourceURL,
     std::vector<std::string> modules
+  ) {
+    return compileWithFlags(input, sourceURL, modules, JS_EVAL_FLAG_COMPILE_ONLY | JS_EVAL_TYPE_MODULE);
+  }
+
+  /// @brief Compile as script (global eval)
+  std::vector<uint8_t> QuickJSBinding::compileScript(
+    std::string input, 
+    std::string sourceURL,
+    std::vector<std::string> modules
+  ) {
+    return compileWithFlags(input, sourceURL, modules, JS_EVAL_FLAG_COMPILE_ONLY | JS_EVAL_TYPE_GLOBAL);
+  }
+
+  /// @brief Internal compile with flags
+  std::vector<uint8_t> QuickJSBinding::compileWithFlags(
+    std::string input, 
+    std::string sourceURL,
+    std::vector<std::string> modules,
+    int evalFlags
   ) {
     JSContext *context = prepare(modules);
     JSValue m = JS_Eval(
@@ -85,7 +105,7 @@ namespace quickjs {
       input.c_str(),
       input.size(),
       sourceURL.c_str(),
-      JS_EVAL_FLAG_COMPILE_ONLY | JS_EVAL_TYPE_MODULE
+      evalFlags
     );
 
     if (taro_is_exception(m)) {
@@ -348,6 +368,20 @@ namespace quickjs {
     return codes;
   }
 
+  std::vector<SpecialObject> QuickJSBinding::getSpecialObjects() {
+    std::vector<SpecialObject> objects;
+
+    objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_ARGUMENTS, name: "OP_SPECIAL_OBJECT_ARGUMENTS" });
+    objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_MAPPED_ARGUMENTS, name: "OP_SPECIAL_OBJECT_MAPPED_ARGUMENTS" });
+    objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_THIS_FUNC, name: "OP_SPECIAL_OBJECT_THIS_FUNC" });
+    objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_NEW_TARGET, name: "OP_SPECIAL_OBJECT_NEW_TARGET" });
+    objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_HOME_OBJECT, name: "OP_SPECIAL_OBJECT_HOME_OBJECT" });
+    objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_VAR_OBJECT, name: "OP_SPECIAL_OBJECT_VAR_OBJECT" });
+    objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_IMPORT_META, name: "OP_SPECIAL_OBJECT_IMPORT_META" });
+
+    return objects;
+  }
+
   std::vector<FunctionKind> QuickJSBinding::getFunctionKinds() {
     std::vector<FunctionKind> kinds;
 
@@ -385,23 +419,52 @@ namespace quickjs {
     return tags;
   }
 
-  std::vector<OpFmt> QuickJSBinding::getOpcodeFormats() {
-    std::vector<OpFmt> formats;
-
-    // 先构造本地格式枚举，确保 f 有确定的数值
-    enum {
-      #define FMT(f) OPFMT_##f,
-      #define DEF(id, size, n_pop, n_push, f)
+  int QuickJSBinding::getOpcodeId(std::string name) {
+    // 定义 opcode 的 name 数组
+    static const char* opcode_names[] = {
+      #define FMT(f)
+      #define DEF(id, size, n_pop, n_push, f) #id,
       #define def(id, size, n_pop, n_push, f)
       #include "QuickJS/quickjs-opcode.h"
       #undef def
       #undef DEF
       #undef FMT
-      OPFMT__COUNT
     };
 
-    // 然后填充格式数组
-    #define FMT(f) formats.push_back(OpFmt{ static_cast<uint8_t>(OPFMT_##f), #f });
+    // 在非临时 opcodes 中查找
+    for (uint32_t i = 0; i < OP_COUNT; i++) {
+      if (name == opcode_names[i]) {
+        return static_cast<int>(i);
+      }
+    }
+
+    // 定义临时 opcode 的 name 数组
+    static const char* temp_opcode_names[] = {
+      #define FMT(f)
+      #define DEF(id, size, n_pop, n_push, f)
+      #define def(id, size, n_pop, n_push, f) #id,
+      #include "QuickJS/quickjs-opcode.h"
+      #undef def
+      #undef DEF
+      #undef FMT
+    };
+
+    // 在临时 opcodes 中查找
+    size_t temp_count = sizeof(temp_opcode_names) / sizeof(temp_opcode_names[0]);
+    for (size_t i = 0; i < temp_count; i++) {
+      if (name == temp_opcode_names[i]) {
+        return static_cast<int>(OP_TEMP_START + i);
+      }
+    }
+
+    return -1; // 未找到
+  }
+
+  std::vector<OpFmt> QuickJSBinding::getOpcodeFormats() {
+    std::vector<OpFmt> formats;
+
+    // 使用宏展开来填充格式数组
+    #define FMT(f) formats.push_back(OpFmt{ static_cast<uint8_t>(OP_FMT_##f), #f });
     #define DEF(id, size, n_pop, n_push, f)
     #define def(id, size, n_pop, n_push, f)
     #include "QuickJS/quickjs-opcode.h"
@@ -414,83 +477,141 @@ namespace quickjs {
 
   std::vector<Op> QuickJSBinding::getOpcodes() {
     std::vector<Op> opcodes;
-    #ifndef SHORT_OPCODES
-    #define SHORT_OPCODES 1
-    #endif
 
-    // 本地 opcode 枚举，包含普通与短指令，顺序与 QuickJS 一致
-    enum {
+    // 定义 opcode 的 size 数组
+    static const uint8_t opcode_size[] = {
       #define FMT(f)
-      #define DEF(id, size, n_pop, n_push, f) OP_LOCAL_##id,
-      #define def(id, size, n_pop, n_push, f) OP_LOCAL_##id,
-      #include "QuickJS/quickjs-opcode.h"
-      #undef def
-      #undef DEF
-      #undef FMT
-      OP_LOCAL_COUNT,
-    };
-
-    // 同步构造格式枚举以获得格式码
-    enum {
-      #define FMT(f) OPFMT_##f,
-      #define DEF(id, size, n_pop, n_push, f)
+      #define DEF(id, size, n_pop, n_push, f) size,
       #define def(id, size, n_pop, n_push, f)
       #include "QuickJS/quickjs-opcode.h"
       #undef def
       #undef DEF
       #undef FMT
-      OPFMT__COUNT
     };
 
-    #define FMT(f)
-    #define DEF(id, size, n_pop, n_push, f) opcodes.push_back(Op{ \
-      static_cast<uint32_t>(OP_LOCAL_##id), \
-      #id, \
-      static_cast<uint8_t>(n_pop), \
-      static_cast<uint8_t>(n_push), \
-      static_cast<uint8_t>(OPFMT_##f), \
-      static_cast<uint8_t>(size) \
-    });
-    #define def(id, size, n_pop, n_push, f) opcodes.push_back(Op{ \
-      static_cast<uint32_t>(OP_LOCAL_##id), \
-      #id, \
-      static_cast<uint8_t>(n_pop), \
-      static_cast<uint8_t>(n_push), \
-      static_cast<uint8_t>(OPFMT_##f), \
-      static_cast<uint8_t>(size) \
-    });
-    #include "QuickJS/quickjs-opcode.h"
-    #undef def
-    #undef DEF
-    #undef FMT
-
-    return opcodes;
-  }
-
-  int QuickJSBinding::getOpcodeId(std::string name) {
-    #ifndef SHORT_OPCODES
-    #define SHORT_OPCODES 1
-    #endif
-
-    enum {
+    // 定义 opcode 的 n_pop 数组
+    static const uint8_t opcode_n_pop[] = {
       #define FMT(f)
-      #define DEF(id, size, n_pop, n_push, f) OP_LOCAL_##id,
-      #define def(id, size, n_pop, n_push, f) OP_LOCAL_##id,
+      #define DEF(id, size, n_pop, n_push, f) n_pop,
+      #define def(id, size, n_pop, n_push, f)
       #include "QuickJS/quickjs-opcode.h"
       #undef def
       #undef DEF
       #undef FMT
-      OP_LOCAL_COUNT,
     };
 
-    #define FMT(f)
-    #define DEF(id, size, n_pop, n_push, f) if (name == #id || name == "OP_" #id) return OP_LOCAL_##id;
-    #define def(id, size, n_pop, n_push, f) if (name == #id || name == "OP_" #id) return OP_LOCAL_##id;
-    #include "QuickJS/quickjs-opcode.h"
-    #undef def
-    #undef DEF
-    #undef FMT
+    // 定义 opcode 的 n_push 数组
+    static const uint8_t opcode_n_push[] = {
+      #define FMT(f)
+      #define DEF(id, size, n_pop, n_push, f) n_push,
+      #define def(id, size, n_pop, n_push, f)
+      #include "QuickJS/quickjs-opcode.h"
+      #undef def
+      #undef DEF
+      #undef FMT
+    };
 
-    return -1;
+    // 定义 opcode 的 fmt 数组
+    static const uint8_t opcode_fmt[] = {
+      #define FMT(f)
+      #define DEF(id, size, n_pop, n_push, f) OP_FMT_##f,
+      #define def(id, size, n_pop, n_push, f)
+      #include "QuickJS/quickjs-opcode.h"
+      #undef def
+      #undef DEF
+      #undef FMT
+    };
+
+    // 定义 opcode 的 name 数组
+    static const char* opcode_names[] = {
+      #define FMT(f)
+      #define DEF(id, size, n_pop, n_push, f) #id,
+      #define def(id, size, n_pop, n_push, f)
+      #include "QuickJS/quickjs-opcode.h"
+      #undef def
+      #undef DEF
+      #undef FMT
+    };
+
+    // 填充 DEF 定义的 opcodes (非临时 opcodes)
+    for (uint32_t i = 0; i < OP_COUNT; i++) {
+      opcodes.push_back(Op{
+        i,
+        opcode_names[i],
+        opcode_n_pop[i],
+        opcode_n_push[i],
+        opcode_fmt[i],
+        opcode_size[i],
+        false  // isTemp = false
+      });
+    }
+
+    // 定义临时 opcode 的数组 (def 小写定义的)
+    static const uint8_t temp_opcode_size[] = {
+      #define FMT(f)
+      #define DEF(id, size, n_pop, n_push, f)
+      #define def(id, size, n_pop, n_push, f) size,
+      #include "QuickJS/quickjs-opcode.h"
+      #undef def
+      #undef DEF
+      #undef FMT
+    };
+
+    static const uint8_t temp_opcode_n_pop[] = {
+      #define FMT(f)
+      #define DEF(id, size, n_pop, n_push, f)
+      #define def(id, size, n_pop, n_push, f) n_pop,
+      #include "QuickJS/quickjs-opcode.h"
+      #undef def
+      #undef DEF
+      #undef FMT
+    };
+
+    static const uint8_t temp_opcode_n_push[] = {
+      #define FMT(f)
+      #define DEF(id, size, n_pop, n_push, f)
+      #define def(id, size, n_pop, n_push, f) n_push,
+      #include "QuickJS/quickjs-opcode.h"
+      #undef def
+      #undef DEF
+      #undef FMT
+    };
+
+    static const uint8_t temp_opcode_fmt[] = {
+      #define FMT(f)
+      #define DEF(id, size, n_pop, n_push, f)
+      #define def(id, size, n_pop, n_push, f) OP_FMT_##f,
+      #include "QuickJS/quickjs-opcode.h"
+      #undef def
+      #undef DEF
+      #undef FMT
+    };
+
+    static const char* temp_opcode_names[] = {
+      #define FMT(f)
+      #define DEF(id, size, n_pop, n_push, f)
+      #define def(id, size, n_pop, n_push, f) #id,
+      #include "QuickJS/quickjs-opcode.h"
+      #undef def
+      #undef DEF
+      #undef FMT
+    };
+
+    // 填充临时 opcodes (从 OP_TEMP_START 开始)
+    // 注意：临时 opcodes 的 ID 与 SHORT_OPCODES 重叠，它们只在编译阶段使用
+    size_t temp_count = sizeof(temp_opcode_size) / sizeof(temp_opcode_size[0]);
+    for (size_t i = 0; i < temp_count; i++) {
+      opcodes.push_back(Op{
+        static_cast<uint32_t>(OP_TEMP_START + i),
+        temp_opcode_names[i],
+        temp_opcode_n_pop[i],
+        temp_opcode_n_push[i],
+        temp_opcode_fmt[i],
+        temp_opcode_size[i],
+        true  // isTemp = true
+      });
+    }
+
+    return opcodes;
   }
 }

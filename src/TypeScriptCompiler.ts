@@ -108,6 +108,10 @@ export class TypeScriptCompiler implements CompilerContext {
     fd.superCallAllowed = false
     fd.superAllowed = false
     fd.argumentsAllowed = true
+    // 重要: 对于 eval 脚本，js_new_function_def 使用 js_mallocz 初始化
+    // 所以 has_simple_parameter_list 初始为 0 (FALSE)，不像正常函数会设置为 TRUE
+    // (parser.c:13072 只对实际函数声明设置 TRUE)
+    fd.hasSimpleParameterList = false
     fd.funcName = this.compiler.addAtom('<eval>')
     fd.filename = this.compiler.addAtom(filename)
     fd.source = source
@@ -131,8 +135,9 @@ export class TypeScriptCompiler implements CompilerContext {
     this.compiler.pushScope(fd)
     fd.bodyScope = fd.scopeLevel
     
-    // 4. 添加隐藏变量 _ret_ 用于返回值 - 对应 parser.c:13499-13502
-    const retAtom = this.compiler.addAtom('_ret_')
+    // 4. 添加隐藏变量 <ret> 用于返回值 - 对应 parser.c:13499-13502
+    // 注意: QuickJS 中 JS_ATOM__ret_ 的实际字符串是 '<ret>' (见 quickjs-atom.h:116)
+    const retAtom = this.compiler.addAtom('<ret>')
     const retIdx = this.compiler.addVar(fd, retAtom)
     fd.evalRetIdx = retIdx
     
@@ -149,12 +154,15 @@ export class TypeScriptCompiler implements CompilerContext {
     
     // 7. 调用后端处理 - 对应 js_create_function (parser.c:12439-12705)
     
+
+    
     // 7.1 解析变量 - resolve_variables (parser.c:10456-10800)
     this.variableResolver.resolve(fd)
     
     // 7.2 解析标签 - resolve_labels (parser.c:11088-12120)
     const labelResolver = new LabelResolver(this)
     labelResolver.resolve(fd)
+
     
     // 7.3 计算栈大小 - compute_stack_size (parser.c:12191-12380)
     const stackComputer = new StackSizeComputer(this)
@@ -294,7 +302,7 @@ export class TypeScriptCompiler implements CompilerContext {
         this.expressionVisitor.visitDeleteExpression(node as ts.DeleteExpression)
         break
       case ts.SyntaxKind.ExpressionStatement:
-        // TODO
+        this.statementVisitor.visitExpressionStatement(node as ts.ExpressionStatement)
         break
       case ts.SyntaxKind.StringLiteral:
         this.literalVisitor.visitStringLiteral(node as ts.StringLiteral)

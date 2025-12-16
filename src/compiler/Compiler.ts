@@ -13,7 +13,7 @@ import {
   ARG_SCOPE_INDEX,
   JS_MAX_LOCAL_VARS,
 } from './FunctionDef'
-import { Opcode, env, BytecodeTag, JSAtom, PC2Line, OPCODE_DEFS } from '../env'
+import { Opcode, TempOpcode, env, BytecodeTag, JSAtom, PC2Line, OPCODE_DEFS } from '../env'
 import { BytecodeBuilder } from './BytecodeBuilder'
 import { AtomTable } from './AtomTable'
 import ts from 'typescript'
@@ -224,6 +224,29 @@ export class Compiler {
     this.builtInAtoms.set('reason', JSAtom.JS_ATOM_reason)
     this.builtInAtoms.set('globalThis', JSAtom.JS_ATOM_globalThis)
     this.builtInAtoms.set('bigint', JSAtom.JS_ATOM_bigint)
+
+    // 特殊数值字符串 (QuickJS quickjs-atom.h: 143-146)
+    this.builtInAtoms.set('-0', JSAtom.JS_ATOM_minus_zero)
+    this.builtInAtoms.set('Infinity', JSAtom.JS_ATOM_Infinity)
+    this.builtInAtoms.set('-Infinity', JSAtom.JS_ATOM_minus_Infinity)
+    this.builtInAtoms.set('NaN', JSAtom.JS_ATOM_NaN)
+
+    // RegExp flags (QuickJS quickjs-atom.h: 147-152)
+    this.builtInAtoms.set('hasIndices', JSAtom.JS_ATOM_hasIndices)
+    this.builtInAtoms.set('ignoreCase', JSAtom.JS_ATOM_ignoreCase)
+    this.builtInAtoms.set('multiline', JSAtom.JS_ATOM_multiline)
+    this.builtInAtoms.set('dotAll', JSAtom.JS_ATOM_dotAll)
+    this.builtInAtoms.set('sticky', JSAtom.JS_ATOM_sticky)
+    this.builtInAtoms.set('unicodeSets', JSAtom.JS_ATOM_unicodeSets)
+
+    // Atomics 结果标识符 (QuickJS quickjs-atom.h: 153-155)
+    this.builtInAtoms.set('not-equal', JSAtom.JS_ATOM_not_equal)
+    this.builtInAtoms.set('timed-out', JSAtom.JS_ATOM_timed_out)
+    this.builtInAtoms.set('ok', JSAtom.JS_ATOM_ok)
+
+    // toJSON 方法名 (QuickJS quickjs-atom.h: 156)
+    this.builtInAtoms.set('toJSON', JSAtom.JS_ATOM_toJSON)
+
     this.builtInAtoms.set('Object', JSAtom.JS_ATOM_Object)
     this.builtInAtoms.set('Array', JSAtom.JS_ATOM_Array)
     this.builtInAtoms.set('Error', JSAtom.JS_ATOM_Error)
@@ -281,7 +304,7 @@ export class Compiler {
     this.builtInAtoms.set('TypeError', JSAtom.JS_ATOM_TypeError)
     this.builtInAtoms.set('URIError', JSAtom.JS_ATOM_URIError)
     this.builtInAtoms.set('InternalError', JSAtom.JS_ATOM_InternalError)
-    this.builtInAtoms.set('Private_brand', JSAtom.JS_ATOM_Private_brand)
+    this.builtInAtoms.set('<brand>', JSAtom.JS_ATOM_Private_brand)
     this.builtInAtoms.set('Symbol.toPrimitive', JSAtom.JS_ATOM_Symbol_toPrimitive)
     this.builtInAtoms.set('Symbol.iterator', JSAtom.JS_ATOM_Symbol_iterator)
     this.builtInAtoms.set('Symbol.match', JSAtom.JS_ATOM_Symbol_match)
@@ -512,7 +535,7 @@ export class Compiler {
    */
   emitSourcePos(fd: FunctionDef, sourcePos: number): void {
     if (fd.lastOpcodeSourcePtr !== sourcePos) {
-      fd.byteCode.putByte(Opcode.OP_line_num)
+      fd.byteCode.putByte(TempOpcode.OP_line_num)
       fd.byteCode.putU32(sourcePos)
       fd.lastOpcodeSourcePtr = sourcePos
     }
@@ -557,11 +580,12 @@ export class Compiler {
    * 
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1805-1807
    * 
-   * 注意: 当前 TypeScript 版本中暂不实现 IC 优化
+   * 注意: 编译期间仅跟踪属性名 atoms，实际 IC 缓存在 QuickJS 运行时管理
    */
   emitIc(fd: FunctionDef, atom: number): void {
-    // TODO: 实现内联缓存支持
-    // add_ic_slot1(fd->ic, atom)
+    // 对应 add_ic_slot1(fd->ic, atom)
+    // QuickJS 源码位置: third_party/QuickJS/src/core/ic.h:108-127
+    fd.ic.addSlot(atom)
   }
 
   // ============================================================================
@@ -617,7 +641,7 @@ export class Compiler {
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1847-1851
    */
   emitLabelRaw(fd: FunctionDef, label: number): void {
-    this.emitU8(fd, Opcode.OP_label)
+    this.emitU8(fd, TempOpcode.OP_label)
     this.emitU32(fd, label)
     fd.labelSlots[label].pos = fd.byteCode.size
   }
@@ -631,7 +655,7 @@ export class Compiler {
    */
   emitLabelInt(fd: FunctionDef, label: number): number {
     if (label >= 0) {
-      this.emitOp(fd, Opcode.OP_label)
+      this.emitOp(fd, TempOpcode.OP_label)
       this.emitU32(fd, label)
       fd.labelSlots[label].pos = fd.byteCode.size
       return fd.byteCode.size - 4
@@ -658,6 +682,7 @@ export class Compiler {
    * @returns 标签索引，如果是死代码返回 -1
    */
   emitGotoInt(fd: FunctionDef, opcode: number, label: number): number {
+
     if (this.isLiveCode(fd)) {
       if (label < 0) {
         label = this.newLabelInt(fd)
@@ -666,8 +691,10 @@ export class Compiler {
       this.emitOp(fd, opcode)
       this.emitU32(fd, label)
       fd.labelSlots[label].refCount++
+
       return label
     }
+
     return -1
   }
 
@@ -860,7 +887,7 @@ export class Compiler {
     fd.scopes[scope].parent = fd.scopeLevel
     fd.scopes[scope].first = fd.scopeFirst
     
-    this.emitOp(fd, Opcode.OP_enter_scope)
+    this.emitOp(fd, TempOpcode.OP_enter_scope)
     this.emitU16(fd, scope)
     
     fd.scopeLevel = scope
@@ -890,7 +917,7 @@ export class Compiler {
    */
   popScope(fd: FunctionDef): void {
     const scope = fd.scopeLevel
-    this.emitOp(fd, Opcode.OP_leave_scope)
+    this.emitOp(fd, TempOpcode.OP_leave_scope)
     this.emitU16(fd, scope)
     fd.scopeLevel = fd.scopes[scope].parent
     fd.scopeFirst = this.getFirstLexicalVar(fd, fd.scopeLevel)
@@ -903,7 +930,7 @@ export class Compiler {
    */
   closeScopes(fd: FunctionDef, scope: number, scopeStop: number): void {
     while (scope > scopeStop) {
-      this.emitOp(fd, Opcode.OP_leave_scope)
+      this.emitOp(fd, TempOpcode.OP_leave_scope)
       this.emitU16(fd, scope)
       scope = fd.scopes[scope].parent
     }
@@ -1067,6 +1094,22 @@ export class Compiler {
    */
   addConst(fd: FunctionDef, val: any): number {
     return this.cpoolAdd(fd, val)
+  }
+
+  /**
+   * 设置 eval 返回值为 undefined - 对应 parser.c:6906-6912
+   * 
+   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:6906-6912
+   * 
+   * 在 if/while/do/for/switch/try 等控制流语句前调用，
+   * 确保在控制流不执行表达式的情况下返回值是 undefined。
+   */
+  setEvalRetUndefined(fd: FunctionDef): void {
+    if (fd.evalRetIdx >= 0) {
+      this.emitOp(fd, Opcode.OP_undefined)
+      this.emitOp(fd, Opcode.OP_put_loc)
+      this.emitU16(fd, fd.evalRetIdx)
+    }
   }
 
   /**

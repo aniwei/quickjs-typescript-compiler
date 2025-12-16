@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/comparison-ops/cli/comparison-ops.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/comparison-ops/cli/comparison-ops.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/comparison-ops/cli/comparison-ops.pc2line.txt",
-    "bytecodeSize": 365,
-    "pc2lineLength": 0,
+    "bytecodeSize": 308,
+    "pc2lineLength": 34,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 303,
-    "wasmSize": 284,
-    "sizeDiff": 19,
-    "sizeDiffPercent": 6.690140845070422
+    "tsSize": 246,
+    "wasmSize": 276,
+    "sizeDiff": -30,
+    "sizeDiffPercent": -10.869565217391305
   },
   "trace": {
     "differenceCount": 0,

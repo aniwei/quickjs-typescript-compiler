@@ -1,6 +1,6 @@
 import ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
-import { Opcode, FunctionKind, JSMode, JSAtom } from '../../env'
+import { Opcode, TempOpcode, FunctionKind, JSMode, JSAtom } from '../../env'
 import { 
   FunctionDef, 
   JSVarKind,
@@ -193,7 +193,7 @@ export class ClassVisitor extends VisitorContext {
     } else {
       this.compiler.emitOp(fd, Opcode.OP_undefined)
     }
-    this.compiler.emitOp(fd, Opcode.OP_scope_put_var_init)
+    this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
     this.compiler.emitAtom(fd, JSAtom.JS_ATOM_class_fields_init)
     this.compiler.emitU16(fd, fd.scopeLevel)
 
@@ -210,7 +210,7 @@ export class ClassVisitor extends VisitorContext {
     // 存储类名到作用域变量 - 对应 parser.c:3685-3694
     if (className !== 0) {
       this.compiler.emitOp(fd, Opcode.OP_dup)
-      this.compiler.emitOp(fd, Opcode.OP_scope_put_var_init)
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
       this.compiler.emitAtom(fd, className)
       this.compiler.emitU16(fd, fd.scopeLevel)
     }
@@ -234,12 +234,12 @@ export class ClassVisitor extends VisitorContext {
     // 对于类声明，定义变量并存储 - 对应 parser.c:3708-3716
     if (classVarName !== 0) {
       this.compiler.defineVar(fd, classVarName, JSVarDefEnum.JS_VAR_DEF_LET)
-      this.compiler.emitOp(fd, Opcode.OP_scope_put_var_init)
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
       this.compiler.emitAtom(fd, classVarName)
       this.compiler.emitU16(fd, fd.scopeLevel)
     } else if (className === 0) {
       // 匿名类: 设置类名
-      this.compiler.emitOp(fd, Opcode.OP_set_class_name)
+      this.compiler.emitOp(fd, TempOpcode.OP_set_class_name)
       this.compiler.emitU32(fd, fd.lastOpcodePos + 1 - defineClassOffset)
     }
 
@@ -425,7 +425,7 @@ export class ClassVisitor extends VisitorContext {
       this.compiler.emitOp(fd, Opcode.OP_set_home_object)
       this.compiler.emitOp(fd, Opcode.OP_set_name)
       this.compiler.emitAtom(fd, methodName)
-      this.compiler.emitOp(fd, Opcode.OP_scope_put_var_init)
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
       this.compiler.emitAtom(fd, methodName)
       this.compiler.emitU16(fd, fd.scopeLevel)
     } else {
@@ -502,7 +502,7 @@ export class ClassVisitor extends VisitorContext {
     if (isPrivate) {
       accessorFd.needHomeObject = true
       this.compiler.emitOp(fd, Opcode.OP_set_home_object)
-      this.compiler.emitOp(fd, Opcode.OP_scope_put_var_init)
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
       this.compiler.emitAtom(fd, accessorName)
       this.compiler.emitU16(fd, fd.scopeLevel)
     } else {
@@ -540,7 +540,7 @@ export class ClassVisitor extends VisitorContext {
       this.compiler.defineVar(fd, fieldName, JSVarDefEnum.JS_VAR_DEF_CONST)
       this.compiler.emitOp(fd, Opcode.OP_private_symbol)
       this.compiler.emitAtom(fd, fieldName)
-      this.compiler.emitOp(fd, Opcode.OP_scope_put_var_init)
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
       this.compiler.emitAtom(fd, fieldName)
       this.compiler.emitU16(fd, fd.scopeLevel)
     }
@@ -555,18 +555,18 @@ export class ClassVisitor extends VisitorContext {
     this.context.funcDef = cf.fieldsInitFd
 
     // 发射 this
-    this.compiler.emitOp(cf.fieldsInitFd, Opcode.OP_scope_get_var)
+    this.compiler.emitOp(cf.fieldsInitFd, TempOpcode.OP_scope_get_var)
     this.compiler.emitAtom(cf.fieldsInitFd, JSAtom.JS_ATOM_this)
     this.compiler.emitU16(cf.fieldsInitFd, 0)
 
     if (isComputedName) {
       // 获取计算属性名
-      this.compiler.emitOp(cf.fieldsInitFd, Opcode.OP_scope_get_var)
+      this.compiler.emitOp(cf.fieldsInitFd, TempOpcode.OP_scope_get_var)
       this.compiler.emitAtom(cf.fieldsInitFd, JSAtom.JS_ATOM_computed_field + (isStatic ? 1 : 0))
       this.compiler.emitU16(cf.fieldsInitFd, fd.scopeLevel)
       cf.computedFieldsCount++
     } else if (isPrivate) {
-      this.compiler.emitOp(cf.fieldsInitFd, Opcode.OP_scope_get_var)
+      this.compiler.emitOp(cf.fieldsInitFd, TempOpcode.OP_scope_get_var)
       this.compiler.emitAtom(cf.fieldsInitFd, fieldName)
       this.compiler.emitU16(cf.fieldsInitFd, fd.scopeLevel)
     }
@@ -642,7 +642,7 @@ export class ClassVisitor extends VisitorContext {
     const initFd = cf.fieldsInitFd
     this.compiler.pushScope(initFd)
     
-    this.compiler.emitOp(initFd, Opcode.OP_scope_get_var)
+    this.compiler.emitOp(initFd, TempOpcode.OP_scope_get_var)
     this.compiler.emitAtom(initFd, JSAtom.JS_ATOM_this)
     this.compiler.emitU16(initFd, 0)
 
@@ -702,7 +702,7 @@ export class ClassVisitor extends VisitorContext {
     }
 
     // return this
-    this.compiler.emitOp(ctorFd, Opcode.OP_scope_get_var)
+    this.compiler.emitOp(ctorFd, TempOpcode.OP_scope_get_var)
     this.compiler.emitAtom(ctorFd, JSAtom.JS_ATOM_this)
     this.compiler.emitU16(ctorFd, 0)
     this.compiler.emitOp(ctorFd, Opcode.OP_return)
@@ -839,7 +839,7 @@ export class ClassVisitor extends VisitorContext {
    * 辅助方法: 发射类字段初始化
    */
   private emitClassFieldInitInternal(fd: FunctionDef): void {
-    this.compiler.emitOp(fd, Opcode.OP_scope_get_var)
+    this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var)
     this.compiler.emitAtom(fd, JSAtom.JS_ATOM_class_fields_init)
     this.compiler.emitU16(fd, 0)
 
@@ -850,7 +850,7 @@ export class ClassVisitor extends VisitorContext {
     const label = this.compiler.newLabelInt(fd)
     this.compiler.emitGotoInt(fd, Opcode.OP_if_true, label)
 
-    this.compiler.emitOp(fd, Opcode.OP_scope_get_var)
+    this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var)
     this.compiler.emitAtom(fd, JSAtom.JS_ATOM_this)
     this.compiler.emitU16(fd, 0)
     this.compiler.emitOp(fd, Opcode.OP_swap)

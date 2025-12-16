@@ -1,7 +1,7 @@
 import ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
 import { CompilerContext } from '../CompilerContext'
-import { Opcode, JSAtom } from '../../env'
+import { Opcode, TempOpcode, JSAtom } from '../../env'
 import { BlockEnv, JSVarKindEnum } from '../FunctionDef'
 import { JSVarDefEnum } from '../Compiler'
 
@@ -88,8 +88,8 @@ export class StatementVisitor extends VisitorContext {
 
           // 发射 scope_put_var_init 或 scope_put_var
           const opcode = (isConst || isLet) 
-            ? Opcode.OP_scope_put_var_init 
-            : Opcode.OP_scope_put_var
+            ? TempOpcode.OP_scope_put_var_init 
+            : TempOpcode.OP_scope_put_var
           this.compiler.emitOp(fd, opcode, sourcePos)
           this.compiler.emitU32(fd, atom)
           this.compiler.emitU16(fd, fd.scopeLevel)
@@ -101,7 +101,7 @@ export class StatementVisitor extends VisitorContext {
           if (isLet) {
             // let 变量需要初始化为 undefined - 对应 parser.c:6567-6572
             this.compiler.emitOp(fd, Opcode.OP_undefined)
-            this.compiler.emitOp(fd, Opcode.OP_scope_put_var_init)
+            this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
             this.compiler.emitU32(fd, atom)
             this.compiler.emitU16(fd, fd.scopeLevel)
           }
@@ -129,6 +129,9 @@ export class StatementVisitor extends VisitorContext {
     // 创建新作用域 (用于 `let f; if(1) function f(){}` 语义)
     this.compiler.pushScope(fd)
 
+    // 设置 eval 返回值为 undefined - 对应 parser.c:7033
+    this.compiler.setEvalRetUndefined(fd)
+
     // 编译条件表达式
     this.context.visit(node.expression)
 
@@ -138,8 +141,10 @@ export class StatementVisitor extends VisitorContext {
     // 条件为假跳转到 label1
     this.compiler.emitGotoInt(fd, Opcode.OP_if_false, label1)
 
+
     // 编译 then 分支
     this.context.visit(node.thenStatement)
+
 
     if (node.elseStatement) {
       // 有 else 分支
@@ -151,8 +156,10 @@ export class StatementVisitor extends VisitorContext {
       // 发射 label1 (else 分支开始)
       this.compiler.emitLabelInt(fd, label1)
 
+
       // 编译 else 分支
       this.context.visit(node.elseStatement)
+
 
       // 发射 label2 (结束)
       this.compiler.emitLabelInt(fd, label2)
@@ -184,6 +191,9 @@ export class StatementVisitor extends VisitorContext {
     // 压入 break 条目 - 对应 parser.c:7064-7065
     const breakEntry = new BlockEnv()
     this.compiler.pushBreakEntry(fd, breakEntry, 0, labelBreak, labelCont, 0)
+
+    // 设置 eval 返回值为 undefined - 对应 parser.c:7072
+    this.compiler.setEvalRetUndefined(fd)
 
     // 发射 continue 标签 - 对应 parser.c:7072
     this.compiler.emitLabelInt(fd, labelCont)
@@ -228,6 +238,9 @@ export class StatementVisitor extends VisitorContext {
     const breakEntry = new BlockEnv()
     this.compiler.pushBreakEntry(fd, breakEntry, 0, labelBreak, labelCont, 0)
 
+    // 设置 eval 返回值为 undefined - 对应 parser.c:7103
+    this.compiler.setEvalRetUndefined(fd)
+
     // 发射循环开始标签 - 对应 parser.c:7102
     this.compiler.emitLabelInt(fd, label1)
 
@@ -262,6 +275,9 @@ export class StatementVisitor extends VisitorContext {
   visitForStatement(node: ts.ForStatement): void {
     const fd = this.funcDef!
     const blockScopeLevel = fd.scopeLevel
+
+    // 设置 eval 返回值为 undefined - 对应 parser.c:7134
+    this.compiler.setEvalRetUndefined(fd)
 
     // 创建作用域 (用于 for 循环中的词法变量)
     this.compiler.pushScope(fd)
@@ -367,15 +383,15 @@ export class StatementVisitor extends VisitorContext {
         if (declaration.initializer) {
           this.context.visit(declaration.initializer)
           const opcode = (isConst || isLet)
-            ? Opcode.OP_scope_put_var_init
-            : Opcode.OP_scope_put_var
+            ? TempOpcode.OP_scope_put_var_init
+            : TempOpcode.OP_scope_put_var
           this.compiler.emitOp(fd, opcode, sourcePos)
           this.compiler.emitU32(fd, atom)
           this.compiler.emitU16(fd, fd.scopeLevel)
         } else if (isLet) {
           // let 变量初始化为 undefined
           this.compiler.emitOp(fd, Opcode.OP_undefined)
-          this.compiler.emitOp(fd, Opcode.OP_scope_put_var_init)
+          this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
           this.compiler.emitU32(fd, atom)
           this.compiler.emitU16(fd, fd.scopeLevel)
         }
@@ -395,6 +411,9 @@ export class StatementVisitor extends VisitorContext {
   visitForOfStatement(node: ts.ForOfStatement): void {
     const fd = this.funcDef!
     const blockScopeLevel = fd.scopeLevel
+
+    // 设置 eval 返回值为 undefined - for-of 从 for 语句分支进入，继承 parser.c:7134
+    this.compiler.setEvalRetUndefined(fd)
 
     // 创建标签
     const labelCont = this.compiler.newLabelInt(fd)
@@ -438,8 +457,8 @@ export class StatementVisitor extends VisitorContext {
 
         // 存储迭代值到变量
         const opcode = (isConst || isLet)
-          ? Opcode.OP_scope_put_var_init
-          : Opcode.OP_scope_put_var
+          ? TempOpcode.OP_scope_put_var_init
+          : TempOpcode.OP_scope_put_var
         this.compiler.emitOp(fd, opcode)
         this.compiler.emitU32(fd, atom)
         this.compiler.emitU16(fd, fd.scopeLevel)
@@ -447,7 +466,7 @@ export class StatementVisitor extends VisitorContext {
     } else if (ts.isIdentifier(node.initializer)) {
       // 简单标识符
       const atom = this.compiler.addAtom(node.initializer.text)
-      this.compiler.emitOp(fd, Opcode.OP_scope_put_var)
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var)
       this.compiler.emitU32(fd, atom)
       this.compiler.emitU16(fd, fd.scopeLevel)
     }
@@ -510,6 +529,9 @@ export class StatementVisitor extends VisitorContext {
     const fd = this.funcDef!
     const blockScopeLevel = fd.scopeLevel
 
+    // 设置 eval 返回值为 undefined - for-in 从 for 语句分支进入，继承 parser.c:7134
+    this.compiler.setEvalRetUndefined(fd)
+
     // 创建标签
     const labelCont = this.compiler.newLabelInt(fd)
     const labelBody = this.compiler.newLabelInt(fd)
@@ -552,8 +574,8 @@ export class StatementVisitor extends VisitorContext {
 
         // 存储迭代值到变量
         const opcode = (isConst || isLet)
-          ? Opcode.OP_scope_put_var_init
-          : Opcode.OP_scope_put_var
+          ? TempOpcode.OP_scope_put_var_init
+          : TempOpcode.OP_scope_put_var
         this.compiler.emitOp(fd, opcode)
         this.compiler.emitU32(fd, atom)
         this.compiler.emitU16(fd, fd.scopeLevel)
@@ -561,7 +583,7 @@ export class StatementVisitor extends VisitorContext {
     } else if (ts.isIdentifier(node.initializer)) {
       // 简单标识符
       const atom = this.compiler.addAtom(node.initializer.text)
-      this.compiler.emitOp(fd, Opcode.OP_scope_put_var)
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var)
       this.compiler.emitU32(fd, atom)
       this.compiler.emitU16(fd, fd.scopeLevel)
     }
@@ -622,6 +644,9 @@ export class StatementVisitor extends VisitorContext {
   visitSwitchStatement(node: ts.SwitchStatement): void {
     const fd = this.funcDef!
 
+    // 设置 eval 返回值为 undefined - 对应 parser.c:7296
+    this.compiler.setEvalRetUndefined(fd)
+
     // 编译 switch 表达式
     this.context.visit(node.expression)
 
@@ -653,7 +678,7 @@ export class StatementVisitor extends VisitorContext {
         }
 
         // 记录 default 位置，用于后续修补
-        this.compiler.emitOp(fd, Opcode.OP_label)
+        this.compiler.emitOp(fd, TempOpcode.OP_label)
         this.compiler.emitU32(fd, 0) // 占位符
         defaultLabelPos = fd.byteCode.size - 4
 
@@ -822,6 +847,9 @@ export class StatementVisitor extends VisitorContext {
   visitTryStatement(node: ts.TryStatement): void {
     const fd = this.funcDef!
 
+    // 设置 eval 返回值为 undefined - 对应 parser.c:7389
+    this.compiler.setEvalRetUndefined(fd)
+
     // 创建标签
     const labelCatch = this.compiler.newLabelInt(fd)
     const labelCatch2 = this.compiler.newLabelInt(fd)
@@ -871,7 +899,7 @@ export class StatementVisitor extends VisitorContext {
           this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_CATCH)
 
           // 存储异常值到 catch 变量
-          this.compiler.emitOp(fd, Opcode.OP_scope_put_var)
+          this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var)
           this.compiler.emitU32(fd, atom)
           this.compiler.emitU16(fd, fd.scopeLevel)
         }
@@ -1021,7 +1049,7 @@ export class StatementVisitor extends VisitorContext {
     const sourcePos = node.getStart()
 
     // 发射源码位置
-    this.compiler.emitOp(fd, Opcode.OP_line_num, sourcePos)
+    this.compiler.emitOp(fd, TempOpcode.OP_line_num, sourcePos)
     this.compiler.emitU32(fd, sourcePos)
 
     // 编译表达式

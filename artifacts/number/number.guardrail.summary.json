@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/number/cli/number.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/number/cli/number.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/number/cli/number.pc2line.txt",
-    "bytecodeSize": 145,
-    "pc2lineLength": 0,
+    "bytecodeSize": 122,
+    "pc2lineLength": 2,
     "stackMax": 0
   },
   "bytecode": {
-    "identical": false,
-    "tsSize": 83,
-    "wasmSize": 65,
-    "sizeDiff": 18,
-    "sizeDiffPercent": 27.692307692307693
+    "identical": true,
+    "tsSize": 60,
+    "wasmSize": 60,
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
   },
   "trace": {
     "differenceCount": 0,

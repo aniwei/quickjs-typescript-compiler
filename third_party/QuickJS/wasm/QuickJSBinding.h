@@ -30,6 +30,7 @@ struct Op {
   uint8_t nPush;
   uint8_t fmt;
   uint8_t size;
+  bool isTemp;
 };
 
 struct Atom {
@@ -62,6 +63,11 @@ struct PC2Line {
   std::string name;
 };
 
+struct SpecialObject {
+  int32_t id;
+  std::string name;
+};
+
 class QuickJSBinding {
   using Ptr = std::shared_ptr<QuickJSBinding>;
 
@@ -83,6 +89,20 @@ class QuickJSBinding {
     std::string sourceURL, 
     std::vector<std::string> modules);
 
+  static std::vector<uint8_t> compileScript(
+    std::string input,
+    std::string sourceURL, 
+    std::vector<std::string> modules);
+
+ private:
+  static std::vector<uint8_t> compileWithFlags(
+    std::string input,
+    std::string sourceURL, 
+    std::vector<std::string> modules,
+    int evalFlags);
+
+ public:
+
   static uint32_t getBytecodeVersion();
   static uint32_t getCompileOptions();
   static uint32_t getFirstAtomId();
@@ -99,6 +119,7 @@ class QuickJSBinding {
   static std::vector<FunctionKind> getFunctionKinds();
   static std::vector<JSMode> getJSModes();
   static std::vector<PC2Line> getPC2LineCodes();
+  static std::vector<SpecialObject> getSpecialObjects();
 
   static std::vector<Atom> getAtoms();
   static std::vector<Atom> getEnvironmentAtoms();

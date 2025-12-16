@@ -1,7 +1,7 @@
 import ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
 import { CompilerContext } from '../CompilerContext'
-import { Opcode, FunctionKind, JSMode, JSAtom } from '../../env'
+import { Opcode, TempOpcode, FunctionKind, JSMode, JSAtom } from '../../env'
 import { 
   FunctionDef, 
   JSVarKind,
@@ -113,7 +113,7 @@ export class FunctionVisitor extends VisitorContext {
     }
 
     // 存储到作用域变量 - 对应 parser.c:13419-13423
-    this.compiler.emitOp(parentFd, Opcode.OP_scope_put_var_init)
+    this.compiler.emitOp(parentFd, TempOpcode.OP_scope_put_var_init)
     this.compiler.emitAtom(parentFd, funcName)
     this.compiler.emitU16(parentFd, parentFd.scopeLevel)
 
@@ -671,7 +671,7 @@ export class FunctionVisitor extends VisitorContext {
    */
   private emitClassFieldInit(fd: FunctionDef): void {
     // 获取类字段初始化函数
-    this.compiler.emitOp(fd, Opcode.OP_scope_get_var)
+    this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var)
     this.compiler.emitAtom(fd, JSAtom.JS_ATOM_class_fields_init)
     this.compiler.emitU16(fd, 0)
 
@@ -684,7 +684,7 @@ export class FunctionVisitor extends VisitorContext {
     this.compiler.emitGotoInt(fd, Opcode.OP_if_true, label)
 
     // 调用初始化函数
-    this.compiler.emitOp(fd, Opcode.OP_scope_get_var)
+    this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var)
     this.compiler.emitAtom(fd, JSAtom.JS_ATOM_this)
     this.compiler.emitU16(fd, 0)
     this.compiler.emitOp(fd, Opcode.OP_swap)

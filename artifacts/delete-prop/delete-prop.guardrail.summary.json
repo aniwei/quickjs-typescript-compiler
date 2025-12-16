@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/delete-prop/cli/delete-prop.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/delete-prop/cli/delete-prop.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/delete-prop/cli/delete-prop.pc2line.txt",
-    "bytecodeSize": 233,
-    "pc2lineLength": 0,
+    "bytecodeSize": 226,
+    "pc2lineLength": 28,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 171,
-    "wasmSize": 126,
-    "sizeDiff": 45,
-    "sizeDiffPercent": 35.714285714285715
+    "tsSize": 164,
+    "wasmSize": 146,
+    "sizeDiff": 18,
+    "sizeDiffPercent": 12.32876712328767
   },
   "trace": {
     "differenceCount": 0,

@@ -14,6 +14,7 @@ interface OpcodeMeta {
   nPush: number
   fmt: number
   size: number
+  isTemp: boolean
 }
 
 interface StringArray {
@@ -31,6 +32,7 @@ interface WasmInstance {
   runWithBinary: (input: Uint8Array, args: StringArray) => void
   dumpWithBinary: (input: Uint8Array, args: StringArray) => string
   compile: (source: string, sourcePath: string, args: StringArray) => Uint8Array
+  compileScript: (source: string, sourcePath: string, args: StringArray) => Uint8Array
   getBytecodeVersion: () => number
   getFirstAtomId: () => number
   getAtoms: () => Atom[]
@@ -163,6 +165,17 @@ export class QuickJSLib {
   static async getPC2LineCodes() {
     const WasmInstance = await QuickJSLib.getWasmInstance()
     const vec = WasmInstance.QuickJSBinding.getPC2LineCodes()
+    const map: Record<string, number> = {}
+    for (let i = 0; i < vec.size(); i++) {
+      const o = vec.get(i)
+      map[o.name] = o.id
+    }
+    return map
+  }
+
+  static async getSpecialObjects() {
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+    const vec = WasmInstance.QuickJSBinding.getSpecialObjects()
     const map: Record<string, number> = {}
     for (let i = 0; i < vec.size(); i++) {
       const o = vec.get(i)
@@ -309,7 +322,7 @@ export class QuickJSLib {
     const out: OpcodeMeta[] = []
     for (let i = 0; i < vec.size(); i++) {
       const o = vec.get(i)
-      out.push({ name: o.name, code: o.id, nPop: o.nPop, nPush: o.nPush, fmt: o.fmt, size: o.size })
+      out.push({ name: o.name, code: o.id, nPop: o.nPop, nPush: o.nPush, fmt: o.fmt, size: o.size, isTemp: o.isTemp })
     }
     return out
   }
@@ -329,6 +342,25 @@ export class QuickJSLib {
     const WasmInstance = await QuickJSLib.getWasmInstance()
 
     const result = await WasmInstance.QuickJSBinding.compile(
+      source, 
+      relative(cwd || process.cwd(), sourcePath), 
+      new WasmInstance.StringArray())
+
+    const output: Buffer = Buffer.alloc(result.size())
+    for (let i = 0; i < result.size(); i++) {
+      output[i] = result.get(i)
+    }
+    
+    return output
+  }
+
+  /**
+   * Compile source as script (global eval mode) instead of module
+   */
+  static async compileSourceAsScript(source: string, sourcePath: string = '<eval>', cwd?: string): Promise<Buffer> {
+    const WasmInstance = await QuickJSLib.getWasmInstance()
+
+    const result = await WasmInstance.QuickJSBinding.compileScript(
       source, 
       relative(cwd || process.cwd(), sourcePath), 
       new WasmInstance.StringArray())

@@ -62,23 +62,11 @@ export class LiteralVisitor extends VisitorContext {
     if (Number.isInteger(value) && value >= -2147483648 && value <= 2147483647) {
       const intVal = value | 0
       
-      // 使用短操作码
-      if (intVal >= -1 && intVal <= 7) {
-        // OP_push_minus1 到 OP_push_7
-        this.compiler.emitOp(fd, Opcode.OP_push_minus1 + intVal + 1, sourcePos)
-      } else if (intVal >= -128 && intVal <= 127) {
-        // OP_push_i8
-        this.compiler.emitOp(fd, Opcode.OP_push_i8, sourcePos)
-        this.compiler.emitU8(fd, intVal & 0xff)
-      } else if (intVal >= -32768 && intVal <= 32767) {
-        // OP_push_i16
-        this.compiler.emitOp(fd, Opcode.OP_push_i16, sourcePos)
-        this.compiler.emitU16(fd, intVal & 0xffff)
-      } else {
-        // OP_push_i32
-        this.compiler.emitOp(fd, Opcode.OP_push_i32, sourcePos)
-        this.compiler.emitU32(fd, intVal >>> 0)
-      }
+      // 编译阶段始终使用长操作码，短操作码优化由 LabelResolver 处理
+      // 这是因为短操作码的值 (182-200) 与临时操作码重叠
+      // QuickJS 参考: parser.c 中的编译阶段只发射 OP_push_i32 等长操作码
+      this.compiler.emitOp(fd, Opcode.OP_push_i32, sourcePos)
+      this.compiler.emitU32(fd, intVal >>> 0)
     } else {
       // 浮点数: 添加到常量池
       const idx = this.compiler.cpoolAdd(fd, value)

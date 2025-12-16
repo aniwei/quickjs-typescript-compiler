@@ -1,7 +1,7 @@
 import ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
 import { CompilerContext } from '../CompilerContext'
-import { Opcode, JSAtom } from '../../env'
+import { Opcode, TempOpcode, JSAtom } from '../../env'
 
 export class IdentifierVisitor extends VisitorContext {
   
@@ -33,7 +33,7 @@ export class IdentifierVisitor extends VisitorContext {
     // 发射 OP_scope_get_var 指令获取变量
     // 格式: OP_scope_get_var atom:u32 scope:u16
     const atom = this.compiler.addAtom(name)
-    this.compiler.emitOp(fd, Opcode.OP_scope_get_var, sourcePos)
+    this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var, sourcePos)
     this.compiler.emitAtom(fd, atom)
     this.compiler.emitU16(fd, fd.scopeLevel)
   }
