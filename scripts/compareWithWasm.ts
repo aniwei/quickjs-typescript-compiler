@@ -124,6 +124,10 @@ class BytecodeComparator {
 
     const bytecode = await compiler.compile(sourceCode, filename);
 
+    if (process.env.DEBUG_JUMP) {
+      console.log(`[compileWithTypeScript] bytecode.length=${bytecode.length}, bytecode[83]=0x${bytecode[83]?.toString(16) ?? 'undefined'}`)
+    }
+
     let disassembly: string | undefined
     if (this.options.disasm) {
       disassembly = await this.disassembleBytecode(bytecode, 'ts')
@@ -390,6 +394,10 @@ class BytecodeComparator {
 
   private async saveArtifacts(tsResult: CompilationResult, wasmResult: CompilationResult): Promise<void> {
     const baseName = path.basename(this.options.inputTs, '.ts')
+    
+    if (process.env.DEBUG_JUMP) {
+      console.log(`[saveArtifacts] tsResult.bytecode.length=${tsResult.bytecode.length}, tsResult.bytecode[83]=0x${tsResult.bytecode[83]?.toString(16) ?? 'undefined'}`)
+    }
     
     // Save bytecode files
     await fs.writeFile(

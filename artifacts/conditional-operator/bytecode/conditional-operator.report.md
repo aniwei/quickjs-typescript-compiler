@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/conditional-operator.ts
-**生成时间**: 2025-12-16T14:11:02.478Z
+**生成时间**: 2025-12-20T21:36:57.009Z
 
 ## 大小对比
 
-- TypeScript编译器: 128 字节
+- TypeScript编译器: 130 字节
 - WASM编译器: 130 字节
-- 差异: -2 字节 (-1.54%)
+- 差异: 0 字节 (0.00%)
 
 ## 结构分析
 
@@ -54,7 +54,7 @@
   "functionHeader": {
     "offset": 61,
     "tag": "0xc",
-    "remaining": 67
+    "remaining": 69
   }
 }
 ```
@@ -109,19 +109,8 @@
 
 ## 字节级差异
 
-共发现 11 个字节差异:
+共发现 0 个字节差异:
 
-- 偏移量 0x74: TS=0x0a vs WASM=0x0c
-- 偏移量 0x77: TS=0x34 vs WASM=0x1b
-- 偏移量 0x78: TS=0x18 vs WASM=0x0e
-- 偏移量 0x79: TS=0x4d vs WASM=0x1b
-- 偏移量 0x7a: TS=0x1a vs WASM=0x0a
-- 偏移量 0x7b: TS=0x11 vs WASM=0x1b
-- 偏移量 0x7d: TS=0x07 vs WASM=0x1b
-- 偏移量 0x7e: TS=0x39 vs WASM=0x08
-- 偏移量 0x7f: TS=0x00 vs WASM=0x2f
-- 偏移量 0x80: TS=EOF vs WASM=0x11
-- 偏移量 0x81: TS=EOF vs WASM=0x00
 
 ## 十六进制转储对比
 
@@ -134,7 +123,8 @@
 00000040: 00 a4 01 00 01 00 04 00 00 22 01 a6 01 00 00 00 |........."......|
 00000050: 39 e4 00 00 00 43 e5 00 00 00 39 a7 00 00 00 43 |9....C....9....C|
 00000060: e6 00 00 00 24 00 00 ec 04 b8 ee 02 b9 24 01 00 |....$........$..|
-00000070: cf 28 ce 03 0a 00 00 34 18 4d 1a 11 08 07 39 00 |.(.....4.M....9.|
+00000070: cf 28 ce 03 0c 00 00 1b 0e 1b 0a 1b 08 1b 08 2f |.(............./|
+00000080: 11 00                                           |..|
 ```
 
 ### WASM

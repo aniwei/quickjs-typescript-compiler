@@ -1,0 +1,1104 @@
+{
+  "summary": {
+    "total": 107,
+    "ok": 80,
+    "warn": 20,
+    "fail": 7,
+    "ambiguous": 0
+  },
+  "findings": [
+    {
+      "moduleFromDoc": "FunctionDef.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/FunctionDef.ts",
+      "symbolRaw": "class FunctionDef",
+      "symbolKind": "class",
+      "symbolName": "FunctionDef",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "FunctionDef.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/FunctionDef.ts",
+      "symbolRaw": "class JSVarDef",
+      "symbolKind": "class",
+      "symbolName": "JSVarDef",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "FunctionDef.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/FunctionDef.ts",
+      "symbolRaw": "class JSClosureVar",
+      "symbolKind": "class",
+      "symbolName": "JSClosureVar",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "FunctionDef.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/FunctionDef.ts",
+      "symbolRaw": "class JSGlobalVar",
+      "symbolKind": "class",
+      "symbolName": "JSGlobalVar",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "FunctionDef.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/FunctionDef.ts",
+      "symbolRaw": "class BlockEnv",
+      "symbolKind": "class",
+      "symbolName": "BlockEnv",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "FunctionDef.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/FunctionDef.ts",
+      "symbolRaw": "class LabelSlot",
+      "symbolKind": "class",
+      "symbolName": "LabelSlot",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "FunctionDef.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/FunctionDef.ts",
+      "symbolRaw": "class JumpSlot",
+      "symbolKind": "class",
+      "symbolName": "JumpSlot",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "FunctionDef.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/FunctionDef.ts",
+      "symbolRaw": "class LineNumberSlot",
+      "symbolKind": "class",
+      "symbolName": "LineNumberSlot",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "FunctionDef.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/FunctionDef.ts",
+      "symbolRaw": "class JSVarScope",
+      "symbolKind": "class",
+      "symbolName": "JSVarScope",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "FunctionDef.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/FunctionDef.ts",
+      "symbolRaw": "enum JSVarKind",
+      "symbolKind": "enum",
+      "symbolName": "JSVarKind",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "BytecodeBuilder.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/BytecodeBuilder.ts",
+      "symbolRaw": "putByte(c)",
+      "symbolKind": "function",
+      "symbolName": "putByte",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "BytecodeBuilder.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/BytecodeBuilder.ts",
+      "symbolRaw": "putU16(val)",
+      "symbolKind": "function",
+      "symbolName": "putU16",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "BytecodeBuilder.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/BytecodeBuilder.ts",
+      "symbolRaw": "putU32(val)",
+      "symbolKind": "function",
+      "symbolName": "putU32",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "BytecodeBuilder.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/BytecodeBuilder.ts",
+      "symbolRaw": "putULEB128(val)",
+      "symbolKind": "function",
+      "symbolName": "putULEB128",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "BytecodeBuilder.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/BytecodeBuilder.ts",
+      "symbolRaw": "putSLEB128(val)",
+      "symbolKind": "function",
+      "symbolName": "putSLEB128",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "BytecodeBuilder.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/BytecodeBuilder.ts",
+      "symbolRaw": "realloc(size)",
+      "symbolKind": "function",
+      "symbolName": "realloc",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "Compiler.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "symbolRaw": "jsNewFunctionDef()",
+      "symbolKind": "function",
+      "symbolName": "jsNewFunctionDef",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/TypeScriptCompiler.ts",
+      "quickjsLine": 8215,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/TypeScriptCompiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "Compiler.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "symbolRaw": "jsFreeFunctionDef()",
+      "symbolKind": "function",
+      "symbolName": "jsFreeFunctionDef",
+      "ok": false,
+      "note": "symbol not found in module file",
+      "quickjsLine": 8286,
+      "level": "FAIL"
+    },
+    {
+      "moduleFromDoc": "Compiler.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "symbolRaw": "jsCreateFunction()",
+      "symbolKind": "function",
+      "symbolName": "jsCreateFunction",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/TypeScriptCompiler.ts",
+      "quickjsLine": 12439,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/TypeScriptCompiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "Compiler.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "symbolRaw": "emitOp(op)",
+      "symbolKind": "function",
+      "symbolName": "emitOp",
+      "ok": true,
+      "quickjsLine": 1788,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "Compiler.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "symbolRaw": "emitU8(val)",
+      "symbolKind": "function",
+      "symbolName": "emitU8",
+      "ok": true,
+      "quickjsLine": 1764,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "Compiler.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "symbolRaw": "emitU16(val)",
+      "symbolKind": "function",
+      "symbolName": "emitU16",
+      "ok": true,
+      "quickjsLine": 1768,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "Compiler.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "symbolRaw": "emitU32(val)",
+      "symbolKind": "function",
+      "symbolName": "emitU32",
+      "ok": true,
+      "quickjsLine": 1772,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "Compiler.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "symbolRaw": "emitAtom(name)",
+      "symbolKind": "function",
+      "symbolName": "emitAtom",
+      "ok": true,
+      "quickjsLine": 1795,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "Compiler.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "symbolRaw": "emitLabel(label)",
+      "symbolKind": "function",
+      "symbolName": "emitLabel",
+      "ok": true,
+      "quickjsLine": 1851,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "Compiler.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "symbolRaw": "emitGoto(opcode, label)",
+      "symbolKind": "function",
+      "symbolName": "emitGoto",
+      "ok": true,
+      "quickjsLine": 1862,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "Compiler.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "symbolRaw": "emitPushConst(val)",
+      "symbolKind": "function",
+      "symbolName": "emitPushConst",
+      "ok": true,
+      "quickjsLine": 1893,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "Compiler.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "symbolRaw": "newLabel()",
+      "symbolKind": "function",
+      "symbolName": "newLabel",
+      "ok": true,
+      "quickjsLine": 1835,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "Compiler.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "symbolRaw": "newLabelFd()",
+      "symbolKind": "function",
+      "symbolName": "newLabelFd",
+      "ok": true,
+      "quickjsLine": 1814,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "Compiler.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "symbolRaw": "cpoolAdd(val)",
+      "symbolKind": "function",
+      "symbolName": "cpoolAdd",
+      "ok": true,
+      "quickjsLine": 1880,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "ScopeManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/ScopeManager.ts",
+      "symbolRaw": "pushScope()",
+      "symbolKind": "function",
+      "symbolName": "pushScope",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/TypeScriptCompiler.ts",
+      "quickjsLine": 2031,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/TypeScriptCompiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "ScopeManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/ScopeManager.ts",
+      "symbolRaw": "popScope()",
+      "symbolKind": "function",
+      "symbolName": "popScope",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "quickjsLine": 2069,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "ScopeManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/ScopeManager.ts",
+      "symbolRaw": "closeScopes()",
+      "symbolKind": "function",
+      "symbolName": "closeScopes",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "quickjsLine": 2084,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "ScopeManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/ScopeManager.ts",
+      "symbolRaw": "addVar()",
+      "symbolKind": "function",
+      "symbolName": "addVar",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/TypeScriptCompiler.ts",
+      "quickjsLine": 2092,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/TypeScriptCompiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "ScopeManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/ScopeManager.ts",
+      "symbolRaw": "addScopeVar()",
+      "symbolKind": "function",
+      "symbolName": "addScopeVar",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "quickjsLine": 2111,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "ScopeManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/ScopeManager.ts",
+      "symbolRaw": "addFuncVar()",
+      "symbolKind": "function",
+      "symbolName": "addFuncVar",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "quickjsLine": 2126,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "ScopeManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/ScopeManager.ts",
+      "symbolRaw": "addArgumentsVar()",
+      "symbolKind": "function",
+      "symbolName": "addArgumentsVar",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "quickjsLine": 2138,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "ScopeManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/ScopeManager.ts",
+      "symbolRaw": "findVar()",
+      "symbolKind": "function",
+      "symbolName": "findVar",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "quickjsLine": 1937,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "ScopeManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/ScopeManager.ts",
+      "symbolRaw": "findArg()",
+      "symbolKind": "function",
+      "symbolName": "findArg",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "quickjsLine": 1929,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "ScopeManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/ScopeManager.ts",
+      "symbolRaw": "findVarInScope()",
+      "symbolKind": "function",
+      "symbolName": "findVarInScope",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "quickjsLine": 1951,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "ScopeManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/ScopeManager.ts",
+      "symbolRaw": "findGlobalVar()",
+      "symbolKind": "function",
+      "symbolName": "findGlobalVar",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "quickjsLine": 1999,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "ScopeManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/ScopeManager.ts",
+      "symbolRaw": "findLexicalDecl()",
+      "symbolKind": "function",
+      "symbolName": "findLexicalDecl",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "quickjsLine": 2016,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "VariableResolver.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/VariableResolver.ts",
+      "symbolRaw": "resolveVariables()",
+      "symbolKind": "function",
+      "symbolName": "resolveVariables",
+      "ok": true,
+      "quickjsLine": 10456,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "VariableResolver.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/VariableResolver.ts",
+      "symbolRaw": "resolveScopeVar()",
+      "symbolKind": "function",
+      "symbolName": "resolveScopeVar",
+      "ok": true,
+      "quickjsLine": 9140,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "VariableResolver.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/VariableResolver.ts",
+      "symbolRaw": "resolvePseudoVar()",
+      "symbolKind": "function",
+      "symbolName": "resolvePseudoVar",
+      "ok": true,
+      "quickjsLine": 9077,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "VariableResolver.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/VariableResolver.ts",
+      "symbolRaw": "addClosureVar()",
+      "symbolKind": "function",
+      "symbolName": "addClosureVar",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "quickjsLine": 8812,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "VariableResolver.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/VariableResolver.ts",
+      "symbolRaw": "getClosureVar()",
+      "symbolKind": "function",
+      "symbolName": "getClosureVar",
+      "ok": true,
+      "quickjsLine": 8876,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "VariableResolver.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/VariableResolver.ts",
+      "symbolRaw": "addEvalVariables()",
+      "symbolKind": "function",
+      "symbolName": "addEvalVariables",
+      "ok": true,
+      "quickjsLine": 10306,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "VariableResolver.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/VariableResolver.ts",
+      "symbolRaw": "markEvalCapturedVariables()",
+      "symbolKind": "function",
+      "symbolName": "markEvalCapturedVariables",
+      "ok": true,
+      "quickjsLine": 10100,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "LabelManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/LabelManager.ts",
+      "symbolRaw": "resolveLabels()",
+      "symbolKind": "function",
+      "symbolName": "resolveLabels",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/TypeScriptCompiler.ts",
+      "quickjsLine": 11088,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/TypeScriptCompiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "LabelManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/LabelManager.ts",
+      "symbolRaw": "computeStackSize()",
+      "symbolKind": "function",
+      "symbolName": "computeStackSize",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/TypeScriptCompiler.ts",
+      "quickjsLine": 12196,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/TypeScriptCompiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "LabelManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/LabelManager.ts",
+      "symbolRaw": "updateLabel()",
+      "symbolKind": "function",
+      "symbolName": "updateLabel",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "quickjsLine": 1805,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/Compiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "LabelManager.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/LabelManager.ts",
+      "symbolRaw": "skipDeadCode()",
+      "symbolKind": "function",
+      "symbolName": "skipDeadCode",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/LabelResolver.ts",
+      "quickjsLine": 10625,
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/LabelResolver.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "visitors/StatementVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/StatementVisitor.ts",
+      "symbolRaw": "visitBlock()",
+      "symbolKind": "function",
+      "symbolName": "visitBlock",
+      "ok": true,
+      "quickjsLine": 6491,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/StatementVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/StatementVisitor.ts",
+      "symbolRaw": "visitIfStatement()",
+      "symbolKind": "function",
+      "symbolName": "visitIfStatement",
+      "ok": true,
+      "quickjsLine": 6914,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/StatementVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/StatementVisitor.ts",
+      "symbolRaw": "visitWhileStatement()",
+      "symbolKind": "function",
+      "symbolName": "visitWhileStatement",
+      "ok": true,
+      "quickjsLine": 6914,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/StatementVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/StatementVisitor.ts",
+      "symbolRaw": "visitDoStatement()",
+      "symbolKind": "function",
+      "symbolName": "visitDoStatement",
+      "ok": true,
+      "quickjsLine": 6914,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/StatementVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/StatementVisitor.ts",
+      "symbolRaw": "visitForStatement()",
+      "symbolKind": "function",
+      "symbolName": "visitForStatement",
+      "ok": true,
+      "quickjsLine": 6914,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/StatementVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/StatementVisitor.ts",
+      "symbolRaw": "visitForOfStatement()",
+      "symbolKind": "function",
+      "symbolName": "visitForOfStatement",
+      "ok": true,
+      "quickjsLine": 6914,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/StatementVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/StatementVisitor.ts",
+      "symbolRaw": "visitForInStatement()",
+      "symbolKind": "function",
+      "symbolName": "visitForInStatement",
+      "ok": true,
+      "quickjsLine": 6914,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/StatementVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/StatementVisitor.ts",
+      "symbolRaw": "visitSwitchStatement()",
+      "symbolKind": "function",
+      "symbolName": "visitSwitchStatement",
+      "ok": true,
+      "quickjsLine": 6914,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/StatementVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/StatementVisitor.ts",
+      "symbolRaw": "visitTryStatement()",
+      "symbolKind": "function",
+      "symbolName": "visitTryStatement",
+      "ok": true,
+      "quickjsLine": 6914,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/StatementVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/StatementVisitor.ts",
+      "symbolRaw": "visitReturnStatement()",
+      "symbolKind": "function",
+      "symbolName": "visitReturnStatement",
+      "ok": true,
+      "quickjsLine": 6914,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/StatementVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/StatementVisitor.ts",
+      "symbolRaw": "visitThrowStatement()",
+      "symbolKind": "function",
+      "symbolName": "visitThrowStatement",
+      "ok": true,
+      "quickjsLine": 6914,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/StatementVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/StatementVisitor.ts",
+      "symbolRaw": "visitBreakStatement()",
+      "symbolKind": "function",
+      "symbolName": "visitBreakStatement",
+      "ok": true,
+      "quickjsLine": 6914,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/StatementVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/StatementVisitor.ts",
+      "symbolRaw": "visitContinueStatement()",
+      "symbolKind": "function",
+      "symbolName": "visitContinueStatement",
+      "ok": true,
+      "quickjsLine": 6914,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/StatementVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/StatementVisitor.ts",
+      "symbolRaw": "visitLabeledStatement()",
+      "symbolKind": "function",
+      "symbolName": "visitLabeledStatement",
+      "ok": true,
+      "quickjsLine": 6914,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/StatementVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/StatementVisitor.ts",
+      "symbolRaw": "visitVariableStatement()",
+      "symbolKind": "function",
+      "symbolName": "visitVariableStatement",
+      "ok": true,
+      "quickjsLine": 6914,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitBinaryExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitBinaryExpression",
+      "ok": true,
+      "quickjsLine": 5925,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitPrefixUnaryExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitPrefixUnaryExpression",
+      "ok": true,
+      "quickjsLine": 5584,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitPostfixUnaryExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitPostfixUnaryExpression",
+      "ok": true,
+      "quickjsLine": 4818,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitConditionalExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitConditionalExpression",
+      "ok": true,
+      "quickjsLine": 5954,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitCallExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitCallExpression",
+      "ok": true,
+      "quickjsLine": 4818,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitPropertyAccessExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitPropertyAccessExpression",
+      "ok": true,
+      "quickjsLine": 4818,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitElementAccessExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitElementAccessExpression",
+      "ok": true,
+      "quickjsLine": 4818,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitArrayLiteralExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitArrayLiteralExpression",
+      "ok": true,
+      "quickjsLine": 3743,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitObjectLiteralExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitObjectLiteralExpression",
+      "ok": true,
+      "quickjsLine": 2912,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitNewExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitNewExpression",
+      "ok": true,
+      "quickjsLine": 4818,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitDeleteExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitDeleteExpression",
+      "ok": true,
+      "quickjsLine": 5495,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitTypeOfExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitTypeOfExpression",
+      "ok": true,
+      "quickjsLine": 5584,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitVoidExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitVoidExpression",
+      "ok": true,
+      "quickjsLine": 5584,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitAssignmentExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitAssignmentExpression",
+      "ok": true,
+      "quickjsLine": 5982,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitSpreadElement()",
+      "symbolKind": "function",
+      "symbolName": "visitSpreadElement",
+      "ok": false,
+      "note": "symbol not found in module file",
+      "quickjsLine": 4189,
+      "level": "FAIL"
+    },
+    {
+      "moduleFromDoc": "visitors/ExpressionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ExpressionVisitor.ts",
+      "symbolRaw": "visitTemplateExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitTemplateExpression",
+      "ok": false,
+      "note": "symbol not found in module file",
+      "quickjsLine": 2437,
+      "level": "FAIL"
+    },
+    {
+      "moduleFromDoc": "visitors/FunctionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/FunctionVisitor.ts",
+      "symbolRaw": "visitFunctionDeclaration()",
+      "symbolKind": "function",
+      "symbolName": "visitFunctionDeclaration",
+      "ok": true,
+      "quickjsLine": 13474,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/FunctionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/FunctionVisitor.ts",
+      "symbolRaw": "visitFunctionExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitFunctionExpression",
+      "ok": true,
+      "quickjsLine": 12892,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/FunctionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/FunctionVisitor.ts",
+      "symbolRaw": "visitArrowFunction()",
+      "symbolKind": "function",
+      "symbolName": "visitArrowFunction",
+      "ok": true,
+      "quickjsLine": 12892,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/FunctionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/FunctionVisitor.ts",
+      "symbolRaw": "visitMethodDeclaration()",
+      "symbolKind": "function",
+      "symbolName": "visitMethodDeclaration",
+      "ok": true,
+      "quickjsLine": 12892,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/FunctionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/FunctionVisitor.ts",
+      "symbolRaw": "visitGetAccessor()",
+      "symbolKind": "function",
+      "symbolName": "visitGetAccessor",
+      "ok": true,
+      "quickjsLine": 12892,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/FunctionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/FunctionVisitor.ts",
+      "symbolRaw": "visitSetAccessor()",
+      "symbolKind": "function",
+      "symbolName": "visitSetAccessor",
+      "ok": true,
+      "quickjsLine": 12892,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/FunctionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/FunctionVisitor.ts",
+      "symbolRaw": "parseDirectives()",
+      "symbolKind": "function",
+      "symbolName": "parseDirectives",
+      "ok": false,
+      "note": "symbol not found in module file",
+      "quickjsLine": 12709,
+      "level": "FAIL"
+    },
+    {
+      "moduleFromDoc": "visitors/FunctionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/FunctionVisitor.ts",
+      "symbolRaw": "parseFunctionCheckNames()",
+      "symbolKind": "function",
+      "symbolName": "parseFunctionCheckNames",
+      "ok": false,
+      "note": "symbol not found in module file",
+      "quickjsLine": 12804,
+      "level": "FAIL"
+    },
+    {
+      "moduleFromDoc": "visitors/FunctionVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/FunctionVisitor.ts",
+      "symbolRaw": "parseDestructuringElement()",
+      "symbolKind": "function",
+      "symbolName": "parseDestructuringElement",
+      "ok": false,
+      "note": "symbol not found in module file",
+      "quickjsLine": 4277,
+      "level": "FAIL"
+    },
+    {
+      "moduleFromDoc": "visitors/ClassVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ClassVisitor.ts",
+      "symbolRaw": "visitClassDeclaration()",
+      "symbolKind": "function",
+      "symbolName": "visitClassDeclaration",
+      "ok": true,
+      "quickjsLine": 3213,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ClassVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ClassVisitor.ts",
+      "symbolRaw": "visitClassExpression()",
+      "symbolKind": "function",
+      "symbolName": "visitClassExpression",
+      "ok": true,
+      "quickjsLine": 3213,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ClassVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ClassVisitor.ts",
+      "symbolRaw": "visitClassDefaultCtor()",
+      "symbolKind": "function",
+      "symbolName": "visitClassDefaultCtor",
+      "ok": true,
+      "quickjsLine": 3044,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ClassVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ClassVisitor.ts",
+      "symbolRaw": "visitClassFieldsInit()",
+      "symbolKind": "function",
+      "symbolName": "visitClassFieldsInit",
+      "ok": true,
+      "quickjsLine": 12860,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/ClassVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/ClassVisitor.ts",
+      "symbolRaw": "visitPropertyName()",
+      "symbolKind": "function",
+      "symbolName": "visitPropertyName",
+      "ok": true,
+      "quickjsLine": 2571,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/LiteralVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/LiteralVisitor.ts",
+      "symbolRaw": "visitNumericLiteral()",
+      "symbolKind": "function",
+      "symbolName": "visitNumericLiteral",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/LiteralVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/LiteralVisitor.ts",
+      "symbolRaw": "visitStringLiteral()",
+      "symbolKind": "function",
+      "symbolName": "visitStringLiteral",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/LiteralVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/LiteralVisitor.ts",
+      "symbolRaw": "visitBigIntLiteral()",
+      "symbolKind": "function",
+      "symbolName": "visitBigIntLiteral",
+      "ok": true,
+      "note": "symbol found elsewhere: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/TypeScriptCompiler.ts",
+      "foundElsewhereFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/TypeScriptCompiler.ts",
+      "level": "WARN"
+    },
+    {
+      "moduleFromDoc": "visitors/LiteralVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/LiteralVisitor.ts",
+      "symbolRaw": "visitRegExpLiteral()",
+      "symbolKind": "function",
+      "symbolName": "visitRegExpLiteral",
+      "ok": false,
+      "note": "symbol not found in module file",
+      "quickjsLine": 464,
+      "level": "FAIL"
+    },
+    {
+      "moduleFromDoc": "visitors/LiteralVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/LiteralVisitor.ts",
+      "symbolRaw": "visitNullLiteral()",
+      "symbolKind": "function",
+      "symbolName": "visitNullLiteral",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/LiteralVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/LiteralVisitor.ts",
+      "symbolRaw": "visitBooleanLiteral()",
+      "symbolKind": "function",
+      "symbolName": "visitBooleanLiteral",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/IdentifierVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/IdentifierVisitor.ts",
+      "symbolRaw": "visitIdentifier()",
+      "symbolKind": "function",
+      "symbolName": "visitIdentifier",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/IdentifierVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/IdentifierVisitor.ts",
+      "symbolRaw": "emitScopeGetVar()",
+      "symbolKind": "function",
+      "symbolName": "emitScopeGetVar",
+      "ok": true,
+      "level": "OK"
+    },
+    {
+      "moduleFromDoc": "visitors/IdentifierVisitor.ts",
+      "moduleFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/src/compiler/visitors/IdentifierVisitor.ts",
+      "symbolRaw": "emitScopePutVar()",
+      "symbolKind": "function",
+      "symbolName": "emitScopePutVar",
+      "ok": true,
+      "level": "OK"
+    }
+  ]
+}

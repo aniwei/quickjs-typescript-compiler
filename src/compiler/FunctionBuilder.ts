@@ -182,6 +182,17 @@ export class FunctionBuilder {
     b.byteCodeBuf = fd.byteCode.data()
     b.byteCodeLen = fd.byteCode.size
     
+    if (process.env.DEBUG_JUMP) {
+      console.log(`[FunctionBuilder.build] byteCodeLen=${b.byteCodeLen}`)
+      const buf = b.byteCodeBuf
+      for (let i = 0; i < b.byteCodeLen; i++) {
+        const byte = buf[i]
+        if (byte === 0x6c || byte === 0x6e || byte === 0xec || byte === 0xee) {
+          console.log(`  [offset ${i}] op=0x${byte.toString(16)}`)
+        }
+      }
+    }
+    
     // 4. 复制函数名 - parser.c:12579
     b.funcName = fd.funcName
     
@@ -334,7 +345,13 @@ export class BytecodeWriter {
     this.writeFunctionBytecode(b)
     
     // 写入 atoms 表到开头
-    return this.finalizeWithAtoms()
+    const result = this.finalizeWithAtoms()
+    
+    if (process.env.DEBUG_JUMP) {
+      console.log(`[BytecodeWriter.write] Returning result.length=${result.length}, result[83]=0x${result[83]?.toString(16) ?? 'undefined'}`)
+    }
+    
+    return result
   }
   
   /**
@@ -419,6 +436,9 @@ export class BytecodeWriter {
     }
     
     // 写入字节码 - bytecode.cpp:506-507
+    if (process.env.DEBUG_JUMP) {
+      console.log(`[writeFunctionBytecode] Writing bytecode at out.size=${this.out.size}`)
+    }
     this.writeBytecodeBuf(b.byteCodeBuf, b.byteCodeLen)
     
     // 写入调试信息 - bytecode.cpp:509-522
@@ -451,14 +471,31 @@ export class BytecodeWriter {
     const buf = new Uint8Array(bcLen)
     buf.set(bcBuf.subarray(0, bcLen))
     
+    if (process.env.DEBUG_JUMP) {
+      console.log(`[writeBytecodeBuf] bcLen=${bcLen}`)
+      for (let i = 0; i < bcLen; i++) {
+        const byte = buf[i]
+        if (byte === 0x6c || byte === 0x6e || byte === 0xec || byte === 0xee) {
+          console.log(`  [BEFORE offset ${i}] op=0x${byte.toString(16)}`)
+        }
+      }
+    }
+    
     // 遍历字节码，转换 atom 索引
     let pos = 0
     while (pos < bcLen) {
       const op = buf[pos]
       const opDef = OPCODE_BY_CODE[op]
       
+      if (process.env.DEBUG_JUMP && (op === 0xec || op === 0xee || op === 0x6c || op === 0x6e)) {
+        console.log(`  [writeBytecodeBuf] At pos ${pos}: op=0x${op.toString(16)}, opDef=${opDef ? opDef.id + ' size=' + opDef.size : 'null'}`)
+      }
+      
       if (!opDef) {
         // 未知操作码，跳过1字节
+        if (process.env.DEBUG_JUMP) {
+          console.log(`  [writeBytecodeBuf] Unknown opcode 0x${op.toString(16)} at pos ${pos}, skipping`)
+        }
         pos++
         continue
       }
@@ -485,7 +522,21 @@ export class BytecodeWriter {
       pos += opDef.size
     }
     
+    if (process.env.DEBUG_JUMP && buf.length > 12) {
+      console.log(`  [writeBytecodeBuf] AFTER processing, buf[12]=0x${buf[12].toString(16)}`)
+    }
+    
     this.out.put(buf)
+    
+    if (process.env.DEBUG_JUMP) {
+      // 检查 out 中的内容
+      const outData = this.out.data()
+      const bcStartInOut = this.out.size - bcLen
+      console.log(`  [writeBytecodeBuf] After put: out.size=${this.out.size}, bcStartInOut=${bcStartInOut}`)
+      if (bcLen > 12) {
+        console.log(`  [writeBytecodeBuf] out[${bcStartInOut + 12}]=0x${outData[bcStartInOut + 12].toString(16)}`)
+      }
+    }
   }
   
   /** 从缓冲区读取 little-endian U32 */
@@ -664,6 +715,15 @@ export class BytecodeWriter {
     const result = new Uint8Array(atomsOut.size + body.length)
     result.set(atomsOut.data())
     result.set(body, atomsOut.size)
+    
+    if (process.env.DEBUG_JUMP) {
+      console.log(`[finalizeWithAtoms] atomsOut.size=${atomsOut.size}, body.length=${body.length}`)
+      // 字节码在 body 中的位置是 24，所以在 result 中是 atomsOut.size + 24
+      const bcOffsetInResult = atomsOut.size + 24 + 12  // atoms + 函数头 + 第12字节
+      if (bcOffsetInResult < result.length) {
+        console.log(`[finalizeWithAtoms] result[${bcOffsetInResult}]=0x${result[bcOffsetInResult].toString(16)}`)
+      }
+    }
     
     return result
   }

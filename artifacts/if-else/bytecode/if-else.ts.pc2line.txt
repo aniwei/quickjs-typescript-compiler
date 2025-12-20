@@ -1,0 +1,21 @@
+
+--- Function (Atom 164) ---
+Flags: 0x600
+Args: 0, Vars: 1, Stack: 3
+Closure Vars: 0, Constants: 0, Bytecode: 67
+Var Defs: 1
+  Var 0: Atom 166, Scope 0, Next 0, Flags 0x0
+[DEBUG] Reading pc2line len=18
+📄 文件: artifacts/if-else/bytecode/if-else.ts.qbc
+🔢 pc2line 长度: 18 字节
+原始字节: 0x00 0x00 0x67 0x08 0x1b 0x08 0x07 0x03 0x12 0x04 0x37 0x00 0x2c 0x0f 0x1b 0x0e 0x34 0x08
+┏━━╸PC ╺━━╸行 ╺━━╸列 ╺━━╸ΔPC ╺━━╸Δ行 ╺━━╸Δ列
+┃    0 →   1 :   1  [Δpc=  0 Δ行=  0 Δ列=  0]
+┃   20 →   2 :   5  [Δpc= 20 Δ行=  1 Δ列=  4]
+┃   25 →   2 :   9  [Δpc=  5 Δ行=  0 Δ列=  4]
+┃   26 →   2 :   7  [Δpc=  1 Δ行=  0 Δ列= -2]
+┃   29 →   3 :   9  [Δpc=  3 Δ行=  1 Δ列=  2]
+┃   39 →   6 :   9  [Δpc= 10 Δ行=  3 Δ列=  0]
+┃   47 →   8 :   1  [Δpc=  8 Δ行=  2 Δ列= -8]
+┃   52 →   8 :   8  [Δpc=  5 Δ行=  0 Δ列=  7]
+┃   62 →   8 :  12  [Δpc= 10 Δ行=  0 Δ列=  4]

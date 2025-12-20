@@ -61,6 +61,16 @@ const OP_SPECIAL_OBJECT_MAPPED_ARGUMENTS = OPSpecialObjectEnum.OP_SPECIAL_OBJECT
 const OP_SPECIAL_OBJECT_VAR_OBJECT = OPSpecialObjectEnum.OP_SPECIAL_OBJECT_VAR_OBJECT
 
 // ============================================================================
+// 多操作码匹配宏 - 对应 parser.c:10126-10129
+// ============================================================================
+
+/** 打包 2 个操作码用于模式匹配 */
+const M2 = (op1: number, op2: number) => (op1) | ((op2) << 8)
+
+/** 打包 3 个操作码用于模式匹配 */
+const M3 = (op1: number, op2: number, op3: number) => (op1) | ((op2) << 8) | ((op3) << 16)
+
+// ============================================================================
 // 代码上下文 - 用于模式匹配
 // 
 // QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:10113-10129
@@ -139,9 +149,10 @@ export class LabelResolver {
       atom: 0,
     }
     
-    let lineNum = fd.sourcePos
-    
     // 初始化跳转槽
+    if (process.env.DEBUG_JUMP) {
+      console.log(`[resolve] fd.jumpSize=${fd.jumpSize}, USE_SHORT_OPCODES=${USE_SHORT_OPCODES}`)
+    }
     if (USE_SHORT_OPCODES && fd.jumpSize > 0) {
       fd.jumpSlots = new Array(fd.jumpSize)
       for (let i = 0; i < fd.jumpSize; i++) {
@@ -149,15 +160,34 @@ export class LabelResolver {
       }
     }
     
-    // 初始化行号槽
-    if (fd.lineNumberSize > 0 && !fd.stripDebug) {
-      fd.lineNumberSlots = new Array(fd.lineNumberSize)
-      for (let i = 0; i < fd.lineNumberSize; i++) {
-        fd.lineNumberSlots[i] = new LineNumberSlot()
+    // 初始化行号槽 - 总是初始化，因为我们需要在 LabelResolver 中记录 pc2line
+    // QuickJS 策略：先预估 line_number_size（等价于 line_num 标记数量），再一次性分配固定容量。
+    // 这样 add_pc2line_info 不需要 realloc，也不会出现“16 条后静默截断”。
+    if (!fd.stripDebug) {
+      if (fd.lineNumberSize <= 0) {
+        fd.lineNumberSize = this.countLineNumMarkers(bcBuf, bcLen)
       }
-      fd.lineNumberLast = fd.sourcePos
-      fd.lineNumberLastPc = 0
+      if (fd.lineNumberSize > 0) {
+        fd.lineNumberSlots = new Array(fd.lineNumberSize)
+        for (let i = 0; i < fd.lineNumberSize; i++) {
+          fd.lineNumberSlots[i] = new LineNumberSlot()
+        }
+        fd.lineNumberCount = 0
+        // 与 C 源码一致：初始化为函数的 source_pos
+        // parser.c:11121: s->line_number_last = s->source_pos;
+        fd.lineNumberLast = fd.sourcePos
+        fd.lineNumberLastPc = 0
+      } else {
+        fd.lineNumberSlots = []
+        fd.lineNumberCount = 0
+        fd.lineNumberLast = fd.sourcePos
+        fd.lineNumberLastPc = 0
+      }
     }
+    
+    // 初始化 lineNum 为函数的 source_pos
+    // parser.c:11102: line_num = s->source_pos;
+    let lineNum = fd.sourcePos
     
     // === 初始化特殊变量 ===
     this.initializeSpecialVars(fd, bcOut)
@@ -175,16 +205,96 @@ export class LabelResolver {
       let posNext = pos + len
       
       switch (op) {
+        // === 短操作码优化: push_empty_string ===
+        // QuickJS 会在 phase 3 将 push_atom_value("" ) 优化为 OP_push_empty_string。
+        // 我们在编译阶段避免发射短操作码（与 TempOpcode 重叠），这里再做等价压缩。
+        case Opcode.OP_push_atom_value: {
+          const atom = this.getU32(bcBuf, pos + 1)
+          if (USE_SHORT_OPCODES && OPTIMIZE && atom === JSAtom.JS_ATOM_empty_string) {
+            this.addPc2lineInfo(fd, bcOut.size, lineNum)
+            bcOut.putU8(Opcode.OP_push_empty_string)
+            break
+          }
+          // 默认输出为 push_atom_value
+          this.addPc2lineInfo(fd, bcOut.size, lineNum)
+          bcOut.putU8(op)
+          bcOut.putU32(atom)
+          break
+        }
+
         // === 行号信息 ===
         case TempOpcode.OP_line_num:
           lineNum = this.getU32(bcBuf, pos + 1)
           break
         
+        // === 作用域进入/退出 (TempOpcode) ===
+        // 对应 QuickJS 源码 parser.c:10691-10750
+        case TempOpcode.OP_enter_scope: {
+          const scope = this.getU16(bcBuf, pos + 1)
+          
+          // 遍历作用域中的变量并初始化
+          let scopeIdx = fd.scopes[scope].first
+          while (scopeIdx >= 0) {
+            const vd = fd.vars[scopeIdx]
+            if (vd.scopeLevel === scope) {
+              if (scopeIdx !== fd.argumentsArgIdx) {
+                if (vd.varKind === JSVarKindEnum.JS_VAR_FUNCTION_DECL ||
+                    vd.varKind === JSVarKindEnum.JS_VAR_NEW_FUNCTION_DECL) {
+                  // 初始化词法变量 (函数声明)
+                  this.addPc2lineInfo(fd, bcOut.size, lineNum)
+                  bcOut.putU8(Opcode.OP_fclosure)
+                  bcOut.putU32(vd.funcPoolIdx)
+                  this.putShortCode(bcOut, Opcode.OP_put_loc, scopeIdx)
+                } else {
+                  // 初始化为 uninitialized
+                  this.addPc2lineInfo(fd, bcOut.size, lineNum)
+                  bcOut.putU8(Opcode.OP_set_loc_uninitialized)
+                  bcOut.putU16(scopeIdx)
+                }
+              }
+              scopeIdx = vd.scopeNext
+            } else {
+              break
+            }
+          }
+          break
+        }
+
+        case TempOpcode.OP_leave_scope: {
+          const scope = this.getU16(bcBuf, pos + 1)
+          
+          // 遍历作用域中的变量并关闭捕获的变量
+          let scopeIdx = fd.scopes[scope].first
+          while (scopeIdx >= 0) {
+            const vd = fd.vars[scopeIdx]
+            if (vd.scopeLevel === scope) {
+              if (vd.isCaptured) {
+                this.addPc2lineInfo(fd, bcOut.size, lineNum)
+                bcOut.putU8(Opcode.OP_close_loc)
+                bcOut.putU16(scopeIdx)
+              }
+              scopeIdx = vd.scopeNext
+            } else {
+              break
+            }
+          }
+          break
+        }
+
         // === 标签定义 ===
         case TempOpcode.OP_label: {
           const labelIdx = this.getU32(bcBuf, pos + 1)
           if (labelIdx >= 0 && labelIdx < fd.labelSlots.length) {
             const ls = fd.labelSlots[labelIdx]
+            
+            // 关键：pos2 用于后续 jump diff 的“静态预估”。
+            // QuickJS 在 pass2（resolve_variables）里设置：
+            //   third_party/QuickJS/src/core/parser.c: case OP_label: ls->pos2 = bc_out.size + opcode_info[op].size;
+            // 注意：这里的 bc_out 是 pass2 输出缓冲；我们在 resolve_labels 里没有独立的 pass2，
+            // 因此用当前 bcOut.size 来等价模拟。
+            // 另外：OP_label 本身不会输出到 bcOut，但它在输入字节码里占用 5 bytes（1 + u32 label）。
+            ls.pos2 = bcOut.size + len
+            
             ls.addr = bcOut.size
             
             // 解析重定位条目
@@ -213,13 +323,13 @@ export class LabelResolver {
         }
         
         // === 返回/抛出 - 死代码消除 ===
+        // 注意: 与 QuickJS C 源码一致，return/throw 走 no_change，不调用 add_pc2line_info
         case Opcode.OP_return:
         case Opcode.OP_return_undef:
         case Opcode.OP_return_async:
         case Opcode.OP_throw:
         case Opcode.OP_throw_error:
           posNext = this.skipDeadCode(fd, bcBuf, bcLen, posNext, { lineNum })
-          this.addPc2lineInfo(fd, bcOut.size, lineNum)
           bcOut.put(bcBuf.slice(pos, pos + len))
           break
         
@@ -250,7 +360,7 @@ export class LabelResolver {
           }
           
           // 输出跳转指令
-          this.emitJump(fd, bcOut, op, label, lineNum)
+          this.emitJump(fd, bcOut, op, label, lineNum, pos)
           posNext = this.skipDeadCode(fd, bcBuf, bcLen, posNext, { lineNum })
           break
         }
@@ -258,14 +368,14 @@ export class LabelResolver {
         // === gosub (用于 finally) ===
         case Opcode.OP_gosub: {
           const label = this.getU32(bcBuf, pos + 1)
-          this.emitJump(fd, bcOut, op, label, lineNum)
+          this.emitJump(fd, bcOut, op, label, lineNum, pos)
           break
         }
         
         // === catch ===
         case Opcode.OP_catch: {
           const label = this.getU32(bcBuf, pos + 1)
-          this.emitJump(fd, bcOut, op, label, lineNum)
+          this.emitJump(fd, bcOut, op, label, lineNum, pos)
           break
         }
         
@@ -296,13 +406,13 @@ export class LabelResolver {
                 label = cc.label
                 // 翻转条件
                 const newOp = op === Opcode.OP_if_false ? Opcode.OP_if_true : Opcode.OP_if_false
-                this.emitJump(fd, bcOut, newOp, label, lineNum)
+                this.emitJump(fd, bcOut, newOp, label, lineNum, pos)
                 break
               }
             }
           }
           
-          this.emitJump(fd, bcOut, op, label, lineNum)
+          this.emitJump(fd, bcOut, op, label, lineNum, pos)
           break
         }
         
@@ -347,6 +457,21 @@ export class LabelResolver {
           const val = this.getI32(bcBuf, pos + 1)
           
           if (OPTIMIZE) {
+            // i32(val) neg -> i32(-val)
+            // QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:11492-11517
+            // 注意: val==0 时不能做该优化（-0 语义），INT32_MIN 取负会溢出。
+            if (val !== 0 && val !== -2147483648 && this.codeMatch(cc, posNext, [Opcode.OP_neg, -1])) {
+              if (cc.lineNum >= 0) lineNum = cc.lineNum
+              if (this.codeMatch(cc, cc.pos, [Opcode.OP_drop, -1])) {
+                if (cc.lineNum >= 0) lineNum = cc.lineNum
+              } else {
+                this.addPc2lineInfo(fd, bcOut.size, lineNum)
+                this.pushShortInt(bcOut, -val)
+              }
+              posNext = cc.pos
+              break
+            }
+
             // i32 drop → (nothing)
             if (this.codeMatch(cc, posNext, [Opcode.OP_drop, -1])) {
               if (cc.lineNum >= 0) lineNum = cc.lineNum
@@ -400,6 +525,7 @@ export class LabelResolver {
         }
         
         // === push_const / fclosure 优化 ===
+        // 注意: 只有短格式优化时才调用 add_pc2line_info，否则走 default
         case Opcode.OP_push_const:
         case Opcode.OP_fclosure: {
           if (USE_SHORT_OPCODES && OPTIMIZE) {
@@ -411,7 +537,7 @@ export class LabelResolver {
               break
             }
           }
-          this.addPc2lineInfo(fd, bcOut.size, lineNum)
+          // goto no_change - 走 default 分支
           bcOut.put(bcBuf.slice(pos, pos + len))
           break
         }
@@ -488,7 +614,85 @@ export class LabelResolver {
           break
         }
         
+        // === post_inc/post_dec 优化 ===
+        // QuickJS 源码位置: parser.c:11896-11957
+        // 
+        // 优化模式:
+        // - post_inc put_loc(n) drop → inc put_loc(n)
+        // - post_inc put_arg(n) drop → inc put_arg(n)
+        // - post_inc put_var_ref(n) drop → inc put_var_ref(n)
+        // - post_inc perm3 put_field drop → inc put_field
+        // - post_inc perm3 put_var_strict drop → inc put_var_strict
+        // - post_inc perm4 put_array_el drop → inc put_array_el
+        case Opcode.OP_post_inc:
+        case Opcode.OP_post_dec: {
+          if (OPTIMIZE) {
+            // post_inc put_loc/put_arg/put_var_ref drop → inc put_x
+            if (this.codeMatch(cc, posNext, [
+              M3(Opcode.OP_put_loc, Opcode.OP_put_arg, Opcode.OP_put_var_ref), -1, 
+              Opcode.OP_drop, -1
+            ])) {
+              if (cc.lineNum >= 0) lineNum = cc.lineNum
+              const op1 = cc.op
+              const idx = cc.idx
+              let pos1 = cc.pos
+              
+              // 检查是否可以进一步优化为 set_x
+              // put_x(n) get_x(n) → set_x(n)
+              if (this.codeMatch(cc, pos1, [op1 - 1, idx, -1])) {
+                if (cc.lineNum >= 0) lineNum = cc.lineNum
+                pos1 = cc.pos
+                // op1 + 1 → set_x
+                this.addPc2lineInfo(fd, bcOut.size, lineNum)
+                bcOut.putU8(Opcode.OP_dec + (op - Opcode.OP_post_dec)) // inc or dec
+                this.putShortCode(bcOut, op1 + 1, idx)
+                posNext = pos1
+                break
+              }
+              
+              this.addPc2lineInfo(fd, bcOut.size, lineNum)
+              bcOut.putU8(Opcode.OP_dec + (op - Opcode.OP_post_dec)) // inc or dec
+              this.putShortCode(bcOut, op1, idx)
+              posNext = pos1
+              break
+            }
+            
+            // post_inc perm3 put_field/put_var_strict drop → inc put_field/put_var_strict
+            if (this.codeMatch(cc, posNext, [
+              Opcode.OP_perm3,
+              M2(Opcode.OP_put_field, Opcode.OP_put_var_strict), -1,
+              Opcode.OP_drop, -1
+            ])) {
+              if (cc.lineNum >= 0) lineNum = cc.lineNum
+              this.addPc2lineInfo(fd, bcOut.size, lineNum)
+              bcOut.putU8(Opcode.OP_dec + (op - Opcode.OP_post_dec)) // inc or dec
+              bcOut.putU8(cc.op)
+              bcOut.putU32(cc.atom)
+              posNext = cc.pos
+              break
+            }
+            
+            // post_inc perm4 put_array_el drop → inc put_array_el
+            if (this.codeMatch(cc, posNext, [
+              Opcode.OP_perm4, Opcode.OP_put_array_el, Opcode.OP_drop, -1
+            ])) {
+              if (cc.lineNum >= 0) lineNum = cc.lineNum
+              this.addPc2lineInfo(fd, bcOut.size, lineNum)
+              bcOut.putU8(Opcode.OP_dec + (op - Opcode.OP_post_dec)) // inc or dec
+              bcOut.putU8(Opcode.OP_put_array_el)
+              posNext = cc.pos
+              break
+            }
+          }
+          // no optimization, output as-is
+          this.addPc2lineInfo(fd, bcOut.size, lineNum)
+          bcOut.putU8(op)
+          break
+        }
+        
         // === 默认处理 ===
+        // 注意: 与之前的理解不同，C 源码的 no_change 确实调用 add_pc2line_info
+        // 但由于 TS 编译器发射 OP_line_num 的策略与 C 不同，这里不调用以避免重复
         default:
           this.addPc2lineInfo(fd, bcOut.size, lineNum)
           bcOut.put(bcBuf.slice(pos, pos + len))
@@ -509,6 +713,18 @@ export class LabelResolver {
     // === 替换字节码 ===
     fd.byteCode = bcOut
     fd.useShortOpcodes = true
+    
+    if (process.env.DEBUG_JUMP) {
+      // 检查字节码中的跳转指令
+      const buf = bcOut.buffer
+      console.log(`[resolve] Final bcOut.size=${bcOut.size}`)
+      for (let i = 0; i < bcOut.size; i++) {
+        const b = buf[i]
+        if (b === 0x6c || b === 0x6e || b === 0xec || b === 0xee) {
+          console.log(`  [offset ${i}] op=0x${b.toString(16)}`)
+        }
+      }
+    }
   }
 
   // ============================================================================
@@ -684,13 +900,17 @@ export class LabelResolver {
 
   /**
    * 发射跳转指令
+   * 
+   * @param srcPos 源字节码中的当前位置，用于估计短跳转距离
+   *               对应 QuickJS C 源码: int diff = ls->pos2 - pos - 1;
    */
   private emitJump(
     fd: FunctionDef,
     bcOut: BytecodeBuilder,
     op: number,
     label: number,
-    lineNum: number
+    lineNum: number,
+    srcPos: number = 0
   ): void {
     if (label < 0 || label >= fd.labelSlots.length) {
       throw new Error(`Invalid label: ${label}`)
@@ -703,10 +923,22 @@ export class LabelResolver {
       // 尝试使用短跳转
       if (ls.addr === -1) {
         // 未解析: 使用 pos2 估计
-        const diff = ls.pos2 - bcOut.size - 1
+        // 关键修复: 使用源位置 srcPos 而不是输出位置 bcOut.size
+        // 对应 QuickJS C 源码 parser.c:11341: int diff = ls->pos2 - pos - 1;
+        const diff = ls.pos2 - srcPos - 1
+        
+        // DEBUG: 打印跳转信息
+        if (process.env.DEBUG_JUMP) {
+          console.log(`[emitJump] op=${op.toString(16)}, label=${label}, srcPos=${srcPos}, ls.pos2=${ls.pos2}, diff=${diff}, bcOut.size=${bcOut.size}`)
+        }
+        
         if (diff >= -128 && diff <= 127 && 
             (op === Opcode.OP_if_false || op === Opcode.OP_if_true || op === Opcode.OP_goto)) {
           const shortOp = op === Opcode.OP_goto ? Opcode.OP_goto8 : Opcode.OP_if_false8 + (op - Opcode.OP_if_false)
+          
+          if (process.env.DEBUG_JUMP) {
+            console.log(`[emitJump] Using SHORT jump: shortOp=0x${shortOp.toString(16)}, bcOut.size=${bcOut.size}`)
+          }
           
           // 记录跳转槽 - 短跳转使用 1 字节偏移
           if (fd.jumpCount < fd.jumpSlots.length) {
@@ -741,15 +973,46 @@ export class LabelResolver {
         }
       } else {
         // 已解析: 使用实际地址
+        // 对应 QuickJS 源码 parser.c:11356 (resolve_labels)
         const diff = ls.addr - bcOut.size - 1
         if (diff >= -128 && diff <= 127 &&
             (op === Opcode.OP_if_false || op === Opcode.OP_if_true || op === Opcode.OP_goto)) {
           const shortOp = op === Opcode.OP_goto ? Opcode.OP_goto8 : Opcode.OP_if_false8 + (op - Opcode.OP_if_false)
+          
+          // 关键修复: 即使是向后跳转且已经是短跳转，也必须记录到 jumpSlots
+          // 因为后续的 optimizeShortJumps 可能会收缩中间的代码，导致 diff 发生变化
+          // 对应 QuickJS 源码 parser.c:11363:
+          // "we must record the jump because the offset may change if we optimize other jumps"
+          if (fd.jumpCount < fd.jumpSlots.length) {
+            const jp = fd.jumpSlots[fd.jumpCount]
+            jp.op = shortOp
+            jp.size = 1
+            jp.pos = bcOut.size + 1
+            jp.label = label
+            fd.jumpCount++
+          }
+
           bcOut.putU8(shortOp)
           bcOut.putU8(diff & 0xff)
           return
         }
         if (diff >= -32768 && diff <= 32767 && op === Opcode.OP_goto) {
+          // 同上，记录中等跳转
+          // 对应 QuickJS 源码 parser.c resolve_labels:
+          // if (diff == (int16_t)diff && op == OP_goto) {
+          //   jp->size = 2;
+          //   jp->op = OP_goto16;
+          //   ...
+          // }
+          if (fd.jumpCount < fd.jumpSlots.length) {
+            const jp = fd.jumpSlots[fd.jumpCount]
+            jp.op = Opcode.OP_goto16
+            jp.size = 2
+            jp.pos = bcOut.size + 1
+            jp.label = label
+            fd.jumpCount++
+          }
+
           bcOut.putU8(Opcode.OP_goto16)
           bcOut.putU16(diff & 0xffff)
           return
@@ -757,6 +1020,9 @@ export class LabelResolver {
       }
       
       // 记录跳转槽 - 长跳转使用 4 字节偏移
+      if (process.env.DEBUG_JUMP) {
+        console.log(`[emitJump] Before recording: jumpCount=${fd.jumpCount}, jumpSlots.length=${fd.jumpSlots?.length ?? 'null'}`)
+      }
       if (fd.jumpCount < fd.jumpSlots.length) {
         const jp = fd.jumpSlots[fd.jumpCount]
         jp.op = op
@@ -764,6 +1030,10 @@ export class LabelResolver {
         jp.pos = bcOut.size + 1
         jp.label = label
         fd.jumpCount++
+        
+        if (process.env.DEBUG_JUMP) {
+          console.log(`[emitJump] Recorded LONG jump: op=0x${op.toString(16)}, size=4, pos=${jp.pos}, label=${label}`)
+        }
       }
     }
     
@@ -990,8 +1260,10 @@ export class LabelResolver {
       // 检查操作码匹配
       // expected 可以是单个操作码，或用 M2/M3/M4 打包的多个操作码
       let matched = false
+      let isMultiMatch = false  // 标记是否是多操作码匹配
       if (expected === op) {
         matched = true
+        // 精确匹配：不更新 cc.op (与 QuickJS C 行为一致)
       } else if (expected > 255) {
         // M2/M3/M4 编码的多个操作码
         if (op === (expected & 0xFF) ||
@@ -999,12 +1271,16 @@ export class LabelResolver {
             op === ((expected >> 16) & 0xFF) ||
             op === ((expected >> 24) & 0xFF)) {
           matched = true
+          isMultiMatch = true
         }
       }
       
       if (!matched) return false
       
-      cc.op = op
+      // 只有多操作码匹配时才更新 cc.op (与 QuickJS C 行为一致)
+      if (isMultiMatch) {
+        cc.op = op
+      }
       
       // 根据操作码格式读取参数，并可能与 pattern 中的下一个值匹配
       const posNext = pos + opDef.size
@@ -1014,14 +1290,15 @@ export class LabelResolver {
         case OpFormat.loc8: {
           const idx = cc.bcBuf[pos + 1]
           cc.idx = idx
-          // 检查是否需要匹配参数值
-          if (i < pattern.length && pattern[i] !== -1) {
+          // 读取参数期望值
+          if (i < pattern.length) {
             const expectedArg = pattern[i]
-            if (expectedArg >= 0) {
-              // 正数：需要精确匹配
+            i++ // 始终递增 i 来消费参数
+            if (expectedArg !== -1) {
+              // 不是 -1：需要精确匹配
               if (idx !== expectedArg) return false
-              i++
             }
+            // -1：只保存值，不检查
           }
           break
         }
@@ -1032,14 +1309,15 @@ export class LabelResolver {
         case OpFormat.npop: {
           const idx = this.getU16(cc.bcBuf, pos + 1)
           cc.idx = idx
-          // 检查是否需要匹配参数值
-          if (i < pattern.length && pattern[i] !== -1) {
+          // 读取参数期望值
+          if (i < pattern.length) {
             const expectedArg = pattern[i]
-            if (expectedArg >= 0) {
-              // 正数：需要精确匹配
+            i++ // 始终递增 i 来消费参数
+            if (expectedArg !== -1) {
+              // 不是 -1：需要精确匹配
               if (idx !== expectedArg) return false
-              i++
             }
+            // -1：只保存值，不检查
           }
           break
         }
@@ -1075,17 +1353,37 @@ export class LabelResolver {
    * 添加 pc2line 信息 - 对应 parser.c:add_pc2line_info
    */
   private addPc2lineInfo(fd: FunctionDef, pc: number, sourcePos: number): void {
-    if (fd.lineNumberSlots && 
-        fd.lineNumberCount < fd.lineNumberSize &&
-        pc >= fd.lineNumberLastPc && 
-        sourcePos !== fd.lineNumberLast) {
-      fd.lineNumberSlots[fd.lineNumberCount] = new LineNumberSlot()
-      fd.lineNumberSlots[fd.lineNumberCount].pc = pc
-      fd.lineNumberSlots[fd.lineNumberCount].sourcePos = sourcePos
-      fd.lineNumberCount++
-      fd.lineNumberLastPc = pc
-      fd.lineNumberLast = sourcePos
+    // Mirror QuickJS add_pc2line_info: only record if slots are allocated.
+    if (fd.lineNumberSize <= 0 || fd.lineNumberSlots.length === 0) return
+
+    // Mirror QuickJS: stop if capacity is exhausted (capacity should be precomputed).
+    if (fd.lineNumberCount >= fd.lineNumberSize) return
+
+    // Mirror QuickJS add_pc2line_info: only record monotonically increasing PCs
+    // and skip identical source positions.
+    if (pc < fd.lineNumberLastPc || sourcePos === fd.lineNumberLast) {
+      return
     }
+
+    const slot = fd.lineNumberSlots[fd.lineNumberCount]
+    slot.pc = pc
+    slot.sourcePos = sourcePos
+    fd.lineNumberCount++
+    fd.lineNumberLastPc = pc
+    fd.lineNumberLast = sourcePos
+  }
+
+  private countLineNumMarkers(bcBuf: Uint8Array, bcLen: number): number {
+    let count = 0
+    let pos = 0
+    while (pos < bcLen) {
+      const op = bcBuf[pos]
+      const opDef = this.getOpcodeDef(op)
+      if (!opDef) break
+      if (op === TempOpcode.OP_line_num) count++
+      pos += opDef.size
+    }
+    return count
   }
 
   /**
@@ -1101,34 +1399,176 @@ export class LabelResolver {
   // ============================================================================
 
   /**
-   * 优化短跳转 - 对应 parser.c 中的 SHORT_OPCODES 优化
+   * 优化短跳转 - 对应 parser.c:12030-12080 中的 SHORT_OPCODES 优化
    * 
-   * 注意：短跳转和中等跳转已经在 emitJump 中通过 addReloc + resolveRelocations 处理。
-   * 这个函数只处理在 emitJump 中被标记为 size=4 的长跳转，它们不能通过
-   * resolveRelocations 处理，因为需要在知道所有标签地址后才能决定是否可以缩短。
+   * 在第一遍处理后，所有标签地址已知。这个函数尝试将长跳转 (4字节偏移) 
+   * 收缩为短跳转 (1字节偏移) 或中等跳转 (2字节偏移)。
+   * 
+   * 收缩过程需要：
+   * 1. 更新跳转指令的 opcode 和偏移大小
+   * 2. 移动后续字节码
+   * 3. 更新所有标签地址和跳转槽位置
+   * 4. 更新行号槽位置
    */
   private optimizeShortJumps(fd: FunctionDef, bcOut: BytecodeBuilder): void {
     if (!fd.jumpSlots || fd.jumpCount === 0) return
     
-    // 只处理长跳转 (size=4) 的重定位
-    // 短跳转 (size=1) 和中等跳转 (size=2) 已经通过 addReloc + resolveRelocations 处理
-    for (let j = 0; j < fd.jumpCount; j++) {
-      const jp = fd.jumpSlots[j]
+    // 迭代优化，直到没有更多可以收缩的跳转
+    let patchOffsets = 1
+    while (patchOffsets > 0) {
+      patchOffsets = 0
       
-      // 只处理长跳转
-      if (jp.size !== 4) continue
+      if (process.env.DEBUG_JUMP) {
+        console.log(`[optimizeShortJumps] jumpCount=${fd.jumpCount}`)
+      }
       
-      const ls = fd.labelSlots[jp.label]
-      const diff = ls.addr - jp.pos
-      const buf = bcOut.buffer
-      
-      buf[jp.pos] = diff & 0xff
-      buf[jp.pos + 1] = (diff >> 8) & 0xff
-      buf[jp.pos + 2] = (diff >> 16) & 0xff
-      buf[jp.pos + 3] = (diff >> 24) & 0xff
+      for (let i = 0; i < fd.jumpCount; i++) {
+        const jp = fd.jumpSlots[i]
+        const ls = fd.labelSlots[jp.label]
+        const pos = jp.pos
+        const op = jp.op
+        const diff = ls.addr - pos
+        
+        if (process.env.DEBUG_JUMP) {
+          console.log(`  [${i}] op=0x${op.toString(16)}, pos=${pos}, label=${jp.label}, addr=${ls.addr}, diff=${diff}, size=${jp.size}`)
+        }
+        
+        let delta = 3  // 默认 delta: 4字节 -> 1字节 = 3字节差
+        let newSize = 1
+        let newOp = op
+        
+        switch (op) {
+          case Opcode.OP_goto16:
+            delta = 1  // 2字节 -> 1字节 = 1字节差
+            // fall through
+          case Opcode.OP_if_false:
+          case Opcode.OP_if_true:
+          case Opcode.OP_goto:
+            // 检查是否可以收缩为短跳转 (1字节偏移)
+            // C 源码: diff >= -128 && diff <= 127 + delta
+            // 需要考虑收缩后 diff 会改变（如果目标在当前位置之后）
+            if (diff >= -128 && diff <= 127 + delta) {
+              newSize = 1
+              if (op === Opcode.OP_goto16) {
+                newOp = Opcode.OP_goto8
+              } else if (op === Opcode.OP_if_false || op === Opcode.OP_if_true || op === Opcode.OP_goto) {
+                newOp = Opcode.OP_if_false8 + (op - Opcode.OP_if_false)
+              } else {
+                continue  // 已经是短跳转
+              }
+              
+              // 检查是否真的需要收缩
+              if (jp.size <= newSize) continue
+              
+              // 执行收缩
+              this.shrinkJump(fd, bcOut, jp, newOp, newSize, delta, i)
+              patchOffsets++
+            } else if ((diff === (diff << 16 >> 16)) && op === Opcode.OP_goto && jp.size === 4) {
+              // 检查是否可以收缩为中等跳转 (2字节偏移)
+              newSize = 2
+              delta = 2
+              newOp = Opcode.OP_goto16
+              
+              this.shrinkJump(fd, bcOut, jp, newOp, newSize, delta, i)
+              patchOffsets++
+            } else if (jp.size === 4) {
+              // 无法收缩，但需要填充偏移
+              const buf = bcOut.buffer
+              buf[pos] = diff & 0xff
+              buf[pos + 1] = (diff >> 8) & 0xff
+              buf[pos + 2] = (diff >> 16) & 0xff
+              buf[pos + 3] = (diff >> 24) & 0xff
+            }
+            break
+            
+          default:
+            // 其他跳转类型（catch, gosub 等）只填充偏移，不收缩
+            // 同时也处理已经是短跳转的情况 (更新偏移量)
+            if (jp.size === 1) {
+              const buf = bcOut.buffer
+              buf[pos] = diff & 0xff
+            } else if (jp.size === 2) {
+              const buf = bcOut.buffer
+              buf[pos] = diff & 0xff
+              buf[pos + 1] = (diff >> 8) & 0xff
+            } else if (jp.size === 4) {
+              const buf = bcOut.buffer
+              buf[pos] = diff & 0xff
+              buf[pos + 1] = (diff >> 8) & 0xff
+              buf[pos + 2] = (diff >> 16) & 0xff
+              buf[pos + 3] = (diff >> 24) & 0xff
+            }
+            break
+        }
+      }
+    }
+  }
+  
+  /**
+   * 收缩跳转指令
+   */
+  private shrinkJump(
+    fd: FunctionDef,
+    bcOut: BytecodeBuilder,
+    jp: JumpSlot,
+    newOp: number,
+    newSize: number,
+    delta: number,
+    currentIdx: number
+  ): void {
+    const pos = jp.pos
+    const buf = bcOut.buffer
+    
+    // 更新 opcode
+    buf[pos - 1] = newOp
+    jp.op = newOp
+    jp.size = newSize
+    
+    // 计算新的跳转偏移（收缩后）
+    const ls = fd.labelSlots[jp.label]
+    let newDiff = ls.addr - pos
+    if (ls.addr > pos) {
+      newDiff -= delta  // 目标在后面，收缩后距离减小
     }
     
-    // TODO: 尝试将长跳转优化为短跳转（需要收缩字节码）
+    // 写入新偏移
+    if (newSize === 1) {
+      buf[pos] = newDiff & 0xff
+    } else if (newSize === 2) {
+      buf[pos] = newDiff & 0xff
+      buf[pos + 1] = (newDiff >> 8) & 0xff
+    }
+    
+    // 移动后续字节码
+    const oldEnd = pos + newSize + delta
+    const newEnd = pos + newSize
+    for (let k = newEnd; k < bcOut.size - delta; k++) {
+      buf[k] = buf[k + delta]
+    }
+    bcOut.size -= delta
+    
+    // 更新标签地址
+    for (let j = 0; j < fd.labelSlots.length; j++) {
+      if (fd.labelSlots[j].addr > pos) {
+        fd.labelSlots[j].addr -= delta
+      }
+    }
+    
+    // 更新后续跳转槽位置
+    for (let j = currentIdx + 1; j < fd.jumpCount; j++) {
+      if (fd.jumpSlots[j].pos > pos) {
+        fd.jumpSlots[j].pos -= delta
+      }
+    }
+    
+    // 更新行号槽
+    if (fd.lineNumberSlots) {
+      for (let j = 0; j < fd.lineNumberCount; j++) {
+        if (fd.lineNumberSlots[j].pc > pos) {
+          fd.lineNumberSlots[j].pc -= delta
+        }
+      }
+    }
   }
 
   /**

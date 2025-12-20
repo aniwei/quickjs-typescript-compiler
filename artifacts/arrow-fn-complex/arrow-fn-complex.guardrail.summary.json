@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/arrow-fn-complex/cli/arrow-fn-complex.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/arrow-fn-complex/cli/arrow-fn-complex.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/arrow-fn-complex/cli/arrow-fn-complex.pc2line.txt",
-    "bytecodeSize": 393,
-    "pc2lineLength": 18,
+    "bytecodeSize": 262,
+    "pc2lineLength": 14,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 331,
+    "tsSize": 200,
     "wasmSize": 224,
-    "sizeDiff": 107,
-    "sizeDiffPercent": 47.767857142857146
+    "sizeDiff": -24,
+    "sizeDiffPercent": -10.714285714285714
   },
   "trace": {
     "differenceCount": 0,

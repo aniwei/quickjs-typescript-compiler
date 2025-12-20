@@ -5,6 +5,8 @@
   "main": "dist/compiler.js",
   "scripts": {
     "gen:env": "tsx scripts/getEnv.ts",
+    "audit:env": "tsx scripts/auditEnv.ts",
+    "audit:spec": "tsx scripts/auditSpec.ts",
     "build": "npm run gen:env && tsc",
     "build:wasm": "tsx scripts/buildWasm.ts",
     "start": "tsx src/cli.ts",

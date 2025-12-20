@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/logical-operators.ts
-**生成时间**: 2025-12-16T14:11:02.542Z
+**生成时间**: 2025-12-20T21:36:57.110Z
 
 ## 大小对比
 
-- TypeScript编译器: 220 字节
+- TypeScript编译器: 215 字节
 - WASM编译器: 213 字节
-- 差异: 7 字节 (3.29%)
+- 差异: 2 字节 (0.94%)
 
 ## 结构分析
 
@@ -46,7 +46,7 @@
   "functionHeader": {
     "offset": 54,
     "tag": "0xc",
-    "remaining": 166
+    "remaining": 161
   }
 }
 ```
@@ -93,29 +93,26 @@
 
 ## 字节级差异
 
-共发现 51 个字节差异:
+共发现 18 个字节差异:
 
-- 偏移量 0x42: TS=0x6d vs WASM=0x6a
-- 偏移量 0xaa: TS=0x6d vs WASM=0xed
-- 偏移量 0xab: TS=0x06 vs WASM=0x03
-- 偏移量 0xac: TS=0x00 vs WASM=0x0e
-- 偏移量 0xad: TS=0x00 vs WASM=0xba
-- 偏移量 0xae: TS=0x00 vs WASM=0x24
-- 偏移量 0xaf: TS=0x0e vs WASM=0x01
-- 偏移量 0xb0: TS=0xba vs WASM=0x00
-- 偏移量 0xb1: TS=0x24 vs WASM=0xcf
-- 偏移量 0xb2: TS=0x01 vs WASM=0x28
-- 偏移量 0xb3: TS=0x00 vs WASM=0xcc
-- 偏移量 0xb4: TS=0xcf vs WASM=0x03
-- 偏移量 0xb5: TS=0x28 vs WASM=0x1e
-- 偏移量 0xb6: TS=0xcc vs WASM=0x00
-- 偏移量 0xb7: TS=0x03 vs WASM=0x00
-- 偏移量 0xb8: TS=0x22 vs WASM=0x1b
-- 偏移量 0xb9: TS=0x00 vs WASM=0x0e
-- 偏移量 0xba: TS=0x00 vs WASM=0x39
-- 偏移量 0xbb: TS=0x34 vs WASM=0x08
-- 偏移量 0xbc: TS=0x18 vs WASM=0x17
-- ... (显示前20个差异，总共51个)
+- 偏移量 0xb5: TS=0x20 vs WASM=0x1e
+- 偏移量 0xc6: TS=0x39 vs WASM=0x52
+- 偏移量 0xc7: TS=0x1a vs WASM=0x08
+- 偏移量 0xc8: TS=0x1b vs WASM=0x17
+- 偏移量 0xc9: TS=0x11 vs WASM=0x15
+- 偏移量 0xca: TS=0x17 vs WASM=0x1b
+- 偏移量 0xcb: TS=0x15 vs WASM=0x0e
+- 偏移量 0xcc: TS=0x1b vs WASM=0x39
+- 偏移量 0xcd: TS=0x0e vs WASM=0x08
+- 偏移量 0xce: TS=0x39 vs WASM=0x17
+- 偏移量 0xcf: TS=0x08 vs WASM=0x15
+- 偏移量 0xd0: TS=0x17 vs WASM=0x1b
+- 偏移量 0xd1: TS=0x15 vs WASM=0x0e
+- 偏移量 0xd2: TS=0x1b vs WASM=0x39
+- 偏移量 0xd3: TS=0x0e vs WASM=0x08
+- 偏移量 0xd4: TS=0x39 vs WASM=0x00
+- 偏移量 0xd5: TS=0x08 vs WASM=EOF
+- 偏移量 0xd6: TS=0x00 vs WASM=EOF
 
 ## 十六进制转储对比
 
@@ -125,16 +122,16 @@
 00000010: 5f 74 65 73 74 73 5f 5f 2f 66 69 78 74 75 72 65 |_tests__/fixture|
 00000020: 73 2f 6c 6f 67 69 63 61 6c 2d 6f 70 65 72 61 74 |s/logical-operat|
 00000030: 6f 72 73 2e 6a 73 0c 00 06 00 a4 01 00 01 00 04 |ors.js..........|
-00000040: 00 00 6d 01 a6 01 00 00 00 39 e4 00 00 00 43 e5 |..m......9....C.|
+00000040: 00 00 6a 01 a6 01 00 00 00 39 e4 00 00 00 43 e5 |..j......9....C.|
 00000050: 00 00 00 0a 11 ec 03 0e 09 24 01 00 cb 39 e4 00 |.........$...9..|
 00000060: 00 00 43 e5 00 00 00 09 11 ed 03 0e 0a 24 01 00 |..C..........$..|
 00000070: cb 39 e4 00 00 00 43 e5 00 00 00 07 11 b2 ec 07 |.9....C.........|
 00000080: 0e 04 16 00 00 00 24 01 00 cb 39 e4 00 00 00 43 |......$...9....C|
 00000090: e5 00 00 00 b8 11 ec 03 0e b9 24 01 00 cb 39 e4 |..........$...9.|
-000000a0: 00 00 00 43 e5 00 00 00 b7 11 6d 06 00 00 00 0e |...C......m.....|
-000000b0: ba 24 01 00 cf 28 cc 03 22 00 00 34 18 1b 10 07 |.$...(.."..4....|
-000000c0: 27 17 00 34 18 1b 12 07 29 17 00 34 18 20 10 1b |'..4....)..4. ..|
-000000d0: 27 17 00 34 18 1b 0a 07 21 17 00 00             |'..4....!...|
+000000a0: 00 00 00 43 e5 00 00 00 b7 11 ed 03 0e ba 24 01 |...C..........$.|
+000000b0: 00 cf 28 cc 03 20 00 00 1b 0e 39 08 17 15 1b 0e |..(.. ....9.....|
+000000c0: 39 08 17 15 1b 0e 39 1a 1b 11 17 15 1b 0e 39 08 |9.....9.......9.|
+000000d0: 17 15 1b 0e 39 08 00                            |....9..|
 ```
 
 ### WASM

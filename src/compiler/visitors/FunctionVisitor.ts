@@ -86,36 +86,27 @@ export class FunctionVisitor extends VisitorContext {
     const cpoolIdx = this.compiler.cpoolAdd(parentFd, null)
     fd.parentCpoolIdx = cpoolIdx
 
-    // 发射 OP_fclosure - 对应 parser.c:13361-13377
-    // 对于函数声明，需要在外部作用域定义变量
-    this.compiler.emitOp(parentFd, Opcode.OP_fclosure, sourcePos)
-    this.compiler.emitU32(parentFd, cpoolIdx)
-
-    // 如果有函数名，设置名称
-    if (funcName === 0) {
-      this.compiler.emitOp(parentFd, Opcode.OP_set_name)
-      this.compiler.emitU32(parentFd, 0) // JS_ATOM_NULL
-    }
-
-    // 定义函数变量 - 对应 parser.c:13379-13430
+    // 定义函数变量 - 对应 parser.c:13379-13461
     if (parentFd.isGlobalVar) {
       // 全局作用域: 添加全局变量
+      // 对应 QuickJS parser.c:13429-13461
+      // 不发射任何操作码！函数会在 instantiate_hoisted_definitions 中初始化
       const hf = this.compiler.addGlobalVar(parentFd, funcName)
       if (hf) {
         hf.cpoolIdx = cpoolIdx
       }
+      // 注意：这里不发射 OP_fclosure 或 OP_scope_put_var_init
+      // 全局函数初始化由 VariableResolver.instantiateHoistedDefinitions 处理
     } else {
       // 函数作用域: 定义 var 变量
+      // 对应 QuickJS parser.c:13429-13435
       const varIdx = this.compiler.defineVar(parentFd, funcName, JSVarDefEnum.JS_VAR_DEF_VAR)
       if (varIdx >= 0 && varIdx < ARGUMENT_VAR_OFFSET) {
         parentFd.vars[varIdx].funcPoolIdx = cpoolIdx
       }
+      // 注意：对于非全局函数，变量初始化也由 VariableResolver.resolvePass2 的
+      // OP_enter_scope 处理中完成
     }
-
-    // 存储到作用域变量 - 对应 parser.c:13419-13423
-    this.compiler.emitOp(parentFd, TempOpcode.OP_scope_put_var_init)
-    this.compiler.emitAtom(parentFd, funcName)
-    this.compiler.emitU16(parentFd, parentFd.scopeLevel)
 
     // 缓存用于后续引用
     this.hoisted.set(node, { fd, childIdx, cpoolIdx })

@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/es2020_bigint/cli/es2020_bigint.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/es2020_bigint/cli/es2020_bigint.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/es2020_bigint/cli/es2020_bigint.pc2line.txt",
-    "bytecodeSize": 363,
-    "pc2lineLength": 36,
+    "bytecodeSize": 355,
+    "pc2lineLength": 28,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 301,
+    "tsSize": 293,
     "wasmSize": 309,
-    "sizeDiff": -8,
-    "sizeDiffPercent": -2.5889967637540456
+    "sizeDiff": -16,
+    "sizeDiffPercent": -5.177993527508091
   },
   "trace": {
     "differenceCount": 0,

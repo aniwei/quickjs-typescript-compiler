@@ -236,6 +236,15 @@ async function main() {
   lines.push(`}`)
   lines.push(``)
 
+  // TEMP_OPCODE_BY_CODE - 按数字索引的临时 opcodes（用于 VariableResolver）
+  lines.push(`export const TEMP_OPCODE_BY_CODE: Record<number, OpcodeDefinition> = {`)
+  for (const op of tempOpcodes) {
+    const fmtName = fmtMap.get(op.fmt) || 'none'
+    lines.push(`  ${op.code}: { id: "${op.name}", size: ${op.size}, nPop: ${op.nPop}, nPush: ${op.nPush}, format: OpFormat.${fmtName} },`)
+  }
+  lines.push(`}`)
+  lines.push(``)
+
   // SHORT_OPCODE_DEFS - 保持兼容性
   lines.push(`export const SHORT_OPCODE_DEFS: Record<string, OpcodeDefinition> = {`)
   for (const op of finalOpcodes) {

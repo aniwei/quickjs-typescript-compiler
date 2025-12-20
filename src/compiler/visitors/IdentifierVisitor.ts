@@ -2,12 +2,33 @@ import ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
 import { CompilerContext } from '../CompilerContext'
 import { Opcode, TempOpcode, JSAtom } from '../../env'
+import { FunctionDef } from '../FunctionDef'
 
 export class IdentifierVisitor extends VisitorContext {
   
 
   constructor(context: CompilerContext) {
     super(context)
+  }
+
+  /**
+   * 发射获取变量（文档对照用）
+   * 对应 QuickJS resolve_scope_var 路径最终生成的 scope_get_var。
+   */
+  emitScopeGetVar(fd: FunctionDef, atom: number, scopeLevel: number, sourcePos?: number) {
+    this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var, sourcePos)
+    this.compiler.emitAtom(fd, atom)
+    this.compiler.emitU16(fd, scopeLevel)
+  }
+
+  /**
+   * 发射设置变量（文档对照用）
+   * 注意：最终 opcode 会在 VariableResolver 阶段被降解为 put_loc/put_var 等。
+   */
+  emitScopePutVar(fd: FunctionDef, atom: number, scopeLevel: number, sourcePos?: number) {
+    this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var, sourcePos)
+    this.compiler.emitAtom(fd, atom)
+    this.compiler.emitU16(fd, scopeLevel)
   }
 
   /**
@@ -33,8 +54,6 @@ export class IdentifierVisitor extends VisitorContext {
     // 发射 OP_scope_get_var 指令获取变量
     // 格式: OP_scope_get_var atom:u32 scope:u16
     const atom = this.compiler.addAtom(name)
-    this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var, sourcePos)
-    this.compiler.emitAtom(fd, atom)
-    this.compiler.emitU16(fd, fd.scopeLevel)
+    this.emitScopeGetVar(fd, atom, fd.scopeLevel, sourcePos)
   }
 }

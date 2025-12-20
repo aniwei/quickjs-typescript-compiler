@@ -1,0 +1,23 @@
+
+--- Function (Atom 164) ---
+Flags: 0x600
+Args: 0, Vars: 1, Stack: 4
+Closure Vars: 0, Constants: 0, Bytecode: 87
+Var Defs: 1
+  Var 0: Atom 166, Scope 0, Next 0, Flags 0x0
+[DEBUG] Reading pc2line len=22
+📄 文件: artifacts/switch-case.wasm.qbc
+🔢 pc2line 长度: 22 字节
+原始字节: 0x00 0x00 0x67 0x10 0x36 0x00 0x1b 0x0e 0x20 0x08 0x3c 0x15 0x1b 0x0e 0x20 0x08 0x23 0x15 0x1b 0x0e 0x20 0x08
+┏━━╸PC ╺━━╸行 ╺━━╸列 ╺━━╸ΔPC ╺━━╸Δ行 ╺━━╸Δ列
+┃    0 →   1 :   1  [Δpc=  0 Δ行=  0 Δ列=  0]
+┃   20 →   2 :   9  [Δpc= 20 Δ行=  1 Δ列=  8]
+┃   30 →   4 :   9  [Δpc= 10 Δ行=  2 Δ列=  0]
+┃   35 →   4 :  16  [Δpc=  5 Δ行=  0 Δ列=  7]
+┃   41 →   4 :  20  [Δpc=  6 Δ行=  0 Δ列=  4]
+┃   52 →   7 :   9  [Δpc= 11 Δ行=  3 Δ列=-11]
+┃   57 →   7 :  16  [Δpc=  5 Δ行=  0 Δ列=  7]
+┃   63 →   7 :  20  [Δpc=  6 Δ行=  0 Δ列=  4]
+┃   69 →  10 :   9  [Δpc=  6 Δ行=  3 Δ列=-11]
+┃   74 →  10 :  16  [Δpc=  5 Δ行=  0 Δ列=  7]
+┃   80 →  10 :  20  [Δpc=  6 Δ行=  0 Δ列=  4]

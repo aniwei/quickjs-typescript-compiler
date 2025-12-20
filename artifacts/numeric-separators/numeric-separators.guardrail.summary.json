@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/numeric-separators/cli/numeric-separators.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/numeric-separators/cli/numeric-separators.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/numeric-separators/cli/numeric-separators.pc2line.txt",
-    "bytecodeSize": 400,
-    "pc2lineLength": 36,
+    "bytecodeSize": 393,
+    "pc2lineLength": 29,
     "stackMax": 0
   },
   "bytecode": {
-    "identical": false,
-    "tsSize": 338,
+    "identical": true,
+    "tsSize": 331,
     "wasmSize": 331,
-    "sizeDiff": 7,
-    "sizeDiffPercent": 2.1148036253776437
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
   },
   "trace": {
     "differenceCount": 0,

@@ -18,6 +18,7 @@ import { VariableResolver } from './compiler/VariableResolver'
 import { LabelResolver } from './compiler/LabelResolver'
 import { StackSizeComputer } from './compiler/StackSizeComputer'
 import { FunctionBuilder, BytecodeWriter } from './compiler/FunctionBuilder'
+import { DebugInfoBuilder } from './compiler/DebugInfoBuilder'
 
 export class TypeScriptCompiler implements CompilerContext {
   public compiler: Compiler
@@ -117,6 +118,10 @@ export class TypeScriptCompiler implements CompilerContext {
     fd.source = source
     fd.sourceLen = source.length
     fd.sourcePos = 0
+
+    // 初始化行列缓存 - 对应 QuickJS get_line_col_cached (parser.c:148-180)
+    // 供后续 DebugInfoBuilder.computePc2LineInfo 使用。
+    DebugInfoBuilder.initLineColCache(fd, source)
     
     // 初始化作用域数组 - parser.c:8261-8268
     fd.scopes = [new JSVarScope(), new JSVarScope(), new JSVarScope(), new JSVarScope()]
@@ -152,28 +157,9 @@ export class TypeScriptCompiler implements CompilerContext {
     this.compiler.emitU16(fd, fd.evalRetIdx)
     this.compiler.emitReturn(fd, true)
     
-    // 7. 调用后端处理 - 对应 js_create_function (parser.c:12439-12705)
-    
-
-    
-    // 7.1 解析变量 - resolve_variables (parser.c:10456-10800)
-    this.variableResolver.resolve(fd)
-    
-    // 7.2 解析标签 - resolve_labels (parser.c:11088-12120)
-    const labelResolver = new LabelResolver(this)
-    labelResolver.resolve(fd)
-
-    
-    // 7.3 计算栈大小 - compute_stack_size (parser.c:12191-12380)
-    const stackComputer = new StackSizeComputer(this)
-    const stackSize = stackComputer.compute(fd)
-    if (stackSize < 0) {
-      throw new Error('Stack size computation failed')
-    }
-    fd.stackSize = stackSize
-    
-    // 7.4 计算 pc2line 调试信息
-    this.compiler.computePc2LineInfo(fd)
+    // 7. 递归处理所有函数 - 对应 js_create_function (parser.c:12439-12705)
+    // QuickJS 的 js_create_function 是递归的，先处理子函数再处理父函数
+    this.processFunctionDef(fd)
     
     // 8. 构建最终字节码 - 对应 parser.c:12572-12700
     const builder = new FunctionBuilder()
@@ -183,17 +169,65 @@ export class TypeScriptCompiler implements CompilerContext {
     const writer = new BytecodeWriter(this.compiler)
     const result = writer.write(bytecode)
     
+    if (process.env.DEBUG_JUMP) {
+      console.log(`[TypeScriptCompiler.compile] result.length=${result.length}, result[83]=0x${result[83]?.toString(16) ?? 'undefined'}`)
+    }
+    
     return result
+  }
+  
+  /**
+   * 递归处理函数定义 - 对应 js_create_function
+   * 
+   * QuickJS 的 js_create_function 递归处理每个函数:
+   * 1. 先递归处理所有子函数
+   * 2. 然后解析变量 (resolve_variables)
+   * 3. 解析标签 (resolve_labels)
+   * 4. 计算栈大小 (compute_stack_size)
+   */
+  private processFunctionDef(fd: FunctionDef): void {
+    // 1. 先递归处理所有子函数 (parser.c:12485-12497)
+    for (const childFd of fd.childList) {
+      this.processFunctionDef(childFd)
+    }
+    
+    // 2. 解析变量 - resolve_variables (parser.c:10456-10800)
+    this.variableResolver.resolve(fd)
+    
+    // 3. 解析标签 - resolve_labels (parser.c:11088-12120)
+    const labelResolver = new LabelResolver(this)
+    labelResolver.resolve(fd)
+    
+    // 4. 计算栈大小 - compute_stack_size (parser.c:12191-12380)
+    const stackComputer = new StackSizeComputer(this)
+    const stackSize = stackComputer.compute(fd)
+    if (stackSize < 0) {
+      throw new Error('Stack size computation failed for function')
+    }
+    fd.stackSize = stackSize
+
+    // 5. 计算 pc2line 调试信息 (QuickJS 对齐实现)
+    // 对应 parser.c:10862-10912 (compute_pc2line_info)
+    if (!fd.getLineColCache && fd.source) {
+      DebugInfoBuilder.initLineColCache(fd, fd.source)
+    }
+    DebugInfoBuilder.computePc2LineInfo(fd)
   }
 
   /**
    * 访问语句节点
    */
   private visitStatement(node: ts.Statement): void {
-    // 记录源码位置
+    // 发射源码位置信息 (OP_line_num)
+    // 这与 QuickJS C 版本一致，在语句开始时记录位置
     if (this.funcDef) {
-      const sourcePos = node.getStart()
-      this.compiler.addPc2LineInfo(this.funcDef, this.funcDef.byteCode.size, sourcePos)
+      // QuickJS 似乎不为 break/continue/var 发射行号
+      if (!ts.isBreakStatement(node) && 
+          !ts.isContinueStatement(node) && 
+          !ts.isVariableStatement(node)) {
+        const sourcePos = node.getStart()
+        this.compiler.emitSourcePos(this.funcDef, sourcePos)
+      }
     }
     
     // 处理表达式语句
@@ -354,6 +388,12 @@ export class TypeScriptCompiler implements CompilerContext {
         break
       case ts.SyntaxKind.VoidExpression:
         this.expressionVisitor.visitVoidExpression(node as ts.VoidExpression)
+        break
+      case ts.SyntaxKind.AwaitExpression:
+        this.expressionVisitor.visitAwaitExpression(node as ts.AwaitExpression)
+        break
+      case ts.SyntaxKind.YieldExpression:
+        this.expressionVisitor.visitYieldExpression(node as ts.YieldExpression)
         break
       default:
         // console.warn('Unhandled node kind:', node.kind)

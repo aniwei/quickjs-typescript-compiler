@@ -52,6 +52,25 @@ export class ClassVisitor extends VisitorContext {
     super(context)
   }
 
+  // --------------------------------------------------------------------------
+  // 文档兼容包装：用于对照 TRANSPILATION_SPEC.md 的函数命名
+  // --------------------------------------------------------------------------
+
+  /** 对应 QuickJS js_parse_class_default_ctor (parser.c:3044+) */
+  private visitClassDefaultCtor(fd: FunctionDef, classFlags: number): FunctionDef {
+    return this.createDefaultConstructor(fd, classFlags)
+  }
+
+  /** 对应 QuickJS class fields init helper（内部创建初始化函数） */
+  private visitClassFieldsInit(fd: FunctionDef, isStatic: boolean): FunctionDef {
+    return this.createFieldsInitFunction(fd, isStatic)
+  }
+
+  /** 对应 QuickJS property name 处理（这里返回 atom） */
+  private visitPropertyName(name: ts.PropertyName): number {
+    return this.getPropertyNameAtom(name)
+  }
+
   /**
    * 访问类声明 - 对应 parser.c:js_parse_class
    * 
@@ -142,8 +161,10 @@ export class ClassVisitor extends VisitorContext {
       }
     }
 
-    // 发射 OP_define_class - 对应 parser.c:3292-3296
-    this.compiler.emitOp(fd, Opcode.OP_define_class, sourcePos)
+    // 发射 OP_define_class
+    // QuickJS: js_parse_class() 里直接 emit_op(s, OP_define_class)（无 emit_source_pos），因此这里不绑定 sourcePos，避免额外 OP_line_num 采样点。
+    // third_party/QuickJS/src/core/parser.c: js_parse_class() -> emit_op(s, OP_define_class)
+    this.compiler.emitOp(fd, Opcode.OP_define_class)
     this.compiler.emitAtom(fd, className1)
     this.compiler.emitU8(fd, classFlags)
     const defineClassOffset = fd.lastOpcodePos
@@ -185,6 +206,9 @@ export class ClassVisitor extends VisitorContext {
     // 存储字段初始化函数
     const varIdx = this.compiler.defineVar(fd, JSAtom.JS_ATOM_class_fields_init, JSVarDefEnum.JS_VAR_DEF_CONST)
     if (cf.fieldsInitFd) {
+      // 在字段初始化函数末尾发射 return_undef - 对应 parser.c:emit_class_init_end
+      this.compiler.emitOp(cf.fieldsInitFd, Opcode.OP_return_undef)
+      
       // 发射闭包并存储
       const initCpoolIdx = this.compiler.cpoolAdd(fd, null)
       cf.fieldsInitFd.parentCpoolIdx = initCpoolIdx
@@ -217,6 +241,9 @@ export class ClassVisitor extends VisitorContext {
 
     // 初始化静态字段 - 对应 parser.c:3696-3703
     if (classFields[1].fieldsInitFd) {
+      // 在静态字段初始化函数末尾发射 return_undef - 对应 parser.c:emit_class_init_end
+      this.compiler.emitOp(classFields[1].fieldsInitFd, Opcode.OP_return_undef)
+      
       this.compiler.emitOp(fd, Opcode.OP_dup)
       const initCpoolIdx = this.compiler.cpoolAdd(fd, null)
       classFields[1].fieldsInitFd.parentCpoolIdx = initCpoolIdx
@@ -416,7 +443,10 @@ export class ClassVisitor extends VisitorContext {
     methodFd.parentCpoolIdx = cpoolIdx
 
     // 发射 OP_fclosure
-    this.compiler.emitOp(fd, Opcode.OP_fclosure, sourcePos)
+    // QuickJS: 类解析路径（js_parse_class）本身不调用 emit_source_pos；类相关 opcode 使用 emit_op() 直接发射。
+    // 例如 emit_class_init_end() 中对闭包也是 emit_op(s, OP_fclosure)（无 emit_source_pos）。
+    // third_party/QuickJS/src/core/parser.c: emit_class_init_end() -> emit_op(s, OP_fclosure)
+    this.compiler.emitOp(fd, Opcode.OP_fclosure)
     this.compiler.emitU32(fd, cpoolIdx)
 
     // 处理私有方法 - 对应 parser.c:3541-3563
@@ -496,7 +526,8 @@ export class ClassVisitor extends VisitorContext {
     const cpoolIdx = this.compiler.cpoolAdd(fd, null)
     accessorFd.parentCpoolIdx = cpoolIdx
 
-    this.compiler.emitOp(fd, Opcode.OP_fclosure, sourcePos)
+    // 同上：类成员闭包发射不绑定 sourcePos，避免 pc2line 额外 entry
+    this.compiler.emitOp(fd, Opcode.OP_fclosure)
     this.compiler.emitU32(fd, cpoolIdx)
 
     if (isPrivate) {
@@ -837,34 +868,35 @@ export class ClassVisitor extends VisitorContext {
 
   /**
    * 辅助方法: 发射类字段初始化
+   * 
+   * 对应 parser.c:3127-3150 (emit_class_field_init)
    */
   private emitClassFieldInitInternal(fd: FunctionDef): void {
+    // 获取 class_fields_init
+    // 对应 parser.c:3131-3133
     this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var)
     this.compiler.emitAtom(fd, JSAtom.JS_ATOM_class_fields_init)
-    this.compiler.emitU16(fd, 0)
+    this.compiler.emitU16(fd, fd.scopeLevel)  // 使用当前 scope_level
 
+    // 如果 class_fields_init 是 falsy (undefined)，跳过调用
+    // 对应 parser.c:3136-3137
     this.compiler.emitOp(fd, Opcode.OP_dup)
-    this.compiler.emitOp(fd, Opcode.OP_undefined)
-    this.compiler.emitOp(fd, Opcode.OP_strict_eq)
+    const labelNext = this.compiler.newLabelInt(fd)
+    this.compiler.emitGotoInt(fd, Opcode.OP_if_false, labelNext)
 
-    const label = this.compiler.newLabelInt(fd)
-    this.compiler.emitGotoInt(fd, Opcode.OP_if_true, label)
-
+    // 获取 this 并调用 class_fields_init
+    // 对应 parser.c:3139-3147
     this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var)
     this.compiler.emitAtom(fd, JSAtom.JS_ATOM_this)
     this.compiler.emitU16(fd, 0)
     this.compiler.emitOp(fd, Opcode.OP_swap)
     this.compiler.emitOp(fd, Opcode.OP_call_method)
     this.compiler.emitU16(fd, 0)
+
+    // 标签和 drop
+    // 对应 parser.c:3148-3149
+    this.compiler.emitLabelInt(fd, labelNext)
     this.compiler.emitOp(fd, Opcode.OP_drop)
-
-    const label2 = this.compiler.newLabelInt(fd)
-    this.compiler.emitGotoInt(fd, Opcode.OP_goto, label2)
-
-    this.compiler.emitLabelInt(fd, label)
-    this.compiler.emitOp(fd, Opcode.OP_drop)
-
-    this.compiler.emitLabelInt(fd, label2)
   }
 
   /**

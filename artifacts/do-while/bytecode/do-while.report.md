@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/do-while.ts
-**生成时间**: 2025-12-16T14:11:02.494Z
+**生成时间**: 2025-12-20T21:36:57.029Z
 
 ## 大小对比
 
-- TypeScript编译器: 150 字节
+- TypeScript编译器: 152 字节
 - WASM编译器: 150 字节
-- 差异: 0 字节 (0.00%)
+- 差异: 2 字节 (1.33%)
 
 ## 结构分析
 
@@ -54,7 +54,7 @@
   "functionHeader": {
     "offset": 47,
     "tag": "0xc",
-    "remaining": 103
+    "remaining": 105
   }
 }
 ```
@@ -109,29 +109,27 @@
 
 ## 字节级差异
 
-共发现 41 个字节差异:
+共发现 19 个字节差异:
 
-- 偏移量 0x38: TS=0x04 vs WASM=0x03
-- 偏移量 0x3b: TS=0x3c vs WASM=0x3e
-- 偏移量 0x47: TS=0x00 vs WASM=0x80
-- 偏移量 0x4d: TS=0x12 vs WASM=0x82
-- 偏移量 0x68: TS=0x0e vs WASM=0xcb
-- 偏移量 0x69: TS=0x7d vs WASM=0x39
-- 偏移量 0x6e: TS=0x3d vs WASM=0x93
-- 偏移量 0x6f: TS=0x93 vs WASM=0x3a
-- 偏移量 0x70: TS=0x19 vs WASM=0xe4
-- 偏移量 0x71: TS=0x3e vs WASM=0x00
-- 偏移量 0x72: TS=0x0e vs WASM=0x00
-- 偏移量 0x73: TS=0x39 vs WASM=0x00
-- 偏移量 0x74: TS=0xe4 vs WASM=0xcb
-- 偏移量 0x75: TS=0x00 vs WASM=0x39
-- 偏移量 0x76: TS=0x00 vs WASM=0xe4
-- 偏移量 0x78: TS=0xba vs WASM=0x00
-- 偏移量 0x79: TS=0xa5 vs WASM=0x00
-- 偏移量 0x7a: TS=0xed vs WASM=0xba
-- 偏移量 0x7b: TS=0xdb vs WASM=0xa5
-- 偏移量 0x7c: TS=0xc7 vs WASM=0xed
-- ... (显示前20个差异，总共41个)
+- 偏移量 0x7d: TS=0xd9 vs WASM=0xd7
+- 偏移量 0x82: TS=0x14 vs WASM=0x12
+- 偏移量 0x85: TS=0x5d vs WASM=0x68
+- 偏移量 0x86: TS=0x00 vs WASM=0x08
+- 偏移量 0x87: TS=0x0d vs WASM=0x1b
+- 偏移量 0x88: TS=0x08 vs WASM=0x0e
+- 偏移量 0x8a: TS=0x0e vs WASM=0x0a
+- 偏移量 0x8c: TS=0x0a vs WASM=0x01
+- 偏移量 0x8d: TS=0x1b vs WASM=0x17
+- 偏移量 0x8e: TS=0x01 vs WASM=0x15
+- 偏移量 0x8f: TS=0x17 vs WASM=0x1b
+- 偏移量 0x90: TS=0x15 vs WASM=0x02
+- 偏移量 0x91: TS=0x1b vs WASM=0x26
+- 偏移量 0x92: TS=0x02 vs WASM=0x08
+- 偏移量 0x93: TS=0x26 vs WASM=0x20
+- 偏移量 0x94: TS=0x08 vs WASM=0x04
+- 偏移量 0x95: TS=0x20 vs WASM=0x00
+- 偏移量 0x96: TS=0x04 vs WASM=EOF
+- 偏移量 0x97: TS=0x00 vs WASM=EOF
 
 ## 十六进制转储对比
 
@@ -140,13 +138,13 @@
 00000000: 05 04 02 69 0e 63 6f 6e 73 6f 6c 65 06 6c 6f 67 |...i.console.log|
 00000010: 3c 5f 5f 74 65 73 74 73 5f 5f 2f 66 69 78 74 75 |<__tests__/fixtu|
 00000020: 72 65 73 2f 64 6f 2d 77 68 69 6c 65 2e 6a 73 0c |res/do-while.js.|
-00000030: 00 06 00 a4 01 00 01 00 04 00 00 3c 01 a6 01 00 |...........<....|
-00000040: 00 00 40 e4 00 00 00 00 3f e4 00 00 00 12 b7 3b |..@.....?......;|
+00000030: 00 06 00 a4 01 00 01 00 03 00 00 3e 01 a6 01 00 |...........>....|
+00000040: 00 00 40 e4 00 00 00 80 3f e4 00 00 00 82 b7 3b |..@.....?......;|
 00000050: e4 00 00 00 06 cb 39 e5 00 00 00 43 e6 00 00 00 |......9....C....|
-00000060: 39 e4 00 00 00 24 01 00 0e 7d e4 00 00 00 3d 93 |9....$...}....=.|
-00000070: 19 3e 0e 39 e4 00 00 00 ba a5 ed db c7 28 ce 03 |.>.9.........(..|
-00000080: 14 00 00 3e 10 07 07 27 00 34 18 1b 17 17 00 35 |...>...'.4.....5|
-00000090: 0a 1b 08 07 03 00                               |......|
+00000060: 39 e4 00 00 00 24 01 00 cb 39 e4 00 00 00 93 3a |9....$...9.....:|
+00000070: e4 00 00 00 cb 39 e4 00 00 00 ba a5 ed d9 c7 28 |.....9.........(|
+00000080: ce 03 14 00 00 5d 00 0d 08 1b 0e 1b 0a 1b 01 17 |.....]..........|
+00000090: 15 1b 02 26 08 20 04 00                         |...&. ..|
 ```
 
 ### WASM

@@ -88,7 +88,7 @@ export class QuickJSLib {
     enums['COMPILE_FLAG_NONE'] = WasmInstance.CompileFlags.COMPILE_FLAG_NONE.value
     enums['COMPILE_FLAG_DUMP'] = WasmInstance.CompileFlags.COMPILE_FLAG_DUMP.value
     enums['COMPILE_FLAG_BIGNUM'] = WasmInstance.CompileFlags.COMPILE_FLAG_BIGNUM.value
-    enums['COMPILE_SHORT_OPCODES'] = WasmInstance.CompileFlags.COMPILE_FLAG_SHORT_OPCODES.value
+    enums['COMPILE_FLAG_SHORT_OPCODES'] = WasmInstance.CompileFlags.COMPILE_FLAG_SHORT_OPCODES.value
 
     return enums
   }

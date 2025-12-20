@@ -1,27 +1,39 @@
 import { BytecodeBuilder } from './BytecodeBuilder'
-import { JSAtom } from '../env'
+import { 
+  JSAtom,
+  ARGUMENT_VAR_OFFSET as ENV_ARGUMENT_VAR_OFFSET,
+  ARG_SCOPE_INDEX as ENV_ARG_SCOPE_INDEX,
+  ARG_SCOPE_END as ENV_ARG_SCOPE_END,
+  DEBUG_SCOPE_INDEX as ENV_DEBUG_SCOPE_INDEX,
+  JS_MAX_LOCAL_VARS as ENV_JS_MAX_LOCAL_VARS,
+  JS_STACK_SIZE_MAX as ENV_JS_STACK_SIZE_MAX,
+} from '../env'
 
 // ============================================================================
 // 常量定义 - 对应 QuickJS types.h / parser.h
+// 这些常量从 env.ts 导入，由 WASM 生成确保与 QuickJS C 源码一致
 // ============================================================================
 
-/** 参数变量偏移量，用于区分参数和局部变量 */
-export const ARGUMENT_VAR_OFFSET = 0x10000
+/** 
+ * 参数变量偏移量，用于区分参数和局部变量
+ * C源码: builtins/js-function.h:32 - #define ARGUMENT_VAR_OFFSET 0x20000000
+ */
+export const ARGUMENT_VAR_OFFSET = ENV_ARGUMENT_VAR_OFFSET
 
 /** 参数作用域索引 - parser.h:ARG_SCOPE_INDEX */
-export const ARG_SCOPE_INDEX = 1
+export const ARG_SCOPE_INDEX = ENV_ARG_SCOPE_INDEX
 
 /** 参数作用域结束标记 - parser.h:ARG_SCOPE_END */
-export const ARG_SCOPE_END = -2
+export const ARG_SCOPE_END = ENV_ARG_SCOPE_END
 
 /** 调试作用域索引 - parser.h:DEBUG_SCOP_INDEX */
-export const DEBUG_SCOPE_INDEX = -3
+export const DEBUG_SCOPE_INDEX = ENV_DEBUG_SCOPE_INDEX
 
 /** 最大局部变量数 - types.h:JS_MAX_LOCAL_VARS */
-export const JS_MAX_LOCAL_VARS = 65534
+export const JS_MAX_LOCAL_VARS = ENV_JS_MAX_LOCAL_VARS
 
 /** 最大栈大小 - types.h:JS_STACK_SIZE_MAX */
-export const JS_STACK_SIZE_MAX = 65534
+export const JS_STACK_SIZE_MAX = ENV_JS_STACK_SIZE_MAX
 
 // ============================================================================
 // 枚举定义 - 对应 QuickJS types.h / parser.h
@@ -465,6 +477,9 @@ export class FunctionDef {
   /** 是否在函数体内 */
   inFunctionBody: boolean = false
 
+  /** 是否抑制源码位置发射 (用于 switch case 表达式等) */
+  suppressSourcePos: boolean = false
+
   // ========== 函数类型信息 - parser.h:253-256 ==========
   /** 函数种类 (JSFunctionKindEnum) - 8 bits */
   funcKind: JSFunctionKindEnum = JSFunctionKindEnum.JS_FUNC_NORMAL
@@ -579,10 +594,14 @@ export class FunctionDef {
   lastOpcodePos: number = -1
   
   /** 最后一个操作码的源码指针 */
-  lastOpcodeSourcePtr: number = 0
+  lastOpcodeSourcePtr: number = -1  // 初始化为 -1，确保第一次调用 emitSourcePos 总是发射 OP_line_num
+  
+  /** 最后一个发射的行号 */
+  lastLineNum: number = -1
   
   /** true if short opcodes are used in byte_code */
-  useShortOpcodes: boolean = true
+  // 对应 QuickJS 源码 parser.h:305: BOOL use_short_opcodes;
+  useShortOpcodes: boolean = false
 
   // ========== 标签 - parser.h:307-310 ==========
   /** 标签槽数组 */

@@ -1,0 +1,287 @@
+/*
+ * QuickJS TypeScript Compiler - Trace/Debug utilities
+ *
+ * This file provides debugging utilities for tracing the compilation
+ * process to help verify the TypeScript transpilation matches QuickJS.
+ */
+
+#pragma once
+
+#include <stdio.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* ============================================================================
+ * Trace Configuration
+ * ============================================================================
+ * 
+ * QTS_TRACE_ENABLED: Master switch for all tracing
+ * QTS_TRACE_LEVEL: Verbosity level (1=minimal, 2=detailed, 3=verbose)
+ * 
+ * Individual trace categories:
+ *   QTS_TRACE_EMIT       - Bytecode emission (emit_op, emit_u8, etc.)
+ *   QTS_TRACE_VARIABLE   - Variable resolution
+ *   QTS_TRACE_CLOSURE    - Closure variable handling
+ *   QTS_TRACE_LABEL      - Label resolution
+ *   QTS_TRACE_STACK      - Stack size computation
+ *   QTS_TRACE_SCOPE      - Scope management
+ */
+
+#ifndef QTS_TRACE_ENABLED
+#define QTS_TRACE_ENABLED 0
+#endif
+
+#ifndef QTS_TRACE_LEVEL
+#define QTS_TRACE_LEVEL 1
+#endif
+
+/* Individual category enables (default: all on when tracing enabled) */
+#ifndef QTS_TRACE_EMIT
+#define QTS_TRACE_EMIT QTS_TRACE_ENABLED
+#endif
+
+#ifndef QTS_TRACE_VARIABLE
+#define QTS_TRACE_VARIABLE QTS_TRACE_ENABLED
+#endif
+
+#ifndef QTS_TRACE_CLOSURE
+#define QTS_TRACE_CLOSURE QTS_TRACE_ENABLED
+#endif
+
+#ifndef QTS_TRACE_LABEL
+#define QTS_TRACE_LABEL QTS_TRACE_ENABLED
+#endif
+
+#ifndef QTS_TRACE_STACK
+#define QTS_TRACE_STACK QTS_TRACE_ENABLED
+#endif
+
+#ifndef QTS_TRACE_SCOPE
+#define QTS_TRACE_SCOPE QTS_TRACE_ENABLED
+#endif
+
+/* ============================================================================
+ * Trace Macros
+ * ============================================================================ */
+
+#if QTS_TRACE_ENABLED
+
+/* General trace */
+#define QTS_TRACE(fmt, ...) \
+    fprintf(stderr, "[QTS] " fmt "\n", ##__VA_ARGS__)
+
+/* Section markers */
+#define QTS_TRACE_SECTION_BEGIN(name) \
+    fprintf(stderr, "[QTS] ===== %s BEGIN =====\n", name)
+
+#define QTS_TRACE_SECTION_END(name) \
+    fprintf(stderr, "[QTS] ===== %s END =====\n", name)
+
+/* Bytecode emission tracing */
+#if QTS_TRACE_EMIT
+#define QTS_TRACE_EMIT_OP(op, pos) \
+    fprintf(stderr, "[QTS:EMIT] pos=%zu op=%d\n", (size_t)(pos), (int)(op))
+
+#define QTS_TRACE_EMIT_U8(val, pos) \
+    fprintf(stderr, "[QTS:EMIT] pos=%zu u8=0x%02x\n", (size_t)(pos), (uint8_t)(val))
+
+#define QTS_TRACE_EMIT_U16(val, pos) \
+    fprintf(stderr, "[QTS:EMIT] pos=%zu u16=0x%04x (%d)\n", (size_t)(pos), (uint16_t)(val), (int)(val))
+
+#define QTS_TRACE_EMIT_U32(val, pos) \
+    fprintf(stderr, "[QTS:EMIT] pos=%zu u32=0x%08x (%d)\n", (size_t)(pos), (uint32_t)(val), (int)(val))
+
+#define QTS_TRACE_EMIT_ATOM(atom, pos) \
+    fprintf(stderr, "[QTS:EMIT] pos=%zu atom=%d\n", (size_t)(pos), (int)(atom))
+#else
+#define QTS_TRACE_EMIT_OP(op, pos)
+#define QTS_TRACE_EMIT_U8(val, pos)
+#define QTS_TRACE_EMIT_U16(val, pos)
+#define QTS_TRACE_EMIT_U32(val, pos)
+#define QTS_TRACE_EMIT_ATOM(atom, pos)
+#endif
+
+/* Variable resolution tracing */
+#if QTS_TRACE_VARIABLE
+#define QTS_TRACE_VAR_RESOLVE(name, scope, op) \
+    fprintf(stderr, "[QTS:VAR] resolve: atom=%d scope=%d op=%d\n", (int)(name), (int)(scope), (int)(op))
+
+#define QTS_TRACE_VAR_FOUND(idx, is_arg) \
+    fprintf(stderr, "[QTS:VAR]   found: idx=%d is_arg=%d\n", (int)(idx), (int)(is_arg))
+
+#define QTS_TRACE_VAR_NOT_FOUND(name) \
+    fprintf(stderr, "[QTS:VAR]   not found: atom=%d\n", (int)(name))
+
+#define QTS_TRACE_VAR_EMIT(op, idx) \
+    fprintf(stderr, "[QTS:VAR]   emit: op=%d idx=%d\n", (int)(op), (int)(idx))
+#else
+#define QTS_TRACE_VAR_RESOLVE(name, scope, op)
+#define QTS_TRACE_VAR_FOUND(idx, is_arg)
+#define QTS_TRACE_VAR_NOT_FOUND(name)
+#define QTS_TRACE_VAR_EMIT(op, idx)
+#endif
+
+/* Closure variable tracing */
+#if QTS_TRACE_CLOSURE
+#define QTS_TRACE_CLOSURE_ADD(var_idx, is_local, is_arg, var_name) \
+    fprintf(stderr, "[QTS:CLOSURE] add: var_idx=%d is_local=%d is_arg=%d var_name=%d\n", \
+            (int)(var_idx), (int)(is_local), (int)(is_arg), (int)(var_name))
+
+#define QTS_TRACE_CLOSURE_GET(fd_idx, var_idx, is_arg) \
+    fprintf(stderr, "[QTS:CLOSURE] get: fd_depth=%d var_idx=%d is_arg=%d\n", \
+            (int)(fd_idx), (int)(var_idx), (int)(is_arg))
+
+#define QTS_TRACE_CLOSURE_CAPTURE(var_idx, var_name) \
+    fprintf(stderr, "[QTS:CLOSURE] capture: var_idx=%d var_name=%d\n", \
+            (int)(var_idx), (int)(var_name))
+#else
+#define QTS_TRACE_CLOSURE_ADD(var_idx, is_local, is_arg, var_name)
+#define QTS_TRACE_CLOSURE_GET(fd_idx, var_idx, is_arg)
+#define QTS_TRACE_CLOSURE_CAPTURE(var_idx, var_name)
+#endif
+
+/* Label resolution tracing */
+#if QTS_TRACE_LABEL
+#define QTS_TRACE_LABEL_NEW(label) \
+    fprintf(stderr, "[QTS:LABEL] new: label=%d\n", (int)(label))
+
+#define QTS_TRACE_LABEL_EMIT(label, pos) \
+    fprintf(stderr, "[QTS:LABEL] emit: label=%d pos=%zu\n", (int)(label), (size_t)(pos))
+
+#define QTS_TRACE_LABEL_GOTO(opcode, label) \
+    fprintf(stderr, "[QTS:LABEL] goto: opcode=%d label=%d\n", (int)(opcode), (int)(label))
+
+#define QTS_TRACE_LABEL_RESOLVE(label, addr) \
+    fprintf(stderr, "[QTS:LABEL] resolve: label=%d addr=%d\n", (int)(label), (int)(addr))
+#else
+#define QTS_TRACE_LABEL_NEW(label)
+#define QTS_TRACE_LABEL_EMIT(label, pos)
+#define QTS_TRACE_LABEL_GOTO(opcode, label)
+#define QTS_TRACE_LABEL_RESOLVE(label, addr)
+#endif
+
+/* Stack size tracing */
+#if QTS_TRACE_STACK
+#define QTS_TRACE_STACK_OP(op, stack_before, stack_after) \
+    fprintf(stderr, "[QTS:STACK] op=%d stack: %d -> %d\n", \
+            (int)(op), (int)(stack_before), (int)(stack_after))
+
+#define QTS_TRACE_STACK_RESULT(max_stack, var_count) \
+    fprintf(stderr, "[QTS:STACK] result: max_stack=%d var_count=%d\n", \
+            (int)(max_stack), (int)(var_count))
+#else
+#define QTS_TRACE_STACK_OP(op, stack_before, stack_after)
+#define QTS_TRACE_STACK_RESULT(max_stack, var_count)
+#endif
+
+/* Scope tracing */
+#if QTS_TRACE_SCOPE
+#define QTS_TRACE_SCOPE_PUSH(scope_level, first_var) \
+    fprintf(stderr, "[QTS:SCOPE] push: level=%d first_var=%d\n", \
+            (int)(scope_level), (int)(first_var))
+
+#define QTS_TRACE_SCOPE_POP(scope_level) \
+    fprintf(stderr, "[QTS:SCOPE] pop: level=%d\n", (int)(scope_level))
+
+#define QTS_TRACE_SCOPE_ENTER(scope_idx, body_scope) \
+    fprintf(stderr, "[QTS:SCOPE] enter: idx=%d is_body=%d\n", \
+            (int)(scope_idx), (int)((scope_idx) == (body_scope)))
+
+#define QTS_TRACE_SCOPE_LEAVE(scope_idx) \
+    fprintf(stderr, "[QTS:SCOPE] leave: idx=%d\n", (int)(scope_idx))
+#else
+#define QTS_TRACE_SCOPE_PUSH(scope_level, first_var)
+#define QTS_TRACE_SCOPE_POP(scope_level)
+#define QTS_TRACE_SCOPE_ENTER(scope_idx, body_scope)
+#define QTS_TRACE_SCOPE_LEAVE(scope_idx)
+#endif
+
+#else /* QTS_TRACE_ENABLED == 0 */
+
+/* All macros become no-ops when tracing is disabled */
+#define QTS_TRACE(fmt, ...)
+#define QTS_TRACE_SECTION_BEGIN(name)
+#define QTS_TRACE_SECTION_END(name)
+#define QTS_TRACE_EMIT_OP(op, pos)
+#define QTS_TRACE_EMIT_U8(val, pos)
+#define QTS_TRACE_EMIT_U16(val, pos)
+#define QTS_TRACE_EMIT_U32(val, pos)
+#define QTS_TRACE_EMIT_ATOM(atom, pos)
+#define QTS_TRACE_VAR_RESOLVE(name, scope, op)
+#define QTS_TRACE_VAR_FOUND(idx, is_arg)
+#define QTS_TRACE_VAR_NOT_FOUND(name)
+#define QTS_TRACE_VAR_EMIT(op, idx)
+#define QTS_TRACE_CLOSURE_ADD(var_idx, is_local, is_arg, var_name)
+#define QTS_TRACE_CLOSURE_GET(fd_idx, var_idx, is_arg)
+#define QTS_TRACE_CLOSURE_CAPTURE(var_idx, var_name)
+#define QTS_TRACE_LABEL_NEW(label)
+#define QTS_TRACE_LABEL_EMIT(label, pos)
+#define QTS_TRACE_LABEL_GOTO(opcode, label)
+#define QTS_TRACE_LABEL_RESOLVE(label, addr)
+#define QTS_TRACE_STACK_OP(op, stack_before, stack_after)
+#define QTS_TRACE_STACK_RESULT(max_stack, var_count)
+#define QTS_TRACE_SCOPE_PUSH(scope_level, first_var)
+#define QTS_TRACE_SCOPE_POP(scope_level)
+#define QTS_TRACE_SCOPE_ENTER(scope_idx, body_scope)
+#define QTS_TRACE_SCOPE_LEAVE(scope_idx)
+
+#endif /* QTS_TRACE_ENABLED */
+
+/* ============================================================================
+ * Trace Functions (for complex logging)
+ * ============================================================================ */
+
+#if QTS_TRACE_ENABLED
+
+/* Dump function definition summary */
+static inline void qts_trace_func_def(
+    const char* phase,
+    int var_count,
+    int arg_count,
+    int closure_var_count,
+    int scope_count,
+    size_t bc_size
+) {
+    fprintf(stderr, "[QTS:FUNC] %s: vars=%d args=%d closures=%d scopes=%d bc_size=%zu\n",
+            phase, var_count, arg_count, closure_var_count, scope_count, bc_size);
+}
+
+/* Dump bytecode hex (first N bytes) */
+static inline void qts_trace_bytecode_hex(const uint8_t* buf, size_t len, size_t max_bytes) {
+    fprintf(stderr, "[QTS:HEX] ");
+    size_t n = len < max_bytes ? len : max_bytes;
+    for (size_t i = 0; i < n; i++) {
+        fprintf(stderr, "%02x ", buf[i]);
+        if ((i + 1) % 16 == 0 && i + 1 < n) {
+            fprintf(stderr, "\n[QTS:HEX] ");
+        }
+    }
+    if (len > max_bytes) {
+        fprintf(stderr, "... (%zu more bytes)", len - max_bytes);
+    }
+    fprintf(stderr, "\n");
+}
+
+#else
+
+static inline void qts_trace_func_def(
+    const char* phase,
+    int var_count,
+    int arg_count,
+    int closure_var_count,
+    int scope_count,
+    size_t bc_size
+) { (void)phase; (void)var_count; (void)arg_count; (void)closure_var_count; (void)scope_count; (void)bc_size; }
+
+static inline void qts_trace_bytecode_hex(const uint8_t* buf, size_t len, size_t max_bytes) {
+    (void)buf; (void)len; (void)max_bytes;
+}
+
+#endif /* QTS_TRACE_ENABLED */
+
+#ifdef __cplusplus
+}
+#endif

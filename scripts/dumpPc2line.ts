@@ -72,6 +72,12 @@ class Parser {
     }
 
     const tag = this.readU8()
+    if (tag === BytecodeTag.TC_TAG_FUNCTION_BYTECODE) {
+      // 直接是函数
+      this.offset-- // 回退 tag
+      return this.readFunction()
+    }
+
     if (tag !== BytecodeTag.TC_TAG_MODULE) {
       throw new Error(`预期模块标签(${BytecodeTag.TC_TAG_MODULE}), 实际 ${tag}`)
     }

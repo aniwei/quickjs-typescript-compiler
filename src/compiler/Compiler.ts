@@ -17,6 +17,7 @@ import { Opcode, TempOpcode, env, BytecodeTag, JSAtom, PC2Line, OPCODE_DEFS } fr
 import { BytecodeBuilder } from './BytecodeBuilder'
 import { AtomTable } from './AtomTable'
 import ts from 'typescript'
+import { DebugInfoBuilder } from './DebugInfoBuilder'
 
 // ============================================================================
 // 类型定义
@@ -423,76 +424,21 @@ export class Compiler {
     fd.lineNumberLastPc = pc
     fd.lineNumberLast = sourcePos
 
-    if (this.sourceFile) {
+    if (this.sourceFile && process.env.DEBUG_PC2LINE) {
       const pos = ts.getLineAndCharacterOfPosition(this.sourceFile, sourcePos)
-      // console.log(`[DEBUG] addPc2LineInfo: pc=${pc}, line=${pos.line + 1}, col=${pos.character + 1}`)
+      console.log(`[COMP] addPc2LineInfo: pc=${pc}, line=${pos.line + 1}, col=${pos.character + 1}`)
     }
   }
 
+  /**
+   * @deprecated 已冻结：pc2line 生成已切换到 DebugInfoBuilder（QuickJS 对齐实现）。
+   * 保留该方法仅为兼容旧调用点；新代码请直接调用 DebugInfoBuilder.computePc2LineInfo。
+   */
   computePc2LineInfo(fd: FunctionDef) {
-    if (!this.sourceFile) {
-      return
+    if (!fd.getLineColCache && fd.source) {
+      DebugInfoBuilder.initLineColCache(fd, fd.source)
     }
-
-    let lastLineNum = 0
-    let lastColNum = 0
-    let lastPc = 0
-    
-    // Initial line/col from sourcePos of function
-    if (fd.sourcePos >= 0) {
-      const pos = ts.getLineAndCharacterOfPosition(this.sourceFile, fd.sourcePos)
-      lastLineNum = pos.line
-      lastColNum = pos.character
-    }
-
-    fd.pc2line.putULEB128(lastLineNum)
-    fd.pc2line.putULEB128(lastColNum)
-
-    for (const slot of fd.lineNumberSlots) {
-      const pc = slot.pc
-      const sourcePos = slot.sourcePos
-      
-      if (sourcePos === -1) {
-        continue
-      }
-      
-      const diffPc = pc - lastPc
-      if (diffPc < 0) {
-        continue
-      }
-      
-      const pos = ts.getLineAndCharacterOfPosition(this.sourceFile, sourcePos)
-      const lineNum = pos.line
-      const colNum = pos.character
-      
-      const diffLine = lineNum - lastLineNum
-      const diffCol = colNum - lastColNum
-        
-      if (diffLine === 0 && diffCol === 0) {
-        continue
-      }
-        
-      if (diffLine >= PC2Line.PC2LINE_BASE && 
-        diffLine < PC2Line.PC2LINE_BASE + PC2Line.PC2LINE_RANGE &&
-        diffPc <= PC2Line.PC2LINE_DIFF_PC_MAX) {
-        
-        const op = (diffLine - PC2Line.PC2LINE_BASE) + 
-                    (diffPc * PC2Line.PC2LINE_RANGE) + 
-                    PC2Line.PC2LINE_OP_FIRST
-        
-        fd.pc2line.putByte(op)
-        fd.pc2line.putSLEB128(diffCol)
-      } else {
-        fd.pc2line.putByte(0)
-        fd.pc2line.putULEB128(diffPc)
-        fd.pc2line.putSLEB128(diffLine)
-        fd.pc2line.putSLEB128(diffCol)
-      }
-      
-      lastPc = pc
-      lastLineNum = lineNum
-      lastColNum = colNum
-    }
+    DebugInfoBuilder.computePc2LineInfo(fd)
   }
 
   // ============================================================================
@@ -534,6 +480,14 @@ export class Compiler {
    * 注意: 如果源码位置与上次不同，则发射 OP_line_num 指令
    */
   emitSourcePos(fd: FunctionDef, sourcePos: number): void {
+    if (fd.suppressSourcePos) return
+
+    // Defensive: some synthetic/implicit TS nodes can yield negative positions.
+    // QuickJS never emits an OP_line_num for an invalid source pointer.
+    if (sourcePos < 0) return
+
+    // Match QuickJS emit_source_pos(): dedup by exact source position.
+    // QuickJS compares the source_ptr pointer; our equivalent is `sourcePos`.
     if (fd.lastOpcodeSourcePtr !== sourcePos) {
       fd.byteCode.putByte(TempOpcode.OP_line_num)
       fd.byteCode.putU32(sourcePos)
@@ -547,13 +501,14 @@ export class Compiler {
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1788-1794
    */
   emitOp(fd: FunctionDef, val: number, sourcePos: number = -1): void {
+    // 如果提供了源码位置，先发射 OP_line_num
+    // 这与 QuickJS C 版本在调用 emit_op 前调用 emit_source_pos 的行为一致
+    if (sourcePos !== -1) {
+      this.emitSourcePos(fd, sourcePos)
+    }
+    
     fd.lastOpcodePos = fd.byteCode.size
     fd.byteCode.putByte(val)
-    
-    // 如果提供了源码位置，添加 pc2line 信息
-    if (sourcePos !== -1) {
-      this.addPc2LineInfo(fd, fd.lastOpcodePos, sourcePos)
-    }
   }
 
   /**
@@ -691,6 +646,9 @@ export class Compiler {
       this.emitOp(fd, opcode)
       this.emitU32(fd, label)
       fd.labelSlots[label].refCount++
+      
+      // 增加跳转计数 - 对应 parser.c:s->jump_size++
+      fd.jumpSize++
 
       return label
     }
@@ -1168,6 +1126,9 @@ export class Compiler {
     this.emitOp(fd, op)
     const pos = fd.byteCode.size
     this.emitU32(fd, 0) // placeholder
+    
+    // 增加跳转计数 - 对应 parser.c:s->jump_size++
+    fd.jumpSize++
     
     if (label.addr >= 0) {
       // Label 已定义，直接计算偏移

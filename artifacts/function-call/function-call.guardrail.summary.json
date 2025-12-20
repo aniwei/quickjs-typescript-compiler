@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/function-call/cli/function-call.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/function-call/cli/function-call.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/function-call/cli/function-call.pc2line.txt",
-    "bytecodeSize": 299,
-    "pc2lineLength": 18,
+    "bytecodeSize": 249,
+    "pc2lineLength": 12,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 237,
+    "tsSize": 187,
     "wasmSize": 199,
-    "sizeDiff": 38,
-    "sizeDiffPercent": 19.09547738693467
+    "sizeDiff": -12,
+    "sizeDiffPercent": -6.030150753768844
   },
   "trace": {
     "differenceCount": 0,

@@ -7,7 +7,7 @@
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/primitives/cli/primitives.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/primitives/cli/primitives.pc2line.txt",
     "bytecodeSize": 272,
-    "pc2lineLength": 34,
+    "pc2lineLength": 38,
     "stackMax": 0
   },
   "bytecode": {

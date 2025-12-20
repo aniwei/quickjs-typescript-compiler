@@ -92,6 +92,16 @@ export class VariableResolver {
     const bcBuf = bc.buffer
     const bcLen = bc.size
     
+    // 重置优化状态
+    this.optimizedLabels = undefined
+    this.skipNextGetRefValue = false
+    
+    // === 预先设置特殊变量索引 ===
+    // 对应 parser.c:9863-9873 (add_eval_variables)
+    // 这些变量需要在 resolve_variables 开始时就设置，
+    // 因为 resolve_labels 会在开始处生成初始化代码
+    this.addSpecialVariables(fd)
+    
     // 创建输出缓冲区
     const bcOut = new BytecodeBuilder()
     
@@ -105,6 +115,91 @@ export class VariableResolver {
     
     // 用新字节码替换原字节码
     fd.byteCode = bcOut
+  }
+
+  /**
+   * 文档兼容入口：对应 TRANSPILATION_SPEC.md 中的 `resolveVariables()`。
+   * 实际实现为 `resolve()`。
+   */
+  resolveVariables(fd: FunctionDef): void {
+    this.resolve(fd)
+  }
+
+  /**
+   * 预先添加特殊变量 - 对应 parser.c:add_eval_variables
+   * 
+   * 注意: 这个函数只在函数包含 eval 调用时才被调用！
+   * 对于普通函数，特殊变量是在解析变量引用时按需创建的。
+   * 
+   * 对应 parser.c:12477-12479:
+   *   if (fd->has_eval_call)
+   *     add_eval_variables(ctx, fd);
+   */
+  private addSpecialVariables(fd: FunctionDef): void {
+    // 只有当函数包含 eval 调用时，才需要预先创建这些变量
+    // 对应 parser.c:12477-12479
+    if (!fd.hasEvalCall) {
+      return
+    }
+    
+    // 处理 this 绑定相关的特殊变量
+    // 对应 parser.c:9863-9873
+    if (fd.hasThisBinding) {
+      // this 变量
+      if (fd.thisVarIdx < 0) {
+        fd.thisVarIdx = this.addVarThis(fd)
+      }
+      
+      // new.target 变量
+      if (fd.newTargetVarIdx < 0) {
+        fd.newTargetVarIdx = this.compiler.addVar(fd, JSAtom.JS_ATOM_new_target)
+      }
+      
+      // 派生类构造函数需要 this.active_func
+      if (fd.isDerivedClassConstructor && fd.thisActiveFuncVarIdx < 0) {
+        fd.thisActiveFuncVarIdx = this.compiler.addVar(fd, JSAtom.JS_ATOM_this_active_func)
+      }
+      
+      // home_object (用于 super)
+      if (fd.hasHomeObject && fd.homeObjectVarIdx < 0) {
+        fd.homeObjectVarIdx = this.compiler.addVar(fd, JSAtom.JS_ATOM_home_object)
+      }
+    }
+    
+    // 处理 arguments 绑定
+    // 对应 parser.c:9874-9881
+    if (fd.hasArgumentsBinding && fd.argumentsVarIdx < 0) {
+      this.addArgumentsVar(fd)
+    }
+    
+    // 函数表达式名称
+    // 对应 parser.c:9882-9883
+    if (fd.isFuncExpr && fd.funcName !== 0) {
+      if (fd.funcVarIdx < 0) {
+        fd.funcVarIdx = this.compiler.addFuncVar(fd, fd.funcName)
+      }
+    }
+  }
+
+  /**
+   * 文档兼容别名：对应 QuickJS `add_eval_variables`。
+   * 实际实现为 `addSpecialVariables()`。
+   */
+  private addEvalVariables(fd: FunctionDef): void {
+    this.addSpecialVariables(fd)
+  }
+
+  /**
+   * 添加 arguments 变量 - 对应 parser.c:add_arguments_var
+   */
+  private addArgumentsVar(fd: FunctionDef): void {
+    // 添加 arguments 变量
+    fd.argumentsVarIdx = this.compiler.addVar(fd, JSAtom.JS_ATOM_arguments)
+    // 设置变量属性
+    if (fd.argumentsVarIdx >= 0) {
+      const vd = fd.vars[fd.argumentsVarIdx]
+      vd.isCaptured = true  // arguments 总是被捕获
+    }
   }
 
   // ============================================================================
@@ -124,24 +219,29 @@ export class VariableResolver {
   ): void {
     const isStrict = (fd.jsMode & JS_MODE_STRICT) !== 0
     
+    // 常量定义 - 对应 runtime.h:50-51
+    const DEFINE_GLOBAL_LEX_VAR = 0x80   // 1 << 7
+    const DEFINE_GLOBAL_FUNC_VAR = 0x40  // 1 << 6
+    
     // 遍历全局变量，添加检查指令
+    // 对应 parser.c:10458-10502
     for (let i = 0; i < fd.globalVarCount; i++) {
       const hf = fd.globalVars[i]
       const varName = hf.varName
       
-      // 检查是否需要定义检查
-      // 对于词法变量 (let/const) 和函数声明，需要检查
+      // 构造标志位
+      let flags = 0
       if (hf.isLexical) {
-        // let/const 变量需要检查是否重复定义
-        bcOut.putU8(Opcode.OP_check_define_var)
-        bcOut.putU32(varName)
-        bcOut.putU8(hf.isConst ? 1 : 0) // flags: 1 = const
-      } else if (hf.forceInit) {
-        // 需要强制初始化的变量
-        bcOut.putU8(Opcode.OP_check_define_var)
-        bcOut.putU32(varName)
-        bcOut.putU8(2) // flags: 2 = var
+        flags |= DEFINE_GLOBAL_LEX_VAR  // 0x80
       }
+      if (hf.cpoolIdx >= 0) {
+        flags |= DEFINE_GLOBAL_FUNC_VAR  // 0x40
+      }
+      
+      // 发射 check_define_var
+      bcOut.putU8(Opcode.OP_check_define_var)
+      bcOut.putU32(varName)
+      bcOut.putU8(flags)
     }
   }
 
@@ -182,18 +282,20 @@ export class VariableResolver {
         case TempOpcode.OP_scope_delete_var:
         case TempOpcode.OP_scope_get_ref:
         case TempOpcode.OP_scope_make_ref: {
-          // 格式: OP atom:u32 scope:u16 [label:u32]
+          // OP_scope_make_ref 格式: OP atom:u32 label:u32 scope:u16
+          // 其他 scope 操作码格式: OP atom:u32 scope:u16
           const atom = this.getU32(bcBuf, pos)
           pos += 4
-          const scopeLevel = this.getU16(bcBuf, pos)
-          pos += 2
           
-          // OP_scope_make_ref 有额外的 label
           let label = -1
           if (op === TempOpcode.OP_scope_make_ref) {
+            // OP_scope_make_ref 的 label 在 atom 之后
             label = this.getU32(bcBuf, pos)
             pos += 4
           }
+          
+          const scopeLevel = this.getU16(bcBuf, pos)
+          pos += 2
           
           // 解析 scope 变量
           this.resolveScopeVar(fd, atom, scopeLevel, op, bcOut, bcBuf, label, startPos)
@@ -212,7 +314,7 @@ export class VariableResolver {
           pos += 2
           
           // 解析私有字段
-          this.resolveScopePrivateField(fd, atom, scopeLevel, op, bcOut)
+          this.resolveScopePrivateField(fd, atom, scopeLevel, op, bcOut, startPos)
           break
         }
         
@@ -322,6 +424,76 @@ export class VariableResolver {
           const labelIdx = this.getU32(bcBuf, pos)
           pos += 4
           
+          // 检查是否有优化标记
+          if (this.optimizedLabels && this.optimizedLabels.has(labelIdx)) {
+            const optInfo = this.optimizedLabels.get(labelIdx)!
+            
+            // 跳过 perm4/insert3/rot3l/nop 和 put_ref_value
+            // 这些操作码已经被优化，不需要输出
+            // 只需要输出 put 操作
+            
+            // 检查下一个操作码 (应该是 perm4/insert3/rot3l/nop)
+            const nextOp = bcBuf[pos]
+            
+            if (optInfo.isGlobal) {
+              // 全局变量优化
+              // 对应 QuickJS parser.c:9042-9067
+              if (optInfo.isStrict) {
+                // 严格模式: 需要调整栈操作
+                if (nextOp !== Opcode.OP_nop) {
+                  switch (nextOp) {
+                    case Opcode.OP_insert3:
+                      bcOut.putU8(Opcode.OP_insert2)
+                      break
+                    case Opcode.OP_perm4:
+                      bcOut.putU8(Opcode.OP_perm3)
+                      break
+                    case Opcode.OP_rot3l:
+                      bcOut.putU8(Opcode.OP_swap)
+                      break
+                  }
+                }
+              } else {
+                // 非严格模式: insert3 需要 dup
+                if (nextOp === Opcode.OP_insert3) {
+                  bcOut.putU8(Opcode.OP_dup)
+                }
+              }
+              
+              // 输出 put_var / put_var_strict
+              bcOut.putU8(optInfo.putOp)
+              bcOut.putU32(optInfo.varIdx) // varIdx 是 atom
+            } else if (optInfo.isClosure) {
+              // 闭包变量优化
+              if (nextOp === Opcode.OP_insert3) {
+                // insert3 需要先输出 dup
+                bcOut.putU8(Opcode.OP_dup)
+              }
+              
+              // 输出 put_var_ref
+              bcOut.putU8(optInfo.putOp)
+              bcOut.putU16(optInfo.varIdx)
+            } else {
+              // 局部变量优化 (put_loc / put_arg)
+              if (nextOp === Opcode.OP_insert3) {
+                // insert3 需要先输出 dup
+                bcOut.putU8(Opcode.OP_dup)
+              }
+              
+              // 输出 put_loc / put_arg
+              bcOut.putU8(optInfo.putOp)
+              bcOut.putU16(optInfo.varIdx)
+            }
+            
+            // 跳过 perm4/insert3/rot3l/nop + put_ref_value
+            pos += 1 // skip perm4/insert3/rot3l/nop
+            pos += 1 // skip put_ref_value
+            
+            // 清理优化标记
+            this.optimizedLabels.delete(labelIdx)
+            break
+          }
+          
           // 更新标签位置
           if (labelIdx >= 0 && labelIdx < fd.labelSlots.length) {
             fd.labelSlots[labelIdx].pos2 = bcOut.size
@@ -329,6 +501,19 @@ export class VariableResolver {
           
           bcOut.putU8(TempOpcode.OP_label)
           bcOut.putU32(labelIdx)
+          break
+        }
+        
+        // === 优化时跳过 get_ref_value ===
+        case Opcode.OP_get_ref_value: {
+          // 检查前一个操作是否触发了优化
+          // 如果是，这个 get_ref_value 已经被 get_loc/get_arg 替代
+          if (this.skipNextGetRefValue) {
+            this.skipNextGetRefValue = false
+            break
+          }
+          // 否则正常复制
+          bcOut.putU8(op)
           break
         }
         
@@ -393,27 +578,36 @@ export class VariableResolver {
       return
     }
     
+    // 常量定义 - 对应 runtime.h
+    const DEFINE_GLOBAL_LEX_VAR = 0x80   // 1 << 7
+    const JS_PROP_CONFIGURABLE = 0x01    // 1 << 0
+    const JS_PROP_WRITABLE = 0x02        // 1 << 1
+    
     for (const hf of fd.globalVars) {
       // 计算 flags
       let flags = 0
       if (fd.evalType !== 1) { // JS_EVAL_TYPE_GLOBAL = 1
-        flags |= 0x01 // JS_PROP_CONFIGURABLE
+        flags |= JS_PROP_CONFIGURABLE // 0x01
       }
       
       if (hf.cpoolIdx >= 0 && !hf.isLexical) {
         // 全局函数定义: fclosure + define_func
+        // 对应 QuickJS parser.c:10315-10325 然后 goto done_global_var
         bcOut.putU8(Opcode.OP_fclosure)
         bcOut.putU32(hf.cpoolIdx)
         
         bcOut.putU8(Opcode.OP_define_func)
         bcOut.putU32(hf.varName)
         bcOut.putU8(flags)
+        
+        // 跳过后续的 put_var_init 处理 (对应 QuickJS 的 goto done_global_var)
+        continue
       } else {
         // 变量定义
         if (hf.isLexical) {
-          flags |= 0x10 // DEFINE_GLOBAL_LEX_VAR
+          flags |= DEFINE_GLOBAL_LEX_VAR // 0x80
           if (!hf.isConst) {
-            flags |= 0x02 // JS_PROP_WRITABLE
+            flags |= JS_PROP_WRITABLE // 0x02
           }
         }
         bcOut.putU8(Opcode.OP_define_var)
@@ -482,7 +676,7 @@ export class VariableResolver {
       }
       
       // 生成局部变量访问代码
-      this.emitLocalVarAccess(fd, varIdx, varName, op, bcOut)
+      this.emitLocalVarAccess(fd, varIdx, varName, op, bcOut, bcBuf, labelIdx)
       return
     }
     
@@ -493,7 +687,7 @@ export class VariableResolver {
       if (this.checkConstAssignment(fd, varIdx, varName, op, bcOut)) {
         return
       }
-      this.emitLocalVarAccess(fd, varIdx, varName, op, bcOut)
+      this.emitLocalVarAccess(fd, varIdx, varName, op, bcOut, bcBuf, labelIdx)
       return
     }
     
@@ -501,13 +695,13 @@ export class VariableResolver {
     const closureResult = this.findInParentScopes(fd, varName, scopeLevel, op, isPseudoVar)
     if (closureResult.found) {
       if (closureResult.varIdx >= 0) {
-        this.emitClosureVarAccess(fd, closureResult.varIdx, varName, op, bcOut)
+        this.emitClosureVarAccess(fd, closureResult.varIdx, varName, op, bcOut, bcBuf, labelIdx)
       }
       return
     }
     
     // === 步骤4: 全局变量访问 ===
-    this.emitGlobalVarAccess(varName, op, bcOut)
+    this.emitGlobalVarAccess(fd, varName, op, bcOut, bcBuf, labelIdx)
   }
 
   // ============================================================================
@@ -780,14 +974,124 @@ export class VariableResolver {
   // ============================================================================
 
   /**
+   * 检查是否可以优化 put_ref_value 模式
+   * 
+   * 对应 QuickJS parser.c:8938 can_opt_put_ref_value
+   * 
+   * 检查 label.pos 位置的字节码模式是否为:
+   * - insert3 / put_ref_value
+   * - perm4 / put_ref_value  
+   * - rot3l / put_ref_value
+   * - nop / put_ref_value
+   */
+  private canOptPutRefValue(bcBuf: Uint8Array, pos: number): boolean {
+    if (pos < 0 || pos + 1 >= bcBuf.length) {
+      return false
+    }
+    const opcode = bcBuf[pos]
+    return (
+      bcBuf[pos + 1] === Opcode.OP_put_ref_value &&
+      (opcode === Opcode.OP_insert3 || opcode === Opcode.OP_perm4 || 
+       opcode === Opcode.OP_nop || opcode === Opcode.OP_rot3l)
+    )
+  }
+
+  /**
+   * 优化 scope_make_ref 模式
+   * 
+   * 对应 QuickJS parser.c:8956 optimize_scope_make_ref
+   * 
+   * 将引用模式 (scope_make_ref -> get_ref_value -> ... -> perm4/insert3 -> put_ref_value)
+   * 优化为直接的局部变量访问模式 (get_loc -> ... -> put_loc)
+   * 
+   * 这个优化对于后缀递增/递减操作尤其重要:
+   * - 原模式: make_ref, get_ref_value, post_inc, perm4, put_ref_value (栈深度 4)
+   * - 优化后: get_loc, post_inc, put_loc (栈深度 2-3)
+   */
+  private optimizeScopeMakeRef(
+    fd: FunctionDef,
+    bcBuf: Uint8Array,
+    bcOut: BytecodeBuilder,
+    labelIdx: number,
+    getOp: number,
+    varIdx: number
+  ): void {
+    const ls = fd.labelSlots[labelIdx]
+    const labelPos = ls.pos
+    
+    // 从 labelPos 开始检查字节码模式
+    // label.pos 指向 OP_label 后的第一条指令 (即 perm4/insert3/rot3l/nop)
+    const pos = labelPos
+    
+    // 如果第一条指令后面有 get_ref_value，发射 get_op
+    // 注意: 这里我们只需要发射 get_op，因为 get_ref_value 在原始字节码中的处理会被跳过
+    // VariableResolver 不处理 get_ref_value，它会被直接复制
+    
+    // 发射 get 操作
+    bcOut.putU8(getOp)
+    bcOut.putU16(varIdx)
+    
+    // 标记原始字节码中的 label 位置需要被修补
+    // 在 QuickJS 中，这是通过直接修改 bc_buf 来实现的
+    // 但在我们的实现中，我们需要在 label 位置处替换字节码
+    
+    // 计算原始字节码中需要修补的位置
+    // label.pos 指向 OP_perm4/OP_insert3 的位置
+    // 需要将 [OP_perm4, OP_put_ref_value] 替换为 [OP_put_loc idx, OP_nop*]
+    
+    // 由于 VariableResolver 是重写字节码而不是修改原始字节码
+    // 我们需要在 OP_label 处理时检测并应用这个优化
+    // 这需要更复杂的跨操作码协调
+    
+    // 更简单的方法: 在此标记需要优化，让后续的 OP_label/perm4/put_ref_value 被跳过
+    // 但这需要某种状态传递机制
+    
+    // 最直接的实现: 记录这个 label 需要被优化
+    // 在 OP_label 处理时，如果检测到优化标记，则直接输出替换代码
+    
+    // 保存优化信息到 labelSlot
+    // 使用一个 Map 来存储需要优化的 label
+    if (!this.optimizedLabels) {
+      this.optimizedLabels = new Map()
+    }
+    
+    const opcode = bcBuf[pos]
+    this.optimizedLabels.set(labelIdx, {
+      putOp: getOp + 1, // get_loc -> put_loc, get_arg -> put_arg
+      varIdx: varIdx,
+      hasDup: opcode === Opcode.OP_insert3  // insert3 需要额外的 dup
+    })
+    
+    // 标记需要跳过下一个 get_ref_value
+    this.skipNextGetRefValue = true
+  }
+  
+  // 存储需要优化的 label 信息
+  private optimizedLabels?: Map<number, { 
+    putOp: number; 
+    varIdx: number; 
+    hasDup: boolean;
+    isGlobal?: boolean;
+    isStrict?: boolean;
+    isClosure?: boolean;  // 闭包变量标志
+  }>
+  
+  // 标记是否需要跳过下一个 get_ref_value
+  private skipNextGetRefValue = false
+
+  /**
    * 生成局部变量访问代码
+   * 
+   * 对应 QuickJS parser.c:9220-9295 中局部变量处理部分
    */
   private emitLocalVarAccess(
     fd: FunctionDef,
     varIdx: number,
     varName: number,
     op: number,
-    bcOut: BytecodeBuilder
+    bcOut: BytecodeBuilder,
+    bcBuf?: Uint8Array,
+    labelIdx?: number
   ): void {
     const isPut = (op === TempOpcode.OP_scope_put_var || op === TempOpcode.OP_scope_put_var_init)
     const isArg = (varIdx & ARGUMENT_VAR_OFFSET) !== 0
@@ -795,7 +1099,34 @@ export class VariableResolver {
     
     switch (op) {
       case TempOpcode.OP_scope_make_ref: {
-        // 创建引用
+        // 检查是否可以优化
+        // 对应 parser.c:9241-9261 中的 can_opt_put_ref_value 检测
+        if (bcBuf && labelIdx !== undefined && labelIdx >= 0 && labelIdx < fd.labelSlots.length) {
+          const ls = fd.labelSlots[labelIdx]
+          if (ls.pos >= 0 && this.canOptPutRefValue(bcBuf, ls.pos)) {
+            // 可以优化!
+            let getOp: number
+            if (isArg) {
+              getOp = Opcode.OP_get_arg
+            } else {
+              const vd = fd.vars[realIdx]
+              if (vd && vd.isLexical) {
+                getOp = Opcode.OP_get_loc_check
+              } else {
+                getOp = Opcode.OP_get_loc
+              }
+            }
+            
+            // 执行优化
+            this.optimizeScopeMakeRef(fd, bcBuf, bcOut, labelIdx, getOp, realIdx)
+            
+            // 减少 label 引用计数 (QuickJS 在 resolve_labels 中做这个)
+            fd.labelSlots[labelIdx].refCount--
+            break
+          }
+        }
+        
+        // 无法优化，使用原始的 make_ref 模式
         if (isArg) {
           bcOut.putU8(Opcode.OP_make_arg_ref)
           bcOut.putU32(varName)
@@ -868,13 +1199,17 @@ export class VariableResolver {
 
   /**
    * 生成闭包变量访问代码
+   * 
+   * 对应 QuickJS parser.c:9510-9570
    */
   private emitClosureVarAccess(
     fd: FunctionDef,
     closureIdx: number,
     varName: number,
     op: number,
-    bcOut: BytecodeBuilder
+    bcOut: BytecodeBuilder,
+    bcBuf?: Uint8Array,
+    labelIdx?: number
   ): void {
     const cv = fd.closureVar[closureIdx]
     const isPut = (op === TempOpcode.OP_scope_put_var || op === TempOpcode.OP_scope_put_var_init)
@@ -889,7 +1224,47 @@ export class VariableResolver {
     
     switch (op) {
       case TempOpcode.OP_scope_make_ref: {
-        // 创建闭包引用
+        // 检查是否可以优化
+        // 对应 parser.c:9525-9538
+        if (cv.varKind !== JSVarKindEnum.JS_VAR_FUNCTION_NAME &&
+            bcBuf && labelIdx !== undefined && labelIdx >= 0 && labelIdx < fd.labelSlots.length) {
+          const ls = fd.labelSlots[labelIdx]
+          if (ls.pos >= 0 && this.canOptPutRefValue(bcBuf, ls.pos)) {
+            // 可以优化!
+            let getOp: number
+            if (cv.isLexical) {
+              getOp = Opcode.OP_get_var_ref_check
+            } else {
+              getOp = Opcode.OP_get_var_ref
+            }
+            
+            // 发射 get 操作
+            bcOut.putU8(getOp)
+            bcOut.putU16(closureIdx)
+            
+            // 保存优化信息
+            if (!this.optimizedLabels) {
+              this.optimizedLabels = new Map()
+            }
+            
+            const opcode = bcBuf[ls.pos]
+            this.optimizedLabels.set(labelIdx, {
+              putOp: getOp + 1, // get_var_ref -> put_var_ref
+              varIdx: closureIdx,
+              hasDup: opcode === Opcode.OP_insert3,
+              isClosure: true  // 标记为闭包变量
+            })
+            
+            // 标记需要跳过下一个 get_ref_value
+            this.skipNextGetRefValue = true
+            
+            // 减少 label 引用计数
+            fd.labelSlots[labelIdx].refCount--
+            break
+          }
+        }
+        
+        // 无法优化，使用原始模式
         if (cv.varKind === JSVarKindEnum.JS_VAR_FUNCTION_NAME) {
           // 函数名特殊处理
           bcOut.putU8(Opcode.OP_object)
@@ -950,18 +1325,86 @@ export class VariableResolver {
   // ============================================================================
 
   /**
+   * 优化全局变量的 scope_make_ref 模式
+   * 
+   * 对应 QuickJS parser.c:9001 optimize_scope_make_global_ref
+   * 
+   * 非严格模式下:
+   * - 原模式: make_var_ref -> get_ref_value -> ... -> perm4/insert3 -> put_ref_value
+   * - 优化后: get_var -> ... -> put_var
+   */
+  private optimizeScopeMakeGlobalRef(
+    fd: FunctionDef,
+    bcBuf: Uint8Array,
+    bcOut: BytecodeBuilder,
+    labelIdx: number,
+    varName: number
+  ): void {
+    const isStrict = (fd.jsMode & JS_MODE_STRICT) !== 0
+    const ls = fd.labelSlots[labelIdx]
+    const labelPos = ls.pos
+    
+    // 严格模式下需要先检查变量是否存在
+    if (isStrict) {
+      bcOut.putU8(Opcode.OP_check_var)
+      bcOut.putU32(varName)
+    }
+    
+    // 发射 get_var
+    bcOut.putU8(Opcode.OP_get_var)
+    bcOut.putU32(varName)
+    
+    // 保存优化信息
+    if (!this.optimizedLabels) {
+      this.optimizedLabels = new Map()
+    }
+    
+    const opcode = bcBuf[labelPos]
+    this.optimizedLabels.set(labelIdx, {
+      putOp: isStrict ? Opcode.OP_put_var_strict : Opcode.OP_put_var,
+      varIdx: varName, // 对于全局变量，存储 varName (atom)
+      hasDup: opcode === Opcode.OP_insert3,
+      isGlobal: true,
+      isStrict: isStrict
+    })
+    
+    // 标记需要跳过下一个 get_ref_value
+    this.skipNextGetRefValue = true
+    
+    // 减少 label 引用计数
+    fd.labelSlots[labelIdx].refCount--
+  }
+
+  /**
    * 生成全局变量访问代码
+   * 
+   * 对应 QuickJS parser.c:9583-9615
    */
   private emitGlobalVarAccess(
+    fd: FunctionDef,
     varName: number,
     op: number,
-    bcOut: BytecodeBuilder
+    bcOut: BytecodeBuilder,
+    bcBuf?: Uint8Array,
+    labelIdx?: number
   ): void {
     switch (op) {
-      case TempOpcode.OP_scope_make_ref:
+      case TempOpcode.OP_scope_make_ref: {
+        // 检查是否可以优化
+        if (bcBuf && labelIdx !== undefined && labelIdx >= 0 && labelIdx < fd.labelSlots.length) {
+          const ls = fd.labelSlots[labelIdx]
+          if (ls.pos >= 0 && this.canOptPutRefValue(bcBuf, ls.pos)) {
+            // 可以优化!
+            this.optimizeScopeMakeGlobalRef(fd, bcBuf, bcOut, labelIdx, varName)
+            break
+          }
+        }
+        
+        // 无法优化，使用原始模式
         bcOut.putU8(Opcode.OP_make_var_ref)
         bcOut.putU32(varName)
         break
+      }
         
       case TempOpcode.OP_scope_get_ref:
         bcOut.putU8(Opcode.OP_undefined)
@@ -1011,13 +1454,16 @@ export class VariableResolver {
     varName: number,
     scopeLevel: number,
     op: number,
-    bcOut: BytecodeBuilder
+    bcOut: BytecodeBuilder,
+    posInOriginal: number
   ): void {
     // 查找私有字段
     const result = this.findPrivateField(fd, varName, scopeLevel)
     
     if (result.idx < 0) {
-      throw new Error(`undefined private field '${varName}'`)
+      throw new Error(
+        `undefined private field '${varName}' (pc=${posInOriginal}, scope=${scopeLevel}, op=${op})`
+      )
     }
     
     const { idx, isRef, varKind } = result

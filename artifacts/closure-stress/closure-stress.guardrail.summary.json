@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-stress/cli/closure-stress.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-stress/cli/closure-stress.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-stress/cli/closure-stress.pc2line.txt",
-    "bytecodeSize": 874,
-    "pc2lineLength": 6,
+    "bytecodeSize": 458,
+    "pc2lineLength": 8,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 812,
+    "tsSize": 396,
     "wasmSize": 446,
-    "sizeDiff": 366,
-    "sizeDiffPercent": 82.0627802690583
+    "sizeDiff": -50,
+    "sizeDiffPercent": -11.210762331838566
   },
   "trace": {
     "differenceCount": 0,
