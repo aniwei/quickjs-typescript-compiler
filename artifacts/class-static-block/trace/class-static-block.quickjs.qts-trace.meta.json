@@ -1,0 +1,11 @@
+{
+  "fixture": "class-static-block",
+  "input": "__tests__/fixtures/class-static-block.ts",
+  "tags": [
+    "debug",
+    "func-meta",
+    "scope",
+    "semantics"
+  ],
+  "lines": 329
+}

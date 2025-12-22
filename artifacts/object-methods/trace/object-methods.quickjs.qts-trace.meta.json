@@ -1,0 +1,9 @@
+{
+  "fixture": "object-methods",
+  "input": "__tests__/fixtures/object-methods.ts",
+  "tags": [
+    "debug",
+    "scope"
+  ],
+  "lines": 72
+}

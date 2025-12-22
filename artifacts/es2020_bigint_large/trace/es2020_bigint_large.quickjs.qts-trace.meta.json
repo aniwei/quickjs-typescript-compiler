@@ -1,0 +1,8 @@
+{
+  "fixture": "es2020_bigint_large",
+  "input": "__tests__/fixtures/es2020_bigint_large.ts",
+  "tags": [
+    "cpool"
+  ],
+  "lines": 57
+}

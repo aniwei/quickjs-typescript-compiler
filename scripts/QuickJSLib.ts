@@ -47,6 +47,39 @@ export class QuickJSLib {
   // 使用 any 以避免对 Emscripten 模块结构的过度约束
   static WasmInstance: any | null = null
 
+  private static outputHandlers: {
+    print: (text: string) => void
+    printErr: (text: string) => void
+  } = {
+    print: (text: string) => console.log(text),
+    printErr: (text: string) => console.error(text),
+  }
+
+  static setOutputHandlers(handlers: Partial<typeof QuickJSLib.outputHandlers>) {
+    QuickJSLib.outputHandlers = {
+      ...QuickJSLib.outputHandlers,
+      ...handlers,
+    }
+  }
+
+  static async withCapturedOutput<T>(fn: () => Promise<T> | T): Promise<{ result: T; stdout: string[]; stderr: string[] }> {
+    const stdout: string[] = []
+    const stderr: string[] = []
+
+    const prev = QuickJSLib.outputHandlers
+    QuickJSLib.setOutputHandlers({
+      print: (text) => stdout.push(String(text ?? '')),
+      printErr: (text) => stderr.push(String(text ?? '')),
+    })
+
+    try {
+      const result = await fn()
+      return { result, stdout, stderr }
+    } finally {
+      QuickJSLib.outputHandlers = prev
+    }
+  }
+
   static ensureWasmBuilt () {
     const path = resolve(process.cwd(), 'third_party/QuickJS/wasm/output/quickjs_wasm.js')
     const configPath = resolve(process.cwd(), 'third_party/QuickJS/wasm/output/quickjs_wasm.build-config.json')
@@ -136,8 +169,8 @@ export class QuickJSLib {
 
     const WasmModule: any = await import(path)
     QuickJSLib.WasmInstance = await WasmModule.default({
-      print: (text: string) => console.log(text),
-      printErr: (text: string) => console.error(text)
+      print: (text: string) => QuickJSLib.outputHandlers.print(text),
+      printErr: (text: string) => QuickJSLib.outputHandlers.printErr(text),
     })
     return QuickJSLib.WasmInstance as WasmInstance
   }

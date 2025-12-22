@@ -618,12 +618,8 @@ export class FunctionVisitor extends VisitorContext {
       // 表达式体: => expression - 对应 parser.c:13288-13301
       this.context.visit(body)
 
-      // 发射返回指令
-      if (fd.funcKind !== JSFunctionKindEnum.JS_FUNC_NORMAL) {
-        this.compiler.emitOp(fd, Opcode.OP_return_async)
-      } else {
-        this.compiler.emitOp(fd, Opcode.OP_return)
-      }
+      // 发射返回指令 (mirror parser.c:emit_return)
+      this.compiler.emitReturn(fd, true)
     }
 
     this.context.funcDef = prevFd

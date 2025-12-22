@@ -1,0 +1,9 @@
+{
+  "fixture": "labeled-statements",
+  "input": "__tests__/fixtures/labeled-statements.ts",
+  "tags": [
+    "debug",
+    "semantics"
+  ],
+  "lines": 312
+}

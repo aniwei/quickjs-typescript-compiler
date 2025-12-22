@@ -1,0 +1,9 @@
+{
+  "fixture": "async-await",
+  "input": "__tests__/fixtures/async-await.ts",
+  "tags": [
+    "debug",
+    "semantics"
+  ],
+  "lines": 113
+}

@@ -1,0 +1,10 @@
+{
+  "fixture": "function-default-params",
+  "input": "__tests__/fixtures/function-default-params.ts",
+  "tags": [
+    "debug",
+    "scope",
+    "semantics"
+  ],
+  "lines": 78
+}

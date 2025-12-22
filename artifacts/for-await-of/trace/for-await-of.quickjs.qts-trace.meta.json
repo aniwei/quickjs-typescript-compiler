@@ -1,0 +1,9 @@
+{
+  "fixture": "for-await-of",
+  "input": "__tests__/fixtures/for-await-of.ts",
+  "tags": [
+    "debug",
+    "semantics"
+  ],
+  "lines": 177
+}

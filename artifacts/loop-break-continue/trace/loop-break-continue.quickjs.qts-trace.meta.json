@@ -1,0 +1,9 @@
+{
+  "fixture": "loop-break-continue",
+  "input": "__tests__/fixtures/loop-break-continue.ts",
+  "tags": [
+    "debug",
+    "semantics"
+  ],
+  "lines": 173
+}

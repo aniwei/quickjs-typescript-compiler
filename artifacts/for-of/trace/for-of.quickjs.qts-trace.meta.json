@@ -1,0 +1,9 @@
+{
+  "fixture": "for-of",
+  "input": "__tests__/fixtures/for-of.ts",
+  "tags": [
+    "debug",
+    "semantics"
+  ],
+  "lines": 87
+}

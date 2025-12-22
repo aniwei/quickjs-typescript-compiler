@@ -1,0 +1,9 @@
+{
+  "fixture": "computed-property",
+  "input": "__tests__/fixtures/computed-property.ts",
+  "tags": [
+    "debug",
+    "semantics"
+  ],
+  "lines": 52
+}

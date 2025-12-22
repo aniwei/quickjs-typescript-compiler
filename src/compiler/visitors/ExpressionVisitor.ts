@@ -2,7 +2,7 @@ import * as ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
 import { Opcode, TempOpcode, JSAtom, PutLValueEnum } from '../../env'
 import { CompilerContext } from '../CompilerContext'
-import { FunctionDef, ARGUMENT_VAR_OFFSET } from '../FunctionDef'
+import { FunctionDef, ARGUMENT_VAR_OFFSET, JSFunctionKindEnum } from '../FunctionDef'
 import { Label } from '../Compiler'
 
 /**
@@ -838,8 +838,42 @@ export class ExpressionVisitor extends VisitorContext {
 
     // 根据左值类型处理
     if (ts.isIdentifier(node.left)) {
-      // 简单变量: 使用 scope_make_ref / get_ref_value 模式
+      // 简单变量:
+      // QuickJS usually emits scope_make_ref/get_ref_value/put_ref_value and later
+      // optimizes it to get_loc_check/put_loc_check for locals. For byte-perfect
+      // parity (notably in async functions), we emit the optimized local form
+      // directly when we can prove it's a local/arg binding.
       const name = this.compiler.addAtom(node.left.text)
+
+      // Determine whether `name` resolves to a local/arg in the current scope chain.
+      let isLocalOrArg = this.compiler.findArg(fd, name) >= 0
+      if (!isLocalOrArg) {
+        for (let scope = fd.scopeLevel; scope >= 0; scope = fd.scopes[scope].parent) {
+          if (this.compiler.findVarInScope(fd, name, scope) >= 0) {
+            isLocalOrArg = true
+            break
+          }
+          if (fd.scopes[scope].parent < 0) break
+        }
+      }
+
+      if (isLocalOrArg) {
+        // scope_get_var; rhs; op; dup; scope_put_var
+        this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var)
+        this.compiler.emitU32(fd, name)
+        this.compiler.emitU16(fd, fd.scopeLevel)
+
+        this.context.visit(node.right)
+        this.compiler.emitOp(fd, opcode, sourcePos)
+
+        this.compiler.emitOp(fd, Opcode.OP_dup)
+        this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var)
+        this.compiler.emitU32(fd, name)
+        this.compiler.emitU16(fd, fd.scopeLevel)
+        return
+      }
+
+      // Fallback: generic ref-based compound assignment.
       const label = this.compiler.newLabelInt(fd)
       
       // OP_scope_make_ref: 栈 [] -> [ref ref]
@@ -2344,6 +2378,7 @@ export class ExpressionVisitor extends VisitorContext {
    */
   visitYieldExpression(node: ts.YieldExpression): void {
     const fd = this.funcDef!
+    const sourcePos = node.getStart(node.getSourceFile())
 
     if (node.expression) {
       // 计算 yield 的表达式
@@ -2358,7 +2393,26 @@ export class ExpressionVisitor extends VisitorContext {
       this.compiler.emitOp(fd, Opcode.OP_yield_star)
     } else {
       // yield 表达式
-      this.compiler.emitOp(fd, Opcode.OP_yield)
+      // QuickJS (parser.c: js_parse_assign_expr2 -> TOK_YIELD) emits:
+      //   if (is_async) OP_await;
+      //   OP_yield;
+      //   if_false label_next;
+      //   emit_return(TRUE);
+      //   label_next:
+      // This is crucial for (async) generators and for byte-perfect output.
+
+      if (fd.funcKind === JSFunctionKindEnum.JS_FUNC_ASYNC_GENERATOR) {
+        this.compiler.emitOp(fd, Opcode.OP_await)
+      }
+
+      this.compiler.emitOp(fd, Opcode.OP_yield, sourcePos)
+
+      if (fd.funcKind !== JSFunctionKindEnum.JS_FUNC_NORMAL) {
+        const labelNext = this.compiler.newLabelInt(fd)
+        this.compiler.emitGotoInt(fd, Opcode.OP_if_false, labelNext)
+        this.compiler.emitReturn(fd, true)
+        this.compiler.emitLabelInt(fd, labelNext)
+      }
     }
   }
 }

@@ -330,6 +330,7 @@ export class StatementVisitor extends VisitorContext {
     this.compiler.pushBreakEntry(fd, breakEntry, labelName, labelBreak, labelCont, 0)
 
     // 测试表达式 - 对应 parser.c:7190-7199
+    // QuickJS 的布局是：test → body（fallthrough）→ incr → goto test
     if (node.condition) {
       this.compiler.emitLabelInt(fd, labelTest)
       this.context.visit(node.condition)
@@ -339,24 +340,6 @@ export class StatementVisitor extends VisitorContext {
       labelTest = labelBody
     }
 
-    // 跳过增量部分到循环体 - 对应 parser.c:7203
-    if (node.incrementor) {
-      this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelBody)
-
-      // 增量表达式部分 - 对应 parser.c:7205-7212
-      this.compiler.emitLabelInt(fd, labelCont)
-      this.context.visit(node.incrementor)
-      this.compiler.emitOp(fd, Opcode.OP_drop)
-      
-      // 跳回测试 - 对应 parser.c:7214
-      if (labelTest !== labelBody) {
-        this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelTest)
-      }
-    } else {
-      // 无增量表达式，continue 标签指向测试
-      breakEntry.labelCont = labelTest
-    }
-
     // 循环体 - 对应 parser.c:7222-7225
     this.compiler.emitLabelInt(fd, labelBody)
     this.context.visit(node.statement)
@@ -364,8 +347,19 @@ export class StatementVisitor extends VisitorContext {
     // 关闭闭包 - 对应 parser.c:7228-7229
     this.compiler.closeScopes(fd, fd.scopeLevel, blockScopeLevel)
 
-    // 跳转到 continue 标签 - 对应 parser.c:7243
-    this.compiler.emitGotoInt(fd, Opcode.OP_goto, node.incrementor ? labelCont : labelTest)
+    if (node.incrementor) {
+      // 增量表达式部分（continue 目标）- 对应 parser.c:7205-7212
+      this.compiler.emitLabelInt(fd, labelCont)
+      this.context.visit(node.incrementor)
+      this.compiler.emitOp(fd, Opcode.OP_drop)
+
+      // 跳回测试 - 对应 parser.c:7214
+      this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelTest)
+    } else {
+      // 无增量表达式：continue 指向测试，并在循环体末尾回到测试
+      breakEntry.labelCont = labelTest
+      this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelTest)
+    }
 
     // 发射 break 标签 - 对应 parser.c:7246
     this.compiler.emitLabelInt(fd, labelBreak)
@@ -390,6 +384,10 @@ export class StatementVisitor extends VisitorContext {
         const name = declaration.name.text
         const atom = this.compiler.addAtom(name)
         const sourcePos = declaration.getStart()
+
+        // QuickJS does not emit a standalone pc2line sample for the for-loop initializer.
+        // Pre-seed the dedup pointer so initializer-related ops don't introduce an extra entry.
+        fd.lastOpcodeSourcePtr = sourcePos
 
         // 定义变量
         if (isConst) {
@@ -437,10 +435,9 @@ export class StatementVisitor extends VisitorContext {
     this.compiler.setEvalRetUndefined(fd)
 
     const labelCont = this.compiler.newLabelInt(fd)
-    const labelBody = this.compiler.newLabelInt(fd)
     const labelBreak = this.compiler.newLabelInt(fd)
+    // QuickJS: labelNext 是 loop body entry（每次迭代把 value 赋给目标，然后 fallthrough 执行 body）
     const labelNext = this.compiler.newLabelInt(fd)
-    const labelExpr = this.compiler.newLabelInt(fd)
 
     // create scope
     this.compiler.pushScope(fd)
@@ -452,29 +449,27 @@ export class StatementVisitor extends VisitorContext {
     breakEntry.hasIterator = true
     breakEntry.scopeLevel = blockScopeLevel
 
-    // goto expr
-    this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelExpr)
-
-    // label_next: assign iteration value to target, then goto body
-    this.compiler.emitLabelInt(fd, labelNext)
-
+    // 1) 先在当前作用域里定义 loop target（QuickJS 在 for_xxx_start 之前就会 set_loc_uninitialized）
+    // 2) 每次迭代在 labelNext 里把 iterator value 赋给 target
+    let assignTarget: (() => void) | undefined
     if (ts.isVariableDeclarationList(node.initializer)) {
       const decl = node.initializer.declarations[0]
-      if (decl && ts.isIdentifier(decl.name)) {
-        const atom = this.compiler.addAtom(decl.name.text)
-        const isConst = (node.initializer.flags & ts.NodeFlags.Const) !== 0
-        const isLet = (node.initializer.flags & ts.NodeFlags.Let) !== 0
+      if (!decl || !ts.isIdentifier(decl.name)) {
+        throw new Error('Unsupported for-of initializer')
+      }
+      const atom = this.compiler.addAtom(decl.name.text)
+      const isConst = (node.initializer.flags & ts.NodeFlags.Const) !== 0
+      const isLet = (node.initializer.flags & ts.NodeFlags.Let) !== 0
 
-        // define var (compile-time / env)
-        if (isConst) {
-          this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_CONST)
-        } else if (isLet) {
-          this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_LET)
-        } else {
-          this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_VAR)
-        }
+      if (isConst) {
+        this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_CONST)
+      } else if (isLet) {
+        this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_LET)
+      } else {
+        this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_VAR)
+      }
 
-        // store iteration value
+      assignTarget = () => {
         const opcode = (isConst || isLet)
           ? TempOpcode.OP_scope_put_var_init
           : TempOpcode.OP_scope_put_var
@@ -484,17 +479,17 @@ export class StatementVisitor extends VisitorContext {
       }
     } else if (ts.isIdentifier(node.initializer)) {
       const atom = this.compiler.addAtom(node.initializer.text)
-      this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var)
-      this.compiler.emitU32(fd, atom)
-      this.compiler.emitU16(fd, fd.scopeLevel)
+      assignTarget = () => {
+        this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var)
+        this.compiler.emitU32(fd, atom)
+        this.compiler.emitU16(fd, fd.scopeLevel)
+      }
     } else {
       throw new Error('Unsupported for-of initializer')
     }
 
-    this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelBody)
-
     // label_expr: eval iterable + start iterator, then goto cont
-    this.compiler.emitLabelInt(fd, labelExpr)
+    // QuickJS: js_parse_for_in_of (parser.c:6659-6825)
     this.context.visit(node.expression)
     if (node.awaitModifier) {
       this.compiler.emitOp(fd, Opcode.OP_for_await_of_start)
@@ -503,8 +498,11 @@ export class StatementVisitor extends VisitorContext {
     }
     this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelCont)
 
-    // label_body: loop body
-    this.compiler.emitLabelInt(fd, labelBody)
+    // label_next: assign iteration value to target, then fallthrough to body
+    this.compiler.emitLabelInt(fd, labelNext)
+    assignTarget()
+
+    // loop body
     this.context.visit(node.statement)
 
     this.compiler.closeScopes(fd, fd.scopeLevel, breakEntry.scopeLevel)
@@ -522,8 +520,9 @@ export class StatementVisitor extends VisitorContext {
     }
 
     // on stack: enum_rec value bool
+    // QuickJS: if_false -> labelNext (继续迭代)
     this.compiler.emitGotoInt(fd, Opcode.OP_if_false, labelNext)
-    // drop the undefined value from for_xx_next
+    // 结束路径: drop value (通常为 undefined)，然后 close iterator
     this.compiler.emitOp(fd, Opcode.OP_drop)
 
     // label_break: close and drop enum_rec
@@ -835,7 +834,7 @@ export class StatementVisitor extends VisitorContext {
           this.compiler.emitOp(fd, Opcode.OP_push_atom_value)
           this.compiler.emitAtom(fd, atom)
         }
-        this.compiler.emitOp(fd, Opcode.OP_return, sourcePos)
+        this.compiler.emitReturn(fd, true, sourcePos)
         return
       }
 
@@ -857,10 +856,10 @@ export class StatementVisitor extends VisitorContext {
       } finally {
         fd.suppressSourcePos = prevSuppressSourcePos
       }
-      this.compiler.emitOp(fd, Opcode.OP_return, sourcePos)
+      this.compiler.emitReturn(fd, true, sourcePos)
     } else {
       // 无返回值 - 返回 undefined
-      this.compiler.emitOp(fd, Opcode.OP_return_undef, sourcePos)
+      this.compiler.emitReturn(fd, false, sourcePos)
     }
   }
 

@@ -1,0 +1,52 @@
+[QTS:SCOPE] push: level=1 first_var=-1
+[QTS:SCOPE] enter: idx=1 is_body=0
+[QTS:EMIT] pos=0 op=182
+[QTS:EMIT] pos=1 u16=0x0001 (1)
+[QTS:EMIT] pos=3 op=4
+[QTS:EMIT] pos=4 u32=0x000001d9 (473)
+[QTS:EMIT] pos=8 op=191
+[QTS:EMIT] pos=9 atom=472
+[QTS:EMIT] pos=13 u16=0x0001 (1)
+[QTS:EMIT] pos=15 op=11
+[QTS:EMIT] pos=16 op=200
+[QTS:EMIT] pos=17 u32=0x00000020 (32)
+[QTS:EMIT] pos=21 op=186
+[QTS:EMIT] pos=22 u32=0x000001d8 (472)
+[QTS:EMIT] pos=26 u16=0x0001 (1)
+[QTS:EMIT] pos=28 op=116
+[QTS:EMIT] pos=29 op=1
+[QTS:EMIT] pos=30 u32=0x00000001 (1)
+[QTS:EMIT] pos=34 op=83
+[QTS:EMIT] pos=35 op=14
+[QTS:EMIT] pos=36 op=191
+[QTS:EMIT] pos=37 atom=474
+[QTS:EMIT] pos=41 u16=0x0001 (1)
+[QTS:EMIT] pos=43 op=200
+[QTS:EMIT] pos=44 u32=0x0000002b (43)
+[QTS:EMIT] pos=48 op=186
+[QTS:EMIT] pos=49 u32=0x000001db (475)
+[QTS:EMIT] pos=53 u16=0x0001 (1)
+[QTS:EMIT] pos=55 op=200
+[QTS:EMIT] pos=56 u32=0x00000032 (50)
+[QTS:EMIT] pos=60 op=66
+[QTS:EMIT] pos=61 atom=476
+[QTS:EMIT] pos=65 op=200
+[QTS:EMIT] pos=66 u32=0x00000037 (55)
+[QTS:EMIT] pos=70 op=186
+[QTS:EMIT] pos=71 u32=0x000001da (474)
+[QTS:EMIT] pos=75 u16=0x0001 (1)
+[QTS:EMIT] pos=77 op=200
+[QTS:EMIT] pos=78 u32=0x0000003b (59)
+[QTS:EMIT] pos=82 op=186
+[QTS:EMIT] pos=83 u32=0x000001d8 (472)
+[QTS:EMIT] pos=87 u16=0x0001 (1)
+[QTS:EMIT] pos=89 op=200
+[QTS:EMIT] pos=90 u32=0x0000003a (58)
+[QTS:EMIT] pos=94 op=72
+[QTS:EMIT] pos=95 op=200
+[QTS:EMIT] pos=96 u32=0x00000036 (54)
+[QTS:EMIT] pos=100 op=36
+[QTS:EMIT] pos=101 u16=0x0001 (1)
+[QTS:EMIT] pos=103 op=14
+[QTS:EMIT] pos=104 op=6
+[QTS:EMIT] pos=105 op=47

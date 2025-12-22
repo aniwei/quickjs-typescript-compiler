@@ -5,6 +5,7 @@ import {
   LineNumberSlot, 
   JSVarKind,
   JSVarKindEnum,
+  JSFunctionKindEnum,
   LabelSlot,
   RelocEntry,
   JSGlobalVar,
@@ -1077,11 +1078,64 @@ export class Compiler {
   /**
    * 发射 return 指令
    */
-  emitReturn(fd: FunctionDef, hasVal: boolean): void {
+  emitReturn(fd: FunctionDef, hasVal: boolean, sourcePos?: number): void {
+    // Mirror QuickJS: third_party/QuickJS/src/core/parser.c: emit_return()
+
+    const isNonNormal = fd.funcKind !== JSFunctionKindEnum.JS_FUNC_NORMAL
+
+    // For non-normal functions, QuickJS forces a value on the stack.
+    // This ensures returning from (async/)generator uses OP_return_async.
+    if (isNonNormal) {
+      if (!hasVal) {
+        this.emitOp(fd, Opcode.OP_undefined)
+        hasVal = true
+      } else if (fd.funcKind === JSFunctionKindEnum.JS_FUNC_ASYNC_GENERATOR) {
+        // In async generators, the first await must happen before finally handling.
+        this.emitOp(fd, Opcode.OP_await)
+      }
+    }
+
+    // Derived class constructor return handling.
+    // QuickJS: emit_return() special-cases derived constructors so `this` can be
+    // accessed only when returning a non-object value.
+    if (fd.isDerivedClassConstructor) {
+      let labelReturn = -1
+      if (hasVal) {
+        this.emitOp(fd, Opcode.OP_check_ctor_return)
+        labelReturn = this.newLabelInt(fd)
+        this.emitGotoInt(fd, Opcode.OP_if_false, labelReturn)
+        this.emitOp(fd, Opcode.OP_drop)
+      }
+
+      this.emitOp(fd, TempOpcode.OP_scope_get_var_checkthis)
+      this.emitAtom(fd, JSAtom.JS_ATOM_this)
+      this.emitU16(fd, 0)
+
+      if (labelReturn !== -1) {
+        this.emitLabelInt(fd, labelReturn)
+      }
+
+      this.emitOp(fd, Opcode.OP_return, sourcePos)
+      return
+    }
+
+    if (isNonNormal) {
+      // At this point, we must return via OP_return_async.
+      if (!hasVal) {
+        this.emitOp(fd, Opcode.OP_undefined)
+      } else if (fd.funcKind === JSFunctionKindEnum.JS_FUNC_ASYNC_GENERATOR) {
+        // Async generators await the returned value again just before return.
+        this.emitOp(fd, Opcode.OP_await)
+      }
+      this.emitOp(fd, Opcode.OP_return_async, sourcePos)
+      return
+    }
+
+    // Normal function.
     if (hasVal) {
-      this.emitOp(fd, Opcode.OP_return)
+      this.emitOp(fd, Opcode.OP_return, sourcePos)
     } else {
-      this.emitOp(fd, Opcode.OP_return_undef)
+      this.emitOp(fd, Opcode.OP_return_undef, sourcePos)
     }
   }
 

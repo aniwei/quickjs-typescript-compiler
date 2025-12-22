@@ -1,0 +1,9 @@
+{
+  "fixture": "for-loop",
+  "input": "__tests__/fixtures/for-loop.ts",
+  "tags": [
+    "debug",
+    "semantics"
+  ],
+  "lines": 92
+}
