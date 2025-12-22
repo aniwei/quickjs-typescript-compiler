@@ -1,0 +1,177 @@
+{
+  "version": 5,
+  "atoms": [
+    "greet",
+    "QuickJS",
+    "__tests__/fixtures/function-default-params.js",
+    "world",
+    "console",
+    "log",
+    "Hello"
+  ],
+  "func": {
+    "tag": 12,
+    "flags": 1536,
+    "jsMode": 0,
+    "funcNameAtom": 82,
+    "argCount": 0,
+    "varCount": 1,
+    "definedArgCount": 0,
+    "stackSize": 2,
+    "closureVarCount": 0,
+    "cpoolCount": 1,
+    "bytecodeLen": 34,
+    "bytecode": {
+      "type": "Buffer",
+      "data": [
+        64,
+        228,
+        0,
+        0,
+        0,
+        64,
+        194,
+        0,
+        65,
+        228,
+        0,
+        0,
+        0,
+        0,
+        57,
+        228,
+        0,
+        0,
+        0,
+        240,
+        203,
+        57,
+        228,
+        0,
+        0,
+        0,
+        4,
+        229,
+        0,
+        0,
+        0,
+        241,
+        207,
+        40
+      ]
+    },
+    "varDefs": [
+      {
+        "nameAtom": 83,
+        "scopeLevel": 0,
+        "scopeNextPlus1": 0,
+        "flags": 0
+      }
+    ],
+    "closureVars": [],
+    "hasDebug": true,
+    "debug": {
+      "filenameAtom": 230,
+      "filename": "__tests__/fixtures/function-default-params.js",
+      "pc2line": {
+        "type": "Buffer",
+        "data": [
+          0,
+          0,
+          75,
+          0,
+          27,
+          10,
+          13,
+          9,
+          52,
+          10
+        ]
+      }
+    },
+    "cpool": [
+      {
+        "tag": 12,
+        "flags": 1601,
+        "jsMode": 0,
+        "funcNameAtom": 228,
+        "funcName": "greet",
+        "argCount": 1,
+        "varCount": 0,
+        "definedArgCount": 0,
+        "stackSize": 5,
+        "closureVarCount": 0,
+        "cpoolCount": 0,
+        "bytecodeLen": 33,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            211,
+            17,
+            6,
+            173,
+            236,
+            8,
+            14,
+            4,
+            231,
+            0,
+            0,
+            0,
+            219,
+            57,
+            232,
+            0,
+            0,
+            0,
+            67,
+            233,
+            0,
+            0,
+            0,
+            4,
+            234,
+            0,
+            0,
+            0,
+            211,
+            36,
+            2,
+            0,
+            41
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 56,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 230,
+          "filename": "__tests__/fixtures/function-default-params.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              0,
+              0,
+              68,
+              8,
+              27,
+              14,
+              52,
+              28,
+              7,
+              19
+            ]
+          }
+        },
+        "cpool": []
+      }
+    ]
+  }
+}

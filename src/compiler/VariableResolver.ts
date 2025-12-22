@@ -777,6 +777,10 @@ export class VariableResolver {
       case JSAtom.JS_ATOM_home_object:
         if (fd.homeObjectVarIdx < 0) {
           fd.homeObjectVarIdx = this.compiler.addVar(fd, varName)
+          // QuickJS: add_var() uses memset(0) so scope_next defaults to 0.
+          // This field is serialized and must match for byte-perfect output.
+          // Source: third_party/QuickJS/src/core/parser.c: add_var (memset(vd, 0, sizeof(*vd)))
+          fd.vars[fd.homeObjectVarIdx].scopeNext = 0
         }
         varIdx = fd.homeObjectVarIdx
         break
@@ -784,6 +788,8 @@ export class VariableResolver {
       case JSAtom.JS_ATOM_this_active_func:
         if (fd.thisActiveFuncVarIdx < 0) {
           fd.thisActiveFuncVarIdx = this.compiler.addVar(fd, varName)
+          // See add_var() memset(0) note above.
+          fd.vars[fd.thisActiveFuncVarIdx].scopeNext = 0
         }
         varIdx = fd.thisActiveFuncVarIdx
         break
@@ -791,6 +797,8 @@ export class VariableResolver {
       case JSAtom.JS_ATOM_new_target:
         if (fd.newTargetVarIdx < 0) {
           fd.newTargetVarIdx = this.compiler.addVar(fd, varName)
+          // See add_var() memset(0) note above.
+          fd.vars[fd.newTargetVarIdx].scopeNext = 0
         }
         varIdx = fd.newTargetVarIdx
         break
@@ -816,6 +824,12 @@ export class VariableResolver {
       // 在派生类构造函数中，this 需要标记为词法变量
       // 用于触发 'uninitialized' 检查
       vd.isLexical = true
+    }
+    if (idx >= 0) {
+      // QuickJS: add_var_this() ultimately calls add_var(), which zero-inits vd.
+      // Ensure scope_next matches (0 => encoded scopeNextPlus1=1).
+      // Source: third_party/QuickJS/src/core/parser.c: add_var_this / add_var
+      fd.vars[idx].scopeNext = 0
     }
     return idx
   }

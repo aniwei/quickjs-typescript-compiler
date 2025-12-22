@@ -1,0 +1,316 @@
+{
+  "version": 5,
+  "atoms": [
+    "fetchValue",
+    "run",
+    "__tests__/fixtures/async-await.js",
+    "console",
+    "log"
+  ],
+  "func": {
+    "tag": 12,
+    "flags": 1536,
+    "jsMode": 0,
+    "funcNameAtom": 82,
+    "argCount": 0,
+    "varCount": 1,
+    "definedArgCount": 0,
+    "stackSize": 3,
+    "closureVarCount": 0,
+    "cpoolCount": 3,
+    "bytecodeLen": 51,
+    "bytecode": {
+      "type": "Buffer",
+      "data": [
+        64,
+        228,
+        0,
+        0,
+        0,
+        64,
+        64,
+        229,
+        0,
+        0,
+        0,
+        64,
+        194,
+        0,
+        65,
+        228,
+        0,
+        0,
+        0,
+        0,
+        194,
+        1,
+        65,
+        229,
+        0,
+        0,
+        0,
+        0,
+        57,
+        229,
+        0,
+        0,
+        0,
+        240,
+        67,
+        129,
+        0,
+        0,
+        0,
+        194,
+        2,
+        79,
+        0,
+        0,
+        0,
+        0,
+        36,
+        1,
+        0,
+        207,
+        40
+      ]
+    },
+    "varDefs": [
+      {
+        "nameAtom": 83,
+        "scopeLevel": 0,
+        "scopeNextPlus1": 0,
+        "flags": 0
+      }
+    ],
+    "closureVars": [],
+    "hasDebug": true,
+    "debug": {
+      "filenameAtom": 230,
+      "filename": "__tests__/fixtures/async-await.js",
+      "pc2line": {
+        "type": "Buffer",
+        "data": [
+          0,
+          0,
+          0,
+          28,
+          16,
+          0,
+          27,
+          6,
+          7,
+          4,
+          62,
+          10
+        ]
+      }
+    },
+    "cpool": [
+      {
+        "tag": 12,
+        "flags": 1634,
+        "jsMode": 0,
+        "funcNameAtom": 228,
+        "funcName": "fetchValue",
+        "argCount": 0,
+        "varCount": 0,
+        "definedArgCount": 0,
+        "stackSize": 1,
+        "closureVarCount": 0,
+        "cpoolCount": 0,
+        "bytecodeLen": 3,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            191,
+            42,
+            47
+          ]
+        },
+        "varDefs": [],
+        "closureVars": [],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 230,
+          "filename": "__tests__/fixtures/async-await.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              0,
+              0,
+              13,
+              8
+            ]
+          }
+        },
+        "cpool": []
+      },
+      {
+        "tag": 12,
+        "flags": 1634,
+        "jsMode": 0,
+        "funcNameAtom": 229,
+        "funcName": "run",
+        "argCount": 0,
+        "varCount": 1,
+        "definedArgCount": 0,
+        "stackSize": 4,
+        "closureVarCount": 0,
+        "cpoolCount": 0,
+        "bytecodeLen": 39,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            99,
+            0,
+            0,
+            57,
+            228,
+            0,
+            0,
+            0,
+            240,
+            141,
+            203,
+            57,
+            231,
+            0,
+            0,
+            0,
+            67,
+            232,
+            0,
+            0,
+            0,
+            4,
+            66,
+            0,
+            0,
+            0,
+            100,
+            0,
+            0,
+            36,
+            2,
+            0,
+            14,
+            100,
+            0,
+            0,
+            184,
+            159,
+            47
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 66,
+            "scopeLevel": 1,
+            "scopeNextPlus1": 0,
+            "flags": 48
+          }
+        ],
+        "closureVars": [],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 230,
+          "filename": "__tests__/fixtures/async-await.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              3,
+              0,
+              18,
+              48,
+              27,
+              20,
+              18,
+              59,
+              27,
+              14,
+              52,
+              28,
+              17,
+              19,
+              23,
+              7,
+              22,
+              12,
+              7,
+              25
+            ]
+          }
+        },
+        "cpool": []
+      },
+      {
+        "tag": 12,
+        "flags": 1538,
+        "jsMode": 0,
+        "funcNameAtom": 0,
+        "argCount": 1,
+        "varCount": 0,
+        "definedArgCount": 1,
+        "stackSize": 4,
+        "closureVarCount": 0,
+        "cpoolCount": 0,
+        "bytecodeLen": 19,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            57,
+            231,
+            0,
+            0,
+            0,
+            67,
+            232,
+            0,
+            0,
+            0,
+            4,
+            108,
+            0,
+            0,
+            0,
+            211,
+            37,
+            2,
+            0
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 108,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 230,
+          "filename": "__tests__/fixtures/async-await.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              8,
+              11,
+              2,
+              20,
+              27,
+              14,
+              52,
+              26,
+              7,
+              17
+            ]
+          }
+        },
+        "cpool": []
+      }
+    ]
+  }
+}

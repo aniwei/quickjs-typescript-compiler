@@ -1154,7 +1154,25 @@ export class StatementVisitor extends VisitorContext {
     this.compiler.emitSourcePos(fd, sourcePos)
 
     // 编译表达式
-    this.context.visit(node.expression)
+    // QuickJS: 对于一些“语句级”表达式（尤其是简单赋值），会以不保留结果的模式编译，
+    // 因此不会在语句末尾再发射 OP_drop。
+    // 我们在非 eval 模式下对顶层简单赋值做同样处理，以对齐 class-* 等 fixture。
+    const expr = node.expression
+    const isTopLevelSimpleAssign =
+      fd.evalRetIdx < 0 &&
+      ts.isBinaryExpression(expr) &&
+      expr.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+      (ts.isIdentifier(expr.left) || ts.isPropertyAccessExpression(expr.left) || ts.isElementAccessExpression(expr.left))
+
+    if (isTopLevelSimpleAssign) {
+      const prev = this.context.expressionValueUsed
+      this.context.expressionValueUsed = false
+      this.context.visit(expr)
+      this.context.expressionValueUsed = prev
+      return
+    }
+
+    this.context.visit(expr)
 
     // 处理表达式结果 - 对应 parser.c:7632-7649
     // QuickJS 在 eval/顶层脚本模式下会把语句表达式的值写入特殊的 <ret> 局部变量

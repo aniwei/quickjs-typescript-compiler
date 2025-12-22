@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/object-methods.ts
-**生成时间**: 2025-12-22T11:00:40.470Z
+**生成时间**: 2025-12-22T14:32:14.562Z
 
 ## 大小对比
 
-- TypeScript编译器: 208 字节
+- TypeScript编译器: 206 字节
 - WASM编译器: 206 字节
-- 差异: 2 字节 (0.97%)
+- 差异: 0 字节 (0.00%)
 
 ## 结构分析
 
@@ -70,7 +70,7 @@
   "functionHeader": {
     "offset": 59,
     "tag": "0xc",
-    "remaining": 149
+    "remaining": 147
   }
 }
 ```
@@ -141,20 +141,8 @@
 
 ## 字节级差异
 
-共发现 12 个字节差异:
+共发现 0 个字节差异:
 
-- 偏移量 0xb3: TS=0x00 vs WASM=0x01
-- 偏移量 0xc2: TS=0x0c vs WASM=0x0a
-- 偏移量 0xc5: TS=0x0d vs WASM=0x12
-- 偏移量 0xc6: TS=0x16 vs WASM=0x1e
-- 偏移量 0xc7: TS=0x07 vs WASM=0x1b
-- 偏移量 0xc8: TS=0x08 vs WASM=0x0a
-- 偏移量 0xc9: TS=0x1b vs WASM=0x07
-- 偏移量 0xca: TS=0x0a vs WASM=0x03
-- 偏移量 0xcc: TS=0x03 vs WASM=0x1b
-- 偏移量 0xcd: TS=0x07 vs WASM=0x00
-- 偏移量 0xce: TS=0x1b vs WASM=EOF
-- 偏移量 0xcf: TS=0x00 vs WASM=EOF
 
 ## 十六进制转储对比
 
@@ -171,8 +159,8 @@
 00000080: 00 00 b9 24 01 00 24 01 00 cf 28 d0 03 10 00 00 |...$..$...(.....|
 00000090: 00 20 0c 00 1b 0e 1b 0a 1b 06 20 08 11 0f 00 0c |. ........ .....|
 000000a0: 42 07 00 00 01 01 01 02 00 00 0b 02 d2 03 00 01 |B...............|
-000000b0: 00 10 00 00 00 08 cb c7 42 e5 00 00 00 d3 9f 28 |........B......(|
-000000c0: d0 03 0c 02 04 0d 16 07 08 1b 0a 07 03 07 1b 00 |................|
+000000b0: 00 10 00 01 00 08 cb c7 42 e5 00 00 00 d3 9f 28 |........B......(|
+000000c0: d0 03 0a 02 04 12 1e 1b 0a 07 03 07 1b 00       |..............|
 ```
 
 ### WASM

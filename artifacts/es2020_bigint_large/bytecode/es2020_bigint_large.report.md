@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/es2020_bigint_large.ts
-**生成时间**: 2025-12-22T11:00:40.398Z
+**生成时间**: 2025-12-22T14:32:14.493Z
 
 ## 大小对比
 
-- TypeScript编译器: 183 字节
+- TypeScript编译器: 195 字节
 - WASM编译器: 195 字节
-- 差异: -12 字节 (-6.15%)
+- 差异: 0 字节 (0.00%)
 
 ## 结构分析
 
@@ -62,7 +62,7 @@
   "functionHeader": {
     "offset": 60,
     "tag": "0xc",
-    "remaining": 123
+    "remaining": 135
   }
 }
 ```
@@ -125,22 +125,8 @@
 
 ## 字节级差异
 
-共发现 14 个字节差异:
+共发现 0 个字节差异:
 
-- 偏移量 0xb5: TS=0x01 vs WASM=0x0a
-- 偏移量 0xb6: TS=0x01 vs WASM=0x05
-- 偏移量 0xb7: TS=EOF vs WASM=0x00
-- 偏移量 0xb8: TS=EOF vs WASM=0x00
-- 偏移量 0xb9: TS=EOF vs WASM=0x00
-- 偏移量 0xba: TS=EOF vs WASM=0x80
-- 偏移量 0xbb: TS=EOF vs WASM=0x00
-- 偏移量 0xbc: TS=EOF vs WASM=0x0a
-- 偏移量 0xbd: TS=EOF vs WASM=0x05
-- 偏移量 0xbe: TS=EOF vs WASM=0x01
-- 偏移量 0xbf: TS=EOF vs WASM=0x00
-- 偏移量 0xc0: TS=EOF vs WASM=0x00
-- 偏移量 0xc1: TS=EOF vs WASM=0x80
-- 偏移量 0xc2: TS=EOF vs WASM=0x00
 
 ## 十六进制转储对比
 
@@ -157,7 +143,8 @@
 00000080: 39 e4 00 00 00 24 01 00 cb 39 e6 00 00 00 43 e7 |9....$...9....C.|
 00000090: 00 00 00 39 e5 00 00 00 24 01 00 cf 28 d0 03 14 |...9....$...(...|
 000000a0: 00 00 a8 14 21 13 1b 0e 1b 0a 1b 01 17 15 1b 0e |....!...........|
-000000b0: 1b 0a 1b 01 00 01 01                            |.......|
+000000b0: 1b 0a 1b 01 00 0a 05 00 00 00 80 00 0a 05 01 00 |................|
+000000c0: 00 80 00                                        |...|
 ```
 
 ### WASM

@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/computed-property/cli/computed-property.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/computed-property/cli/computed-property.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/computed-property/cli/computed-property.pc2line.txt",
-    "bytecodeSize": 238,
+    "bytecodeSize": 240,
     "pc2lineLength": 16,
     "stackMax": 0
   },
   "bytecode": {
-    "identical": false,
-    "tsSize": 176,
+    "identical": true,
+    "tsSize": 178,
     "wasmSize": 178,
-    "sizeDiff": -2,
-    "sizeDiffPercent": -1.1235955056179776
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
   },
   "trace": {
     "differenceCount": 0,

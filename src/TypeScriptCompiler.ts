@@ -29,6 +29,7 @@ export class TypeScriptCompiler implements CompilerContext {
   public currentNode: ts.Node | null = null
   public deferredTasks: (() => void)[] = []
   public isTerminated = false
+  public expressionValueUsed = true
   public nodeScopeMap: Map<ts.Node, number[]> = new Map()
   private statementVisitor: StatementVisitor
   private expressionVisitor: ExpressionVisitor

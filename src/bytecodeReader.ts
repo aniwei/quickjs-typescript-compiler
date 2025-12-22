@@ -220,6 +220,27 @@ function readFunctionBytecode(reader: Reader, atoms: string[]): FunctionBytecode
       case BytecodeTag.TC_TAG_STRING:
         cpool.push(reader.readString())
         break
+      case BytecodeTag.TC_TAG_BIG_INT: {
+        const len = reader.readULEB128()
+        if (len === 0) {
+          cpool.push(0n)
+          break
+        }
+        const bytes = reader.readBytes(len)
+        // two's complement little-endian
+        let x = 0n
+        for (let j = 0; j < bytes.length; j++) {
+          x |= BigInt(bytes[j]) << (BigInt(j) * 8n)
+        }
+        // sign extend if negative
+        const signBit = bytes[bytes.length - 1] & 0x80
+        if (signBit !== 0) {
+          const bits = BigInt(bytes.length) * 8n
+          x -= 1n << bits
+        }
+        cpool.push(x)
+        break
+      }
       case BytecodeTag.TC_TAG_FUNCTION_BYTECODE:
         reader.ptr -= 1
         cpool.push(readFunctionBytecode(reader, atoms))

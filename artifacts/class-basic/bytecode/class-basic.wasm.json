@@ -1,0 +1,202 @@
+{
+  "version": 5,
+  "atoms": [
+    "Point",
+    "__tests__/fixtures/class-basic.js",
+    "x",
+    "y"
+  ],
+  "func": {
+    "tag": 12,
+    "flags": 1536,
+    "jsMode": 0,
+    "funcNameAtom": 82,
+    "argCount": 0,
+    "varCount": 3,
+    "definedArgCount": 0,
+    "stackSize": 3,
+    "closureVarCount": 0,
+    "cpoolCount": 1,
+    "bytecodeLen": 41,
+    "bytecode": {
+      "type": "Buffer",
+      "data": [
+        64,
+        228,
+        0,
+        0,
+        0,
+        128,
+        63,
+        228,
+        0,
+        0,
+        0,
+        130,
+        99,
+        1,
+        0,
+        6,
+        99,
+        2,
+        0,
+        193,
+        0,
+        88,
+        228,
+        0,
+        0,
+        0,
+        0,
+        6,
+        205,
+        14,
+        208,
+        107,
+        2,
+        0,
+        59,
+        228,
+        0,
+        0,
+        0,
+        199,
+        40
+      ]
+    },
+    "varDefs": [
+      {
+        "nameAtom": 83,
+        "scopeLevel": 0,
+        "scopeNextPlus1": 0,
+        "flags": 0
+      },
+      {
+        "nameAtom": 228,
+        "name": "Point",
+        "scopeLevel": 2,
+        "scopeNextPlus1": 0,
+        "flags": 48
+      },
+      {
+        "nameAtom": 120,
+        "scopeLevel": 3,
+        "scopeNextPlus1": 2,
+        "flags": 112
+      }
+    ],
+    "closureVars": [],
+    "hasDebug": true,
+    "debug": {
+      "filenameAtom": 229,
+      "filename": "__tests__/fixtures/class-basic.js",
+      "pc2line": {
+        "type": "Buffer",
+        "data": [
+          0,
+          0
+        ]
+      }
+    },
+    "cpool": [
+      {
+        "tag": 12,
+        "flags": 1858,
+        "jsMode": 1,
+        "funcNameAtom": 0,
+        "argCount": 2,
+        "varCount": 1,
+        "definedArgCount": 2,
+        "stackSize": 2,
+        "closureVarCount": 1,
+        "cpoolCount": 0,
+        "bytecodeLen": 30,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            8,
+            203,
+            43,
+            104,
+            0,
+            0,
+            17,
+            236,
+            6,
+            199,
+            27,
+            36,
+            0,
+            0,
+            14,
+            199,
+            211,
+            68,
+            230,
+            0,
+            0,
+            0,
+            199,
+            212,
+            68,
+            231,
+            0,
+            0,
+            0,
+            41
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 230,
+            "name": "x",
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          },
+          {
+            "nameAtom": 231,
+            "name": "y",
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          },
+          {
+            "nameAtom": 8,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [
+          {
+            "nameAtom": 120,
+            "varIdx": 2,
+            "flags": 13
+          }
+        ],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 229,
+          "filename": "__tests__/fixtures/class-basic.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              1,
+              4,
+              78,
+              8,
+              7,
+              18,
+              33,
+              17,
+              7,
+              18
+            ]
+          }
+        },
+        "cpool": []
+      }
+    ]
+  }
+}

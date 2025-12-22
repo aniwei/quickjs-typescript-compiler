@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-static-block/cli/class-static-block.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-static-block/cli/class-static-block.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-static-block/cli/class-static-block.pc2line.txt",
-    "bytecodeSize": 683,
+    "bytecodeSize": 672,
     "pc2lineLength": 36,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 621,
+    "tsSize": 610,
     "wasmSize": 642,
-    "sizeDiff": -21,
-    "sizeDiffPercent": -3.2710280373831773
+    "sizeDiff": -32,
+    "sizeDiffPercent": -4.984423676012461
   },
   "trace": {
     "differenceCount": 0,

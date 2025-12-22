@@ -752,13 +752,17 @@ export class ExpressionVisitor extends VisitorContext {
   private emitSimpleAssignment(node: ts.BinaryExpression): void {
     const fd = this.funcDef!
 
+    const keepResult = this.context.expressionValueUsed
+
     // 对于简单标识符赋值，直接使用 scope_put_var
     if (ts.isIdentifier(node.left)) {
       // 计算右值
       this.context.visit(node.right)
 
-      // 发射 dup 以保留赋值结果
-      this.compiler.emitOp(fd, Opcode.OP_dup)
+      // 仅在需要表达式值时保留赋值结果
+      if (keepResult) {
+        this.compiler.emitOp(fd, Opcode.OP_dup)
+      }
 
       // 发射 scope_put_var
       const name = this.compiler.addAtom(node.left.text)
@@ -776,8 +780,10 @@ export class ExpressionVisitor extends VisitorContext {
       // 计算值
       this.context.visit(node.right)
 
-      // 发射 dup 以保留赋值结果  
-      this.compiler.emitOp(fd, Opcode.OP_insert2)
+      // 仅在需要表达式值时保留赋值结果
+      if (keepResult) {
+        this.compiler.emitOp(fd, Opcode.OP_insert2)
+      }
 
       // 发射 put_field
       const name = this.compiler.addAtom(node.left.name.text)
@@ -800,8 +806,10 @@ export class ExpressionVisitor extends VisitorContext {
       // 计算值
       this.context.visit(node.right)
 
-      // 发射 dup 以保留赋值结果
-      this.compiler.emitOp(fd, Opcode.OP_insert3)
+      // 仅在需要表达式值时保留赋值结果
+      if (keepResult) {
+        this.compiler.emitOp(fd, Opcode.OP_insert3)
+      }
 
       // 发射 put_array_el
       // QuickJS: put_lvalue() 里的 OP_put_array_el 不会触发 emit_source_pos
@@ -1991,11 +1999,21 @@ export class ExpressionVisitor extends VisitorContext {
         } else if (ts.isComputedPropertyName(prop.name)) {
           // 计算属性键
           this.context.visit(prop.name.expression)
+          // QuickJS: name == JS_ATOM_NULL (computed) 时，在解析 ':' 之前必须先
+          // emit_op(OP_to_propkey)。
+          // 参见: third_party/QuickJS/src/core/parser.c: js_parse_object_literal:
+          //   if (name == JS_ATOM_NULL) emit_op(s, OP_to_propkey);
+          this.compiler.emitOp(fd, Opcode.OP_to_propkey)
           this.context.visit(prop.initializer)
           // QuickJS: computed key 路径会 emit_op(OP_to_propkey) / emit_op(OP_define_array_el)
           // 均不绑定 source 位置。
           // 参见: third_party/QuickJS/src/core/parser.c: js_parse_object_literal.
           this.compiler.emitOp(fd, Opcode.OP_define_array_el)
+          // QuickJS: computed data property 使用 OP_define_array_el 后会 drop 掉 value
+          // 以保持栈上只留下对象。
+          // 参见: third_party/QuickJS/src/core/parser.c: js_parse_object_literal:
+          //   emit_op(s, OP_define_array_el); emit_op(s, OP_drop);
+          this.compiler.emitOp(fd, Opcode.OP_drop)
         }
       } else if (ts.isShorthandPropertyAssignment(prop)) {
         // 简写属性: { x } 等价于 { x: x }

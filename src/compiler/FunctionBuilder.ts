@@ -297,6 +297,26 @@ export class FunctionBuilder {
         vd.scopeNext = fd.scopes[scope].first
       }
     }
+
+    // QuickJS: special pseudo vars (this/new.target/home_object/this_active_func/arguments/var_object)
+    // are created via add_var() which zero-inits the vardef. In practice these
+    // vars should keep scope_next = 0 in the serialized vardefs.
+    // This is required for byte-perfect output (e.g. object literal methods).
+    // Source: third_party/QuickJS/src/core/parser.c: add_var() + js_create_function() vardefs.
+    const specialVarIdxs = [
+      fd.thisVarIdx,
+      fd.newTargetVarIdx,
+      fd.homeObjectVarIdx,
+      fd.thisActiveFuncVarIdx,
+      fd.argumentsVarIdx,
+      fd.varObjectIdx,
+      fd.argVarObjectIdx,
+    ]
+    for (const varIdx of specialVarIdxs) {
+      if (varIdx >= 0 && varIdx < fd.vars.length) {
+        fd.vars[varIdx].scopeNext = 0
+      }
+    }
   }
 }
 
@@ -570,6 +590,15 @@ export class BytecodeWriter {
       this.out.putByte(BytecodeTag.TC_TAG_UNDEFINED)
     } else if (typeof val === 'boolean') {
       this.out.putByte(val ? BytecodeTag.TC_TAG_BOOL_TRUE : BytecodeTag.TC_TAG_BOOL_FALSE)
+    } else if (typeof val === 'bigint') {
+      // BigInt 常量写出：对齐 QuickJS bytecode.cpp:JS_WriteBigInt
+      // 规则：写入两补码 little-endian 表示，使用最短字节长度（可为 0 表示 0n）。
+      this.out.putByte(BytecodeTag.TC_TAG_BIG_INT)
+      const bytes = this.bigIntToTwosComplementLE(val)
+      this.out.putULEB128(bytes.length)
+      if (bytes.length > 0) {
+        this.out.put(bytes)
+      }
     } else if (typeof val === 'number') {
       if (Number.isInteger(val) && val >= -2147483648 && val <= 2147483647) {
         this.out.putByte(BytecodeTag.TC_TAG_INT32)
@@ -588,6 +617,38 @@ export class BytecodeWriter {
       // 其他类型暂不支持
       this.out.putByte(BytecodeTag.TC_TAG_NULL)
     }
+  }
+
+  /**
+   * 将 BigInt 编码为两补码 little-endian 的最短字节数组。
+   *
+   * 对齐 QuickJS JS_WriteBigInt 的“最短 two's complement bytes”语义：
+   * - 0n => len=0
+   * - 正数：最高字节最高位必须为 0
+   * - 负数：最高字节最高位必须为 1
+   */
+  private bigIntToTwosComplementLE(value: bigint): Uint8Array {
+    if (value === 0n) {
+      return new Uint8Array(0)
+    }
+
+    const out: number[] = []
+    let v = value
+    while (true) {
+      const byte = Number(v & 0xffn)
+      out.push(byte)
+      // BigInt 右移是算术移位（带符号扩展）
+      v >>= 8n
+
+      // 停止条件（标准最短 two's complement 表示）
+      // - 如果 v == 0 且当前最高字节符号位为 0，表示正数已收敛
+      // - 如果 v == -1 且当前最高字节符号位为 1，表示负数已收敛
+      if ((v === 0n && (byte & 0x80) === 0) || (v === -1n && (byte & 0x80) !== 0)) {
+        break
+      }
+    }
+
+    return Uint8Array.from(out)
   }
   
   /**

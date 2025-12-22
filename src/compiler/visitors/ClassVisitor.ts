@@ -71,6 +71,32 @@ export class ClassVisitor extends VisitorContext {
     return this.getPropertyNameAtom(name)
   }
 
+  private bodyContainsSuper(body: ts.ConciseBody | undefined): boolean {
+    if (!body) return false
+
+    let found = false
+    const root: ts.Node = body
+
+    const walk = (node: ts.Node) => {
+      if (found) return
+
+      if (node.kind === ts.SyntaxKind.SuperKeyword) {
+        found = true
+        return
+      }
+
+      // Only count super usage in the current function's body.
+      if (node !== root && (ts.isFunctionLike(node) || ts.isClassLike(node))) {
+        return
+      }
+
+      ts.forEachChild(node, walk)
+    }
+
+    walk(root)
+    return found
+  }
+
   /**
    * 访问类声明 - 对应 parser.c:js_parse_class
    * 
@@ -196,6 +222,11 @@ export class ClassVisitor extends VisitorContext {
     // 处理实例字段初始化 - 对应 parser.c:3631-3668
     const cf = classFields[0]
     if (cf.needBrand) {
+      // QuickJS: patch the placeholder push_false in <class_fields_init> to push_true
+      // so the guarded add_brand block runs.
+      if (cf.fieldsInitFd && cf.fieldsInitFd.byteCode && cf.fieldsInitFd.byteCode.size > cf.brandPushPos) {
+        cf.fieldsInitFd.byteCode.buffer[cf.brandPushPos] = Opcode.OP_push_true
+      }
       // 为原型添加私有品牌
       this.compiler.emitOp(fd, Opcode.OP_dup)
       this.compiler.emitOp(fd, Opcode.OP_null)
@@ -214,6 +245,8 @@ export class ClassVisitor extends VisitorContext {
       cf.fieldsInitFd.parentCpoolIdx = initCpoolIdx
       this.compiler.emitOp(fd, Opcode.OP_fclosure)
       this.compiler.emitU32(fd, initCpoolIdx)
+      // QuickJS: emit_class_init_end() always emits OP_set_home_object.
+      this.compiler.emitOp(fd, Opcode.OP_set_home_object)
     } else {
       this.compiler.emitOp(fd, Opcode.OP_undefined)
     }
@@ -249,6 +282,8 @@ export class ClassVisitor extends VisitorContext {
       classFields[1].fieldsInitFd.parentCpoolIdx = initCpoolIdx
       this.compiler.emitOp(fd, Opcode.OP_fclosure)
       this.compiler.emitU32(fd, initCpoolIdx)
+      // QuickJS: emit_class_init_end() always emits OP_set_home_object.
+      this.compiler.emitOp(fd, Opcode.OP_set_home_object)
       this.compiler.emitOp(fd, Opcode.OP_call_method)
       this.compiler.emitU16(fd, 0)
       this.compiler.emitOp(fd, Opcode.OP_drop)
@@ -343,7 +378,9 @@ export class ClassVisitor extends VisitorContext {
 
     // 创建构造函数 FunctionDef
     const ctorFd = new FunctionDef(fd, false, false)
-    ctorFd.funcName = JSAtom.JS_ATOM_constructor
+    // QuickJS: class constructors have a null funcName in the bytecode header
+    // (disasm prints `function: <null>`).
+    ctorFd.funcName = 0 // JS_ATOM_NULL
     ctorFd.funcType = funcType
     ctorFd.funcKind = JSFunctionKindEnum.JS_FUNC_NORMAL
     ctorFd.filename = fd.filename
@@ -417,20 +454,24 @@ export class ClassVisitor extends VisitorContext {
 
     // 创建方法 FunctionDef
     const methodFd = new FunctionDef(fd, false, false)
-    methodFd.funcName = methodName
+    // QuickJS: class methods have a null funcName in the bytecode header; the
+    // name is attached via `define_method` / `set_name`.
+    methodFd.funcName = 0 // JS_ATOM_NULL
     methodFd.funcType = funcType
     methodFd.funcKind = funcKind
     methodFd.filename = fd.filename
     methodFd.sourcePos = sourcePos
 
+    const needsHomeObject = this.bodyContainsSuper(node.body)
+
     // 方法属性
     methodFd.hasPrototype = false
-    methodFd.hasHomeObject = true
+    methodFd.hasHomeObject = needsHomeObject
     methodFd.hasArgumentsBinding = true
     methodFd.hasThisBinding = true
     methodFd.newTargetAllowed = true
     methodFd.superAllowed = true
-    methodFd.needHomeObject = true
+    methodFd.needHomeObject = needsHomeObject
 
     // 添加到父函数
     this.compiler.addChild(fd, methodFd)
@@ -504,19 +545,22 @@ export class ClassVisitor extends VisitorContext {
 
     // 创建访问器 FunctionDef
     const accessorFd = new FunctionDef(fd, false, false)
-    accessorFd.funcName = accessorName
+    // QuickJS: accessors have a null funcName in the bytecode header.
+    accessorFd.funcName = 0 // JS_ATOM_NULL
     accessorFd.funcType = funcType
     accessorFd.funcKind = JSFunctionKindEnum.JS_FUNC_NORMAL
     accessorFd.filename = fd.filename
     accessorFd.sourcePos = sourcePos
 
+    const needsHomeObject = this.bodyContainsSuper(node.body)
+
     accessorFd.hasPrototype = false
-    accessorFd.hasHomeObject = true
+    accessorFd.hasHomeObject = needsHomeObject
     accessorFd.hasArgumentsBinding = true
     accessorFd.hasThisBinding = true
     accessorFd.newTargetAllowed = true
     accessorFd.superAllowed = true
-    accessorFd.needHomeObject = true
+    accessorFd.needHomeObject = needsHomeObject
 
     this.compiler.addChild(fd, accessorFd)
 
@@ -578,7 +622,7 @@ export class ClassVisitor extends VisitorContext {
 
     // 创建字段初始化函数（如果还没有）
     if (!cf.fieldsInitFd) {
-      cf.fieldsInitFd = this.createFieldsInitFunction(fd, isStatic)
+      cf.fieldsInitFd = this.createFieldsInitFunction(fd, isStatic, cf)
     }
 
     // 切换到字段初始化函数
@@ -635,7 +679,7 @@ export class ClassVisitor extends VisitorContext {
     const cf = classFields[1] // 静态
 
     if (!cf.fieldsInitFd) {
-      cf.fieldsInitFd = this.createFieldsInitFunction(fd, true)
+      cf.fieldsInitFd = this.createFieldsInitFunction(fd, true, cf)
     }
 
     // 创建静态块函数
@@ -694,7 +738,8 @@ export class ClassVisitor extends VisitorContext {
     const hasHeritage = (classFlags & 0x01) !== 0
 
     const ctorFd = new FunctionDef(fd, false, false)
-    ctorFd.funcName = JSAtom.JS_ATOM_constructor
+    // QuickJS: default class constructors have a null funcName in the bytecode header.
+    ctorFd.funcName = 0 // JS_ATOM_NULL
     ctorFd.funcType = hasHeritage
       ? JSParseFunctionEnum.JS_PARSE_FUNC_DERIVED_CLASS_CONSTRUCTOR
       : JSParseFunctionEnum.JS_PARSE_FUNC_CLASS_CONSTRUCTOR
@@ -712,31 +757,27 @@ export class ClassVisitor extends VisitorContext {
 
     this.compiler.addChild(fd, ctorFd)
 
-    // 发射检查构造函数调用
-    this.compiler.emitOp(ctorFd, Opcode.OP_check_ctor)
+    // QuickJS default ctor: enter body scope first.
+    // Source: third_party/QuickJS/src/core/parser.c: js_parse_class_default_ctor
+    this.compiler.pushScope(ctorFd)
+    ctorFd.bodyScope = ctorFd.scopeLevel
 
     if (hasHeritage) {
-      // 派生类: super(...arguments) - 对应 parser.c:3074-3123
-      // 获取 arguments
-      this.compiler.emitOp(ctorFd, Opcode.OP_special_object)
-      this.compiler.emitU8(ctorFd, 0) // OP_SPECIAL_OBJECT_ARGUMENTS
-
-      // 调用 super
-      this.compiler.emitOp(ctorFd, Opcode.OP_get_super)
-      this.compiler.emitOp(ctorFd, Opcode.OP_swap)
-      this.compiler.emitOp(ctorFd, Opcode.OP_apply)
-      this.compiler.emitU16(ctorFd, 0x0300) // CALL_FLAG_COPY_RETURN | CALL_FLAG_CONSTRUCTOR
-      this.compiler.emitOp(ctorFd, Opcode.OP_drop)
+      // Derived: OP_init_ctor performs the super constructor call.
+      this.compiler.emitOp(ctorFd, Opcode.OP_init_ctor)
+      // Bind `this` in the constructor scope.
+      this.compiler.emitOp(ctorFd, TempOpcode.OP_scope_put_var_init)
+      this.compiler.emitAtom(ctorFd, JSAtom.JS_ATOM_this)
+      this.compiler.emitU16(ctorFd, 0)
+      // Then run class field initialization.
+      this.emitClassFieldInitInternal(ctorFd)
     } else {
-      // 非派生类: 调用字段初始化
-      // 这里简化实现，省略字段初始化调用
+      // Base: check ctor and run class field initialization.
+      this.compiler.emitOp(ctorFd, Opcode.OP_check_ctor)
+      this.emitClassFieldInitInternal(ctorFd)
     }
 
-    // return this
-    this.compiler.emitOp(ctorFd, TempOpcode.OP_scope_get_var)
-    this.compiler.emitAtom(ctorFd, JSAtom.JS_ATOM_this)
-    this.compiler.emitU16(ctorFd, 0)
-    this.compiler.emitOp(ctorFd, Opcode.OP_return)
+    this.compiler.emitReturn(ctorFd, false)
 
     const cpoolIdx = this.compiler.cpoolAdd(fd, null)
     ctorFd.parentCpoolIdx = cpoolIdx
@@ -747,11 +788,11 @@ export class ClassVisitor extends VisitorContext {
   /**
    * 创建字段初始化函数 - 对应 parser.c:emit_class_init_start
    */
-  private createFieldsInitFunction(fd: FunctionDef, isStatic: boolean): FunctionDef {
+  private createFieldsInitFunction(fd: FunctionDef, isStatic: boolean, cf?: ClassFieldsDef): FunctionDef {
     const initFd = new FunctionDef(fd, false, false)
-    initFd.funcName = isStatic 
-      ? JSAtom.JS_ATOM_static_computed_field 
-      : JSAtom.JS_ATOM_class_fields_init
+    // QuickJS: class init helper functions have a null funcName in the bytecode
+    // header; naming is provided by surrounding class opcodes.
+    initFd.funcName = 0 // JS_ATOM_NULL
     initFd.funcType = JSParseFunctionEnum.JS_PARSE_FUNC_METHOD
     initFd.funcKind = JSFunctionKindEnum.JS_FUNC_NORMAL
     initFd.filename = fd.filename
@@ -763,8 +804,31 @@ export class ClassVisitor extends VisitorContext {
 
     this.compiler.addChild(fd, initFd)
 
-    // 初始化品牌检查占位符
-    this.compiler.emitOp(initFd, Opcode.OP_push_false)
+    // QuickJS: emit_class_init_start() emits a brand-check block guarded by a
+    // push_false placeholder that can be patched to push_true when needed.
+    if (!isStatic) {
+      this.compiler.emitOp(initFd, Opcode.OP_push_false)
+      if (cf) {
+        cf.brandPushPos = initFd.lastOpcodePos
+      }
+
+      const labelAddBrand = this.compiler.newLabelInt(initFd)
+      this.compiler.emitGotoInt(initFd, Opcode.OP_if_false, labelAddBrand)
+
+      this.compiler.emitOp(initFd, TempOpcode.OP_scope_get_var)
+      this.compiler.emitAtom(initFd, JSAtom.JS_ATOM_this)
+      this.compiler.emitU16(initFd, 0)
+
+      this.compiler.emitOp(initFd, TempOpcode.OP_scope_get_var)
+      this.compiler.emitAtom(initFd, JSAtom.JS_ATOM_home_object)
+      this.compiler.emitU16(initFd, 0)
+
+      this.compiler.emitOp(initFd, Opcode.OP_add_brand)
+      this.compiler.emitLabelInt(initFd, labelAddBrand)
+    } else {
+      // Static fields init does not need the brand block.
+      this.compiler.emitOp(initFd, Opcode.OP_push_false)
+    }
     
     return initFd
   }

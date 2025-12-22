@@ -553,8 +553,29 @@ export class FunctionVisitor extends VisitorContext {
       this.emitClassFieldInit(fd)
     }
 
-    // 解析参数 - 对应 parser.c:13060-13170
+    // 解析参数 - 对应 parser.c:13060-13289
+    // QuickJS: 如果形参列表里出现 '='，则认为存在 parameter expressions，
+    // 会创建一个无父作用域的 argument scope，并在其中用 let 方式定义形参变量。
+    // Source: third_party/QuickJS/src/core/parser.c:13098-13133
+    fd.hasParameterExpressions = parameters.some((p) => !!p.initializer)
+    if (fd.hasParameterExpressions) {
+      // force no parent scope (scope parent = -1)
+      fd.scopeLevel = -1
+      fd.scopeFirst = -1
+      this.compiler.pushScope(fd) // enter argument scope (ARG_SCOPE_INDEX)
+    }
+
     this.compileParameters(fd, parameters)
+
+    if (fd.hasParameterExpressions) {
+      // QuickJS: argument scope has no parent, so it doesn't use pop_scope()
+      // Source: third_party/QuickJS/src/core/parser.c:13220-13228
+      const scope = fd.scopeLevel
+      this.compiler.emitOp(fd, TempOpcode.OP_leave_scope)
+      this.compiler.emitU16(fd, scope)
+      fd.scopeLevel = 0
+      fd.scopeFirst = this.compiler.getFirstLexicalVar(fd, fd.scopeLevel)
+    }
 
     // 生成器函数的 initial_yield - 对应 parser.c:13275-13276
     if (fd.funcKind === JSFunctionKindEnum.JS_FUNC_GENERATOR ||
@@ -596,8 +617,23 @@ export class FunctionVisitor extends VisitorContext {
     const prevFd = this.funcDef
     this.context.funcDef = fd
 
-    // 解析参数
+    // 解析参数 (同 compileFunctionBody 的 argument scope 行为)
+    fd.hasParameterExpressions = parameters.some((p) => !!p.initializer)
+    if (fd.hasParameterExpressions) {
+      fd.scopeLevel = -1
+      fd.scopeFirst = -1
+      this.compiler.pushScope(fd)
+    }
+
     this.compileParameters(fd, parameters)
+
+    if (fd.hasParameterExpressions) {
+      const scope = fd.scopeLevel
+      this.compiler.emitOp(fd, TempOpcode.OP_leave_scope)
+      this.compiler.emitU16(fd, scope)
+      fd.scopeLevel = 0
+      fd.scopeFirst = this.compiler.getFirstLexicalVar(fd, fd.scopeLevel)
+    }
 
     // 进入函数体
     fd.inFunctionBody = true
@@ -659,16 +695,35 @@ export class FunctionVisitor extends VisitorContext {
       // 简单标识符参数
       if (ts.isIdentifier(param.name)) {
         const nameAtom = this.compiler.addAtom(param.name.text)
+
+        // QuickJS: when has_parameter_expressions, define the parameter as a let
+        // binding in the argument scope before allocating the argument slot.
+        // Source: third_party/QuickJS/src/core/parser.c:13112-13123
+        if (fd.hasParameterExpressions) {
+          this.compiler.defineVar(fd, nameAtom, JSVarDefEnum.JS_VAR_DEF_LET)
+        }
+
         const idx = this.compiler.addArg(fd, nameAtom)
 
         // 检查默认值 - 对应 parser.c:13134-13164
         if (param.initializer) {
           fd.hasSimpleParameterList = false
           hasOptArg = true
-          this.compileParameterDefaultValue(fd, param, idx)
+          this.compileParameterDefaultValue(fd, param, idx, nameAtom)
         } else {
           if (!hasOptArg) {
             fd.definedArgCount++
+          }
+
+          // QuickJS: when has_parameter_expressions, copy the argument to the
+          // argument scope binding.
+          // Source: third_party/QuickJS/src/core/parser.c:13164-13172
+          if (fd.hasParameterExpressions) {
+            this.compiler.emitOp(fd, Opcode.OP_get_arg)
+            this.compiler.emitU16(fd, idx)
+            this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
+            this.compiler.emitAtom(fd, nameAtom)
+            this.compiler.emitU16(fd, fd.scopeLevel)
           }
         }
       }
@@ -690,6 +745,16 @@ export class FunctionVisitor extends VisitorContext {
     this.compiler.emitOp(fd, Opcode.OP_rest)
     this.compiler.emitU16(fd, idx)
 
+    // QuickJS: when has_parameter_expressions, also init the argument scope
+    // binding with the rest array value.
+    // Source: third_party/QuickJS/src/core/parser.c:13127-13133
+    if (fd.hasParameterExpressions) {
+      this.compiler.emitOp(fd, Opcode.OP_dup)
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
+      this.compiler.emitAtom(fd, nameAtom)
+      this.compiler.emitU16(fd, fd.scopeLevel)
+    }
+
     // 存储到参数位置
     this.compiler.emitOp(fd, Opcode.OP_put_arg)
     this.compiler.emitU16(fd, idx)
@@ -708,6 +773,7 @@ export class FunctionVisitor extends VisitorContext {
     fd: FunctionDef,
     param: ts.ParameterDeclaration,
     idx: number
+    ,nameAtom: number
   ): void {
     if (!param.initializer) return
 
@@ -717,10 +783,10 @@ export class FunctionVisitor extends VisitorContext {
     this.compiler.emitOp(fd, Opcode.OP_get_arg)
     this.compiler.emitU16(fd, idx)
 
-    // 复制并检查是否为 undefined - 对应 parser.c:13145-13148
+    // QuickJS optimize: undefined strict_eq -> is_undefined
+    // Source: third_party/QuickJS/src/core/parser.c:11670-11677
     this.compiler.emitOp(fd, Opcode.OP_dup)
-    this.compiler.emitOp(fd, Opcode.OP_undefined)
-    this.compiler.emitOp(fd, Opcode.OP_strict_eq)
+    this.compiler.emitOp(fd, Opcode.OP_is_undefined)
 
     // 如果不是 undefined，跳过默认值
     this.compiler.emitGotoInt(fd, Opcode.OP_if_false, label)
@@ -731,13 +797,23 @@ export class FunctionVisitor extends VisitorContext {
     // 编译默认值表达式
     this.context.visit(param.initializer)
 
-    // 复制并存回参数 - 对应 parser.c:13155-13158
+    // Emit in the same pre-optimization shape as QuickJS:
+    //   dup; put_arg
+    // LabelResolver will fold it to set_arg0..set_arg3 when possible.
     this.compiler.emitOp(fd, Opcode.OP_dup)
     this.compiler.emitOp(fd, Opcode.OP_put_arg)
     this.compiler.emitU16(fd, idx)
 
     // 标签: 跳过默认值
     this.compiler.emitLabelInt(fd, label)
+
+    // When has_parameter_expressions, init the argument scope binding.
+    // This resolves to put_loc* after resolve_variables.
+    if (fd.hasParameterExpressions) {
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
+      this.compiler.emitAtom(fd, nameAtom)
+      this.compiler.emitU16(fd, fd.scopeLevel)
+    }
   }
 
   /**

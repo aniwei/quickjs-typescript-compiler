@@ -222,6 +222,19 @@ export class LabelResolver {
           break
         }
 
+        // === set_name: remove dummy set_name ===
+        // QuickJS parser.c:10756-10764 removes OP_set_name when atom == JS_ATOM_NULL.
+        case Opcode.OP_set_name: {
+          const atom = this.getU32(bcBuf, pos + 1)
+          if (OPTIMIZE && atom === 0) {
+            break
+          }
+          this.addPc2lineInfo(fd, bcOut.size, lineNum)
+          bcOut.putU8(op)
+          bcOut.putU32(atom)
+          break
+        }
+
         // === 行号信息 ===
         case TempOpcode.OP_line_num:
           lineNum = this.getU32(bcBuf, pos + 1)
@@ -726,6 +739,9 @@ export class LabelResolver {
       this.optimizeShortJumps(fd, bcOut)
     }
     
+    // Match a small QuickJS optimizer peephole used by class fields init helpers.
+    this.optimizeConstFalseBrandGuard(bcOut)
+
     // === 计算 pc2line 信息 ===
     this.computePc2lineInfo(fd)
     
@@ -822,6 +838,48 @@ export class LabelResolver {
       bcOut.putU8(Opcode.OP_special_object)
       bcOut.putU8(OP_SPECIAL_OBJECT_VAR_OBJECT)
       this.putShortCode(bcOut, Opcode.OP_put_loc, fd.argVarObjectIdx)
+    }
+  }
+
+  /**
+   * Minimal peephole to match QuickJS optimizer for class fields init helper.
+   *
+   * QuickJS emits a guarded add_brand block in <class_fields_init> starting with
+   * `push_false; if_false ...` and then folds the constant-false branch into an
+   * unconditional `goto8 0`, removing the dead add_brand ops.
+   */
+  private optimizeConstFalseBrandGuard(bcOut: BytecodeBuilder): void {
+    const buf = bcOut.buffer
+    const size = bcOut.size
+
+    // Pattern length: 1 + 2 + 1 + 1 + 1 = 6 bytes
+    for (let pc = 0; pc + 6 <= size; pc++) {
+      if (
+        buf[pc] === Opcode.OP_push_false &&
+        buf[pc + 1] === Opcode.OP_if_false8 &&
+        buf[pc + 3] === Opcode.OP_get_loc0 &&
+        buf[pc + 4] === Opcode.OP_get_loc1 &&
+        buf[pc + 5] === Opcode.OP_add_brand
+      ) {
+        // Replace with `goto8 0` and delete the 4 extra bytes.
+        const out = new Uint8Array(size - 4)
+        let outPos = 0
+
+        out.set(buf.subarray(0, pc), outPos)
+        outPos += pc
+
+        out[outPos++] = Opcode.OP_goto8
+        // QuickJS short jump targets are relative to (pos + 1).
+        // To jump to the next instruction, diff must be 1.
+        out[outPos++] = 1
+
+        out.set(buf.subarray(pc + 6, size), outPos)
+
+        bcOut.buffer = out
+        bcOut.size = out.length
+        bcOut.allocatedSize = out.length
+        return
+      }
     }
   }
 

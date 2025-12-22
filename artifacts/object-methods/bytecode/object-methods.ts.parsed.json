@@ -1,0 +1,195 @@
+{
+  "version": 5,
+  "atoms": [
+    "obj",
+    "x",
+    "console",
+    "log",
+    "__tests__/fixtures/object-methods.js",
+    "y"
+  ],
+  "func": {
+    "tag": 12,
+    "flags": 1536,
+    "jsMode": 0,
+    "funcNameAtom": 82,
+    "argCount": 0,
+    "varCount": 1,
+    "definedArgCount": 0,
+    "stackSize": 5,
+    "closureVarCount": 0,
+    "cpoolCount": 1,
+    "bytecodeLen": 61,
+    "bytecode": {
+      "type": "Buffer",
+      "data": [
+        64,
+        228,
+        0,
+        0,
+        0,
+        128,
+        63,
+        228,
+        0,
+        0,
+        0,
+        128,
+        11,
+        184,
+        78,
+        229,
+        0,
+        0,
+        0,
+        194,
+        0,
+        86,
+        106,
+        0,
+        0,
+        0,
+        4,
+        59,
+        228,
+        0,
+        0,
+        0,
+        57,
+        230,
+        0,
+        0,
+        0,
+        67,
+        231,
+        0,
+        0,
+        0,
+        57,
+        228,
+        0,
+        0,
+        0,
+        67,
+        106,
+        0,
+        0,
+        0,
+        185,
+        36,
+        1,
+        0,
+        36,
+        1,
+        0,
+        207,
+        40
+      ]
+    },
+    "varDefs": [
+      {
+        "nameAtom": 83,
+        "scopeLevel": 0,
+        "scopeNextPlus1": 0,
+        "flags": 0
+      }
+    ],
+    "closureVars": [],
+    "hasDebug": true,
+    "debug": {
+      "filenameAtom": 232,
+      "filename": "__tests__/fixtures/object-methods.js",
+      "pc2line": {
+        "type": "Buffer",
+        "data": [
+          0,
+          0,
+          0,
+          32,
+          12,
+          0,
+          27,
+          14,
+          27,
+          10,
+          27,
+          6,
+          32,
+          8,
+          17,
+          15
+        ]
+      }
+    },
+    "cpool": [
+      {
+        "tag": 12,
+        "flags": 1858,
+        "jsMode": 0,
+        "funcNameAtom": 0,
+        "argCount": 1,
+        "varCount": 1,
+        "definedArgCount": 1,
+        "stackSize": 2,
+        "closureVarCount": 0,
+        "cpoolCount": 0,
+        "bytecodeLen": 11,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            8,
+            203,
+            199,
+            66,
+            229,
+            0,
+            0,
+            0,
+            211,
+            159,
+            40
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 233,
+            "name": "y",
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          },
+          {
+            "nameAtom": 8,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 0,
+            "flags": 0
+          }
+        ],
+        "closureVars": [],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 232,
+          "filename": "__tests__/fixtures/object-methods.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              2,
+              4,
+              13,
+              22,
+              7,
+              8,
+              27,
+              10,
+              7,
+              3,
+              7,
+              27
+            ]
+          }
+        },
+        "cpool": []
+      }
+    ]
+  }
+}
