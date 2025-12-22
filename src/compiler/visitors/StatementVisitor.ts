@@ -1154,17 +1154,28 @@ export class StatementVisitor extends VisitorContext {
     this.compiler.emitSourcePos(fd, sourcePos)
 
     // 编译表达式
-    // QuickJS: 对于一些“语句级”表达式（尤其是简单赋值），会以不保留结果的模式编译，
+    // QuickJS: 对于一些“语句级”表达式（尤其是各种赋值），会以不保留结果的模式编译，
     // 因此不会在语句末尾再发射 OP_drop。
-    // 我们在非 eval 模式下对顶层简单赋值做同样处理，以对齐 class-* 等 fixture。
+    // 我们在非 eval 模式下对顶层赋值语句做同样处理，以对齐 class-* 等 fixture。
     const expr = node.expression
-    const isTopLevelSimpleAssign =
+    const op = ts.isBinaryExpression(expr) ? expr.operatorToken.kind : -1
+    const isAssignmentOp =
+      op === ts.SyntaxKind.EqualsToken ||
+      (op >= ts.SyntaxKind.PlusEqualsToken && op <= ts.SyntaxKind.CaretEqualsToken) ||
+      op === ts.SyntaxKind.AmpersandAmpersandEqualsToken ||
+      op === ts.SyntaxKind.BarBarEqualsToken ||
+      op === ts.SyntaxKind.QuestionQuestionEqualsToken
+
+    const isSimpleEqualsAssignmentOp = op === ts.SyntaxKind.EqualsToken
+
+    const isTopLevelAssignmentStmt =
       fd.evalRetIdx < 0 &&
       ts.isBinaryExpression(expr) &&
-      expr.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+      isAssignmentOp &&
+      isSimpleEqualsAssignmentOp &&
       (ts.isIdentifier(expr.left) || ts.isPropertyAccessExpression(expr.left) || ts.isElementAccessExpression(expr.left))
 
-    if (isTopLevelSimpleAssign) {
+    if (isTopLevelAssignmentStmt) {
       const prev = this.context.expressionValueUsed
       this.context.expressionValueUsed = false
       this.context.visit(expr)

@@ -23,6 +23,8 @@ interface StackSizeState {
   stackLenMax: number
   stackLevelTab: Uint16Array   // 每个 PC 位置的栈大小
   catchPosTab: Int32Array      // 每个 PC 位置的 catch 位置
+  fromPosTab: Int32Array       // 记录首次到达该 PC 的来源 PC（诊断用）
+  fromOpTab: Uint8Array        // 记录首次到达该 PC 的来源 opcode（诊断用）
   pcStack: number[]            // 待探索的 PC 栈
 }
 
@@ -69,11 +71,13 @@ export class StackSizeComputer {
       stackLenMax: 0,
       stackLevelTab: new Uint16Array(bcLen).fill(0xffff),
       catchPosTab: new Int32Array(bcLen).fill(-1),
+      fromPosTab: new Int32Array(bcLen).fill(-1),
+      fromOpTab: new Uint8Array(bcLen).fill(0),
       pcStack: [],
     }
     
     // 广度优先探索
-    if (!this.ssCheck(s, 0, Opcode.OP_invalid, 0, -1)) {
+    if (!this.ssCheck(s, 0, -1, Opcode.OP_invalid, 0, -1)) {
       return -1
     }
     
@@ -142,7 +146,7 @@ export class StackSizeComputer {
         case Opcode.OP_goto: {
           const diff = this.getI32(bcBuf, pos + 1)
           const target = pos + 1 + diff
-          if (!this.ssCheck(s, target, op, newStackLen, catchPos)) {
+          if (!this.ssCheck(s, target, pos, op, newStackLen, catchPos)) {
             return -1
           }
           continue
@@ -152,7 +156,7 @@ export class StackSizeComputer {
         case Opcode.OP_goto16: {
           const diff = this.getI16(bcBuf, pos + 1)
           const target = pos + 1 + diff
-          if (!this.ssCheck(s, target, op, newStackLen, catchPos)) {
+          if (!this.ssCheck(s, target, pos, op, newStackLen, catchPos)) {
             return -1
           }
           continue
@@ -162,7 +166,7 @@ export class StackSizeComputer {
         case Opcode.OP_goto8: {
           const diff = this.getI8(bcBuf, pos + 1)
           const target = pos + 1 + diff
-          if (!this.ssCheck(s, target, op, newStackLen, catchPos)) {
+          if (!this.ssCheck(s, target, pos, op, newStackLen, catchPos)) {
             return -1
           }
           continue
@@ -173,7 +177,7 @@ export class StackSizeComputer {
         case Opcode.OP_if_false8: {
           const diff = this.getI8(bcBuf, pos + 1)
           const target = pos + 1 + diff
-          if (!this.ssCheck(s, target, op, newStackLen, catchPos)) {
+          if (!this.ssCheck(s, target, pos, op, newStackLen, catchPos)) {
             return -1
           }
           break
@@ -184,7 +188,7 @@ export class StackSizeComputer {
         case Opcode.OP_if_false: {
           const diff = this.getI32(bcBuf, pos + 1)
           const target = pos + 1 + diff
-          if (!this.ssCheck(s, target, op, newStackLen, catchPos)) {
+          if (!this.ssCheck(s, target, pos, op, newStackLen, catchPos)) {
             return -1
           }
           break
@@ -195,7 +199,7 @@ export class StackSizeComputer {
           const diff = this.getI32(bcBuf, pos + 1)
           const target = pos + 1 + diff
           // gosub 会在栈上压入返回地址
-          if (!this.ssCheck(s, target, op, newStackLen + 1, catchPos)) {
+          if (!this.ssCheck(s, target, pos, op, newStackLen + 1, catchPos)) {
             return -1
           }
           break
@@ -206,7 +210,7 @@ export class StackSizeComputer {
         case Opcode.OP_with_delete_var: {
           const diff = this.getI32(bcBuf, pos + 5)
           const target = pos + 5 + diff
-          if (!this.ssCheck(s, target, op, newStackLen + 1, catchPos)) {
+          if (!this.ssCheck(s, target, pos, op, newStackLen + 1, catchPos)) {
             return -1
           }
           break
@@ -216,7 +220,7 @@ export class StackSizeComputer {
         case Opcode.OP_with_get_ref: {
           const diff = this.getI32(bcBuf, pos + 5)
           const target = pos + 5 + diff
-          if (!this.ssCheck(s, target, op, newStackLen + 2, catchPos)) {
+          if (!this.ssCheck(s, target, pos, op, newStackLen + 2, catchPos)) {
             return -1
           }
           break
@@ -225,7 +229,7 @@ export class StackSizeComputer {
         case Opcode.OP_with_put_var: {
           const diff = this.getI32(bcBuf, pos + 5)
           const target = pos + 5 + diff
-          if (!this.ssCheck(s, target, op, newStackLen - 1, catchPos)) {
+          if (!this.ssCheck(s, target, pos, op, newStackLen - 1, catchPos)) {
             return -1
           }
           break
@@ -235,7 +239,7 @@ export class StackSizeComputer {
         case Opcode.OP_catch: {
           const diff = this.getI32(bcBuf, pos + 1)
           const target = pos + 1 + diff
-          if (!this.ssCheck(s, target, op, newStackLen, catchPos)) {
+          if (!this.ssCheck(s, target, pos, op, newStackLen, catchPos)) {
             return -1
           }
           catchPos = pos
@@ -295,7 +299,7 @@ export class StackSizeComputer {
       }
       
       // 检查下一条指令
-      if (!this.ssCheck(s, posNext, op, newStackLen, catchPos)) {
+      if (!this.ssCheck(s, posNext, pos, op, newStackLen, catchPos)) {
         return -1
       }
     }
@@ -314,6 +318,7 @@ export class StackSizeComputer {
   private ssCheck(
     s: StackSizeState,
     pos: number,
+    fromPos: number,
     op: number,
     stackLen: number,
     catchPos: number
@@ -332,8 +337,10 @@ export class StackSizeComputer {
     if (s.stackLevelTab[pos] !== 0xffff) {
       // 已探索: 检查一致性
       if (s.stackLevelTab[pos] !== stackLen) {
+        const prevFromPos = s.fromPosTab[pos]
+        const prevFromOp = s.fromOpTab[pos]
         throw new Error(
-          `Inconsistent stack size: ${s.stackLevelTab[pos]} vs ${stackLen} (pc=${pos})`
+          `Inconsistent stack size: ${s.stackLevelTab[pos]} vs ${stackLen} (pc=${pos}, prev_from_pc=${prevFromPos}, prev_from_op=${prevFromOp}, new_from_pc=${fromPos}, new_from_op=${op})`
         )
       }
       if (s.catchPosTab[pos] !== catchPos) {
@@ -347,6 +354,8 @@ export class StackSizeComputer {
     // 标记为已探索
     s.stackLevelTab[pos] = stackLen
     s.catchPosTab[pos] = catchPos
+    s.fromPosTab[pos] = fromPos
+    s.fromOpTab[pos] = op & 0xff
     
     // 加入探索队列
     s.pcStack.push(pos)

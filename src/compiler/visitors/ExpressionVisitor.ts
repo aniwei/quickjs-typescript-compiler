@@ -32,6 +32,42 @@ export class ExpressionVisitor extends VisitorContext {
     super(context)
   }
 
+  /**
+   * Derived class constructor: after `super()` returns, QuickJS initializes the
+   * lexical `this` binding and runs `<class_fields_init>`.
+   *
+   * This also ensures the constructor captures `class_fields_init` as a closure
+   * variable when needed.
+   */
+  private emitDerivedCtorPostSuperInit(fd: FunctionDef): void {
+    // Keep the `super()` return value on stack as the call expression result.
+    this.compiler.emitOp(fd, Opcode.OP_dup)
+
+    // Initialize `this` (lexical, uninitialized until first super()).
+    this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
+    this.compiler.emitAtom(fd, JSAtom.JS_ATOM_this)
+    this.compiler.emitU16(fd, 0)
+
+    // Call `<class_fields_init>` if present.
+    this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var)
+    this.compiler.emitAtom(fd, JSAtom.JS_ATOM_class_fields_init)
+    this.compiler.emitU16(fd, fd.scopeLevel)
+
+    this.compiler.emitOp(fd, Opcode.OP_dup)
+    const labelNext = this.compiler.newLabelInt(fd)
+    this.compiler.emitGotoInt(fd, Opcode.OP_if_false, labelNext)
+
+    this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var)
+    this.compiler.emitAtom(fd, JSAtom.JS_ATOM_this)
+    this.compiler.emitU16(fd, 0)
+    this.compiler.emitOp(fd, Opcode.OP_swap)
+    this.compiler.emitOp(fd, Opcode.OP_call_method)
+    this.compiler.emitU16(fd, 0)
+
+    this.compiler.emitLabelInt(fd, labelNext)
+    this.compiler.emitOp(fd, Opcode.OP_drop)
+  }
+
   // ============================================================================
   // 复合赋值操作码映射 - 对应 parser.c:6200-6212 assign_opcodes
   // ============================================================================
@@ -777,6 +813,25 @@ export class ExpressionVisitor extends VisitorContext {
       // 计算对象
       this.context.visit(node.left.expression)
 
+      // QuickJS: for property lvalues, member access emits source position at the '.' token
+      // (op_token_ptr) and then get_lvalue() can truncate OP_get_field while keeping the
+      // OP_line_num. That OP_line_num ends up anchoring the first RHS opcode in pc2line.
+      // Mirror that by emitting the '.' sourcePos between object evaluation and RHS.
+      const sf = node.left.getSourceFile()
+      const text = sf.text
+      const exprEnd = node.left.expression.getEnd()
+      const nameStart = node.left.name.getStart(sf)
+      let dotPos = -1
+      for (let i = nameStart - 1; i >= exprEnd; i--) {
+        if (text.charCodeAt(i) === 0x2e /* '.' */) {
+          dotPos = i
+          break
+        }
+      }
+      if (dotPos >= 0) {
+        this.compiler.emitSourcePos(fd, dotPos)
+      }
+
       // 计算值
       this.context.visit(node.right)
 
@@ -836,7 +891,15 @@ export class ExpressionVisitor extends VisitorContext {
    */
   private emitCompoundAssignment(node: ts.BinaryExpression): void {
     const fd = this.funcDef!
-    const sourcePos = node.operatorToken.getStart()
+    // QuickJS pc2line anchors compound assignments to the operator token.
+    // For tokens like "+=", QuickJS uses the token start (the "+"), not the trailing "=".
+    const sf = node.getSourceFile()
+    const sourcePos = Math.max(0, node.operatorToken.getStart(sf))
+
+    // QuickJS distinguishes whether the assignment expression value is used.
+    // When the value is not used (expression statement), it does not preserve the
+    // computed value on the stack (no insert2/insert3 pattern).
+    const keepResult = this.context.expressionValueUsed
 
     // 获取复合运算的操作码
     const opcode = this.getCompoundOpcode(node.operatorToken.kind)
@@ -915,7 +978,7 @@ export class ExpressionVisitor extends VisitorContext {
       this.context.visit(node.left.expression)
       
       // OP_get_field2: 栈 [obj] -> [obj value]
-      this.compiler.emitOp(fd, Opcode.OP_get_field2)
+      this.compiler.emitOp(fd, Opcode.OP_get_field2, sourcePos)
       this.compiler.emitU32(fd, name)
       this.compiler.emitIc(fd, name)
       
@@ -924,11 +987,15 @@ export class ExpressionVisitor extends VisitorContext {
       
       // 执行运算: 栈 [obj value rightVal] -> [obj newValue]
       this.compiler.emitOp(fd, opcode, sourcePos)
-      
-      // OP_insert2: 栈 [obj newValue] -> [newValue obj newValue]
-      this.compiler.emitOp(fd, Opcode.OP_insert2)
-      
-      // OP_put_field: 栈 [newValue obj newValue] -> [newValue]
+
+      if (keepResult) {
+        // OP_insert2: 栈 [obj newValue] -> [newValue obj newValue]
+        this.compiler.emitOp(fd, Opcode.OP_insert2)
+      }
+
+      // OP_put_field:
+      // - keepResult=true:  栈 [newValue obj newValue] -> [newValue]
+      // - keepResult=false: 栈 [obj newValue] -> []
       this.compiler.emitOp(fd, Opcode.OP_put_field)
       this.compiler.emitU32(fd, name)
       this.compiler.emitIc(fd, name)
@@ -943,18 +1010,22 @@ export class ExpressionVisitor extends VisitorContext {
       this.context.visit(node.left.argumentExpression)
       
       // OP_get_array_el2: 栈 [obj idx] -> [obj idx value]
-      this.compiler.emitOp(fd, Opcode.OP_get_array_el2)
+      this.compiler.emitOp(fd, Opcode.OP_get_array_el2, sourcePos)
       
       // 计算右值: 栈 [obj idx value] -> [obj idx value rightVal]
       this.context.visit(node.right)
       
       // 执行运算: 栈 [obj idx value rightVal] -> [obj idx newValue]
       this.compiler.emitOp(fd, opcode, sourcePos)
-      
-      // OP_insert3: 栈 [obj idx newValue] -> [newValue obj idx newValue]
-      this.compiler.emitOp(fd, Opcode.OP_insert3)
-      
-      // OP_put_array_el: 栈 [newValue obj idx newValue] -> [newValue]
+
+      if (keepResult) {
+        // OP_insert3: 栈 [obj idx newValue] -> [newValue obj idx newValue]
+        this.compiler.emitOp(fd, Opcode.OP_insert3)
+      }
+
+      // OP_put_array_el:
+      // - keepResult=true:  栈 [newValue obj idx newValue] -> [newValue]
+      // - keepResult=false: 栈 [obj idx newValue] -> []
       this.compiler.emitOp(fd, Opcode.OP_put_array_el)
       return
     }
@@ -1447,25 +1518,42 @@ export class ExpressionVisitor extends VisitorContext {
       // 检查是否是 super.method() 调用
       if (node.expression.expression.kind === ts.SyntaxKind.SuperKeyword) {
         // super.method() 调用
-        // 发射: get_var(this), get_var(home_object), get_super, get_field2
+        // QuickJS emits: get_var(this), get_var(home_object), get_super,
+        // push_atom_value(name), get_array_el
+        // leaving [this, func] on the stack for OP_call_method.
         this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var)
         this.compiler.emitAtom(fd, JSAtom.JS_ATOM_this)
         this.compiler.emitU16(fd, 0)
-        
+
         this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var)
         this.compiler.emitAtom(fd, JSAtom.JS_ATOM_home_object)
         this.compiler.emitU16(fd, 0)
-        
+
         this.compiler.emitOp(fd, Opcode.OP_get_super)
-        
-        // 使用 get_field2 获取方法并保留 this
+
         const methodName = this.compiler.addAtom(node.expression.name.text)
-        // QuickJS: 属性访问/方法调用的字节码发射在 js_parse_call/js_parse_postfix_expr
-        // (parser.c:5128-5380 / 5393-5432)。
-        // 成员访问的 source-pos 更接近 '.'；TS AST 没有 dot 节点，这里用 objExpr.getEnd() 近似。
-        this.compiler.emitOp(fd, Opcode.OP_get_field2, node.expression.expression.getEnd())
+
+        // QuickJS emits a source position at the '.' token for `super.prop`.
+        // In the reference bytecode, this anchors to the OP_push_atom_value
+        // (pc=8 in `Dog.speak`). Mirror that by attaching the dot sourcePos
+        // to OP_push_atom_value rather than OP_get_array_el.
+        const sf = node.getSourceFile()
+        const text = sf.text
+        const exprEnd = node.expression.expression.getEnd()
+        const nameStart = node.expression.name.getStart(sf)
+        let dotPos = -1
+        for (let i = nameStart - 1; i >= exprEnd; i--) {
+          if (text.charCodeAt(i) === 0x2e /* '.' */) {
+            dotPos = i
+            break
+          }
+        }
+
+        this.compiler.emitOp(fd, Opcode.OP_push_atom_value, dotPos)
         this.compiler.emitAtom(fd, methodName)
-        this.compiler.emitIc(fd, methodName)
+
+        // QuickJS does not anchor OP_get_array_el itself for `super.prop`.
+        this.compiler.emitOp(fd, Opcode.OP_get_array_el)
         isMethodCall = true
       } else {
         // 普通方法调用: obj.method()
@@ -1527,6 +1615,12 @@ export class ExpressionVisitor extends VisitorContext {
       // super() 调用使用 OP_call_constructor
       this.compiler.emitOp(fd, Opcode.OP_call_constructor, callSourcePos)
       this.compiler.emitU16(fd, argCount)
+
+      // QuickJS: in derived class constructors, `super()` initializes `this`
+      // and triggers class field initialization right after the call.
+      if (fd.isDerivedClassConstructor) {
+        this.emitDerivedCtorPostSuperInit(fd)
+      }
     } else if (isMethodCall) {
       this.compiler.emitOp(fd, Opcode.OP_call_method, callSourcePos)
       this.compiler.emitU16(fd, argCount)
@@ -1678,16 +1772,12 @@ export class ExpressionVisitor extends VisitorContext {
       const anyP: any = p as any
       const isOptionalByToken = anyP.questionDotToken != null
 
-      // Note: TypeScript AST in this workspace represents optional chaining using
-      // the normal SyntaxKind.*Expression nodes plus `questionDotToken`.
+      // Note: this repo targets a TypeScript build where optional chaining is
+      // represented via normal *Expression nodes + `questionDotToken`.
+      // Avoid relying on newer SyntaxKind.*Chain enums.
       const isChainParent =
-        p.kind === ts.SyntaxKind.PropertyAccessChain ||
-        p.kind === ts.SyntaxKind.ElementAccessChain ||
-        p.kind === ts.SyntaxKind.CallChain ||
-        ((p.kind === ts.SyntaxKind.PropertyAccessExpression ||
-          p.kind === ts.SyntaxKind.ElementAccessExpression ||
-          p.kind === ts.SyntaxKind.CallExpression) &&
-          isOptionalByToken)
+        (ts.isPropertyAccessExpression(p) || ts.isElementAccessExpression(p) || ts.isCallExpression(p)) &&
+        isOptionalByToken
 
       // In TS AST, chained nodes nest via `.expression`.
       if (isChainParent && (p as any).expression === cur) {
@@ -1811,7 +1901,7 @@ export class ExpressionVisitor extends VisitorContext {
 
     // Mirror QuickJS js_parse_postfix_expr() call-site logic: determine how many stack values
     // must be dropped when the callee is nullish.
-    if (expr.kind === ts.SyntaxKind.PropertyAccessExpression || expr.kind === ts.SyntaxKind.PropertyAccessChain) {
+    if (ts.isPropertyAccessExpression(expr)) {
       // obj?.prop?.(args)
       this.context.visit(expr.expression)
       const methodName = this.compiler.addAtom(expr.name.text)
@@ -1820,7 +1910,7 @@ export class ExpressionVisitor extends VisitorContext {
       this.compiler.emitIc(fd, methodName)
       isMethodCall = true
       dropCount = 2
-    } else if (expr.kind === ts.SyntaxKind.ElementAccessExpression || expr.kind === ts.SyntaxKind.ElementAccessChain) {
+    } else if (ts.isElementAccessExpression(expr)) {
       // obj?.[key]?.(args)
       this.context.visit(expr.expression)
       this.context.visit(expr.argumentExpression)

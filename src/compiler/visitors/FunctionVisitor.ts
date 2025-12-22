@@ -306,6 +306,9 @@ export class FunctionVisitor extends VisitorContext {
     const sourcePos = node.getStart()
 
     const isObjectLiteralMethod = ts.isObjectLiteralExpression(node.parent)
+    // NOTE: In the TS AST, class methods have parent = ClassDeclaration/ClassExpression.
+    // Using explicit checks avoids version-dependent helpers like ts.isClassLike.
+    const isClassMethod = ts.isClassDeclaration(node.parent) || ts.isClassExpression(node.parent)
 
     // 确定函数类型
     let funcType = JSParseFunctionEnum.JS_PARSE_FUNC_METHOD
@@ -355,9 +358,10 @@ export class FunctionVisitor extends VisitorContext {
     this.compiler.emitOp(parentFd, Opcode.OP_fclosure, isObjectLiteralMethod ? undefined : sourcePos)
     this.compiler.emitU32(parentFd, cpoolIdx)
 
-    // 对于需要 home object 的方法，发射 OP_set_home_object
-    // QuickJS: 对象字面量方法的 home object 由 define_method 处理，这里不需要显式 set_home_object。
-    if (fd.needHomeObject && !isObjectLiteralMethod) {
+    // 对于需要 home object 的方法：
+    // - QuickJS 的 class method 由 define_method 路径处理 home object（不单独发 OP_set_home_object）。
+    // - 对象字面量方法同样不需要这里显式 set_home_object。
+    if (fd.needHomeObject && !isObjectLiteralMethod && !isClassMethod) {
       this.compiler.emitOp(parentFd, Opcode.OP_set_home_object)
     }
   }

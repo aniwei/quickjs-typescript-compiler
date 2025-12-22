@@ -3,7 +3,6 @@
   "input": "__tests__/fixtures/class-inheritance.ts",
   "tags": [
     "debug",
-    "func-meta",
     "scope",
     "semantics"
   ],

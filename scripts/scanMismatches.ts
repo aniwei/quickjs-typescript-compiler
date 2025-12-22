@@ -42,6 +42,14 @@ function summarizeBytes(buf: Uint8Array, max = 16): string {
   return `${buf.length} bytes: ${head}${buf.length > max ? ' …' : ''}`
 }
 
+function safeStringify(v: unknown): string {
+  // JSON.stringify() does not support BigInt.
+  return JSON.stringify(v, (_key, value) => {
+    if (typeof value === 'bigint') return `${value.toString()}n`
+    return value
+  })
+}
+
 function varDefsEqual(a: VarDef[], b: VarDef[]): boolean {
   if (a.length !== b.length) return false
   for (let i = 0; i < a.length; i++) {
@@ -201,8 +209,8 @@ function compareFunctions(tsFunc: FunctionBytecode, wasmFunc: FunctionBytecode, 
       diffs.push(...compareFunctions(a, b, `${p}.cpool[${i}](func)`))
     } else {
       // Primitive constants: compare via JSON
-      const sa = JSON.stringify(a)
-      const sb = JSON.stringify(b)
+      const sa = safeStringify(a)
+      const sb = safeStringify(b)
       if (sa !== sb) {
         diffs.push({
           kind: 'func.cpool.itemTag',

@@ -57,8 +57,12 @@ export class ClassVisitor extends VisitorContext {
   // --------------------------------------------------------------------------
 
   /** 对应 QuickJS js_parse_class_default_ctor (parser.c:3044+) */
-  private visitClassDefaultCtor(fd: FunctionDef, classFlags: number): FunctionDef {
-    return this.createDefaultConstructor(fd, classFlags)
+  private visitClassDefaultCtor(
+    fd: FunctionDef,
+    classFlags: number,
+    node: ts.ClassLikeDeclaration
+  ): FunctionDef {
+    return this.createDefaultConstructor(fd, classFlags, node)
   }
 
   /** 对应 QuickJS class fields init helper（内部创建初始化函数） */
@@ -213,7 +217,7 @@ export class ClassVisitor extends VisitorContext {
 
     // 如果没有显式构造函数，创建默认构造函数 - 对应 parser.c:3612-3618
     if (!ctorFd) {
-      ctorFd = this.createDefaultConstructor(fd, classFlags)
+      ctorFd = this.createDefaultConstructor(fd, classFlags, node)
     }
 
     // 修补构造函数常量池索引 - 对应 parser.c:3619
@@ -501,10 +505,6 @@ export class ClassVisitor extends VisitorContext {
       this.compiler.emitU16(fd, fd.scopeLevel)
     } else {
       // 公有方法 - 对应 parser.c:3564-3575
-      if (methodFd.needHomeObject) {
-        this.compiler.emitOp(fd, Opcode.OP_set_home_object)
-      }
-
       if (isComputedName) {
         this.compiler.emitOp(fd, Opcode.OP_define_method_computed)
       } else {
@@ -581,10 +581,6 @@ export class ClassVisitor extends VisitorContext {
       this.compiler.emitAtom(fd, accessorName)
       this.compiler.emitU16(fd, fd.scopeLevel)
     } else {
-      if (accessorFd.needHomeObject) {
-        this.compiler.emitOp(fd, Opcode.OP_set_home_object)
-      }
-
       if (isComputedName) {
         this.compiler.emitOp(fd, Opcode.OP_define_method_computed)
       } else {
@@ -734,7 +730,11 @@ export class ClassVisitor extends VisitorContext {
   /**
    * 创建默认构造函数 - 对应 parser.c:3044-3203 js_parse_class_default_ctor
    */
-  private createDefaultConstructor(fd: FunctionDef, classFlags: number): FunctionDef {
+  private createDefaultConstructor(
+    fd: FunctionDef,
+    classFlags: number,
+    classNode: ts.ClassLikeDeclaration
+  ): FunctionDef {
     const hasHeritage = (classFlags & 0x01) !== 0
 
     const ctorFd = new FunctionDef(fd, false, false)
@@ -750,10 +750,21 @@ export class ClassVisitor extends VisitorContext {
     ctorFd.hasHomeObject = true
     ctorFd.hasArgumentsBinding = true
     ctorFd.hasThisBinding = true
+    // QuickJS: default class constructors use a non-simple parameter list and
+    // do not enable the `arguments` binding/var in the function flags.
+    // This affects the serialized function header flags (0x540 for base default ctors).
+    ctorFd.hasSimpleParameterList = false
+    ctorFd.argumentsAllowed = false
     ctorFd.newTargetAllowed = true
     ctorFd.superCallAllowed = hasHeritage
     ctorFd.superAllowed = true
     ctorFd.isDerivedClassConstructor = hasHeritage
+
+    // QuickJS: default ctor debug base position is anchored near the end of the class
+    // definition. Use the closing '}' token position as the function's sourcePos so
+    // pc2line base matches WASM output.
+    const classEndPos = Math.max(0, classNode.getEnd() - 1)
+    ctorFd.sourcePos = classEndPos
 
     this.compiler.addChild(fd, ctorFd)
 
@@ -801,6 +812,12 @@ export class ClassVisitor extends VisitorContext {
     initFd.hasHomeObject = true
     initFd.hasArgumentsBinding = true
     initFd.hasThisBinding = true
+    // QuickJS: class fields init helpers serialize with flags 0x548 in simple cases
+    // (notably: non-simple parameter list, no arguments object, but allow super/new.target).
+    initFd.hasSimpleParameterList = false
+    initFd.argumentsAllowed = false
+    initFd.newTargetAllowed = true
+    initFd.superAllowed = true
 
     this.compiler.addChild(fd, initFd)
 

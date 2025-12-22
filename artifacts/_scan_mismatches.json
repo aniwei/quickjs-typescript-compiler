@@ -1,0 +1,35 @@
+Artifacts: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts
+Skipped non-fixture dirs: 2
+Total fixtures: 61
+Identical: 56
+Mismatched: 5
+
+Mismatch tags:
+  - debug: 4
+  - semantics: 3
+  - scope: 2
+  - func-meta: 1
+  - error: 1
+
+- class-methods: TS=370 WASM=370 Δ+0 tags=debug
+    * func.debug.pc2line @ func.cpool[1](func): pc2line differ (TS 14 bytes: 05 04 0d 08 07 18 1b 04 07 03 26 01 1b 15 vs WASM 14 bytes: 05 04 0d 08 07 08 1b 14 07 05 26 00 1b 15)
+    * func.debug.pc2line @ func.cpool[2](func): pc2line differ (TS 10 bytes: 09 04 03 1e 16 16 07 01 11 29 vs WASM 10 bytes: 09 0b 03 10 16 16 07 01 11 29)
+- class-private-fields: TS=447 WASM=450 Δ-3 tags=debug,scope,semantics
+    * func.varDefs @ func: varDefs differ (TS=4, WASM=4)
+    * func.signature @ func.cpool[0](func): sig TS(arg=0 var=1 defArg=0 stack=2) vs WASM(arg=0 var=1 defArg=0 stack=4)
+    * func.closureVars @ func.cpool[0](func): closureVars differ (TS=0, WASM=1)
+    * func.bytecode @ func.cpool[0](func): bytecode differ (TS 15 bytes: 08 cb c7 43 e5 00 00 00 91 44 e5 00 00 00 29 vs WASM 11 bytes: 08 cb c7 11 df 45 93 18 df 46 29)
+    * … (6 more diffs)
+- class-static-block: TS=629 WASM=642 Δ-13 tags=debug,func-meta,scope,semantics
+    * func.signature @ func: sig TS(arg=0 var=4 defArg=0 stack=4) vs WASM(arg=0 var=5 defArg=0 stack=4)
+    * func.varDefs @ func: varDefs differ (TS=4, WASM=5)
+    * func.bytecode @ func: bytecode differ (TS 177 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 63 01 00 06 … vs WASM 177 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 63 01 00 06 …)
+    * func.signature @ func.cpool[0](func): sig TS(arg=0 var=1 defArg=0 stack=3) vs WASM(arg=0 var=1 defArg=0 stack=4)
+    * … (18 more diffs)
+- closure-vars: TS=363 WASM=365 Δ-2 tags=debug,semantics
+    * func.bytecode @ func.cpool[0](func).cpool[0](func): bytecode differ (TS 83 bytes: 39 eb 00 00 00 43 ec 00 00 00 68 00 00 24 01 00 … vs WASM 85 bytes: 39 eb 00 00 00 43 ec 00 00 00 68 00 00 24 01 00 …)
+    * func.debug.pc2line @ func.cpool[0](func).cpool[0](func): pc2line differ (TS 42 bytes: 05 04 03 08 1b 0e 1b 0a 11 01 17 15 1b 0e 1b 0a … vs WASM 42 bytes: 05 04 03 08 1b 0e 1b 0a 11 01 17 15 1b 0e 1b 0a …)
+- es2020_bigint_large: TS=-1 WASM=-1 Δ+0 tags=error
+    * module.version @ error: Do not know how to serialize a BigInt
+
+Wrote artifacts/mismatch-structure-summary.json

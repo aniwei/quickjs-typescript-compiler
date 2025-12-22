@@ -340,6 +340,54 @@
 			"command": "pnpm -s exec tsx -e 'import { parseBytecodeModule } from \"./src/bytecodeReader\"; import fs from \"fs\";\nconst PC2LINE_BASE=-1, PC2LINE_RANGE=5, PC2LINE_OP_FIRST=1;\nfunction readULEB(data:Uint8Array, st:{i:number}){let r=0,sh=0; while(st.i<data.length){const b=data[st.i++]; r|=(b&0x7f)<<sh; if((b&0x80)===0) break; sh+=7;} return r>>>0;}\nfunction readSLEB(data:Uint8Array, st:{i:number}){let r=0,sh=0,b=0; do{b=data[st.i++]; r|=(b&0x7f)<<sh; sh+=7;}while((b&0x80)!==0); if(sh<32 && (b&0x40)!==0){r|=(~0<<sh);} return r|0;}\nfunction decode(pc2:Uint8Array){const st={i:0}; const initLine=readULEB(pc2,st); const initCol=readULEB(pc2,st); let pc=0,line=initLine,col=initCol; const out:any[]=[{pc,line,col,kind:\"init\"}]; while(st.i<pc2.length){const op=pc2[st.i++]; if(op===0){ if(st.i>=pc2.length){out.push({kind:\"end\"}); break;} const dpc=readULEB(pc2,st); const dl=readSLEB(pc2,st); const dc=readSLEB(pc2,st); pc+=dpc; line+=dl; col+=dc; out.push({pc,line,col,op:\"long\",dpc,dl,dc}); } else { const opVal=op-PC2LINE_OP_FIRST; const dpc=Math.floor(opVal/PC2LINE_RANGE); const dl=(opVal%PC2LINE_RANGE)+PC2LINE_BASE; const dc=readSLEB(pc2,st); pc+=dpc; line+=dl; col+=dc; out.push({pc,line,col,op:\"short\",dpc,dl,dc,raw:op}); } } return out;}\nfunction inner(mod:any){const cp=mod.func.cpool||[]; return cp.find((e:any)=>e && typeof e===\"object\" && e.tag===12);\n}\nfunction show(name:string, pc2:Uint8Array){console.log(`\\n=== ${name} len=${pc2.length} ===`); console.log(Array.from(pc2).map(b=>b.toString(16).padStart(2,\"0\")).join(\" \")); console.log(decode(pc2));}\nconst ts=parseBytecodeModule(fs.readFileSync(\"artifacts/optional-chaining.ts.qbc\"));\nconst wasm=parseBytecodeModule(fs.readFileSync(\"artifacts/optional-chaining.wasm.qbc\"));\nshow(\"TS outer\", ts.func.debug!.pc2line);\nshow(\"WASM outer\", wasm.func.debug!.pc2line);\nshow(\"TS inner\", inner(ts).debug.pc2line);\nshow(\"WASM inner\", inner(wasm).debug.pc2line);\n'",
 			"isBackground": false,
 			"group": "build"
+		},
+		{
+			"label": "debug: scan OP_line_num in class-methods",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import {readFileSync} from 'node:fs'; import {parseBytecodeModule} from './src/bytecodeReader'; const OP=200; function scan(label,qbc){ const m=parseBytecodeModule(readFileSync(qbc)); const bc=m.func.cpool[1].bytecode; const hits=[]; for(let i=0;i<=bc.length-5;i++){ if(bc[i]===OP){ const v=(bc[i+1]|(bc[i+2]<<8)|(bc[i+3]<<16)|(bc[i+4]<<24))>>>0; hits.push({i,sourcePos:v}); } } console.log(label, hits); } scan('TS','artifacts/class-methods/bytecode/class-methods.ts.qbc'); scan('WASM','artifacts/class-methods/bytecode/class-methods.wasm.qbc');\"",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "debug: inspect transpiled whitespace class-methods",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import ts from 'typescript'; import {readFileSync} from 'node:fs'; const file='__tests__/fixtures/class-methods.ts'; const code=readFileSync(file,'utf8'); const out=ts.transpileModule(code,{fileName:file, compilerOptions:{module: ts.ModuleKind.ESNext,target: ts.ScriptTarget.ESNext}}).outputText; const lines=out.split('\\n'); console.log('lineCount', lines.length); lines.forEach((l,i)=>{ if(i>=4 && i<=8){ const vis=l.replace(/ /g,'.'); console.log(i, vis, 'len', l.length); } }); const targetLine=lines[6]; console.log('line6 raw:', JSON.stringify(targetLine)); console.log('indexOf(\"+=\")', targetLine.indexOf('+='), 'indexOf(\"=\")', targetLine.indexOf('=') );\"",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "debug: inspect qbc embedded source (class-methods add)",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import {readFileSync} from 'node:fs'; import {parseBytecodeModule} from './src/bytecodeReader'; function show(label,qbc){ const m=parseBytecodeModule(readFileSync(qbc)); const src=m.func.cpool[1].debug.source as string; const lines=src.split('\\n'); console.log('\\n',label,'embeddedSource lineCount',lines.length); const idxs=[5,6,7]; for(const i of idxs){ const l=lines[i]??''; console.log('line',i, l.replace(/ /g,'.'),'len',l.length); } } show('TS','artifacts/class-methods/bytecode/class-methods.ts.qbc'); show('WASM','artifacts/class-methods/bytecode/class-methods.wasm.qbc');\"",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "debug: max col on line 6 in transpiled output",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import ts from 'typescript'; import {readFileSync} from 'node:fs'; import { DebugInfoBuilder } from './src/compiler/DebugInfoBuilder'; import { GetLineColCache } from './src/compiler/FunctionDef'; const file='__tests__/fixtures/class-methods.ts'; const code=readFileSync(file,'utf8'); const out=ts.transpileModule(code,{fileName:file, compilerOptions:{module: ts.ModuleKind.ESNext,target: ts.ScriptTarget.ESNext}}).outputText; const cache=new GetLineColCache(); cache.ptr=0; cache.lineNum=1; cache.colNum=0; cache.bufStart=0; let maxCol=-1; let maxPos=-1; for(let pos=0; pos<out.length; pos++){ const c2=new GetLineColCache(); Object.assign(c2, cache); // not use cached; do fresh each time\n const [ln, col]=DebugInfoBuilder.getLineColCached(c2,out,pos);\n if(ln===6 && col>maxCol){ maxCol=col; maxPos=pos; }\n }\n console.log({maxCol, maxPos});\"",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "dumpPc2line class-methods wasm",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/dumpPc2line.ts artifacts/class-methods/bytecode/class-methods.wasm.qbc",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "debug: decode pc2line with QuickJS zigzag (class-methods cpool[1])",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"const PC2LINE_BASE=-1,PC2LINE_RANGE=5,PC2LINE_OP_FIRST=1; const readULEB=(data,o)=>{let r=0,s=0; for(;;){const b=data[o.i++]; r|=(b&0x7f)<<s; if(!(b&0x80)) break; s+=7;} return r>>>0;}; const readZigZag=(data,o)=>{const u=readULEB(data,o); return ((u>>>1) ^ -(u&1))|0;}; function decode(name,data){const o={i:0}; let pc=0; let line=readULEB(data,o); let col=readULEB(data,o); console.log('\\n'+name,'init', {pc,line,col}); while(o.i<data.length){const op=data[o.i++]; let dpc,dline; if(op===0){dpc=readULEB(data,o); dline=readZigZag(data,o);} else {const enc=op-PC2LINE_OP_FIRST; dpc=Math.floor(enc/PC2LINE_RANGE); dline=(enc%PC2LINE_RANGE)+PC2LINE_BASE;} const dcol=readZigZag(data,o); pc+=dpc; line+=dline; col+=dcol; console.log({pc,line,col,dpc,dline,dcol,op:'0x'+op.toString(16)}); } }\nconst ts=[0x05,0x04,0x0d,0x08,0x07,0x18,0x1b,0x04,0x07,0x03,0x26,0x01,0x1b,0x15];\nconst wasm=[0x05,0x04,0x0d,0x08,0x07,0x08,0x1b,0x14,0x07,0x05,0x26,0x00,0x1b,0x15];\ndecode('TS',ts); decode('WASM',wasm);\"",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
 		}
 	]
 }
