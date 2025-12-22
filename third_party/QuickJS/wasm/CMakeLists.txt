@@ -37,3 +37,33 @@ target_link_libraries(quickjs_wasm PRIVATE quickjs-libc)
 # Ensure dump bytecode utilities are compiled
 target_compile_definitions(quickjs PRIVATE DUMP_BYTECODE=1)
 target_compile_definitions(quickjs_wasm PRIVATE DUMP_BYTECODE=1)
+
+# ─────────────────────────── QTS tracing (optional) ───────────────────────────
+# These are intended for debugging/verification only. Default is disabled.
+# Use numeric 0/1 to avoid toolchain differences with ON/OFF.
+set(QTS_TRACE_ENABLED "0" CACHE STRING "Enable QTS trace logs (0/1)")
+set_property(CACHE QTS_TRACE_ENABLED PROPERTY STRINGS "0" "1")
+
+set(QTS_TRACE_LEVEL "1" CACHE STRING "QTS trace verbosity level (1..3)")
+set_property(CACHE QTS_TRACE_LEVEL PROPERTY STRINGS "1" "2" "3")
+
+set(QTS_TRACE_EMIT "" CACHE STRING "Override QTS_TRACE_EMIT (empty=default, else 0/1)")
+set(QTS_TRACE_VARIABLE "" CACHE STRING "Override QTS_TRACE_VARIABLE (empty=default, else 0/1)")
+set(QTS_TRACE_CLOSURE "" CACHE STRING "Override QTS_TRACE_CLOSURE (empty=default, else 0/1)")
+set(QTS_TRACE_LABEL "" CACHE STRING "Override QTS_TRACE_LABEL (empty=default, else 0/1)")
+set(QTS_TRACE_STACK "" CACHE STRING "Override QTS_TRACE_STACK (empty=default, else 0/1)")
+set(QTS_TRACE_SCOPE "" CACHE STRING "Override QTS_TRACE_SCOPE (empty=default, else 0/1)")
+
+set(_QTS_TRACE_DEFS
+        QTS_TRACE_ENABLED=${QTS_TRACE_ENABLED}
+        QTS_TRACE_LEVEL=${QTS_TRACE_LEVEL}
+)
+
+foreach(_k IN ITEMS EMIT VARIABLE CLOSURE LABEL STACK SCOPE)
+    if(NOT "${QTS_TRACE_${_k}}" STREQUAL "")
+        list(APPEND _QTS_TRACE_DEFS QTS_TRACE_${_k}=${QTS_TRACE_${_k}})
+    endif()
+endforeach()
+
+target_compile_definitions(quickjs PRIVATE ${_QTS_TRACE_DEFS})
+target_compile_definitions(quickjs_wasm PRIVATE ${_QTS_TRACE_DEFS})

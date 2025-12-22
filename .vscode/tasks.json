@@ -319,6 +319,27 @@
 			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/array-literal.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
 			"args": [],
 			"group": "build"
+		},
+		{
+			"label": "Inspect optional-chaining qbc sizes",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e 'import { parseBytecodeModule } from \"./src/bytecodeReader\"; import fs from \"fs\"; const ts=parseBytecodeModule(fs.readFileSync(\"artifacts/optional-chaining.ts.qbc\")); const wasm=parseBytecodeModule(fs.readFileSync(\"artifacts/optional-chaining.wasm.qbc\")); const tsDbg=ts.func.debug; const wasmDbg=wasm.func.debug; console.log(\"TS atoms\",ts.atoms.length,\"WASM atoms\",wasm.atoms.length); console.log(\"TS bytecodeLen\",ts.func.bytecodeLen,\"WASM\",wasm.func.bytecodeLen); console.log(\"TS cpoolCount\",ts.func.cpoolCount,\"WASM\",wasm.func.cpoolCount); console.log(\"TS hasDebug\",ts.func.hasDebug,\"WASM\",wasm.func.hasDebug); console.log(\"TS pc2lineLen\",tsDbg?.pc2line?.length||0,\"WASM\",wasmDbg?.pc2line?.length||0); console.log(\"TS sourceLen\",tsDbg?.source?.length||0,\"WASM\",wasmDbg?.source?.length||0);'",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Inspect optional-chaining inner func debug",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e 'import { parseBytecodeModule } from \"./src/bytecodeReader\"; import fs from \"fs\"; function inner(mod:any){ const cp=mod.func.cpool||[]; const f=cp.find((e:any)=>e && typeof e===\"object\" && e.tag===12); return f; } const ts=parseBytecodeModule(fs.readFileSync(\"artifacts/optional-chaining.ts.qbc\")); const wasm=parseBytecodeModule(fs.readFileSync(\"artifacts/optional-chaining.wasm.qbc\")); const tsIn=inner(ts); const wasmIn=inner(wasm); console.log(\"TS inner?\",!!tsIn,\"WASM inner?\",!!wasmIn); if(tsIn&&wasmIn){ console.log(\"TS inner bytecodeLen\",tsIn.bytecodeLen,\"WASM\",wasmIn.bytecodeLen); console.log(\"TS inner hasDebug\",tsIn.hasDebug,\"WASM\",wasmIn.hasDebug); console.log(\"TS inner pc2lineLen\",tsIn.debug?.pc2line?.length||0,\"WASM\",wasmIn.debug?.pc2line?.length||0); console.log(\"TS inner filename\",tsIn.debug?.filename, \"WASM\", wasmIn.debug?.filename); }'",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Decode optional-chaining pc2line (outer+inner)",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e 'import { parseBytecodeModule } from \"./src/bytecodeReader\"; import fs from \"fs\";\nconst PC2LINE_BASE=-1, PC2LINE_RANGE=5, PC2LINE_OP_FIRST=1;\nfunction readULEB(data:Uint8Array, st:{i:number}){let r=0,sh=0; while(st.i<data.length){const b=data[st.i++]; r|=(b&0x7f)<<sh; if((b&0x80)===0) break; sh+=7;} return r>>>0;}\nfunction readSLEB(data:Uint8Array, st:{i:number}){let r=0,sh=0,b=0; do{b=data[st.i++]; r|=(b&0x7f)<<sh; sh+=7;}while((b&0x80)!==0); if(sh<32 && (b&0x40)!==0){r|=(~0<<sh);} return r|0;}\nfunction decode(pc2:Uint8Array){const st={i:0}; const initLine=readULEB(pc2,st); const initCol=readULEB(pc2,st); let pc=0,line=initLine,col=initCol; const out:any[]=[{pc,line,col,kind:\"init\"}]; while(st.i<pc2.length){const op=pc2[st.i++]; if(op===0){ if(st.i>=pc2.length){out.push({kind:\"end\"}); break;} const dpc=readULEB(pc2,st); const dl=readSLEB(pc2,st); const dc=readSLEB(pc2,st); pc+=dpc; line+=dl; col+=dc; out.push({pc,line,col,op:\"long\",dpc,dl,dc}); } else { const opVal=op-PC2LINE_OP_FIRST; const dpc=Math.floor(opVal/PC2LINE_RANGE); const dl=(opVal%PC2LINE_RANGE)+PC2LINE_BASE; const dc=readSLEB(pc2,st); pc+=dpc; line+=dl; col+=dc; out.push({pc,line,col,op:\"short\",dpc,dl,dc,raw:op}); } } return out;}\nfunction inner(mod:any){const cp=mod.func.cpool||[]; return cp.find((e:any)=>e && typeof e===\"object\" && e.tag===12);\n}\nfunction show(name:string, pc2:Uint8Array){console.log(`\\n=== ${name} len=${pc2.length} ===`); console.log(Array.from(pc2).map(b=>b.toString(16).padStart(2,\"0\")).join(\" \")); console.log(decode(pc2));}\nconst ts=parseBytecodeModule(fs.readFileSync(\"artifacts/optional-chaining.ts.qbc\"));\nconst wasm=parseBytecodeModule(fs.readFileSync(\"artifacts/optional-chaining.wasm.qbc\"));\nshow(\"TS outer\", ts.func.debug!.pc2line);\nshow(\"WASM outer\", wasm.func.debug!.pc2line);\nshow(\"TS inner\", inner(ts).debug.pc2line);\nshow(\"WASM inner\", inner(wasm).debug.pc2line);\n'",
+			"isBackground": false,
+			"group": "build"
 		}
 	]
 }

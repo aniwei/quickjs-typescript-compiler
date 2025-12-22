@@ -1009,6 +1009,10 @@ export class Compiler {
     const vd = new JSVarDef()
     vd.varName = name
     vd.funcPoolIdx = -1
+    // QuickJS add_arg() does `memset(vd, 0, sizeof(*vd))`, so scope_next
+    // defaults to 0 (encoded as scopeNextPlus1=1 in bytecode). This matters
+    // for byte-perfect vardef encoding.
+    vd.scopeNext = 0
     
     fd.args.push(vd)
     return fd.argCount++

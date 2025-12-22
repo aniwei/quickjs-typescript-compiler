@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
 import { existsSync, mkdirSync } from 'node:fs'
+import fs from 'node:fs'
 import { join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
 
@@ -8,6 +9,8 @@ type Options = {
   buildType?: 'Release' | 'Debug'
   reinstall?: boolean
   verbose?: boolean
+  trace?: boolean
+  traceLevel?: 1 | 2 | 3
 }
 
 function run(
@@ -69,7 +72,9 @@ function parseArgs(): Options {
   const opts: Options = { 
     buildType: 'Release', 
     reinstall: false, 
-    verbose: false 
+    verbose: false,
+    trace: false,
+    traceLevel: 1
   }
 
   for (let i = 0; i < args.length; i++) {
@@ -84,6 +89,11 @@ function parseArgs(): Options {
       opts.reinstall = true 
     } else if (a === '--verbose' || a === '-v') { 
       opts.verbose = true 
+    } else if (a === '--trace') {
+      opts.trace = true
+    } else if ((a === '--trace-level' || a === '--traceLevel') && args[i+1]) {
+      const v = Number(args[++i])
+      if (v === 1 || v === 2 || v === 3) opts.traceLevel = v
     }
   }
 
@@ -163,13 +173,48 @@ function buildWasm(opts: Options) {
   const buildDir = resolve(wasmRoot, 'build')
   const outJs = resolve(wasmRoot, 'output/quickjs_wasm.js')
   const outWasm = resolve(wasmRoot, 'output/quickjs_wasm.wasm')
+  const outConfig = resolve(wasmRoot, 'output/quickjs_wasm.build-config.json')
 
   const { emsdkDir, envScript } = ensureEmsdk(opts, repoRoot)
   if (!existsSync(buildDir)) mkdirSync(buildDir, { recursive: true })
 
   const prefix = envScript ? `source ${envScript} && ` : ''
   // Configure
-  runBash(`${prefix}emcmake cmake -S ${JSON.stringify(wasmRoot)} -B ${JSON.stringify(buildDir)} -DCMAKE_BUILD_TYPE=${opts.buildType}`, { cwd: repoRoot, verbose: opts.verbose })
+  const traceArgs: string[] = []
+  const traceEnabled = Boolean(opts.trace)
+  const traceLevel = traceEnabled ? (opts.traceLevel ?? 1) : 1
+
+  // Always pass explicit values so CMake cache can't "stick" between builds.
+  traceArgs.push(`-DQTS_TRACE_ENABLED=${traceEnabled ? 1 : 0}`)
+  traceArgs.push(`-DQTS_TRACE_LEVEL=${traceLevel}`)
+
+  const categoryKeys = [
+    'QTS_TRACE_EMIT',
+    'QTS_TRACE_VARIABLE',
+    'QTS_TRACE_CLOSURE',
+    'QTS_TRACE_LABEL',
+    'QTS_TRACE_STACK',
+    'QTS_TRACE_SCOPE',
+  ] as const
+
+  for (const key of categoryKeys) {
+    if (!traceEnabled) {
+      traceArgs.push(`-D${key}=0`)
+      continue
+    }
+    const v = process.env[key]
+    if (v === '0' || v === '1') {
+      traceArgs.push(`-D${key}=${v}`)
+    }
+  }
+
+  const cmakeArgs = [
+    `emcmake cmake -S ${JSON.stringify(wasmRoot)} -B ${JSON.stringify(buildDir)}`,
+    `-DCMAKE_BUILD_TYPE=${opts.buildType}`,
+    ...traceArgs
+  ].join(' ')
+
+  runBash(`${prefix}${cmakeArgs}`, { cwd: repoRoot, verbose: opts.verbose })
   // Build
   runBash(`${prefix}cmake --build ${JSON.stringify(buildDir)} -j`, { cwd: repoRoot, verbose: opts.verbose })
 
@@ -177,9 +222,39 @@ function buildWasm(opts: Options) {
     throw new Error(`Build completed but outputs not found: ${outJs} / ${outWasm}`)
   }
 
+  const resolveCategory = (key: string): 0 | 1 => {
+    if (!traceEnabled) return 0
+    const v = process.env[key]
+    if (v === '0') return 0
+    if (v === '1') return 1
+    return 1
+  }
+  const buildConfig = {
+    buildType: opts.buildType,
+    qtsTrace: {
+      enabled: traceEnabled ? 1 : 0,
+      level: traceLevel,
+      categories: {
+        EMIT: resolveCategory('QTS_TRACE_EMIT'),
+        VARIABLE: resolveCategory('QTS_TRACE_VARIABLE'),
+        CLOSURE: resolveCategory('QTS_TRACE_CLOSURE'),
+        LABEL: resolveCategory('QTS_TRACE_LABEL'),
+        STACK: resolveCategory('QTS_TRACE_STACK'),
+        SCOPE: resolveCategory('QTS_TRACE_SCOPE'),
+      },
+    },
+  }
+  try {
+    fs.mkdirSync(resolve(wasmRoot, 'output'), { recursive: true })
+    fs.writeFileSync(outConfig, JSON.stringify(buildConfig, null, 2), 'utf8')
+  } catch {
+    // best-effort marker only
+  }
+
   console.log('WASM build outputs ready:')
   console.log(' -', outJs)
   console.log(' -', outWasm)
+  console.log(' -', outConfig)
 }
 
 function main() {

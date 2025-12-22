@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/logical-assignment.ts
-**生成时间**: 2025-12-20T21:36:57.084Z
+**生成时间**: 2025-12-22T02:37:15.805Z
 
 ## 大小对比
 
-- TypeScript编译器: 511 字节
+- TypeScript编译器: 507 字节
 - WASM编译器: 513 字节
-- 差异: -2 字节 (-0.39%)
+- 差异: -6 字节 (-1.17%)
 
 ## 结构分析
 
@@ -126,7 +126,7 @@
   "functionHeader": {
     "offset": 87,
     "tag": "0xc",
-    "remaining": 424
+    "remaining": 420
   }
 }
 ```
@@ -253,29 +253,29 @@
 
 ## 字节级差异
 
-共发现 37 个字节差异:
+共发现 24 个字节差异:
 
-- 偏移量 0x1c7: TS=0x36 vs WASM=0x38
-- 偏移量 0x1d0: TS=0x34 vs WASM=0x71
-- 偏移量 0x1d1: TS=0x0c vs WASM=0x00
-- 偏移量 0x1d2: TS=0x3f vs WASM=0x76
-- 偏移量 0x1d3: TS=0x0b vs WASM=0x00
-- 偏移量 0x1d4: TS=0x39 vs WASM=0x62
-- 偏移量 0x1d5: TS=0x0c vs WASM=0x00
-- 偏移量 0x1d6: TS=0x3f vs WASM=0x1b
-- 偏移量 0x1d7: TS=0x0b vs WASM=0x0e
-- 偏移量 0x1d8: TS=0x62 vs WASM=0x1b
-- 偏移量 0x1d9: TS=0x00 vs WASM=0x0a
-- 偏移量 0x1db: TS=0x0e vs WASM=0x06
-- 偏移量 0x1dd: TS=0x0a vs WASM=0x06
-- 偏移量 0x1e1: TS=0x06 vs WASM=0x13
-- 偏移量 0x1e2: TS=0x1b vs WASM=0x90
-- 偏移量 0x1e3: TS=0x06 vs WASM=0x15
-- 偏移量 0x1e5: TS=0x13 vs WASM=0x06
-- 偏移量 0x1e6: TS=0x90 vs WASM=0x67
-- 偏移量 0x1e7: TS=0x15 vs WASM=0x05
+- 偏移量 0x1c7: TS=0x32 vs WASM=0x38
+- 偏移量 0x1e4: TS=0x80 vs WASM=0x1b
+- 偏移量 0x1e5: TS=0x00 vs WASM=0x06
+- 偏移量 0x1e6: TS=0x8a vs WASM=0x67
+- 偏移量 0x1e7: TS=0x00 vs WASM=0x05
 - 偏移量 0x1e8: TS=0x80 vs WASM=0x1b
-- ... (显示前20个差异，总共37个)
+- 偏移量 0x1e9: TS=0x00 vs WASM=0x06
+- 偏移量 0x1ea: TS=0x1b vs WASM=0x71
+- 偏移量 0x1eb: TS=0x0e vs WASM=0x05
+- 偏移量 0x1ed: TS=0x0a vs WASM=0x06
+- 偏移量 0x1ee: TS=0x1b vs WASM=0x67
+- 偏移量 0x1ef: TS=0x06 vs WASM=0x05
+- 偏移量 0x1f1: TS=0x08 vs WASM=0x0e
+- 偏移量 0x1f3: TS=0x06 vs WASM=0x0a
+- 偏移量 0x1f5: TS=0x08 vs WASM=0x06
+- 偏移量 0x1f7: TS=0x06 vs WASM=0x08
+- 偏移量 0x1f9: TS=0x23 vs WASM=0x06
+- 偏移量 0x1fa: TS=0x00 vs WASM=0x1b
+- 偏移量 0x1fb: TS=EOF vs WASM=0x08
+- 偏移量 0x1fc: TS=EOF vs WASM=0x1b
+- ... (显示前20个差异，总共24个)
 
 ## 十六进制转储对比
 
@@ -309,10 +309,10 @@
 00000190: ef 00 00 00 ee 02 0f cb 39 eb 00 00 00 43 ec 00 |........9....C..|
 000001a0: 00 00 39 e8 00 00 00 42 ed 00 00 00 39 e8 00 00 |..9....B....9...|
 000001b0: 00 42 ee 00 00 00 39 e8 00 00 00 42 ef 00 00 00 |.B....9....B....|
-000001c0: 24 03 00 cf 28 e0 03 36 00 00 00 54 08 00 5d 00 |$...(..6...T..].|
-000001d0: 34 0c 3f 0b 39 0c 3f 0b 62 00 1b 0e 1b 0a 1b 06 |4.?.9.?.b.......|
-000001e0: 1b 06 1b 06 1b 13 90 15 80 00 8a 00 80 00 1b 0e |................|
-000001f0: 1b 0a 1b 06 1b 08 1b 06 1b 08 1b 06 1b 23 00    |.............#.|
+000001c0: 24 03 00 cf 28 e0 03 32 00 00 00 54 08 00 5d 00 |$...(..2...T..].|
+000001d0: 71 00 76 00 62 00 1b 0e 1b 0a 1b 06 1b 06 1b 06 |q.v.b...........|
+000001e0: 1b 13 90 15 80 00 8a 00 80 00 1b 0e 1b 0a 1b 06 |................|
+000001f0: 1b 08 1b 06 1b 08 1b 06 1b 23 00                |.........#.|
 ```
 
 ### WASM

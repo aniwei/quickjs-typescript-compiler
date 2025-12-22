@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/logical-operators/cli/logical-operators.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/logical-operators/cli/logical-operators.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/logical-operators/cli/logical-operators.pc2line.txt",
-    "bytecodeSize": 277,
-    "pc2lineLength": 32,
+    "bytecodeSize": 275,
+    "pc2lineLength": 30,
     "stackMax": 0
   },
   "bytecode": {
-    "identical": false,
-    "tsSize": 215,
+    "identical": true,
+    "tsSize": 213,
     "wasmSize": 213,
-    "sizeDiff": 2,
-    "sizeDiffPercent": 0.9389671361502347
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
   },
   "trace": {
     "differenceCount": 0,

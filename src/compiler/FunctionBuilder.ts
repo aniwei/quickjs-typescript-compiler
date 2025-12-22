@@ -199,6 +199,12 @@ export class FunctionBuilder {
     // 5. 复制变量定义 - parser.c:12580-12603
     if (fd.argCount + fd.varCount > 0) {
       if (!fd.stripDebug || fd.hasEvalCall) {
+        // QuickJS add_arg() memset()'s the vardef, so arg.scopeNext defaults to 0
+        // (encoded as scopeNextPlus1=1). Ensure we match this even if a synthetic
+        // arg somehow left scopeNext uninitialized.
+        for (const arg of fd.args) {
+          if (arg.scopeNext < 0) arg.scopeNext = 0
+        }
         // 合并 args 和 vars
         b.vardefs = [...fd.args, ...fd.vars]
       }

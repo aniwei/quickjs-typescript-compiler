@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-basic/cli/closure-basic.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-basic/cli/closure-basic.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-basic/cli/closure-basic.pc2line.txt",
-    "bytecodeSize": 234,
+    "bytecodeSize": 248,
     "pc2lineLength": 8,
     "stackMax": 0
   },
   "bytecode": {
-    "identical": false,
-    "tsSize": 172,
+    "identical": true,
+    "tsSize": 186,
     "wasmSize": 186,
-    "sizeDiff": -14,
-    "sizeDiffPercent": -7.526881720430108
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
   },
   "trace": {
     "differenceCount": 0,

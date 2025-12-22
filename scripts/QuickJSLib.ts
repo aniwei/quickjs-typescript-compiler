@@ -49,10 +49,80 @@ export class QuickJSLib {
 
   static ensureWasmBuilt () {
     const path = resolve(process.cwd(), 'third_party/QuickJS/wasm/output/quickjs_wasm.js')
-    if (existsSync(path)) return path
+    const configPath = resolve(process.cwd(), 'third_party/QuickJS/wasm/output/quickjs_wasm.build-config.json')
+    const wantTrace = process.env.QTS_TRACE_ENABLED === '1'
+    const wantTraceOverride = Boolean(
+      process.env.QTS_TRACE_LEVEL ||
+      process.env.QTS_TRACE_EMIT ||
+      process.env.QTS_TRACE_VARIABLE ||
+      process.env.QTS_TRACE_CLOSURE ||
+      process.env.QTS_TRACE_LABEL ||
+      process.env.QTS_TRACE_STACK ||
+      process.env.QTS_TRACE_SCOPE,
+    )
+
+    const desiredEnabled = (wantTrace || wantTraceOverride) ? 1 : 0
+    const desiredLevel = (() => {
+      const v = process.env.QTS_TRACE_LEVEL
+      if (v === '1' || v === '2' || v === '3') return Number(v)
+      return 1
+    })()
+    const desiredCategory = (envKey: string): 0 | 1 => {
+      if (!desiredEnabled) return 0
+      const v = process.env[envKey]
+      if (v === '0') return 0
+      if (v === '1') return 1
+      return 1
+    }
+    const desired = {
+      enabled: desiredEnabled,
+      level: desiredLevel,
+      categories: {
+        EMIT: desiredCategory('QTS_TRACE_EMIT'),
+        VARIABLE: desiredCategory('QTS_TRACE_VARIABLE'),
+        CLOSURE: desiredCategory('QTS_TRACE_CLOSURE'),
+        LABEL: desiredCategory('QTS_TRACE_LABEL'),
+        STACK: desiredCategory('QTS_TRACE_STACK'),
+        SCOPE: desiredCategory('QTS_TRACE_SCOPE'),
+      },
+    }
+
+    if (existsSync(path) && existsSync(configPath)) {
+      try {
+        const cfg = JSON.parse(readFileSync(configPath, 'utf8'))
+        const built = cfg?.qtsTrace
+        const same =
+          built?.enabled === desired.enabled &&
+          built?.level === desired.level &&
+          built?.categories?.EMIT === desired.categories.EMIT &&
+          built?.categories?.VARIABLE === desired.categories.VARIABLE &&
+          built?.categories?.CLOSURE === desired.categories.CLOSURE &&
+          built?.categories?.LABEL === desired.categories.LABEL &&
+          built?.categories?.STACK === desired.categories.STACK &&
+          built?.categories?.SCOPE === desired.categories.SCOPE
+        if (same) return path
+      } catch {
+        // fall through to rebuild
+      }
+    }
+
+    if (existsSync(path) && desiredEnabled === 0 && !existsSync(configPath)) {
+      // legacy build without marker: assume non-trace
+      return path
+    }
 
     const buildScript = resolve(process.cwd(), 'scripts/buildWasm.ts')
-    const r = spawnSync('npx', ['tsx', buildScript], { stdio: 'inherit', encoding: 'utf8' })
+
+    const args: string[] = ['tsx', buildScript]
+    if (wantTrace || wantTraceOverride) {
+      args.push('--trace')
+      const lvl = process.env.QTS_TRACE_LEVEL
+      if (lvl === '1' || lvl === '2' || lvl === '3') {
+        args.push('--trace-level', lvl)
+      }
+    }
+
+    const r = spawnSync('npx', args, { stdio: 'inherit', encoding: 'utf8' })
     
     if (r.status !== 0) return null
     return existsSync(path) ? path : null

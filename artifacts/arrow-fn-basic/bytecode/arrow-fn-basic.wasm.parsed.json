@@ -1,0 +1,168 @@
+{
+  "version": 5,
+  "atoms": [
+    "console",
+    "log",
+    "__tests__/fixtures/arrow-fn-basic.js",
+    "a",
+    "b"
+  ],
+  "func": {
+    "tag": 12,
+    "flags": 1536,
+    "jsMode": 0,
+    "funcNameAtom": 82,
+    "argCount": 0,
+    "varCount": 1,
+    "definedArgCount": 0,
+    "stackSize": 5,
+    "closureVarCount": 0,
+    "cpoolCount": 1,
+    "bytecodeLen": 47,
+    "bytecode": {
+      "type": "Buffer",
+      "data": [
+        64,
+        106,
+        0,
+        0,
+        0,
+        128,
+        63,
+        106,
+        0,
+        0,
+        0,
+        128,
+        194,
+        0,
+        79,
+        106,
+        0,
+        0,
+        0,
+        59,
+        106,
+        0,
+        0,
+        0,
+        57,
+        228,
+        0,
+        0,
+        0,
+        67,
+        229,
+        0,
+        0,
+        0,
+        57,
+        106,
+        0,
+        0,
+        0,
+        184,
+        185,
+        242,
+        36,
+        1,
+        0,
+        207,
+        40
+      ]
+    },
+    "varDefs": [
+      {
+        "nameAtom": 83,
+        "scopeLevel": 0,
+        "scopeNextPlus1": 0,
+        "flags": 0
+      }
+    ],
+    "closureVars": [],
+    "hasDebug": true,
+    "debug": {
+      "filenameAtom": 230,
+      "filename": "__tests__/fixtures/arrow-fn-basic.js",
+      "pc2line": {
+        "type": "Buffer",
+        "data": [
+          0,
+          0,
+          125,
+          0,
+          27,
+          14,
+          27,
+          10,
+          37,
+          6,
+          7,
+          7
+        ]
+      }
+    },
+    "cpool": [
+      {
+        "tag": 12,
+        "flags": 1538,
+        "jsMode": 0,
+        "funcNameAtom": 0,
+        "argCount": 2,
+        "varCount": 0,
+        "definedArgCount": 2,
+        "stackSize": 2,
+        "closureVarCount": 0,
+        "cpoolCount": 0,
+        "bytecodeLen": 4,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            211,
+            212,
+            159,
+            40
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 231,
+            "name": "a",
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          },
+          {
+            "nameAtom": 232,
+            "name": "b",
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 230,
+          "filename": "__tests__/fixtures/arrow-fn-basic.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              0,
+              12,
+              3,
+              1,
+              7,
+              8,
+              7,
+              3,
+              7,
+              17
+            ]
+          }
+        },
+        "cpool": []
+      }
+    ]
+  }
+}

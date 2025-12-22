@@ -27,6 +27,7 @@
 #include <stdio.h>
 
 #include "parser.h"
+#include "qts_trace.h"
 #include "QuickJS/dtoa.h"
 #include "QuickJS/libregexp.h"
 #include "QuickJS/libunicode.h"
@@ -1763,14 +1764,17 @@ static BOOL js_is_live_code(JSParseState* s) {
 }
 
 static void emit_u8(JSParseState* s, uint8_t val) {
+  QTS_TRACE_EMIT_U8(val, s->cur_func->byte_code.size);
   dbuf_putc(&s->cur_func->byte_code, val);
 }
 
 static void emit_u16(JSParseState* s, uint16_t val) {
+  QTS_TRACE_EMIT_U16(val, s->cur_func->byte_code.size);
   dbuf_put_u16(&s->cur_func->byte_code, val);
 }
 
 static void emit_u32(JSParseState* s, uint32_t val) {
+  QTS_TRACE_EMIT_U32(val, s->cur_func->byte_code.size);
   dbuf_put_u32(&s->cur_func->byte_code, val);
 }
 
@@ -1779,7 +1783,9 @@ static void emit_source_pos(JSParseState* s, const uint8_t* source_ptr) {
   DynBuf* bc = &fd->byte_code;
 
   if (unlikely(fd->last_opcode_source_ptr != source_ptr)) {
+    QTS_TRACE_EMIT_OP(OP_line_num, bc->size);
     dbuf_putc(bc, OP_line_num);
+    QTS_TRACE_EMIT_U32(source_ptr - s->buf_start, bc->size);
     dbuf_put_u32(bc, source_ptr - s->buf_start);
     fd->last_opcode_source_ptr = source_ptr;
   }
@@ -1790,6 +1796,7 @@ static void emit_op(JSParseState* s, uint8_t val) {
   DynBuf* bc = &fd->byte_code;
 
   fd->last_opcode_pos = bc->size;
+  QTS_TRACE_EMIT_OP(val, bc->size);
   dbuf_putc(bc, val);
 }
 
@@ -1797,6 +1804,7 @@ static void emit_atom(JSParseState* s, JSAtom name) {
   DynBuf* bc = &s->cur_func->byte_code;
   if (dbuf_realloc(bc, bc->size + 4))
     return; /* not enough memory : don't duplicate the atom */
+  QTS_TRACE_EMIT_ATOM(name, bc->size);
   put_u32(bc->buf + bc->size, JS_DupAtom(s->ctx, name));
   bc->size += 4;
 }
@@ -2056,6 +2064,9 @@ int push_scope(JSParseState* s) {
     fd->scope_count++;
     fd->scopes[scope].parent = fd->scope_level;
     fd->scopes[scope].first = fd->scope_first;
+
+    QTS_TRACE_SCOPE_PUSH(scope, fd->scope_first);
+    QTS_TRACE_SCOPE_ENTER(scope, fd->body_scope);
     emit_op(s, OP_enter_scope);
     emit_u16(s, scope);
     return fd->scope_level = scope;
@@ -2078,6 +2089,9 @@ static void pop_scope(JSParseState* s) {
     /* disable scoped variables */
     JSFunctionDef* fd = s->cur_func;
     int scope = fd->scope_level;
+
+    QTS_TRACE_SCOPE_LEAVE(scope);
+    QTS_TRACE_SCOPE_POP(scope);
     emit_op(s, OP_leave_scope);
     emit_u16(s, scope);
     fd->scope_level = fd->scopes[scope].parent;
@@ -9164,6 +9178,7 @@ static int resolve_scope_var(
   BOOL is_pseudo_var, is_arg_scope;
 
   label_done = -1;
+  QTS_TRACE_VAR_RESOLVE(var_name, scope_level, op);
 
   /* XXX: could be simpler to use a specific function to
      resolve the pseudo variables */
@@ -9186,6 +9201,7 @@ static int resolve_scope_var(
         }
       }
       var_idx = idx;
+      QTS_TRACE_VAR_FOUND(var_idx, 0);
       break;
     } else if (vd->var_name == JS_ATOM__with_ && !is_pseudo_var) {
       dbuf_putc(bc, OP_get_loc);
@@ -9216,6 +9232,7 @@ static int resolve_scope_var(
     }
   }
   if (var_idx >= 0) {
+    QTS_TRACE_VAR_EMIT(op, var_idx);
     if ((op == OP_scope_put_var || op == OP_scope_make_ref) &&
         !(var_idx & ARGUMENT_VAR_OFFSET) && s->vars[var_idx].is_const) {
       /* only happens when assigning a function expression name
@@ -9479,6 +9496,7 @@ static int resolve_scope_var(
     /* find the corresponding closure variable */
     if (var_idx & ARGUMENT_VAR_OFFSET) {
       fd->args[var_idx - ARGUMENT_VAR_OFFSET].is_captured = 1;
+      QTS_TRACE_CLOSURE_CAPTURE(var_idx - ARGUMENT_VAR_OFFSET, var_name);
       idx = get_closure_var(
           ctx,
           s,
@@ -9491,6 +9509,7 @@ static int resolve_scope_var(
           JS_VAR_NORMAL);
     } else {
       fd->vars[var_idx].is_captured = 1;
+      QTS_TRACE_CLOSURE_CAPTURE(var_idx, var_name);
       idx = get_closure_var(
           ctx,
           s,
@@ -9504,6 +9523,7 @@ static int resolve_scope_var(
     }
     if (idx >= 0) {
     has_idx:
+      QTS_TRACE_VAR_FOUND(idx, 0);
       if ((op == OP_scope_put_var || op == OP_scope_make_ref) &&
           s->closure_var[idx].is_const) {
         dbuf_putc(bc, OP_throw_error);

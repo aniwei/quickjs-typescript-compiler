@@ -816,11 +816,49 @@ export class StatementVisitor extends VisitorContext {
    */
   visitReturnStatement(node: ts.ReturnStatement): void {
     const fd = this.funcDef!
-    const sourcePos = node.getStart()
+    // QuickJS anchors return's source position to the `return` token:
+    // parser.c captures `op_token_ptr = s->token.ptr` and later calls
+    // `emit_source_pos(s, op_token_ptr)` right before emitting the return opcode.
+    // See: third_party/QuickJS/src/core/parser.c (TOK_RETURN case).
+    const sourcePos = node.getStart(node.getSourceFile())
 
     if (node.expression) {
       // 有返回值
-      this.context.visit(node.expression)
+      const expr = node.expression
+
+      // Fast-path: `return 'literal'` should not attach a sourcePos to the literal push.
+      // QuickJS typically records source position at the return opcode, not at the literal.
+      if (ts.isStringLiteral(expr)) {
+        const text = expr.text
+        if (text === '') {
+          this.compiler.emitAtomOp(fd, Opcode.OP_push_atom_value, JSAtom.JS_ATOM_empty_string)
+        } else {
+          const atom = this.compiler.addAtom(text)
+          this.compiler.emitOp(fd, Opcode.OP_push_atom_value)
+          this.compiler.emitAtom(fd, atom)
+        }
+        this.compiler.emitOp(fd, Opcode.OP_return, sourcePos)
+        return
+      }
+
+      // QuickJS 通常只在 return opcode 处记录 source pos；
+      // 对于简单字面量返回，抑制表达式自身的 sourcePos，可避免多余的 pc2line entry。
+      const isSimpleLiteralReturn =
+        ts.isStringLiteral(expr) ||
+        ts.isNumericLiteral(expr) ||
+        expr.kind === ts.SyntaxKind.TrueKeyword ||
+        expr.kind === ts.SyntaxKind.FalseKeyword ||
+        expr.kind === ts.SyntaxKind.NullKeyword
+
+      const prevSuppressSourcePos = fd.suppressSourcePos
+      if (isSimpleLiteralReturn) {
+        fd.suppressSourcePos = true
+      }
+      try {
+        this.context.visit(expr)
+      } finally {
+        fd.suppressSourcePos = prevSuppressSourcePos
+      }
       this.compiler.emitOp(fd, Opcode.OP_return, sourcePos)
     } else {
       // 无返回值 - 返回 undefined

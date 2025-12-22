@@ -82,20 +82,18 @@ export class LiteralVisitor extends VisitorContext {
   visitStringLiteral(node: ts.StringLiteral) {
     const fd = this.funcDef
     if (!fd) return
-    
-    const sourcePos = node.getStart()
     const text = node.text
     
     // 空字符串：编译阶段发射长操作码，短操作码优化由 LabelResolver 处理。
     // 这是因为短操作码的值 (182-200) 与临时操作码重叠，VariableResolver 会在第二遍扫描时误判。
     if (text === '') {
-      this.compiler.emitAtomOp(fd, Opcode.OP_push_atom_value, JSAtom.JS_ATOM_empty_string, sourcePos)
+      this.compiler.emitAtomOp(fd, Opcode.OP_push_atom_value, JSAtom.JS_ATOM_empty_string)
       return
     }
     
     // 使用 atom 来表示字符串
     const atom = this.compiler.addAtom(text)
-    this.compiler.emitOp(fd, Opcode.OP_push_atom_value, sourcePos)
+    this.compiler.emitOp(fd, Opcode.OP_push_atom_value)
     this.compiler.emitAtom(fd, atom)
   }
 }

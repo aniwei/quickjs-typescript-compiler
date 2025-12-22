@@ -224,7 +224,11 @@ export class TypeScriptCompiler implements CompilerContext {
       // QuickJS 似乎不为 break/continue/var 发射行号
       if (!ts.isBreakStatement(node) && 
           !ts.isContinueStatement(node) && 
-          !ts.isVariableStatement(node)) {
+          !ts.isVariableStatement(node) &&
+          // return/throw 的 source pos 由对应 opcode 处精确锚定（见 StatementVisitor），
+          // 不应在语句开始时提前发射，否则会污染表达式的 pc2line（尤其是 `return 'hi'` 这种简单函数）。
+          !ts.isReturnStatement(node) &&
+          !ts.isThrowStatement(node)) {
         const sourcePos = node.getStart()
         this.compiler.emitSourcePos(this.funcDef, sourcePos)
       }
@@ -347,6 +351,9 @@ export class TypeScriptCompiler implements CompilerContext {
       case ts.SyntaxKind.CallExpression:
         this.expressionVisitor.visitCallExpression(node as ts.CallExpression)
         break
+      case ts.SyntaxKind.CallChain:
+        this.expressionVisitor.visitCallChain(node as any)
+        break
       case ts.SyntaxKind.NewExpression:
         this.expressionVisitor.visitNewExpression(node as ts.NewExpression)
         break
@@ -359,8 +366,14 @@ export class TypeScriptCompiler implements CompilerContext {
       case ts.SyntaxKind.PropertyAccessExpression:
         this.expressionVisitor.visitPropertyAccessExpression(node as ts.PropertyAccessExpression)
         break
+      case ts.SyntaxKind.PropertyAccessChain:
+        this.expressionVisitor.visitPropertyAccessChain(node as any)
+        break
       case ts.SyntaxKind.ElementAccessExpression:
         this.expressionVisitor.visitElementAccessExpression(node as ts.ElementAccessExpression)
+        break
+      case ts.SyntaxKind.ElementAccessChain:
+        this.expressionVisitor.visitElementAccessChain(node as any)
         break
       case ts.SyntaxKind.NullKeyword:
         this.literalVisitor.visitNullKeyword(node)

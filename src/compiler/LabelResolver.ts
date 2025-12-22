@@ -313,7 +313,11 @@ export class LabelResolver {
             if (cc.lineNum >= 0) lineNum = cc.lineNum
             this.addPc2lineInfo(fd, bcOut.size, lineNum)
             this.putShortCode(bcOut, op + 1, argc) // tail_call / tail_call_method
-            posNext = this.skipDeadCode(fd, bcBuf, bcLen, cc.pos, { lineNum })
+            {
+              const state = { lineNum }
+              posNext = this.skipDeadCode(fd, bcBuf, bcLen, cc.pos, state)
+              lineNum = state.lineNum
+            }
             break
           }
           
@@ -323,14 +327,21 @@ export class LabelResolver {
         }
         
         // === 返回/抛出 - 死代码消除 ===
-        // 注意: 与 QuickJS C 源码一致，return/throw 走 no_change，不调用 add_pc2line_info
+        // QuickJS: return/throw 会先 skip_dead_code，然后 goto no_change；
+        // 而 no_change 分支会 add_pc2line_info(s, bc_out.size, line_num)。
+        // 因此 return/throw 也应记录 pc2line 采样点，否则会丢失最后一条 entry（常见于简单函数/箭头函数/闭包）。
         case Opcode.OP_return:
         case Opcode.OP_return_undef:
         case Opcode.OP_return_async:
         case Opcode.OP_throw:
         case Opcode.OP_throw_error:
-          posNext = this.skipDeadCode(fd, bcBuf, bcLen, posNext, { lineNum })
-          bcOut.put(bcBuf.slice(pos, pos + len))
+          {
+            const state = { lineNum }
+            posNext = this.skipDeadCode(fd, bcBuf, bcLen, posNext, state)
+            lineNum = state.lineNum
+            this.addPc2lineInfo(fd, bcOut.size, lineNum)
+            bcOut.put(bcBuf.slice(pos, pos + len))
+          }
           break
         
         // === 无条件跳转 ===
@@ -354,14 +365,22 @@ export class LabelResolver {
               this.updateLabel(fd, label, -1)
               this.addPc2lineInfo(fd, bcOut.size, lineNum)
               bcOut.putU8(result.op)
-              posNext = this.skipDeadCode(fd, bcBuf, bcLen, posNext, { lineNum })
+              {
+                const state = { lineNum }
+                posNext = this.skipDeadCode(fd, bcBuf, bcLen, posNext, state)
+                lineNum = state.lineNum
+              }
               break
             }
           }
           
           // 输出跳转指令
           this.emitJump(fd, bcOut, op, label, lineNum, pos)
-          posNext = this.skipDeadCode(fd, bcBuf, bcLen, posNext, { lineNum })
+          {
+            const state = { lineNum }
+            posNext = this.skipDeadCode(fd, bcBuf, bcLen, posNext, state)
+            lineNum = state.lineNum
+          }
           break
         }
         

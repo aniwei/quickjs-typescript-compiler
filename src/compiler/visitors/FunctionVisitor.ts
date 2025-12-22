@@ -30,6 +30,54 @@ export class FunctionVisitor extends VisitorContext {
   /** 缓存已提升的函数声明 */
   private hoisted: Map<ts.FunctionDeclaration, { fd: FunctionDef, childIdx: number, cpoolIdx: number }> = new Map()
 
+  private inferSetNameAtomFromContext(expr: ts.Expression): number {
+    // Unwrap parentheses: `const x = ((...) => ...)`
+    let cur: ts.Node = expr
+    while (cur.parent && ts.isParenthesizedExpression(cur.parent)) {
+      cur = cur.parent
+    }
+
+    const parent = cur.parent
+    if (!parent) return 0
+
+    // `const name = <func>` / `let name = <func>`
+    if (ts.isVariableDeclaration(parent) && parent.initializer === cur) {
+      if (ts.isIdentifier(parent.name)) {
+        return this.compiler.addAtom(parent.name.text)
+      }
+      return 0
+    }
+
+    // `name = <func>`
+    if (ts.isBinaryExpression(parent) && parent.right === cur && parent.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
+      const lhs = parent.left
+      if (ts.isIdentifier(lhs)) {
+        return this.compiler.addAtom(lhs.text)
+      }
+      if (ts.isPropertyAccessExpression(lhs)) {
+        return this.compiler.addAtom(lhs.name.text)
+      }
+      if (ts.isElementAccessExpression(lhs)) {
+        const arg = lhs.argumentExpression
+        if (arg && ts.isStringLiteral(arg)) {
+          return this.compiler.addAtom(arg.text)
+        }
+      }
+      return 0
+    }
+
+    // `{ name: <func> }`
+    if (ts.isPropertyAssignment(parent) && parent.initializer === cur) {
+      const n = parent.name
+      if (ts.isIdentifier(n)) return this.compiler.addAtom(n.text)
+      if (ts.isStringLiteral(n)) return this.compiler.addAtom(n.text)
+      if (ts.isNumericLiteral(n)) return this.compiler.addAtom(n.text)
+      return 0
+    }
+
+    return 0
+  }
+
   constructor(context: CompilerContext) {
     super(context)
   }
@@ -169,10 +217,10 @@ export class FunctionVisitor extends VisitorContext {
     this.compiler.emitOp(parentFd, Opcode.OP_fclosure, sourcePos)
     this.compiler.emitU32(parentFd, cpoolIdx)
 
-    // 如果没有名称，设置为 null
+    // 如果没有名称，尝试从赋值/初始化上下文推断 (QuickJS 行为)
     if (funcName === 0) {
       this.compiler.emitOp(parentFd, Opcode.OP_set_name)
-      this.compiler.emitU32(parentFd, 0) // JS_ATOM_NULL
+      this.compiler.emitU32(parentFd, this.inferSetNameAtomFromContext(node) || 0) // JS_ATOM_NULL
     }
   }
 
@@ -237,7 +285,7 @@ export class FunctionVisitor extends VisitorContext {
 
     // 箭头函数没有名称，但可能从赋值推断
     this.compiler.emitOp(parentFd, Opcode.OP_set_name)
-    this.compiler.emitU32(parentFd, 0) // JS_ATOM_NULL
+    this.compiler.emitU32(parentFd, this.inferSetNameAtomFromContext(node) || 0) // JS_ATOM_NULL
   }
 
   // ============================================================================
@@ -255,12 +303,20 @@ export class FunctionVisitor extends VisitorContext {
     const parentFd = this.funcDef!
     const sourcePos = node.getStart()
 
+    const isObjectLiteralMethod = ts.isObjectLiteralExpression(node.parent)
+
     // 确定函数类型
     let funcType = JSParseFunctionEnum.JS_PARSE_FUNC_METHOD
     let funcKind = this.getFunctionKind(node)
 
     // 获取方法名
-    const funcName = this.getPropertyNameAtom(node.name)
+    // QuickJS: 对象字面量的 method bytecode header 通常是匿名的 (name=<null>)，
+    // 方法名通过 define_method 的 atom 单独携带。
+    const funcName = isObjectLiteralMethod ? 0 : this.getPropertyNameAtom(node.name)
+
+    // QuickJS: 仅当方法体实际使用 super 时才需要 home object。
+    // 否则会清掉 needHomeObject flag，以减少 bytecode header 差异。
+    const needsHomeObject = this.bodyContainsSuper(node.body)
 
     // 创建子函数定义
     const fd = new FunctionDef(parentFd, false, false)
@@ -272,14 +328,14 @@ export class FunctionVisitor extends VisitorContext {
 
     // 方法属性 - 对应 parser.c:13022-13030
     fd.hasPrototype = false // 方法没有 prototype
-    fd.hasHomeObject = true // 方法有 home object (用于 super)
+    fd.hasHomeObject = needsHomeObject // 仅当需要 super 时才分配
     fd.hasArgumentsBinding = true
     fd.hasThisBinding = true
     fd.newTargetAllowed = true
     fd.superCallAllowed = false
     fd.superAllowed = true // 方法可以使用 super
     fd.argumentsAllowed = true
-    fd.needHomeObject = true
+    fd.needHomeObject = needsHomeObject
 
     // 添加到父函数的子函数列表
     this.compiler.addChild(parentFd, fd)
@@ -292,13 +348,42 @@ export class FunctionVisitor extends VisitorContext {
     fd.parentCpoolIdx = cpoolIdx
 
     // 发射 OP_fclosure
-    this.compiler.emitOp(parentFd, Opcode.OP_fclosure, sourcePos)
+    // QuickJS: 对象字面量方法路径不会为 OP_fclosure 绑定 source-pos。
+    // 参见 third_party/QuickJS/src/core/parser.c: js_parse_object_literal()（方法分支用 emit_op）。
+    this.compiler.emitOp(parentFd, Opcode.OP_fclosure, isObjectLiteralMethod ? undefined : sourcePos)
     this.compiler.emitU32(parentFd, cpoolIdx)
 
     // 对于需要 home object 的方法，发射 OP_set_home_object
-    if (fd.needHomeObject) {
+    // QuickJS: 对象字面量方法的 home object 由 define_method 处理，这里不需要显式 set_home_object。
+    if (fd.needHomeObject && !isObjectLiteralMethod) {
       this.compiler.emitOp(parentFd, Opcode.OP_set_home_object)
     }
+  }
+
+  private bodyContainsSuper(body: ts.ConciseBody | undefined): boolean {
+    if (!body) return false
+
+    let found = false
+    const root: ts.Node = body
+
+    const walk = (node: ts.Node) => {
+      if (found) return
+
+      if (node.kind === ts.SyntaxKind.SuperKeyword) {
+        found = true
+        return
+      }
+
+      // Avoid counting nested functions/classes: only the current function's own body matters.
+      if (node !== root && (ts.isFunctionLike(node) || ts.isClassLike(node))) {
+        return
+      }
+
+      ts.forEachChild(node, walk)
+    }
+
+    walk(root)
+    return found
   }
 
   /**

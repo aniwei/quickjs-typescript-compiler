@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/function-expressions/cli/function-expressions.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/function-expressions/cli/function-expressions.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/function-expressions/cli/function-expressions.pc2line.txt",
-    "bytecodeSize": 334,
+    "bytecodeSize": 354,
     "pc2lineLength": 24,
     "stackMax": 0
   },
   "bytecode": {
-    "identical": false,
-    "tsSize": 272,
+    "identical": true,
+    "tsSize": 292,
     "wasmSize": 292,
-    "sizeDiff": -20,
-    "sizeDiffPercent": -6.8493150684931505
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
   },
   "trace": {
     "differenceCount": 0,

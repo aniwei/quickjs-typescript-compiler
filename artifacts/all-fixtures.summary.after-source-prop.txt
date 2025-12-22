@@ -1,0 +1,4786 @@
+Looking for fixtures in: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures
+Found 117 entries in /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures
+🔁 Comparing 61 fixtures from /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures
+
+=== __tests__/fixtures/array-literal.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const arr = [1, 2, 3];
+console.log(arr[1]);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/array-literal.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var arr,128
+        define_var arr,128
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        put_var_init arr
+        get_var console
+        get_field2 log
+        get_var arr
+        push_1 1
+        get_array_el
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/array-literal/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 134 bytes
+WASM compiler:       134 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/array-nested.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const arr = [
+    [1, 2],
+    [3, 4],
+    { a: 5 }
+];
+console.log(arr[0][1]);
+console.log(arr[2].a);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/array-nested.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var arr,128
+        define_var arr,128
+        push_1 1
+        push_2 2
+        array_from 2
+        push_3 3
+        push_4 4
+        array_from 2
+        object
+        push_5 5
+        define_field a
+        array_from 3
+        put_var_init arr
+        get_var console
+        get_field2 log
+        get_var arr
+        push_0 0
+        get_array_el
+        push_1 1
+        get_array_el
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var arr
+        push_2 2
+        get_array_el
+        get_field a
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/array-nested/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 193 bytes
+WASM compiler:       193 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/array-spread.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const a = [1, 2];
+const b = [...a, 3];
+console.log(b[2]);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/array-spread.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var a,128
+        check_define_var b,128
+        define_var a,128
+        define_var b,128
+        push_1 1
+        push_2 2
+        array_from 2
+        put_var_init a
+        array_from 0
+        push_0 0
+        get_var a
+        append
+        push_3 3
+        define_array_el
+        inc
+        drop
+        put_var_init b
+        get_var console
+        get_field2 log
+        get_var b
+        push_2 2
+        get_array_el
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/array-spread/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 165 bytes
+WASM compiler:       165 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/arrow-fn-basic.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const add = (a, b) => {
+    return a + b;
+};
+console.log(add(1, 2));
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/arrow-fn-basic.js:1:13: function: <null>
+  args: a b
+  stack_size: 2
+  opcodes:
+        get_arg0 0: a
+        get_arg1 1: b
+        add
+        return
+
+__tests__/fixtures/arrow-fn-basic.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 5
+  opcodes:
+        check_define_var add,128
+        define_var add,128
+        fclosure8 0: [bytecode <null>]
+        set_name add
+        put_var_init add
+        get_var console
+        get_field2 log
+        get_var add
+        push_1 1
+        push_2 2
+        call2 2
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/arrow-fn-basic/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 176 bytes
+WASM compiler:       178 bytes
+Size difference:     -2 bytes (-1.1%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/arrow-fn-complex.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const complex = (x) => {
+    const y = 10;
+    if (x > y) {
+        return x - y;
+    }
+    return y - x;
+};
+console.log(complex(5));
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/arrow-fn-complex.js:1:17: function: <null>
+  args: x
+  locals:
+    0: const y [level:1 next:-1]
+  stack_size: 2
+  opcodes:
+        set_loc_uninitialized 0: y
+        push_i8 10
+        put_loc0 0: y
+        get_arg0 0: x
+        get_loc_check 0: y
+        gt
+        if_false8 19
+        get_arg0 0: x
+        get_loc_check 0: y
+        sub
+        return
+   19:  get_loc_check 0: y
+        get_arg0 0: x
+        sub
+        return
+
+__tests__/fixtures/arrow-fn-complex.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var complex,128
+        define_var complex,128
+        fclosure8 0: [bytecode <null>]
+        set_name complex
+        put_var_init complex
+        get_var console
+        get_field2 log
+        get_var complex
+        push_5 5
+        call1 1
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/arrow-fn-complex/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 220 bytes
+WASM compiler:       224 bytes
+Size difference:     -4 bytes (-1.8%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/async-await.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+async function fetchValue() {
+    return 42;
+}
+async function run() {
+    const value = await fetchValue();
+    console.log('value', value);
+    return value + 1;
+}
+run().then((next) => console.log('next', next));
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/async-await.js:1:1: function: fetchValue
+  stack_size: 1
+  opcodes:
+        push_i8 42
+        return_async
+
+__tests__/fixtures/async-await.js:4:1: function: run
+  locals:
+    0: const value [level:1 next:-1]
+  stack_size: 4
+  opcodes:
+        set_loc_uninitialized 0: value
+        get_var fetchValue
+        call0 0
+        await
+        put_loc0 0: value
+        get_var console
+        get_field2 log
+        push_atom_value value
+        get_loc_check 0: value
+        call_method 2
+        drop
+        get_loc_check 0: value
+        push_1 1
+        add
+        return_async
+
+__tests__/fixtures/async-await.js:9:12: function: <null>
+  args: next
+  stack_size: 4
+  opcodes:
+        get_var console
+        get_field2 log
+        push_atom_value next
+        get_arg0 0: next
+        tail_call_method 2
+
+__tests__/fixtures/async-await.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var fetchValue,64
+        check_define_var run,64
+        fclosure8 0: [bytecode fetchValue]
+        define_func fetchValue,0
+        fclosure8 1: [bytecode run]
+        define_func run,0
+        get_var run
+        call0 0
+        get_field2 then
+        fclosure8 2: [bytecode <null>]
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-await/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 301 bytes
+WASM compiler:       302 bytes
+Size difference:     -1 bytes (-0.3%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/binary-ops.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+console.log(1 + 2);
+console.log(1 - 2);
+console.log(2 * 3);
+console.log(4 / 2);
+console.log(5 % 2);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/binary-ops.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        add
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        sub
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_2 2
+        push_3 3
+        mul
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_4 4
+        push_2 2
+        div
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_5 5
+        push_2 2
+        mod
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/binary-ops/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 196 bytes
+WASM compiler:       196 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/bitwise-ops.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+console.log(1 & 2);
+console.log(1 | 2);
+console.log(1 ^ 2);
+console.log(1 << 2);
+console.log(1 >> 2);
+console.log(1 >>> 2);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/bitwise-ops.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        and
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        or
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        xor
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        shl
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        sar
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        shr
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/bitwise-ops/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 222 bytes
+WASM compiler:       222 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/class-accessors.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+class Box {
+    _value = 0;
+    get value() {
+        console.log("Getting value");
+        return this._value;
+    }
+    set value(v) {
+        console.log("Setting value");
+        this._value = v;
+    }
+}
+const b = new Box();
+b.value = 10;
+console.log(b.value);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/class-accessors.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 2
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        goto8 7
+    7:  get_loc0 0: this
+        push_0 0
+        define_field _value
+        return_undef
+
+__tests__/fixtures/class-accessors.js:3:5: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_var console
+        get_field2 log
+        push_atom_value "Getting value"
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_field _value
+        return
+
+__tests__/fixtures/class-accessors.js:7:5: function: <null>
+  mode: strict
+  args: v
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_var console
+        get_field2 log
+        push_atom_value "Setting value"
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_arg0 0: v
+        put_field _value
+        return_undef
+
+__tests__/fixtures/class-accessors.js:11:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  return_undef
+
+__tests__/fixtures/class-accessors.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const Box [level:2 next:-1]
+    2: const <class_fields_init> [level:3 next:1]
+  stack_size: 3
+  opcodes:
+        check_define_var Box,128
+        check_define_var b,128
+        define_var Box,130
+        define_var b,128
+        set_loc_uninitialized 1: Box
+        undefined
+        set_loc_uninitialized 2: "<class_fields_init>"
+        push_const8 2: [bytecode <null>]
+        define_class Box,0
+        fclosure8 0: [bytecode <null>]
+        define_method value,1
+        fclosure8 1: [bytecode <null>]
+        define_method value,2
+        fclosure8 3: [bytecode <null>]
+        set_home_object
+        put_loc2 2: "<class_fields_init>"
+        drop
+        set_loc1 1: Box
+        close_loc 2: "<class_fields_init>"
+        put_var_init Box
+        get_var Box
+        dup
+        call_constructor 0
+        put_var_init b
+        get_var b
+        push_i8 10
+        insert2
+        put_field value
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var b
+        get_field value
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-accessors/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 458 bytes
+WASM compiler:       485 bytes
+Size difference:     -27 bytes (-5.6%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/class-basic.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+class Point {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/class-basic.js:2:5: function: <null>
+  mode: strict
+  args: x y
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  drop
+        get_loc0 0: this
+        get_arg0 0: x
+        put_field x
+        get_loc0 0: this
+        get_arg1 1: y
+        put_field y
+        return_undef
+
+__tests__/fixtures/class-basic.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const Point [level:2 next:-1]
+    2: const <class_fields_init> [level:3 next:1]
+  stack_size: 3
+  opcodes:
+        check_define_var Point,128
+        define_var Point,130
+        set_loc_uninitialized 1: Point
+        undefined
+        set_loc_uninitialized 2: "<class_fields_init>"
+        push_const8 0: [bytecode <null>]
+        define_class Point,0
+        undefined
+        put_loc2 2: "<class_fields_init>"
+        drop
+        set_loc1 1: Point
+        close_loc 2: "<class_fields_init>"
+        put_var_init Point
+        get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-basic/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 200 bytes
+WASM compiler:       197 bytes
+Size difference:     +3 bytes (+1.5%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/class-inheritance.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+class Animal {
+    name;
+    constructor(name) {
+        this.name = name;
+    }
+    speak() {
+        console.log("Animal speaks");
+    }
+}
+class Dog extends Animal {
+    breed;
+    constructor(name, breed) {
+        super(name);
+        this.breed = breed;
+    }
+    speak() {
+        super.speak();
+        console.log("Dog barks");
+    }
+}
+const d = new Dog("Rex", "German Shepherd");
+d.speak();
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/class-inheritance.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 2
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        goto8 7
+    7:  get_loc0 0: this
+        undefined
+        define_field name
+        return_undef
+
+__tests__/fixtures/class-inheritance.js:3:5: function: <null>
+  mode: strict
+  args: name
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  drop
+        get_loc0 0: this
+        get_arg0 0: name
+        put_field name
+        return_undef
+
+__tests__/fixtures/class-inheritance.js:6:5: function: <null>
+  mode: strict
+  stack_size: 3
+  opcodes:
+        get_var console
+        get_field2 log
+        push_atom_value "Animal speaks"
+        call_method 1
+        return_undef
+
+__tests__/fixtures/class-inheritance.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 2
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        goto8 7
+    7:  get_loc0 0: this
+        undefined
+        define_field breed
+        return_undef
+
+__tests__/fixtures/class-inheritance.js:12:5: function: <null>
+  mode: strict
+  args: name breed
+  locals:
+    0: var this.active_func
+    1: var new.target
+    2: let this
+  closure vars:
+    0: <class_fields_init> local:loc4 const
+  stack_size: 3
+  opcodes:
+        special_object 2
+        put_loc0 0: "this.active_func"
+        special_object 3
+        put_loc1 1: "new.target"
+        set_loc_uninitialized 2: this
+        check_ctor
+        get_loc0 0: "this.active_func"
+        get_super
+        get_loc1 1: "new.target"
+        get_arg0 0: name
+        call_constructor 1
+        dup
+        put_loc_check_init 2: this
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 34
+        get_loc_check 2: this
+        swap
+        call_method 0
+   34:  drop
+        drop
+        get_loc_check 2: this
+        get_arg1 1: breed
+        put_field breed
+        get_loc_checkthis 2: this
+        return
+
+__tests__/fixtures/class-inheritance.js:16:5: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 3
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc1 1: "<home_object>"
+        get_super
+        push_atom_value speak
+        get_array_el
+        call_method 0
+        drop
+        get_var console
+        get_field2 log
+        push_atom_value "Dog barks"
+        call_method 1
+        return_undef
+
+__tests__/fixtures/class-inheritance.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const Animal [level:2 next:-1]
+    2: const <class_fields_init> [level:3 next:1]
+    3: const Dog [level:4 next:-1]
+    4: const <class_fields_init> [level:5 next:3]
+  stack_size: 4
+  opcodes:
+        check_define_var Animal,128
+        check_define_var Dog,128
+        check_define_var d,128
+        define_var Animal,130
+        define_var Dog,130
+        define_var d,128
+        set_loc_uninitialized 1: Animal
+        undefined
+        set_loc_uninitialized 2: "<class_fields_init>"
+        push_const8 0: [bytecode <null>]
+        define_class Animal,0
+        fclosure8 1: [bytecode <null>]
+        define_method speak,0
+        fclosure8 2: [bytecode <null>]
+        set_home_object
+        put_loc2 2: "<class_fields_init>"
+        drop
+        set_loc1 1: Animal
+        close_loc 2: "<class_fields_init>"
+        put_var_init Animal
+        set_loc_uninitialized 3: Dog
+        get_var Animal
+        set_loc_uninitialized 4: "<class_fields_init>"
+        push_const8 3: [bytecode <null>]
+        define_class Dog,1
+        fclosure8 4: [bytecode <null>]
+        define_method speak,0
+        fclosure8 5: [bytecode <null>]
+        set_home_object
+        put_loc8 4: "<class_fields_init>"
+        drop
+        set_loc3 3: Dog
+        close_loc 4: "<class_fields_init>"
+        put_var_init Dog
+        get_var Dog
+        dup
+        push_atom_value Rex
+        push_atom_value "German Shepherd"
+        call_constructor 2
+        put_var_init d
+        get_var d
+        get_field2 speak
+        call_method 0
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-inheritance/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 664 bytes
+WASM compiler:       709 bytes
+Size difference:     -45 bytes (-6.3%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/class-methods.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+class Calculator {
+    value;
+    constructor(val) {
+        this.value = val;
+    }
+    add(n) {
+        this.value += n;
+        return this.value;
+    }
+    static create(val) {
+        return new Calculator(val);
+    }
+}
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/class-methods.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 2
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        goto8 7
+    7:  get_loc0 0: this
+        undefined
+        define_field value
+        return_undef
+
+__tests__/fixtures/class-methods.js:3:5: function: <null>
+  mode: strict
+  args: val
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  drop
+        get_loc0 0: this
+        get_arg0 0: val
+        put_field value
+        return_undef
+
+__tests__/fixtures/class-methods.js:6:5: function: <null>
+  mode: strict
+  args: n
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 value
+        get_arg0 0: n
+        add
+        put_field value
+        get_loc0 0: this
+        get_field value
+        return
+
+__tests__/fixtures/class-methods.js:10:12: function: <null>
+  mode: strict
+  args: val
+  closure vars:
+    0: Calculator local:loc1 const
+  stack_size: 3
+  opcodes:
+        get_var_ref_check 0: Calculator
+        dup
+        get_arg0 0: val
+        call_constructor 1
+        return
+
+__tests__/fixtures/class-methods.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const Calculator [level:2 next:-1]
+    2: const <class_fields_init> [level:3 next:1]
+  stack_size: 3
+  opcodes:
+        check_define_var Calculator,128
+        define_var Calculator,130
+        set_loc_uninitialized 1: Calculator
+        undefined
+        set_loc_uninitialized 2: "<class_fields_init>"
+        push_const8 0: [bytecode <null>]
+        define_class Calculator,0
+        fclosure8 1: [bytecode <null>]
+        define_method add,0
+        swap
+        fclosure8 2: [bytecode <null>]
+        define_method create,0
+        swap
+        fclosure8 3: [bytecode <null>]
+        set_home_object
+        put_loc2 2: "<class_fields_init>"
+        drop
+        set_loc1 1: Calculator
+        close_loc 2: "<class_fields_init>"
+        close_loc 1: Calculator
+        put_var_init Calculator
+        get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-methods/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 364 bytes
+WASM compiler:       370 bytes
+Size difference:     -6 bytes (-1.6%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/class-private-fields.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+class Counter {
+    #count = 0;
+    increment() {
+        this.#count++;
+    }
+    get value() {
+        return this.#count;
+    }
+}
+const c = new Counter();
+c.increment();
+console.log(c.value);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/class-private-fields.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  closure vars:
+    0: #count local:loc2 const
+  stack_size: 3
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        goto8 7
+    7:  get_loc0 0: this
+        get_var_ref_check 0: "#count"
+        push_0 0
+        define_private_field
+        return_undef
+
+__tests__/fixtures/class-private-fields.js:3:5: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: #count local:loc2 const
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        dup
+        get_var_ref0 0: "#count"
+        get_private_field
+        post_inc
+        perm3
+        get_var_ref0 0: "#count"
+        put_private_field
+        return_undef
+
+__tests__/fixtures/class-private-fields.js:6:5: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: #count local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_var_ref0 0: "#count"
+        get_private_field
+        return
+
+__tests__/fixtures/class-private-fields.js:9:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc3 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  return_undef
+
+__tests__/fixtures/class-private-fields.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const Counter [level:2 next:-1]
+    2: const #count [level:3 next:1]
+    3: const <class_fields_init> [level:3 next:2]
+  stack_size: 3
+  opcodes:
+        check_define_var Counter,128
+        check_define_var c,128
+        define_var Counter,130
+        define_var c,128
+        set_loc_uninitialized 1: Counter
+        undefined
+        set_loc_uninitialized 3: "<class_fields_init>"
+        set_loc_uninitialized 2: "#count"
+        push_const8 2: [bytecode <null>]
+        define_class Counter,0
+        private_symbol "#count"
+        put_loc2 2: "#count"
+        fclosure8 0: [bytecode <null>]
+        define_method increment,0
+        fclosure8 1: [bytecode <null>]
+        define_method value,1
+        fclosure8 3: [bytecode <null>]
+        set_home_object
+        put_loc3 3: "<class_fields_init>"
+        drop
+        set_loc1 1: Counter
+        close_loc 3: "<class_fields_init>"
+        close_loc 2: "#count"
+        put_var_init Counter
+        get_var Counter
+        dup
+        call_constructor 0
+        put_var_init c
+        get_var c
+        get_field2 increment
+        call_method 0
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var c
+        get_field value
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-private-fields/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 421 bytes
+WASM compiler:       450 bytes
+Size difference:     -29 bytes (-6.4%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/class-static-block.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+class Counter {
+    static #count = 0;
+    static label = 'counter';
+    static {
+        this.#count = 1;
+        this.label = 'booted';
+    }
+    static #bump() {
+        this.#count += 1;
+    }
+    static inc() {
+        this.#bump();
+        return this.#count;
+    }
+    static get value() {
+        return this.#count;
+    }
+}
+console.log(Counter.label);
+console.log(Counter.inc());
+console.log(Counter.value);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/class-static-block.js:4:12: function: <null>
+  mode: strict
+  closure vars:
+    0: this local:loc0 var
+    1: #count parent:loc0 const
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: this
+        push_1 1
+        insert2
+        get_var_ref1 1: "#count"
+        put_private_field
+        drop
+        get_var_ref0 0: this
+        push_atom_value booted
+        put_field label
+        return_undef
+
+__tests__/fixtures/class-static-block.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: #count local:loc2 const
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_var_ref_check 0: "#count"
+        push_0 0
+        define_private_field
+        get_loc0 0: this
+        push_atom_value counter
+        define_field label
+        fclosure8 0: [bytecode <null>]
+        get_loc0 0: this
+        swap
+        call_method 0
+        return_undef
+
+__tests__/fixtures/class-static-block.js:8:12: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: #count local:loc2 const
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        dup
+        get_var_ref0 0: "#count"
+        get_private_field
+        push_1 1
+        add
+        insert2
+        get_var_ref0 0: "#count"
+        put_private_field
+        return_undef
+
+__tests__/fixtures/class-static-block.js:11:12: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: #bump local:loc3 const
+    1: #count local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_var_ref0 0: "#bump"
+        check_brand
+        call_method 0
+        drop
+        get_loc0 0: this
+        get_var_ref1 1: "#count"
+        get_private_field
+        return
+
+__tests__/fixtures/class-static-block.js:15:12: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: #count local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_var_ref0 0: "#count"
+        get_private_field
+        return
+
+__tests__/fixtures/class-static-block.js:18:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc4 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  return_undef
+
+__tests__/fixtures/class-static-block.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const Counter [level:2 next:-1]
+    2: const #count [level:3 next:1]
+    3: const #bump [level:3 next:2]
+    4: const <class_fields_init> [level:3 next:3]
+  stack_size: 4
+  opcodes:
+        check_define_var Counter,128
+        define_var Counter,130
+        set_loc_uninitialized 1: Counter
+        undefined
+        set_loc_uninitialized 4: "<class_fields_init>"
+        set_loc_uninitialized 3: "#bump"
+        set_loc_uninitialized 2: "#count"
+        push_const8 3: [bytecode <null>]
+        define_class Counter,0
+        swap
+        private_symbol "#count"
+        put_loc2 2: "#count"
+        swap
+        swap
+        swap
+        swap
+        fclosure8 0: [bytecode <null>]
+        set_home_object
+        set_name "#bump"
+        put_loc3 3: "#bump"
+        swap
+        swap
+        fclosure8 1: [bytecode <null>]
+        define_method inc,0
+        swap
+        swap
+        fclosure8 2: [bytecode <null>]
+        define_method value,1
+        swap
+        undefined
+        put_loc8 4: "<class_fields_init>"
+        drop
+        dup
+        dup
+        add_brand
+        set_loc1 1: Counter
+        dup
+        fclosure8 4: [bytecode <null>]
+        set_home_object
+        call_method 0
+        drop
+        close_loc 4: "<class_fields_init>"
+        close_loc 2: "#count"
+        put_var_init Counter
+        get_var console
+        get_field2 log
+        get_var Counter
+        get_field label
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var Counter
+        get_field2 inc
+        call_method 0
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var Counter
+        get_field value
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-static-block/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 621 bytes
+WASM compiler:       642 bytes
+Size difference:     -21 bytes (-3.3%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/closure-basic.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+function outer() {
+    let x = 10;
+    function inner() {
+        return x;
+    }
+    return inner();
+}
+outer();
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/closure-basic.js:3:5: function: inner
+  closure vars:
+    0: x local:loc0 let
+  stack_size: 1
+  opcodes:
+        get_var_ref_check 0: x
+        return
+
+__tests__/fixtures/closure-basic.js:1:1: function: outer
+  locals:
+    0: let x [level:1 next:-1]
+    1: var inner
+  stack_size: 1
+  opcodes:
+        fclosure8 0: [bytecode inner]
+        put_loc1 1: inner
+        set_loc_uninitialized 0: x
+        push_i8 10
+        put_loc0 0: x
+        get_loc1 1: inner
+        tail_call 0
+
+__tests__/fixtures/closure-basic.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var outer,64
+        fclosure8 0: [bytecode outer]
+        define_func outer,0
+        get_var outer
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-basic/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 184 bytes
+WASM compiler:       186 bytes
+Size difference:     -2 bytes (-1.1%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/closure-short.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+function short() {
+    var v0 = 0;
+    var v1 = 1;
+    var v2 = 2;
+    var v3 = 3;
+    var v4 = 4;
+    function inner() {
+        v0++;
+        v1++;
+        v2++;
+        v3++;
+        v4++;
+    }
+    inner();
+}
+short();
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/closure-short.js:7:5: function: inner
+  closure vars:
+    0: v0 local:loc0 var
+    1: v1 local:loc1 var
+    2: v2 local:loc2 var
+    3: v3 local:loc3 var
+    4: v4 local:loc4 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: v0
+        inc
+        put_var_ref0 0: v0
+        get_var_ref1 1: v1
+        inc
+        put_var_ref1 1: v1
+        get_var_ref2 2: v2
+        inc
+        put_var_ref2 2: v2
+        get_var_ref3 3: v3
+        inc
+        put_var_ref3 3: v3
+        get_var_ref 4: v4
+        inc
+        put_var_ref 4: v4
+        return_undef
+
+__tests__/fixtures/closure-short.js:1:1: function: short
+  locals:
+    0: var v0
+    1: var v1
+    2: var v2
+    3: var v3
+    4: var v4
+    5: var inner
+  stack_size: 1
+  opcodes:
+        fclosure8 0: [bytecode inner]
+        put_loc8 5: inner
+        push_0 0
+        put_loc0 0: v0
+        push_1 1
+        put_loc1 1: v1
+        push_2 2
+        put_loc2 2: v2
+        push_3 3
+        put_loc3 3: v3
+        push_4 4
+        put_loc8 4: v4
+        get_loc8 5: inner
+        call0 0
+        return_undef
+
+__tests__/fixtures/closure-short.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var short,64
+        fclosure8 0: [bytecode short]
+        define_func short,0
+        get_var short
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-short/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 273 bytes
+WASM compiler:       273 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/closure-stress.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+function stress() {
+    let l0 = 0;
+    let l1 = 1;
+    let l2 = 2;
+    let l3 = 3;
+    let l4 = 4;
+    var v0 = 10;
+    var v1 = 11;
+    var v2 = 12;
+    var v3 = 13;
+    var v4 = 14;
+    function inner() {
+        // Lexical (checked) - should use OP_get_var_ref_check (long)
+        l0++;
+        l1++;
+        l2++;
+        l3++;
+        l4++;
+        // Var (unchecked) - should use OP_get_var_ref0-3 (short) for first 4, then OP_get_var_ref (long)
+        v0++;
+        v1++;
+        v2++;
+        v3++;
+        v4++;
+    }
+    inner();
+}
+stress();
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/closure-stress.js:12:5: function: inner
+  closure vars:
+    0: l0 local:loc0 let
+    1: l1 local:loc1 let
+    2: l2 local:loc2 let
+    3: l3 local:loc3 let
+    4: l4 local:loc4 let
+    5: v0 local:loc5 var
+    6: v1 local:loc6 var
+    7: v2 local:loc7 var
+    8: v3 local:loc8 var
+    9: v4 local:loc9 var
+  stack_size: 2
+  opcodes:
+        get_var_ref_check 0: l0
+        post_inc
+        put_var_ref_check 0: l0
+        drop
+        get_var_ref_check 1: l1
+        post_inc
+        put_var_ref_check 1: l1
+        drop
+        get_var_ref_check 2: l2
+        post_inc
+        put_var_ref_check 2: l2
+        drop
+        get_var_ref_check 3: l3
+        post_inc
+        put_var_ref_check 3: l3
+        drop
+        get_var_ref_check 4: l4
+        post_inc
+        put_var_ref_check 4: l4
+        drop
+        get_var_ref 5: v0
+        inc
+        put_var_ref 5: v0
+        get_var_ref 6: v1
+        inc
+        put_var_ref 6: v1
+        get_var_ref 7: v2
+        inc
+        put_var_ref 7: v2
+        get_var_ref 8: v3
+        inc
+        put_var_ref 8: v3
+        get_var_ref 9: v4
+        inc
+        put_var_ref 9: v4
+        return_undef
+
+__tests__/fixtures/closure-stress.js:1:1: function: stress
+  locals:
+    0: let l0 [level:1 next:-1]
+    1: let l1 [level:1 next:0]
+    2: let l2 [level:1 next:1]
+    3: let l3 [level:1 next:2]
+    4: let l4 [level:1 next:3]
+    5: var v0
+    6: var v1
+    7: var v2
+    8: var v3
+    9: var v4
+   10: var inner
+  stack_size: 1
+  opcodes:
+        fclosure8 0: [bytecode inner]
+        put_loc8 10: inner
+        set_loc_uninitialized 4: l4
+        set_loc_uninitialized 3: l3
+        set_loc_uninitialized 2: l2
+        set_loc_uninitialized 1: l1
+        set_loc_uninitialized 0: l0
+        push_0 0
+        put_loc0 0: l0
+        push_1 1
+        put_loc1 1: l1
+        push_2 2
+        put_loc2 2: l2
+        push_3 3
+        put_loc3 3: l3
+        push_4 4
+        put_loc8 4: l4
+        push_i8 10
+        put_loc8 5: v0
+        push_i8 11
+        put_loc8 6: v1
+        push_i8 12
+        put_loc8 7: v2
+        push_i8 13
+        put_loc8 8: v3
+        push_i8 14
+        put_loc8 9: v4
+        get_loc8 10: inner
+        call0 0
+        return_undef
+
+__tests__/fixtures/closure-stress.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var stress,64
+        fclosure8 0: [bytecode stress]
+        define_func stress,0
+        get_var stress
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-stress/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 446 bytes
+WASM compiler:       446 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/closure-vars.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+function testClosure() {
+    let a = 1;
+    let b = 2;
+    const c = 3;
+    var d = 4;
+    function inner() {
+        console.log(a);
+        console.log(b);
+        console.log(c);
+        console.log(d);
+        a++;
+        b = 10;
+        d = 20;
+    }
+    inner();
+}
+testClosure();
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/closure-vars.js:6:5: function: inner
+  closure vars:
+    0: a local:loc0 let
+    1: b local:loc1 let
+    2: c local:loc2 const
+    3: d local:loc3 var
+  stack_size: 3
+  opcodes:
+        get_var console
+        get_field2 log
+        get_var_ref_check 0: a
+        call_method 1
+        drop
+        get_var console
+        get_field2 log
+        get_var_ref_check 1: b
+        call_method 1
+        drop
+        get_var console
+        get_field2 log
+        get_var_ref_check 2: c
+        call_method 1
+        drop
+        get_var console
+        get_field2 log
+        get_var_ref3 3: d
+        call_method 1
+        drop
+        get_var_ref_check 0: a
+        post_inc
+        put_var_ref_check 0: a
+        drop
+        push_i8 10
+        dup
+        put_var_ref_check 1: b
+        drop
+        push_i8 20
+        put_var_ref3 3: d
+        return_undef
+
+__tests__/fixtures/closure-vars.js:1:1: function: testClosure
+  locals:
+    0: let a [level:1 next:-1]
+    1: let b [level:1 next:0]
+    2: const c [level:1 next:1]
+    3: var d
+    4: var inner
+  stack_size: 1
+  opcodes:
+        fclosure8 0: [bytecode inner]
+        put_loc8 4: inner
+        set_loc_uninitialized 2: c
+        set_loc_uninitialized 1: b
+        set_loc_uninitialized 0: a
+        push_1 1
+        put_loc0 0: a
+        push_2 2
+        put_loc1 1: b
+        push_3 3
+        put_loc2 2: c
+        push_4 4
+        put_loc3 3: d
+        get_loc8 4: inner
+        call0 0
+        return_undef
+
+__tests__/fixtures/closure-vars.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var testClosure,64
+        fclosure8 0: [bytecode testClosure]
+        define_func testClosure,0
+        get_var testClosure
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-vars/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 365 bytes
+WASM compiler:       365 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/comparison-ops.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+console.log(1 < 2);
+console.log(1 > 2);
+console.log(1 <= 2);
+console.log(1 >= 2);
+console.log(1 == 2);
+console.log(1 != 2);
+console.log(1 === 2);
+console.log(1 !== 2);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/comparison-ops.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        lt
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        gt
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        lte
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        gte
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        eq
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        neq
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        strict_eq
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        strict_neq
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/comparison-ops/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 276 bytes
+WASM compiler:       276 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/compute.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/compute.js:1:1: function: compute
+  args: a b
+  stack_size: 2
+  opcodes:
+        get_arg0 0: a
+        get_arg1 1: b
+        add
+        return
+
+__tests__/fixtures/compute.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var compute,64
+        fclosure8 0: [bytecode compute]
+        define_func compute,0
+        get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/compute/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 125 bytes
+WASM compiler:       127 bytes
+Size difference:     -2 bytes (-1.6%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/computed-property.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const key = 'a';
+const obj = { [key]: 1 };
+console.log(obj[key]);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/computed-property.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var key,128
+        check_define_var obj,128
+        define_var key,128
+        define_var obj,128
+        push_atom_value a
+        put_var_init key
+        object
+        get_var key
+        to_propkey
+        push_1 1
+        define_array_el
+        drop
+        put_var_init obj
+        get_var console
+        get_field2 log
+        get_var obj
+        get_var key
+        get_array_el
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/computed-property/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 174 bytes
+WASM compiler:       178 bytes
+Size difference:     -4 bytes (-2.2%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/conditional-operator.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+console.log(Date.now() ? 1 : 2);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/conditional-operator.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        get_var console
+        get_field2 log
+        get_var Date
+        get_field2 now
+        call_method 0
+        if_false8 28
+        push_1 1
+        goto8 29
+   28:  push_2 2
+   29:  call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/conditional-operator/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 130 bytes
+WASM compiler:       130 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/console-log.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+console.log("Hello World");
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/console-log.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        get_var console
+        get_field2 log
+        push_atom_value "Hello World"
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/console-log/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 109 bytes
+WASM compiler:       109 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/debug-info-basic.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+console.log(1);
+console.log(2);
+console.log(3);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/debug-info-basic.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        get_var console
+        get_field2 log
+        push_1 1
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_2 2
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_3 3
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/debug-info-basic/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 140 bytes
+WASM compiler:       140 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/delete-prop.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const obj = { a: 1 };
+delete obj.a;
+const arr = [1, 2];
+delete arr[0];
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/delete-prop.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 2
+  opcodes:
+        check_define_var obj,128
+        check_define_var arr,128
+        define_var obj,128
+        define_var arr,128
+        object
+        push_1 1
+        define_field a
+        put_var_init obj
+        get_var obj
+        push_atom_value a
+        delete
+        put_loc0 0: "<ret>"
+        push_1 1
+        push_2 2
+        array_from 2
+        put_var_init arr
+        get_var arr
+        push_0 0
+        delete
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/delete-prop/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 146 bytes
+WASM compiler:       146 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/do-while-break.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+let i = 0;
+do {
+    i++;
+    if (i === 1)
+        continue;
+    console.log(i);
+    if (i === 3)
+        break;
+} while (i < 5);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/do-while-break.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var i,128
+        define_var i,130
+        push_0 0
+        put_var_init i
+   18:  undefined
+        put_loc0 0: "<ret>"
+        get_var i
+        post_inc
+        put_var i
+        put_loc0 0: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        get_var i
+        push_1 1
+        strict_eq
+        if_true8 73
+        get_var console
+        get_field2 log
+        get_var i
+        call_method 1
+        put_loc0 0: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        get_var i
+        push_3 3
+        strict_eq
+        if_true8 82
+   73:  get_var i
+        push_5 5
+        lt
+        if_true8 18
+   82:  get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/do-while-break/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 188 bytes
+WASM compiler:       186 bytes
+Size difference:     +2 bytes (+1.1%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/do-while.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+let i = 0;
+do {
+    console.log(i);
+    i++;
+} while (i < 3);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/do-while.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var i,128
+        define_var i,130
+        push_0 0
+        put_var_init i
+   18:  undefined
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var i
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var i
+        post_inc
+        put_var i
+        put_loc0 0: "<ret>"
+        get_var i
+        push_3 3
+        lt
+        if_true8 18
+        get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/do-while/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 152 bytes
+WASM compiler:       150 bytes
+Size difference:     +2 bytes (+1.3%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/empty.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+// Empty file
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/empty.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/empty/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 57 bytes
+WASM compiler:       57 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/es2020_bigint_large.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const a = 2147483648n;
+const b = -2147483649n;
+console.log(a);
+console.log(b);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/es2020_bigint_large.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var a,128
+        check_define_var b,128
+        define_var a,128
+        define_var b,128
+        push_const8 0: 2147483648n
+        put_var_init a
+        push_const8 1: 2147483649n
+        neg
+        put_var_init b
+        get_var console
+        get_field2 log
+        get_var a
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var b
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/es2020_bigint_large/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 181 bytes
+WASM compiler:       195 bytes
+Size difference:     -14 bytes (-7.2%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/es2020_bigint.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const a = 10n;
+const b = 20n;
+const c = a + b;
+const d = a * b;
+const e = -a;
+console.log(c);
+console.log(d);
+console.log(e);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/es2020_bigint.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var a,128
+        check_define_var b,128
+        check_define_var c,128
+        check_define_var d,128
+        check_define_var e,128
+        define_var a,128
+        define_var b,128
+        define_var c,128
+        define_var d,128
+        define_var e,128
+        push_bigint_i32 10
+        put_var_init a
+        push_bigint_i32 20
+        put_var_init b
+        get_var a
+        get_var b
+        add
+        put_var_init c
+        get_var a
+        get_var b
+        mul
+        put_var_init d
+        get_var a
+        neg
+        put_var_init e
+        get_var console
+        get_field2 log
+        get_var c
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var d
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var e
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/es2020_bigint/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 293 bytes
+WASM compiler:       309 bytes
+Size difference:     -16 bytes (-5.2%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/for-await-of.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+async function* numbers() {
+    yield 1;
+    yield 2;
+    yield 3;
+}
+async function main() {
+    let sum = 0;
+    for await (const n of numbers()) {
+        sum += n;
+    }
+    console.log('sum', sum);
+}
+main();
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/for-await-of.js:1:1: function: numbers
+  stack_size: 2
+  opcodes:
+        initial_yield
+        push_1 1
+        await
+        yield
+        if_false8 9
+        await
+        await
+        return_async
+    9:  drop
+        push_2 2
+        await
+        yield
+        if_false8 18
+        await
+        await
+        return_async
+   18:  drop
+        push_3 3
+        await
+        yield
+        if_false8 27
+        await
+        await
+        return_async
+   27:  drop
+        undefined
+        await
+        return_async
+
+__tests__/fixtures/for-await-of.js:6:1: function: main
+  locals:
+    0: let sum [level:1 next:-1]
+    1: const n [level:2 next:0]
+  stack_size: 5
+  opcodes:
+        set_loc_uninitialized 0: sum
+        push_0 0
+        put_loc0 0: sum
+        set_loc_uninitialized 1: n
+        get_var numbers
+        call0 0
+        for_await_of_start
+        goto8 30
+   17:  put_loc1 1: n
+        get_loc_check 0: sum
+        get_loc_check 1: n
+        add
+        dup
+        put_loc_check 0: sum
+        drop
+   30:  for_await_of_next
+        await
+        iterator_get_value_done
+        if_false8 17
+        drop
+        iterator_close
+        get_var console
+        get_field2 log
+        push_atom_value sum
+        get_loc_check 0: sum
+        call_method 2
+        drop
+        undefined
+        return_async
+
+__tests__/fixtures/for-await-of.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var numbers,64
+        check_define_var main,64
+        fclosure8 0: [bytecode numbers]
+        define_func numbers,0
+        fclosure8 1: [bytecode main]
+        define_func main,0
+        get_var main
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/for-await-of/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 285 bytes
+WASM compiler:       301 bytes
+Size difference:     -16 bytes (-5.3%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/for-loop.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+for (let i = 0; i < 3; i++) {
+    console.log(i);
+}
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/for-loop.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: let i [level:2 next:-1]
+  stack_size: 3
+  opcodes:
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 1: i
+        push_0 0
+        put_loc1 1: i
+    7:  get_loc_check 1: i
+        push_3 3
+        lt
+        if_false8 41
+        get_var console
+        get_field2 log
+        get_loc_check 1: i
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_loc_check 1: i
+        post_inc
+        put_loc_check 1: i
+        drop
+        goto8 7
+   41:  get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/for-loop/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 142 bytes
+WASM compiler:       136 bytes
+Size difference:     +6 bytes (+4.4%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/for-of.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const arr = [1, 2, 3];
+for (const x of arr) {
+    console.log(x);
+}
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/for-of.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const x [level:2 next:-1]
+  stack_size: 6
+  opcodes:
+        check_define_var arr,128
+        define_var arr,128
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        put_var_init arr
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 1: x
+        get_var arr
+        for_of_start
+        goto8 54
+   36:  put_loc1 1: x
+        get_var console
+        get_field2 log
+        get_loc_check 1: x
+        call_method 1
+        put_loc0 0: "<ret>"
+   54:  for_of_next 0
+        if_false8 36
+        drop
+        iterator_close
+        get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/for-of/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 157 bytes
+WASM compiler:       151 bytes
+Size difference:     +6 bytes (+4.0%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/function-call.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+function add(a, b) {
+    return a + b;
+}
+let result = add(1, 2);
+console.log(result);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/function-call.js:1:1: function: add
+  args: a b
+  stack_size: 2
+  opcodes:
+        get_arg0 0: a
+        get_arg1 1: b
+        add
+        return
+
+__tests__/fixtures/function-call.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var add,64
+        check_define_var result,128
+        fclosure8 0: [bytecode add]
+        define_func add,0
+        define_var result,130
+        get_var add
+        push_1 1
+        push_2 2
+        call2 2
+        put_var_init result
+        get_var console
+        get_field2 log
+        get_var result
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/function-call/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 195 bytes
+WASM compiler:       199 bytes
+Size difference:     -4 bytes (-2.0%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/function-default-params.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+function greet(name = "world") {
+    console.log("Hello", name);
+}
+greet();
+greet("QuickJS");
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/function-default-params.js:1:1: function: greet
+  args: name
+  locals:
+    0: let name [level:1 next:-2]
+  stack_size: 4
+  opcodes:
+        set_loc_uninitialized 0: name
+        get_arg0 0: name
+        dup
+        is_undefined
+        if_false8 15
+        drop
+        push_atom_value world
+        set_arg0 0: name
+   15:  put_loc0 0: name
+        get_var console
+        get_field2 log
+        push_atom_value Hello
+        get_arg0 0: name
+        call_method 2
+        return_undef
+
+__tests__/fixtures/function-default-params.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 2
+  opcodes:
+        check_define_var greet,64
+        fclosure8 0: [bytecode greet]
+        define_func greet,0
+        get_var greet
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var greet
+        push_atom_value QuickJS
+        call1 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/function-default-params/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 220 bytes
+WASM compiler:       229 bytes
+Size difference:     -9 bytes (-3.9%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/function-expressions.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const add = function (a, b) {
+    return a + b;
+};
+console.log(add(3, 4));
+const sub = function subName(a, b) {
+    return a - b;
+};
+console.log(sub(10, 2));
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/function-expressions.js:1:13: function: <null>
+  args: a b
+  stack_size: 2
+  opcodes:
+        get_arg0 0: a
+        get_arg1 1: b
+        add
+        return
+
+__tests__/fixtures/function-expressions.js:5:13: function: subName
+  args: a b
+  stack_size: 2
+  opcodes:
+        get_arg0 0: a
+        get_arg1 1: b
+        sub
+        return
+
+__tests__/fixtures/function-expressions.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 5
+  opcodes:
+        check_define_var add,128
+        check_define_var sub,128
+        define_var add,128
+        define_var sub,128
+        fclosure8 0: [bytecode <null>]
+        set_name add
+        put_var_init add
+        get_var console
+        get_field2 log
+        get_var add
+        push_3 3
+        push_4 4
+        call2 2
+        call_method 1
+        put_loc0 0: "<ret>"
+        fclosure8 1: [bytecode subName]
+        put_var_init sub
+        get_var console
+        get_field2 log
+        get_var sub
+        push_i8 10
+        push_2 2
+        call2 2
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/function-expressions/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 288 bytes
+WASM compiler:       292 bytes
+Size difference:     -4 bytes (-1.4%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/if-else.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+let a = 1;
+if (a > 0) {
+    a = 2;
+}
+else {
+    a = 3;
+}
+console.log(a);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/if-else.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var a,128
+        define_var a,130
+        push_1 1
+        put_var_init a
+        undefined
+        put_loc0 0: "<ret>"
+        get_var a
+        push_0 0
+        gt
+        if_false8 39
+        push_2 2
+        dup
+        put_var a
+        put_loc0 0: "<ret>"
+        goto8 47
+   39:  push_3 3
+        dup
+        put_var a
+        put_loc0 0: "<ret>"
+   47:  get_var console
+        get_field2 log
+        get_var a
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/if-else/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 154 bytes
+WASM compiler:       154 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/labeled-statements.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+loop1: for (let i = 0; i < 3; i++) {
+    loop2: for (let j = 0; j < 3; j++) {
+        if (i === 1) {
+            if (j === 1) {
+                continue loop1;
+            }
+        }
+        if (i === 2) {
+            if (j === 2) {
+                break loop2;
+            }
+        }
+        console.log(i, j);
+    }
+}
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/labeled-statements.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: let i [level:2 next:-1]
+    2: let j [level:4 next:1]
+  stack_size: 4
+  opcodes:
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 1: i
+        push_0 0
+        put_loc1 1: i
+    7:  get_loc_check 1: i
+        push_3 3
+        lt
+        if_false8 104
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 2: j
+        push_0 0
+        put_loc2 2: j
+   21:  get_loc_check 2: j
+        push_3 3
+        lt
+        if_false8 94
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 1: i
+        push_1 1
+        strict_eq
+        if_false8 46
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 2: j
+        push_1 1
+        strict_eq
+        if_true8 94
+   46:  undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 1: i
+        push_2 2
+        strict_eq
+        if_false8 64
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 2: j
+        push_2 2
+        strict_eq
+        if_true8 94
+   64:  get_var console
+        get_field2 log
+        get_loc_check 1: i
+        get_loc_check 2: j
+        call_method 2
+        put_loc0 0: "<ret>"
+        get_loc_check 2: j
+        post_inc
+        put_loc_check 2: j
+        drop
+        goto8 21
+   94:  get_loc_check 1: i
+        post_inc
+        put_loc_check 1: i
+        drop
+        goto8 7
+  104:  get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/labeled-statements/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 258 bytes
+WASM compiler:       248 bytes
+Size difference:     +10 bytes (+4.0%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/logical-assignment.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+let a = 0;
+let b = '';
+let c = null;
+let d;
+a ||= 1;
+b &&= 'fallback';
+c ??= 'init';
+d ??= 2;
+console.log(a, b, c, d);
+const obj = { x: 0, y: null, z: false };
+obj.x &&= 5;
+obj.y ??= 10;
+obj.z ||= true;
+console.log(obj.x, obj.y, obj.z);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/logical-assignment.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 6
+  opcodes:
+        check_define_var a,128
+        check_define_var b,128
+        check_define_var c,128
+        check_define_var d,128
+        check_define_var obj,128
+        define_var a,130
+        define_var b,130
+        define_var c,130
+        define_var d,130
+        define_var obj,128
+        push_0 0
+        put_var_init a
+        push_empty_string
+        put_var_init b
+        null
+        put_var_init c
+        undefined
+        put_var_init d
+        make_var_ref a
+        get_ref_value
+        dup
+        if_true8 99
+        drop
+        push_1 1
+        insert3
+        put_ref_value
+        goto8 101
+   99:  nip
+        nip
+  101:  put_loc0 0: "<ret>"
+        make_var_ref b
+        get_ref_value
+        dup
+        if_false8 121
+        drop
+        push_atom_value fallback
+        insert3
+        put_ref_value
+        goto8 123
+  121:  nip
+        nip
+  123:  put_loc0 0: "<ret>"
+        make_var_ref c
+        get_ref_value
+        dup
+        is_undefined_or_null
+        if_false8 144
+        drop
+        push_atom_value init
+        insert3
+        put_ref_value
+        goto8 146
+  144:  nip
+        nip
+  146:  put_loc0 0: "<ret>"
+        make_var_ref d
+        get_ref_value
+        dup
+        is_undefined_or_null
+        if_false8 163
+        drop
+        push_2 2
+        insert3
+        put_ref_value
+        goto8 165
+  163:  nip
+        nip
+  165:  put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var a
+        get_var b
+        get_var c
+        get_var d
+        call_method 4
+        put_loc0 0: "<ret>"
+        object
+        push_0 0
+        define_field x
+        null
+        define_field y
+        push_false
+        define_field z
+        put_var_init obj
+        get_var obj
+        get_field2 x
+        dup
+        if_false8 247
+        drop
+        push_5 5
+        insert2
+        put_field x
+        goto8 248
+  247:  nip
+  248:  put_loc0 0: "<ret>"
+        get_var obj
+        get_field2 y
+        dup
+        is_undefined_or_null
+        if_false8 274
+        drop
+        push_i8 10
+        insert2
+        put_field y
+        goto8 275
+  274:  nip
+  275:  put_loc0 0: "<ret>"
+        get_var obj
+        get_field2 z
+        dup
+        if_true8 299
+        drop
+        push_true
+        insert2
+        put_field z
+        goto8 300
+  299:  nip
+  300:  put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var obj
+        get_field x
+        get_var obj
+        get_field y
+        get_var obj
+        get_field z
+        call_method 3
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/logical-assignment/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 511 bytes
+WASM compiler:       513 bytes
+Size difference:     -2 bytes (-0.4%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/logical-operators.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+console.log(true && false);
+console.log(false || true);
+console.log(null ?? "default");
+console.log(1 && 2);
+console.log(0 || 3);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/logical-operators.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        get_var console
+        get_field2 log
+        push_true
+        dup
+        if_false8 16
+        drop
+        push_false
+   16:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_false
+        dup
+        if_true8 36
+        drop
+        push_true
+   36:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        null
+        dup
+        is_undefined_or_null
+        if_false8 61
+        drop
+        push_atom_value default
+   61:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        dup
+        if_false8 81
+        drop
+        push_2 2
+   81:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_0 0
+        dup
+        if_true8 101
+        drop
+        push_3 3
+  101:  call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/logical-operators/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 215 bytes
+WASM compiler:       213 bytes
+Size difference:     +2 bytes (+0.9%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/loop-break-continue.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+for (let i = 0; i < 10; i++) {
+    if (i === 5) {
+        break;
+    }
+    if (i % 2 === 0) {
+        continue;
+    }
+    console.log(i);
+}
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/loop-break-continue.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: let i [level:2 next:-1]
+  stack_size: 3
+  opcodes:
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 1: i
+        push_0 0
+        put_loc1 1: i
+    7:  get_loc_check 1: i
+        push_i8 10
+        lt
+        if_false8 62
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 1: i
+        push_5 5
+        strict_eq
+        if_true8 62
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 1: i
+        push_2 2
+        mod
+        push_0 0
+        strict_eq
+        if_true8 52
+        get_var console
+        get_field2 log
+        get_loc_check 1: i
+        call_method 1
+        put_loc0 0: "<ret>"
+   52:  get_loc_check 1: i
+        post_inc
+        put_loc_check 1: i
+        drop
+        goto8 7
+   62:  get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/loop-break-continue/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 184 bytes
+WASM compiler:       180 bytes
+Size difference:     +4 bytes (+2.2%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/number.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+123;
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/number.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        push_i8 123
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/number/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 60 bytes
+WASM compiler:       60 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/numeric-separators.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const decimal = 1_000_000;
+const binary = 0b1010_1010;
+const hex = 0xff_ff;
+const octal = 0o7_77;
+const big = 123456789n;
+const bigHex = 0x1ffn;
+console.log(decimal, binary, hex, octal);
+console.log(big, bigHex);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/numeric-separators.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 6
+  opcodes:
+        check_define_var decimal,128
+        check_define_var binary,128
+        check_define_var hex,128
+        check_define_var octal,128
+        check_define_var big,128
+        check_define_var bigHex,128
+        define_var decimal,128
+        define_var binary,128
+        define_var hex,128
+        define_var octal,128
+        define_var big,128
+        define_var bigHex,128
+        push_i32 1000000
+        put_var_init decimal
+        push_i16 170
+        put_var_init binary
+        push_i32 65535
+        put_var_init hex
+        push_i16 511
+        put_var_init octal
+        push_bigint_i32 123456789
+        put_var_init big
+        push_bigint_i32 511
+        put_var_init bigHex
+        get_var console
+        get_field2 log
+        get_var decimal
+        get_var binary
+        get_var hex
+        get_var octal
+        call_method 4
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var big
+        get_var bigHex
+        call_method 2
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/numeric-separators/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 331 bytes
+WASM compiler:       331 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/object-literal.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const obj = { a: 1, b: 2 };
+console.log(obj.a);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/object-literal.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var obj,128
+        define_var obj,128
+        object
+        push_1 1
+        define_field a
+        push_2 2
+        define_field b
+        put_var_init obj
+        get_var console
+        get_field2 log
+        get_var obj
+        get_field a
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-literal/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 149 bytes
+WASM compiler:       149 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/object-methods.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const obj = {
+    x: 1,
+    add(y) {
+        return this.x + y;
+    }
+};
+console.log(obj.add(2));
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/object-methods.js:3:5: function: <null>
+  args: y
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field x
+        get_arg0 0: y
+        add
+        return
+
+__tests__/fixtures/object-methods.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 5
+  opcodes:
+        check_define_var obj,128
+        define_var obj,128
+        object
+        push_1 1
+        define_field x
+        fclosure8 0: [bytecode <null>]
+        define_method add,4
+        put_var_init obj
+        get_var console
+        get_field2 log
+        get_var obj
+        get_field2 add
+        push_2 2
+        call_method 1
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-methods/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 149 bytes
+WASM compiler:       206 bytes
+Size difference:     -57 bytes (-27.7%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/object-nested.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const data = {
+    users: [
+        { id: 1, name: "Alice" },
+        { id: 2, name: "Bob" }
+    ],
+    meta: {
+        page: 1,
+        total: 100
+    }
+};
+console.log(data.users[0].name);
+console.log(data.meta.total);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/object-nested.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var data,128
+        define_var data,128
+        object
+        object
+        push_1 1
+        define_field id
+        push_atom_value Alice
+        define_field name
+        object
+        push_2 2
+        define_field id
+        push_atom_value Bob
+        define_field name
+        array_from 2
+        define_field users
+        object
+        push_1 1
+        define_field page
+        push_i8 100
+        define_field total
+        define_field meta
+        put_var_init data
+        get_var console
+        get_field2 log
+        get_var data
+        get_field users
+        push_0 0
+        get_array_el
+        get_field name
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var data
+        get_field meta
+        get_field total
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-nested/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 279 bytes
+WASM compiler:       279 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/object-spread.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const a = { x: 1 };
+const b = { ...a, y: 2 };
+console.log(b.x);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/object-spread.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var a,128
+        check_define_var b,128
+        define_var a,128
+        define_var b,128
+        object
+        push_1 1
+        define_field x
+        put_var_init a
+        object
+        get_var a
+        null
+        copy_data_properties 6
+        drop
+        drop
+        push_2 2
+        define_field y
+        put_var_init b
+        get_var console
+        get_field2 log
+        get_var b
+        get_field x
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-spread/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 178 bytes
+WASM compiler:       178 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/optional-catch-binding.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+try {
+    throw new Error('boom');
+}
+catch {
+    console.log('caught without binding');
+}
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/optional-catch-binding.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        undefined
+        put_loc0 0: "<ret>"
+        catch 22
+        get_var Error
+        dup
+        push_atom_value boom
+        call_constructor 1
+        throw
+   22:  drop
+        catch 50
+        get_var console
+        get_field2 log
+        push_atom_value "caught without binding"
+        call_method 1
+        put_loc0 0: "<ret>"
+        drop
+        goto8 51
+   50:  throw
+   51:  get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/optional-catch-binding/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 192 bytes
+WASM compiler:       177 bytes
+Size difference:     +15 bytes (+8.5%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/optional-chaining.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+const user = {
+    profile: {
+        name: 'alice',
+        contact: { email: 'a@example.com' },
+        greet() {
+            return 'hi';
+        },
+    },
+};
+console.log(user?.profile?.name);
+console.log(user?.profile?.greet?.());
+const list = [{ value: 1 }, null, { nested: { deep: 3 } }];
+console.log(list?.[1]?.value ?? 'missing');
+console.log(list?.[2]?.nested?.deep ?? 0);
+console.log(user?.missing?.prop);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/optional-chaining.js:5:9: function: <null>
+  stack_size: 1
+  opcodes:
+        push_atom_value hi
+        return
+
+__tests__/fixtures/optional-chaining.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 5
+  opcodes:
+        check_define_var user,128
+        check_define_var list,128
+        define_var user,128
+        define_var list,128
+        object
+        object
+        push_atom_value alice
+        define_field name
+        object
+        push_atom_value "a@example.com"
+        define_field email
+        define_field contact
+        fclosure8 0: [bytecode <null>]
+        define_method greet,4
+        define_field profile
+        put_var_init user
+        get_var console
+        get_field2 log
+        get_var user
+        dup
+        is_undefined_or_null
+        if_false8 93
+        drop
+        undefined
+        goto8 111
+   93:  get_field profile
+        dup
+        is_undefined_or_null
+        if_false8 106
+        drop
+        undefined
+        goto8 111
+  106:  get_field name
+  111:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var user
+        dup
+        is_undefined_or_null
+        if_false8 138
+        drop
+        undefined
+        goto8 168
+  138:  get_field profile
+        dup
+        is_undefined_or_null
+        if_false8 151
+        drop
+        undefined
+        goto8 168
+  151:  get_field2 greet
+        dup
+        is_undefined_or_null
+        if_false8 165
+        drop
+        drop
+        undefined
+        goto8 168
+  165:  call_method 0
+  168:  call_method 1
+        put_loc0 0: "<ret>"
+        object
+        push_1 1
+        define_field value
+        null
+        object
+        object
+        push_3 3
+        define_field deep
+        define_field nested
+        array_from 3
+        put_var_init list
+        get_var console
+        get_field2 log
+        get_var list
+        dup
+        is_undefined_or_null
+        if_false8 224
+        drop
+        undefined
+        goto8 239
+  224:  push_1 1
+        get_array_el
+        dup
+        is_undefined_or_null
+        if_false8 234
+        drop
+        undefined
+        goto8 239
+  234:  get_field value
+  239:  dup
+        is_undefined_or_null
+        if_false8 249
+        drop
+        push_atom_value missing
+  249:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var list
+        dup
+        is_undefined_or_null
+        if_false8 276
+        drop
+        undefined
+        goto8 304
+  276:  push_2 2
+        get_array_el
+        dup
+        is_undefined_or_null
+        if_false8 286
+        drop
+        undefined
+        goto8 304
+  286:  get_field nested
+        dup
+        is_undefined_or_null
+        if_false8 299
+        drop
+        undefined
+        goto8 304
+  299:  get_field deep
+  304:  dup
+        is_undefined_or_null
+        if_false8 310
+        drop
+        push_0 0
+  310:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var user
+        dup
+        is_undefined_or_null
+        if_false8 337
+        drop
+        undefined
+        goto8 355
+  337:  get_field missing
+        dup
+        is_undefined_or_null
+        if_false8 350
+        drop
+        undefined
+        goto8 355
+  350:  get_field prop
+  355:  call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/optional-chaining/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 486 bytes
+WASM compiler:       619 bytes
+Size difference:     -133 bytes (-21.5%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/postfix-unary.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+let a = 1;
+console.log(a++);
+console.log(a--);
+console.log(a);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/postfix-unary.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var a,128
+        define_var a,130
+        push_1 1
+        put_var_init a
+        get_var console
+        get_field2 log
+        get_var a
+        post_inc
+        put_var a
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var a
+        post_dec
+        put_var a
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var a
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/postfix-unary/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 193 bytes
+WASM compiler:       193 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/prefix-unary.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+let a = 1;
+console.log(++a);
+console.log(--a);
+console.log(a);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/prefix-unary.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var a,128
+        define_var a,130
+        push_1 1
+        put_var_init a
+        get_var console
+        get_field2 log
+        get_var a
+        inc
+        dup
+        put_var a
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var a
+        dec
+        dup
+        put_var a
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var a
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/prefix-unary/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 194 bytes
+WASM compiler:       194 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/primitives.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+console.log(null);
+console.log(undefined);
+console.log(true);
+console.log(false);
+console.log(123);
+console.log(1.5);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/primitives.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        get_var console
+        get_field2 log
+        null
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var undefined
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_true
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_false
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_i8 123
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_const8 0: 1.5
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/primitives/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 210 bytes
+WASM compiler:       214 bytes
+Size difference:     -4 bytes (-1.9%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/switch-case.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+let a = 1;
+switch (a) {
+    case 0:
+        console.log(0);
+        break;
+    case 1:
+        console.log(1);
+        break;
+    default:
+        console.log(2);
+}
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/switch-case.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var a,128
+        define_var a,130
+        push_1 1
+        put_var_init a
+        undefined
+        put_loc0 0: "<ret>"
+        get_var a
+        dup
+        push_0 0
+        strict_eq
+        if_false8 47
+        get_var console
+        get_field2 log
+        push_0 0
+        call_method 1
+        put_loc0 0: "<ret>"
+        goto8 84
+   47:  dup
+        push_1 1
+        strict_eq
+        if_false8 69
+        get_var console
+        get_field2 log
+        push_1 1
+        call_method 1
+        put_loc0 0: "<ret>"
+        goto8 84
+   69:  get_var console
+        get_field2 log
+        push_2 2
+        call_method 1
+        put_loc0 0: "<ret>"
+   84:  drop
+        get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-case/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 182 bytes
+WASM compiler:       182 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/switch-default-first.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+let a = 0;
+switch (a) {
+    default:
+        console.log(2);
+    case 0:
+        console.log(0);
+}
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/switch-default-first.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var a,128
+        define_var a,130
+        push_0 0
+        put_var_init a
+        undefined
+        put_loc0 0: "<ret>"
+        get_var a
+        goto8 44
+   27:  get_var console
+        get_field2 log
+        push_2 2
+        call_method 1
+        put_loc0 0: "<ret>"
+        goto8 49
+   44:  dup
+        push_0 0
+        strict_eq
+        if_false8 27
+   49:  get_var console
+        get_field2 log
+        push_0 0
+        call_method 1
+        put_loc0 0: "<ret>"
+        drop
+        get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-default-first/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 165 bytes
+WASM compiler:       165 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/switch-default-middle.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+let a = 0;
+switch (a) {
+    case 0:
+        console.log(0);
+    default:
+        console.log(2);
+    case 1:
+        console.log(1);
+}
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/switch-default-middle.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var a,128
+        define_var a,130
+        push_0 0
+        put_var_init a
+        undefined
+        put_loc0 0: "<ret>"
+        get_var a
+        dup
+        push_0 0
+        strict_eq
+        if_false8 62
+        get_var console
+        get_field2 log
+        push_0 0
+        call_method 1
+        put_loc0 0: "<ret>"
+   45:  get_var console
+        get_field2 log
+        push_2 2
+        call_method 1
+        put_loc0 0: "<ret>"
+        goto8 67
+   62:  dup
+        push_1 1
+        strict_eq
+        if_false8 45
+   67:  get_var console
+        get_field2 log
+        push_1 1
+        call_method 1
+        put_loc0 0: "<ret>"
+        drop
+        get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-default-middle/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 190 bytes
+WASM compiler:       190 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/switch-fallthrough.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+let a = 0;
+switch (a) {
+    case 0:
+        console.log(0);
+    case 1:
+        console.log(1);
+        break;
+    default:
+        console.log(2);
+}
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/switch-fallthrough.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var a,128
+        define_var a,130
+        push_0 0
+        put_var_init a
+        undefined
+        put_loc0 0: "<ret>"
+        get_var a
+        dup
+        push_0 0
+        strict_eq
+        if_false8 47
+        get_var console
+        get_field2 log
+        push_0 0
+        call_method 1
+        put_loc0 0: "<ret>"
+        goto8 52
+   47:  dup
+        push_1 1
+        strict_eq
+        if_false8 69
+   52:  get_var console
+        get_field2 log
+        push_1 1
+        call_method 1
+        put_loc0 0: "<ret>"
+        goto8 84
+   69:  get_var console
+        get_field2 log
+        push_2 2
+        call_method 1
+        put_loc0 0: "<ret>"
+   84:  drop
+        get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-fallthrough/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 189 bytes
+WASM compiler:       189 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/try-catch.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+try {
+    console.log("try");
+    throw "error";
+}
+catch (e) {
+    console.log("catch", e);
+}
+finally {
+    console.log("finally");
+}
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/try-catch.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: catch e [level:3 next:-1]
+    2: var <ret>
+  stack_size: 5
+  opcodes:
+        undefined
+        put_loc0 0: "<ret>"
+        catch 32
+        get_var console
+        get_field2 log
+        push_atom_value try
+        call_method 1
+        put_loc0 0: "<ret>"
+        push_atom_value error
+        throw
+   32:  put_loc1 1: e
+        catch 68
+        get_var console
+        get_field2 log
+        push_atom_value catch
+        get_loc1 1: e
+        call_method 2
+        put_loc0 0: "<ret>"
+        drop
+        undefined
+        gosub 74
+        drop
+        goto8 100
+   68:  gosub 74
+        throw
+   74:  get_loc0 0: "<ret>"
+        put_loc2 2: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_atom_value finally
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_loc2 2: "<ret>"
+        put_loc0 0: "<ret>"
+        ret
+  100:  get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/try-catch/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 204 bytes
+WASM compiler:       213 bytes
+Size difference:     -9 bytes (-4.2%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/unary-ops.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+console.log(!true);
+console.log(~1);
+console.log(+1);
+console.log(-1);
+console.log(typeof 1);
+console.log(void 0);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/unary-ops.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        get_var console
+        get_field2 log
+        push_true
+        lnot
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        not
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        plus
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_minus1 -1
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        typeof
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        undefined
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/unary-ops/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 206 bytes
+WASM compiler:       206 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/variables-let-block.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+let a = 1;
+{
+    let b = 2;
+    console.log(b);
+}
+console.log(a);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/variables-let-block.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: let b [level:2 next:-1]
+  stack_size: 3
+  opcodes:
+        check_define_var a,128
+        define_var a,130
+        push_1 1
+        put_var_init a
+        set_loc_uninitialized 1: b
+        push_2 2
+        put_loc1 1: b
+        get_var console
+        get_field2 log
+        get_loc_check 1: b
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var a
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/variables-let-block/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 168 bytes
+WASM compiler:       166 bytes
+Size difference:     +2 bytes (+1.2%)
+Bytecode identical:  ❌ No
+──────────────────────────────────────────────────
+⚠️  Differences found. Review artifacts for detailed analysis.
+
+=== __tests__/fixtures/variables-var.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+var a = 1;
+console.log(a);
+var b = 2;
+console.log(b);
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/variables-var.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var a,0
+        check_define_var b,0
+        define_var a,0
+        define_var b,0
+        push_1 1
+        put_var a
+        get_var console
+        get_field2 log
+        get_var a
+        call_method 1
+        put_loc0 0: "<ret>"
+        push_2 2
+        put_var b
+        get_var console
+        get_field2 log
+        get_var b
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/variables-var/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 170 bytes
+WASM compiler:       170 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+=== __tests__/fixtures/while.ts ===
+🔍 Starting bytecode comparison...
+📦 Compiling with TypeScript compiler...
+--- Transpiled Code ---
+let i = 0;
+while (i < 3) {
+    console.log(i);
+    i++;
+}
+
+-----------------------
+QuickJS WASM firstAtomId: 228
+🌐 Compiling with QuickJS WASM...
+__tests__/fixtures/while.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var i,128
+        define_var i,130
+        push_0 0
+        put_var_init i
+        undefined
+        put_loc0 0: "<ret>"
+   20:  get_var i
+        push_3 3
+        lt
+        if_false8 62
+        get_var console
+        get_field2 log
+        get_var i
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var i
+        post_inc
+        put_var i
+        put_loc0 0: "<ret>"
+        goto8 20
+   62:  get_loc0 0: "<ret>"
+        return
+
+💾 Artifacts saved to /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/while/bytecode/
+
+📊 Comparison Results:
+──────────────────────────────────────────────────
+TypeScript compiler: 149 bytes
+WASM compiler:       149 bytes
+Size difference:     0 bytes (+0.0%)
+Bytecode identical:  ✅ Yes
+──────────────────────────────────────────────────
+🎉 Perfect match! TypeScript compiler output is identical to WASM compiler.
+
+Summary:
+────────────
+✅ __tests__/fixtures/array-literal.ts — bytecode 134 bytes, trace OK
+✅ __tests__/fixtures/array-nested.ts — bytecode 193 bytes, trace OK
+⚠️  __tests__/fixtures/array-spread.ts — Δ0 bytes (+0.00%), trace OK
+⚠️  __tests__/fixtures/arrow-fn-basic.ts — Δ-2 bytes (-1.12%), trace OK
+⚠️  __tests__/fixtures/arrow-fn-complex.ts — Δ-4 bytes (-1.79%), trace OK
+⚠️  __tests__/fixtures/async-await.ts — Δ-1 bytes (-0.33%), trace OK
+✅ __tests__/fixtures/binary-ops.ts — bytecode 196 bytes, trace OK
+✅ __tests__/fixtures/bitwise-ops.ts — bytecode 222 bytes, trace OK
+⚠️  __tests__/fixtures/class-accessors.ts — Δ-27 bytes (-5.57%), trace OK
+⚠️  __tests__/fixtures/class-basic.ts — Δ+3 bytes (+1.52%), trace OK
+⚠️  __tests__/fixtures/class-inheritance.ts — Δ-45 bytes (-6.35%), trace OK
+⚠️  __tests__/fixtures/class-methods.ts — Δ-6 bytes (-1.62%), trace OK
+⚠️  __tests__/fixtures/class-private-fields.ts — Δ-29 bytes (-6.44%), trace OK
+⚠️  __tests__/fixtures/class-static-block.ts — Δ-21 bytes (-3.27%), trace OK
+⚠️  __tests__/fixtures/closure-basic.ts — Δ-2 bytes (-1.08%), trace OK
+✅ __tests__/fixtures/closure-short.ts — bytecode 273 bytes, trace OK
+✅ __tests__/fixtures/closure-stress.ts — bytecode 446 bytes, trace OK
+✅ __tests__/fixtures/closure-vars.ts — bytecode 365 bytes, trace OK
+✅ __tests__/fixtures/comparison-ops.ts — bytecode 276 bytes, trace OK
+⚠️  __tests__/fixtures/compute.ts — Δ-2 bytes (-1.57%), trace OK
+⚠️  __tests__/fixtures/computed-property.ts — Δ-4 bytes (-2.25%), trace OK
+✅ __tests__/fixtures/conditional-operator.ts — bytecode 130 bytes, trace OK
+✅ __tests__/fixtures/console-log.ts — bytecode 109 bytes, trace OK
+✅ __tests__/fixtures/debug-info-basic.ts — bytecode 140 bytes, trace OK
+✅ __tests__/fixtures/delete-prop.ts — bytecode 146 bytes, trace OK
+⚠️  __tests__/fixtures/do-while-break.ts — Δ+2 bytes (+1.08%), trace OK
+⚠️  __tests__/fixtures/do-while.ts — Δ+2 bytes (+1.33%), trace OK
+✅ __tests__/fixtures/empty.ts — bytecode 57 bytes, trace OK
+⚠️  __tests__/fixtures/es2020_bigint_large.ts — Δ-14 bytes (-7.18%), trace OK
+⚠️  __tests__/fixtures/es2020_bigint.ts — Δ-16 bytes (-5.18%), trace OK
+⚠️  __tests__/fixtures/for-await-of.ts — Δ-16 bytes (-5.32%), trace OK
+⚠️  __tests__/fixtures/for-loop.ts — Δ+6 bytes (+4.41%), trace OK
+⚠️  __tests__/fixtures/for-of.ts — Δ+6 bytes (+3.97%), trace OK
+⚠️  __tests__/fixtures/function-call.ts — Δ-4 bytes (-2.01%), trace OK
+⚠️  __tests__/fixtures/function-default-params.ts — Δ-9 bytes (-3.93%), trace OK
+⚠️  __tests__/fixtures/function-expressions.ts — Δ-4 bytes (-1.37%), trace OK
+✅ __tests__/fixtures/if-else.ts — bytecode 154 bytes, trace OK
+⚠️  __tests__/fixtures/labeled-statements.ts — Δ+10 bytes (+4.03%), trace OK
+⚠️  __tests__/fixtures/logical-assignment.ts — Δ-2 bytes (-0.39%), trace OK
+⚠️  __tests__/fixtures/logical-operators.ts — Δ+2 bytes (+0.94%), trace OK
+⚠️  __tests__/fixtures/loop-break-continue.ts — Δ+4 bytes (+2.22%), trace OK
+✅ __tests__/fixtures/number.ts — bytecode 60 bytes, trace OK
+✅ __tests__/fixtures/numeric-separators.ts — bytecode 331 bytes, trace OK
+✅ __tests__/fixtures/object-literal.ts — bytecode 149 bytes, trace OK
+⚠️  __tests__/fixtures/object-methods.ts — Δ-57 bytes (-27.67%), trace OK
+✅ __tests__/fixtures/object-nested.ts — bytecode 279 bytes, trace OK
+⚠️  __tests__/fixtures/object-spread.ts — Δ0 bytes (+0.00%), trace OK
+⚠️  __tests__/fixtures/optional-catch-binding.ts — Δ+15 bytes (+8.47%), trace OK
+⚠️  __tests__/fixtures/optional-chaining.ts — Δ-133 bytes (-21.49%), trace OK
+✅ __tests__/fixtures/postfix-unary.ts — bytecode 193 bytes, trace OK
+✅ __tests__/fixtures/prefix-unary.ts — bytecode 194 bytes, trace OK
+⚠️  __tests__/fixtures/primitives.ts — Δ-4 bytes (-1.87%), trace OK
+✅ __tests__/fixtures/switch-case.ts — bytecode 182 bytes, trace OK
+✅ __tests__/fixtures/switch-default-first.ts — bytecode 165 bytes, trace OK
+✅ __tests__/fixtures/switch-default-middle.ts — bytecode 190 bytes, trace OK
+✅ __tests__/fixtures/switch-fallthrough.ts — bytecode 189 bytes, trace OK
+⚠️  __tests__/fixtures/try-catch.ts — Δ-9 bytes (-4.23%), trace OK
+✅ __tests__/fixtures/unary-ops.ts — bytecode 206 bytes, trace OK
+⚠️  __tests__/fixtures/variables-let-block.ts — Δ+2 bytes (+1.20%), trace OK
+✅ __tests__/fixtures/variables-var.ts — bytecode 170 bytes, trace OK
+✅ __tests__/fixtures/while.ts — bytecode 149 bytes, trace OK
+
+Totals:
+  ✅ Identical : 27
+  ⚠️  Mismatched: 34
+  ✖ Errors   : 0

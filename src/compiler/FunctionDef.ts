@@ -749,6 +749,15 @@ export class FunctionDef {
       // 继承父函数的 JS 模式
       this.jsMode = parent.jsMode
       this.parentScopeLevel = parent.scopeLevel
+
+      // 继承调试/源码上下文：否则子函数 fd.source 为空字符串，pc2line 将无法生成
+      // （TypeScriptCompiler.processFunctionDef 只在 fd.source truthy 时初始化行列缓存）
+      this.filename = parent.filename
+      this.source = parent.source
+      this.sourceLen = parent.sourceLen
+      this.stripDebug = parent.stripDebug
+      this.stripSource = parent.stripSource
+      this.hasDebug = parent.hasDebug
     }
 
     // 设置 eval 和函数表达式标志 - parser.c:8243-8244

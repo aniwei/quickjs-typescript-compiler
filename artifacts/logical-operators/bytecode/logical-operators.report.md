@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/logical-operators.ts
-**生成时间**: 2025-12-20T21:36:57.110Z
+**生成时间**: 2025-12-22T02:37:15.810Z
 
 ## 大小对比
 
-- TypeScript编译器: 215 字节
+- TypeScript编译器: 213 字节
 - WASM编译器: 213 字节
-- 差异: 2 字节 (0.94%)
+- 差异: 0 字节 (0.00%)
 
 ## 结构分析
 
@@ -46,7 +46,7 @@
   "functionHeader": {
     "offset": 54,
     "tag": "0xc",
-    "remaining": 161
+    "remaining": 159
   }
 }
 ```
@@ -93,26 +93,8 @@
 
 ## 字节级差异
 
-共发现 18 个字节差异:
+共发现 0 个字节差异:
 
-- 偏移量 0xb5: TS=0x20 vs WASM=0x1e
-- 偏移量 0xc6: TS=0x39 vs WASM=0x52
-- 偏移量 0xc7: TS=0x1a vs WASM=0x08
-- 偏移量 0xc8: TS=0x1b vs WASM=0x17
-- 偏移量 0xc9: TS=0x11 vs WASM=0x15
-- 偏移量 0xca: TS=0x17 vs WASM=0x1b
-- 偏移量 0xcb: TS=0x15 vs WASM=0x0e
-- 偏移量 0xcc: TS=0x1b vs WASM=0x39
-- 偏移量 0xcd: TS=0x0e vs WASM=0x08
-- 偏移量 0xce: TS=0x39 vs WASM=0x17
-- 偏移量 0xcf: TS=0x08 vs WASM=0x15
-- 偏移量 0xd0: TS=0x17 vs WASM=0x1b
-- 偏移量 0xd1: TS=0x15 vs WASM=0x0e
-- 偏移量 0xd2: TS=0x1b vs WASM=0x39
-- 偏移量 0xd3: TS=0x0e vs WASM=0x08
-- 偏移量 0xd4: TS=0x39 vs WASM=0x00
-- 偏移量 0xd5: TS=0x08 vs WASM=EOF
-- 偏移量 0xd6: TS=0x00 vs WASM=EOF
 
 ## 十六进制转储对比
 
@@ -129,9 +111,9 @@
 00000080: 0e 04 16 00 00 00 24 01 00 cb 39 e4 00 00 00 43 |......$...9....C|
 00000090: e5 00 00 00 b8 11 ec 03 0e b9 24 01 00 cb 39 e4 |..........$...9.|
 000000a0: 00 00 00 43 e5 00 00 00 b7 11 ed 03 0e ba 24 01 |...C..........$.|
-000000b0: 00 cf 28 cc 03 20 00 00 1b 0e 39 08 17 15 1b 0e |..(.. ....9.....|
-000000c0: 39 08 17 15 1b 0e 39 1a 1b 11 17 15 1b 0e 39 08 |9.....9.......9.|
-000000d0: 17 15 1b 0e 39 08 00                            |....9..|
+000000b0: 00 cf 28 cc 03 1e 00 00 1b 0e 39 08 17 15 1b 0e |..(.......9.....|
+000000c0: 39 08 17 15 1b 0e 52 08 17 15 1b 0e 39 08 17 15 |9.....R.....9...|
+000000d0: 1b 0e 39 08 00                                  |..9..|
 ```
 
 ### WASM

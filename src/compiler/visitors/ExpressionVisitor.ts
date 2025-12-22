@@ -27,6 +27,7 @@ export interface LValueInfo {
  * - js_parse_assign_expr2 (parser.c:5982-6275)
  */
 export class ExpressionVisitor extends VisitorContext {
+  private optionalChainEndLabels: WeakMap<ts.Node, number> = new WeakMap()
   constructor(context: CompilerContext) {
     super(context)
   }
@@ -1191,6 +1192,165 @@ export class ExpressionVisitor extends VisitorContext {
     let isMethodCall = false
     let isSuperCall = false
 
+    // Optional call: callee?.(args)
+    // QuickJS: optional_chain_test() around the call-site (parser.c: optional_chain_test + js_parse_postfix_expr)
+    if ((node as any).questionDotToken != null) {
+      const endLabel = this.getOptionalChainEndLabel(fd, node)
+      let dropCount = 1
+
+      const sf = node.getSourceFile()
+      const sourceText = sf.text
+
+      // QuickJS anchors the call opcode source position to the '(' token in parse_func_call.
+      // TS's `node.expression.getEnd()` points to the end of the callee, so we try to find the
+      // actual '(' for correct pc2line column alignment.
+      let optionalCallParenPos = node.arguments.pos - 1
+      if (
+        optionalCallParenPos < 0 ||
+        optionalCallParenPos >= sourceText.length ||
+        sourceText.charCodeAt(optionalCallParenPos) !== 0x28 /* '(' */
+      ) {
+        optionalCallParenPos = callSourcePos
+        const scanStart = Math.max(0, node.expression.getEnd())
+        const scanEnd = Math.min(sourceText.length, node.end)
+        for (let i = scanStart; i < scanEnd; i++) {
+          if (sourceText.charCodeAt(i) === 0x28 /* '(' */) {
+            optionalCallParenPos = i
+            break
+          }
+        }
+      }
+
+      const qdotToken: any = (node as any).questionDotToken
+      const callQDotPos = qdotToken ? qdotToken.getStart(sf) : -1
+      let optionalCallTestSourcePos = callQDotPos
+
+      const callee = node.expression as any
+      if (ts.isPropertyAccessExpression(callee)) {
+        // obj.method?.(args)
+        this.context.visit(callee.expression)
+
+        // Align member-access sourcePos to the '.' / '?.' token (QuickJS behavior).
+        const sf2 = callee.getSourceFile()
+        const text2 = sf2.text
+        const exprEnd2 = callee.expression.getEnd()
+        const nameStart2 = callee.name.getStart(sf2)
+        let dotPos2 = -1
+        for (let i = nameStart2 - 1; i >= exprEnd2; i--) {
+          const ch = text2.charCodeAt(i)
+          if (
+            ch === 0x3f /* '?' */ &&
+            i + 1 < text2.length &&
+            text2.charCodeAt(i + 1) === 0x2e /* '.' */
+          ) {
+            dotPos2 = i
+            break
+          }
+          if (ch === 0x2e /* '.' */) {
+            dotPos2 = i
+            break
+          }
+        }
+        let memberSourcePos = dotPos2 >= 0 ? dotPos2 : callee.name.getStart(sf2)
+        const qdotToken2: any = (callee as any).questionDotToken
+        if (qdotToken2) {
+          memberSourcePos = qdotToken2.getStart(sf2)
+        }
+
+        // If the property access itself is optional (obj?.method?.()), test before get_field2
+        if (callee.questionDotToken != null) {
+          this.emitOptionalChainTest(fd, endLabel, 1, memberSourcePos)
+        }
+
+        const methodName = this.compiler.addAtom(callee.name.text)
+        this.compiler.emitOp(fd, Opcode.OP_get_field2, memberSourcePos)
+        this.compiler.emitAtom(fd, methodName)
+        this.compiler.emitIc(fd, methodName)
+        isMethodCall = true
+        dropCount = 2
+        // QuickJS keeps the optional-call test anchored to the member-access token.
+        optionalCallTestSourcePos = memberSourcePos
+      } else if (ts.isElementAccessExpression(callee)) {
+        // obj[key]?.(args)
+        this.context.visit(callee.expression)
+
+        // Align element-access sourcePos to the '[' token (QuickJS behavior).
+        const sf2 = callee.getSourceFile()
+        const text2 = sf2.text
+        const exprEnd2 = callee.expression.getEnd()
+        const argStart2 = callee.argumentExpression.getStart(sf2)
+        let bracketPos2 = -1
+        for (let i = argStart2 - 1; i >= exprEnd2; i--) {
+          if (text2.charCodeAt(i) === 0x5b /* '[' */) {
+            bracketPos2 = i
+            break
+          }
+        }
+        const elementSourcePos = bracketPos2 >= 0 ? bracketPos2 : callee.getStart(sf2)
+
+        if (callee.questionDotToken != null) {
+          const qdotToken2: any = (callee as any).questionDotToken
+          const qdotPos2 = qdotToken2 ? qdotToken2.getStart(sf2) : -1
+          this.emitOptionalChainTest(fd, endLabel, 1, qdotPos2 >= 0 ? qdotPos2 : elementSourcePos)
+        }
+
+        this.context.visit(callee.argumentExpression)
+        this.compiler.emitOp(fd, Opcode.OP_get_array_el2, elementSourcePos)
+        isMethodCall = true
+        dropCount = 2
+        // QuickJS keeps the optional-call test anchored to the element-access token.
+        optionalCallTestSourcePos = elementSourcePos
+      } else {
+        // func?.(args)
+        this.context.visit(callee)
+        isMethodCall = false
+        dropCount = 1
+      }
+
+      // Optional-call test (drop this+func for method calls, or func for plain calls)
+      this.emitOptionalChainTest(fd, endLabel, dropCount, optionalCallTestSourcePos)
+
+      // 处理参数（复用原有 suppressSourcePos 策略）
+      const argCount = node.arguments.length
+      const prevSuppressSourcePos = fd.suppressSourcePos
+      try {
+        for (const arg of node.arguments) {
+          const expr = ts.isSpreadElement(arg) ? arg.expression : arg
+          const isSimpleLiteralArg =
+            ts.isNumericLiteral(expr) ||
+            ts.isStringLiteral(expr) ||
+            ts.isNoSubstitutionTemplateLiteral(expr) ||
+            expr.kind === ts.SyntaxKind.TrueKeyword ||
+            expr.kind === ts.SyntaxKind.FalseKeyword ||
+            expr.kind === ts.SyntaxKind.NullKeyword ||
+            ts.isBigIntLiteral(expr)
+
+          fd.suppressSourcePos = prevSuppressSourcePos || isSimpleLiteralArg
+
+          if (ts.isSpreadElement(arg)) {
+            this.context.visit(arg.expression)
+          } else {
+            this.context.visit(arg)
+          }
+        }
+      } finally {
+        fd.suppressSourcePos = prevSuppressSourcePos
+      }
+
+      if (isMethodCall) {
+        this.compiler.emitOp(fd, Opcode.OP_call_method, optionalCallParenPos)
+        this.compiler.emitU16(fd, argCount)
+      } else {
+        this.compiler.emitOp(fd, Opcode.OP_call, optionalCallParenPos)
+        this.compiler.emitU16(fd, argCount)
+      }
+
+      if (node === this.getOptionalChainRoot(node)) {
+        this.compiler.emitLabelInt(fd, endLabel)
+      }
+      return
+    }
+
     // 检查是否是 super() 调用 - 对应 parser.c:5236-5245
     if (node.expression.kind === ts.SyntaxKind.SuperKeyword) {
       // super() 调用: 派生类构造函数中调用父类构造函数
@@ -1335,10 +1495,34 @@ export class ExpressionVisitor extends VisitorContext {
         break
       }
     }
-    const sourcePos = dotPos >= 0 ? dotPos : nameStart
+    // Default member-access sourcePos is the '.' token; for optional chaining we prefer the
+    // AST token start to avoid edge-cases where exprEnd skips past `?.`.
+    let sourcePos = dotPos >= 0 ? dotPos : nameStart
+    const qdotToken: any = (node as any).questionDotToken
+    if (qdotToken) {
+      sourcePos = qdotToken.getStart(sf)
+    }
 
     // 计算对象
     this.context.visit(node.expression)
+
+    // Optional chaining: obj?.prop
+    // QuickJS: js_parse_postfix_expr() `TOK_QUESTION_MARK_DOT` + optional_chain_test(drop_count=1)
+    if ((node as any).questionDotToken != null) {
+      const endLabel = this.getOptionalChainEndLabel(fd, node)
+      // Bind optional-chain test to the `?.` token to match QuickJS pc2line sampling.
+      this.emitOptionalChainTest(fd, endLabel, 1, sourcePos)
+
+      const name = this.compiler.addAtom(node.name.text)
+      this.compiler.emitOp(fd, Opcode.OP_get_field, sourcePos)
+      this.compiler.emitAtom(fd, name)
+      this.compiler.emitIc(fd, name)
+
+      if (node === this.getOptionalChainRoot(node)) {
+        this.compiler.emitLabelInt(fd, endLabel)
+      }
+      return
+    }
 
     // 发射 get_field 指令
     const name = this.compiler.addAtom(node.name.text)
@@ -1378,11 +1562,246 @@ export class ExpressionVisitor extends VisitorContext {
     // 计算对象
     this.context.visit(node.expression)
 
+    // Optional chaining: obj?.[expr]
+    // QuickJS: optional_chain_test(drop_count=1) before evaluating index + OP_get_array_el
+    if ((node as any).questionDotToken != null) {
+      const endLabel = this.getOptionalChainEndLabel(fd, node)
+      const qdotToken: any = (node as any).questionDotToken
+      const qdotPos = qdotToken ? qdotToken.getStart(sf) : -1
+
+      // QuickJS does NOT call emit_source_pos() before optional_chain_test() for array access.
+      // It only emits source pos at `op_token_ptr` right before OP_get_array_el.
+      this.emitOptionalChainTest(fd, endLabel, 1)
+
+      // 计算索引
+      this.context.visit(node.argumentExpression)
+
+      // 发射 get_array_el 指令
+      this.compiler.emitOp(fd, Opcode.OP_get_array_el, qdotPos >= 0 ? qdotPos : sourcePos)
+
+      if (node === this.getOptionalChainRoot(node)) {
+        this.compiler.emitLabelInt(fd, endLabel)
+      }
+      return
+    }
+
     // 计算索引
     this.context.visit(node.argumentExpression)
 
     // 发射 get_array_el 指令
     this.compiler.emitOp(fd, Opcode.OP_get_array_el, sourcePos)
+  }
+
+  // ============================================================================
+  // Optional chaining (?.) - 对应 parser.c: js_parse_postfix_expr + optional_chain_test
+  // ============================================================================
+
+  private getOptionalChainRoot(node: ts.Node): ts.Node {
+    let cur: ts.Node = node
+    for (;;) {
+      const p = cur.parent
+      if (!p) break
+
+      const anyP: any = p as any
+      const isOptionalByToken = anyP.questionDotToken != null
+
+      // Note: TypeScript AST in this workspace represents optional chaining using
+      // the normal SyntaxKind.*Expression nodes plus `questionDotToken`.
+      const isChainParent =
+        p.kind === ts.SyntaxKind.PropertyAccessChain ||
+        p.kind === ts.SyntaxKind.ElementAccessChain ||
+        p.kind === ts.SyntaxKind.CallChain ||
+        ((p.kind === ts.SyntaxKind.PropertyAccessExpression ||
+          p.kind === ts.SyntaxKind.ElementAccessExpression ||
+          p.kind === ts.SyntaxKind.CallExpression) &&
+          isOptionalByToken)
+
+      // In TS AST, chained nodes nest via `.expression`.
+      if (isChainParent && (p as any).expression === cur) {
+        cur = p
+        continue
+      }
+      break
+    }
+    return cur
+  }
+
+  private getOptionalChainEndLabel(fd: FunctionDef, node: ts.Node): number {
+    const root = this.getOptionalChainRoot(node)
+    const existing = this.optionalChainEndLabels.get(root)
+    if (existing != null) return existing
+    const label = this.compiler.newLabelInt(fd)
+    this.optionalChainEndLabels.set(root, label)
+    return label
+  }
+
+  private emitOptionalChainTest(fd: FunctionDef, endLabel: number, dropCount: number, sourcePos: number = -1): void {
+    // Mirror QuickJS optional_chain_test() in parser.c:
+    //   dup; is_undefined_or_null; if_false label_next;
+    //   drop xN; undefined; goto endLabel; label_next:
+    const labelNext = this.compiler.newLabelInt(fd)
+    // QuickJS calls emit_source_pos() at the `?.` token before emitting the optional-chain test.
+    // To mirror that, we bind sourcePos only to the first opcode in the test (dup).
+    this.compiler.emitOp(fd, Opcode.OP_dup, sourcePos)
+    this.compiler.emitOp(fd, Opcode.OP_is_undefined_or_null)
+    this.compiler.emitGotoInt(fd, Opcode.OP_if_false, labelNext)
+    for (let i = 0; i < dropCount; i++) {
+      this.compiler.emitOp(fd, Opcode.OP_drop)
+    }
+    this.compiler.emitOp(fd, Opcode.OP_undefined)
+    this.compiler.emitGotoInt(fd, Opcode.OP_goto, endLabel)
+    this.compiler.emitLabelInt(fd, labelNext)
+  }
+
+  visitPropertyAccessChain(node: any): void {
+    const fd = this.funcDef!
+    const endLabel = this.getOptionalChainEndLabel(fd, node)
+
+    // Evaluate receiver (could itself be a chain)
+    this.context.visit(node.expression)
+
+    // QuickJS: optional_chain_test(..., drop_count=1) before OP_get_field
+    this.emitOptionalChainTest(fd, endLabel, 1)
+
+    // Emit get_field with source position aligned to `?.`/`.` token
+    const sf = node.getSourceFile()
+    const text = sf.text
+    const exprEnd = node.expression.getEnd()
+    const nameStart = node.name.getStart(sf)
+    let dotPos = -1
+    for (let i = nameStart - 1; i >= exprEnd; i--) {
+      const ch = text.charCodeAt(i)
+      if (ch === 0x2e /* '.' */) {
+        dotPos = i
+        break
+      }
+      if (ch === 0x3f /* '?' */ && i + 1 < text.length && text.charCodeAt(i + 1) === 0x2e /* '.' */) {
+        dotPos = i
+        break
+      }
+    }
+    const sourcePos = dotPos >= 0 ? dotPos : nameStart
+
+    const name = this.compiler.addAtom(node.name.text)
+    this.compiler.emitOp(fd, Opcode.OP_get_field, sourcePos)
+    this.compiler.emitAtom(fd, name)
+    this.compiler.emitIc(fd, name)
+
+    if (node === this.getOptionalChainRoot(node)) {
+      this.compiler.emitLabelInt(fd, endLabel)
+    }
+  }
+
+  visitElementAccessChain(node: any): void {
+    const fd = this.funcDef!
+    const endLabel = this.getOptionalChainEndLabel(fd, node)
+
+    // Evaluate receiver
+    this.context.visit(node.expression)
+
+    // QuickJS: optional_chain_test(..., drop_count=1) before parsing index and OP_get_array_el
+    this.emitOptionalChainTest(fd, endLabel, 1)
+
+    // Evaluate index
+    this.context.visit(node.argumentExpression)
+
+    // Emit get_array_el with source position aligned to '['
+    const sf = node.getSourceFile()
+    const text = sf.text
+    const exprEnd = node.expression.getEnd()
+    const argStart = node.argumentExpression.getStart(sf)
+    let bracketPos = -1
+    for (let i = argStart - 1; i >= exprEnd; i--) {
+      if (text.charCodeAt(i) === 0x5b /* '[' */) {
+        bracketPos = i
+        break
+      }
+    }
+    const sourcePos = bracketPos >= 0 ? bracketPos : node.getStart(sf)
+
+    this.compiler.emitOp(fd, Opcode.OP_get_array_el, sourcePos)
+
+    if (node === this.getOptionalChainRoot(node)) {
+      this.compiler.emitLabelInt(fd, endLabel)
+    }
+  }
+
+  visitCallChain(node: any): void {
+    const fd = this.funcDef!
+    const endLabel = this.getOptionalChainEndLabel(fd, node)
+    const callSourcePos = node.expression.getEnd()
+
+    let isMethodCall = false
+    let dropCount = 1
+
+    const expr = node.expression
+
+    // Mirror QuickJS js_parse_postfix_expr() call-site logic: determine how many stack values
+    // must be dropped when the callee is nullish.
+    if (expr.kind === ts.SyntaxKind.PropertyAccessExpression || expr.kind === ts.SyntaxKind.PropertyAccessChain) {
+      // obj?.prop?.(args)
+      this.context.visit(expr.expression)
+      const methodName = this.compiler.addAtom(expr.name.text)
+      this.compiler.emitOp(fd, Opcode.OP_get_field2, expr.expression.getEnd())
+      this.compiler.emitAtom(fd, methodName)
+      this.compiler.emitIc(fd, methodName)
+      isMethodCall = true
+      dropCount = 2
+    } else if (expr.kind === ts.SyntaxKind.ElementAccessExpression || expr.kind === ts.SyntaxKind.ElementAccessChain) {
+      // obj?.[key]?.(args)
+      this.context.visit(expr.expression)
+      this.context.visit(expr.argumentExpression)
+      this.compiler.emitOp(fd, Opcode.OP_get_array_el2, expr.getStart())
+      isMethodCall = true
+      dropCount = 2
+    } else {
+      // func?.(args)
+      this.context.visit(expr)
+      isMethodCall = false
+      dropCount = 1
+    }
+
+    // Optional call test (QuickJS: optional_chain_test(..., drop_count))
+    this.emitOptionalChainTest(fd, endLabel, dropCount)
+
+    // Arguments
+    const argCount = node.arguments.length
+    const prevSuppressSourcePos = fd.suppressSourcePos
+    try {
+      for (const arg of node.arguments) {
+        const a = ts.isSpreadElement(arg) ? arg.expression : arg
+        const isSimpleLiteralArg =
+          ts.isNumericLiteral(a) ||
+          ts.isStringLiteral(a) ||
+          ts.isNoSubstitutionTemplateLiteral(a) ||
+          a.kind === ts.SyntaxKind.TrueKeyword ||
+          a.kind === ts.SyntaxKind.FalseKeyword ||
+          a.kind === ts.SyntaxKind.NullKeyword ||
+          ts.isBigIntLiteral(a)
+
+        fd.suppressSourcePos = prevSuppressSourcePos || isSimpleLiteralArg
+
+        if (ts.isSpreadElement(arg)) {
+          this.context.visit(arg.expression)
+        } else {
+          this.context.visit(arg)
+        }
+      }
+    } finally {
+      fd.suppressSourcePos = prevSuppressSourcePos
+    }
+
+    if (isMethodCall) {
+      this.compiler.emitOp(fd, Opcode.OP_call_method, callSourcePos)
+      this.compiler.emitU16(fd, argCount)
+    } else {
+      this.compiler.emitOp(fd, Opcode.OP_call, callSourcePos)
+      this.compiler.emitU16(fd, argCount)
+    }
+
+    if (node === this.getOptionalChainRoot(node)) {
+      this.compiler.emitLabelInt(fd, endLabel)
+    }
   }
 
   // ============================================================================
@@ -1556,8 +1975,38 @@ export class ExpressionVisitor extends VisitorContext {
         // 弹出 src
         this.compiler.emitOp(fd, Opcode.OP_drop)
       } else if (ts.isMethodDeclaration(prop)) {
-        // 方法声明
-        // TODO: 实现方法声明
+        // 方法声明: { foo() {} }
+        // QuickJS: js_parse_object_literal() 对方法使用 fclosure + define_method，且方法是可枚举的。
+        // WASM 参考: artifacts/optional-chaining (profile.greet) -> `fclosure8 ...` + `define_method greet,4`
+
+        const isComputedName = ts.isComputedPropertyName(prop.name)
+
+        if (isComputedName) {
+          this.context.visit((prop.name as ts.ComputedPropertyName).expression)
+        }
+
+        // 生成闭包（由 FunctionVisitor.visitMethodDefinition 发射 OP_fclosure）
+        this.context.visit(prop)
+
+        if (isComputedName) {
+          this.compiler.emitOp(fd, Opcode.OP_define_method_computed)
+        } else {
+          let methodNameText: string
+          if (ts.isIdentifier(prop.name)) {
+            methodNameText = prop.name.text
+          } else if (ts.isStringLiteral(prop.name) || ts.isNumericLiteral(prop.name)) {
+            methodNameText = prop.name.text
+          } else {
+            // Fallback (should be covered by computed)
+            methodNameText = prop.name.getText(prop.getSourceFile())
+          }
+          const methodName = this.compiler.addAtom(methodNameText)
+          this.compiler.emitOp(fd, Opcode.OP_define_method)
+          this.compiler.emitAtom(fd, methodName)
+        }
+
+        // flags: enumerable(4) | method(0)
+        this.compiler.emitU8(fd, 4)
       } else if (ts.isGetAccessorDeclaration(prop) || ts.isSetAccessorDeclaration(prop)) {
         // getter/setter
         // TODO: 实现 getter/setter

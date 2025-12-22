@@ -44,13 +44,7 @@ export class IdentifierVisitor extends VisitorContext {
     
     const name = node.text
     const sourcePos = node.getStart()
-    
-    // 处理特殊值
-    if (name === 'undefined') {
-      this.compiler.emitOp(fd, Opcode.OP_undefined, sourcePos)
-      return
-    }
-    
+
     // 发射 OP_scope_get_var 指令获取变量
     // 格式: OP_scope_get_var atom:u32 scope:u16
     const atom = this.compiler.addAtom(name)
