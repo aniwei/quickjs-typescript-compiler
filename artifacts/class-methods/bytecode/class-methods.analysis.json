@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-22T02:37:15.677Z",
+  "timestamp": "2025-12-22T09:18:38.660Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/class-methods.ts",
   "compilation": {
     "typescript": {
@@ -334,9 +334,9 @@
         "0x16",
         "0x16",
         "0x07",
-        "0x1d",
+        "0x01",
         "0x11",
-        "0x0d",
+        "0x29",
         "0x00",
         "0x0c",
         "0x02",
@@ -395,7 +395,7 @@
         "00000110: 05 04 0d 08 20 1c 07 05 2b 07 07 08 1b 15 00 0c |.... ...+.......|",
         "00000120: 4a 07 01 ca 03 01 00 01 03 01 00 09 01 ce 03 00 |J...............|",
         "00000130: 01 00 c8 03 01 0d 68 00 00 11 d3 21 01 00 28 cc |......h....!..(.|",
-        "00000140: 03 0a 09 04 03 1e 16 16 07 1d 11 0d 00 0c 02 06 |................|",
+        "00000140: 03 0a 09 04 03 1e 16 16 07 01 11 29 00 0c 02 06 |...........)....|",
         "00000150: 01 f0 01 00 01 00 03 00 00 0b 01 10 00 00 00 08 |................|",
         "00000160: cb 09 c7 06 4e 42 00 00 00 29 cc 03 02 00 00 00 |....NB...)......|"
       ],
@@ -2414,9 +2414,9 @@
     {
       "offset": 329,
       "offsetHex": "0x149",
-      "typescript": "0x1d",
+      "typescript": "0x01",
       "wasm": "0x05",
-      "typescriptDecimal": 29,
+      "typescriptDecimal": 1,
       "wasmDecimal": 5
     },
     {
@@ -2430,9 +2430,9 @@
     {
       "offset": 331,
       "offsetHex": "0x14b",
-      "typescript": "0x0d",
+      "typescript": "0x29",
       "wasm": "0x00",
-      "typescriptDecimal": 13,
+      "typescriptDecimal": 41,
       "wasmDecimal": 0
     },
     {

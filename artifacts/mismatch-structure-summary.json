@@ -1,0 +1,1563 @@
+[
+  {
+    "fixture": "array-literal",
+    "tsBytes": 134,
+    "wasmBytes": 134,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "array-nested",
+    "tsBytes": 193,
+    "wasmBytes": 193,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "array-spread",
+    "tsBytes": 165,
+    "wasmBytes": 165,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "arrow-fn-basic",
+    "tsBytes": 178,
+    "wasmBytes": 178,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "arrow-fn-complex",
+    "tsBytes": 224,
+    "wasmBytes": 224,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "async-await",
+    "tsBytes": 307,
+    "wasmBytes": 302,
+    "identical": false,
+    "tags": [
+      "debug",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.bytecode",
+        "path": "func",
+        "details": "bytecode differ (TS 51 bytes: 40 e4 00 00 00 40 40 e5 00 00 00 40 c2 00 41 e4 … vs WASM 46 bytes: 40 e4 00 00 00 40 40 e5 00 00 00 40 c2 00 41 e4 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func",
+        "details": "pc2line differ (TS 12 bytes: 00 00 00 1c 10 00 1b 06 07 04 3e 0a vs WASM 12 bytes: 00 00 00 1c 10 00 1b 06 07 04 25 0a)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[0](func)",
+        "details": "bytecode differ (TS 3 bytes: bf 2a 28 vs WASM 3 bytes: bf 2a 2f)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[1](func)",
+        "details": "bytecode differ (TS 39 bytes: 63 00 00 39 e4 00 00 00 f0 8d cb 39 e7 00 00 00 … vs WASM 39 bytes: 63 00 00 39 e4 00 00 00 f0 8d cb 39 e7 00 00 00 …)"
+      }
+    ]
+  },
+  {
+    "fixture": "binary-ops",
+    "tsBytes": 196,
+    "wasmBytes": 196,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "bitwise-ops",
+    "tsBytes": 222,
+    "wasmBytes": 222,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "class-accessors",
+    "tsBytes": 464,
+    "wasmBytes": 485,
+    "identical": false,
+    "tags": [
+      "debug",
+      "func-meta",
+      "scope",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.varDefs",
+        "path": "func",
+        "details": "varDefs differ (TS=3, WASM=3)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func",
+        "details": "bytecode differ (TS 120 bytes: 40 e4 00 00 00 80 40 e5 00 00 00 80 3f e4 00 00 … vs WASM 122 bytes: 40 e4 00 00 00 80 40 e5 00 00 00 80 3f e4 00 00 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func",
+        "details": "pc2line differ (TS 20 bytes: 00 00 00 43 16 1c 20 07 2b 13 49 00 1b 0e 1b 0a … vs WASM 22 bytes: 00 00 00 45 16 1c 20 06 2b 21 1b 02 30 01 1b 0e …)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[0](func)",
+        "details": "flags TS=0x74a WASM=0x742"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[0](func)",
+        "details": "funcNameAtom TS=66(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[0](func)",
+        "details": "varDefs differ (TS=1, WASM=1)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[0](func)",
+        "details": "pc2line differ (TS 14 bytes: 02 04 0d 08 1b 0e 34 08 17 07 07 08 1b 15 vs WASM 12 bytes: 02 04 0d 08 1b 0e 34 08 1c 00 1b 15)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[1](func)",
+        "details": "flags TS=0x74a WASM=0x742"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[1](func)",
+        "details": "funcNameAtom TS=66(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[1](func)",
+        "details": "varDefs differ (TS=2, WASM=2)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[1](func)",
+        "details": "bytecode differ (TS 30 bytes: 08 cb 39 e6 00 00 00 43 e7 00 00 00 04 ec 00 00 … vs WASM 29 bytes: 08 cb 39 e6 00 00 00 43 e7 00 00 00 04 ec 00 00 …)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[2](func)",
+        "details": "flags TS=0x742 WASM=0x540"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[2](func)",
+        "details": "funcNameAtom TS=62(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[2](func)",
+        "details": "sig TS(arg=0 var=1 defArg=0 stack=1) vs WASM(arg=0 var=1 defArg=0 stack=2)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[2](func)",
+        "details": "varDefs differ (TS=1, WASM=1)"
+      },
+      {
+        "kind": "func.closureVars",
+        "path": "func.cpool[2](func)",
+        "details": "closureVars differ (TS=0, WASM=1)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[2](func)",
+        "details": "bytecode differ (TS 5 bytes: 08 cb 2b c7 28 vs WASM 15 bytes: 08 cb 2b 68 00 00 11 ec 06 c7 1b 24 00 00 29)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[2](func)",
+        "details": "pc2line differ (TS 2 bytes: 00 00 vs WASM 2 bytes: 0a 00)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[3](func)",
+        "details": "flags TS=0x602 WASM=0x548"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[3](func)",
+        "details": "funcNameAtom TS=120(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[3](func)",
+        "details": "sig TS(arg=0 var=1 defArg=0 stack=3) vs WASM(arg=0 var=2 defArg=0 stack=2)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[3](func)",
+        "details": "varDefs differ (TS=1, WASM=2)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[3](func)",
+        "details": "bytecode differ (TS 11 bytes: 08 cb 09 c7 b7 4e ea 00 00 00 29 vs WASM 15 bytes: 0c 04 cc 08 cb ee 01 c7 b7 4e ea 00 00 00 29)"
+      }
+    ]
+  },
+  {
+    "fixture": "class-basic",
+    "tsBytes": 200,
+    "wasmBytes": 197,
+    "identical": false,
+    "tags": [
+      "debug",
+      "func-meta",
+      "scope",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[0](func)",
+        "details": "funcNameAtom TS=62(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[0](func)",
+        "details": "sig TS(arg=2 var=1 defArg=2 stack=3) vs WASM(arg=2 var=1 defArg=2 stack=2)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[0](func)",
+        "details": "varDefs differ (TS=3, WASM=3)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[0](func)",
+        "details": "bytecode differ (TS 33 bytes: 08 cb 2b 68 00 00 11 ec 06 c7 1b 24 00 00 0e c7 … vs WASM 30 bytes: 08 cb 2b 68 00 00 11 ec 06 c7 1b 24 00 00 0e c7 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[0](func)",
+        "details": "pc2line differ (TS 10 bytes: 01 04 4e 08 07 12 2b 11 07 12 vs WASM 10 bytes: 01 04 4e 08 07 12 21 11 07 12)"
+      }
+    ]
+  },
+  {
+    "fixture": "class-inheritance",
+    "tsBytes": 668,
+    "wasmBytes": 709,
+    "identical": false,
+    "tags": [
+      "debug",
+      "func-meta",
+      "scope",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.varDefs",
+        "path": "func",
+        "details": "varDefs differ (TS=5, WASM=5)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func",
+        "details": "bytecode differ (TS 151 bytes: 40 e4 00 00 00 80 40 e5 00 00 00 80 40 e6 00 00 … vs WASM 154 bytes: 40 e4 00 00 00 80 40 e5 00 00 00 80 40 e6 00 00 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func",
+        "details": "pc2line differ (TS 18 bytes: 00 00 00 4c 12 24 00 24 16 07 52 07 2b 13 1b 02 … vs WASM 18 bytes: 00 00 00 4c 12 24 00 27 16 07 52 06 2b 21 1b 02 …)"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[0](func)",
+        "details": "funcNameAtom TS=62(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[0](func)",
+        "details": "sig TS(arg=1 var=1 defArg=1 stack=3) vs WASM(arg=1 var=1 defArg=1 stack=2)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[0](func)",
+        "details": "varDefs differ (TS=2, WASM=2)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[0](func)",
+        "details": "bytecode differ (TS 24 bytes: 08 cb 2b 68 00 00 11 ec 06 c7 1b 24 00 00 0e c7 … vs WASM 23 bytes: 08 cb 2b 68 00 00 11 ec 06 c7 1b 24 00 00 0e c7 …)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[1](func)",
+        "details": "flags TS=0x74a WASM=0x742"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[1](func)",
+        "details": "funcNameAtom TS=231(speak) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[2](func)",
+        "details": "flags TS=0x602 WASM=0x548"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[2](func)",
+        "details": "funcNameAtom TS=120(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[2](func)",
+        "details": "sig TS(arg=0 var=1 defArg=0 stack=3) vs WASM(arg=0 var=2 defArg=0 stack=2)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[2](func)",
+        "details": "varDefs differ (TS=1, WASM=2)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[2](func)",
+        "details": "bytecode differ (TS 11 bytes: 08 cb 09 c7 06 4e 38 00 00 00 29 vs WASM 15 bytes: 0c 04 cc 08 cb ee 01 c7 06 4e 38 00 00 00 29)"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[3](func)",
+        "details": "funcNameAtom TS=62(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[3](func)",
+        "details": "varDefs differ (TS=5, WASM=5)"
+      },
+      {
+        "kind": "func.closureVars",
+        "path": "func.cpool[3](func)",
+        "details": "closureVars differ (TS=0, WASM=1)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[3](func)",
+        "details": "bytecode differ (TS 29 bytes: 0c 02 cb 0c 03 cc 63 02 00 2b c7 35 c8 d3 21 01 … vs WASM 49 bytes: 0c 02 cb 0c 03 cc 63 02 00 2b c7 35 c8 d3 21 01 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[3](func)",
+        "details": "pc2line differ (TS 12 bytes: 0b 04 35 08 11 0c 07 01 17 09 11 1a vs WASM 12 bytes: 0b 04 35 08 11 0c 07 01 71 09 11 1a)"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[4](func)",
+        "details": "funcNameAtom TS=231(speak) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[4](func)",
+        "details": "sig TS(arg=0 var=2 defArg=0 stack=4) vs WASM(arg=0 var=2 defArg=0 stack=3)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[4](func)",
+        "details": "varDefs differ (TS=2, WASM=2)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[4](func)",
+        "details": "bytecode differ (TS 36 bytes: 0c 04 cc 08 cb c7 c8 35 43 e7 00 00 00 24 00 00 … vs WASM 37 bytes: 0c 04 cc 08 cb c7 c8 35 04 e7 00 00 00 48 24 00 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[4](func)",
+        "details": "pc2line differ (TS 14 bytes: 0f 04 1c 08 11 0a 1b 0c 17 15 1b 0e 34 08 vs WASM 14 bytes: 0f 04 1c 08 11 0a 20 0c 17 15 1b 0e 34 08)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[5](func)",
+        "details": "flags TS=0x602 WASM=0x548"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[5](func)",
+        "details": "funcNameAtom TS=120(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[5](func)",
+        "details": "sig TS(arg=0 var=1 defArg=0 stack=3) vs WASM(arg=0 var=2 defArg=0 stack=2)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[5](func)",
+        "details": "varDefs differ (TS=1, WASM=2)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[5](func)",
+        "details": "bytecode differ (TS 11 bytes: 08 cb 09 c7 06 4e ee 00 00 00 29 vs WASM 15 bytes: 0c 04 cc 08 cb ee 01 c7 06 4e ee 00 00 00 29)"
+      }
+    ]
+  },
+  {
+    "fixture": "class-methods",
+    "tsBytes": 368,
+    "wasmBytes": 370,
+    "identical": false,
+    "tags": [
+      "debug",
+      "func-meta",
+      "scope",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.bytecode",
+        "path": "func",
+        "details": "bytecode differ (TS 65 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 63 01 00 06 … vs WASM 64 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 63 01 00 06 …)"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[0](func)",
+        "details": "funcNameAtom TS=62(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[0](func)",
+        "details": "sig TS(arg=1 var=1 defArg=1 stack=3) vs WASM(arg=1 var=1 defArg=1 stack=2)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[0](func)",
+        "details": "varDefs differ (TS=2, WASM=2)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[0](func)",
+        "details": "bytecode differ (TS 24 bytes: 08 cb 2b 68 00 00 11 ec 06 c7 1b 24 00 00 0e c7 … vs WASM 23 bytes: 08 cb 2b 68 00 00 11 ec 06 c7 1b 24 00 00 0e c7 …)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[1](func)",
+        "details": "flags TS=0x74a WASM=0x742"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[1](func)",
+        "details": "funcNameAtom TS=106(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[1](func)",
+        "details": "varDefs differ (TS=2, WASM=2)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[1](func)",
+        "details": "bytecode differ (TS 24 bytes: 08 cb c7 43 42 00 00 00 d3 9f 15 44 42 00 00 00 … vs WASM 22 bytes: 08 cb c7 43 42 00 00 00 d3 9f 44 42 00 00 00 c7 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[1](func)",
+        "details": "pc2line differ (TS 14 bytes: 05 04 0d 08 20 1c 07 05 2b 07 07 08 1b 15 vs WASM 14 bytes: 05 04 0d 08 07 08 1b 14 07 05 26 00 1b 15)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[2](func)",
+        "details": "flags TS=0x74a WASM=0x742"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[2](func)",
+        "details": "funcNameAtom TS=229(create) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[2](func)",
+        "details": "pc2line differ (TS 10 bytes: 09 04 03 1e 16 16 07 1d 11 0d vs WASM 10 bytes: 09 0b 03 10 16 16 07 01 11 29)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[3](func)",
+        "details": "flags TS=0x602 WASM=0x548"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[3](func)",
+        "details": "funcNameAtom TS=120(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[3](func)",
+        "details": "sig TS(arg=0 var=1 defArg=0 stack=3) vs WASM(arg=0 var=2 defArg=0 stack=2)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[3](func)",
+        "details": "varDefs differ (TS=1, WASM=2)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[3](func)",
+        "details": "bytecode differ (TS 11 bytes: 08 cb 09 c7 06 4e 42 00 00 00 29 vs WASM 15 bytes: 0c 04 cc 08 cb ee 01 c7 06 4e 42 00 00 00 29)"
+      }
+    ]
+  },
+  {
+    "fixture": "class-private-fields",
+    "tsBytes": 427,
+    "wasmBytes": 450,
+    "identical": false,
+    "tags": [
+      "debug",
+      "func-meta",
+      "scope",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.varDefs",
+        "path": "func",
+        "details": "varDefs differ (TS=4, WASM=4)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func",
+        "details": "bytecode differ (TS 132 bytes: 40 e4 00 00 00 80 40 e6 00 00 00 80 3f e4 00 00 … vs WASM 134 bytes: 40 e4 00 00 00 80 40 e6 00 00 00 80 3f e4 00 00 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func",
+        "details": "pc2line differ (TS 24 bytes: 00 00 00 4f 12 1c 20 07 2b 13 1b 02 1b 14 17 15 … vs WASM 24 bytes: 00 00 00 51 12 1c 20 0e 2b 29 1b 02 1b 14 17 15 …)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[0](func)",
+        "details": "flags TS=0x74a WASM=0x742"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[0](func)",
+        "details": "funcNameAtom TS=231(increment) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[0](func)",
+        "details": "sig TS(arg=0 var=1 defArg=0 stack=2) vs WASM(arg=0 var=1 defArg=0 stack=4)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[0](func)",
+        "details": "varDefs differ (TS=1, WASM=1)"
+      },
+      {
+        "kind": "func.closureVars",
+        "path": "func.cpool[0](func)",
+        "details": "closureVars differ (TS=0, WASM=1)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[0](func)",
+        "details": "bytecode differ (TS 15 bytes: 08 cb c7 43 e5 00 00 00 91 44 e5 00 00 00 29 vs WASM 11 bytes: 08 cb c7 11 df 45 93 18 df 46 29)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[0](func)",
+        "details": "pc2line differ (TS 6 bytes: 02 04 0d 08 20 16 vs WASM 8 bytes: 02 04 0d 08 07 08 11 0e)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[1](func)",
+        "details": "flags TS=0x74a WASM=0x742"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[1](func)",
+        "details": "funcNameAtom TS=66(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[1](func)",
+        "details": "sig TS(arg=0 var=1 defArg=0 stack=1) vs WASM(arg=0 var=1 defArg=0 stack=2)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[1](func)",
+        "details": "varDefs differ (TS=1, WASM=1)"
+      },
+      {
+        "kind": "func.closureVars",
+        "path": "func.cpool[1](func)",
+        "details": "closureVars differ (TS=0, WASM=1)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[1](func)",
+        "details": "bytecode differ (TS 9 bytes: 08 cb c7 42 e5 00 00 00 28 vs WASM 6 bytes: 08 cb c7 df 45 28)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[1](func)",
+        "details": "pc2line differ (TS 8 bytes: 05 04 0d 16 07 08 1b 15 vs WASM 6 bytes: 05 04 12 1e 0c 15)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[2](func)",
+        "details": "flags TS=0x742 WASM=0x540"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[2](func)",
+        "details": "funcNameAtom TS=62(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[2](func)",
+        "details": "sig TS(arg=0 var=1 defArg=0 stack=1) vs WASM(arg=0 var=1 defArg=0 stack=2)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[2](func)",
+        "details": "varDefs differ (TS=1, WASM=1)"
+      },
+      {
+        "kind": "func.closureVars",
+        "path": "func.cpool[2](func)",
+        "details": "closureVars differ (TS=0, WASM=1)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[2](func)",
+        "details": "bytecode differ (TS 5 bytes: 08 cb 2b c7 28 vs WASM 15 bytes: 08 cb 2b 68 00 00 11 ec 06 c7 1b 24 00 00 29)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[2](func)",
+        "details": "pc2line differ (TS 2 bytes: 00 00 vs WASM 2 bytes: 08 00)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[3](func)",
+        "details": "flags TS=0x602 WASM=0x548"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[3](func)",
+        "details": "funcNameAtom TS=120(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[3](func)",
+        "details": "sig TS(arg=0 var=1 defArg=0 stack=4) vs WASM(arg=0 var=2 defArg=0 stack=3)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[3](func)",
+        "details": "varDefs differ (TS=1, WASM=2)"
+      },
+      {
+        "kind": "func.closureVars",
+        "path": "func.cpool[3](func)",
+        "details": "closureVars differ (TS=1, WASM=1)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[3](func)",
+        "details": "bytecode differ (TS 10 bytes: 08 cb 09 c7 68 00 00 b7 47 29 vs WASM 14 bytes: 0c 04 cc 08 cb ee 01 c7 68 00 00 b7 47 29)"
+      }
+    ]
+  },
+  {
+    "fixture": "class-static-block",
+    "tsBytes": 621,
+    "wasmBytes": 642,
+    "identical": false,
+    "tags": [
+      "debug",
+      "func-meta",
+      "scope",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.signature",
+        "path": "func",
+        "details": "sig TS(arg=0 var=4 defArg=0 stack=4) vs WASM(arg=0 var=5 defArg=0 stack=4)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func",
+        "details": "varDefs differ (TS=4, WASM=5)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func",
+        "details": "bytecode differ (TS 175 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 63 01 00 06 … vs WASM 177 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 63 01 00 06 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func",
+        "details": "pc2line differ (TS 36 bytes: 00 00 00 63 24 00 1b 0e 1b 0a 1b 0e 1b 0f 17 15 … vs WASM 36 bytes: 00 00 00 65 24 00 1b 0e 1b 0a 1b 0e 1b 0f 17 15 …)"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[0](func)",
+        "details": "funcNameAtom TS=230(#bump) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[0](func)",
+        "details": "sig TS(arg=0 var=1 defArg=0 stack=3) vs WASM(arg=0 var=1 defArg=0 stack=4)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[0](func)",
+        "details": "varDefs differ (TS=1, WASM=1)"
+      },
+      {
+        "kind": "func.closureVars",
+        "path": "func.cpool[0](func)",
+        "details": "closureVars differ (TS=0, WASM=1)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[0](func)",
+        "details": "bytecode differ (TS 17 bytes: 08 cb c7 43 e5 00 00 00 b8 9f 15 44 e5 00 00 00 … vs WASM 12 bytes: 08 cb c7 11 df 45 b8 9f 15 df 46 29)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[0](func)",
+        "details": "pc2line differ (TS 6 bytes: 07 04 0d 08 25 18 vs WASM 8 bytes: 07 0b 0d 05 07 08 16 10)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[1](func)",
+        "details": "flags TS=0x74a WASM=0x742"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[1](func)",
+        "details": "funcNameAtom TS=231(inc) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[1](func)",
+        "details": "varDefs differ (TS=1, WASM=1)"
+      },
+      {
+        "kind": "func.closureVars",
+        "path": "func.cpool[1](func)",
+        "details": "closureVars differ (TS=0, WASM=2)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[1](func)",
+        "details": "bytecode differ (TS 19 bytes: 08 cb c7 43 e6 00 00 00 24 00 00 0e c7 42 e5 00 … vs WASM 13 bytes: 08 cb c7 df 2d 24 00 00 0e c7 e0 45 28)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[1](func)",
+        "details": "pc2line differ (TS 14 bytes: 0a 04 0d 08 07 08 1b 0c 17 05 07 08 1b 15 vs WASM 12 bytes: 0a 0b 0d 05 07 08 0c 0c 1c 02 0c 15)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[2](func)",
+        "details": "flags TS=0x74a WASM=0x742"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[2](func)",
+        "details": "funcNameAtom TS=66(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[2](func)",
+        "details": "sig TS(arg=0 var=1 defArg=0 stack=1) vs WASM(arg=0 var=1 defArg=0 stack=2)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[2](func)",
+        "details": "varDefs differ (TS=1, WASM=1)"
+      },
+      {
+        "kind": "func.closureVars",
+        "path": "func.cpool[2](func)",
+        "details": "closureVars differ (TS=0, WASM=1)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[2](func)",
+        "details": "bytecode differ (TS 9 bytes: 08 cb c7 42 e5 00 00 00 28 vs WASM 6 bytes: 08 cb c7 df 45 28)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[2](func)",
+        "details": "pc2line differ (TS 8 bytes: 0e 04 0d 16 07 08 1b 15 vs WASM 6 bytes: 0e 0b 12 10 0c 15)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[3](func)",
+        "details": "flags TS=0x742 WASM=0x540"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[3](func)",
+        "details": "funcNameAtom TS=62(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[3](func)",
+        "details": "sig TS(arg=0 var=1 defArg=0 stack=1) vs WASM(arg=0 var=1 defArg=0 stack=2)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[3](func)",
+        "details": "varDefs differ (TS=1, WASM=1)"
+      },
+      {
+        "kind": "func.closureVars",
+        "path": "func.cpool[3](func)",
+        "details": "closureVars differ (TS=0, WASM=1)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[3](func)",
+        "details": "bytecode differ (TS 5 bytes: 08 cb 2b c7 28 vs WASM 15 bytes: 08 cb 2b 68 00 00 11 ec 06 c7 1b 24 00 00 29)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[3](func)",
+        "details": "pc2line differ (TS 2 bytes: 00 00 vs WASM 2 bytes: 11 00)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[4](func)",
+        "details": "flags TS=0x602 WASM=0x540"
+      },
+      {
+        "kind": "func.funcNameAtom",
+        "path": "func.cpool[4](func)",
+        "details": "funcNameAtom TS=119(<?>“) WASM=0(<?>“)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[4](func)",
+        "details": "sig TS(arg=0 var=1 defArg=0 stack=5) vs WASM(arg=0 var=1 defArg=0 stack=4)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[4](func)",
+        "details": "varDefs differ (TS=1, WASM=1)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[4](func)",
+        "details": "bytecode differ (TS 27 bytes: 08 cb 09 c7 68 00 00 b7 47 c7 04 ec 00 00 00 4e … vs WASM 27 bytes: 08 cb c7 68 00 00 b7 47 c7 04 ec 00 00 00 4e ea …)"
+      },
+      {
+        "kind": "func.flags",
+        "path": "func.cpool[4](func).cpool[0](func)",
+        "details": "flags TS=0x742 WASM=0x542"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[4](func).cpool[0](func)",
+        "details": "sig TS(arg=0 var=0 defArg=0 stack=3) vs WASM(arg=0 var=0 defArg=0 stack=4)"
+      },
+      {
+        "kind": "func.closureVars",
+        "path": "func.cpool[4](func).cpool[0](func)",
+        "details": "closureVars differ (TS=1, WASM=2)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[4](func).cpool[0](func)",
+        "details": "bytecode differ (TS 22 bytes: df b8 15 44 e5 00 00 00 0e df 04 ed 00 00 00 15 … vs WASM 18 bytes: df b8 15 e0 46 0e df 04 ed 00 00 00 44 ea 00 00 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[4](func).cpool[0](func)",
+        "details": "pc2line differ (TS 6 bytes: 03 04 03 08 30 00 vs WASM 10 bytes: 03 0b 03 05 07 08 1c 07 07 08)"
+      }
+    ]
+  },
+  {
+    "fixture": "closure-basic",
+    "tsBytes": 186,
+    "wasmBytes": 186,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "closure-short",
+    "tsBytes": 273,
+    "wasmBytes": 273,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "closure-stress",
+    "tsBytes": 446,
+    "wasmBytes": 446,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "closure-vars",
+    "tsBytes": 365,
+    "wasmBytes": 365,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "comparison-ops",
+    "tsBytes": 276,
+    "wasmBytes": 276,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "compute",
+    "tsBytes": 127,
+    "wasmBytes": 127,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "computed-property",
+    "tsBytes": 176,
+    "wasmBytes": 178,
+    "identical": false,
+    "tags": [
+      "debug",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.signature",
+        "path": "func",
+        "details": "sig TS(arg=0 var=1 defArg=0 stack=5) vs WASM(arg=0 var=1 defArg=0 stack=4)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func",
+        "details": "bytecode differ (TS 73 bytes: 40 e4 00 00 00 80 40 e5 00 00 00 80 3f e4 00 00 … vs WASM 75 bytes: 40 e4 00 00 00 80 40 e5 00 00 00 80 3f e4 00 00 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func",
+        "details": "pc2line differ (TS 16 bytes: 00 00 b2 1e 3f 1d 1b 0e 1b 0a 1b 08 1b 01 07 07 vs WASM 16 bytes: 00 00 b2 1e 49 1d 1b 0e 1b 0a 1b 08 1b 01 07 07)"
+      }
+    ]
+  },
+  {
+    "fixture": "conditional-operator",
+    "tsBytes": 130,
+    "wasmBytes": 130,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "console-log",
+    "tsBytes": 109,
+    "wasmBytes": 109,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "debug-info-basic",
+    "tsBytes": 140,
+    "wasmBytes": 140,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "delete-prop",
+    "tsBytes": 146,
+    "wasmBytes": 146,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "do-while",
+    "tsBytes": 150,
+    "wasmBytes": 150,
+    "identical": false,
+    "tags": [
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.bytecode",
+        "path": "func",
+        "details": "bytecode differ (TS 62 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 b7 3b e4 00 … vs WASM 62 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 b7 3b e4 00 …)"
+      }
+    ]
+  },
+  {
+    "fixture": "do-while-break",
+    "tsBytes": 186,
+    "wasmBytes": 186,
+    "identical": false,
+    "tags": [
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.bytecode",
+        "path": "func",
+        "details": "bytecode differ (TS 84 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 b7 3b e4 00 … vs WASM 84 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 b7 3b e4 00 …)"
+      }
+    ]
+  },
+  {
+    "fixture": "empty",
+    "tsBytes": 57,
+    "wasmBytes": 57,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "es2020_bigint",
+    "tsBytes": 309,
+    "wasmBytes": 309,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "es2020_bigint_large",
+    "tsBytes": 183,
+    "wasmBytes": 195,
+    "identical": false,
+    "tags": [
+      "cpool"
+    ],
+    "diffs": [
+      {
+        "kind": "func.cpool.itemTag",
+        "path": "func.cpool[1]",
+        "details": "cpool item mismatch TS=null WASM=-2147483648"
+      }
+    ]
+  },
+  {
+    "fixture": "for-await-of",
+    "tsBytes": 285,
+    "wasmBytes": 301,
+    "identical": false,
+    "tags": [
+      "debug",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[0](func)",
+        "details": "sig TS(arg=0 var=0 defArg=0 stack=4) vs WASM(arg=0 var=0 defArg=0 stack=2)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[0](func)",
+        "details": "bytecode differ (TS 10 bytes: 89 b8 8a 0e b9 8a 0e ba 8a 29 vs WASM 31 bytes: 89 b8 8d 8a ec 04 8d 8d 2f 0e b9 8d 8a ec 04 8d …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[0](func)",
+        "details": "pc2line differ (TS 8 bytes: 00 00 08 08 12 00 12 00 vs WASM 8 bytes: 00 00 08 08 30 00 30 00)"
+      },
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[1](func)",
+        "details": "sig TS(arg=0 var=2 defArg=0 stack=7) vs WASM(arg=0 var=2 defArg=0 stack=5)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[1](func)",
+        "details": "bytecode differ (TS 66 bytes: 63 00 00 b7 cb 63 01 00 ee 04 cc ee 0a 39 e4 00 … vs WASM 61 bytes: 63 00 00 b7 cb 63 01 00 39 e4 00 00 00 f0 80 ee …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[1](func)",
+        "details": "pc2line differ (TS 20 bytes: 05 00 45 34 1b 0e 17 31 2a 0e 11 05 3b 0f 1b 0e … vs WASM 20 bytes: 05 00 2c 34 1b 0e 1c 31 11 0e 11 05 45 0f 1b 0e …)"
+      }
+    ]
+  },
+  {
+    "fixture": "for-loop",
+    "tsBytes": 142,
+    "wasmBytes": 136,
+    "identical": false,
+    "tags": [
+      "debug",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.bytecode",
+        "path": "func",
+        "details": "bytecode differ (TS 47 bytes: 06 cb 63 01 00 b7 cc 64 01 00 ba a5 ec 20 ee 0b … vs WASM 43 bytes: 06 cb 63 01 00 b7 cc 64 01 00 ba a5 ec 1c 39 e5 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func",
+        "details": "pc2line differ (TS 20 bytes: 00 00 20 12 07 0e 16 04 1b 0a 11 02 26 27 1b 0e … vs WASM 18 bytes: 00 00 25 20 16 04 12 1b 1b 0e 1b 0a 11 01 15 10 …)"
+      }
+    ]
+  },
+  {
+    "fixture": "for-of",
+    "tsBytes": 155,
+    "wasmBytes": 151,
+    "identical": false,
+    "tags": [
+      "debug",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.bytecode",
+        "path": "func",
+        "details": "bytecode differ (TS 66 bytes: 40 e5 00 00 00 80 3f e5 00 00 00 80 b8 b9 ba 26 … vs WASM 62 bytes: 40 e5 00 00 00 80 3f e5 00 00 00 80 b8 b9 ba 26 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func",
+        "details": "pc2line differ (TS 12 bytes: 00 00 a8 20 2b 17 1b 0e 1b 0a 11 01 vs WASM 12 bytes: 00 00 8f 20 30 17 1b 0e 1b 0a 11 01)"
+      }
+    ]
+  },
+  {
+    "fixture": "function-call",
+    "tsBytes": 199,
+    "wasmBytes": 199,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "function-default-params",
+    "tsBytes": 218,
+    "wasmBytes": 229,
+    "identical": false,
+    "tags": [
+      "debug",
+      "scope",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.signature",
+        "path": "func.cpool[0](func)",
+        "details": "sig TS(arg=1 var=0 defArg=0 stack=5) vs WASM(arg=1 var=1 defArg=0 stack=4)"
+      },
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[0](func)",
+        "details": "varDefs differ (TS=1, WASM=2)"
+      },
+      {
+        "kind": "func.bytecode",
+        "path": "func.cpool[0](func)",
+        "details": "bytecode differ (TS 33 bytes: d3 11 06 ad ec 08 0e 04 e7 00 00 00 db 39 e8 00 … vs WASM 36 bytes: 63 00 00 d3 11 f4 ec 08 0e 04 e7 00 00 00 db cb …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[0](func)",
+        "details": "pc2line differ (TS 10 bytes: 00 00 44 08 1b 0e 34 1c 07 13 vs WASM 10 bytes: 00 00 53 08 1b 0e 34 1c 07 13)"
+      }
+    ]
+  },
+  {
+    "fixture": "function-expressions",
+    "tsBytes": 292,
+    "wasmBytes": 292,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "if-else",
+    "tsBytes": 154,
+    "wasmBytes": 154,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "labeled-statements",
+    "tsBytes": 258,
+    "wasmBytes": 248,
+    "identical": false,
+    "tags": [
+      "debug",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.bytecode",
+        "path": "func",
+        "details": "bytecode differ (TS 114 bytes: 06 cb 63 01 00 b7 cc 64 01 00 ba a5 ec 63 ee 0b … vs WASM 106 bytes: 06 cb 63 01 00 b7 cc 64 01 00 ba a5 ec 5b 06 cb …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func",
+        "details": "pc2line differ (TS 52 bytes: 00 00 20 20 07 0e 16 04 1b 0a 11 02 44 15 07 0e … vs WASM 50 bytes: 00 00 25 2e 16 04 35 04 16 04 1c 21 16 04 1c 04 …)"
+      }
+    ]
+  },
+  {
+    "fixture": "logical-assignment",
+    "tsBytes": 500,
+    "wasmBytes": 513,
+    "identical": false,
+    "tags": [
+      "debug"
+    ],
+    "diffs": [
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func",
+        "details": "pc2line differ (TS 43 bytes: 00 00 00 a6 01 10 00 1b 0e 1b 0a 1b 06 1b 06 1b … vs WASM 56 bytes: 00 00 00 54 08 00 5d 00 71 00 76 00 62 00 1b 0e …)"
+      }
+    ]
+  },
+  {
+    "fixture": "logical-operators",
+    "tsBytes": 213,
+    "wasmBytes": 213,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "loop-break-continue",
+    "tsBytes": 184,
+    "wasmBytes": 180,
+    "identical": false,
+    "tags": [
+      "debug",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.bytecode",
+        "path": "func",
+        "details": "bytecode differ (TS 68 bytes: 06 cb 63 01 00 b7 cc 64 01 00 bf 0a a5 ec 34 ee … vs WASM 64 bytes: 06 cb 63 01 00 b7 cc 64 01 00 bf 0a a5 ec 30 06 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func",
+        "details": "pc2line differ (TS 30 bytes: 00 00 20 12 07 0e 1b 04 1b 0c 11 02 30 21 16 04 … vs WASM 30 bytes: 00 00 25 20 1b 04 1c 13 16 04 1e 03 16 04 0c 08 …)"
+      }
+    ]
+  },
+  {
+    "fixture": "number",
+    "tsBytes": 60,
+    "wasmBytes": 60,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "numeric-separators",
+    "tsBytes": 331,
+    "wasmBytes": 331,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "object-literal",
+    "tsBytes": 149,
+    "wasmBytes": 149,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "object-methods",
+    "tsBytes": 208,
+    "wasmBytes": 206,
+    "identical": false,
+    "tags": [
+      "debug",
+      "scope"
+    ],
+    "diffs": [
+      {
+        "kind": "func.varDefs",
+        "path": "func.cpool[0](func)",
+        "details": "varDefs differ (TS=2, WASM=2)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func.cpool[0](func)",
+        "details": "pc2line differ (TS 12 bytes: 02 04 0d 16 07 08 1b 0a 07 03 07 1b vs WASM 10 bytes: 02 04 12 1e 1b 0a 07 03 07 1b)"
+      }
+    ]
+  },
+  {
+    "fixture": "object-nested",
+    "tsBytes": 279,
+    "wasmBytes": 279,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "object-spread",
+    "tsBytes": 178,
+    "wasmBytes": 178,
+    "identical": false,
+    "tags": [
+      "debug",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.bytecode",
+        "path": "func",
+        "details": "bytecode differ (TS 83 bytes: 40 e4 00 00 00 80 40 e5 00 00 00 80 3f e4 00 00 … vs WASM 83 bytes: 40 e4 00 00 00 80 40 e5 00 00 00 80 3f e4 00 00 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func",
+        "details": "pc2line differ (TS 14 bytes: 00 00 c1 1e 67 1d 1b 0e 1b 0a 1b 02 1b 03 vs WASM 14 bytes: 00 00 bc 1e 6c 1d 1b 0e 1b 0a 1b 02 1b 03)"
+      }
+    ]
+  },
+  {
+    "fixture": "optional-catch-binding",
+    "tsBytes": 190,
+    "wasmBytes": 177,
+    "identical": false,
+    "tags": [
+      "debug",
+      "semantics"
+    ],
+    "diffs": [
+      {
+        "kind": "func.bytecode",
+        "path": "func",
+        "details": "bytecode differ (TS 66 bytes: 06 cb 6f 13 00 00 00 39 9f 00 00 00 11 04 e4 00 … vs WASM 53 bytes: 06 cb 6f 13 00 00 00 39 9f 00 00 00 11 04 e4 00 …)"
+      },
+      {
+        "kind": "func.debug.pc2line",
+        "path": "func",
+        "details": "pc2line differ (TS 14 bytes: 00 00 26 1c 39 07 11 0b 28 00 1b 0e 34 08 vs WASM 14 bytes: 00 00 26 1c 39 0a 11 1d 28 00 1b 0e 34 08)"
+      }
+    ]
+  },
+  {
+    "fixture": "optional-chaining",
+    "tsBytes": 619,
+    "wasmBytes": 619,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "postfix-unary",
+    "tsBytes": 193,
+    "wasmBytes": 193,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "prefix-unary",
+    "tsBytes": 194,
+    "wasmBytes": 194,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "primitives",
+    "tsBytes": 214,
+    "wasmBytes": 214,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "switch-case",
+    "tsBytes": 182,
+    "wasmBytes": 182,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "switch-default-first",
+    "tsBytes": 165,
+    "wasmBytes": 165,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "switch-default-middle",
+    "tsBytes": 190,
+    "wasmBytes": 190,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "switch-fallthrough",
+    "tsBytes": 189,
+    "wasmBytes": 189,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "try-catch",
+    "tsBytes": 213,
+    "wasmBytes": 213,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "unary-ops",
+    "tsBytes": 206,
+    "wasmBytes": 206,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "variables-let-block",
+    "tsBytes": 166,
+    "wasmBytes": 166,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "variables-var",
+    "tsBytes": 170,
+    "wasmBytes": 170,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  },
+  {
+    "fixture": "while",
+    "tsBytes": 149,
+    "wasmBytes": 149,
+    "identical": true,
+    "tags": [
+      "identical"
+    ],
+    "diffs": []
+  }
+]

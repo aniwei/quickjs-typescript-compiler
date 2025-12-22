@@ -533,6 +533,9 @@ export class FunctionDef {
   
   /** 包含 eval 返回值的变量索引 (-1 if none) */
   evalRetIdx: number = -1
+
+  /** finally/gosub 保存 eval_ret 的临时变量索引 (-1 if none) */
+  gosubRetIdx: number = -1
   
   /** 包含 'this' 值的变量索引 (-1 if none) */
   thisVarIdx: number = -1
@@ -780,6 +783,7 @@ export class FunctionDef {
     this.argumentsArgIdx = -1
     this.funcVarIdx = -1
     this.evalRetIdx = -1
+    this.gosubRetIdx = -1
     this.thisVarIdx = -1
     this.newTargetVarIdx = -1
     this.thisActiveFuncVarIdx = -1

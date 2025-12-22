@@ -245,26 +245,6 @@ export class DebugInfoBuilder {
       
       // 获取行列号 - parser.c:10886-10887
       const [lineNum, colNum] = this.getLineColCached(cache, source, sourcePos)
-
-      // QuickJS 的 pc2line 采样点来源于 emit_source_pos() 的触发位置；在语句层面很多关键字
-      // 并不会额外触发 emit_source_pos（更倾向于把采样点落在真正参与求值的表达式/操作符上）。
-      // 但本仓历史上可能在语句起点生成了额外槽位。为了与 WASM 输出一致，这里做最小过滤：
-      // 如果当前槽落在同一行列 0，并且紧随其后的槽同一行且列更靠后，且 PC 间隔很小，则跳过。
-      if (colNum === 0) {
-        // 找到下一个“有效”的槽（跳过 sourcePos=-1 的占位槽）
-        let j = i + 1
-        while (j < fd.lineNumberCount && fd.lineNumberSlots[j].sourcePos === -1) {
-          j++
-        }
-
-        if (j < fd.lineNumberCount) {
-          const next = fd.lineNumberSlots[j]
-          const [nextLineNum, nextColNum] = this.getLineColCached(cache, source, next.sourcePos)
-          if (nextLineNum === lineNum && nextColNum > 0 && (next.pc - pc) <= 4) {
-            continue
-          }
-        }
-      }
       const diffLine = lineNum - lastLineNum
       const diffCol = colNum - lastColNum
       

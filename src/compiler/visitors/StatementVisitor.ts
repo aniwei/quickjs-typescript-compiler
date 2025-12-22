@@ -37,15 +37,14 @@ export class StatementVisitor extends VisitorContext {
       return
     }
 
-    // 压入新作用域
+    // QuickJS: js_parse_block() 对非空块总是 push_scope/pop_scope。
+    // 即使块内没有词法绑定，这也会影响 scope index 的分配，进而影响 varDef.scopeLevel。
     this.compiler.pushScope(fd)
 
-    // 遍历所有语句
     for (const stmt of statements) {
       this.context.visit(stmt)
     }
 
-    // 弹出作用域
     this.compiler.popScope(fd)
   }
 
@@ -88,13 +87,10 @@ export class StatementVisitor extends VisitorContext {
         // 处理初始化器 - 对应 parser.c:6541-6566
         if (declaration.initializer) {
           // 计算初始化表达式
-          const prevSuppressSourcePos = fd.suppressSourcePos
-          fd.suppressSourcePos = true
-          try {
-            this.context.visit(declaration.initializer)
-          } finally {
-            fd.suppressSourcePos = prevSuppressSourcePos
-          }
+          // QuickJS: initializer 的表达式求值路径会自然触发 emit_source_pos（通过各表达式的 emit_op/emit_source_pos 逻辑），
+          // 只有最终的 store 指令（OP_scope_put_var[_init]）不绑定 sourcePos。
+          // 因此这里不应全局 suppress source pos。
+          this.context.visit(declaration.initializer)
 
           // 发射 scope_put_var_init 或 scope_put_var
           const opcode = (isConst || isLet) 
@@ -898,13 +894,15 @@ export class StatementVisitor extends VisitorContext {
   visitTryStatement(node: ts.TryStatement): void {
     const fd = this.funcDef!
 
+    const hasFinally = !!node.finallyBlock
+
     // 设置 eval 返回值为 undefined - 对应 parser.c:7389
     this.compiler.setEvalRetUndefined(fd)
 
     // 创建标签
     const labelCatch = this.compiler.newLabelInt(fd)
     const labelCatch2 = this.compiler.newLabelInt(fd)
-    const labelFinally = this.compiler.newLabelInt(fd)
+    const labelFinally = hasFinally ? this.compiler.newLabelInt(fd) : -1
     const labelEnd = this.compiler.newLabelInt(fd)
 
     // 发射 catch 指令 - 对应 parser.c:7362
@@ -913,7 +911,9 @@ export class StatementVisitor extends VisitorContext {
     // 压入 break 条目 - 对应 parser.c:7364-7365
     const blockEnv = new BlockEnv()
     this.compiler.pushBreakEntry(fd, blockEnv, 0, -1, -1, 1)
-    blockEnv.labelFinally = labelFinally
+    if (hasFinally) {
+      blockEnv.labelFinally = labelFinally
+    }
 
     // 编译 try 块
     this.visitBlock(node.tryBlock)
@@ -924,11 +924,13 @@ export class StatementVisitor extends VisitorContext {
     // try 块正常结束 - 对应 parser.c:7371-7379
     // 丢弃 catch 偏移
     this.compiler.emitOp(fd, Opcode.OP_drop)
-    // 推送 undefined 保持栈平衡
-    this.compiler.emitOp(fd, Opcode.OP_undefined)
-    // 调用 finally
-    this.compiler.emitGotoInt(fd, Opcode.OP_gosub, labelFinally)
-    this.compiler.emitOp(fd, Opcode.OP_drop)
+    if (hasFinally) {
+      // 推送 undefined 保持栈平衡
+      this.compiler.emitOp(fd, Opcode.OP_undefined)
+      // 调用 finally
+      this.compiler.emitGotoInt(fd, Opcode.OP_gosub, labelFinally)
+      this.compiler.emitOp(fd, Opcode.OP_drop)
+    }
     // 跳转到结束
     this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelEnd)
 
@@ -968,7 +970,9 @@ export class StatementVisitor extends VisitorContext {
       // 压入 break 条目
       const catchBlockEnv = new BlockEnv()
       this.compiler.pushBreakEntry(fd, catchBlockEnv, 0, -1, -1, 1)
-      catchBlockEnv.labelFinally = labelFinally
+      if (hasFinally) {
+        catchBlockEnv.labelFinally = labelFinally
+      }
 
       // 编译 catch 块
       this.visitBlock(node.catchClause.block)
@@ -985,47 +989,81 @@ export class StatementVisitor extends VisitorContext {
       // catch 块正常结束 - 对应 parser.c:7432-7441
       // 丢弃 catch2 偏移
       this.compiler.emitOp(fd, Opcode.OP_drop)
-      // 推送 undefined
-      this.compiler.emitOp(fd, Opcode.OP_undefined)
-      // 调用 finally
-      this.compiler.emitGotoInt(fd, Opcode.OP_gosub, labelFinally)
-      this.compiler.emitOp(fd, Opcode.OP_drop)
+      if (hasFinally) {
+        // 推送 undefined
+        this.compiler.emitOp(fd, Opcode.OP_undefined)
+        // 调用 finally
+        this.compiler.emitGotoInt(fd, Opcode.OP_gosub, labelFinally)
+        this.compiler.emitOp(fd, Opcode.OP_drop)
+      }
       // 跳转到结束
       this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelEnd)
 
       // catch2 标签 - catch 块中发生异常
       this.compiler.emitLabelInt(fd, labelCatch2)
       // 调用 finally
-      this.compiler.emitGotoInt(fd, Opcode.OP_gosub, labelFinally)
+      if (hasFinally) {
+        this.compiler.emitGotoInt(fd, Opcode.OP_gosub, labelFinally)
+      }
       // 重新抛出
       this.compiler.emitOp(fd, Opcode.OP_throw)
     } else {
       // 无 catch 子句 - 对应 parser.c:7453-7458
       this.compiler.emitLabelInt(fd, labelCatch)
       // 调用 finally
-      this.compiler.emitGotoInt(fd, Opcode.OP_gosub, labelFinally)
+      if (hasFinally) {
+        this.compiler.emitGotoInt(fd, Opcode.OP_gosub, labelFinally)
+      }
       // 重新抛出
       this.compiler.emitOp(fd, Opcode.OP_throw)
     }
 
-    // finally 标签 - 对应 parser.c:7462
-    this.compiler.emitLabelInt(fd, labelFinally)
+    if (hasFinally) {
+      // finally 标签 - 对应 parser.c:7462
+      this.compiler.emitLabelInt(fd, labelFinally)
 
-    // finally 块 - 对应 parser.c:7500-7530
-    if (node.finallyBlock) {
+      // finally 块 - 对应 parser.c:7500-7530
+      // QuickJS: 为 finally/gosub 预留一个额外的 <ret> 局部变量 (gosub_ret_value)
+      // 在 try-catch-finally 中通常是 loc2；在 try-finally(无 catch 绑定) 中可能是 loc1。
+      if (fd.gosubRetIdx < 0) {
+        const retAtom = this.compiler.addAtom('<ret>')
+        fd.gosubRetIdx = this.compiler.addVar(fd, retAtom)
+      }
+      const retValueIdx = fd.evalRetIdx
+      const gosubRetIdx = fd.gosubRetIdx
+
       // 压入 break 条目 (dropCount=2 用于 ret_value 和 gosub_ret_value)
       const finallyBlockEnv = new BlockEnv()
       this.compiler.pushBreakEntry(fd, finallyBlockEnv, 0, -1, -1, 2)
 
+      // QuickJS: 进入 finally 前保存/清理 ret_value，避免 finally 语句污染 loc0
+      // 对应 WASM 反汇编序列: get_loc0; put_loc2; undefined; put_loc0
+      // 注意: 不能直接发射 OP_get_loc0/OP_put_loc2 等短操作码，
+      // 因为它们与 TempOpcode(182-200) 重叠，会在 resolve_variables/resolve_labels 阶段被误判。
+      // 这里使用长格式 OP_get_loc/OP_put_loc，后续由 LabelResolver 收缩为短操作码。
+      this.compiler.emitOp(fd, Opcode.OP_get_loc)
+      this.compiler.emitU16(fd, retValueIdx)
+      this.compiler.emitOp(fd, Opcode.OP_put_loc)
+      this.compiler.emitU16(fd, gosubRetIdx)
+      this.compiler.emitOp(fd, Opcode.OP_undefined)
+      this.compiler.emitOp(fd, Opcode.OP_put_loc)
+      this.compiler.emitU16(fd, retValueIdx)
+
       // 编译 finally 块
       this.visitBlock(node.finallyBlock)
 
+      // QuickJS: finally 结束后恢复 ret_value
+      // 对应 WASM 反汇编序列: get_loc2; put_loc0
+      this.compiler.emitOp(fd, Opcode.OP_get_loc)
+      this.compiler.emitU16(fd, gosubRetIdx)
+      this.compiler.emitOp(fd, Opcode.OP_put_loc)
+      this.compiler.emitU16(fd, retValueIdx)
+
       // 弹出 break 条目
       this.compiler.popBreakEntry(fd)
+      // 发射 ret (返回到 gosub 调用点)
+      this.compiler.emitOp(fd, Opcode.OP_ret)
     }
-
-    // 发射 ret (返回到 gosub 调用点)
-    this.compiler.emitOp(fd, Opcode.OP_ret)
 
     // 发射 end 标签
     this.compiler.emitLabelInt(fd, labelEnd)

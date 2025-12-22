@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/do-while-break/cli/do-while-break.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/do-while-break/cli/do-while-break.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/do-while-break/cli/do-while-break.pc2line.txt",
-    "bytecodeSize": 250,
-    "pc2lineLength": 28,
+    "bytecodeSize": 248,
+    "pc2lineLength": 26,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 188,
+    "tsSize": 186,
     "wasmSize": 186,
-    "sizeDiff": 2,
-    "sizeDiffPercent": 1.0752688172043012
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
   },
   "trace": {
     "differenceCount": 0,

@@ -214,7 +214,8 @@ export class FunctionVisitor extends VisitorContext {
 
     // 发射 OP_fclosure - 对应 parser.c:13361-13370
     // 函数表达式直接将闭包压栈
-    this.compiler.emitOp(parentFd, Opcode.OP_fclosure, sourcePos)
+    // QuickJS: 该结构性指令通常不绑定 source pos（避免产生额外 OP_line_num 采样点）。
+    this.compiler.emitOp(parentFd, Opcode.OP_fclosure)
     this.compiler.emitU32(parentFd, cpoolIdx)
 
     // 如果没有名称，尝试从赋值/初始化上下文推断 (QuickJS 行为)
@@ -280,7 +281,8 @@ export class FunctionVisitor extends VisitorContext {
     fd.parentCpoolIdx = cpoolIdx
 
     // 发射 OP_fclosure
-    this.compiler.emitOp(parentFd, Opcode.OP_fclosure, sourcePos)
+    // QuickJS: 该结构性指令不绑定 source pos。
+    this.compiler.emitOp(parentFd, Opcode.OP_fclosure)
     this.compiler.emitU32(parentFd, cpoolIdx)
 
     // 箭头函数没有名称，但可能从赋值推断
@@ -422,7 +424,8 @@ export class FunctionVisitor extends VisitorContext {
     const cpoolIdx = this.compiler.cpoolAdd(parentFd, null)
     fd.parentCpoolIdx = cpoolIdx
 
-    this.compiler.emitOp(parentFd, Opcode.OP_fclosure, sourcePos)
+    // QuickJS: 该结构性指令不绑定 source pos。
+    this.compiler.emitOp(parentFd, Opcode.OP_fclosure)
     this.compiler.emitU32(parentFd, cpoolIdx)
 
     if (fd.needHomeObject) {
@@ -466,7 +469,8 @@ export class FunctionVisitor extends VisitorContext {
     const cpoolIdx = this.compiler.cpoolAdd(parentFd, null)
     fd.parentCpoolIdx = cpoolIdx
 
-    this.compiler.emitOp(parentFd, Opcode.OP_fclosure, sourcePos)
+    // QuickJS: 该结构性指令不绑定 source pos。
+    this.compiler.emitOp(parentFd, Opcode.OP_fclosure)
     this.compiler.emitU32(parentFd, cpoolIdx)
 
     if (fd.needHomeObject) {

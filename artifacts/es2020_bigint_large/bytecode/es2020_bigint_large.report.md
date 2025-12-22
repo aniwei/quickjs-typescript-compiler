@@ -1,13 +1,13 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/es2020_bigint_large.ts
-**生成时间**: 2025-12-22T02:37:15.760Z
+**生成时间**: 2025-12-22T09:18:38.781Z
 
 ## 大小对比
 
-- TypeScript编译器: 181 字节
+- TypeScript编译器: 183 字节
 - WASM编译器: 195 字节
-- 差异: -14 字节 (-7.18%)
+- 差异: -12 字节 (-6.15%)
 
 ## 结构分析
 
@@ -62,7 +62,7 @@
   "functionHeader": {
     "offset": 60,
     "tag": "0xc",
-    "remaining": 121
+    "remaining": 123
   }
 }
 ```
@@ -125,29 +125,22 @@
 
 ## 字节级差异
 
-共发现 29 个字节差异:
+共发现 14 个字节差异:
 
-- 偏移量 0x9f: TS=0x12 vs WASM=0x14
-- 偏移量 0xa2: TS=0xc7 vs WASM=0xa8
-- 偏移量 0xa3: TS=0x00 vs WASM=0x14
-- 偏移量 0xa4: TS=0x1b vs WASM=0x21
-- 偏移量 0xa5: TS=0x0e vs WASM=0x13
-- 偏移量 0xa7: TS=0x0a vs WASM=0x0e
-- 偏移量 0xa9: TS=0x01 vs WASM=0x0a
-- 偏移量 0xaa: TS=0x17 vs WASM=0x1b
-- 偏移量 0xab: TS=0x15 vs WASM=0x01
-- 偏移量 0xac: TS=0x1b vs WASM=0x17
-- 偏移量 0xad: TS=0x0e vs WASM=0x15
-- 偏移量 0xaf: TS=0x0a vs WASM=0x0e
-- 偏移量 0xb1: TS=0x01 vs WASM=0x0a
-- 偏移量 0xb2: TS=0x00 vs WASM=0x1b
-- 偏移量 0xb4: TS=0x01 vs WASM=0x00
-- 偏移量 0xb5: TS=EOF vs WASM=0x0a
-- 偏移量 0xb6: TS=EOF vs WASM=0x05
+- 偏移量 0xb5: TS=0x01 vs WASM=0x0a
+- 偏移量 0xb6: TS=0x01 vs WASM=0x05
 - 偏移量 0xb7: TS=EOF vs WASM=0x00
 - 偏移量 0xb8: TS=EOF vs WASM=0x00
 - 偏移量 0xb9: TS=EOF vs WASM=0x00
-- ... (显示前20个差异，总共29个)
+- 偏移量 0xba: TS=EOF vs WASM=0x80
+- 偏移量 0xbb: TS=EOF vs WASM=0x00
+- 偏移量 0xbc: TS=EOF vs WASM=0x0a
+- 偏移量 0xbd: TS=EOF vs WASM=0x05
+- 偏移量 0xbe: TS=EOF vs WASM=0x01
+- 偏移量 0xbf: TS=EOF vs WASM=0x00
+- 偏移量 0xc0: TS=EOF vs WASM=0x00
+- 偏移量 0xc1: TS=EOF vs WASM=0x80
+- 偏移量 0xc2: TS=EOF vs WASM=0x00
 
 ## 十六进制转储对比
 
@@ -162,9 +155,9 @@
 00000060: 80 3f e5 00 00 00 80 c1 00 3b e4 00 00 00 c1 01 |.?.......;......|
 00000070: 8e 3b e5 00 00 00 39 e6 00 00 00 43 e7 00 00 00 |.;....9....C....|
 00000080: 39 e4 00 00 00 24 01 00 cb 39 e6 00 00 00 43 e7 |9....$...9....C.|
-00000090: 00 00 00 39 e5 00 00 00 24 01 00 cf 28 d0 03 12 |...9....$...(...|
-000000a0: 00 00 c7 00 1b 0e 1b 0a 1b 01 17 15 1b 0e 1b 0a |................|
-000000b0: 1b 01 00 01 01                                  |.....|
+00000090: 00 00 00 39 e5 00 00 00 24 01 00 cf 28 d0 03 14 |...9....$...(...|
+000000a0: 00 00 a8 14 21 13 1b 0e 1b 0a 1b 01 17 15 1b 0e |....!...........|
+000000b0: 1b 0a 1b 01 00 01 01                            |.......|
 ```
 
 ### WASM

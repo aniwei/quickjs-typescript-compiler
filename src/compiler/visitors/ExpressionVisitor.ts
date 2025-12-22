@@ -946,8 +946,16 @@ export class ExpressionVisitor extends VisitorContext {
     const fd = this.funcDef!
     const op = node.operatorToken.kind
 
+    // QuickJS: expression statements call emit_source_pos(s, s->token.ptr) before parsing the expression
+    // (parser.c:7632-7649). For logical assignment we often avoid visiting the LHS node directly
+    // (we lower to make_ref/get_ref_value or get_field2/get_array_el3), which would otherwise
+    // naturally anchor the first pc2line sample. Ensure we still anchor to the LHS token.
+    const sf = node.getSourceFile()
+
     // 对于简单变量 (depth=2)
     if (ts.isIdentifier(node.left)) {
+      this.compiler.emitSourcePos(fd, node.left.getStart(sf))
+
       const name = this.compiler.addAtom(node.left.text)
       const labelSkip = this.compiler.newLabelInt(fd)
       const labelEnd = this.compiler.newLabelInt(fd)
@@ -1014,6 +1022,9 @@ export class ExpressionVisitor extends VisitorContext {
 
     // 对于属性访问 (depth=1)
     if (ts.isPropertyAccessExpression(node.left)) {
+      // Statement/LHS anchor (col 1)
+      this.compiler.emitSourcePos(fd, node.left.getStart(sf))
+
       const name = this.compiler.addAtom(node.left.name.text)
       const labelSkip = this.compiler.newLabelInt(fd)
       const labelEnd = this.compiler.newLabelInt(fd)
@@ -1021,6 +1032,24 @@ export class ExpressionVisitor extends VisitorContext {
       // 计算对象
       // 栈: [] -> [obj]
       this.context.visit(node.left.expression)
+
+      // QuickJS member access records source position at the '.' token (op_token_ptr)
+      // before emitting OP_get_field (then get_lvalue() truncates OP_get_field but keeps
+      // the OP_line_num). Mirror that by anchoring to '.' before OP_get_field2.
+      const text = sf.text
+      const exprEnd = node.left.expression.getEnd()
+      const nameStart = node.left.name.getStart(sf)
+      let dotPos = -1
+      for (let i = nameStart - 1; i >= exprEnd; i--) {
+        const ch = text.charCodeAt(i)
+        if (ch === 0x2e /* '.' */) {
+          dotPos = i
+          break
+        }
+      }
+      if (dotPos >= 0) {
+        this.compiler.emitSourcePos(fd, dotPos)
+      }
 
       // OP_get_field2: nPop=1, nPush=2
       // 栈: [obj] -> [obj value]
@@ -1079,6 +1108,8 @@ export class ExpressionVisitor extends VisitorContext {
 
     // 对于元素访问 (depth=2)
     if (ts.isElementAccessExpression(node.left)) {
+      this.compiler.emitSourcePos(fd, node.left.getStart(sf))
+
       const labelSkip = this.compiler.newLabelInt(fd)
       const labelEnd = this.compiler.newLabelInt(fd)
 
@@ -2040,8 +2071,12 @@ export class ExpressionVisitor extends VisitorContext {
       this.context.visit(arg)
     }
 
+    // QuickJS 会把 call/construct 相关的 source pos 更贴近参数列表的 '(' 位置。
+    // 对于 `new Foo(...)`，这里用 callee 表达式的 end 作为 '(' 的位置对齐列号。
+    const callSourcePos = node.arguments ? node.expression.getEnd() : sourcePos
+
     // 发射 call_constructor 指令
-    this.compiler.emitOp(fd, Opcode.OP_call_constructor, sourcePos)
+    this.compiler.emitOp(fd, Opcode.OP_call_constructor, callSourcePos)
     this.compiler.emitU16(fd, argCount)
   }
 

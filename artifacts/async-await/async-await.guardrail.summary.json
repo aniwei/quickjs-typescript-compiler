@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-await/cli/async-await.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-await/cli/async-await.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-await/cli/async-await.pc2line.txt",
-    "bytecodeSize": 367,
-    "pc2lineLength": 14,
+    "bytecodeSize": 369,
+    "pc2lineLength": 12,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 305,
+    "tsSize": 307,
     "wasmSize": 302,
-    "sizeDiff": 3,
-    "sizeDiffPercent": 0.9933774834437087
+    "sizeDiff": 5,
+    "sizeDiffPercent": 1.6556291390728477
   },
   "trace": {
     "differenceCount": 0,

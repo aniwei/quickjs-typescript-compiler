@@ -197,6 +197,15 @@ export class TypeScriptCompiler implements CompilerContext {
     // 3. 解析标签 - resolve_labels (parser.c:11088-12120)
     const labelResolver = new LabelResolver(this)
     labelResolver.resolve(fd)
+
+    if (process.env.DEBUG_DUMP_BC) {
+      const bcBuf = fd.byteCode.buffer
+      const bcLen = fd.byteCode.size
+      const start = Math.max(0, Math.min(bcLen, 60))
+      const end = Math.max(start, Math.min(bcLen, start + 80))
+      const slice = Array.from(bcBuf.slice(start, end)).map(b => b.toString(16).padStart(2, '0')).join(' ')
+      console.log(`[DEBUG_DUMP_BC] bcLen=${bcLen} bytes [${start}..${end}): ${slice}`)
+    }
     
     // 4. 计算栈大小 - compute_stack_size (parser.c:12191-12380)
     const stackComputer = new StackSizeComputer(this)
@@ -218,41 +227,10 @@ export class TypeScriptCompiler implements CompilerContext {
    * 访问语句节点
    */
   private visitStatement(node: ts.Statement): void {
-    // 发射源码位置信息 (OP_line_num)
-    // 这与 QuickJS C 版本一致，在语句开始时记录位置
-    if (this.funcDef) {
-      // QuickJS 似乎不为 break/continue/var 发射行号
-      if (!ts.isBreakStatement(node) && 
-          !ts.isContinueStatement(node) && 
-          !ts.isVariableStatement(node) &&
-          // return/throw 的 source pos 由对应 opcode 处精确锚定（见 StatementVisitor），
-          // 不应在语句开始时提前发射，否则会污染表达式的 pc2line（尤其是 `return 'hi'` 这种简单函数）。
-          !ts.isReturnStatement(node) &&
-          !ts.isThrowStatement(node)) {
-        const sourcePos = node.getStart()
-        this.compiler.emitSourcePos(this.funcDef, sourcePos)
-      }
-    }
-    
-    // 处理表达式语句
-    if (ts.isExpressionStatement(node)) {
-      // 先执行表达式 (将结果压栈)
-      this.visitExpression(node.expression)
-      
-      // 将结果存储到 _ret_ 变量
-      if (this.funcDef && this.funcDef.evalRetIdx >= 0) {
-        this.compiler.emitOp(this.funcDef, Opcode.OP_put_loc)
-        this.compiler.emitU16(this.funcDef, this.funcDef.evalRetIdx)
-      } else {
-        // 丢弃表达式结果
-        if (this.funcDef) {
-          this.compiler.emitOp(this.funcDef, Opcode.OP_drop)
-        }
-      }
-    } else {
-      // 其他语句类型
-      this.visit(node)
-    }
+    // 委托给统一的 visit() 分发。
+    // 重要：ExpressionStatement 必须走 StatementVisitor.visitExpressionStatement，
+    // 以对齐 QuickJS parser.c:7632-7649 的 emit_source_pos(s, s->token.ptr) 行为。
+    this.visit(node)
   }
   
   /**
