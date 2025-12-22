@@ -1984,12 +1984,13 @@ export class ExpressionVisitor extends VisitorContext {
         // 展开属性: { ...obj }
         // QuickJS 源码: parser.c:2928-2937
         // 栈状态: [dest] -> 需要 [dest, src, excludeList]
-        
-        // 发射 OP_null 作为 excludeList
-        this.compiler.emitOp(fd, Opcode.OP_null)
-        
+
         // 访问 spread 表达式 (src)
         this.context.visit(prop.expression)
+
+        // 发射 OP_null 作为 excludeList
+        // QuickJS 输出顺序为: src -> null -> copy_data_properties
+        this.compiler.emitOp(fd, Opcode.OP_null)
         
         // 发射 OP_copy_data_properties
         // 参数格式: (copy_flags) | (exclude_first_idx << 2) | (exclude_second_idx << 5)

@@ -126,7 +126,7 @@
       {
         "kind": "func.debug.pc2line",
         "path": "func",
-        "details": "pc2line differ (TS 20 bytes: 00 00 00 43 16 1c 20 07 2b 13 49 00 1b 0e 1b 0a … vs WASM 22 bytes: 00 00 00 45 16 1c 20 06 2b 21 1b 02 30 01 1b 0e …)"
+        "details": "pc2line differ (TS 20 bytes: 00 00 00 43 16 1c 20 06 2b 21 49 00 1b 0e 1b 0a … vs WASM 22 bytes: 00 00 00 45 16 1c 20 06 2b 21 1b 02 30 01 1b 0e …)"
       },
       {
         "kind": "func.flags",
@@ -294,7 +294,7 @@
       {
         "kind": "func.debug.pc2line",
         "path": "func",
-        "details": "pc2line differ (TS 18 bytes: 00 00 00 4c 12 24 00 24 16 07 52 07 2b 13 1b 02 … vs WASM 18 bytes: 00 00 00 4c 12 24 00 27 16 07 52 06 2b 21 1b 02 …)"
+        "details": "pc2line differ (TS 18 bytes: 00 00 00 4c 12 24 00 24 16 07 52 06 2b 21 1b 02 … vs WASM 18 bytes: 00 00 00 4c 12 24 00 27 16 07 52 06 2b 21 1b 02 …)"
       },
       {
         "kind": "func.funcNameAtom",
@@ -503,7 +503,7 @@
       {
         "kind": "func.debug.pc2line",
         "path": "func.cpool[2](func)",
-        "details": "pc2line differ (TS 10 bytes: 09 04 03 1e 16 16 07 1d 11 0d vs WASM 10 bytes: 09 0b 03 10 16 16 07 01 11 29)"
+        "details": "pc2line differ (TS 10 bytes: 09 04 03 1e 16 16 07 01 11 29 vs WASM 10 bytes: 09 0b 03 10 16 16 07 01 11 29)"
       },
       {
         "kind": "func.flags",
@@ -557,7 +557,7 @@
       {
         "kind": "func.debug.pc2line",
         "path": "func",
-        "details": "pc2line differ (TS 24 bytes: 00 00 00 4f 12 1c 20 07 2b 13 1b 02 1b 14 17 15 … vs WASM 24 bytes: 00 00 00 51 12 1c 20 0e 2b 29 1b 02 1b 14 17 15 …)"
+        "details": "pc2line differ (TS 24 bytes: 00 00 00 4f 12 1c 20 0e 2b 29 1b 02 1b 14 17 15 … vs WASM 24 bytes: 00 00 00 51 12 1c 20 0e 2b 29 1b 02 1b 14 17 15 …)"
       },
       {
         "kind": "func.flags",
@@ -1278,19 +1278,13 @@
   },
   {
     "fixture": "logical-assignment",
-    "tsBytes": 500,
+    "tsBytes": 513,
     "wasmBytes": 513,
-    "identical": false,
+    "identical": true,
     "tags": [
-      "debug"
+      "identical"
     ],
-    "diffs": [
-      {
-        "kind": "func.debug.pc2line",
-        "path": "func",
-        "details": "pc2line differ (TS 43 bytes: 00 00 00 a6 01 10 00 1b 0e 1b 0a 1b 06 1b 06 1b … vs WASM 56 bytes: 00 00 00 54 08 00 5d 00 71 00 76 00 62 00 1b 0e …)"
-      }
-    ]
+    "diffs": []
   },
   {
     "fixture": "logical-operators",
@@ -1410,25 +1404,13 @@
   },
   {
     "fixture": "optional-catch-binding",
-    "tsBytes": 190,
+    "tsBytes": 177,
     "wasmBytes": 177,
-    "identical": false,
+    "identical": true,
     "tags": [
-      "debug",
-      "semantics"
+      "identical"
     ],
-    "diffs": [
-      {
-        "kind": "func.bytecode",
-        "path": "func",
-        "details": "bytecode differ (TS 66 bytes: 06 cb 6f 13 00 00 00 39 9f 00 00 00 11 04 e4 00 … vs WASM 53 bytes: 06 cb 6f 13 00 00 00 39 9f 00 00 00 11 04 e4 00 …)"
-      },
-      {
-        "kind": "func.debug.pc2line",
-        "path": "func",
-        "details": "pc2line differ (TS 14 bytes: 00 00 26 1c 39 07 11 0b 28 00 1b 0e 34 08 vs WASM 14 bytes: 00 00 26 1c 39 0a 11 1d 28 00 1b 0e 34 08)"
-      }
-    ]
+    "diffs": []
   },
   {
     "fixture": "optional-chaining",

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-22T09:18:38.768Z",
+  "timestamp": "2025-12-22T09:42:57.081Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/do-while-break.ts",
   "compilation": {
     "typescript": {
@@ -158,7 +158,7 @@
         "0xbc",
         "0xa5",
         "0xed",
-        "0xc3",
+        "0xc1",
         "0xc7",
         "0x28",
         "0xce",
@@ -202,7 +202,7 @@
         "00000060: 00 93 3a e4 00 00 00 cb 06 cb 39 e4 00 00 00 b8 |..:.......9.....|",
         "00000070: ad ed 1f 39 e5 00 00 00 43 e6 00 00 00 39 e4 00 |...9....C....9..|",
         "00000080: 00 00 24 01 00 cb 06 cb 39 e4 00 00 00 ba ad ed |..$.....9.......|",
-        "00000090: 0a 39 e4 00 00 00 bc a5 ed c3 c7 28 ce 03 1a 00 |.9.........(....|",
+        "00000090: 0a 39 e4 00 00 00 bc a5 ed c1 c7 28 ce 03 1a 00 |.9.........(....|",
         "000000a0: 00 68 08 1b 02 30 06 20 04 13 0b 1b 0e 1b 0a 1b |.h...0. ........|",
         "000000b0: 01 21 0d 20 04 13 01 20 04 00                   |.!. ... ..|"
       ],
@@ -501,16 +501,7 @@
       }
     }
   },
-  "differences": [
-    {
-      "offset": 153,
-      "offsetHex": "0x99",
-      "typescript": "0xc3",
-      "wasm": "0xc1",
-      "typescriptDecimal": 195,
-      "wasmDecimal": 193
-    }
-  ],
+  "differences": [],
   "sizeDifference": {
     "absolute": 0,
     "percentage": "0.00"

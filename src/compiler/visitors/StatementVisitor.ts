@@ -253,11 +253,13 @@ export class StatementVisitor extends VisitorContext {
     const breakEntry = new BlockEnv()
     this.compiler.pushBreakEntry(fd, breakEntry, labelName, labelBreak, labelCont, 0)
 
-    // 设置 eval 返回值为 undefined - 对应 parser.c:7103
-    this.compiler.setEvalRetUndefined(fd)
-
+    // QuickJS 顺序: 先 emit_label(label1)，再 set_eval_ret_undefined。
+    // 参考: third_party/QuickJS/src/core/parser.c (TOK_DO 分支)
     // 发射循环开始标签 - 对应 parser.c:7102
     this.compiler.emitLabelInt(fd, label1)
+
+    // 设置 eval 返回值为 undefined - 对应 parser.c:7104
+    this.compiler.setEvalRetUndefined(fd)
 
     // 编译循环体 - 对应 parser.c:7106-7107
     this.context.visit(node.statement)
