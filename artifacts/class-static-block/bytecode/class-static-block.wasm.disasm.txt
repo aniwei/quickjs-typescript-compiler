@@ -1,0 +1,141 @@
+Function: undefined
+  Bytecode Len: 177
+     0: OP_check_define_var e4 00 00 00 80
+     6: OP_define_var e4 00 00 00 82
+    12: OP_set_loc_uninitialized 01 00
+    15: OP_undefined
+    16: OP_set_loc_uninitialized 04 00
+    19: OP_set_loc_uninitialized 03 00
+    22: OP_set_loc_uninitialized 02 00
+    25: OP_push_const8 03
+    27: OP_define_class e4 00 00 00 00
+    33: OP_swap
+    34: OP_private_symbol e5 00 00 00
+    39: OP_put_loc2
+    40: OP_swap
+    41: OP_swap
+    42: OP_swap
+    43: OP_swap
+    44: OP_fclosure8 00
+    46: OP_set_home_object
+    47: OP_set_name e6 00 00 00
+    52: OP_put_loc3
+    53: OP_swap
+    54: OP_swap
+    55: OP_fclosure8 01
+    57: OP_define_method e7 00 00 00 00
+    63: OP_swap
+    64: OP_swap
+    65: OP_fclosure8 02
+    67: OP_define_method 42 00 00 00 01
+    73: OP_swap
+    74: OP_undefined
+    75: OP_put_loc8 04
+    77: OP_drop
+    78: OP_dup
+    79: OP_dup
+    80: OP_add_brand
+    81: OP_set_loc1
+    82: OP_dup
+    83: OP_fclosure8 04
+    85: OP_set_home_object
+    86: OP_call_method 00 00
+    89: OP_drop
+    90: OP_close_loc 04 00
+    93: OP_close_loc 02 00
+    96: OP_put_var_init e4 00 00 00
+   101: OP_get_var e8 00 00 00
+   106: OP_get_field2 e9 00 00 00
+   111: OP_get_var e4 00 00 00
+   116: OP_get_field ea 00 00 00
+   121: OP_call_method 01 00
+   124: OP_put_loc0
+   125: OP_get_var e8 00 00 00
+   130: OP_get_field2 e9 00 00 00
+   135: OP_get_var e4 00 00 00
+   140: OP_get_field2 e7 00 00 00
+   145: OP_call_method 00 00
+   148: OP_call_method 01 00
+   151: OP_put_loc0
+   152: OP_get_var e8 00 00 00
+   157: OP_get_field2 e9 00 00 00
+   162: OP_get_var e4 00 00 00
+   167: OP_get_field 42 00 00 00
+   172: OP_call_method 01 00
+   175: OP_set_loc0
+   176: OP_return
+  Function: undefined
+    Bytecode Len: 12
+       0: OP_push_this
+       1: OP_put_loc0
+       2: OP_get_loc0
+       3: OP_dup
+       4: OP_get_var_ref0
+       5: OP_get_private_field
+       6: OP_push_1
+       7: OP_add
+       8: OP_insert2
+       9: OP_get_var_ref0
+      10: OP_put_private_field
+      11: OP_return_undef
+  Function: undefined
+    Bytecode Len: 13
+       0: OP_push_this
+       1: OP_put_loc0
+       2: OP_get_loc0
+       3: OP_get_var_ref0
+       4: OP_check_brand
+       5: OP_call_method 00 00
+       8: OP_drop
+       9: OP_get_loc0
+      10: OP_get_var_ref1
+      11: OP_get_private_field
+      12: OP_return
+  Function: undefined
+    Bytecode Len: 6
+       0: OP_push_this
+       1: OP_put_loc0
+       2: OP_get_loc0
+       3: OP_get_var_ref0
+       4: OP_get_private_field
+       5: OP_return
+  Function: undefined
+    Bytecode Len: 15
+       0: OP_push_this
+       1: OP_put_loc0
+       2: OP_check_ctor
+       3: OP_get_var_ref_check 00 00
+       6: OP_dup
+       7: OP_if_false8 06
+       9: OP_get_loc0
+      10: OP_swap
+      11: OP_call_method 00 00
+      14: OP_return_undef
+  Function: undefined
+    Bytecode Len: 27
+       0: OP_push_this
+       1: OP_put_loc0
+       2: OP_get_loc0
+       3: OP_get_var_ref_check 00 00
+       6: OP_push_0
+       7: OP_define_private_field
+       8: OP_get_loc0
+       9: OP_push_atom_value ec 00 00 00
+      14: OP_define_field ea 00 00 00
+      19: OP_fclosure8 00
+      21: OP_get_loc0
+      22: OP_swap
+      23: OP_call_method 00 00
+      26: OP_return_undef
+    Function: undefined
+      Bytecode Len: 18
+         0: OP_get_var_ref0
+         1: OP_push_1
+         2: OP_insert2
+         3: OP_get_var_ref1
+         4: OP_put_private_field
+         5: OP_drop
+         6: OP_get_var_ref0
+         7: OP_push_atom_value ed 00 00 00
+        12: OP_put_field ea 00 00 00
+        17: OP_return_undef

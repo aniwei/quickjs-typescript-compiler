@@ -789,14 +789,17 @@ export class ClassVisitor extends VisitorContext {
 
     const initFd = cf.fieldsInitFd
     this.compiler.pushScope(initFd)
-    
-    this.compiler.emitOp(initFd, TempOpcode.OP_scope_get_var)
-    this.compiler.emitAtom(initFd, JSAtom.JS_ATOM_this)
-    this.compiler.emitU16(initFd, 0)
 
+    // QuickJS: js_parse_class() static-block path leaves the fclosure on stack,
+    // then loads `this`, swaps, and calls as a method.
+    // third_party/QuickJS/src/core/parser.c: around js_parse_class() static block branch.
     this.compiler.emitOp(initFd, Opcode.OP_fclosure)
     this.compiler.emitU32(initFd, cpoolIdx)
 
+    this.compiler.emitOp(initFd, TempOpcode.OP_scope_get_var)
+    this.compiler.emitAtom(initFd, JSAtom.JS_ATOM_this)
+    this.compiler.emitU16(initFd, 0)
+    this.compiler.emitOp(initFd, Opcode.OP_swap)
     this.compiler.emitOp(initFd, Opcode.OP_call_method)
     this.compiler.emitU16(initFd, 0)
     this.compiler.emitOp(initFd, Opcode.OP_drop)
@@ -906,6 +909,7 @@ export class ClassVisitor extends VisitorContext {
 
     // QuickJS: emit_class_init_start() emits a brand-check block guarded by a
     // push_false placeholder that can be patched to push_true when needed.
+    // For static fields init: QuickJS emits no prologue here.
     if (!isStatic) {
       this.compiler.emitOp(initFd, Opcode.OP_push_false)
       if (cf) {
@@ -925,9 +929,6 @@ export class ClassVisitor extends VisitorContext {
 
       this.compiler.emitOp(initFd, Opcode.OP_add_brand)
       this.compiler.emitLabelInt(initFd, labelAddBrand)
-    } else {
-      // Static fields init does not need the brand block.
-      this.compiler.emitOp(initFd, Opcode.OP_push_false)
     }
     
     return initFd

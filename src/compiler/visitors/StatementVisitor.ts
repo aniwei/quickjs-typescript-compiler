@@ -1154,37 +1154,42 @@ export class StatementVisitor extends VisitorContext {
     this.compiler.emitSourcePos(fd, sourcePos)
 
     // 编译表达式
-    // QuickJS: 对于一些“语句级”表达式（尤其是各种赋值），会以不保留结果的模式编译，
-    // 因此不会在语句末尾再发射 OP_drop。
-    // 我们在非 eval 模式下对顶层赋值语句做同样处理，以对齐 class-* 等 fixture。
     const expr = node.expression
-    const op = ts.isBinaryExpression(expr) ? expr.operatorToken.kind : -1
-    const isAssignmentOp =
-      op === ts.SyntaxKind.EqualsToken ||
-      (op >= ts.SyntaxKind.PlusEqualsToken && op <= ts.SyntaxKind.CaretEqualsToken) ||
-      op === ts.SyntaxKind.AmpersandAmpersandEqualsToken ||
-      op === ts.SyntaxKind.BarBarEqualsToken ||
-      op === ts.SyntaxKind.QuestionQuestionEqualsToken
 
-    const isSimpleEqualsAssignmentOp = op === ts.SyntaxKind.EqualsToken
-    const isCompoundAssignmentOp =
-      op >= ts.SyntaxKind.PlusEqualsToken && op <= ts.SyntaxKind.CaretEqualsToken
-
-    const isTopLevelAssignmentStmt =
+    // QuickJS 对属性/元素赋值类表达式语句会走 PUT_LVALUE_NOKEEP_* 路径，
+    // 从而不保留赋值表达式的结果（例如 `this.x = y;` / `this.x += n;`）。
+    // 这时语句末尾不会再发射 OP_drop。
+    // 参考：third_party/QuickJS/src/core/parser.c: js_parse_for_in_of() 里 local `sum += n` 会留下值并 drop；
+    //       以及 class-methods 的 `this.value += n` 不留下值也无 drop（通过 disasm 观测）。
+    if (
       fd.evalRetIdx < 0 &&
-      ts.isBinaryExpression(expr) &&
-      isAssignmentOp &&
-      (isSimpleEqualsAssignmentOp || isCompoundAssignmentOp) &&
-      (ts.isIdentifier(expr.left) || ts.isPropertyAccessExpression(expr.left) || ts.isElementAccessExpression(expr.left))
+      ts.isBinaryExpression(expr)
+    ) {
+      const op = expr.operatorToken.kind
+      const isAssignmentOp =
+        op === ts.SyntaxKind.EqualsToken ||
+        (op >= ts.SyntaxKind.PlusEqualsToken && op <= ts.SyntaxKind.CaretEqualsToken) ||
+        op === ts.SyntaxKind.AmpersandAmpersandEqualsToken ||
+        op === ts.SyntaxKind.BarBarEqualsToken ||
+        op === ts.SyntaxKind.QuestionQuestionEqualsToken
 
-    if (isTopLevelAssignmentStmt) {
-      const prev = this.context.expressionValueUsed
-      this.context.expressionValueUsed = false
-      this.context.visit(expr)
-      this.context.expressionValueUsed = prev
-      return
+      const isNonPrivatePropLValue =
+        ts.isPropertyAccessExpression(expr.left) &&
+        !ts.isPrivateIdentifier(expr.left.name)
+      const isElemLValue = ts.isElementAccessExpression(expr.left)
+
+      const isPropOrElemLValue = isNonPrivatePropLValue || isElemLValue
+
+      if (isAssignmentOp && isPropOrElemLValue) {
+        const prev = this.context.expressionValueUsed
+        this.context.expressionValueUsed = false
+        this.context.visit(expr)
+        this.context.expressionValueUsed = prev
+        return
+      }
     }
 
+    // 默认：正常生成表达式（保留结果），然后在非 eval 模式下 drop
     this.context.visit(expr)
 
     // 处理表达式结果 - 对应 parser.c:7632-7649

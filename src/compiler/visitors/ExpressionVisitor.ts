@@ -472,26 +472,45 @@ export class ExpressionVisitor extends VisitorContext {
       this.compiler.emitOp(fd, Opcode.OP_put_ref_value)
       
     } else if (ts.isPropertyAccessExpression(operand)) {
-      // 属性访问: obj.prop
+      // 属性访问: obj.prop / obj.#private
       const name = this.compiler.addAtom(operand.name.text)
-      
+
+      // 私有字段后缀 ++/--: obj.#name++
+      // QuickJS (disasm) pattern:
+      //   obj; dup; <resolve private>; get_private_field; post_inc; perm3; <resolve private>; put_private_field
+      // This keeps stack layout consistent with OP_put_private_field semantics.
+      if (ts.isPrivateIdentifier(operand.name)) {
+        this.context.visit(operand.expression)
+        this.compiler.emitOp(fd, Opcode.OP_dup)
+        this.compiler.emitOp(fd, TempOpcode.OP_scope_get_private_field)
+        this.compiler.emitU32(fd, name)
+        this.compiler.emitU16(fd, fd.scopeLevel)
+        this.compiler.emitOp(fd, opcode, sourcePos)
+        this.compiler.emitOp(fd, Opcode.OP_perm3)
+        this.compiler.emitOp(fd, TempOpcode.OP_scope_put_private_field)
+        this.compiler.emitU32(fd, name)
+        this.compiler.emitU16(fd, fd.scopeLevel)
+        return
+      }
+
+      // 公有属性: obj.prop
       // 访问对象
       this.context.visit(operand.expression)
-      
+
       // 发射 OP_get_field2
       // 栈效果: [obj] -> [obj, value]
       this.compiler.emitOp(fd, Opcode.OP_get_field2)
       this.compiler.emitU32(fd, name)
       this.compiler.emitIc(fd, name)
-      
+
       // 发射后缀递增/递减操作
       // 栈效果: [obj, value] -> [obj, new_value, old_value]
       this.compiler.emitOp(fd, opcode, sourcePos)
-      
+
       // put_lvalue 使用 PUT_LVALUE_KEEP_SECOND (depth=1)
       // perm3: [obj, new_value, old_value] -> [old_value, obj, new_value]
       this.compiler.emitOp(fd, Opcode.OP_perm3)
-      
+
       // put_field: [old_value, obj, new_value] -> [old_value]
       this.compiler.emitOp(fd, Opcode.OP_put_field)
       this.compiler.emitU32(fd, name)

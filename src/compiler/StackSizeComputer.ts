@@ -19,6 +19,7 @@ const OP_COUNT = 256
  * 栈大小状态
  */
 interface StackSizeState {
+  bcBuf: Uint8Array
   bcLen: number
   stackLenMax: number
   stackLevelTab: Uint16Array   // 每个 PC 位置的栈大小
@@ -67,6 +68,7 @@ export class StackSizeComputer {
     
     // 初始化状态
     const s: StackSizeState = {
+      bcBuf,
       bcLen,
       stackLenMax: 0,
       stackLevelTab: new Uint16Array(bcLen).fill(0xffff),
@@ -261,13 +263,16 @@ export class StackSizeComputer {
         }
         
         case Opcode.OP_nip: {
-          const catchLevel = newStackLen  // nip 后的深度
+          // QuickJS: catch_level = stack_len - 1 (parser.c:12293)
+          // 注意：这里的 newStackLen 对应 C 中已应用 n_push/n_pop 后的 stack_len
+          const catchLevel = newStackLen - 1
           catchPos = this.checkCatch(s, bcBuf, catchPos, catchLevel)
           break
         }
         
         case Opcode.OP_nip1: {
-          const catchLevel = newStackLen  // nip1 后的深度
+          // QuickJS: catch_level = stack_len - 1 (parser.c:12296)
+          const catchLevel = newStackLen - 1
           catchPos = this.checkCatch(s, bcBuf, catchPos, catchLevel)
           break
         }
@@ -339,6 +344,19 @@ export class StackSizeComputer {
       if (s.stackLevelTab[pos] !== stackLen) {
         const prevFromPos = s.fromPosTab[pos]
         const prevFromOp = s.fromOpTab[pos]
+
+        if (process.env.DEBUG_STACK) {
+          this.dumpStackMismatch(s, {
+            pc: pos,
+            prevStackLen: s.stackLevelTab[pos],
+            newStackLen: stackLen,
+            prevFromPc: prevFromPos,
+            prevFromOp,
+            newFromPc: fromPos,
+            newFromOp: op & 0xff,
+          })
+        }
+
         throw new Error(
           `Inconsistent stack size: ${s.stackLevelTab[pos]} vs ${stackLen} (pc=${pos}, prev_from_pc=${prevFromPos}, prev_from_op=${prevFromOp}, new_from_pc=${fromPos}, new_from_op=${op})`
         )
@@ -360,6 +378,89 @@ export class StackSizeComputer {
     // 加入探索队列
     s.pcStack.push(pos)
     return true
+  }
+
+  private dumpStackMismatch(
+    s: StackSizeState,
+    info: {
+      pc: number
+      prevStackLen: number
+      newStackLen: number
+      prevFromPc: number
+      prevFromOp: number
+      newFromPc: number
+      newFromOp: number
+    }
+  ): void {
+    const bcBuf = s.bcBuf
+    const bcLen = s.bcLen
+
+    const opName = (opcode: number) => OPCODE_BY_CODE[opcode]?.id ?? `unknown_${opcode}`
+
+    const formatInsn = (pc: number): string => {
+      const opcode = bcBuf[pc]
+      const def = OPCODE_BY_CODE[opcode]
+      const size = def?.size ?? 1
+      const bytes = Array.from(bcBuf.slice(pc, Math.min(bcLen, pc + size)))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join(' ')
+
+      let extra = ''
+      switch (opcode) {
+        case Opcode.OP_goto: {
+          const diff = this.getI32(bcBuf, pc + 1)
+          extra = ` diff=${diff} target=${pc + 1 + diff}`
+          break
+        }
+        case Opcode.OP_goto16: {
+          const diff = this.getI16(bcBuf, pc + 1)
+          extra = ` diff=${diff} target=${pc + 1 + diff}`
+          break
+        }
+        case Opcode.OP_goto8: {
+          const diff = this.getI8(bcBuf, pc + 1)
+          extra = ` diff=${diff} target=${pc + 1 + diff}`
+          break
+        }
+        case Opcode.OP_if_true:
+        case Opcode.OP_if_false: {
+          const diff = this.getI32(bcBuf, pc + 1)
+          extra = ` diff=${diff} target=${pc + 1 + diff}`
+          break
+        }
+        case Opcode.OP_if_true8:
+        case Opcode.OP_if_false8: {
+          const diff = this.getI8(bcBuf, pc + 1)
+          extra = ` diff=${diff} target=${pc + 1 + diff}`
+          break
+        }
+        default:
+          break
+      }
+
+      const stack = s.stackLevelTab[pc]
+      const stackStr = stack === 0xffff ? '??' : String(stack)
+      const pops = def?.nPop ?? 0
+      const pushes = def?.nPush ?? 0
+      return `pc=${pc.toString().padStart(4)} stack=${stackStr.padStart(2)} op=${opName(opcode).padEnd(26)} bytes=${bytes.padEnd(14)} pop=${pops} push=${pushes}${extra}`
+    }
+
+    const marks = new Set([info.pc, info.prevFromPc, info.newFromPc].filter(v => v >= 0))
+    console.error(
+      `[DEBUG_STACK] Inconsistent stack size at pc=${info.pc}: prev=${info.prevStackLen} (from pc=${info.prevFromPc}, op=${opName(info.prevFromOp)}) vs new=${info.newStackLen} (from pc=${info.newFromPc}, op=${opName(info.newFromOp)})`
+    )
+    console.error(`[DEBUG_STACK] Bytecode length=${bcLen}`)
+
+    let pc = 0
+    let safety = 0
+    while (pc < bcLen && safety++ < bcLen + 5) {
+      const opcode = bcBuf[pc]
+      const def = OPCODE_BY_CODE[opcode]
+      const size = def?.size ?? 1
+      const prefix = marks.has(pc) ? '>> ' : '   '
+      console.error(prefix + formatInsn(pc))
+      pc += size
+    }
   }
 
   /**
