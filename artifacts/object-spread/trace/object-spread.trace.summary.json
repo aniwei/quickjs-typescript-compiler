@@ -1,0 +1,9 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-spread/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-spread/trace/object-spread.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-spread/trace/object-spread.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/object-spread/trace/object-spread.wasm.trace.log",
+  "differenceCount": 0,
+  "tsEventCount": 55,
+  "wasmEventCount": 55
+}

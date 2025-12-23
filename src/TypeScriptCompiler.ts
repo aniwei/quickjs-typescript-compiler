@@ -353,6 +353,9 @@ export class TypeScriptCompiler implements CompilerContext {
       case ts.SyntaxKind.StringLiteral:
         this.literalVisitor.visitStringLiteral(node as ts.StringLiteral)
         break
+      case ts.SyntaxKind.NoSubstitutionTemplateLiteral:
+        this.expressionVisitor.visitNoSubstitutionTemplateLiteral(node as ts.NoSubstitutionTemplateLiteral)
+        break
       case ts.SyntaxKind.BigIntLiteral:
         this.expressionVisitor.visitBigIntLiteral(node as ts.BigIntLiteral)
         break
@@ -398,9 +401,28 @@ export class TypeScriptCompiler implements CompilerContext {
       case ts.SyntaxKind.ConditionalExpression:
         this.expressionVisitor.visitConditionalExpression(node as ts.ConditionalExpression)
         break
+      case ts.SyntaxKind.TemplateExpression:
+        this.expressionVisitor.visitTemplateExpression(node as ts.TemplateExpression)
+        break
       case ts.SyntaxKind.ParenthesizedExpression:
         // Parentheses do not change semantics; just visit the inner expression.
         this.visit((node as ts.ParenthesizedExpression).expression)
+        break
+      case ts.SyntaxKind.AsExpression:
+        // TypeScript `expr as T` is a runtime no-op.
+        this.visit((node as ts.AsExpression).expression)
+        break
+      case ts.SyntaxKind.TypeAssertionExpression:
+        // TypeScript `<T>expr` is a runtime no-op.
+        this.visit((node as ts.TypeAssertion).expression)
+        break
+      case ts.SyntaxKind.NonNullExpression:
+        // TypeScript `expr!` is a runtime no-op.
+        this.visit((node as ts.NonNullExpression).expression)
+        break
+      case ts.SyntaxKind.SatisfiesExpression:
+        // TypeScript `expr satisfies T` is a runtime no-op.
+        this.visit((node as any).expression)
         break
       case ts.SyntaxKind.PostfixUnaryExpression:
         this.expressionVisitor.visitPostfixUnaryExpression(node as ts.PostfixUnaryExpression)

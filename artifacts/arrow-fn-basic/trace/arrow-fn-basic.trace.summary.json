@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/arrow-fn-basic/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/arrow-fn-basic/trace/arrow-fn-basic.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/arrow-fn-basic/trace/arrow-fn-basic.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/arrow-fn-basic/trace/arrow-fn-basic.wasm.trace.log",
+  "differenceCount": 37,
+  "tsEventCount": 58,
+  "wasmEventCount": 60,
+  "firstDifference": {
+    "index": 23,
+    "ts": "[QTS:EMIT] pos=9 atom=106",
+    "wasm": "[QTS:EMIT] pos=9 atom=0"
+  }
+}

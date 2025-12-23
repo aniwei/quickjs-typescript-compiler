@@ -1,0 +1,9 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/empty/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/empty/trace/empty.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/empty/trace/empty.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/empty/trace/empty.wasm.trace.log",
+  "differenceCount": 0,
+  "tsEventCount": 5,
+  "wasmEventCount": 5
+}

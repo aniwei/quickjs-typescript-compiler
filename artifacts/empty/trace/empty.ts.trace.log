@@ -1,0 +1,5 @@
+[QTS:EMIT] pos=0 op=182
+[QTS:EMIT] pos=1 u16=0x0001 (1)
+[QTS:EMIT] pos=3 op=90
+[QTS:EMIT] pos=4 u16=0x0000 (0)
+[QTS:EMIT] pos=6 op=40

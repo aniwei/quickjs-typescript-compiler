@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-generator-basic/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-generator-basic/trace/async-generator-basic.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-generator-basic/trace/async-generator-basic.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-generator-basic/trace/async-generator-basic.wasm.trace.log",
+  "differenceCount": 98,
+  "tsEventCount": 145,
+  "wasmEventCount": 160,
+  "firstDifference": {
+    "index": 61,
+    "ts": "[QTS:EMIT] pos=18 op=200",
+    "wasm": "[QTS:EMIT] pos=18 op=110"
+  }
+}

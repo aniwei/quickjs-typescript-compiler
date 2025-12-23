@@ -1,0 +1,9 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/es2020_bigint/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/es2020_bigint/trace/es2020_bigint.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/es2020_bigint/trace/es2020_bigint.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/es2020_bigint/trace/es2020_bigint.wasm.trace.log",
+  "differenceCount": 0,
+  "tsEventCount": 118,
+  "wasmEventCount": 118
+}

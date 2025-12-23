@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-field-initializers/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-field-initializers/trace/class-field-initializers.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-field-initializers/trace/class-field-initializers.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-field-initializers/trace/class-field-initializers.wasm.trace.log",
+  "differenceCount": 2,
+  "tsEventCount": 188,
+  "wasmEventCount": 188,
+  "firstDifference": {
+    "index": 109,
+    "ts": "[QTS:EMIT] pos=62 op=41",
+    "wasm": "[QTS:EMIT] pos=47 op=17"
+  }
+}

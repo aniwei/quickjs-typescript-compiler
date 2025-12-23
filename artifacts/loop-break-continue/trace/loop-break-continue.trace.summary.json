@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/loop-break-continue/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/loop-break-continue/trace/loop-break-continue.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/loop-break-continue/trace/loop-break-continue.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/loop-break-continue/trace/loop-break-continue.wasm.trace.log",
+  "differenceCount": 129,
+  "tsEventCount": 153,
+  "wasmEventCount": 158,
+  "firstDifference": {
+    "index": 28,
+    "ts": "[QTS:EMIT] pos=58 op=184",
+    "wasm": "[QTS:EMIT] pos=58 op=110"
+  }
+}

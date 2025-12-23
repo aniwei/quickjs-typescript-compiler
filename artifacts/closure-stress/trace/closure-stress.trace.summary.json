@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-stress/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-stress/trace/closure-stress.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-stress/trace/closure-stress.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-stress/trace/closure-stress.wasm.trace.log",
+  "differenceCount": 273,
+  "tsEventCount": 232,
+  "wasmEventCount": 302,
+  "firstDifference": {
+    "index": 29,
+    "ts": "[QTS:EMIT] pos=63 op=1",
+    "wasm": "[QTS:EMIT] pos=63 op=186"
+  }
+}

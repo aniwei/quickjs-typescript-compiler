@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/static-private-method-basic/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/static-private-method-basic/trace/static-private-method-basic.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/static-private-method-basic/trace/static-private-method-basic.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/static-private-method-basic/trace/static-private-method-basic.wasm.trace.log",
+  "differenceCount": 167,
+  "tsEventCount": 201,
+  "wasmEventCount": 208,
+  "firstDifference": {
+    "index": 38,
+    "ts": "[QTS:EMIT] pos=20 op=194",
+    "wasm": "[QTS:EMIT] pos=20 op=193"
+  }
+}

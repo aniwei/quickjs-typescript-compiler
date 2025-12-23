@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/labeled-statements/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/labeled-statements/trace/labeled-statements.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/labeled-statements/trace/labeled-statements.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/labeled-statements/trace/labeled-statements.wasm.trace.log",
+  "differenceCount": 253,
+  "tsEventCount": 272,
+  "wasmEventCount": 282,
+  "firstDifference": {
+    "index": 28,
+    "ts": "[QTS:EMIT] pos=58 op=184",
+    "wasm": "[QTS:EMIT] pos=58 op=110"
+  }
+}

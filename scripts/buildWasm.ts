@@ -195,6 +195,7 @@ function buildWasm(opts: Options) {
     'QTS_TRACE_LABEL',
     'QTS_TRACE_STACK',
     'QTS_TRACE_SCOPE',
+    'QTS_TRACE_ASSIGN',
   ] as const
 
   for (const key of categoryKeys) {

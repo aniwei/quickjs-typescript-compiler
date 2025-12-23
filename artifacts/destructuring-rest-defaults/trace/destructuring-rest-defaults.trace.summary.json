@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/destructuring-rest-defaults/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/destructuring-rest-defaults/trace/destructuring-rest-defaults.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/destructuring-rest-defaults/trace/destructuring-rest-defaults.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/destructuring-rest-defaults/trace/destructuring-rest-defaults.wasm.trace.log",
+  "differenceCount": 124,
+  "tsEventCount": 146,
+  "wasmEventCount": 152,
+  "firstDifference": {
+    "index": 27,
+    "ts": "[QTS:EMIT] pos=60 op=244",
+    "wasm": "[QTS:EMIT] pos=60 op=6"
+  }
+}

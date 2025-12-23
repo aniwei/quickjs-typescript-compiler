@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/if-else/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/if-else/trace/if-else.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/if-else/trace/if-else.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/if-else/trace/if-else.wasm.trace.log",
+  "differenceCount": 69,
+  "tsEventCount": 83,
+  "wasmEventCount": 97,
+  "firstDifference": {
+    "index": 28,
+    "ts": "[QTS:EMIT] pos=58 op=1",
+    "wasm": "[QTS:EMIT] pos=58 op=186"
+  }
+}

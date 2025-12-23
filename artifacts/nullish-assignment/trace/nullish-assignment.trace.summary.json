@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/nullish-assignment/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/nullish-assignment/trace/nullish-assignment.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/nullish-assignment/trace/nullish-assignment.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/nullish-assignment/trace/nullish-assignment.wasm.trace.log",
+  "differenceCount": 136,
+  "tsEventCount": 130,
+  "wasmEventCount": 145,
+  "firstDifference": {
+    "index": 8,
+    "ts": "[QTS:EMIT] pos=16 op=189",
+    "wasm": "[QTS:EMIT] pos=16 op=186"
+  }
+}

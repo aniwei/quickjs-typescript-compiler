@@ -1,0 +1,9 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-default-first/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-default-first/trace/switch-default-first.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-default-first/trace/switch-default-first.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-default-first/trace/switch-default-first.wasm.trace.log",
+  "differenceCount": 0,
+  "tsEventCount": 75,
+  "wasmEventCount": 75
+}

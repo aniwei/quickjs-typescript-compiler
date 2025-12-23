@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/binary-ops/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/binary-ops/trace/binary-ops.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/binary-ops/trace/binary-ops.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/binary-ops/trace/binary-ops.wasm.trace.log",
+  "differenceCount": 108,
+  "tsEventCount": 115,
+  "wasmEventCount": 113,
+  "firstDifference": {
+    "index": 2,
+    "ts": "[QTS:EMIT] pos=3 op=200",
+    "wasm": "[QTS:EMIT] pos=3 op=186"
+  }
+}

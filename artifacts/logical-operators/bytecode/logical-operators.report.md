@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/logical-operators.ts
-**生成时间**: 2025-12-23T07:34:08.933Z
+**生成时间**: 2025-12-23T10:24:24.195Z
 
 ## 大小对比
 

@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-private-fields/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-private-fields/trace/class-private-fields.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-private-fields/trace/class-private-fields.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-private-fields/trace/class-private-fields.wasm.trace.log",
+  "differenceCount": 135,
+  "tsEventCount": 176,
+  "wasmEventCount": 182,
+  "firstDifference": {
+    "index": 47,
+    "ts": "[QTS:EMIT] pos=20 op=17",
+    "wasm": "[QTS:EMIT] pos=20 op=193"
+  }
+}

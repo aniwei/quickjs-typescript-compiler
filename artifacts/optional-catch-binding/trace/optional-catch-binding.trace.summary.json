@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/optional-catch-binding/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/optional-catch-binding/trace/optional-catch-binding.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/optional-catch-binding/trace/optional-catch-binding.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/optional-catch-binding/trace/optional-catch-binding.wasm.trace.log",
+  "differenceCount": 60,
+  "tsEventCount": 74,
+  "wasmEventCount": 87,
+  "firstDifference": {
+    "index": 27,
+    "ts": "[QTS:EMIT] pos=51 op=110",
+    "wasm": "[QTS:EMIT] pos=51 op=6"
+  }
+}

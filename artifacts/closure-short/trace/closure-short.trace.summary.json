@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-short/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-short/trace/closure-short.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-short/trace/closure-short.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/closure-short/trace/closure-short.wasm.trace.log",
+  "differenceCount": 183,
+  "tsEventCount": 132,
+  "wasmEventCount": 187,
+  "firstDifference": {
+    "index": 4,
+    "ts": "[QTS:EMIT] pos=3 op=1",
+    "wasm": "[QTS:EMIT] pos=3 op=186"
+  }
+}

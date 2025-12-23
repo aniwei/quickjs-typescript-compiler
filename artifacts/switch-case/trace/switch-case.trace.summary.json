@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-case/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-case/trace/switch-case.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-case/trace/switch-case.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-case/trace/switch-case.wasm.trace.log",
+  "differenceCount": 48,
+  "tsEventCount": 98,
+  "wasmEventCount": 96,
+  "firstDifference": {
+    "index": 49,
+    "ts": "[QTS:EMIT] pos=102 u32=3",
+    "wasm": "[QTS:EMIT] pos=102 u32=2"
+  }
+}

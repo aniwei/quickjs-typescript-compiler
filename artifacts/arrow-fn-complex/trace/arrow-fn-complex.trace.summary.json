@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/arrow-fn-complex/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/arrow-fn-complex/trace/arrow-fn-complex.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/arrow-fn-complex/trace/arrow-fn-complex.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/arrow-fn-complex/trace/arrow-fn-complex.wasm.trace.log",
+  "differenceCount": 35,
+  "tsEventCount": 102,
+  "wasmEventCount": 104,
+  "firstDifference": {
+    "index": 69,
+    "ts": "[QTS:EMIT] pos=9 atom=230",
+    "wasm": "[QTS:EMIT] pos=9 atom=0"
+  }
+}

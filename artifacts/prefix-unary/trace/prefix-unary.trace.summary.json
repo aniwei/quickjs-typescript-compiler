@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/prefix-unary/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/prefix-unary/trace/prefix-unary.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/prefix-unary/trace/prefix-unary.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/prefix-unary/trace/prefix-unary.wasm.trace.log",
+  "differenceCount": 75,
+  "tsEventCount": 88,
+  "wasmEventCount": 94,
+  "firstDifference": {
+    "index": 18,
+    "ts": "[QTS:EMIT] pos=42 op=189",
+    "wasm": "[QTS:EMIT] pos=42 op=186"
+  }
+}

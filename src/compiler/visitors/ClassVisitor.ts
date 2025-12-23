@@ -847,7 +847,7 @@ export class ClassVisitor extends VisitorContext {
     const hasHeritage = (classFlags & 0x01) !== 0
 
     const ctorFd = new FunctionDef(fd, false, false)
-    // QuickJS: default class constructors have a null funcName in the bytecode header.
+    // QuickJS: 默认类构造函数在字节码头里 funcName 为 null（名字由外层 class 结构隐式表达）。
     ctorFd.funcName = 0 // JS_ATOM_NULL
     ctorFd.funcType = hasHeritage
       ? JSParseFunctionEnum.JS_PARSE_FUNC_DERIVED_CLASS_CONSTRUCTOR
@@ -859,9 +859,8 @@ export class ClassVisitor extends VisitorContext {
     ctorFd.hasHomeObject = true
     ctorFd.hasArgumentsBinding = true
     ctorFd.hasThisBinding = true
-    // QuickJS: default class constructors use a non-simple parameter list and
-    // do not enable the `arguments` binding/var in the function flags.
-    // This affects the serialized function header flags (0x540 for base default ctors).
+    // QuickJS: 默认构造函数使用“非简单参数列表”，并且不会在函数 flags 里启用 `arguments` 绑定/变量。
+    // 这会影响序列化出来的函数头 flags（例如：base default ctor 常见为 0x540）。
     ctorFd.hasSimpleParameterList = false
     ctorFd.argumentsAllowed = false
     ctorFd.newTargetAllowed = true
@@ -869,16 +868,15 @@ export class ClassVisitor extends VisitorContext {
     ctorFd.superAllowed = true
     ctorFd.isDerivedClassConstructor = hasHeritage
 
-    // QuickJS: default ctor debug base position is anchored near the end of the class
-    // definition. Use the closing '}' token position as the function's sourcePos so
-    // pc2line base matches WASM output.
+    // QuickJS: 默认 ctor 的 debug base 通常锚定在 class 定义末尾附近。
+    // 这里用 class 末尾的 '}' token 位置作为 sourcePos，确保 pc2line base 与 WASM 输出一致。
     const classEndPos = Math.max(0, classNode.getEnd() - 1)
     ctorFd.sourcePos = classEndPos
 
     this.compiler.addChild(fd, ctorFd)
 
-    // QuickJS default ctor: enter body scope first.
-    // Source: third_party/QuickJS/src/core/parser.c: js_parse_class_default_ctor
+    // QuickJS 默认 ctor：先进入 body scope。
+    // QuickJS 源码: third_party/QuickJS/src/core/parser.c: js_parse_class_default_ctor
     this.compiler.pushScope(ctorFd)
     ctorFd.bodyScope = ctorFd.scopeLevel
 
@@ -910,8 +908,7 @@ export class ClassVisitor extends VisitorContext {
    */
   private createFieldsInitFunction(fd: FunctionDef, isStatic: boolean, cf?: ClassFieldsDef): FunctionDef {
     const initFd = new FunctionDef(fd, false, false)
-    // QuickJS: class init helper functions have a null funcName in the bytecode
-    // header; naming is provided by surrounding class opcodes.
+    // QuickJS: class init helper 在字节码头里 funcName 为 null，名字由外层 class opcodes 提供。
     initFd.funcName = 0 // JS_ATOM_NULL
     initFd.funcType = JSParseFunctionEnum.JS_PARSE_FUNC_METHOD
     initFd.funcKind = JSFunctionKindEnum.JS_FUNC_NORMAL
@@ -921,8 +918,8 @@ export class ClassVisitor extends VisitorContext {
     initFd.hasHomeObject = true
     initFd.hasArgumentsBinding = true
     initFd.hasThisBinding = true
-    // QuickJS: class fields init helpers serialize with flags 0x548 in simple cases
-    // (notably: non-simple parameter list, no arguments object, but allow super/new.target).
+    // QuickJS: class fields init helper 在简单场景下序列化 flags 常见为 0x548
+    // （典型特征：非简单参数列表、没有 arguments 对象，但允许 super/new.target）。
     initFd.hasSimpleParameterList = false
     initFd.argumentsAllowed = false
     initFd.newTargetAllowed = true
@@ -930,15 +927,14 @@ export class ClassVisitor extends VisitorContext {
 
     this.compiler.addChild(fd, initFd)
 
-    // QuickJS: fields_init_fd is created while parsing inside the class private
-    // field scope, so closure resolution for private names should start there.
+    // QuickJS: fields_init_fd 创建时位于 class private field scope 内部，因此私有名的闭包解析应从该 scopeLevel 开始。
     if (cf?.privateScopeLevel !== undefined) {
       initFd.parentScopeLevel = cf.privateScopeLevel
     }
 
-    // QuickJS: emit_class_init_start() emits a brand-check block guarded by a
-    // push_false placeholder that can be patched to push_true when needed.
-    // For static fields init: QuickJS emits no prologue here.
+    // QuickJS: emit_class_init_start() 会生成一段 brand-check 逻辑，前面先放一个 push_false 占位，
+    // 在需要时再回填为 push_true。
+    // 对于 static fields init：QuickJS 在这里不生成这段 prologue。
     if (!isStatic) {
       this.compiler.emitOp(initFd, Opcode.OP_push_false)
       if (cf) {

@@ -32,6 +32,76 @@ export class ExpressionVisitor extends VisitorContext {
     super(context)
   }
 
+  // ============================================================================
+  // 模板字面量 - 对应 parser.c:2480-2565 js_parse_template (call=0)
+  // ============================================================================
+
+  /**
+   * 无插值模板字面量: `foo` / `line1\nline2`
+   *
+   * QuickJS 走 js_parse_template(s, 0, NULL)，最终等价于 push cooked string。
+   */
+  visitNoSubstitutionTemplateLiteral(node: ts.NoSubstitutionTemplateLiteral): void {
+    const fd = this.funcDef!
+    this.emitCookedTemplateString(fd, node.text)
+  }
+
+  /**
+   * 模板表达式: `a${b}c${d}`
+   *
+   * QuickJS lowering (js_parse_template(call=0)):
+   *   push head
+   *   get_field2 'concat'
+   *   (push expr, push non-empty literal)*
+   *   call_method argc
+   */
+  visitTemplateExpression(node: ts.TemplateExpression): void {
+    const fd = this.funcDef!
+
+    // First cooked chunk is always pushed (even if empty), like QuickJS (depth==0 rule).
+    this.emitCookedTemplateString(fd, node.head.text)
+
+    // TemplateExpression always has at least one span, but keep this safe.
+    if (node.templateSpans.length === 0) {
+      return
+    }
+
+    // QuickJS emits OP_get_field2 + atom('concat') + ic('concat') (no source-pos).
+    this.compiler.emitOp(fd, Opcode.OP_get_field2)
+    this.compiler.emitAtom(fd, JSAtom.JS_ATOM_concat)
+    this.compiler.emitIc(fd, JSAtom.JS_ATOM_concat)
+
+    let argc = 0
+    for (const span of node.templateSpans) {
+      // Expression part
+      this.context.visit(span.expression)
+      argc++
+
+      // Cooked literal part after the expression (skip empty chunks like QuickJS).
+      const tailText = span.literal.text
+      if (tailText.length !== 0) {
+        this.emitCookedTemplateString(fd, tailText)
+        argc++
+      }
+    }
+
+    this.compiler.emitOp(fd, Opcode.OP_call_method)
+    this.compiler.emitU16(fd, argc)
+  }
+
+  private emitCookedTemplateString(fd: FunctionDef, text: string): void {
+    // QuickJS uses emit_push_const(..., as_atom=1) for both TOK_STRING and template parts.
+    // That results in OP_push_atom_value with an interned atom.
+    if (text === '') {
+      this.compiler.emitAtomOp(fd, Opcode.OP_push_atom_value, JSAtom.JS_ATOM_empty_string)
+      return
+    }
+    const atom = this.compiler.addAtom(text)
+    this.compiler.emitOp(fd, Opcode.OP_push_atom_value)
+    this.compiler.emitAtom(fd, atom)
+    this.compiler.emitIc(fd, atom)
+  }
+
   /**
    * Derived class constructor: after `super()` returns, QuickJS initializes the
    * lexical `this` binding and runs `<class_fields_init>`.
@@ -985,11 +1055,11 @@ export class ExpressionVisitor extends VisitorContext {
 
     // 根据左值类型处理
     if (ts.isIdentifier(node.left)) {
-      // 简单变量:
-      // QuickJS usually emits scope_make_ref/get_ref_value/put_ref_value and later
-      // optimizes it to get_loc_check/put_loc_check for locals. For byte-perfect
-      // parity (notably in async functions), we emit the optimized local form
-      // directly when we can prove it's a local/arg binding.
+      // 简单变量：
+      // QuickJS 在 js_parse_assign_expr2() 针对“标识符左值”的复合赋值，会走
+      // get_var/scope_get_var + <op> + (dup?) + put_var/scope_put_var 的直写路径。
+      // 只有在某些需要引用语义的场景（with/eval/复杂左值）才会走 make_ref/put_ref_value。
+      // 为了 byte-for-byte 对齐，这里对标识符直接生成直写字节码。
       const name = this.compiler.addAtom(node.left.text)
 
       // Determine whether `name` resolves to a local/arg in the current scope chain.
@@ -1005,7 +1075,7 @@ export class ExpressionVisitor extends VisitorContext {
       }
 
       if (isLocalOrArg) {
-        // scope_get_var; rhs; op; dup; scope_put_var
+        // 局部变量/参数：scope_get_var; rhs; op; (dup?); scope_put_var
         this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var)
         this.compiler.emitU32(fd, name)
         this.compiler.emitU16(fd, fd.scopeLevel)
@@ -1013,37 +1083,28 @@ export class ExpressionVisitor extends VisitorContext {
         this.context.visit(node.right)
         this.compiler.emitOp(fd, opcode, sourcePos)
 
-        this.compiler.emitOp(fd, Opcode.OP_dup)
+        if (keepResult) {
+          this.compiler.emitOp(fd, Opcode.OP_dup)
+        }
         this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var)
         this.compiler.emitU32(fd, name)
         this.compiler.emitU16(fd, fd.scopeLevel)
         return
       }
 
-      // Fallback: generic ref-based compound assignment.
-      const label = this.compiler.newLabelInt(fd)
-      
-      // OP_scope_make_ref: 栈 [] -> [ref ref]
-      this.compiler.emitOp(fd, TempOpcode.OP_scope_make_ref)
+      // 非局部/非参数：使用 get_var/put_var（QuickJS: get_var x; rhs; op; dup; put_var x）
+      this.compiler.emitOp(fd, Opcode.OP_get_var)
       this.compiler.emitU32(fd, name)
-      this.compiler.emitU32(fd, label)
-      this.compiler.emitU16(fd, fd.scopeLevel)
-      this.compiler.updateLabel(fd, label, 1)
-      
-      // OP_get_ref_value: 栈 [ref ref] -> [ref ref value]
-      this.compiler.emitOp(fd, Opcode.OP_get_ref_value)
-      
-      // 计算右值: 栈 [ref ref value] -> [ref ref value rightVal]
+
       this.context.visit(node.right)
-      
-      // 执行运算: 栈 [ref ref value rightVal] -> [ref ref newValue]
       this.compiler.emitOp(fd, opcode, sourcePos)
-      
-      // OP_insert3: 栈 [ref ref newValue] -> [newValue ref ref newValue]
-      this.compiler.emitOp(fd, Opcode.OP_insert3)
-      
-      // OP_put_ref_value: 栈 [newValue ref ref newValue] -> [newValue]
-      this.compiler.emitOp(fd, Opcode.OP_put_ref_value)
+
+      if (keepResult) {
+        this.compiler.emitOp(fd, Opcode.OP_dup)
+      }
+
+      this.compiler.emitOp(fd, Opcode.OP_put_var)
+      this.compiler.emitU32(fd, name)
       return
     }
 

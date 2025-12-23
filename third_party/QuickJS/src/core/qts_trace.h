@@ -28,6 +28,7 @@ extern "C" {
  *   QTS_TRACE_LABEL      - Label resolution
  *   QTS_TRACE_STACK      - Stack size computation
  *   QTS_TRACE_SCOPE      - Scope management
+ *   QTS_TRACE_ASSIGN     - 赋值/左值处理 (get_lvalue/put_lvalue/复合赋值)
  */
 
 #ifndef QTS_TRACE_ENABLED
@@ -61,6 +62,10 @@ extern "C" {
 
 #ifndef QTS_TRACE_SCOPE
 #define QTS_TRACE_SCOPE QTS_TRACE_ENABLED
+#endif
+
+#ifndef QTS_TRACE_ASSIGN
+#define QTS_TRACE_ASSIGN QTS_TRACE_ENABLED
 #endif
 
 /* ============================================================================
@@ -199,6 +204,19 @@ extern "C" {
 #define QTS_TRACE_SCOPE_LEAVE(scope_idx)
 #endif
 
+/* Assignment/lvalue tracing */
+#if QTS_TRACE_ASSIGN
+#define QTS_TRACE_ASSIGN_LVALUE(op, scope, name, label) \
+    fprintf(stderr, "[QTS:ASSIGN] lvalue: opcode=%d scope=%d atom=%d label=%d\n", \
+            (int)(op), (int)(scope), (int)(name), (int)(label))
+
+#define QTS_TRACE_ASSIGN_COMPOUND(assign_tok, op) \
+    fprintf(stderr, "[QTS:ASSIGN] compound: tok=%d op=%d\n", (int)(assign_tok), (int)(op))
+#else
+#define QTS_TRACE_ASSIGN_LVALUE(op, scope, name, label)
+#define QTS_TRACE_ASSIGN_COMPOUND(assign_tok, op)
+#endif
+
 #else /* QTS_TRACE_ENABLED == 0 */
 
 /* All macros become no-ops when tracing is disabled */
@@ -227,6 +245,8 @@ extern "C" {
 #define QTS_TRACE_SCOPE_POP(scope_level)
 #define QTS_TRACE_SCOPE_ENTER(scope_idx, body_scope)
 #define QTS_TRACE_SCOPE_LEAVE(scope_idx)
+#define QTS_TRACE_ASSIGN_LVALUE(op, scope, name, label)
+#define QTS_TRACE_ASSIGN_COMPOUND(assign_tok, op)
 
 #endif /* QTS_TRACE_ENABLED */
 

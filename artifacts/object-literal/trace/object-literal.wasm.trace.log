@@ -1,0 +1,41 @@
+[QTS:EMIT] pos=0 op=182
+[QTS:EMIT] pos=1 u16=0x0001 (1)
+[QTS:EMIT] pos=3 op=11
+[QTS:EMIT] pos=4 op=1
+[QTS:EMIT] pos=5 u32=0x00000001 (1)
+[QTS:EMIT] pos=9 op=78
+[QTS:EMIT] pos=10 atom=473
+[QTS:EMIT] pos=14 op=1
+[QTS:EMIT] pos=15 u32=0x00000002 (2)
+[QTS:EMIT] pos=19 op=78
+[QTS:EMIT] pos=20 atom=474
+[QTS:EMIT] pos=24 op=191
+[QTS:EMIT] pos=25 atom=472
+[QTS:EMIT] pos=29 u16=0x0001 (1)
+[QTS:EMIT] pos=31 op=200
+[QTS:EMIT] pos=32 u32=0x0000001c (28)
+[QTS:EMIT] pos=36 op=186
+[QTS:EMIT] pos=37 u32=0x000001db (475)
+[QTS:EMIT] pos=41 u16=0x0001 (1)
+[QTS:EMIT] pos=43 op=200
+[QTS:EMIT] pos=44 u32=0x00000023 (35)
+[QTS:EMIT] pos=48 op=66
+[QTS:EMIT] pos=49 atom=476
+[QTS:EMIT] pos=53 op=200
+[QTS:EMIT] pos=54 u32=0x00000028 (40)
+[QTS:EMIT] pos=58 op=186
+[QTS:EMIT] pos=59 u32=0x000001d8 (472)
+[QTS:EMIT] pos=63 u16=0x0001 (1)
+[QTS:EMIT] pos=65 op=200
+[QTS:EMIT] pos=66 u32=0x0000002b (43)
+[QTS:EMIT] pos=70 op=66
+[QTS:EMIT] pos=71 atom=473
+[QTS:EMIT] pos=75 op=200
+[QTS:EMIT] pos=76 u32=0x00000027 (39)
+[QTS:EMIT] pos=80 op=36
+[QTS:EMIT] pos=81 u16=0x0001 (1)
+[QTS:EMIT] pos=83 op=91
+[QTS:EMIT] pos=84 u16=0x0000 (0)
+[QTS:EMIT] pos=86 op=90
+[QTS:EMIT] pos=87 u16=0x0000 (0)
+[QTS:EMIT] pos=89 op=40

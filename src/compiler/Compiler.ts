@@ -63,8 +63,8 @@ export enum JSVarDefEnum {
 // 全局变量偏移常量
 // ============================================================================
 
-/** 全局变量偏移量 - 用于区分全局变量和局部变量 */
-export const GLOBAL_VAR_OFFSET = 0x40000000
+
+// 统一从 env.ts 读取，避免在多处重复定义导致偏差
 
 export class Compiler {
   atoms: string[] = []
@@ -808,7 +808,7 @@ export class Compiler {
     // 检查全局词法变量
     if (fd.isEval && fd.evalType === 0 /* JS_EVAL_TYPE_GLOBAL */) {
       if (this.findLexicalGlobalVar(fd, name)) {
-        return GLOBAL_VAR_OFFSET
+        return env.globalVarOffset
       }
     }
     return -1
@@ -1288,7 +1288,7 @@ export class Compiler {
         // 检查词法声明是否重复
         idx = this.findLexicalDecl(fd, name, fd.scopeFirst, true)
         if (idx >= 0) {
-          if (idx < GLOBAL_VAR_OFFSET) {
+          if (idx < env.globalVarOffset) {
             if (fd.vars[idx].scopeLevel === fd.scopeLevel) {
               // 同一作用域: 非严格模式下函数可以重定义 (annex B.3.3.4)
               if (!((fd.jsMode & 0x01) === 0 &&  // !JS_MODE_STRICT
@@ -1337,7 +1337,7 @@ export class Compiler {
           if (!hf) return -1
           hf.isLexical = true
           hf.isConst = (varDefType === JSVarDefEnum.JS_VAR_DEF_CONST)
-          idx = GLOBAL_VAR_OFFSET
+          idx = env.globalVarOffset
         } else {
           let varKind: JSVarKindEnum
           if (varDefType === JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL) {
@@ -1374,7 +1374,7 @@ export class Compiler {
           }
           const newHf = this.addGlobalVar(fd, name)
           if (!newHf) return -1
-          idx = GLOBAL_VAR_OFFSET
+          idx = env.globalVarOffset
         } else {
           // 如果变量已存在，不再添加
           idx = this.findVarByAtom(fd, name)

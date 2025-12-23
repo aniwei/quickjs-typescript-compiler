@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/while/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/while/trace/while.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/while/trace/while.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/while/trace/while.wasm.trace.log",
+  "differenceCount": 25,
+  "tsEventCount": 71,
+  "wasmEventCount": 74,
+  "firstDifference": {
+    "index": 48,
+    "ts": "[QTS:EMIT] pos=105 op=189",
+    "wasm": "[QTS:EMIT] pos=105 op=186"
+  }
+}

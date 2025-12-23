@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/function-expressions/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/function-expressions/trace/function-expressions.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/function-expressions/trace/function-expressions.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/function-expressions/trace/function-expressions.wasm.trace.log",
+  "differenceCount": 88,
+  "tsEventCount": 109,
+  "wasmEventCount": 111,
+  "firstDifference": {
+    "index": 23,
+    "ts": "[QTS:EMIT] pos=9 atom=106",
+    "wasm": "[QTS:EMIT] pos=9 atom=0"
+  }
+}

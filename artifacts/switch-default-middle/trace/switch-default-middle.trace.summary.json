@@ -1,0 +1,9 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-default-middle/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-default-middle/trace/switch-default-middle.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-default-middle/trace/switch-default-middle.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/switch-default-middle/trace/switch-default-middle.wasm.trace.log",
+  "differenceCount": 0,
+  "tsEventCount": 96,
+  "wasmEventCount": 96
+}

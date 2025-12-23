@@ -1,0 +1,20 @@
+[QTS:EMIT] pos=0 op=182
+[QTS:EMIT] pos=1 u16=0x0001 (1)
+[QTS:EMIT] pos=3 op=186
+[QTS:EMIT] pos=4 u32=0x000001d8 (472)
+[QTS:EMIT] pos=8 u16=0x0001 (1)
+[QTS:EMIT] pos=10 op=200
+[QTS:EMIT] pos=11 u32=0x00000007 (7)
+[QTS:EMIT] pos=15 op=66
+[QTS:EMIT] pos=16 atom=473
+[QTS:EMIT] pos=20 op=4
+[QTS:EMIT] pos=21 u32=0x000001da (474)
+[QTS:EMIT] pos=25 op=200
+[QTS:EMIT] pos=26 u32=0x0000000b (11)
+[QTS:EMIT] pos=30 op=36
+[QTS:EMIT] pos=31 u16=0x0001 (1)
+[QTS:EMIT] pos=33 op=91
+[QTS:EMIT] pos=34 u16=0x0000 (0)
+[QTS:EMIT] pos=36 op=90
+[QTS:EMIT] pos=37 u16=0x0000 (0)
+[QTS:EMIT] pos=39 op=40

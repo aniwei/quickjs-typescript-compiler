@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/primitives/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/primitives/trace/primitives.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/primitives/trace/primitives.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/primitives/trace/primitives.wasm.trace.log",
+  "differenceCount": 105,
+  "tsEventCount": 107,
+  "wasmEventCount": 105,
+  "firstDifference": {
+    "index": 2,
+    "ts": "[QTS:EMIT] pos=3 op=200",
+    "wasm": "[QTS:EMIT] pos=3 op=186"
+  }
+}

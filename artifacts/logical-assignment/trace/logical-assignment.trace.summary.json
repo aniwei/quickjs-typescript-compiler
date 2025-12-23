@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/logical-assignment/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/logical-assignment/trace/logical-assignment.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/logical-assignment/trace/logical-assignment.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/logical-assignment/trace/logical-assignment.wasm.trace.log",
+  "differenceCount": 300,
+  "tsEventCount": 297,
+  "wasmEventCount": 323,
+  "firstDifference": {
+    "index": 22,
+    "ts": "[QTS:EMIT] pos=48 op=189",
+    "wasm": "[QTS:EMIT] pos=48 op=186"
+  }
+}

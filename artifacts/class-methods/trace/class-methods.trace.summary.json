@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-methods/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-methods/trace/class-methods.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-methods/trace/class-methods.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/class-methods/trace/class-methods.wasm.trace.log",
+  "differenceCount": 105,
+  "tsEventCount": 148,
+  "wasmEventCount": 160,
+  "firstDifference": {
+    "index": 55,
+    "ts": "[QTS:EMIT] pos=51 op=200",
+    "wasm": "[QTS:EMIT] pos=51 op=66"
+  }
+}

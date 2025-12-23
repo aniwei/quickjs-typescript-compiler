@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/bitwise-ops/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/bitwise-ops/trace/bitwise-ops.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/bitwise-ops/trace/bitwise-ops.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/bitwise-ops/trace/bitwise-ops.wasm.trace.log",
+  "differenceCount": 129,
+  "tsEventCount": 137,
+  "wasmEventCount": 135,
+  "firstDifference": {
+    "index": 2,
+    "ts": "[QTS:EMIT] pos=3 op=200",
+    "wasm": "[QTS:EMIT] pos=3 op=186"
+  }
+}

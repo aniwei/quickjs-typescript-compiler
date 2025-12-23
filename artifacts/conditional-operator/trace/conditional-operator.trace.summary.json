@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/conditional-operator/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/conditional-operator/trace/conditional-operator.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/conditional-operator/trace/conditional-operator.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/conditional-operator/trace/conditional-operator.wasm.trace.log",
+  "differenceCount": 42,
+  "tsEventCount": 45,
+  "wasmEventCount": 43,
+  "firstDifference": {
+    "index": 2,
+    "ts": "[QTS:EMIT] pos=3 op=200",
+    "wasm": "[QTS:EMIT] pos=3 op=186"
+  }
+}

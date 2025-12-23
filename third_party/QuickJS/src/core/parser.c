@@ -6202,6 +6202,9 @@ next:
         0)
       return -1;
 
+    /* 赋值/左值路径埋点：用于对齐 TS 转译器的降级/优化选择 */
+    QTS_TRACE_ASSIGN_LVALUE(opcode, scope, name, label);
+
     if (js_parse_assign_expr2(s, parse_flags)) {
       JS_FreeAtom(s->ctx, name);
       return -1;
@@ -6227,6 +6230,7 @@ next:
           OP_pow,
       };
       op = assign_opcodes[op - TOK_MUL_ASSIGN];
+      QTS_TRACE_ASSIGN_COMPOUND(s->token.val, op);
       emit_source_pos(s, op_token_ptr);
       emit_source_pos(s, op_token_ptr);
       emit_op(s, op);

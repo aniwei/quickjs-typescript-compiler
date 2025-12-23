@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/logical-operators/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/logical-operators/trace/logical-operators.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/logical-operators/trace/logical-operators.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/logical-operators/trace/logical-operators.wasm.trace.log",
+  "differenceCount": 124,
+  "tsEventCount": 126,
+  "wasmEventCount": 124,
+  "firstDifference": {
+    "index": 2,
+    "ts": "[QTS:EMIT] pos=3 op=200",
+    "wasm": "[QTS:EMIT] pos=3 op=186"
+  }
+}

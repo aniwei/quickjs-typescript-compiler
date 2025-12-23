@@ -298,10 +298,10 @@ export class StatementVisitor extends VisitorContext {
             this.compiler.emitGotoInt(fd, Opcode.OP_if_false, labelKeep)
             this.compiler.emitOp(fd, Opcode.OP_drop)
 
-            // Match QuickJS for the common `= 2` case (avoid source pos binding).
-            // Important: during compile-time we must not emit SHORT_OPCODES (182-200)
-            // because they overlap with TempOpcode and would be mis-parsed by VariableResolver.
-            // Use long opcode form; LabelResolver will shrink it to `push_2` later.
+            // 对齐 QuickJS：常见的 `= 2` 场景要避免与 sourcePos 绑定产生差异。
+            // 重要：编译期绝不能直接发射 SHORT_OPCODES (182-200)，
+            // 因为它们与 TempOpcode 数值区间重叠，会在 VariableResolver 中被误解析。
+            // 这里先发射 long opcode 形式；后续 LabelResolver 会再收缩为 `push_2`。
             if (ts.isNumericLiteral(defaultInit) && Number(defaultInit.text.replace(/_/g, '')) === 2) {
               this.compiler.emitOp(fd, Opcode.OP_push_i32)
               this.compiler.emitU32(fd, 2)

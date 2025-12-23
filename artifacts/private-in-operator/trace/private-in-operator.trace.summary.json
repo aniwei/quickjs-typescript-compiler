@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/private-in-operator/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/private-in-operator/trace/private-in-operator.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/private-in-operator/trace/private-in-operator.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/private-in-operator/trace/private-in-operator.wasm.trace.log",
+  "differenceCount": 121,
+  "tsEventCount": 172,
+  "wasmEventCount": 174,
+  "firstDifference": {
+    "index": 53,
+    "ts": "[QTS:EMIT] pos=38 op=86",
+    "wasm": "[QTS:EMIT] pos=38 op=79"
+  }
+}

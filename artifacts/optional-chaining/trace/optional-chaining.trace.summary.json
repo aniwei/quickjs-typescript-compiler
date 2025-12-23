@@ -1,0 +1,14 @@
+{
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/optional-chaining/trace",
+  "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/optional-chaining/trace/optional-chaining.trace.summary.json",
+  "tsTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/optional-chaining/trace/optional-chaining.ts.trace.log",
+  "wasmTracePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/optional-chaining/trace/optional-chaining.wasm.trace.log",
+  "differenceCount": 330,
+  "tsEventCount": 353,
+  "wasmEventCount": 355,
+  "firstDifference": {
+    "index": 24,
+    "ts": "[QTS:EMIT] pos=36 op=86",
+    "wasm": "[QTS:EMIT] pos=36 op=79"
+  }
+}
