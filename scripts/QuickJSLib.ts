@@ -91,7 +91,8 @@ export class QuickJSLib {
       process.env.QTS_TRACE_CLOSURE ||
       process.env.QTS_TRACE_LABEL ||
       process.env.QTS_TRACE_STACK ||
-      process.env.QTS_TRACE_SCOPE,
+      process.env.QTS_TRACE_SCOPE ||
+      process.env.QTS_TRACE_ASSIGN,
     )
 
     const desiredEnabled = (wantTrace || wantTraceOverride) ? 1 : 0
@@ -117,6 +118,7 @@ export class QuickJSLib {
         LABEL: desiredCategory('QTS_TRACE_LABEL'),
         STACK: desiredCategory('QTS_TRACE_STACK'),
         SCOPE: desiredCategory('QTS_TRACE_SCOPE'),
+        ASSIGN: desiredCategory('QTS_TRACE_ASSIGN'),
       },
     }
 
@@ -132,7 +134,8 @@ export class QuickJSLib {
           built?.categories?.CLOSURE === desired.categories.CLOSURE &&
           built?.categories?.LABEL === desired.categories.LABEL &&
           built?.categories?.STACK === desired.categories.STACK &&
-          built?.categories?.SCOPE === desired.categories.SCOPE
+          built?.categories?.SCOPE === desired.categories.SCOPE &&
+          built?.categories?.ASSIGN === desired.categories.ASSIGN
         if (same) return path
       } catch {
         // fall through to rebuild

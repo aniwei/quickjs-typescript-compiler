@@ -1,7 +1,7 @@
 import ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
 import { CompilerContext } from '../CompilerContext'
-import { Opcode, TempOpcode, JSAtom } from '../../env'
+import { Opcode, TempOpcode, JSAtom, JS_ATOM_NULL, COPY_DATA_PROPERTIES_FLAGS_DEPTH0 } from '../../env'
 import { BlockEnv, JSVarKindEnum } from '../FunctionDef'
 import { JSVarDefEnum } from '../Compiler'
 
@@ -140,7 +140,6 @@ export class StatementVisitor extends VisitorContext {
           return atom
         }
 
-        const excludeAtoms: number[] = []
         for (const element of pattern.elements) {
           if (element.dotDotDotToken) {
             if (!ts.isIdentifier(element.name)) {
@@ -155,13 +154,14 @@ export class StatementVisitor extends VisitorContext {
           }
           defineBindingIdent(element.name)
 
-          // Track excluded property keys for rest.
+          // 对齐 QuickJS：即使当前 TS 侧实现不直接使用 excludeAtoms，
+          // 也需要在此阶段按源码顺序触发 atom 插入，避免后续 atom id 顺序发生漂移。
           if (element.propertyName == null) {
-            excludeAtoms.push(this.compiler.addAtom(element.name.text))
+            this.compiler.addAtom(element.name.text)
           } else if (ts.isIdentifier(element.propertyName)) {
-            excludeAtoms.push(this.compiler.addAtom(element.propertyName.text))
+            this.compiler.addAtom(element.propertyName.text)
           } else if (ts.isStringLiteral(element.propertyName) || ts.isNumericLiteral(element.propertyName)) {
-            excludeAtoms.push(this.compiler.addAtom(element.propertyName.text))
+            this.compiler.addAtom(element.propertyName.text)
           } else {
             throw new Error('Computed property names in destructuring are not yet supported')
           }
@@ -169,7 +169,7 @@ export class StatementVisitor extends VisitorContext {
 
         const hasRest = pattern.elements.some(e => e.dotDotDotToken != null)
         if (!hasRest) {
-          // Match QuickJS js_parse_destructuring_var():
+          // 对齐 QuickJS js_parse_destructuring_var()：
           //   undefined; dup; is_undefined; if_true load;
           // start: to_object; dup/get_field/put_var_init ... ; drop; goto done;
           // load: drop; <eval initializer>; goto start;
@@ -230,8 +230,8 @@ export class StatementVisitor extends VisitorContext {
           return
         }
 
-        // QuickJS-style lowering for object destructuring + rest.
-        // Current minimal support: initializer must be an identifier.
+        // 对齐 QuickJS：object destructuring + rest 的 lowering。
+        // 当前最小支持：initializer 必须是 identifier。
         if (!ts.isIdentifier(declaration.initializer)) {
           throw new Error('Object destructuring with rest currently requires identifier initializer')
         }
@@ -268,14 +268,6 @@ export class StatementVisitor extends VisitorContext {
 
         if (restAtom == null) {
           throw new Error('Internal error: expected rest binding')
-        }
-
-        if (process.env.DEBUG_DESTRUCTURE_REST) {
-          console.log(
-            `[destructure-rest] src=${declaration.initializer.text} props=` +
-              props.map(p => `${p.bindingAtom}/${p.keyAtom}${p.defaultInit ? ':default' : ''}`).join(',') +
-              ` rest=${restAtom}`
-          )
         }
 
         const labelLoad = this.compiler.newLabelInt(fd)
@@ -330,13 +322,7 @@ export class StatementVisitor extends VisitorContext {
               this.context.visit(defaultInit)
             }
 
-            if (process.env.DEBUG_DESTRUCTURE_REST) {
-              console.log(`[destructure-rest] emit labelKeep=${labelKeep} at bcSize=${fd.byteCode.size}`)
-            }
             this.compiler.emitLabelInt(fd, labelKeep)
-            if (process.env.DEBUG_DESTRUCTURE_REST) {
-              console.log(`[destructure-rest] after labelKeep bcSize=${fd.byteCode.size}`)
-            }
           }
 
           this.compiler.emitOp(fd, Opcode.OP_put_var_init)
@@ -348,10 +334,11 @@ export class StatementVisitor extends VisitorContext {
           }
         }
 
-        // Rest: copy all enumerable own props except exclude keys
+        // Rest：复制源对象的可枚举自有属性，并排除 exclude keys
         this.compiler.emitOp(fd, Opcode.OP_object)
         this.compiler.emitOp(fd, Opcode.OP_copy_data_properties)
-        this.compiler.emitU8(fd, 0x44)
+        // 对齐 QuickJS: emit_u8(s, 0 | ((depth_lvalue + 1) << 2) | ((depth_lvalue + 2) << 5))，此处 depth=0 => 0x44
+        this.compiler.emitU8(fd, COPY_DATA_PROPERTIES_FLAGS_DEPTH0)
         this.compiler.emitOp(fd, Opcode.OP_put_var_init)
         this.compiler.emitU32(fd, restAtom)
         this.compiler.emitOp(fd, Opcode.OP_drop)
@@ -1033,7 +1020,7 @@ export class StatementVisitor extends VisitorContext {
     // 获取标签名 (如果有)
     const label = node.label 
       ? this.compiler.addAtom(node.label.text)
-      : 0 // JS_ATOM_NULL
+      : JS_ATOM_NULL
 
     // 发射 break - 对应 parser.c:6334-6380 emit_break
     this.compiler.emitBreak(fd, label, false)
@@ -1050,7 +1037,7 @@ export class StatementVisitor extends VisitorContext {
     // 获取标签名 (如果有)
     const label = node.label 
       ? this.compiler.addAtom(node.label.text)
-      : 0 // JS_ATOM_NULL
+      : JS_ATOM_NULL
 
     // 发射 continue - 对应 parser.c:6334-6380 emit_break
     this.compiler.emitBreak(fd, label, true)

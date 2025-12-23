@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/async-generator-basic.ts
-**生成时间**: 2025-12-23T10:34:39.654Z
+**生成时间**: 2025-12-23T17:47:17.174Z
 
 ## 大小对比
 

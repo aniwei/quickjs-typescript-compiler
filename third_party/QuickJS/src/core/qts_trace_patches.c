@@ -1,40 +1,40 @@
 /*
- * QuickJS Parser Debug Patch
- * 
- * This file contains instructions for adding debug tracing to parser.c
- * to help verify the TypeScript transpilation matches QuickJS behavior.
- * 
- * USAGE:
- * 1. Include qts_trace.h at the top of parser.c
- * 2. Define QTS_TRACE_ENABLED=1 before including
- * 3. Apply the patches below to key functions
- * 4. Recompile WASM with tracing enabled
- * 5. Compare trace output between WASM and TypeScript
+ * QuickJS Parser 调试埋点补丁说明
+ *
+ * 本文件用于说明如何在 parser.c 中加入调试 trace（仅输出到 stderr），
+ * 以便验证 TypeScript 侧 lowering 是否与 QuickJS 行为一致。
+ *
+ * 用法：
+ * 1. 在 parser.c 顶部 include qts_trace.h
+ * 2. 在 include 之前定义 QTS_TRACE_ENABLED=1
+ * 3. 按下方示例在关键函数打补丁
+ * 4. 重新编译带 trace 的 WASM
+ * 5. 对比 WASM 与 TypeScript 的 trace 输出
  */
 
 /* ============================================================================
- * Step 1: Add include at top of parser.c (after existing includes)
+ * 步骤 1：在 parser.c 顶部加入 include（放在现有 includes 之后）
  * ============================================================================
- * 
- * Add these lines after line ~45:
- * 
+ *
+ * 在约第 45 行附近加入：
+ *
  * #define QTS_TRACE_ENABLED 1
  * #include "qts_trace.h"
  */
 
 /* ============================================================================
- * Step 2: Patch emit_op() - parser.c:1788
+ * 步骤 2：给 emit_op() 打补丁 - parser.c:1788
  * ============================================================================
- * 
- * Original:
+ *
+ * 原始版本：
  *   static void emit_op(JSParseState* s, uint8_t val) {
  *     JSFunctionDef* fd = s->cur_func;
  *     DynBuf* bc = &fd->byte_code;
  *     fd->last_opcode_pos = bc->size;
  *     dbuf_putc(bc, val);
  *   }
- * 
- * Patched:
+ *
+ * 打补丁后：
  */
 
 #if 0  /* Example patch for emit_op */
@@ -50,7 +50,7 @@ static void emit_op(JSParseState* s, uint8_t val) {
 #endif
 
 /* ============================================================================
- * Step 3: Patch emit_u16() - parser.c:1769
+ * 步骤 3：给 emit_u16() 打补丁 - parser.c:1769
  * ============================================================================
  */
 
@@ -62,7 +62,7 @@ static void emit_u16(JSParseState* s, uint16_t val) {
 #endif
 
 /* ============================================================================
- * Step 4: Patch emit_u32() - parser.c:1773
+ * 步骤 4：给 emit_u32() 打补丁 - parser.c:1773
  * ============================================================================
  */
 
@@ -74,7 +74,7 @@ static void emit_u32(JSParseState* s, uint32_t val) {
 #endif
 
 /* ============================================================================
- * Step 5: Patch new_label() - parser.c:1840
+ * 步骤 5：给 new_label() 打补丁 - parser.c:1840
  * ============================================================================
  */
 
@@ -91,7 +91,7 @@ static int new_label(JSParseState* s) {
 #endif
 
 /* ============================================================================
- * Step 6: Patch emit_goto() - parser.c:1867
+ * 步骤 6：给 emit_goto() 打补丁 - parser.c:1867
  * ============================================================================
  */
 
@@ -114,7 +114,7 @@ static int emit_goto(JSParseState* s, int opcode, int label) {
 #endif
 
 /* ============================================================================
- * Step 7: Patch resolve_scope_var() - parser.c:9148
+ * 步骤 7：给 resolve_scope_var() 打补丁 - parser.c:9148
  * ============================================================================
  */
 
@@ -152,7 +152,7 @@ static int resolve_scope_var(
 #endif
 
 /* ============================================================================
- * Step 8: Patch resolve_variables() - parser.c:10456
+ * 步骤 8：给 resolve_variables() 打补丁 - parser.c:10456
  * ============================================================================
  */
 
@@ -175,7 +175,7 @@ fail:
 #endif
 
 /* ============================================================================
- * Step 9: Patch resolve_labels() - parser.c:11088
+ * 步骤 9：给 resolve_labels() 打补丁 - parser.c:11088
  * ============================================================================
  */
 
@@ -198,7 +198,7 @@ fail:
 #endif
 
 /* ============================================================================
- * Step 10: Patch compute_stack_size() - parser.c:12196
+ * 步骤 10：给 compute_stack_size() 打补丁 - parser.c:12196
  * ============================================================================
  */
 
@@ -215,7 +215,7 @@ static int compute_stack_size(JSContext* ctx, JSFunctionDef* fd, int* pstack_siz
 #endif
 
 /* ============================================================================
- * Step 11: Patch add_closure_var() - parser.c:8812
+ * 步骤 11：给 add_closure_var() 打补丁 - parser.c:8812
  * ============================================================================
  */
 

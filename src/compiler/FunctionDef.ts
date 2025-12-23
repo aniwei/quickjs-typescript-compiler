@@ -1,6 +1,7 @@
 import { BytecodeBuilder } from './BytecodeBuilder'
 import { 
   JSAtom,
+  JS_ATOM_NULL,
   ARGUMENT_VAR_OFFSET as ENV_ARGUMENT_VAR_OFFSET,
   ARG_SCOPE_INDEX as ENV_ARG_SCOPE_INDEX,
   ARG_SCOPE_END as ENV_ARG_SCOPE_END,
@@ -44,15 +45,15 @@ export const JS_STACK_SIZE_MAX = ENV_JS_STACK_SIZE_MAX
  */
 export enum JSVarKindEnum {
   JS_VAR_NORMAL = 0,
-  JS_VAR_FUNCTION_DECL = 1,      // lexical var with function declaration
-  JS_VAR_NEW_FUNCTION_DECL = 2,  // lexical var with async/generator function declaration
+  JS_VAR_FUNCTION_DECL = 1,      // 词法变量：函数声明
+  JS_VAR_NEW_FUNCTION_DECL = 2,  // 词法变量：async/generator 函数声明
   JS_VAR_CATCH = 3,
-  JS_VAR_FUNCTION_NAME = 4,      // function expression name
+  JS_VAR_FUNCTION_NAME = 4,      // 函数表达式名称
   JS_VAR_PRIVATE_FIELD = 5,
   JS_VAR_PRIVATE_METHOD = 6,
   JS_VAR_PRIVATE_GETTER = 7,
-  JS_VAR_PRIVATE_SETTER = 8,     // must come after JS_VAR_PRIVATE_GETTER
-  JS_VAR_PRIVATE_GETTER_SETTER = 9, // must come after JS_VAR_PRIVATE_SETTER
+  JS_VAR_PRIVATE_SETTER = 8,     // 必须在 JS_VAR_PRIVATE_GETTER 之后
+  JS_VAR_PRIVATE_GETTER_SETTER = 9, // 必须在 JS_VAR_PRIVATE_SETTER 之后
 }
 
 // 保持向后兼容的别名 (同时作为值和类型)
@@ -774,7 +775,7 @@ export class FunctionDef {
     this.lastOpcodePos = -1
     
     // 初始化函数名 - parser.c:8247
-    this.funcName = 0 // JS_ATOM_NULL
+    this.funcName = JS_ATOM_NULL
 
     // 初始化特殊变量索引为 -1 - parser.c:8248-8258
     this.varObjectIdx = -1

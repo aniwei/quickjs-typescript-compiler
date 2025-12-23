@@ -14,7 +14,7 @@ import {
   ARG_SCOPE_INDEX,
   JS_MAX_LOCAL_VARS,
 } from './FunctionDef'
-import { Opcode, TempOpcode, env, BytecodeTag, JSAtom, PC2Line, OPCODE_DEFS } from '../env'
+import { Opcode, TempOpcode, env, BytecodeTag, JSAtom, PC2Line, OPCODE_DEFS, JSMode, JS_EVAL_TYPE_GLOBAL, JS_EVAL_TYPE_MODULE } from '../env'
 import { BytecodeBuilder } from './BytecodeBuilder'
 import { DebugInfoBuilder } from './DebugInfoBuilder'
 
@@ -806,7 +806,7 @@ export class Compiler {
     }
 
     // 检查全局词法变量
-    if (fd.isEval && fd.evalType === 0 /* JS_EVAL_TYPE_GLOBAL */) {
+    if (fd.isEval && fd.evalType === JS_EVAL_TYPE_GLOBAL) {
       if (this.findLexicalGlobalVar(fd, name)) {
         return env.globalVarOffset
       }
@@ -949,7 +949,7 @@ export class Compiler {
         fd.funcVarIdx = idx
         fd.vars[idx].varKind = JSVarKindEnum.JS_VAR_FUNCTION_NAME
         // 严格模式下，函数名是 const
-        if (fd.jsMode & 0x01 /* JS_MODE_STRICT */) {
+        if (fd.jsMode & JSMode.JS_MODE_STRICT) {
           fd.vars[idx].isConst = true
         }
       }
@@ -1291,7 +1291,7 @@ export class Compiler {
           if (idx < env.globalVarOffset) {
             if (fd.vars[idx].scopeLevel === fd.scopeLevel) {
               // 同一作用域: 非严格模式下函数可以重定义 (annex B.3.3.4)
-              if (!((fd.jsMode & 0x01) === 0 &&  // !JS_MODE_STRICT
+              if (!((fd.jsMode & JSMode.JS_MODE_STRICT) === 0 &&  // !JS_MODE_STRICT
                     varDefType === JSVarDefEnum.JS_VAR_DEF_FUNCTION_DECL &&
                     fd.vars[idx].varKind === JSVarKindEnum.JS_VAR_FUNCTION_DECL)) {
                 throw new Error('invalid redefinition of lexical identifier')
@@ -1330,8 +1330,8 @@ export class Compiler {
 
         // eval 全局/模块作用域的特殊处理
         if (fd.isEval &&
-            (fd.evalType === 0 /* JS_EVAL_TYPE_GLOBAL */ ||
-             fd.evalType === 1 /* JS_EVAL_TYPE_MODULE */) &&
+            (fd.evalType === JS_EVAL_TYPE_GLOBAL ||
+             fd.evalType === JS_EVAL_TYPE_MODULE) &&
             fd.scopeLevel === fd.bodyScope) {
           const hf = this.addGlobalVar(fd, name)
           if (!hf) return -1
@@ -1369,7 +1369,7 @@ export class Compiler {
         if (fd.isGlobalVar) {
           const hf = this.findGlobalVar(fd, name)
           if (hf && hf.isLexical && hf.scopeLevel === fd.scopeLevel &&
-              fd.evalType === 1 /* JS_EVAL_TYPE_MODULE */) {
+              fd.evalType === JS_EVAL_TYPE_MODULE) {
             throw new Error('invalid redefinition of lexical identifier')
           }
           const newHf = this.addGlobalVar(fd, name)

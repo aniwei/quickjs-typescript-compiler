@@ -1,6 +1,17 @@
 import ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
-import { Opcode, TempOpcode, FunctionKind, JSMode, JSAtom } from '../../env'
+import {
+  Opcode,
+  TempOpcode,
+  FunctionKind,
+  JSMode,
+  JSAtom,
+  JS_ATOM_NULL,
+  JS_DEFINE_CLASS_HAS_HERITAGE,
+  OP_DEFINE_METHOD_METHOD,
+  OP_DEFINE_METHOD_GETTER,
+  OP_DEFINE_METHOD_SETTER,
+} from '../../env'
 import { 
   FunctionDef, 
   JSVarKind,
@@ -159,10 +170,10 @@ export class ClassVisitor extends VisitorContext {
 
     // 保存当前 JS 模式，类在严格模式下解析 - 对应 parser.c:3228-3229
     const savedJsMode = fd.jsMode
-    fd.jsMode |= 0x01 // JS_MODE_STRICT
+    fd.jsMode |= JSMode.JS_MODE_STRICT
 
     // 获取类名 - 对应 parser.c:3231-3245
-    let className: number = 0 // JS_ATOM_NULL
+    let className: number = JS_ATOM_NULL
     let classVarName: number = 0
     if (node.name) {
       className = this.compiler.addAtom(node.name.text)
@@ -170,7 +181,7 @@ export class ClassVisitor extends VisitorContext {
 
     // 对于类声明，需要定义变量 - 对应 parser.c:3246-3252
     if (!isClassExpr) {
-      if (className === 0) {
+      if (className === JS_ATOM_NULL) {
         classVarName = JSAtom.JS_ATOM__default_ // export default
       } else {
         classVarName = className
@@ -184,7 +195,7 @@ export class ClassVisitor extends VisitorContext {
     let classFlags = 0
     const heritage = node.heritageClauses?.find(h => h.token === ts.SyntaxKind.ExtendsKeyword)
     if (heritage && heritage.types.length > 0) {
-      classFlags = 0x01 // JS_DEFINE_CLASS_HAS_HERITAGE
+      classFlags = JS_DEFINE_CLASS_HAS_HERITAGE
       // 编译父类表达式
       this.context.visit(heritage.types[0].expression)
     } else {
@@ -192,7 +203,7 @@ export class ClassVisitor extends VisitorContext {
     }
 
     // 为类名添加 const 定义 - 对应 parser.c:3267-3271
-    if (className !== 0) {
+    if (className !== JS_ATOM_NULL) {
       this.compiler.defineVar(fd, className, JSVarDefEnum.JS_VAR_DEF_CONST)
     }
 
@@ -397,7 +408,7 @@ export class ClassVisitor extends VisitorContext {
     classFlags: number
   ): FunctionDef {
     const sourcePos = node.getStart()
-    const hasHeritage = (classFlags & 0x01) !== 0 // JS_DEFINE_CLASS_HAS_HERITAGE
+    const hasHeritage = (classFlags & JS_DEFINE_CLASS_HAS_HERITAGE) !== 0
 
     // 确定函数类型
     const funcType = hasHeritage
@@ -406,9 +417,9 @@ export class ClassVisitor extends VisitorContext {
 
     // 创建构造函数 FunctionDef
     const ctorFd = new FunctionDef(fd, false, false)
-    // QuickJS: class constructors have a null funcName in the bytecode header
-    // (disasm prints `function: <null>`).
-    ctorFd.funcName = 0 // JS_ATOM_NULL
+    // QuickJS: class constructor 的 bytecode header 里 funcName 是 null
+    //（反汇编会显示为 `function: <null>`）。
+    ctorFd.funcName = JS_ATOM_NULL
     ctorFd.funcType = funcType
     ctorFd.funcKind = JSFunctionKindEnum.JS_FUNC_NORMAL
     ctorFd.filename = fd.filename
@@ -447,8 +458,8 @@ export class ClassVisitor extends VisitorContext {
     isStatic: boolean,
     classFields: [ClassFieldsDef, ClassFieldsDef]
   ): void {
-    // QuickJS anchors method function debug positions to the method name token,
-    // not to modifiers like `static`.
+    // QuickJS：方法函数的 debug 位置锚定在“方法名 token”上，
+    // 而不是 `static` 之类的修饰符。
     const sf = node.getSourceFile()
     const sourcePos = node.name ? node.name.getStart(sf) : node.getStart(sf)
 
@@ -487,7 +498,7 @@ export class ClassVisitor extends VisitorContext {
     const methodFd = new FunctionDef(fd, false, false)
     // QuickJS: class methods have a null funcName in the bytecode header; the
     // name is attached via `define_method` / `set_name`.
-    methodFd.funcName = 0 // JS_ATOM_NULL
+    methodFd.funcName = JS_ATOM_NULL
     methodFd.funcType = funcType
     methodFd.funcKind = funcKind
     methodFd.filename = fd.filename
@@ -523,8 +534,8 @@ export class ClassVisitor extends VisitorContext {
 
     // 处理私有方法 - 对应 parser.c:3541-3563
     if (isPrivate) {
-      // QuickJS: add_private_class_field() creates a lexical const var with
-      // varKind=JS_VAR_PRIVATE_METHOD and records is_static_private.
+      // QuickJS: add_private_class_field() 会创建一个 lexical const 变量（varKind=JS_VAR_PRIVATE_METHOD），
+      // 并记录 is_static_private。
       // third_party/QuickJS/src/core/parser.c:3589-3610 + add_private_class_field()
       if (this.findVarInCurrentScope(fd, methodName) >= 0) {
         throw new Error('private class field is already defined')
@@ -545,7 +556,7 @@ export class ClassVisitor extends VisitorContext {
         this.compiler.emitOp(fd, Opcode.OP_define_method)
         this.compiler.emitAtom(fd, methodName)
       }
-      this.compiler.emitU8(fd, 0) // OP_DEFINE_METHOD_METHOD
+      this.compiler.emitU8(fd, OP_DEFINE_METHOD_METHOD)
     }
   }
 
@@ -559,9 +570,9 @@ export class ClassVisitor extends VisitorContext {
     isSetter: boolean,
     classFields: [ClassFieldsDef, ClassFieldsDef]
   ): void {
-    // QuickJS anchors accessor function debug positions to the `get`/`set` keyword
-    // token (after modifiers like `static`), not to the start of the declaration.
-    // This affects the first pc2line entry for accessors.
+    // QuickJS 会把 accessor 的 debug 位置锚定到 `get`/`set` 关键字 token
+    //（在 `static` 等修饰符之后），而不是整个声明的起始位置。
+    // 这会影响 accessor 的第一条 pc2line。
     const sf = node.getSourceFile()
     const text = sf.text
     const declStart = node.getStart(sf)
@@ -598,7 +609,7 @@ export class ClassVisitor extends VisitorContext {
     // 创建访问器 FunctionDef
     const accessorFd = new FunctionDef(fd, false, false)
     // QuickJS: accessors have a null funcName in the bytecode header.
-    accessorFd.funcName = 0 // JS_ATOM_NULL
+    accessorFd.funcName = JS_ATOM_NULL
     accessorFd.funcType = funcType
     accessorFd.funcKind = JSFunctionKindEnum.JS_FUNC_NORMAL
     accessorFd.filename = fd.filename
@@ -675,8 +686,7 @@ export class ClassVisitor extends VisitorContext {
         this.compiler.emitOp(fd, Opcode.OP_define_method)
         this.compiler.emitAtom(fd, accessorName)
       }
-      // OP_DEFINE_METHOD_GETTER = 1, OP_DEFINE_METHOD_SETTER = 2
-      this.compiler.emitU8(fd, isSetter ? 2 : 1)
+      this.compiler.emitU8(fd, isSetter ? OP_DEFINE_METHOD_SETTER : OP_DEFINE_METHOD_GETTER)
     }
   }
 
@@ -844,11 +854,11 @@ export class ClassVisitor extends VisitorContext {
     classFlags: number,
     classNode: ts.ClassLikeDeclaration
   ): FunctionDef {
-    const hasHeritage = (classFlags & 0x01) !== 0
+    const hasHeritage = (classFlags & JS_DEFINE_CLASS_HAS_HERITAGE) !== 0
 
     const ctorFd = new FunctionDef(fd, false, false)
     // QuickJS: 默认类构造函数在字节码头里 funcName 为 null（名字由外层 class 结构隐式表达）。
-    ctorFd.funcName = 0 // JS_ATOM_NULL
+    ctorFd.funcName = JS_ATOM_NULL
     ctorFd.funcType = hasHeritage
       ? JSParseFunctionEnum.JS_PARSE_FUNC_DERIVED_CLASS_CONSTRUCTOR
       : JSParseFunctionEnum.JS_PARSE_FUNC_CLASS_CONSTRUCTOR
@@ -881,16 +891,16 @@ export class ClassVisitor extends VisitorContext {
     ctorFd.bodyScope = ctorFd.scopeLevel
 
     if (hasHeritage) {
-      // Derived: OP_init_ctor performs the super constructor call.
+      // Derived: OP_init_ctor 执行 super 构造调用。
       this.compiler.emitOp(ctorFd, Opcode.OP_init_ctor)
-      // Bind `this` in the constructor scope.
+      // 在构造函数作用域绑定 `this`。
       this.compiler.emitOp(ctorFd, TempOpcode.OP_scope_put_var_init)
       this.compiler.emitAtom(ctorFd, JSAtom.JS_ATOM_this)
       this.compiler.emitU16(ctorFd, 0)
-      // Then run class field initialization.
+      // 然后执行 class fields 初始化。
       this.emitClassFieldInitInternal(ctorFd)
     } else {
-      // Base: check ctor and run class field initialization.
+      // Base: 检查 ctor 并执行 class fields 初始化。
       this.compiler.emitOp(ctorFd, Opcode.OP_check_ctor)
       this.emitClassFieldInitInternal(ctorFd)
     }
@@ -909,7 +919,7 @@ export class ClassVisitor extends VisitorContext {
   private createFieldsInitFunction(fd: FunctionDef, isStatic: boolean, cf?: ClassFieldsDef): FunctionDef {
     const initFd = new FunctionDef(fd, false, false)
     // QuickJS: class init helper 在字节码头里 funcName 为 null，名字由外层 class opcodes 提供。
-    initFd.funcName = 0 // JS_ATOM_NULL
+    initFd.funcName = JS_ATOM_NULL
     initFd.funcType = JSParseFunctionEnum.JS_PARSE_FUNC_METHOD
     initFd.funcKind = JSFunctionKindEnum.JS_FUNC_NORMAL
     initFd.filename = fd.filename
@@ -1102,6 +1112,6 @@ export class ClassVisitor extends VisitorContext {
     } else if (ts.isPrivateIdentifier(name)) {
       return this.compiler.addAtom(name.text)
     }
-    return 0 // JS_ATOM_NULL for computed property name
+    return JS_ATOM_NULL
   }
 }

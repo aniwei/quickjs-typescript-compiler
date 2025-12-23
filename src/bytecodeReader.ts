@@ -1,4 +1,4 @@
-import { BytecodeTag, firstAtomId } from './env'
+import { BytecodeTag, firstAtomId, JS_FUNCTION_BYTECODE_FLAG_HAS_DEBUG } from './env'
 
 export interface ParsedBytecodeModule {
   version: number
@@ -119,8 +119,6 @@ class Reader {
   }
 }
 
-const HAS_DEBUG_MASK = 1 << 10
-
 function decodeAtomName(atom: number, atoms: string[]): string | undefined {
   if (atom >= firstAtomId) {
     const idx = atom - firstAtomId
@@ -178,7 +176,7 @@ function readFunctionBytecode(reader: Reader, atoms: string[]): FunctionBytecode
 
   const bytecode = reader.readBytes(bytecodeLen)
 
-  const hasDebug = (flags & HAS_DEBUG_MASK) !== 0
+  const hasDebug = (flags & JS_FUNCTION_BYTECODE_FLAG_HAS_DEBUG) !== 0
   let debug: FunctionDebugInfo | undefined
   if (hasDebug) {
     const filenameAtom = readAtom(reader)
@@ -227,12 +225,12 @@ function readFunctionBytecode(reader: Reader, atoms: string[]): FunctionBytecode
           break
         }
         const bytes = reader.readBytes(len)
-        // two's complement little-endian
+        // 二进制补码，小端序（two's complement little-endian）
         let x = 0n
         for (let j = 0; j < bytes.length; j++) {
           x |= BigInt(bytes[j]) << (BigInt(j) * 8n)
         }
-        // sign extend if negative
+        // 若为负数则做符号扩展（sign extend）
         const signBit = bytes[bytes.length - 1] & 0x80
         if (signBit !== 0) {
           const bits = BigInt(bytes.length) * 8n

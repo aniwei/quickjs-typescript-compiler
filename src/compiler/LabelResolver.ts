@@ -22,6 +22,7 @@ import {
 } from '../env'
 import { BytecodeBuilder } from './BytecodeBuilder'
 import { Compiler } from './Compiler'
+import { u32ToI32 } from './int32'
 
 // ============================================================================
 // 常量定义 - 对应 QuickJS parser.c
@@ -49,16 +50,13 @@ const canUseShortOpcodes = () => {
 /** 是否启用短操作码 - 根据运行时检查确定 */
 const USE_SHORT_OPCODES = canUseShortOpcodes()
 
-/** JS 模式: 严格模式 */
-const JS_MODE_STRICT = JS_MODE_STRICT_DEFAULT
-
-/** 特殊对象类型 - 从 env.ts 导入 */
-const OP_SPECIAL_OBJECT_HOME_OBJECT = OPSpecialObjectEnum.OP_SPECIAL_OBJECT_HOME_OBJECT
-const OP_SPECIAL_OBJECT_THIS_FUNC = OPSpecialObjectEnum.OP_SPECIAL_OBJECT_THIS_FUNC
-const OP_SPECIAL_OBJECT_NEW_TARGET = OPSpecialObjectEnum.OP_SPECIAL_OBJECT_NEW_TARGET
-const OP_SPECIAL_OBJECT_ARGUMENTS = OPSpecialObjectEnum.OP_SPECIAL_OBJECT_ARGUMENTS
-const OP_SPECIAL_OBJECT_MAPPED_ARGUMENTS = OPSpecialObjectEnum.OP_SPECIAL_OBJECT_MAPPED_ARGUMENTS
-const OP_SPECIAL_OBJECT_VAR_OBJECT = OPSpecialObjectEnum.OP_SPECIAL_OBJECT_VAR_OBJECT
+/**
+ * 临时 opcode 范围（仅本编译器内部使用，最终会在 LabelResolver 阶段被移除/替换）
+ *
+ * 注意：这不是 QuickJS 的语义常量，因此不注入 env.ts。
+ */
+const TEMP_OPCODE_MIN = 182
+const TEMP_OPCODE_MAX = 200
 
 // ============================================================================
 // 多操作码匹配宏 - 对应 parser.c:10126-10129
@@ -116,7 +114,7 @@ export class LabelResolver {
    */
   private getOpcodeDef(op: number): { id: string; size: number; nPop: number; nPush: number; format: OpFormat } | undefined {
     // 检查是否是临时 opcode（182-200 范围）
-    if (op >= 182 && op <= 200 && TEMP_OPCODE_BY_CODE[op]) {
+    if (op >= TEMP_OPCODE_MIN && op <= TEMP_OPCODE_MAX && TEMP_OPCODE_BY_CODE[op]) {
       return TEMP_OPCODE_BY_CODE[op]
     }
     return OPCODE_BY_CODE[op]
@@ -739,7 +737,7 @@ export class LabelResolver {
       this.optimizeShortJumps(fd, bcOut)
     }
     
-    // Match a small QuickJS optimizer peephole used by class fields init helpers.
+    // 对齐 QuickJS：class fields init helper 相关的一个小型 peephole 优化。
     this.optimizeConstTrueBrandGuard(fd, bcOut)
     this.optimizeConstFalseBrandGuard(fd, bcOut)
 
@@ -751,15 +749,7 @@ export class LabelResolver {
     fd.useShortOpcodes = true
     
     if (process.env.DEBUG_JUMP) {
-      // 检查字节码中的跳转指令
-      const buf = bcOut.buffer
       console.log(`[resolve] Final bcOut.size=${bcOut.size}`)
-      for (let i = 0; i < bcOut.size; i++) {
-        const b = buf[i]
-        if (b === 0x6c || b === 0x6e || b === 0xec || b === 0xee) {
-          console.log(`  [offset ${i}] op=0x${b.toString(16)}`)
-        }
-      }
     }
   }
 
@@ -776,21 +766,21 @@ export class LabelResolver {
     // home_object
     if (fd.homeObjectVarIdx >= 0) {
       bcOut.putU8(Opcode.OP_special_object)
-      bcOut.putU8(OP_SPECIAL_OBJECT_HOME_OBJECT)
+      bcOut.putU8(OPSpecialObjectEnum.OP_SPECIAL_OBJECT_HOME_OBJECT)
       this.putShortCode(bcOut, Opcode.OP_put_loc, fd.homeObjectVarIdx)
     }
     
     // this.active_func
     if (fd.thisActiveFuncVarIdx >= 0) {
       bcOut.putU8(Opcode.OP_special_object)
-      bcOut.putU8(OP_SPECIAL_OBJECT_THIS_FUNC)
+      bcOut.putU8(OPSpecialObjectEnum.OP_SPECIAL_OBJECT_THIS_FUNC)
       this.putShortCode(bcOut, Opcode.OP_put_loc, fd.thisActiveFuncVarIdx)
     }
     
     // new.target
     if (fd.newTargetVarIdx >= 0) {
       bcOut.putU8(Opcode.OP_special_object)
-      bcOut.putU8(OP_SPECIAL_OBJECT_NEW_TARGET)
+      bcOut.putU8(OPSpecialObjectEnum.OP_SPECIAL_OBJECT_NEW_TARGET)
       this.putShortCode(bcOut, Opcode.OP_put_loc, fd.newTargetVarIdx)
     }
     
@@ -807,12 +797,12 @@ export class LabelResolver {
     
     // arguments
     if (fd.argumentsVarIdx >= 0) {
-      if ((fd.jsMode & JS_MODE_STRICT) !== 0 || !fd.hasSimpleParameterList) {
+      if ((fd.jsMode & JS_MODE_STRICT_DEFAULT) !== 0 || !fd.hasSimpleParameterList) {
         bcOut.putU8(Opcode.OP_special_object)
-        bcOut.putU8(OP_SPECIAL_OBJECT_ARGUMENTS)
+        bcOut.putU8(OPSpecialObjectEnum.OP_SPECIAL_OBJECT_ARGUMENTS)
       } else {
         bcOut.putU8(Opcode.OP_special_object)
-        bcOut.putU8(OP_SPECIAL_OBJECT_MAPPED_ARGUMENTS)
+        bcOut.putU8(OPSpecialObjectEnum.OP_SPECIAL_OBJECT_MAPPED_ARGUMENTS)
       }
       if (fd.argumentsArgIdx >= 0) {
         this.putShortCode(bcOut, Opcode.OP_set_loc, fd.argumentsArgIdx)
@@ -823,31 +813,31 @@ export class LabelResolver {
     // func_var (函数表达式名称)
     if (fd.funcVarIdx >= 0) {
       bcOut.putU8(Opcode.OP_special_object)
-      bcOut.putU8(OP_SPECIAL_OBJECT_THIS_FUNC)
+      bcOut.putU8(OPSpecialObjectEnum.OP_SPECIAL_OBJECT_THIS_FUNC)
       this.putShortCode(bcOut, Opcode.OP_put_loc, fd.funcVarIdx)
     }
     
     // var_object (用于 eval)
     if (fd.varObjectIdx >= 0) {
       bcOut.putU8(Opcode.OP_special_object)
-      bcOut.putU8(OP_SPECIAL_OBJECT_VAR_OBJECT)
+      bcOut.putU8(OPSpecialObjectEnum.OP_SPECIAL_OBJECT_VAR_OBJECT)
       this.putShortCode(bcOut, Opcode.OP_put_loc, fd.varObjectIdx)
     }
     
     // arg_var_object (用于 eval 的参数作用域)
     if (fd.argVarObjectIdx >= 0) {
       bcOut.putU8(Opcode.OP_special_object)
-      bcOut.putU8(OP_SPECIAL_OBJECT_VAR_OBJECT)
+      bcOut.putU8(OPSpecialObjectEnum.OP_SPECIAL_OBJECT_VAR_OBJECT)
       this.putShortCode(bcOut, Opcode.OP_put_loc, fd.argVarObjectIdx)
     }
   }
 
   /**
-   * Minimal peephole to match QuickJS optimizer for class fields init helper.
-   *
-   * QuickJS emits a guarded add_brand block in <class_fields_init> starting with
-   * `push_false; if_false ...` and then folds the constant-false branch into an
-   * unconditional `goto8 0`, removing the dead add_brand ops.
+    * 对齐 QuickJS：用于 class fields init helper 的最小 peephole 优化。
+    *
+    * QuickJS 在 <class_fields_init> 中会生成一个受保护的 add_brand 代码块，形状以
+    * `push_false; if_false ...` 开头。随后优化器会将“恒为 false”的分支折叠为
+    * 无条件跳转，并移除死代码（add_brand 相关操作）。
    */
   private optimizeConstFalseBrandGuard(fd: FunctionDef, bcOut: BytecodeBuilder): void {
     const buf = bcOut.buffer
@@ -862,13 +852,13 @@ export class LabelResolver {
         buf[pc + 4] === Opcode.OP_get_loc1 &&
         buf[pc + 5] === Opcode.OP_add_brand
       ) {
-        // Replace with `goto8 1` and delete the 4 extra bytes.
+        // 替换为 `goto8 1`，并删除多余的 4 个字节。
         buf[pc] = Opcode.OP_goto8
-        // QuickJS short jump targets are relative to (pos + 1).
-        // To jump to the next instruction, diff must be 1.
+        // QuickJS：短跳转目标是相对于 (pos + 1) 的偏移。
+        // 为跳到下一条指令，diff 必须为 1。
         buf[pc + 1] = 1
 
-        // Remove bytes [pc+2 .. pc+6).
+        // 删除区间 [pc+2 .. pc+6) 的字节。
         this.shrinkBytecode(fd, bcOut, pc, 2, 4)
         return
       }
@@ -876,13 +866,12 @@ export class LabelResolver {
   }
 
   /**
-   * Match QuickJS optimizer for class fields init helper when brand guard is
-   * patched to constant-true.
-   *
-   * Our ClassVisitor emits a placeholder `push_false; if_false8 ...` guard and
-   * later patches `push_false` → `push_true` when a private brand is needed.
-   * QuickJS then folds away the constant-true branch, leaving just the
-   * `get_loc0; get_loc1; add_brand` sequence.
+    * 对齐 QuickJS：当 brand guard 被修补为恒真时的 class fields init helper 优化。
+    *
+    * 我们的 ClassVisitor 会先发射占位的 `push_false; if_false8 ...` guard，
+    * 当需要 private brand 时再将 `push_false` → `push_true`。
+    * QuickJS 随后会折叠掉“恒真”分支，最终只保留
+    * `get_loc0; get_loc1; add_brand` 这一段序列。
    */
   private optimizeConstTrueBrandGuard(fd: FunctionDef, bcOut: BytecodeBuilder): void {
     const buf = bcOut.buffer
@@ -893,13 +882,13 @@ export class LabelResolver {
       if (
         buf[pc] === Opcode.OP_push_true &&
         buf[pc + 1] === Opcode.OP_if_false8 &&
-        // This guard should skip exactly to the instruction after add_brand.
+        // 该 guard 必须精确跳过到 add_brand 之后的下一条指令。
         buf[pc + 2] === 4 &&
         buf[pc + 3] === Opcode.OP_get_loc0 &&
         buf[pc + 4] === Opcode.OP_get_loc1 &&
         buf[pc + 5] === Opcode.OP_add_brand
       ) {
-        // Remove `push_true; if_false8 <imm>` (3 bytes), keep brand ops.
+        // 移除 `push_true; if_false8 <imm>`（共 3 字节），保留 brand ops。
         this.shrinkBytecode(fd, bcOut, pc, 0, 3)
         return
       }
@@ -1457,14 +1446,13 @@ export class LabelResolver {
    * 添加 pc2line 信息 - 对应 parser.c:add_pc2line_info
    */
   private addPc2lineInfo(fd: FunctionDef, pc: number, sourcePos: number): void {
-    // Mirror QuickJS add_pc2line_info: only record if slots are allocated.
+    // 对齐 QuickJS add_pc2line_info：仅当已分配 slots 时才记录。
     if (fd.lineNumberSize <= 0 || fd.lineNumberSlots.length === 0) return
 
-    // Mirror QuickJS: stop if capacity is exhausted (capacity should be precomputed).
+    // 对齐 QuickJS：容量耗尽则停止（容量应在前面预估并一次性分配）。
     if (fd.lineNumberCount >= fd.lineNumberSize) return
 
-    // Mirror QuickJS add_pc2line_info: only record monotonically increasing PCs
-    // and skip identical source positions.
+    // 对齐 QuickJS add_pc2line_info：只记录单调递增的 PC，并跳过重复的 sourcePos。
     if (pc < fd.lineNumberLastPc || sourcePos === fd.lineNumberLast) {
       return
     }
@@ -1752,6 +1740,6 @@ export class LabelResolver {
 
   private getI32(buf: Uint8Array, pos: number): number {
     const val = this.getU32(buf, pos)
-    return val > 0x7FFFFFFF ? val - 0x100000000 : val
+    return u32ToI32(val >>> 0)
   }
 }

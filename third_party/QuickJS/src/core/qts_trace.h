@@ -1,8 +1,8 @@
 /*
  * QuickJS TypeScript Compiler - Trace/Debug utilities
  *
- * This file provides debugging utilities for tracing the compilation
- * process to help verify the TypeScript transpilation matches QuickJS.
+ * 本文件提供编译过程的埋点/调试工具，用于跟踪 QuickJS 的编译行为，
+ * 帮助验证 TypeScript 侧的 lowering 是否与 QuickJS 保持逐字节一致。
  */
 
 #pragma once
@@ -18,17 +18,17 @@ extern "C" {
  * Trace Configuration
  * ============================================================================
  * 
- * QTS_TRACE_ENABLED: Master switch for all tracing
- * QTS_TRACE_LEVEL: Verbosity level (1=minimal, 2=detailed, 3=verbose)
+ * QTS_TRACE_ENABLED: 总开关（0/1），控制是否输出任何 trace
+ * QTS_TRACE_LEVEL: 详细程度（1=最少，2=详细，3=最详细）
  * 
- * Individual trace categories:
- *   QTS_TRACE_EMIT       - Bytecode emission (emit_op, emit_u8, etc.)
- *   QTS_TRACE_VARIABLE   - Variable resolution
- *   QTS_TRACE_CLOSURE    - Closure variable handling
- *   QTS_TRACE_LABEL      - Label resolution
- *   QTS_TRACE_STACK      - Stack size computation
- *   QTS_TRACE_SCOPE      - Scope management
- *   QTS_TRACE_ASSIGN     - 赋值/左值处理 (get_lvalue/put_lvalue/复合赋值)
+ * 分类开关（默认：开启 trace 时各类都开启；也可单独覆盖）：
+ *   QTS_TRACE_EMIT       - 字节码发射（emit_op/emit_u8/...）
+ *   QTS_TRACE_VARIABLE   - 变量解析
+ *   QTS_TRACE_CLOSURE    - 闭包变量处理
+ *   QTS_TRACE_LABEL      - 标签/跳转解析
+ *   QTS_TRACE_STACK      - 栈深计算
+ *   QTS_TRACE_SCOPE      - 作用域管理
+ *   QTS_TRACE_ASSIGN     - 赋值/左值处理（get_lvalue/put_lvalue/复合赋值）
  */
 
 #ifndef QTS_TRACE_ENABLED
@@ -122,11 +122,23 @@ extern "C" {
 
 #define QTS_TRACE_VAR_EMIT(op, idx) \
     fprintf(stderr, "[QTS:VAR]   emit: op=%d idx=%d\n", (int)(op), (int)(idx))
+
+/* Hoisted definitions / global var init tracing */
+#define QTS_TRACE_VAR_HOIST_BEGIN(eval_type, is_module, global_var_count, closure_var_count) \
+    fprintf(stderr, "[QTS:VAR] hoist: eval_type=%d module=%d globals=%d closures=%d\n", \
+            (int)(eval_type), (int)(is_module), (int)(global_var_count), (int)(closure_var_count))
+
+#define QTS_TRACE_VAR_HOIST_GLOBAL(var_name, has_closure, flags, cpool_idx, is_lexical, is_const, force_init) \
+    fprintf(stderr, "[QTS:VAR]   global: atom=%d has_closure=%d flags=0x%02x cpool=%d lexical=%d const=%d force_init=%d\n", \
+            (int)(var_name), (int)(has_closure), (int)(flags), (int)(cpool_idx), \
+            (int)(is_lexical), (int)(is_const), (int)(force_init))
 #else
 #define QTS_TRACE_VAR_RESOLVE(name, scope, op)
 #define QTS_TRACE_VAR_FOUND(idx, is_arg)
 #define QTS_TRACE_VAR_NOT_FOUND(name)
 #define QTS_TRACE_VAR_EMIT(op, idx)
+#define QTS_TRACE_VAR_HOIST_BEGIN(eval_type, is_module, global_var_count, closure_var_count)
+#define QTS_TRACE_VAR_HOIST_GLOBAL(var_name, has_closure, flags, cpool_idx, is_lexical, is_const, force_init)
 #endif
 
 /* Closure variable tracing */
@@ -150,6 +162,13 @@ extern "C" {
 
 /* Label resolution tracing */
 #if QTS_TRACE_LABEL
+#define QTS_TRACE_LABEL_BEGIN(bc_len, label_count, jump_size, line_number_size, strip_debug) \
+    fprintf(stderr, "[QTS:LABEL] begin: bc_len=%d label_count=%d jump_size=%d line_number_size=%d strip_debug=%d\n", \
+            (int)(bc_len), (int)(label_count), (int)(jump_size), (int)(line_number_size), (int)(strip_debug))
+
+#define QTS_TRACE_LABEL_END(out_len) \
+    fprintf(stderr, "[QTS:LABEL] end: out_len=%d\n", (int)(out_len))
+
 #define QTS_TRACE_LABEL_NEW(label) \
     fprintf(stderr, "[QTS:LABEL] new: label=%d\n", (int)(label))
 
@@ -162,6 +181,8 @@ extern "C" {
 #define QTS_TRACE_LABEL_RESOLVE(label, addr) \
     fprintf(stderr, "[QTS:LABEL] resolve: label=%d addr=%d\n", (int)(label), (int)(addr))
 #else
+#define QTS_TRACE_LABEL_BEGIN(bc_len, label_count, jump_size, line_number_size, strip_debug)
+#define QTS_TRACE_LABEL_END(out_len)
 #define QTS_TRACE_LABEL_NEW(label)
 #define QTS_TRACE_LABEL_EMIT(label, pos)
 #define QTS_TRACE_LABEL_GOTO(opcode, label)
@@ -232,6 +253,8 @@ extern "C" {
 #define QTS_TRACE_VAR_FOUND(idx, is_arg)
 #define QTS_TRACE_VAR_NOT_FOUND(name)
 #define QTS_TRACE_VAR_EMIT(op, idx)
+#define QTS_TRACE_VAR_HOIST_BEGIN(eval_type, is_module, global_var_count, closure_var_count)
+#define QTS_TRACE_VAR_HOIST_GLOBAL(var_name, has_closure, flags, cpool_idx, is_lexical, is_const, force_init)
 #define QTS_TRACE_CLOSURE_ADD(var_idx, is_local, is_arg, var_name)
 #define QTS_TRACE_CLOSURE_GET(fd_idx, var_idx, is_arg)
 #define QTS_TRACE_CLOSURE_CAPTURE(var_idx, var_name)

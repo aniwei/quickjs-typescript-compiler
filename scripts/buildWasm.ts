@@ -242,6 +242,7 @@ function buildWasm(opts: Options) {
         LABEL: resolveCategory('QTS_TRACE_LABEL'),
         STACK: resolveCategory('QTS_TRACE_STACK'),
         SCOPE: resolveCategory('QTS_TRACE_SCOPE'),
+        ASSIGN: resolveCategory('QTS_TRACE_ASSIGN'),
       },
     },
   }

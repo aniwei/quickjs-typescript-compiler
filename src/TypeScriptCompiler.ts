@@ -1,7 +1,7 @@
 import ts from 'typescript'
 import { Compiler, Label } from './compiler/Compiler'
 import { FunctionDef, JSVarKind, JSVarDef, JSClosureVar, JSVarScope } from './compiler/FunctionDef'
-import { JSAtom, JSMode, Opcode, FunctionKind, OPCODE_BY_CODE, TempOpcode, TEMP_OPCODE_BY_CODE } from './env'
+import { JSAtom, JSMode, Opcode, FunctionKind, OPCODE_BY_CODE, TempOpcode, TEMP_OPCODE_BY_CODE, JS_EVAL_TYPE_GLOBAL } from './env'
 import { ScopeManager, VarInfo, Scope } from './compiler/ScopeManager'
 import { LabelManager, LoopInfo } from './compiler/LabelManager'
 
@@ -103,7 +103,8 @@ export class TypeScriptCompiler implements CompilerContext {
     // 2. 创建根 FunctionDef - 对应 js_new_function_def (parser.c:8215-8285)
     const fd = new FunctionDef()
     fd.isEval = true
-    fd.evalType = 1 // JS_EVAL_TYPE_GLOBAL
+    // QuickJS: JS_EVAL_TYPE_GLOBAL = (0 << 0)
+    fd.evalType = JS_EVAL_TYPE_GLOBAL
     fd.isGlobalVar = true
     fd.hasThisBinding = true
     fd.newTargetAllowed = false

@@ -3,8 +3,9 @@ import {
   FunctionDef, 
   JS_STACK_SIZE_MAX,
 } from './FunctionDef'
-import { Opcode, OPCODE_DEFS, OPCODE_BY_CODE, OpFormat } from '../env'
+import { Opcode, OPCODE_DEFS, OPCODE_BY_CODE, OpFormat, STACK_LEVEL_UNSET } from '../env'
 import { Compiler } from './Compiler'
+import { u32ToI32 } from './int32'
 
 // ============================================================================
 // 栈大小计算器 - 对应 parser.c:compute_stack_size
@@ -71,7 +72,7 @@ export class StackSizeComputer {
       bcBuf,
       bcLen,
       stackLenMax: 0,
-      stackLevelTab: new Uint16Array(bcLen).fill(0xffff),
+      stackLevelTab: new Uint16Array(bcLen).fill(STACK_LEVEL_UNSET),
       catchPosTab: new Int32Array(bcLen).fill(-1),
       fromPosTab: new Int32Array(bcLen).fill(-1),
       fromOpTab: new Uint8Array(bcLen).fill(0),
@@ -361,7 +362,7 @@ export class StackSizeComputer {
       }
     }
     
-    if (s.stackLevelTab[pos] !== 0xffff) {
+    if (s.stackLevelTab[pos] !== STACK_LEVEL_UNSET) {
       // 已探索: 检查一致性
       if (s.stackLevelTab[pos] !== stackLen) {
         const prevFromPos = s.fromPosTab[pos]
@@ -461,7 +462,7 @@ export class StackSizeComputer {
       }
 
       const stack = s.stackLevelTab[pc]
-      const stackStr = stack === 0xffff ? '??' : String(stack)
+      const stackStr = stack === STACK_LEVEL_UNSET ? '??' : String(stack)
       const pops = def?.nPop ?? 0
       const pushes = def?.nPush ?? 0
       return `pc=${pc.toString().padStart(4)} stack=${stackStr.padStart(2)} op=${opName(opcode).padEnd(26)} bytes=${bytes.padEnd(14)} pop=${pops} push=${pushes}${extra}`
@@ -533,7 +534,7 @@ export class StackSizeComputer {
       }
 
       const stack = s.stackLevelTab[pc]
-      const stackStr = stack === 0xffff ? '??' : String(stack)
+      const stackStr = stack === STACK_LEVEL_UNSET ? '??' : String(stack)
       const pops = def?.nPop ?? 0
       const pushes = def?.nPush ?? 0
       return `pc=${pc.toString().padStart(4)} stack=${stackStr.padStart(2)} op=${opName(opcode).padEnd(26)} bytes=${bytes.padEnd(14)} pop=${pops} push=${pushes}${extra}`
@@ -614,6 +615,6 @@ export class StackSizeComputer {
 
   private getI32(buf: Uint8Array, pos: number): number {
     const val = this.getU32(buf, pos)
-    return val > 0x7FFFFFFF ? val - 0x100000000 : val
+    return u32ToI32(val >>> 0)
   }
 }

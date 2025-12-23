@@ -8,21 +8,29 @@ import {
   ARG_SCOPE_END,
   LabelSlot,
 } from './FunctionDef'
-import { Opcode, TempOpcode, OPCODE_DEFS, OPCODE_BY_CODE, TEMP_OPCODE_BY_CODE, TEMP_OPCODE_DEFS, JSAtom } from '../env'
+import {
+  Opcode,
+  TempOpcode,
+  OPCODE_DEFS,
+  OPCODE_BY_CODE,
+  TEMP_OPCODE_BY_CODE,
+  TEMP_OPCODE_DEFS,
+  JSAtom,
+  JSMode,
+  TEMP_OPCODE_MIN,
+  TEMP_OPCODE_MAX,
+  DEFINE_GLOBAL_LEX_VAR,
+  DEFINE_GLOBAL_FUNC_VAR,
+  JS_PROP_CONFIGURABLE,
+  JS_PROP_WRITABLE,
+  JS_EVAL_TYPE_GLOBAL,
+  JS_THROW_VAR_RO,
+  JS_THROW_VAR_REDECL,
+  JS_THROW_VAR_UNINITIALIZED,
+} from '../env'
 import { BytecodeBuilder } from './BytecodeBuilder'
 import { Compiler } from './Compiler'
-
-// ============================================================================
-// 常量定义 - 对应 QuickJS parser.c
-// ============================================================================
-
-/** JS 模式: 严格模式 */
-const JS_MODE_STRICT = 0x01
-
-/** JS 抛出错误类型 */
-const JS_THROW_VAR_RO = 0      // 只读变量
-const JS_THROW_VAR_REDECL = 1  // 变量重声明
-const JS_THROW_VAR_UNINITIALIZED = 2 // 变量未初始化
+import { u32ToI32 } from './int32'
 
 // ============================================================================
 // 代码上下文 - 对应 parser.c:CodeContext
@@ -68,7 +76,7 @@ export class VariableResolver {
    */
   private getOpcodeDef(op: number) {
     // 检查是否是临时 opcode（182-200 范围）
-    if (op >= 182 && op <= 200 && TEMP_OPCODE_BY_CODE[op]) {
+    if (op >= TEMP_OPCODE_MIN && op <= TEMP_OPCODE_MAX && TEMP_OPCODE_BY_CODE[op]) {
       return TEMP_OPCODE_BY_CODE[op]
     }
     return OPCODE_BY_CODE[op]
@@ -217,11 +225,7 @@ export class VariableResolver {
     bcLen: number,
     bcOut: BytecodeBuilder
   ): void {
-    const isStrict = (fd.jsMode & JS_MODE_STRICT) !== 0
-    
-    // 常量定义 - 对应 runtime.h:50-51
-    const DEFINE_GLOBAL_LEX_VAR = 0x80   // 1 << 7
-    const DEFINE_GLOBAL_FUNC_VAR = 0x40  // 1 << 6
+    const isStrict = (fd.jsMode & JSMode.JS_MODE_STRICT) !== 0
     
     // 遍历全局变量，添加检查指令
     // 对应 parser.c:10458-10502
@@ -578,16 +582,12 @@ export class VariableResolver {
       return
     }
     
-    // 常量定义 - 对应 runtime.h
-    const DEFINE_GLOBAL_LEX_VAR = 0x80   // 1 << 7
-    const JS_PROP_CONFIGURABLE = 0x01    // 1 << 0
-    const JS_PROP_WRITABLE = 0x02        // 1 << 1
-    
     for (const hf of fd.globalVars) {
       // 计算 flags
       let flags = 0
-      if (fd.evalType !== 1) { // JS_EVAL_TYPE_GLOBAL = 1
-        flags |= JS_PROP_CONFIGURABLE // 0x01
+      // QuickJS: instantiate_hoisted_definitions() 里只有非 global eval 才会加 configurable
+      if (fd.evalType !== JS_EVAL_TYPE_GLOBAL) {
+        flags |= JS_PROP_CONFIGURABLE
       }
       
       if (hf.cpoolIdx >= 0 && !hf.isLexical) {
@@ -605,9 +605,9 @@ export class VariableResolver {
       } else {
         // 变量定义
         if (hf.isLexical) {
-          flags |= DEFINE_GLOBAL_LEX_VAR // 0x80
+          flags |= DEFINE_GLOBAL_LEX_VAR
           if (!hf.isConst) {
-            flags |= JS_PROP_WRITABLE // 0x02
+            flags |= JS_PROP_WRITABLE
           }
         }
         bcOut.putU8(Opcode.OP_define_var)
@@ -1354,7 +1354,7 @@ export class VariableResolver {
     labelIdx: number,
     varName: number
   ): void {
-    const isStrict = (fd.jsMode & JS_MODE_STRICT) !== 0
+    const isStrict = (fd.jsMode & JSMode.JS_MODE_STRICT) !== 0
     const ls = fd.labelSlots[labelIdx]
     const labelPos = ls.pos
     
@@ -1694,6 +1694,6 @@ export class VariableResolver {
 
   private getI32(buf: Uint8Array, pos: number): number {
     const val = this.getU32(buf, pos)
-    return val > 0x7FFFFFFF ? val - 0x100000000 : val
+    return u32ToI32(val >>> 0)
   }
 }

@@ -164,6 +164,11 @@ export class FunctionBuilder {
    */
   build(fd: FunctionDef): JSFunctionBytecode {
     const b = new JSFunctionBytecode()
+
+    const isLikelyJumpOpcode = (id: string | undefined): boolean => {
+      if (!id) return false
+      return id.includes('goto') || id.includes('if_true') || id.includes('if_false') || id.includes('gosub') || id.includes('catch')
+    }
     
     // 1. 重新计算作用域链接 - parser.c:12448-12471
     this.recomputeScopeLinkage(fd)
@@ -187,8 +192,9 @@ export class FunctionBuilder {
       const buf = b.byteCodeBuf
       for (let i = 0; i < b.byteCodeLen; i++) {
         const byte = buf[i]
-        if (byte === 0x6c || byte === 0x6e || byte === 0xec || byte === 0xee) {
-          console.log(`  [offset ${i}] op=0x${byte.toString(16)}`)
+        const def = OPCODE_BY_CODE[byte]
+        if (isLikelyJumpOpcode(def?.id)) {
+          console.log(`  [offset ${i}] op=0x${byte.toString(16)} (${def?.id ?? 'unknown'})`)
         }
       }
     }
@@ -199,9 +205,9 @@ export class FunctionBuilder {
     // 5. 复制变量定义 - parser.c:12580-12603
     if (fd.argCount + fd.varCount > 0) {
       if (!fd.stripDebug || fd.hasEvalCall) {
-        // QuickJS add_arg() memset()'s the vardef, so arg.scopeNext defaults to 0
-        // (encoded as scopeNextPlus1=1). Ensure we match this even if a synthetic
-        // arg somehow left scopeNext uninitialized.
+        // QuickJS 的 add_arg() 会对 vardef 做 memset，因此 arg.scopeNext 默认是 0
+        //（编码为 scopeNextPlus1=1）。即使某些合成参数意外留下未初始化的 scopeNext，
+        // 这里也要强制对齐 QuickJS 的默认行为。
         for (const arg of fd.args) {
           if (arg.scopeNext < 0) arg.scopeNext = 0
         }
@@ -496,13 +502,19 @@ export class BytecodeWriter {
     // 创建副本以便修改 atom 引用
     const buf = new Uint8Array(bcLen)
     buf.set(bcBuf.subarray(0, bcLen))
+
+    const isLikelyJumpOpcode = (id: string | undefined): boolean => {
+      if (!id) return false
+      return id.includes('goto') || id.includes('if_true') || id.includes('if_false')
+    }
     
     if (process.env.DEBUG_JUMP) {
       console.log(`[writeBytecodeBuf] bcLen=${bcLen}`)
       for (let i = 0; i < bcLen; i++) {
         const byte = buf[i]
-        if (byte === 0x6c || byte === 0x6e || byte === 0xec || byte === 0xee) {
-          console.log(`  [BEFORE offset ${i}] op=0x${byte.toString(16)}`)
+        const def = OPCODE_BY_CODE[byte]
+        if (isLikelyJumpOpcode(def?.id)) {
+          console.log(`  [BEFORE offset ${i}] op=0x${byte.toString(16)} (${def?.id ?? 'unknown'})`)
         }
       }
     }
@@ -513,7 +525,7 @@ export class BytecodeWriter {
       const op = buf[pos]
       const opDef = OPCODE_BY_CODE[op]
       
-      if (process.env.DEBUG_JUMP && (op === 0xec || op === 0xee || op === 0x6c || op === 0x6e)) {
+      if (process.env.DEBUG_JUMP && isLikelyJumpOpcode(opDef?.id)) {
         console.log(`  [writeBytecodeBuf] At pos ${pos}: op=0x${op.toString(16)}, opDef=${opDef ? opDef.id + ' size=' + opDef.size : 'null'}`)
       }
       

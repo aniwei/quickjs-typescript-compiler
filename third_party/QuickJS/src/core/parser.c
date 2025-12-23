@@ -10269,6 +10269,9 @@ static void
 instantiate_hoisted_definitions(JSContext* ctx, JSFunctionDef* s, DynBuf* bc) {
   int i, idx, label_next = -1;
 
+  /* Trace only: does not affect emitted bytecode */
+  QTS_TRACE_VAR_HOIST_BEGIN(s->eval_type, !!s->module, s->global_var_count, s->closure_var_count);
+
   /* add the hoisted functions in arguments and local variables */
   for (i = 0; i < s->arg_count; i++) {
     JSVarDef* vd = &s->args[i];
@@ -10337,6 +10340,9 @@ instantiate_hoisted_definitions(JSContext* ctx, JSFunctionDef* s, DynBuf* bc) {
       flags = 0;
       if (s->eval_type != JS_EVAL_TYPE_GLOBAL)
         flags |= JS_PROP_CONFIGURABLE;
+
+      QTS_TRACE_VAR_HOIST_GLOBAL(hf->var_name, has_closure, flags, hf->cpool_idx,
+                                hf->is_lexical, hf->is_const, force_init);
       if (hf->cpool_idx >= 0 && !hf->is_lexical) {
         /* global function definitions need a specific handling */
         dbuf_putc(bc, OP_fclosure);
@@ -11129,6 +11135,8 @@ static __exception int resolve_labels(JSContext* ctx, JSFunctionDef* s) {
   cc.bc_len = bc_len = s->byte_code.size;
   js_dbuf_init(ctx, &bc_out);
 
+  QTS_TRACE_LABEL_BEGIN(bc_len, s->label_count, s->jump_size, s->line_number_size, s->strip_debug);
+
 #if SHORT_OPCODES
   if (s->jump_size) {
     s->jump_slots = js_mallocz(s->ctx, sizeof(*s->jump_slots) * s->jump_size);
@@ -11224,6 +11232,7 @@ static __exception int resolve_labels(JSContext* ctx, JSFunctionDef* s) {
         ls = &label_slots[label];
         JS_ASSERT_CONTEXT(ctx, ls->addr == -1);
         ls->addr = bc_out.size;
+        QTS_TRACE_LABEL_EMIT(label, bc_out.size);
         /* resolve the relocation entries */
         for (re = ls->first_reloc; re != NULL; re = re_next) {
           int diff = ls->addr - re->addr;
@@ -11303,6 +11312,7 @@ static __exception int resolve_labels(JSContext* ctx, JSFunctionDef* s) {
              get_loc / get_arg / get_var_ref
            */
         }
+        QTS_TRACE_LABEL_GOTO(op, label);
         goto has_label;
 
       case OP_gosub:
@@ -11315,10 +11325,12 @@ static __exception int resolve_labels(JSContext* ctx, JSFunctionDef* s) {
             break;
           }
         }
+        QTS_TRACE_LABEL_GOTO(op, label);
         goto has_label;
 
       case OP_catch:
         label = get_u32(bc_buf + pos + 1);
+        QTS_TRACE_LABEL_GOTO(op, label);
         goto has_label;
 
       case OP_if_true:
@@ -11347,6 +11359,7 @@ static __exception int resolve_labels(JSContext* ctx, JSFunctionDef* s) {
             }
           }
         }
+        QTS_TRACE_LABEL_GOTO(op, label);
       has_label:
         add_pc2line_info(s, bc_out.size, line_num);
         if (op == OP_goto) {
@@ -11354,6 +11367,9 @@ static __exception int resolve_labels(JSContext* ctx, JSFunctionDef* s) {
         }
         JS_ASSERT_CONTEXT(ctx, label >= 0 && label < s->label_count);
         ls = &label_slots[label];
+        if (ls->addr != -1) {
+          QTS_TRACE_LABEL_RESOLVE(label, ls->addr);
+        }
 #if SHORT_OPCODES
         jp = &s->jump_slots[s->jump_count++];
         jp->op = op;
@@ -12138,10 +12154,12 @@ static __exception int resolve_labels(JSContext* ctx, JSFunctionDef* s) {
     JS_ThrowOutOfMemory(ctx);
     return -1;
   }
+  QTS_TRACE_LABEL_END(s->byte_code.size);
   return 0;
 fail:
   /* XXX: not safe */
   dbuf_free(&bc_out);
+  QTS_TRACE_LABEL_END(-1);
   return -1;
 }
 
@@ -12407,12 +12425,14 @@ compute_stack_size(JSContext* ctx, JSFunctionDef* fd, int* pstack_size) {
   js_free(ctx, s->catch_pos_tab);
   js_free(ctx, s->stack_level_tab);
   *pstack_size = s->stack_len_max;
+  QTS_TRACE_STACK_RESULT(s->stack_len_max, fd->var_count);
   return 0;
 fail:
   js_free(ctx, s->pc_stack);
   js_free(ctx, s->catch_pos_tab);
   js_free(ctx, s->stack_level_tab);
   *pstack_size = 0;
+  QTS_TRACE_STACK_RESULT(0, fd->var_count);
   return -1;
 }
 

@@ -1,7 +1,7 @@
 import ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
 import { CompilerContext } from '../CompilerContext'
-import { Opcode, TempOpcode, FunctionKind, JSMode, JSAtom } from '../../env'
+import { Opcode, TempOpcode, FunctionKind, JSMode, JSAtom, JS_ATOM_NULL } from '../../env'
 import { 
   FunctionDef, 
   JSVarKind,
@@ -31,7 +31,7 @@ export class FunctionVisitor extends VisitorContext {
   private hoisted: Map<ts.FunctionDeclaration, { fd: FunctionDef, childIdx: number, cpoolIdx: number }> = new Map()
 
   private inferSetNameAtomFromContext(expr: ts.Expression): number {
-    // Unwrap parentheses: `const x = ((...) => ...)`
+    // 处理多层括号：例如 `const x = ((...) => ...)`
     let cur: ts.Node = expr
     while (cur.parent && ts.isParenthesizedExpression(cur.parent)) {
       cur = cur.parent
@@ -104,7 +104,7 @@ export class FunctionVisitor extends VisitorContext {
     // 获取函数名
     const funcName = node.name 
       ? this.compiler.addAtom(node.name.text)
-      : 0 // JS_ATOM_NULL
+      : JS_ATOM_NULL
 
     // 创建子函数定义 - 对应 parser.c:13004-13015 js_new_function_def
     const fd = new FunctionDef(parentFd, false, false)
@@ -182,7 +182,7 @@ export class FunctionVisitor extends VisitorContext {
     // 获取函数名 (可选)
     const funcName = node.name
       ? this.compiler.addAtom(node.name.text)
-      : 0 // JS_ATOM_NULL
+      : JS_ATOM_NULL
 
     // 创建子函数定义 - 对应 parser.c:13004-13015
     const fd = new FunctionDef(parentFd, false, true) // isFuncExpr = true
@@ -219,9 +219,9 @@ export class FunctionVisitor extends VisitorContext {
     this.compiler.emitU32(parentFd, cpoolIdx)
 
     // 如果没有名称，尝试从赋值/初始化上下文推断 (QuickJS 行为)
-    if (funcName === 0) {
+    if (funcName === JS_ATOM_NULL) {
       this.compiler.emitOp(parentFd, Opcode.OP_set_name)
-      this.compiler.emitU32(parentFd, this.inferSetNameAtomFromContext(node) || 0) // JS_ATOM_NULL
+      this.compiler.emitU32(parentFd, this.inferSetNameAtomFromContext(node) || JS_ATOM_NULL)
     }
   }
 
@@ -287,7 +287,7 @@ export class FunctionVisitor extends VisitorContext {
 
     // 箭头函数没有名称，但可能从赋值推断
     this.compiler.emitOp(parentFd, Opcode.OP_set_name)
-    this.compiler.emitU32(parentFd, this.inferSetNameAtomFromContext(node) || 0) // JS_ATOM_NULL
+    this.compiler.emitU32(parentFd, this.inferSetNameAtomFromContext(node) || JS_ATOM_NULL)
   }
 
   // ============================================================================
@@ -303,8 +303,8 @@ export class FunctionVisitor extends VisitorContext {
    */
   visitMethodDefinition(node: ts.MethodDeclaration): void {
     const parentFd = this.funcDef!
-    // QuickJS anchors method functions to the method name token (not modifiers like `static`).
-    // This affects the initial (line,col) in pc2line for the method function.
+    // QuickJS：方法函数的 debug 位置锚定在“方法名 token”上（而不是 `static` 等修饰符）。
+    // 这会影响该方法函数的 pc2line 初始 (line,col)。
     const sf = node.getSourceFile()
     const sourcePos = node.name ? node.name.getStart(sf) : node.getStart(sf)
 
@@ -526,11 +526,11 @@ export class FunctionVisitor extends VisitorContext {
       return this.compiler.addAtom(name.text)
     } else if (ts.isComputedPropertyName(name)) {
       // 计算属性名需要特殊处理
-      return 0 // JS_ATOM_NULL
+      return JS_ATOM_NULL
     } else if (ts.isPrivateIdentifier(name)) {
       return this.compiler.addAtom(name.text)
     }
-    return 0
+    return JS_ATOM_NULL
   }
 
   /**

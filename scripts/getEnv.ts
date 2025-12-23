@@ -55,6 +55,47 @@ async function main() {
   lines.push(`export const firstAtomId = ${firstAtomId}`)
   lines.push(``)
 
+  // QuickJS 常量（来自 QuickJS 头文件；用于 TS 侧对齐与消除魔数）
+  lines.push(`// QuickJS 常量（来自 QuickJS 头文件；用于 TS 侧对齐与消除魔数）`)
+  lines.push(`// third_party/QuickJS/include/QuickJS/quickjs.h:61-62`)
+  lines.push(`export const JS_PROP_CONFIGURABLE = ${1 << 0}`)
+  lines.push(`export const JS_PROP_WRITABLE = ${1 << 1}`)
+  lines.push(`// third_party/QuickJS/include/QuickJS/quickjs.h:96-103`)
+  lines.push(`export const JS_EVAL_TYPE_GLOBAL = ${0 << 0}`)
+  lines.push(`export const JS_EVAL_TYPE_MODULE = ${1 << 0}`)
+  lines.push(`export const JS_EVAL_TYPE_DIRECT = ${2 << 0}`)
+  lines.push(`export const JS_EVAL_TYPE_INDIRECT = ${3 << 0}`)
+  lines.push(`export const JS_EVAL_TYPE_MASK = ${3 << 0}`)
+  lines.push(`// third_party/QuickJS/src/core/function.h:40-44`)
+  lines.push(`export const JS_THROW_VAR_RO = ${0}`)
+  lines.push(`export const JS_THROW_VAR_REDECL = ${1}`)
+  lines.push(`export const JS_THROW_VAR_UNINITIALIZED = ${2}`)
+  lines.push(`// third_party/QuickJS/src/core/function.h:34-38`)
+  lines.push(`export const OP_DEFINE_METHOD_METHOD = ${0}`)
+  lines.push(`export const OP_DEFINE_METHOD_GETTER = ${1}`)
+  lines.push(`export const OP_DEFINE_METHOD_SETTER = ${2}`)
+  lines.push(`export const OP_DEFINE_METHOD_ENUMERABLE = ${4}`)
+  lines.push(`// third_party/QuickJS/src/core/runtime.h:50-51`)
+  lines.push(`export const DEFINE_GLOBAL_LEX_VAR = ${1 << 7}`)
+  lines.push(`export const DEFINE_GLOBAL_FUNC_VAR = ${1 << 6}`)
+  lines.push(`// third_party/QuickJS/src/core/exception.h:32`)
+  lines.push(`export const JS_DEFINE_CLASS_HAS_HERITAGE = ${1 << 0}`)
+  lines.push(`// third_party/QuickJS/include/QuickJS/quickjs.h:237`)
+  lines.push(`export const JS_ATOM_NULL = ${0}`)
+  lines.push(``)
+
+  // QuickJS 编译器实现细节常量（来自 QuickJS parser.c；用于 TS 侧对齐与消除魔数）
+  lines.push(`// QuickJS 编译器实现细节常量（来自 QuickJS parser.c；用于 TS 侧对齐与消除魔数）`)
+  lines.push(`// third_party/QuickJS/src/core/parser.c:12248-12252 (compute_stack_size: stack_level_tab 初始化为 0xffff)`)
+  lines.push(`export const STACK_LEVEL_UNSET = ${0xffff}`)
+  lines.push(``)
+
+  // QuickJS 字节码格式常量（来自 QuickJS bytecode.cpp；用于读写 .qbc 时对齐与消除魔数）
+  lines.push(`// QuickJS 字节码格式常量（来自 QuickJS bytecode.cpp；用于读写 .qbc 时对齐与消除魔数）`)
+  lines.push(`// third_party/QuickJS/src/core/bytecode.cpp:448-461 (bc_set_flags: flags bit layout)`)
+  lines.push(`export const JS_FUNCTION_BYTECODE_FLAG_HAS_DEBUG = ${1 << 10}`)
+  lines.push(``)
+
   // CompileFlags
   lines.push(`export enum CompileFlags {`)
   for (const [key, value] of Object.entries(compileFlags)) {
@@ -122,6 +163,20 @@ async function main() {
   // Opcode Enum (只包含最终字节码中的 opcodes)
   const finalOpcodes = opcodes.filter(op => !op.isTemp)
   const tempOpcodes = opcodes.filter(op => op.isTemp)
+
+  // 额外常量（用于与 QuickJS parser.c 输出逐字节对齐）
+  // 说明：这些常量/函数不是从 WASM 导出获取，而是为了在 TS 侧复用 QuickJS 的编码公式，减少魔数散落。
+  // QuickJS 源码出处：third_party/QuickJS/src/core/parser.c
+  // - 赋值 rest 属性：emit_u8(s, 0 | ((depth_lvalue + 1) << 2) | ((depth_lvalue + 2) << 5));
+  //   （位于处理 `{...rest}` / `...rest` 的 copy_data_properties 路径）
+  lines.push(`// copy_data_properties flags 编码（对齐 QuickJS parser.c 的 emit_u8 公式）`)
+  lines.push(`export const TEMP_OPCODE_MIN = ${Math.min(...tempOpcodes.map(o => o.code))}`)
+  lines.push(`export const TEMP_OPCODE_MAX = ${Math.max(...tempOpcodes.map(o => o.code))}`)
+  lines.push(`export function encodeCopyDataPropertiesFlags(depthLValue: number): number {`)
+  lines.push(`  return 0 | ((depthLValue + 1) << 2) | ((depthLValue + 2) << 5)`)
+  lines.push(`}`)
+  lines.push(`export const COPY_DATA_PROPERTIES_FLAGS_DEPTH0 = encodeCopyDataPropertiesFlags(0)`)
+  lines.push(``)
   
   lines.push(`export enum Opcode {`)
   for (const op of finalOpcodes) {
