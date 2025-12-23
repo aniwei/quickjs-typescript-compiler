@@ -169,8 +169,21 @@ export class StatementVisitor extends VisitorContext {
 
         const hasRest = pattern.elements.some(e => e.dotDotDotToken != null)
         if (!hasRest) {
-          // fallback: simple object destructuring without rest (keep previous behavior)
-          this.context.visit(declaration.initializer)
+          // Match QuickJS js_parse_destructuring_var():
+          //   undefined; dup; is_undefined; if_true load;
+          // start: to_object; dup/get_field/put_var_init ... ; drop; goto done;
+          // load: drop; <eval initializer>; goto start;
+          const labelStart = this.compiler.newLabelInt(fd)
+          const labelLoad = this.compiler.newLabelInt(fd)
+          const labelDone = this.compiler.newLabelInt(fd)
+
+          this.compiler.emitOp(fd, Opcode.OP_undefined)
+          this.compiler.emitOp(fd, Opcode.OP_dup)
+          this.compiler.emitOp(fd, Opcode.OP_is_undefined)
+          this.compiler.emitGotoInt(fd, Opcode.OP_if_true, labelLoad)
+
+          this.compiler.emitLabelInt(fd, labelStart)
+          this.compiler.emitOp(fd, Opcode.OP_to_object)
 
           for (const element of pattern.elements) {
             if (!ts.isIdentifier(element.name) || element.dotDotDotToken) {
@@ -206,6 +219,14 @@ export class StatementVisitor extends VisitorContext {
           }
 
           this.compiler.emitOp(fd, Opcode.OP_drop)
+          this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelDone)
+
+          this.compiler.emitLabelInt(fd, labelLoad)
+          this.compiler.emitOp(fd, Opcode.OP_drop)
+          this.context.visit(declaration.initializer)
+          this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelStart)
+
+          this.compiler.emitLabelInt(fd, labelDone)
           return
         }
 
@@ -709,8 +730,11 @@ export class StatementVisitor extends VisitorContext {
       }
     } else if (ts.isIdentifier(node.initializer)) {
       const atom = this.compiler.addAtom(node.initializer.text)
+      const sourcePos = node.initializer.getStart()
       assignTarget = () => {
-        this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var)
+        // QuickJS emits a source-pos anchor for the loop target assignment.
+        // Without this, pc2line misses the `y` token in `for (y of arr)`.
+        this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var, sourcePos)
         this.compiler.emitU32(fd, atom)
         this.compiler.emitU16(fd, fd.scopeLevel)
       }

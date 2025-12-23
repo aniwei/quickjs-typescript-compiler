@@ -1,9 +1,9 @@
 {
-  "timestamp": "2025-12-23T10:24:24.158Z",
+  "timestamp": "2025-12-23T10:34:39.852Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/for-of-destructuring.ts",
   "compilation": {
     "typescript": {
-      "size": 298,
+      "size": 300,
       "bytecode": [
         "0x05",
         "0x07",
@@ -267,7 +267,7 @@
         "0x28",
         "0xd4",
         "0x03",
-        "0x22",
+        "0x24",
         "0x00",
         "0x00",
         "0x00",
@@ -290,8 +290,10 @@
         "0x01",
         "0x40",
         "0x01",
-        "0x4e",
-        "0x03",
+        "0x2a",
+        "0x09",
+        "0x26",
+        "0x06",
         "0x20",
         "0x04",
         "0x32",
@@ -321,9 +323,9 @@
         "000000d0: 06 cb 39 e5 00 00 00 7f ee 11 3a e7 00 00 00 06 |..9.......:.....|",
         "000000e0: cb 39 e7 00 00 00 b9 ad ed 06 82 00 ec ed 0e 86 |.9..............|",
         "000000f0: 39 e8 00 00 00 43 e9 00 00 00 39 e7 00 00 00 24 |9....C....9....$|",
-        "00000100: 01 00 cf 28 d4 03 22 00 00 00 3a 06 1c 30 13 1b |...(..\"...:..0..|",
-        "00000110: 0e 11 05 4a 0f 1b 0e 1b 0a 1b 01 40 01 4e 03 20 |...J.......@.N. |",
-        "00000120: 04 32 13 1b 0e 1b 0a 1b 01 00                   |.2........|"
+        "00000100: 01 00 cf 28 d4 03 24 00 00 00 3a 06 1c 30 13 1b |...(..$...:..0..|",
+        "00000110: 0e 11 05 4a 0f 1b 0e 1b 0a 1b 01 40 01 2a 09 26 |...J.......@.*.&|",
+        "00000120: 06 20 04 32 13 1b 0e 1b 0a 1b 01 00             |. .2........|"
       ],
       "structure": {
         "source": "TypeScript",
@@ -390,7 +392,7 @@
         "functionHeader": {
           "offset": 69,
           "tag": "0xc",
-          "remaining": 229
+          "remaining": 231
         }
       }
     },
@@ -789,120 +791,9 @@
       }
     }
   },
-  "differences": [
-    {
-      "offset": 262,
-      "offsetHex": "0x106",
-      "typescript": "0x22",
-      "wasm": "0x24",
-      "typescriptDecimal": 34,
-      "wasmDecimal": 36
-    },
-    {
-      "offset": 285,
-      "offsetHex": "0x11d",
-      "typescript": "0x4e",
-      "wasm": "0x2a",
-      "typescriptDecimal": 78,
-      "wasmDecimal": 42
-    },
-    {
-      "offset": 286,
-      "offsetHex": "0x11e",
-      "typescript": "0x03",
-      "wasm": "0x09",
-      "typescriptDecimal": 3,
-      "wasmDecimal": 9
-    },
-    {
-      "offset": 287,
-      "offsetHex": "0x11f",
-      "typescript": "0x20",
-      "wasm": "0x26",
-      "typescriptDecimal": 32,
-      "wasmDecimal": 38
-    },
-    {
-      "offset": 288,
-      "offsetHex": "0x120",
-      "typescript": "0x04",
-      "wasm": "0x06",
-      "typescriptDecimal": 4,
-      "wasmDecimal": 6
-    },
-    {
-      "offset": 289,
-      "offsetHex": "0x121",
-      "typescript": "0x32",
-      "wasm": "0x20",
-      "typescriptDecimal": 50,
-      "wasmDecimal": 32
-    },
-    {
-      "offset": 290,
-      "offsetHex": "0x122",
-      "typescript": "0x13",
-      "wasm": "0x04",
-      "typescriptDecimal": 19,
-      "wasmDecimal": 4
-    },
-    {
-      "offset": 291,
-      "offsetHex": "0x123",
-      "typescript": "0x1b",
-      "wasm": "0x32",
-      "typescriptDecimal": 27,
-      "wasmDecimal": 50
-    },
-    {
-      "offset": 292,
-      "offsetHex": "0x124",
-      "typescript": "0x0e",
-      "wasm": "0x13",
-      "typescriptDecimal": 14,
-      "wasmDecimal": 19
-    },
-    {
-      "offset": 294,
-      "offsetHex": "0x126",
-      "typescript": "0x0a",
-      "wasm": "0x0e",
-      "typescriptDecimal": 10,
-      "wasmDecimal": 14
-    },
-    {
-      "offset": 296,
-      "offsetHex": "0x128",
-      "typescript": "0x01",
-      "wasm": "0x0a",
-      "typescriptDecimal": 1,
-      "wasmDecimal": 10
-    },
-    {
-      "offset": 297,
-      "offsetHex": "0x129",
-      "typescript": "0x00",
-      "wasm": "0x1b",
-      "typescriptDecimal": 0,
-      "wasmDecimal": 27
-    },
-    {
-      "offset": 298,
-      "offsetHex": "0x12a",
-      "typescript": "EOF",
-      "wasm": "0x01",
-      "wasmDecimal": 1
-    },
-    {
-      "offset": 299,
-      "offsetHex": "0x12b",
-      "typescript": "EOF",
-      "wasm": "0x00",
-      "wasmDecimal": 0
-    }
-  ],
+  "differences": [],
   "sizeDifference": {
-    "absolute": -2,
-    "percentage": "-0.67"
+    "absolute": 0,
+    "percentage": "0.00"
   }
 }
