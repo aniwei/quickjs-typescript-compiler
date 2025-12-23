@@ -1,1 +1,478 @@
-{"version":5,"atoms":["Counter","#count","c","increment","console","log","__tests__/fixtures/class-private-fields.js"],"func":{"tag":12,"flags":1536,"jsMode":0,"funcNameAtom":82,"argCount":0,"varCount":4,"definedArgCount":0,"stackSize":3,"closureVarCount":0,"cpoolCount":4,"bytecodeLen":134,"bytecode":{"type":"Buffer","data":[64,228,0,0,0,128,64,230,0,0,0,128,63,228,0,0,0,130,63,230,0,0,0,128,99,1,0,6,99,3,0,99,2,0,193,2,88,228,0,0,0,0,5,229,0,0,0,205,194,0,86,231,0,0,0,0,194,1,86,66,0,0,0,1,194,3,82,206,14,208,107,3,0,107,2,0,59,228,0,0,0,57,228,0,0,0,17,33,0,0,59,230,0,0,0,57,230,0,0,0,67,231,0,0,0,36,0,0,203,57,232,0,0,0,67,233,0,0,0,57,230,0,0,0,66,66,0,0,0,36,1,0,207,40]},"varDefs":[{"nameAtom":83,"scopeLevel":0,"scopeNextPlus1":0,"flags":0},{"nameAtom":228,"name":"Counter","scopeLevel":2,"scopeNextPlus1":0,"flags":48},{"nameAtom":229,"name":"#count","scopeLevel":3,"scopeNextPlus1":2,"flags":117},{"nameAtom":120,"scopeLevel":3,"scopeNextPlus1":3,"flags":112}],"closureVars":[],"hasDebug":true,"debug":{"filenameAtom":234,"filename":"__tests__/fixtures/class-private-fields.js","pc2line":{"type":"Buffer","data":[0,0,0,81,18,28,32,14,43,41,27,2,27,20,23,21,27,14,27,10,27,2,27,3]}},"cpool":[{"tag":12,"flags":1858,"jsMode":1,"funcNameAtom":0,"argCount":0,"varCount":1,"definedArgCount":0,"stackSize":4,"closureVarCount":1,"cpoolCount":0,"bytecodeLen":11,"bytecode":{"type":"Buffer","data":[8,203,199,17,223,69,147,24,223,70,41]},"varDefs":[{"nameAtom":8,"scopeLevel":0,"scopeNextPlus1":1,"flags":0}],"closureVars":[{"nameAtom":229,"name":"#count","varIdx":2,"flags":13}],"hasDebug":true,"debug":{"filenameAtom":234,"filename":"__tests__/fixtures/class-private-fields.js","pc2line":{"type":"Buffer","data":[2,4,13,8,7,8,17,14]}},"cpool":[]},{"tag":12,"flags":1858,"jsMode":1,"funcNameAtom":0,"argCount":0,"varCount":1,"definedArgCount":0,"stackSize":2,"closureVarCount":1,"cpoolCount":0,"bytecodeLen":6,"bytecode":{"type":"Buffer","data":[8,203,199,223,69,40]},"varDefs":[{"nameAtom":8,"scopeLevel":0,"scopeNextPlus1":1,"flags":0}],"closureVars":[{"nameAtom":229,"name":"#count","varIdx":2,"flags":13}],"hasDebug":true,"debug":{"filenameAtom":234,"filename":"__tests__/fixtures/class-private-fields.js","pc2line":{"type":"Buffer","data":[5,4,18,30,12,21]}},"cpool":[]},{"tag":12,"flags":1344,"jsMode":1,"funcNameAtom":0,"argCount":0,"varCount":1,"definedArgCount":0,"stackSize":2,"closureVarCount":1,"cpoolCount":0,"bytecodeLen":15,"bytecode":{"type":"Buffer","data":[8,203,43,104,0,0,17,236,6,199,27,36,0,0,41]},"varDefs":[{"nameAtom":8,"scopeLevel":0,"scopeNextPlus1":1,"flags":0}],"closureVars":[{"nameAtom":120,"varIdx":3,"flags":13}],"hasDebug":true,"debug":{"filenameAtom":234,"filename":"__tests__/fixtures/class-private-fields.js","pc2line":{"type":"Buffer","data":[8,0]}},"cpool":[]},{"tag":12,"flags":1352,"jsMode":1,"funcNameAtom":0,"argCount":0,"varCount":2,"definedArgCount":0,"stackSize":3,"closureVarCount":1,"cpoolCount":0,"bytecodeLen":14,"bytecode":{"type":"Buffer","data":[12,4,204,8,203,238,1,199,104,0,0,183,71,41]},"varDefs":[{"nameAtom":8,"scopeLevel":0,"scopeNextPlus1":1,"flags":0},{"nameAtom":117,"scopeLevel":0,"scopeNextPlus1":1,"flags":0}],"closureVars":[{"nameAtom":229,"name":"#count","varIdx":2,"flags":93}],"hasDebug":true,"debug":{"filenameAtom":234,"filename":"__tests__/fixtures/class-private-fields.js","pc2line":{"type":"Buffer","data":[0,0]}},"cpool":[]}]}}
+{
+  "version": 5,
+  "atoms": [
+    "Counter",
+    "#count",
+    "c",
+    "increment",
+    "console",
+    "log",
+    "__tests__/fixtures/class-private-fields.js"
+  ],
+  "func": {
+    "tag": 12,
+    "flags": 1536,
+    "jsMode": 0,
+    "funcNameAtom": 82,
+    "argCount": 0,
+    "varCount": 4,
+    "definedArgCount": 0,
+    "stackSize": 3,
+    "closureVarCount": 0,
+    "cpoolCount": 4,
+    "bytecodeLen": 134,
+    "bytecode": {
+      "type": "Buffer",
+      "data": [
+        64,
+        228,
+        0,
+        0,
+        0,
+        128,
+        64,
+        230,
+        0,
+        0,
+        0,
+        128,
+        63,
+        228,
+        0,
+        0,
+        0,
+        130,
+        63,
+        230,
+        0,
+        0,
+        0,
+        128,
+        99,
+        1,
+        0,
+        6,
+        99,
+        3,
+        0,
+        99,
+        2,
+        0,
+        193,
+        2,
+        88,
+        228,
+        0,
+        0,
+        0,
+        0,
+        5,
+        229,
+        0,
+        0,
+        0,
+        205,
+        194,
+        0,
+        86,
+        231,
+        0,
+        0,
+        0,
+        0,
+        194,
+        1,
+        86,
+        66,
+        0,
+        0,
+        0,
+        1,
+        194,
+        3,
+        82,
+        206,
+        14,
+        208,
+        107,
+        3,
+        0,
+        107,
+        2,
+        0,
+        59,
+        228,
+        0,
+        0,
+        0,
+        57,
+        228,
+        0,
+        0,
+        0,
+        17,
+        33,
+        0,
+        0,
+        59,
+        230,
+        0,
+        0,
+        0,
+        57,
+        230,
+        0,
+        0,
+        0,
+        67,
+        231,
+        0,
+        0,
+        0,
+        36,
+        0,
+        0,
+        203,
+        57,
+        232,
+        0,
+        0,
+        0,
+        67,
+        233,
+        0,
+        0,
+        0,
+        57,
+        230,
+        0,
+        0,
+        0,
+        66,
+        66,
+        0,
+        0,
+        0,
+        36,
+        1,
+        0,
+        207,
+        40
+      ]
+    },
+    "varDefs": [
+      {
+        "nameAtom": 83,
+        "scopeLevel": 0,
+        "scopeNextPlus1": 0,
+        "flags": 0
+      },
+      {
+        "nameAtom": 228,
+        "name": "Counter",
+        "scopeLevel": 2,
+        "scopeNextPlus1": 0,
+        "flags": 48
+      },
+      {
+        "nameAtom": 229,
+        "name": "#count",
+        "scopeLevel": 3,
+        "scopeNextPlus1": 2,
+        "flags": 117
+      },
+      {
+        "nameAtom": 120,
+        "scopeLevel": 3,
+        "scopeNextPlus1": 3,
+        "flags": 112
+      }
+    ],
+    "closureVars": [],
+    "hasDebug": true,
+    "debug": {
+      "filenameAtom": 234,
+      "filename": "__tests__/fixtures/class-private-fields.js",
+      "pc2line": {
+        "type": "Buffer",
+        "data": [
+          0,
+          0,
+          0,
+          81,
+          18,
+          28,
+          32,
+          14,
+          43,
+          41,
+          27,
+          2,
+          27,
+          20,
+          23,
+          21,
+          27,
+          14,
+          27,
+          10,
+          27,
+          2,
+          27,
+          3
+        ]
+      }
+    },
+    "cpool": [
+      {
+        "tag": 12,
+        "flags": 1858,
+        "jsMode": 1,
+        "funcNameAtom": 0,
+        "argCount": 0,
+        "varCount": 1,
+        "definedArgCount": 0,
+        "stackSize": 4,
+        "closureVarCount": 1,
+        "cpoolCount": 0,
+        "bytecodeLen": 11,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            8,
+            203,
+            199,
+            17,
+            223,
+            69,
+            147,
+            24,
+            223,
+            70,
+            41
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 8,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [
+          {
+            "nameAtom": 229,
+            "name": "#count",
+            "varIdx": 2,
+            "flags": 13
+          }
+        ],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 234,
+          "filename": "__tests__/fixtures/class-private-fields.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              2,
+              4,
+              13,
+              8,
+              7,
+              8,
+              17,
+              14
+            ]
+          }
+        },
+        "cpool": []
+      },
+      {
+        "tag": 12,
+        "flags": 1858,
+        "jsMode": 1,
+        "funcNameAtom": 0,
+        "argCount": 0,
+        "varCount": 1,
+        "definedArgCount": 0,
+        "stackSize": 2,
+        "closureVarCount": 1,
+        "cpoolCount": 0,
+        "bytecodeLen": 6,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            8,
+            203,
+            199,
+            223,
+            69,
+            40
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 8,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [
+          {
+            "nameAtom": 229,
+            "name": "#count",
+            "varIdx": 2,
+            "flags": 13
+          }
+        ],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 234,
+          "filename": "__tests__/fixtures/class-private-fields.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              5,
+              4,
+              18,
+              30,
+              12,
+              21
+            ]
+          }
+        },
+        "cpool": []
+      },
+      {
+        "tag": 12,
+        "flags": 1344,
+        "jsMode": 1,
+        "funcNameAtom": 0,
+        "argCount": 0,
+        "varCount": 1,
+        "definedArgCount": 0,
+        "stackSize": 2,
+        "closureVarCount": 1,
+        "cpoolCount": 0,
+        "bytecodeLen": 15,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            8,
+            203,
+            43,
+            104,
+            0,
+            0,
+            17,
+            236,
+            6,
+            199,
+            27,
+            36,
+            0,
+            0,
+            41
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 8,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [
+          {
+            "nameAtom": 120,
+            "varIdx": 3,
+            "flags": 13
+          }
+        ],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 234,
+          "filename": "__tests__/fixtures/class-private-fields.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              8,
+              0
+            ]
+          }
+        },
+        "cpool": []
+      },
+      {
+        "tag": 12,
+        "flags": 1352,
+        "jsMode": 1,
+        "funcNameAtom": 0,
+        "argCount": 0,
+        "varCount": 2,
+        "definedArgCount": 0,
+        "stackSize": 3,
+        "closureVarCount": 1,
+        "cpoolCount": 0,
+        "bytecodeLen": 14,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            12,
+            4,
+            204,
+            8,
+            203,
+            238,
+            1,
+            199,
+            104,
+            0,
+            0,
+            183,
+            71,
+            41
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 8,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          },
+          {
+            "nameAtom": 117,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [
+          {
+            "nameAtom": 229,
+            "name": "#count",
+            "varIdx": 2,
+            "flags": 93
+          }
+        ],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 234,
+          "filename": "__tests__/fixtures/class-private-fields.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              0,
+              0
+            ]
+          }
+        },
+        "cpool": []
+      }
+    ]
+  }
+}

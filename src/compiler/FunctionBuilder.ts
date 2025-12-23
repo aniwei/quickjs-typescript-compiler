@@ -537,6 +537,12 @@ export class BytecodeWriter {
         case OpFormat.atom_label_u16: {
           // atom 在 pos+1 位置，占4字节
           const atom = this.getU32(buf, pos + 1)
+          if (process.env.DEBUG_ATOM_MAP) {
+            const resolved = this.compiler?.getAtomString(atom) ?? null
+            if (atom >= this.firstAtom && resolved == null) {
+              console.log(`[writeBytecodeBuf] Unresolved atom operand: op=0x${op.toString(16)} (${opDef.id}), pos=${pos}, atom=${atom}`)
+            }
+          }
           const idx = this.bcAtomToIdx(atom)
           this.putU32(buf, pos + 1, idx)
           break
@@ -770,7 +776,11 @@ export class BytecodeWriter {
     const encoder = new TextEncoder()
     for (const atom of this.idxToAtom) {
       // 从 Compiler 获取 atom 对应的字符串
-      const str = this.compiler?.getAtomString(atom) || ''
+      const resolved = this.compiler?.getAtomString(atom) ?? null
+      if (process.env.DEBUG_ATOM_MAP && resolved == null) {
+        console.log(`[BytecodeWriter] Unresolved atom id=${atom} (firstAtom=${this.firstAtom})`)
+      }
+      const str = resolved || ''
       const bytes = encoder.encode(str)
       // 长度 << 1 | is_wide_char (UTF-8 不是 wide char)
       atomsOut.putULEB128(bytes.length << 1)

@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/closure-short.ts
-**生成时间**: 2025-12-23T04:18:01.567Z
+**生成时间**: 2025-12-23T07:34:08.808Z
 
 ## 大小对比
 

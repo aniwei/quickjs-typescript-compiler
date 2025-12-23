@@ -559,7 +559,25 @@ export class ClassVisitor extends VisitorContext {
     isSetter: boolean,
     classFields: [ClassFieldsDef, ClassFieldsDef]
   ): void {
-    const sourcePos = node.getStart()
+    // QuickJS anchors accessor function debug positions to the `get`/`set` keyword
+    // token (after modifiers like `static`), not to the start of the declaration.
+    // This affects the first pc2line entry for accessors.
+    const sf = node.getSourceFile()
+    const text = sf.text
+    const declStart = node.getStart(sf)
+    const nameStart = node.name.getStart(sf)
+    const keyword = isSetter ? 'set' : 'get'
+    let sourcePos = declStart
+    const kwIdx = text.indexOf(keyword, declStart)
+    if (kwIdx >= 0 && kwIdx < nameStart) {
+      const before = kwIdx > 0 ? text.charCodeAt(kwIdx - 1) : 0
+      const after = kwIdx + keyword.length < text.length ? text.charCodeAt(kwIdx + keyword.length) : 0
+      const isBoundaryBefore = before === 0 || before === 0x20 || before === 0x09 || before === 0x0a || before === 0x0d
+      const isBoundaryAfter = after === 0 || after === 0x20 || after === 0x09 || after === 0x0a || after === 0x0d
+      if (isBoundaryBefore && isBoundaryAfter) {
+        sourcePos = kwIdx
+      }
+    }
 
     const isPrivate = ts.isPrivateIdentifier(node.name)
     if (isPrivate) {
@@ -761,9 +779,20 @@ export class ClassVisitor extends VisitorContext {
     blockFd.funcType = JSParseFunctionEnum.JS_PARSE_FUNC_CLASS_STATIC_INIT
     blockFd.funcKind = JSFunctionKindEnum.JS_FUNC_NORMAL
     blockFd.filename = fd.filename
-    blockFd.sourcePos = node.getStart()
+    // QuickJS static blocks anchor to the '{' token (after `static`).
+    // This affects the initial pc2line (line/column) entry.
+    {
+      const sf = node.getSourceFile()
+      const text = sf.text
+      const start = node.getStart(sf)
+      const end = node.getEnd()
+      const bracePos = text.indexOf('{', start)
+      blockFd.sourcePos = bracePos >= 0 && bracePos < end ? bracePos : start
+    }
 
     blockFd.hasArgumentsBinding = false
+    // QuickJS: arguments identifier is not allowed in class static init blocks.
+    blockFd.argumentsAllowed = false
     blockFd.newTargetAllowed = true
     blockFd.superAllowed = true
 

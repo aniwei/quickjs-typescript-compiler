@@ -111,217 +111,33 @@
   },
   {
     "fixture": "class-methods",
-    "tsBytes": 372,
+    "tsBytes": 370,
     "wasmBytes": 370,
-    "identical": false,
+    "identical": true,
     "tags": [
-      "debug",
-      "semantics"
+      "identical"
     ],
-    "diffs": [
-      {
-        "kind": "func.bytecode",
-        "path": "func.cpool[1](func)",
-        "details": "bytecode differ (TS 24 bytes: 08 cb c7 43 42 00 00 00 d3 9f 15 44 42 00 00 00 … vs WASM 22 bytes: 08 cb c7 43 42 00 00 00 d3 9f 44 42 00 00 00 c7 …)"
-      },
-      {
-        "kind": "func.debug.pc2line",
-        "path": "func.cpool[1](func)",
-        "details": "pc2line differ (TS 14 bytes: 05 04 0d 08 07 18 1b 04 07 03 30 01 1b 15 vs WASM 14 bytes: 05 04 0d 08 07 08 1b 14 07 05 26 00 1b 15)"
-      },
-      {
-        "kind": "func.debug.pc2line",
-        "path": "func.cpool[2](func)",
-        "details": "pc2line differ (TS 10 bytes: 09 04 03 1e 16 16 07 01 11 29 vs WASM 10 bytes: 09 0b 03 10 16 16 07 01 11 29)"
-      }
-    ]
+    "diffs": []
   },
   {
     "fixture": "class-private-fields",
-    "tsBytes": 447,
+    "tsBytes": 450,
     "wasmBytes": 450,
-    "identical": false,
+    "identical": true,
     "tags": [
-      "debug",
-      "scope",
-      "semantics"
+      "identical"
     ],
-    "diffs": [
-      {
-        "kind": "func.varDefs",
-        "path": "func",
-        "details": "varDefs differ (TS=4, WASM=4)"
-      },
-      {
-        "kind": "func.signature",
-        "path": "func.cpool[0](func)",
-        "details": "sig TS(arg=0 var=1 defArg=0 stack=2) vs WASM(arg=0 var=1 defArg=0 stack=4)"
-      },
-      {
-        "kind": "func.closureVars",
-        "path": "func.cpool[0](func)",
-        "details": "closureVars differ (TS=0, WASM=1)"
-      },
-      {
-        "kind": "func.bytecode",
-        "path": "func.cpool[0](func)",
-        "details": "bytecode differ (TS 15 bytes: 08 cb c7 43 e5 00 00 00 91 44 e5 00 00 00 29 vs WASM 11 bytes: 08 cb c7 11 df 45 93 18 df 46 29)"
-      },
-      {
-        "kind": "func.debug.pc2line",
-        "path": "func.cpool[0](func)",
-        "details": "pc2line differ (TS 6 bytes: 02 04 0d 08 20 16 vs WASM 8 bytes: 02 04 0d 08 07 08 11 0e)"
-      },
-      {
-        "kind": "func.signature",
-        "path": "func.cpool[1](func)",
-        "details": "sig TS(arg=0 var=1 defArg=0 stack=1) vs WASM(arg=0 var=1 defArg=0 stack=2)"
-      },
-      {
-        "kind": "func.closureVars",
-        "path": "func.cpool[1](func)",
-        "details": "closureVars differ (TS=0, WASM=1)"
-      },
-      {
-        "kind": "func.bytecode",
-        "path": "func.cpool[1](func)",
-        "details": "bytecode differ (TS 9 bytes: 08 cb c7 42 e5 00 00 00 28 vs WASM 6 bytes: 08 cb c7 df 45 28)"
-      },
-      {
-        "kind": "func.debug.pc2line",
-        "path": "func.cpool[1](func)",
-        "details": "pc2line differ (TS 6 bytes: 05 04 12 1e 1b 15 vs WASM 6 bytes: 05 04 12 1e 0c 15)"
-      },
-      {
-        "kind": "func.closureVars",
-        "path": "func.cpool[3](func)",
-        "details": "closureVars differ (TS=1, WASM=1)"
-      }
-    ]
+    "diffs": []
   },
   {
     "fixture": "class-static-block",
-    "tsBytes": 630,
+    "tsBytes": 642,
     "wasmBytes": 642,
-    "identical": false,
+    "identical": true,
     "tags": [
-      "debug",
-      "func-meta",
-      "scope",
-      "semantics"
+      "identical"
     ],
-    "diffs": [
-      {
-        "kind": "func.signature",
-        "path": "func",
-        "details": "sig TS(arg=0 var=4 defArg=0 stack=4) vs WASM(arg=0 var=5 defArg=0 stack=4)"
-      },
-      {
-        "kind": "func.varDefs",
-        "path": "func",
-        "details": "varDefs differ (TS=4, WASM=5)"
-      },
-      {
-        "kind": "func.bytecode",
-        "path": "func",
-        "details": "bytecode differ (TS 177 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 63 01 00 06 … vs WASM 177 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 63 01 00 06 …)"
-      },
-      {
-        "kind": "func.signature",
-        "path": "func.cpool[0](func)",
-        "details": "sig TS(arg=0 var=1 defArg=0 stack=3) vs WASM(arg=0 var=1 defArg=0 stack=4)"
-      },
-      {
-        "kind": "func.closureVars",
-        "path": "func.cpool[0](func)",
-        "details": "closureVars differ (TS=0, WASM=1)"
-      },
-      {
-        "kind": "func.bytecode",
-        "path": "func.cpool[0](func)",
-        "details": "bytecode differ (TS 17 bytes: 08 cb c7 43 e5 00 00 00 b8 9f 15 44 e5 00 00 00 … vs WASM 12 bytes: 08 cb c7 11 df 45 b8 9f 15 df 46 29)"
-      },
-      {
-        "kind": "func.debug.pc2line",
-        "path": "func.cpool[0](func)",
-        "details": "pc2line differ (TS 6 bytes: 07 04 0d 08 07 1a vs WASM 8 bytes: 07 0b 0d 05 07 08 16 10)"
-      },
-      {
-        "kind": "func.closureVars",
-        "path": "func.cpool[1](func)",
-        "details": "closureVars differ (TS=0, WASM=2)"
-      },
-      {
-        "kind": "func.bytecode",
-        "path": "func.cpool[1](func)",
-        "details": "bytecode differ (TS 19 bytes: 08 cb c7 43 e6 00 00 00 24 00 00 0e c7 42 e5 00 … vs WASM 13 bytes: 08 cb c7 df 2d 24 00 00 0e c7 e0 45 28)"
-      },
-      {
-        "kind": "func.debug.pc2line",
-        "path": "func.cpool[1](func)",
-        "details": "pc2line differ (TS 12 bytes: 0a 04 0d 08 07 08 1b 0c 1c 02 1b 15 vs WASM 12 bytes: 0a 0b 0d 05 07 08 0c 0c 1c 02 0c 15)"
-      },
-      {
-        "kind": "func.signature",
-        "path": "func.cpool[2](func)",
-        "details": "sig TS(arg=0 var=1 defArg=0 stack=1) vs WASM(arg=0 var=1 defArg=0 stack=2)"
-      },
-      {
-        "kind": "func.closureVars",
-        "path": "func.cpool[2](func)",
-        "details": "closureVars differ (TS=0, WASM=1)"
-      },
-      {
-        "kind": "func.bytecode",
-        "path": "func.cpool[2](func)",
-        "details": "bytecode differ (TS 9 bytes: 08 cb c7 42 e5 00 00 00 28 vs WASM 6 bytes: 08 cb c7 df 45 28)"
-      },
-      {
-        "kind": "func.debug.pc2line",
-        "path": "func.cpool[2](func)",
-        "details": "pc2line differ (TS 6 bytes: 0e 04 12 1e 1b 15 vs WASM 6 bytes: 0e 0b 12 10 0c 15)"
-      },
-      {
-        "kind": "func.closureVars",
-        "path": "func.cpool[3](func)",
-        "details": "closureVars differ (TS=1, WASM=1)"
-      },
-      {
-        "kind": "func.signature",
-        "path": "func.cpool[4](func)",
-        "details": "sig TS(arg=0 var=1 defArg=0 stack=5) vs WASM(arg=0 var=1 defArg=0 stack=4)"
-      },
-      {
-        "kind": "func.bytecode",
-        "path": "func.cpool[4](func)",
-        "details": "bytecode differ (TS 27 bytes: 08 cb 09 c7 68 00 00 b7 47 c7 04 ec 00 00 00 4e … vs WASM 27 bytes: 08 cb c7 68 00 00 b7 47 c7 04 ec 00 00 00 4e ea …)"
-      },
-      {
-        "kind": "func.flags",
-        "path": "func.cpool[4](func).cpool[0](func)",
-        "details": "flags TS=0x742 WASM=0x542"
-      },
-      {
-        "kind": "func.signature",
-        "path": "func.cpool[4](func).cpool[0](func)",
-        "details": "sig TS(arg=0 var=0 defArg=0 stack=2) vs WASM(arg=0 var=0 defArg=0 stack=4)"
-      },
-      {
-        "kind": "func.closureVars",
-        "path": "func.cpool[4](func).cpool[0](func)",
-        "details": "closureVars differ (TS=1, WASM=2)"
-      },
-      {
-        "kind": "func.bytecode",
-        "path": "func.cpool[4](func).cpool[0](func)",
-        "details": "bytecode differ (TS 19 bytes: df b8 44 e5 00 00 00 df 04 ed 00 00 00 44 ea 00 … vs WASM 18 bytes: df b8 15 e0 46 0e df 04 ed 00 00 00 44 ea 00 00 …)"
-      },
-      {
-        "kind": "func.debug.pc2line",
-        "path": "func.cpool[4](func).cpool[0](func)",
-        "details": "pc2line differ (TS 10 bytes: 03 04 03 08 07 08 21 07 07 08 vs WASM 10 bytes: 03 0b 03 05 07 08 1c 07 07 08)"
-      }
-    ]
+    "diffs": []
   },
   {
     "fixture": "closure-basic",
@@ -355,25 +171,13 @@
   },
   {
     "fixture": "closure-vars",
-    "tsBytes": 363,
+    "tsBytes": 365,
     "wasmBytes": 365,
-    "identical": false,
+    "identical": true,
     "tags": [
-      "debug",
-      "semantics"
+      "identical"
     ],
-    "diffs": [
-      {
-        "kind": "func.bytecode",
-        "path": "func.cpool[0](func).cpool[0](func)",
-        "details": "bytecode differ (TS 83 bytes: 39 eb 00 00 00 43 ec 00 00 00 68 00 00 24 01 00 … vs WASM 85 bytes: 39 eb 00 00 00 43 ec 00 00 00 68 00 00 24 01 00 …)"
-      },
-      {
-        "kind": "func.debug.pc2line",
-        "path": "func.cpool[0](func).cpool[0](func)",
-        "details": "pc2line differ (TS 42 bytes: 05 04 03 08 1b 0e 1b 0a 11 01 17 15 1b 0e 1b 0a … vs WASM 42 bytes: 05 04 03 08 1b 0e 1b 0a 11 01 17 15 1b 0e 1b 0a …)"
-      }
-    ]
+    "diffs": []
   },
   {
     "fixture": "comparison-ops",
@@ -499,17 +303,11 @@
     "fixture": "for-await-of",
     "tsBytes": 301,
     "wasmBytes": 301,
-    "identical": false,
+    "identical": true,
     "tags": [
-      "debug"
+      "identical"
     ],
-    "diffs": [
-      {
-        "kind": "func.debug.pc2line",
-        "path": "func.cpool[1](func)",
-        "details": "pc2line differ (TS 20 bytes: 05 00 2c 34 1b 0e 1c 31 11 0e 11 03 45 11 1b 0e … vs WASM 20 bytes: 05 00 2c 34 1b 0e 1c 31 11 0e 11 05 45 0f 1b 0e …)"
-      }
-    ]
+    "diffs": []
   },
   {
     "fixture": "for-loop",

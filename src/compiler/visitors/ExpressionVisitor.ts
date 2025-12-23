@@ -481,6 +481,12 @@ export class ExpressionVisitor extends VisitorContext {
       // This keeps stack layout consistent with OP_put_private_field semantics.
       if (ts.isPrivateIdentifier(operand.name)) {
         this.context.visit(operand.expression)
+        // QuickJS records an intermediate pc2line sample before the synthetic stack ops.
+        // Empirically (WASM parity), this sample aligns to the '.' boundary right after the
+        // object expression in `obj.#name++`, not the start of `#name`.
+        // Without this, we fold the column deltas into a single entry and pc2line differs.
+        const privateSamplePos = operand.expression.getEnd()
+        this.compiler.emitSourcePos(fd, privateSamplePos)
         this.compiler.emitOp(fd, Opcode.OP_dup)
         this.compiler.emitOp(fd, TempOpcode.OP_scope_get_private_field)
         this.compiler.emitU32(fd, name)
@@ -567,6 +573,22 @@ export class ExpressionVisitor extends VisitorContext {
         op === ts.SyntaxKind.BarBarToken ||
         op === ts.SyntaxKind.QuestionQuestionToken) {
       this.visitLogicalExpression(node)
+      return
+    }
+
+    // 私有 brand 检查: #name in obj
+    // QuickJS lowers this via OP_scope_in_private_field and resolves it in resolve_scope_private_field()
+    // to get_var_ref*/get_private_in.
+    if (op === ts.SyntaxKind.InKeyword && ts.isPrivateIdentifier(node.left)) {
+      // `#name` is not a runtime-evaluated expression; only evaluate RHS.
+      this.context.visit(node.right)
+
+      const privateName = this.compiler.addAtom(node.left.text)
+      // Align QuickJS: the operator itself does not introduce an extra pc2line sample here;
+      // RHS evaluation already records a source position.
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_in_private_field)
+      this.compiler.emitU32(fd, privateName)
+      this.compiler.emitU16(fd, fd.scopeLevel)
       return
     }
 
@@ -1781,10 +1803,9 @@ export class ExpressionVisitor extends VisitorContext {
     // resolve_scope_private_field() to get_var_ref*/get_private_field/check_brand.
     if (ts.isPrivateIdentifier(node.name)) {
       const name = this.compiler.addAtom(node.name.text)
-      // QuickJS pc2line for private names tends to anchor to the private-name token
-      // (the '#...' lexeme) rather than the preceding '.'.
-      const privateNamePos = node.name.getStart(sf)
-      this.compiler.emitOp(fd, TempOpcode.OP_scope_get_private_field, privateNamePos)
+      // QuickJS records member-access source position at the '.' token (op_token_ptr)
+      // even for private names (obj.#x). Align to that so pc2line matches WASM.
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_get_private_field, sourcePos)
       this.compiler.emitU32(fd, name)
       this.compiler.emitU16(fd, fd.scopeLevel)
       return
@@ -2630,7 +2651,15 @@ export class ExpressionVisitor extends VisitorContext {
         this.compiler.emitOp(fd, Opcode.OP_await)
       }
 
-      this.compiler.emitOp(fd, Opcode.OP_yield, sourcePos)
+      // QuickJS does not always introduce a new pc2line sampling point at `yield`
+      // when the yielded value is produced by `await ...` in async generators.
+      // Suppress the explicit source position in that specific shape to match WASM.
+      const isYieldAwait = node.expression != null && ts.isAwaitExpression(node.expression)
+      if (fd.funcKind === JSFunctionKindEnum.JS_FUNC_ASYNC_GENERATOR && isYieldAwait) {
+        this.compiler.emitOp(fd, Opcode.OP_yield)
+      } else {
+        this.compiler.emitOp(fd, Opcode.OP_yield, sourcePos)
+      }
 
       if (fd.funcKind !== JSFunctionKindEnum.JS_FUNC_NORMAL) {
         const labelNext = this.compiler.newLabelInt(fd)

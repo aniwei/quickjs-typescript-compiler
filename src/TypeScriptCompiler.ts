@@ -1,7 +1,7 @@
 import ts from 'typescript'
 import { Compiler, Label } from './compiler/Compiler'
 import { FunctionDef, JSVarKind, JSVarDef, JSClosureVar, JSVarScope } from './compiler/FunctionDef'
-import { JSAtom, JSMode, Opcode, FunctionKind, OPCODE_BY_CODE } from './env'
+import { JSAtom, JSMode, Opcode, FunctionKind, OPCODE_BY_CODE, TempOpcode, TEMP_OPCODE_BY_CODE } from './env'
 import { ScopeManager, VarInfo, Scope } from './compiler/ScopeManager'
 import { LabelManager, LoopInfo } from './compiler/LabelManager'
 
@@ -194,6 +194,31 @@ export class TypeScriptCompiler implements CompilerContext {
     
     // 2. 解析变量 - resolve_variables (parser.c:10456-10800)
     this.variableResolver.resolve(fd)
+
+    if (process.env.DEBUG_DUMP_LABELS_PRE) {
+      const bcBuf = fd.byteCode.buffer
+      const bcLen = fd.byteCode.size
+      const labels: Array<{ pos: number; label: number }> = []
+      let pos = 0
+      while (pos < bcLen) {
+        const op = bcBuf[pos]
+        const opDef = (op >= 182 && op <= 200 && TEMP_OPCODE_BY_CODE[op]) ? TEMP_OPCODE_BY_CODE[op] : OPCODE_BY_CODE[op]
+        if (!opDef) {
+          pos++
+          continue
+        }
+        if (op === TempOpcode.OP_label && pos + 5 <= bcLen) {
+          const label = bcBuf[pos + 1] | (bcBuf[pos + 2] << 8) | (bcBuf[pos + 3] << 16) | (bcBuf[pos + 4] << 24)
+          labels.push({ pos, label })
+        }
+        pos += opDef.size
+      }
+      console.log(`[DEBUG_DUMP_LABELS_PRE] labels=${labels.map(x => `${x.label}@${x.pos}`).join(', ')}`)
+      const dumpStart = Math.max(0, Math.min(bcLen, 96))
+      const dumpEnd = Math.max(dumpStart, Math.min(bcLen, dumpStart + 64))
+      const hex = Array.from(bcBuf.slice(dumpStart, dumpEnd)).map(b => b.toString(16).padStart(2, '0')).join(' ')
+      console.log(`[DEBUG_DUMP_LABELS_PRE] bytes[${dumpStart}..${dumpEnd}): ${hex}`)
+    }
     
     // 3. 解析标签 - resolve_labels (parser.c:11088-12120)
     const labelResolver = new LabelResolver(this)
@@ -209,12 +234,16 @@ export class TypeScriptCompiler implements CompilerContext {
     }
     
     // 4. 计算栈大小 - compute_stack_size (parser.c:12191-12380)
-    const stackComputer = new StackSizeComputer(this)
-    const stackSize = stackComputer.compute(fd)
-    if (stackSize < 0) {
-      throw new Error('Stack size computation failed for function')
+    if (process.env.SKIP_STACKCHECK) {
+      fd.stackSize = 0
+    } else {
+      const stackComputer = new StackSizeComputer(this)
+      const stackSize = stackComputer.compute(fd)
+      if (stackSize < 0) {
+        throw new Error('Stack size computation failed for function')
+      }
+      fd.stackSize = stackSize
     }
-    fd.stackSize = stackSize
 
     // 5. 计算 pc2line 调试信息 (QuickJS 对齐实现)
     // 对应 parser.c:10862-10912 (compute_pc2line_info)
@@ -368,6 +397,10 @@ export class TypeScriptCompiler implements CompilerContext {
         break
       case ts.SyntaxKind.ConditionalExpression:
         this.expressionVisitor.visitConditionalExpression(node as ts.ConditionalExpression)
+        break
+      case ts.SyntaxKind.ParenthesizedExpression:
+        // Parentheses do not change semantics; just visit the inner expression.
+        this.visit((node as ts.ParenthesizedExpression).expression)
         break
       case ts.SyntaxKind.PostfixUnaryExpression:
         this.expressionVisitor.visitPostfixUnaryExpression(node as ts.PostfixUnaryExpression)

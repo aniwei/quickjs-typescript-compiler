@@ -117,7 +117,29 @@ export class StackSizeComputer {
       
       // 检查栈下溢
       if (stackLen < nPop) {
-        throw new Error(`Stack underflow at position ${pos}, op=${op}`)
+        const opName = opDef.id ?? `unknown_${op}`
+        const bytes = Array.from(
+          bcBuf.slice(pos, Math.min(bcLen, pos + opDef.size))
+        )
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join(' ')
+
+        const ctxStart = Math.max(0, pos - 16)
+        const ctxEnd = Math.min(bcLen, pos + 32)
+        const ctxBytes = Array.from(bcBuf.slice(ctxStart, ctxEnd))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join(' ')
+
+        const fromPc = s.fromPosTab[pos]
+        const fromOp = s.fromOpTab[pos]
+        const fromOpName = OPCODE_BY_CODE[fromOp]?.id ?? `unknown_${fromOp}`
+
+        if (process.env.DEBUG_STACK) {
+          this.dumpUnderflowWindow(s, pos)
+        }
+        throw new Error(
+          `Stack underflow at pc=${pos} op=${opName} (${op}) stackLen=${stackLen} nPop=${nPop} nPush=${nPush} bytes=${bytes} from_pc=${fromPc} from_op=${fromOpName} (${fromOp}) ctx[${ctxStart}..${ctxEnd})=${ctxBytes}`
+        )
       }
       
       let newStackLen = stackLen + nPush - nPop
@@ -460,6 +482,86 @@ export class StackSizeComputer {
       const prefix = marks.has(pc) ? '>> ' : '   '
       console.error(prefix + formatInsn(pc))
       pc += size
+    }
+  }
+
+  private dumpUnderflowWindow(s: StackSizeState, pcCenter: number): void {
+    const bcBuf = s.bcBuf
+    const bcLen = s.bcLen
+
+    const opName = (opcode: number) => OPCODE_BY_CODE[opcode]?.id ?? `unknown_${opcode}`
+
+    const formatInsn = (pc: number): string => {
+      const opcode = bcBuf[pc]
+      const def = OPCODE_BY_CODE[opcode]
+      const size = def?.size ?? 1
+      const bytes = Array.from(bcBuf.slice(pc, Math.min(bcLen, pc + size)))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join(' ')
+
+      let extra = ''
+      switch (opcode) {
+        case Opcode.OP_goto: {
+          const diff = this.getI32(bcBuf, pc + 1)
+          extra = ` diff=${diff} target=${pc + 1 + diff}`
+          break
+        }
+        case Opcode.OP_goto16: {
+          const diff = this.getI16(bcBuf, pc + 1)
+          extra = ` diff=${diff} target=${pc + 1 + diff}`
+          break
+        }
+        case Opcode.OP_goto8: {
+          const diff = this.getI8(bcBuf, pc + 1)
+          extra = ` diff=${diff} target=${pc + 1 + diff}`
+          break
+        }
+        case Opcode.OP_if_true:
+        case Opcode.OP_if_false: {
+          const diff = this.getI32(bcBuf, pc + 1)
+          extra = ` diff=${diff} target=${pc + 1 + diff}`
+          break
+        }
+        case Opcode.OP_if_true8:
+        case Opcode.OP_if_false8: {
+          const diff = this.getI8(bcBuf, pc + 1)
+          extra = ` diff=${diff} target=${pc + 1 + diff}`
+          break
+        }
+        default:
+          break
+      }
+
+      const stack = s.stackLevelTab[pc]
+      const stackStr = stack === 0xffff ? '??' : String(stack)
+      const pops = def?.nPop ?? 0
+      const pushes = def?.nPush ?? 0
+      return `pc=${pc.toString().padStart(4)} stack=${stackStr.padStart(2)} op=${opName(opcode).padEnd(26)} bytes=${bytes.padEnd(14)} pop=${pops} push=${pushes}${extra}`
+    }
+
+    console.error(`[DEBUG_STACK] Stack underflow window around pc=${pcCenter}`)
+
+    // Walk instruction boundaries to find a nearby start.
+    let pc = 0
+    const insnStarts: number[] = []
+    let safety = 0
+    while (pc < bcLen && safety++ < bcLen + 5) {
+      insnStarts.push(pc)
+      const opcode = bcBuf[pc]
+      const def = OPCODE_BY_CODE[opcode]
+      const size = def?.size ?? 1
+      pc += size
+    }
+
+    const idx = insnStarts.findIndex(p => p === pcCenter)
+    const centerIdx = idx >= 0 ? idx : Math.max(0, insnStarts.findIndex(p => p > pcCenter) - 1)
+    const startIdx = Math.max(0, centerIdx - 12)
+    const endIdx = Math.min(insnStarts.length, centerIdx + 18)
+
+    for (let i = startIdx; i < endIdx; i++) {
+      const p = insnStarts[i]
+      const prefix = p === pcCenter ? '>> ' : '   '
+      console.error(prefix + formatInsn(p))
     }
   }
 

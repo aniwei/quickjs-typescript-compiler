@@ -1,9 +1,9 @@
+import ts from 'typescript'
 import { 
   FunctionDef, 
   JSVarDef, 
   JSClosureVar, 
   LineNumberSlot, 
-  JSVarKind,
   JSVarKindEnum,
   JSFunctionKindEnum,
   LabelSlot,
@@ -16,14 +16,11 @@ import {
 } from './FunctionDef'
 import { Opcode, TempOpcode, env, BytecodeTag, JSAtom, PC2Line, OPCODE_DEFS } from '../env'
 import { BytecodeBuilder } from './BytecodeBuilder'
-import { AtomTable } from './AtomTable'
-import ts from 'typescript'
 import { DebugInfoBuilder } from './DebugInfoBuilder'
 
 // ============================================================================
 // 类型定义
 // ============================================================================
-
 interface PendingJump {
   fd: FunctionDef
   pos: number
@@ -363,6 +360,9 @@ export class Compiler {
    * @returns Atom ID
    */
   addAtom(name: string): number {
+    if (process.env.DEBUG_EMPTY_ATOM && name === '') {
+      throw new Error('Unexpected empty-string atom')
+    }
     // 首先检查内置 atoms
     const builtIn = this.builtInAtoms.get(name)
     if (builtIn !== undefined) {

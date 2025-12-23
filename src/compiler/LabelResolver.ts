@@ -740,7 +740,8 @@ export class LabelResolver {
     }
     
     // Match a small QuickJS optimizer peephole used by class fields init helpers.
-    this.optimizeConstFalseBrandGuard(bcOut)
+    this.optimizeConstTrueBrandGuard(fd, bcOut)
+    this.optimizeConstFalseBrandGuard(fd, bcOut)
 
     // === 计算 pc2line 信息 ===
     this.computePc2lineInfo(fd)
@@ -848,7 +849,7 @@ export class LabelResolver {
    * `push_false; if_false ...` and then folds the constant-false branch into an
    * unconditional `goto8 0`, removing the dead add_brand ops.
    */
-  private optimizeConstFalseBrandGuard(bcOut: BytecodeBuilder): void {
+  private optimizeConstFalseBrandGuard(fd: FunctionDef, bcOut: BytecodeBuilder): void {
     const buf = bcOut.buffer
     const size = bcOut.size
 
@@ -861,23 +862,45 @@ export class LabelResolver {
         buf[pc + 4] === Opcode.OP_get_loc1 &&
         buf[pc + 5] === Opcode.OP_add_brand
       ) {
-        // Replace with `goto8 0` and delete the 4 extra bytes.
-        const out = new Uint8Array(size - 4)
-        let outPos = 0
-
-        out.set(buf.subarray(0, pc), outPos)
-        outPos += pc
-
-        out[outPos++] = Opcode.OP_goto8
+        // Replace with `goto8 1` and delete the 4 extra bytes.
+        buf[pc] = Opcode.OP_goto8
         // QuickJS short jump targets are relative to (pos + 1).
         // To jump to the next instruction, diff must be 1.
-        out[outPos++] = 1
+        buf[pc + 1] = 1
 
-        out.set(buf.subarray(pc + 6, size), outPos)
+        // Remove bytes [pc+2 .. pc+6).
+        this.shrinkBytecode(fd, bcOut, pc, 2, 4)
+        return
+      }
+    }
+  }
 
-        bcOut.buffer = out
-        bcOut.size = out.length
-        bcOut.allocatedSize = out.length
+  /**
+   * Match QuickJS optimizer for class fields init helper when brand guard is
+   * patched to constant-true.
+   *
+   * Our ClassVisitor emits a placeholder `push_false; if_false8 ...` guard and
+   * later patches `push_false` → `push_true` when a private brand is needed.
+   * QuickJS then folds away the constant-true branch, leaving just the
+   * `get_loc0; get_loc1; add_brand` sequence.
+   */
+  private optimizeConstTrueBrandGuard(fd: FunctionDef, bcOut: BytecodeBuilder): void {
+    const buf = bcOut.buffer
+    const size = bcOut.size
+
+    // Pattern length: 1 (push_true) + 2 (if_false8 imm8) + 3 (brand ops) = 6 bytes
+    for (let pc = 0; pc + 6 <= size; pc++) {
+      if (
+        buf[pc] === Opcode.OP_push_true &&
+        buf[pc + 1] === Opcode.OP_if_false8 &&
+        // This guard should skip exactly to the instruction after add_brand.
+        buf[pc + 2] === 4 &&
+        buf[pc + 3] === Opcode.OP_get_loc0 &&
+        buf[pc + 4] === Opcode.OP_get_loc1 &&
+        buf[pc + 5] === Opcode.OP_add_brand
+      ) {
+        // Remove `push_true; if_false8 <imm>` (3 bytes), keep brand ops.
+        this.shrinkBytecode(fd, bcOut, pc, 0, 3)
         return
       }
     }
@@ -999,54 +1022,58 @@ export class LabelResolver {
     if (USE_SHORT_OPCODES) {
       // 尝试使用短跳转
       if (ls.addr === -1) {
-        // 未解析: 使用 pos2 估计
-        // 关键修复: 使用源位置 srcPos 而不是输出位置 bcOut.size
-        // 对应 QuickJS C 源码 parser.c:11341: int diff = ls->pos2 - pos - 1;
-        const diff = ls.pos2 - srcPos - 1
+        // 未解析: 使用 pos2 估计（QuickJS 在 pass2 里总能得到 ls->pos2）。
+        // 我们这里若 pos2 仍为 -1，说明还没遇到对应的 OP_label，无法可靠估计 diff。
+        // 这种情况下不要尝试短跳转，否则会写入错误的负偏移，导致后续 stack size 计算/执行崩溃。
+        if (ls.pos2 >= 0) {
+          // 关键修复: 使用源位置 srcPos 而不是输出位置 bcOut.size
+          // 对应 QuickJS C 源码 parser.c:11341: int diff = ls->pos2 - pos - 1;
+          const diff = ls.pos2 - srcPos - 1
         
-        // DEBUG: 打印跳转信息
-        if (process.env.DEBUG_JUMP) {
-          console.log(`[emitJump] op=${op.toString(16)}, label=${label}, srcPos=${srcPos}, ls.pos2=${ls.pos2}, diff=${diff}, bcOut.size=${bcOut.size}`)
-        }
-        
-        if (diff >= -128 && diff <= 127 && 
-            (op === Opcode.OP_if_false || op === Opcode.OP_if_true || op === Opcode.OP_goto)) {
-          const shortOp = op === Opcode.OP_goto ? Opcode.OP_goto8 : Opcode.OP_if_false8 + (op - Opcode.OP_if_false)
-          
+          // DEBUG: 打印跳转信息
           if (process.env.DEBUG_JUMP) {
-            console.log(`[emitJump] Using SHORT jump: shortOp=0x${shortOp.toString(16)}, bcOut.size=${bcOut.size}`)
+            console.log(`[emitJump] op=${op.toString(16)}, label=${label}, srcPos=${srcPos}, ls.pos2=${ls.pos2}, diff=${diff}, bcOut.size=${bcOut.size}`)
           }
           
-          // 记录跳转槽 - 短跳转使用 1 字节偏移
-          if (fd.jumpCount < fd.jumpSlots.length) {
-            const jp = fd.jumpSlots[fd.jumpCount]
-            jp.op = shortOp
-            jp.size = 1
-            jp.pos = bcOut.size + 1  // 偏移位置
-            jp.label = label
-            fd.jumpCount++
+          if (diff >= -128 && diff <= 127 && 
+              (op === Opcode.OP_if_false || op === Opcode.OP_if_true || op === Opcode.OP_goto)) {
+            const shortOp = op === Opcode.OP_goto ? Opcode.OP_goto8 : Opcode.OP_if_false8 + (op - Opcode.OP_if_false)
+            
+            if (process.env.DEBUG_JUMP) {
+              console.log(`[emitJump] Using SHORT jump: shortOp=0x${shortOp.toString(16)}, bcOut.size=${bcOut.size}`)
+            }
+            
+            // 记录跳转槽 - 短跳转使用 1 字节偏移
+            if (fd.jumpCount < fd.jumpSlots.length) {
+              const jp = fd.jumpSlots[fd.jumpCount]
+              jp.op = shortOp
+              jp.size = 1
+              jp.pos = bcOut.size + 1  // 偏移位置
+              jp.label = label
+              fd.jumpCount++
+            }
+            
+            bcOut.putU8(shortOp)
+            bcOut.putU8(0)
+            this.addReloc(fd, ls, bcOut.size - 1, 1)
+            return
           }
-          
-          bcOut.putU8(shortOp)
-          bcOut.putU8(0)
-          this.addReloc(fd, ls, bcOut.size - 1, 1)
-          return
-        }
-        if (diff >= -32768 && diff <= 32767 && op === Opcode.OP_goto) {
-          // 记录跳转槽 - 中等跳转使用 2 字节偏移
-          if (fd.jumpCount < fd.jumpSlots.length) {
-            const jp = fd.jumpSlots[fd.jumpCount]
-            jp.op = Opcode.OP_goto16
-            jp.size = 2
-            jp.pos = bcOut.size + 1
-            jp.label = label
-            fd.jumpCount++
+          if (diff >= -32768 && diff <= 32767 && op === Opcode.OP_goto) {
+            // 记录跳转槽 - 中等跳转使用 2 字节偏移
+            if (fd.jumpCount < fd.jumpSlots.length) {
+              const jp = fd.jumpSlots[fd.jumpCount]
+              jp.op = Opcode.OP_goto16
+              jp.size = 2
+              jp.pos = bcOut.size + 1
+              jp.label = label
+              fd.jumpCount++
+            }
+            
+            bcOut.putU8(Opcode.OP_goto16)
+            bcOut.putU16(0)
+            this.addReloc(fd, ls, bcOut.size - 2, 2)
+            return
           }
-          
-          bcOut.putU8(Opcode.OP_goto16)
-          bcOut.putU16(0)
-          this.addReloc(fd, ls, bcOut.size - 2, 2)
-          return
         }
       } else {
         // 已解析: 使用实际地址
@@ -1646,6 +1673,15 @@ export class LabelResolver {
         }
       }
     }
+
+    // 更新列号槽
+    if (fd.columnNumberSlots) {
+      for (let j = 0; j < fd.columnNumberCount; j++) {
+        if (fd.columnNumberSlots[j].pc > pos) {
+          fd.columnNumberSlots[j].pc -= delta
+        }
+      }
+    }
   }
 
   /**
@@ -1684,6 +1720,15 @@ export class LabelResolver {
       for (let j = 0; j < fd.lineNumberCount; j++) {
         if (fd.lineNumberSlots[j].pc > pos) {
           fd.lineNumberSlots[j].pc -= delta
+        }
+      }
+    }
+
+    // 更新列号槽
+    if (fd.columnNumberSlots) {
+      for (let j = 0; j < fd.columnNumberCount; j++) {
+        if (fd.columnNumberSlots[j].pc > pos) {
+          fd.columnNumberSlots[j].pc -= delta
         }
       }
     }
