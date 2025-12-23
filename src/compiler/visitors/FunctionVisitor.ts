@@ -303,7 +303,10 @@ export class FunctionVisitor extends VisitorContext {
    */
   visitMethodDefinition(node: ts.MethodDeclaration): void {
     const parentFd = this.funcDef!
-    const sourcePos = node.getStart()
+    // QuickJS anchors method functions to the method name token (not modifiers like `static`).
+    // This affects the initial (line,col) in pc2line for the method function.
+    const sf = node.getSourceFile()
+    const sourcePos = node.name ? node.name.getStart(sf) : node.getStart(sf)
 
     const isObjectLiteralMethod = ts.isObjectLiteralExpression(node.parent)
     // NOTE: In the TS AST, class methods have parent = ClassDeclaration/ClassExpression.

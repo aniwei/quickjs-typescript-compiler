@@ -1540,8 +1540,16 @@ export class VariableResolver {
             
           case JSVarKindEnum.JS_VAR_PRIVATE_SETTER:
           case JSVarKindEnum.JS_VAR_PRIVATE_GETTER_SETTER:
-            // 调用 setter
-            this.emitGetLocOrRef(bcOut, isRef, idx)
+            // 调用 setter: 需要先解析 varName + "<set>" 对应的私有 setter 变量
+            // 对应 QuickJS parser.c:resolve_scope_private_field() OP_scope_put_private_field
+            const base = this.compiler.getAtomString(varName)
+            const setterAtom = this.compiler.addAtom((base ?? '') + '<set>')
+            const setterRes = this.findPrivateField(fd, setterAtom, scopeLevel)
+            if (setterRes.idx < 0) {
+              // 与 QuickJS 一致：找不到 setterName 时视为未解析
+              throw new Error('undefined private field')
+            }
+            this.emitGetLocOrRef(bcOut, setterRes.isRef, setterRes.idx)
             bcOut.putU8(Opcode.OP_swap)
             bcOut.putU8(Opcode.OP_rot3r)
             bcOut.putU8(Opcode.OP_check_brand)

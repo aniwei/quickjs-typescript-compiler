@@ -1,0 +1,417 @@
+{
+  "version": 5,
+  "atoms": [
+    "Calculator",
+    "create",
+    "__tests__/fixtures/class-methods.js",
+    "val",
+    "n"
+  ],
+  "func": {
+    "tag": 12,
+    "flags": 1536,
+    "jsMode": 0,
+    "funcNameAtom": 82,
+    "argCount": 0,
+    "varCount": 3,
+    "definedArgCount": 0,
+    "stackSize": 3,
+    "closureVarCount": 0,
+    "cpoolCount": 4,
+    "bytecodeLen": 64,
+    "bytecode": {
+      "type": "Buffer",
+      "data": [
+        64,
+        228,
+        0,
+        0,
+        0,
+        128,
+        63,
+        228,
+        0,
+        0,
+        0,
+        130,
+        99,
+        1,
+        0,
+        6,
+        99,
+        2,
+        0,
+        193,
+        0,
+        88,
+        228,
+        0,
+        0,
+        0,
+        0,
+        194,
+        1,
+        86,
+        106,
+        0,
+        0,
+        0,
+        0,
+        27,
+        194,
+        2,
+        86,
+        229,
+        0,
+        0,
+        0,
+        0,
+        27,
+        194,
+        3,
+        82,
+        205,
+        14,
+        208,
+        107,
+        2,
+        0,
+        107,
+        1,
+        0,
+        59,
+        228,
+        0,
+        0,
+        0,
+        199,
+        40
+      ]
+    },
+    "varDefs": [
+      {
+        "nameAtom": 83,
+        "scopeLevel": 0,
+        "scopeNextPlus1": 0,
+        "flags": 0
+      },
+      {
+        "nameAtom": 228,
+        "name": "Calculator",
+        "scopeLevel": 2,
+        "scopeNextPlus1": 0,
+        "flags": 112
+      },
+      {
+        "nameAtom": 120,
+        "scopeLevel": 3,
+        "scopeNextPlus1": 2,
+        "flags": 112
+      }
+    ],
+    "closureVars": [],
+    "hasDebug": true,
+    "debug": {
+      "filenameAtom": 230,
+      "filename": "__tests__/fixtures/class-methods.js",
+      "pc2line": {
+        "type": "Buffer",
+        "data": [
+          0,
+          0
+        ]
+      }
+    },
+    "cpool": [
+      {
+        "tag": 12,
+        "flags": 1858,
+        "jsMode": 1,
+        "funcNameAtom": 0,
+        "argCount": 1,
+        "varCount": 1,
+        "definedArgCount": 1,
+        "stackSize": 2,
+        "closureVarCount": 1,
+        "cpoolCount": 0,
+        "bytecodeLen": 23,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            8,
+            203,
+            43,
+            104,
+            0,
+            0,
+            17,
+            236,
+            6,
+            199,
+            27,
+            36,
+            0,
+            0,
+            14,
+            199,
+            211,
+            68,
+            66,
+            0,
+            0,
+            0,
+            41
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 231,
+            "name": "val",
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          },
+          {
+            "nameAtom": 8,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [
+          {
+            "nameAtom": 120,
+            "varIdx": 2,
+            "flags": 13
+          }
+        ],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 230,
+          "filename": "__tests__/fixtures/class-methods.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              2,
+              4,
+              78,
+              8,
+              7,
+              26
+            ]
+          }
+        },
+        "cpool": []
+      },
+      {
+        "tag": 12,
+        "flags": 1858,
+        "jsMode": 1,
+        "funcNameAtom": 0,
+        "argCount": 1,
+        "varCount": 1,
+        "definedArgCount": 1,
+        "stackSize": 3,
+        "closureVarCount": 0,
+        "cpoolCount": 0,
+        "bytecodeLen": 24,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            8,
+            203,
+            199,
+            67,
+            66,
+            0,
+            0,
+            0,
+            211,
+            159,
+            21,
+            68,
+            66,
+            0,
+            0,
+            0,
+            14,
+            199,
+            66,
+            66,
+            0,
+            0,
+            0,
+            40
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 232,
+            "name": "n",
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          },
+          {
+            "nameAtom": 8,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 230,
+          "filename": "__tests__/fixtures/class-methods.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              5,
+              4,
+              13,
+              8,
+              7,
+              22,
+              27,
+              6,
+              7,
+              5,
+              48,
+              0,
+              27,
+              21
+            ]
+          }
+        },
+        "cpool": []
+      },
+      {
+        "tag": 12,
+        "flags": 1858,
+        "jsMode": 1,
+        "funcNameAtom": 0,
+        "argCount": 1,
+        "varCount": 0,
+        "definedArgCount": 1,
+        "stackSize": 3,
+        "closureVarCount": 1,
+        "cpoolCount": 0,
+        "bytecodeLen": 9,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            104,
+            0,
+            0,
+            17,
+            211,
+            33,
+            1,
+            0,
+            40
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 231,
+            "name": "val",
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [
+          {
+            "nameAtom": 228,
+            "name": "Calculator",
+            "varIdx": 1,
+            "flags": 13
+          }
+        ],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 230,
+          "filename": "__tests__/fixtures/class-methods.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              9,
+              4,
+              3,
+              30,
+              22,
+              22,
+              7,
+              1,
+              17,
+              41
+            ]
+          }
+        },
+        "cpool": []
+      },
+      {
+        "tag": 12,
+        "flags": 1352,
+        "jsMode": 1,
+        "funcNameAtom": 0,
+        "argCount": 0,
+        "varCount": 2,
+        "definedArgCount": 0,
+        "stackSize": 2,
+        "closureVarCount": 0,
+        "cpoolCount": 0,
+        "bytecodeLen": 15,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            12,
+            4,
+            204,
+            8,
+            203,
+            238,
+            1,
+            199,
+            6,
+            78,
+            66,
+            0,
+            0,
+            0,
+            41
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 8,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          },
+          {
+            "nameAtom": 117,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 230,
+          "filename": "__tests__/fixtures/class-methods.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              0,
+              0
+            ]
+          }
+        },
+        "cpool": []
+      }
+    ]
+  }
+}

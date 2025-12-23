@@ -1,0 +1,698 @@
+{
+  "version": 5,
+  "atoms": [
+    "Counter",
+    "#count",
+    "#bump",
+    "inc",
+    "console",
+    "log",
+    "label",
+    "__tests__/fixtures/class-static-block.js",
+    "counter",
+    "booted"
+  ],
+  "func": {
+    "tag": 12,
+    "flags": 1536,
+    "jsMode": 0,
+    "funcNameAtom": 82,
+    "argCount": 0,
+    "varCount": 5,
+    "definedArgCount": 0,
+    "stackSize": 4,
+    "closureVarCount": 0,
+    "cpoolCount": 5,
+    "bytecodeLen": 177,
+    "bytecode": {
+      "type": "Buffer",
+      "data": [
+        64,
+        228,
+        0,
+        0,
+        0,
+        128,
+        63,
+        228,
+        0,
+        0,
+        0,
+        130,
+        99,
+        1,
+        0,
+        6,
+        99,
+        4,
+        0,
+        99,
+        3,
+        0,
+        99,
+        2,
+        0,
+        193,
+        3,
+        88,
+        228,
+        0,
+        0,
+        0,
+        0,
+        27,
+        5,
+        229,
+        0,
+        0,
+        0,
+        205,
+        27,
+        27,
+        27,
+        27,
+        194,
+        0,
+        82,
+        79,
+        230,
+        0,
+        0,
+        0,
+        206,
+        27,
+        27,
+        194,
+        1,
+        86,
+        231,
+        0,
+        0,
+        0,
+        0,
+        27,
+        27,
+        194,
+        2,
+        86,
+        66,
+        0,
+        0,
+        0,
+        1,
+        27,
+        6,
+        197,
+        4,
+        14,
+        17,
+        17,
+        46,
+        208,
+        17,
+        194,
+        4,
+        82,
+        36,
+        0,
+        0,
+        14,
+        107,
+        4,
+        0,
+        107,
+        2,
+        0,
+        59,
+        228,
+        0,
+        0,
+        0,
+        57,
+        232,
+        0,
+        0,
+        0,
+        67,
+        233,
+        0,
+        0,
+        0,
+        57,
+        228,
+        0,
+        0,
+        0,
+        66,
+        234,
+        0,
+        0,
+        0,
+        36,
+        1,
+        0,
+        203,
+        57,
+        232,
+        0,
+        0,
+        0,
+        67,
+        233,
+        0,
+        0,
+        0,
+        57,
+        228,
+        0,
+        0,
+        0,
+        67,
+        231,
+        0,
+        0,
+        0,
+        36,
+        0,
+        0,
+        36,
+        1,
+        0,
+        203,
+        57,
+        232,
+        0,
+        0,
+        0,
+        67,
+        233,
+        0,
+        0,
+        0,
+        57,
+        228,
+        0,
+        0,
+        0,
+        66,
+        66,
+        0,
+        0,
+        0,
+        36,
+        1,
+        0,
+        207,
+        40
+      ]
+    },
+    "varDefs": [
+      {
+        "nameAtom": 83,
+        "scopeLevel": 0,
+        "scopeNextPlus1": 0,
+        "flags": 0
+      },
+      {
+        "nameAtom": 228,
+        "name": "Counter",
+        "scopeLevel": 2,
+        "scopeNextPlus1": 0,
+        "flags": 48
+      },
+      {
+        "nameAtom": 229,
+        "name": "#count",
+        "scopeLevel": 3,
+        "scopeNextPlus1": 2,
+        "flags": 117
+      },
+      {
+        "nameAtom": 230,
+        "name": "#bump",
+        "scopeLevel": 3,
+        "scopeNextPlus1": 3,
+        "flags": 54
+      },
+      {
+        "nameAtom": 120,
+        "scopeLevel": 3,
+        "scopeNextPlus1": 4,
+        "flags": 112
+      }
+    ],
+    "closureVars": [],
+    "hasDebug": true,
+    "debug": {
+      "filenameAtom": 235,
+      "filename": "__tests__/fixtures/class-static-block.js",
+      "pc2line": {
+        "type": "Buffer",
+        "data": [
+          0,
+          0,
+          0,
+          101,
+          36,
+          0,
+          27,
+          14,
+          27,
+          10,
+          27,
+          14,
+          27,
+          15,
+          23,
+          21,
+          27,
+          14,
+          27,
+          10,
+          27,
+          14,
+          27,
+          8,
+          17,
+          23,
+          23,
+          21,
+          27,
+          14,
+          27,
+          10,
+          27,
+          14,
+          27,
+          15
+        ]
+      }
+    },
+    "cpool": [
+      {
+        "tag": 12,
+        "flags": 1866,
+        "jsMode": 1,
+        "funcNameAtom": 0,
+        "argCount": 0,
+        "varCount": 1,
+        "definedArgCount": 0,
+        "stackSize": 4,
+        "closureVarCount": 1,
+        "cpoolCount": 0,
+        "bytecodeLen": 12,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            8,
+            203,
+            199,
+            17,
+            223,
+            69,
+            184,
+            159,
+            21,
+            223,
+            70,
+            41
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 8,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [
+          {
+            "nameAtom": 229,
+            "name": "#count",
+            "varIdx": 2,
+            "flags": 13
+          }
+        ],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 235,
+          "filename": "__tests__/fixtures/class-static-block.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              7,
+              11,
+              13,
+              5,
+              7,
+              8,
+              22,
+              16
+            ]
+          }
+        },
+        "cpool": []
+      },
+      {
+        "tag": 12,
+        "flags": 1858,
+        "jsMode": 1,
+        "funcNameAtom": 0,
+        "argCount": 0,
+        "varCount": 1,
+        "definedArgCount": 0,
+        "stackSize": 2,
+        "closureVarCount": 2,
+        "cpoolCount": 0,
+        "bytecodeLen": 13,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            8,
+            203,
+            199,
+            223,
+            45,
+            36,
+            0,
+            0,
+            14,
+            199,
+            224,
+            69,
+            40
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 8,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [
+          {
+            "nameAtom": 230,
+            "name": "#bump",
+            "varIdx": 3,
+            "flags": 13
+          },
+          {
+            "nameAtom": 229,
+            "name": "#count",
+            "varIdx": 2,
+            "flags": 13
+          }
+        ],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 235,
+          "filename": "__tests__/fixtures/class-static-block.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              10,
+              11,
+              13,
+              5,
+              7,
+              8,
+              12,
+              12,
+              28,
+              4,
+              12,
+              23
+            ]
+          }
+        },
+        "cpool": []
+      },
+      {
+        "tag": 12,
+        "flags": 1858,
+        "jsMode": 1,
+        "funcNameAtom": 0,
+        "argCount": 0,
+        "varCount": 1,
+        "definedArgCount": 0,
+        "stackSize": 2,
+        "closureVarCount": 1,
+        "cpoolCount": 0,
+        "bytecodeLen": 6,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            8,
+            203,
+            199,
+            223,
+            69,
+            40
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 8,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [
+          {
+            "nameAtom": 229,
+            "name": "#count",
+            "varIdx": 2,
+            "flags": 13
+          }
+        ],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 235,
+          "filename": "__tests__/fixtures/class-static-block.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              14,
+              4,
+              18,
+              32,
+              12,
+              23
+            ]
+          }
+        },
+        "cpool": []
+      },
+      {
+        "tag": 12,
+        "flags": 1344,
+        "jsMode": 1,
+        "funcNameAtom": 0,
+        "argCount": 0,
+        "varCount": 1,
+        "definedArgCount": 0,
+        "stackSize": 2,
+        "closureVarCount": 1,
+        "cpoolCount": 0,
+        "bytecodeLen": 15,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            8,
+            203,
+            43,
+            104,
+            0,
+            0,
+            17,
+            236,
+            6,
+            199,
+            27,
+            36,
+            0,
+            0,
+            41
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 8,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 0
+          }
+        ],
+        "closureVars": [
+          {
+            "nameAtom": 120,
+            "varIdx": 4,
+            "flags": 13
+          }
+        ],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 235,
+          "filename": "__tests__/fixtures/class-static-block.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              17,
+              0
+            ]
+          }
+        },
+        "cpool": []
+      },
+      {
+        "tag": 12,
+        "flags": 1344,
+        "jsMode": 1,
+        "funcNameAtom": 0,
+        "argCount": 0,
+        "varCount": 1,
+        "definedArgCount": 0,
+        "stackSize": 4,
+        "closureVarCount": 1,
+        "cpoolCount": 1,
+        "bytecodeLen": 27,
+        "bytecode": {
+          "type": "Buffer",
+          "data": [
+            8,
+            203,
+            9,
+            199,
+            104,
+            0,
+            0,
+            183,
+            71,
+            199,
+            4,
+            236,
+            0,
+            0,
+            0,
+            78,
+            234,
+            0,
+            0,
+            0,
+            199,
+            194,
+            0,
+            36,
+            0,
+            0,
+            41
+          ]
+        },
+        "varDefs": [
+          {
+            "nameAtom": 8,
+            "scopeLevel": 0,
+            "scopeNextPlus1": 1,
+            "flags": 64
+          }
+        ],
+        "closureVars": [
+          {
+            "nameAtom": 229,
+            "name": "#count",
+            "varIdx": 2,
+            "flags": 13
+          }
+        ],
+        "hasDebug": true,
+        "debug": {
+          "filenameAtom": 235,
+          "filename": "__tests__/fixtures/class-static-block.js",
+          "pc2line": {
+            "type": "Buffer",
+            "data": [
+              0,
+              0
+            ]
+          }
+        },
+        "cpool": [
+          {
+            "tag": 12,
+            "flags": 1858,
+            "jsMode": 1,
+            "funcNameAtom": 0,
+            "argCount": 0,
+            "varCount": 0,
+            "definedArgCount": 0,
+            "stackSize": 4,
+            "closureVarCount": 2,
+            "cpoolCount": 0,
+            "bytecodeLen": 17,
+            "bytecode": {
+              "type": "Buffer",
+              "data": [
+                223,
+                184,
+                21,
+                224,
+                70,
+                223,
+                4,
+                237,
+                0,
+                0,
+                0,
+                68,
+                234,
+                0,
+                0,
+                0,
+                41
+              ]
+            },
+            "varDefs": [],
+            "closureVars": [
+              {
+                "nameAtom": 8,
+                "varIdx": 0,
+                "flags": 1
+              },
+              {
+                "nameAtom": 229,
+                "name": "#count",
+                "varIdx": 0,
+                "flags": 12
+              }
+            ],
+            "hasDebug": true,
+            "debug": {
+              "filenameAtom": 235,
+              "filename": "__tests__/fixtures/class-static-block.js",
+              "pc2line": {
+                "type": "Buffer",
+                "data": [
+                  3,
+                  4,
+                  3,
+                  8,
+                  7,
+                  8,
+                  23,
+                  7,
+                  7,
+                  8
+                ]
+              }
+            },
+            "cpool": []
+          }
+        ]
+      }
+    ]
+  }
+}

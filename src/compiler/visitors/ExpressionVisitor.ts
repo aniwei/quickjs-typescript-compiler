@@ -810,6 +810,41 @@ export class ExpressionVisitor extends VisitorContext {
 
     // 属性赋值
     if (ts.isPropertyAccessExpression(node.left)) {
+      // 私有字段赋值: obj.#name = rhs
+      if (ts.isPrivateIdentifier(node.left.name)) {
+        // 计算对象
+        this.context.visit(node.left.expression)
+
+        // QuickJS: member access source position anchors at '.' even for private names.
+        const sf = node.left.getSourceFile()
+        const text = sf.text
+        const exprEnd = node.left.expression.getEnd()
+        const nameStart = node.left.name.getStart(sf)
+        let dotPos = -1
+        for (let i = nameStart - 1; i >= exprEnd; i--) {
+          if (text.charCodeAt(i) === 0x2e /* '.' */) {
+            dotPos = i
+            break
+          }
+        }
+        if (dotPos >= 0) {
+          this.compiler.emitSourcePos(fd, dotPos)
+        }
+
+        // 计算值
+        this.context.visit(node.right)
+
+        // QuickJS private-field put path keeps the assigned value on stack;
+        // it uses insert2 before putting the private field.
+        this.compiler.emitOp(fd, Opcode.OP_insert2)
+
+        const name = this.compiler.addAtom(node.left.name.text)
+        this.compiler.emitOp(fd, TempOpcode.OP_scope_put_private_field)
+        this.compiler.emitU32(fd, name)
+        this.compiler.emitU16(fd, fd.scopeLevel)
+        return
+      }
+
       // 计算对象
       this.context.visit(node.left.expression)
 
@@ -976,9 +1011,49 @@ export class ExpressionVisitor extends VisitorContext {
       
       // 计算对象: 栈 [] -> [obj]
       this.context.visit(node.left.expression)
+
+      // QuickJS member access records source position at the '.' token before
+      // emitting OP_get_field2. This affects pc2line for compound assignments
+      // like `obj.prop += x`.
+      const text = sf.text
+      const exprEnd = node.left.expression.getEnd()
+      const nameStart = node.left.name.getStart(sf)
+      let dotPos = -1
+      for (let i = nameStart - 1; i >= exprEnd; i--) {
+        const ch = text.charCodeAt(i)
+        if (ch === 0x2e /* '.' */) {
+          dotPos = i
+          break
+        }
+      }
+      if (dotPos >= 0) {
+        this.compiler.emitSourcePos(fd, dotPos)
+      }
       
+      // 私有字段复合赋值: obj.#name += rhs
+      if (ts.isPrivateIdentifier(node.left.name)) {
+        // OP_scope_get_private_field2: keeps obj and loads private field value.
+        this.compiler.emitOp(fd, TempOpcode.OP_scope_get_private_field2)
+        this.compiler.emitU32(fd, name)
+        this.compiler.emitU16(fd, fd.scopeLevel)
+
+        // 计算右值
+        this.context.visit(node.right)
+
+        // 执行运算
+        this.compiler.emitOp(fd, opcode, sourcePos)
+
+        // QuickJS private-field put path uses insert2 before OP_put_private_field.
+        this.compiler.emitOp(fd, Opcode.OP_insert2)
+
+        this.compiler.emitOp(fd, TempOpcode.OP_scope_put_private_field)
+        this.compiler.emitU32(fd, name)
+        this.compiler.emitU16(fd, fd.scopeLevel)
+        return
+      }
+
       // OP_get_field2: 栈 [obj] -> [obj value]
-      this.compiler.emitOp(fd, Opcode.OP_get_field2, sourcePos)
+      this.compiler.emitOp(fd, Opcode.OP_get_field2)
       this.compiler.emitU32(fd, name)
       this.compiler.emitIc(fd, name)
       
@@ -1559,12 +1634,21 @@ export class ExpressionVisitor extends VisitorContext {
         // 普通方法调用: obj.method()
         this.context.visit(node.expression.expression) // 计算对象
 
-        // 使用 get_field2 获取方法并保留对象
-        const methodName = this.compiler.addAtom(node.expression.name.text)
-        this.compiler.emitOp(fd, Opcode.OP_get_field2, node.expression.expression.getEnd())
-        this.compiler.emitAtom(fd, methodName)
-        this.compiler.emitIc(fd, methodName)
-        isMethodCall = true
+        // 私有方法调用: obj.#m()
+        if (ts.isPrivateIdentifier(node.expression.name)) {
+          const privateName = this.compiler.addAtom(node.expression.name.text)
+          this.compiler.emitOp(fd, TempOpcode.OP_scope_get_private_field2, node.expression.expression.getEnd())
+          this.compiler.emitU32(fd, privateName)
+          this.compiler.emitU16(fd, fd.scopeLevel)
+          isMethodCall = true
+        } else {
+          // 使用 get_field2 获取方法并保留对象
+          const methodName = this.compiler.addAtom(node.expression.name.text)
+          this.compiler.emitOp(fd, Opcode.OP_get_field2, node.expression.expression.getEnd())
+          this.compiler.emitAtom(fd, methodName)
+          this.compiler.emitIc(fd, methodName)
+          isMethodCall = true
+        }
       }
     } else if (ts.isElementAccessExpression(node.expression)) {
       // 方法调用: obj[key]()
@@ -1672,6 +1756,20 @@ export class ExpressionVisitor extends VisitorContext {
 
     // 计算对象
     this.context.visit(node.expression)
+
+    // 私有字段/方法访问: obj.#name
+    // QuickJS lowers these via OP_scope_get_private_field and resolves them in
+    // resolve_scope_private_field() to get_var_ref*/get_private_field/check_brand.
+    if (ts.isPrivateIdentifier(node.name)) {
+      const name = this.compiler.addAtom(node.name.text)
+      // QuickJS pc2line for private names tends to anchor to the private-name token
+      // (the '#...' lexeme) rather than the preceding '.'.
+      const privateNamePos = node.name.getStart(sf)
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_get_private_field, privateNamePos)
+      this.compiler.emitU32(fd, name)
+      this.compiler.emitU16(fd, fd.scopeLevel)
+      return
+    }
 
     // Optional chaining: obj?.prop
     // QuickJS: js_parse_postfix_expr() `TOK_QUESTION_MARK_DOT` + optional_chain_test(drop_count=1)

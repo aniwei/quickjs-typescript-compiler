@@ -27,6 +27,9 @@ interface ClassFieldsDef {
   isStatic: boolean
   /** 品牌推送位置 */
   brandPushPos: number
+
+  /** 类私有字段作用域级别（用于子函数闭包解析对齐 QuickJS） */
+  privateScopeLevel?: number
 }
 
 /**
@@ -99,6 +102,26 @@ export class ClassVisitor extends VisitorContext {
 
     walk(root)
     return found
+  }
+
+  private findVarInCurrentScope(fd: FunctionDef, varName: number): number {
+    let idx = fd.scopes[fd.scopeLevel]?.first ?? -1
+    while (idx >= 0) {
+      const vd = fd.vars[idx]
+      if (vd.varName === varName) {
+        return idx
+      }
+      idx = vd.scopeNext
+    }
+    return -1
+  }
+
+  private getPrivateSetterNameAtom(getterNameAtom: number): number {
+    const base = this.compiler.getAtomString(getterNameAtom)
+    if (!base) {
+      return this.compiler.addAtom('<set>')
+    }
+    return this.compiler.addAtom(base + '<set>')
   }
 
   /**
@@ -175,6 +198,7 @@ export class ClassVisitor extends VisitorContext {
 
     // 进入私有字段作用域 - 对应 parser.c:3277
     this.compiler.pushScope(fd)
+    const privateScopeLevel = fd.scopeLevel
 
     // 占位符: 构造函数常量池索引 - 对应 parser.c:3279-3281
     this.compiler.emitOp(fd, Opcode.OP_push_const)
@@ -201,8 +225,8 @@ export class ClassVisitor extends VisitorContext {
 
     // 初始化类字段定义 - 对应 parser.c:3298-3305
     const classFields: [ClassFieldsDef, ClassFieldsDef] = [
-      { fieldsInitFd: null, computedFieldsCount: 0, needBrand: false, isStatic: false, brandPushPos: 0 },
-      { fieldsInitFd: null, computedFieldsCount: 0, needBrand: false, isStatic: true, brandPushPos: 0 }
+      { fieldsInitFd: null, computedFieldsCount: 0, needBrand: false, isStatic: false, brandPushPos: 0, privateScopeLevel },
+      { fieldsInitFd: null, computedFieldsCount: 0, needBrand: false, isStatic: true, brandPushPos: 0, privateScopeLevel }
     ]
 
     // 编译类成员
@@ -423,7 +447,10 @@ export class ClassVisitor extends VisitorContext {
     isStatic: boolean,
     classFields: [ClassFieldsDef, ClassFieldsDef]
   ): void {
-    const sourcePos = node.getStart()
+    // QuickJS anchors method function debug positions to the method name token,
+    // not to modifiers like `static`.
+    const sf = node.getSourceFile()
+    const sourcePos = node.name ? node.name.getStart(sf) : node.getStart(sf)
 
     // 检查是否为私有方法
     const isPrivate = ts.isPrivateIdentifier(node.name)
@@ -496,6 +523,13 @@ export class ClassVisitor extends VisitorContext {
 
     // 处理私有方法 - 对应 parser.c:3541-3563
     if (isPrivate) {
+      // QuickJS: add_private_class_field() creates a lexical const var with
+      // varKind=JS_VAR_PRIVATE_METHOD and records is_static_private.
+      // third_party/QuickJS/src/core/parser.c:3589-3610 + add_private_class_field()
+      if (this.findVarInCurrentScope(fd, methodName) >= 0) {
+        throw new Error('private class field is already defined')
+      }
+      this.compiler.addPrivateClassField(fd, methodName, JSVarKindEnum.JS_VAR_PRIVATE_METHOD, isStatic)
       methodFd.needHomeObject = true
       this.compiler.emitOp(fd, Opcode.OP_set_home_object)
       this.compiler.emitOp(fd, Opcode.OP_set_name)
@@ -575,10 +609,46 @@ export class ClassVisitor extends VisitorContext {
     this.compiler.emitU32(fd, cpoolIdx)
 
     if (isPrivate) {
+      // Mirror QuickJS private accessor varKind merge logic.
+      // third_party/QuickJS/src/core/parser.c:3404-3434
+      const existingIdx = this.findVarInCurrentScope(fd, accessorName)
+      if (existingIdx >= 0) {
+        const existingKind = fd.vars[existingIdx].varKind
+        const existingIsStatic = fd.vars[existingIdx].isStaticPrivate
+        const isSet = isSetter
+        const otherIsSet = !isSet
+        const kindGetter = JSVarKindEnum.JS_VAR_PRIVATE_GETTER
+        if (
+          existingKind === JSVarKindEnum.JS_VAR_PRIVATE_FIELD ||
+          existingKind === JSVarKindEnum.JS_VAR_PRIVATE_METHOD ||
+          existingKind === JSVarKindEnum.JS_VAR_PRIVATE_GETTER_SETTER ||
+          existingKind === (kindGetter + (isSet ? 1 : 0)) ||
+          (existingKind === (kindGetter + (otherIsSet ? 1 : 0)) && isStatic !== existingIsStatic)
+        ) {
+          throw new Error('private class field is already defined')
+        }
+        fd.vars[existingIdx].varKind = JSVarKindEnum.JS_VAR_PRIVATE_GETTER_SETTER
+      } else {
+        this.compiler.addPrivateClassField(
+          fd,
+          accessorName,
+          isSetter ? JSVarKindEnum.JS_VAR_PRIVATE_SETTER : JSVarKindEnum.JS_VAR_PRIVATE_GETTER,
+          isStatic
+        )
+      }
+
       accessorFd.needHomeObject = true
       this.compiler.emitOp(fd, Opcode.OP_set_home_object)
       this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
-      this.compiler.emitAtom(fd, accessorName)
+      if (isSetter) {
+        // QuickJS stores the setter closure in a separate "<set>"-suffixed private name.
+        // third_party/QuickJS/src/core/parser.c:3438-3460
+        const setterName = this.getPrivateSetterNameAtom(accessorName)
+        this.compiler.addPrivateClassField(fd, setterName, JSVarKindEnum.JS_VAR_PRIVATE_SETTER, isStatic)
+        this.compiler.emitAtom(fd, setterName)
+      } else {
+        this.compiler.emitAtom(fd, accessorName)
+      }
       this.compiler.emitU16(fd, fd.scopeLevel)
     } else {
       if (isComputedName) {
@@ -608,7 +678,12 @@ export class ClassVisitor extends VisitorContext {
 
     // 私有字段需要创建符号
     if (isPrivate) {
-      this.compiler.defineVar(fd, fieldName, JSVarDefEnum.JS_VAR_DEF_CONST)
+      // QuickJS: add_private_class_field() -> add_scope_var + mark lexical const + is_static_private
+      // third_party/QuickJS/src/core/parser.c:3476-3493 + add_private_class_field()
+      if (this.findVarInCurrentScope(fd, fieldName) >= 0) {
+        throw new Error('private class field is already defined')
+      }
+      this.compiler.addPrivateClassField(fd, fieldName, JSVarKindEnum.JS_VAR_PRIVATE_FIELD, isStatic)
       this.compiler.emitOp(fd, Opcode.OP_private_symbol)
       this.compiler.emitAtom(fd, fieldName)
       this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
@@ -634,12 +709,14 @@ export class ClassVisitor extends VisitorContext {
       // 获取计算属性名
       this.compiler.emitOp(cf.fieldsInitFd, TempOpcode.OP_scope_get_var)
       this.compiler.emitAtom(cf.fieldsInitFd, JSAtom.JS_ATOM_computed_field + (isStatic ? 1 : 0))
-      this.compiler.emitU16(cf.fieldsInitFd, fd.scopeLevel)
+      // QuickJS uses the current function's scope_level (fields_init_fd), not the outer class fd.
+      this.compiler.emitU16(cf.fieldsInitFd, cf.fieldsInitFd.scopeLevel)
       cf.computedFieldsCount++
     } else if (isPrivate) {
       this.compiler.emitOp(cf.fieldsInitFd, TempOpcode.OP_scope_get_var)
       this.compiler.emitAtom(cf.fieldsInitFd, fieldName)
-      this.compiler.emitU16(cf.fieldsInitFd, fd.scopeLevel)
+      // Resolve private name via closure from the surrounding class scope.
+      this.compiler.emitU16(cf.fieldsInitFd, cf.fieldsInitFd.scopeLevel)
     }
 
     // 编译初始值或使用 undefined
@@ -820,6 +897,12 @@ export class ClassVisitor extends VisitorContext {
     initFd.superAllowed = true
 
     this.compiler.addChild(fd, initFd)
+
+    // QuickJS: fields_init_fd is created while parsing inside the class private
+    // field scope, so closure resolution for private names should start there.
+    if (cf?.privateScopeLevel !== undefined) {
+      initFd.parentScopeLevel = cf.privateScopeLevel
+    }
 
     // QuickJS: emit_class_init_start() emits a brand-check block guarded by a
     // push_false placeholder that can be patched to push_true when needed.

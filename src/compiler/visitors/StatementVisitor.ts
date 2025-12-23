@@ -1167,12 +1167,14 @@ export class StatementVisitor extends VisitorContext {
       op === ts.SyntaxKind.QuestionQuestionEqualsToken
 
     const isSimpleEqualsAssignmentOp = op === ts.SyntaxKind.EqualsToken
+    const isCompoundAssignmentOp =
+      op >= ts.SyntaxKind.PlusEqualsToken && op <= ts.SyntaxKind.CaretEqualsToken
 
     const isTopLevelAssignmentStmt =
       fd.evalRetIdx < 0 &&
       ts.isBinaryExpression(expr) &&
       isAssignmentOp &&
-      isSimpleEqualsAssignmentOp &&
+      (isSimpleEqualsAssignmentOp || isCompoundAssignmentOp) &&
       (ts.isIdentifier(expr.left) || ts.isPropertyAccessExpression(expr.left) || ts.isElementAccessExpression(expr.left))
 
     if (isTopLevelAssignmentStmt) {
