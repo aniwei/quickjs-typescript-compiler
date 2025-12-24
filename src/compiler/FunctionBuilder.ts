@@ -146,6 +146,54 @@ export class JSFunctionBytecode {
 }
 
 // ============================================================================
+// JSModuleBytecode structure - aligns with QuickJS JSModuleDef serialization
+// ============================================================================
+
+export type JSReqModuleEntry = {
+  moduleNameAtom: number
+  attributes: any
+}
+
+export type JSImportEntry = {
+  varIdx: number
+  isStar: boolean
+  importNameAtom: number
+  reqModuleIdx: number
+}
+
+export enum JSExportTypeEnum {
+  JS_EXPORT_TYPE_LOCAL = 0,
+  JS_EXPORT_TYPE_INDIRECT = 1,
+}
+
+export type JSExportEntry =
+  | {
+      exportType: JSExportTypeEnum.JS_EXPORT_TYPE_LOCAL
+      localVarIdx: number
+      exportNameAtom: number
+    }
+  | {
+      exportType: JSExportTypeEnum.JS_EXPORT_TYPE_INDIRECT
+      reqModuleIdx: number
+      localNameAtom: number
+      exportNameAtom: number
+    }
+
+export type JSStarExportEntry = {
+  reqModuleIdx: number
+}
+
+export class JSModuleBytecode {
+  moduleNameAtom: number = 0
+  reqModuleEntries: JSReqModuleEntry[] = []
+  exportEntries: JSExportEntry[] = []
+  starExportEntries: JSStarExportEntry[] = []
+  importEntries: JSImportEntry[] = []
+  hasTla: boolean = false
+  funcObj!: JSFunctionBytecode
+}
+
+// ============================================================================
 // FunctionBuilder 类
 // ============================================================================
 
@@ -332,7 +380,7 @@ export class FunctionBuilder {
 // ============================================================================
 
 import { Compiler } from './Compiler'
-import { OpFormat, OPCODE_BY_CODE, firstAtomId } from '../env'
+import { OpFormat, OPCODE_BY_CODE, env } from '../env'
 
 /**
  * BytecodeWriter - 将 JSFunctionBytecode 序列化为二进制格式
@@ -360,7 +408,7 @@ export class BytecodeWriter {
     this.atomToIdx = new Map()
     this.idxToAtom = []
     this.compiler = compiler || null
-    this.firstAtom = firstAtomId // 228
+    this.firstAtom = env.firstAtomId // 228
   }
   
   /**
@@ -369,13 +417,17 @@ export class BytecodeWriter {
    * @param b 函数字节码
    * @returns 序列化后的字节数组
    */
-  write(b: JSFunctionBytecode): Uint8Array {
+  write(b: JSFunctionBytecode | JSModuleBytecode): Uint8Array {
     this.out.reset()
     this.atomToIdx.clear()
     this.idxToAtom = []
     
-    // 写入函数字节码
-    this.writeFunctionBytecode(b)
+    // 写入根对象（函数或模块）
+    if (b instanceof JSModuleBytecode) {
+      this.writeModule(b)
+    } else {
+      this.writeFunctionBytecode(b)
+    }
     
     // 写入 atoms 表到开头
     const result = this.finalizeWithAtoms()
@@ -385,6 +437,48 @@ export class BytecodeWriter {
     }
     
     return result
+  }
+
+  private writeModule(m: JSModuleBytecode): void {
+    // Align with QuickJS bytecode.cpp: JS_WriteModule
+    this.out.putByte(BytecodeTag.TC_TAG_MODULE)
+    this.putAtom(m.moduleNameAtom)
+
+    this.out.putULEB128(m.reqModuleEntries.length)
+    for (const rme of m.reqModuleEntries) {
+      this.putAtom(rme.moduleNameAtom)
+      this.writeConstant(rme.attributes)
+    }
+
+    this.out.putULEB128(m.exportEntries.length)
+    for (const e of m.exportEntries) {
+      this.out.putByte(e.exportType)
+      if (e.exportType === JSExportTypeEnum.JS_EXPORT_TYPE_LOCAL) {
+        this.out.putULEB128(e.localVarIdx)
+      } else {
+        this.out.putULEB128(e.reqModuleIdx)
+        this.putAtom(e.localNameAtom)
+      }
+      this.putAtom(e.exportNameAtom)
+    }
+
+    this.out.putULEB128(m.starExportEntries.length)
+    for (const se of m.starExportEntries) {
+      this.out.putULEB128(se.reqModuleIdx)
+    }
+
+    this.out.putULEB128(m.importEntries.length)
+    for (const ie of m.importEntries) {
+      this.out.putULEB128(ie.varIdx)
+      this.out.putByte(ie.isStar ? 1 : 0)
+      this.putAtom(ie.importNameAtom)
+      this.out.putULEB128(ie.reqModuleIdx)
+    }
+
+    this.out.putByte(m.hasTla ? 1 : 0)
+
+    // func_obj
+    this.writeFunctionBytecode(m.funcObj)
   }
   
   /**

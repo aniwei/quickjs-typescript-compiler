@@ -1,5 +1,5 @@
-import { TypeScriptCompiler } from './TypeScriptCompiler'
 import fs from 'fs'
+import { TypeScriptCompiler } from './TypeScriptCompiler'
 import { createAdvancedDisassembly } from './disasm'
 
 const args = process.argv.slice(2)

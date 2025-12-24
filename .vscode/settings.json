@@ -65,5 +65,6 @@
     "quickjs-opcode.h": "c",
     "taro_js_function.h": "c",
     "taro_js_types.h": "c"
-  }
+  },
+  "cmake.sourceDirectory": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/upstream/emscripten/tools/websocket_to_posix_proxy"
 }

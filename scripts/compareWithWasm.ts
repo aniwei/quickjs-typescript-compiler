@@ -53,6 +53,7 @@ class BytecodeComparator {
   private lastSummary: ComparisonSummary | null = null
   private referenceJs: { code: string; path: string } | null = null
   private referenceJsError: unknown | null = null
+  private isModule: boolean | null = null
 
   constructor(options: ComparisonOptions) {
     this.options = options
@@ -65,6 +66,9 @@ class BytecodeComparator {
     // 确保 artifacts 输出目录存在
     await this.ensureArtifactsDir()
     
+    // 判定本次输入应按 script 还是 module 编译（基于 import/export 的 external module 指示）
+    this.isModule = await this.detectIsModule()
+
     // 用我们自己的 TypeScript 编译器编译
     console.log('📦 Compiling with TypeScript compiler...')
     const tsResult = await this.compileWithTypeScript()
@@ -92,6 +96,17 @@ class BytecodeComparator {
     } catch (error) {
       // 目录可能已存在
     }
+  }
+
+  private async detectIsModule(): Promise<boolean> {
+    const reference = await this.resolveReferenceJavaScript({ tolerateErrors: true })
+    const sourceCode = reference ? reference.code : await fs.readFile(this.options.inputTs, 'utf-8')
+    const fileName = reference ? reference.path : this.options.inputTs
+
+    // 用 TypeScript parser 判断 external module（存在 import/export 即为模块）
+    const kind = /\.jsx?$/i.test(fileName) ? ts.ScriptKind.JS : ts.ScriptKind.TS
+    const sf = ts.createSourceFile(fileName, sourceCode, ts.ScriptTarget.ESNext, true, kind)
+    return (sf as any).externalModuleIndicator != null
   }
 
   private async compileWithTypeScript(): Promise<CompilationResult> {
@@ -123,6 +138,8 @@ class BytecodeComparator {
     const compiler = new TypeScriptCompiler({
       ...(flags as any),
       referenceJsSource: reference?.code,
+      // 确保按本次判定的模式编译，避免 “TS 侧 module / WASM 侧 script” 这种全局错配
+      forceModule: this.isModule === true,
     })
     // 使用 JS 文件名，以对齐 WASM 侧输出
     let filename = reference ? reference.path : this.options.inputTs;
@@ -174,7 +191,10 @@ class BytecodeComparator {
       
       // 用 QuickJS WASM 编译（需要 WASM binding；这里是占位实现）
       const { result: bytecode, stdout, stderr } = await QuickJSLib.withCapturedOutput(() => {
-        // 使用 script 模式（全局 eval），用于对齐 TS 侧输出
+        // 按判定模式编译：script（全局 eval）或 module（ESM）
+        if (this.isModule === true) {
+          return QuickJSLib.compileSource(reference.code, reference.path)
+        }
         return QuickJSLib.compileSourceAsScript(reference.code, reference.path)
       })
       

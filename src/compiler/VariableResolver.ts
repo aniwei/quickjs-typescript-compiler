@@ -90,8 +90,9 @@ export class VariableResolver {
     // 创建输出缓冲区
     const bcOut = new BytecodeBuilder()
     
-    // 第一遍: 添加全局变量定义检查 (仅用于全局变量模式)
-    if (fd.isGlobalVar) {
+    // 第一遍: 添加全局变量定义检查 (仅用于 script/eval global 模式)
+    // 对于 module，QuickJS 不会在函数体开头注入这些全局 define checks。
+    if (fd.isGlobalVar && fd.module == null) {
       this.addGlobalVarChecks(fd, bcOut)
     }
     
@@ -546,6 +547,53 @@ export class VariableResolver {
     if (!fd.isGlobalVar) {
       return
     }
+
+    // 模块顶层：bindings 在 module instantiation 阶段创建。
+    // 对齐 QuickJS：不发射 OP_define_var / OP_define_func；仅在需要时生成一个
+    // `push_this; if_false8 ...` 的受保护块来初始化提升函数（global func decl）。
+    if (fd.module) {
+      const hoistedFuncs: { cpoolIdx: number; varName: number; closureVarIdx: number }[] = []
+      for (let i = 0; i < fd.globalVarCount; i++) {
+        const hf = fd.globalVars[i]
+        if (!hf) continue
+        if (hf.cpoolIdx < 0) continue
+        if (hf.isLexical) continue
+
+        const closureVarIdx = fd.closureVar
+          .slice(0, fd.closureVarCount)
+          .findIndex((cv) => cv.varName === hf.varName)
+        if (closureVarIdx < 0) continue
+
+        hoistedFuncs.push({ cpoolIdx: hf.cpoolIdx, varName: hf.varName, closureVarIdx })
+      }
+
+      if (hoistedFuncs.length) {
+        // Guard: if (this) { init_hoisted_funcs; return_undef }
+        // 重要：这里必须使用带 label 的 OP_if_false，而不是直接输出 OP_if_false8。
+        // 否则 LabelResolver 的 skipDeadCode 会把后续字节码当作不可达，从而无法做
+        // push_i32 -> push_1 等短操作码优化。
+        const labelSkip = this.compiler.newLabelInt(fd)
+        fd.labelSlots[labelSkip].refCount++
+        fd.jumpSize++
+
+        bcOut.putU8(Opcode.OP_push_this)
+        bcOut.putU8(Opcode.OP_if_false)
+        bcOut.putU32(labelSkip)
+
+        for (const hf of hoistedFuncs) {
+          bcOut.putU8(Opcode.OP_fclosure)
+          bcOut.putU32(hf.cpoolIdx >>> 0)
+          bcOut.putU8(Opcode.OP_put_var_ref)
+          bcOut.putU16(hf.closureVarIdx)
+        }
+
+        bcOut.putU8(Opcode.OP_return_undef)
+        bcOut.putU8(TempOpcode.OP_label)
+        bcOut.putU32(labelSkip)
+      }
+
+      return
+    }
     
     for (const hf of fd.globalVars) {
       // 计算 flags
@@ -652,6 +700,17 @@ export class VariableResolver {
       }
       this.emitLocalVarAccess(fd, varIdx, varName, op, bcOut, bcBuf, labelIdx)
       return
+    }
+
+    // === 步骤2.5: 在当前函数已存在的闭包变量中查找 ===
+    // 对齐 QuickJS：module 的 import bindings / module globals 会作为 closure vars 存在，
+    // 并且它们不是局部 varDefs（fd.vars）也不是父函数捕获。
+    for (let i = 0; i < fd.closureVarCount; i++) {
+      const cv = fd.closureVar[i]
+      if (cv.varName === varName) {
+        this.emitClosureVarAccess(fd, i, varName, op, bcOut, bcBuf, labelIdx)
+        return
+      }
     }
     
     // === 步骤3: 在父函数中查找 (闭包) ===
@@ -837,6 +896,31 @@ export class VariableResolver {
       }
       
       if (varIdx >= 0) break
+
+      // 在父函数的闭包变量中查找（对齐 QuickJS：父函数可能只有 closure vars，如 module imports/globals）
+      let parentClosureIdx = -1
+      for (let i = 0; i < currentFd.closureVarCount; i++) {
+        const cv = currentFd.closureVar[i]
+        if (cv.varName === varName) {
+          parentClosureIdx = i
+          break
+        }
+      }
+      if (parentClosureIdx >= 0) {
+        const cv = currentFd.closureVar[parentClosureIdx]
+        const closureIdx = this.compiler.getClosureVar(
+          fd,
+          currentFd,
+          false,
+          false,
+          parentClosureIdx,
+          varName,
+          cv.isConst,
+          cv.isLexical,
+          cv.varKind
+        )
+        return { found: true, varIdx: closureIdx }
+      }
       
       // 在父函数的普通变量中查找
       varIdx = this.compiler.findVarByAtom(currentFd, varName)
@@ -1550,6 +1634,12 @@ export class VariableResolver {
         
         // 如果需要闭包引用
         if (isRef && currentFd !== fd) {
+          // 对齐 QuickJS：私有字段名（JS_VAR_PRIVATE_FIELD）会设置 is_captured，
+          // 从而在 leave_scope 时生成 OP_close_loc，并让 vardef.flags 匹配（例如 0x35 -> 0x75）。
+          // 注意：私有方法/访问器名在 QuickJS 中不会设置 is_captured。
+          if (varKind === JSVarKindEnum.JS_VAR_PRIVATE_FIELD) {
+            currentFd.vars[idx].isCaptured = true
+          }
           const closureIdx = this.compiler.getClosureVar(
             fd,
             currentFd,

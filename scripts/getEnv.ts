@@ -48,11 +48,11 @@ async function main() {
   const JS_MODE_STRICT_VALUE = jsModes['JS_MODE_STRICT'] || 1
   const hasShortOpcodes = (compileOptions & COMPILE_FLAG_SHORT_OPCODES) !== 0
   lines.push(`// 基于 compileOptions 推导的常量`)
-  lines.push(`export const compileOptions = ${compileOptions}`)
+  lines.push(`export const COMPILE_OPTIONS = ${compileOptions}`)
   lines.push(`export const SHORT_OPCODES = ${hasShortOpcodes}`)
   lines.push(`export const JS_MODE_STRICT_DEFAULT = ${JS_MODE_STRICT_VALUE}`)
-  lines.push(`export const bytecodeVersion = ${bytecodeVersion}`)
-  lines.push(`export const firstAtomId = ${firstAtomId}`)
+  lines.push(`export const BYTECODE_VERSION = ${bytecodeVersion}`)
+  lines.push(`export const FIRST_ATOM_ID = ${firstAtomId}`)
   lines.push(``)
 
   // QuickJS 常量（来自 QuickJS 头文件；用于 TS 侧对齐与消除魔数）

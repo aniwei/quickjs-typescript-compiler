@@ -1,9 +1,50 @@
-import { BytecodeTag, firstAtomId, JS_FUNCTION_BYTECODE_FLAG_HAS_DEBUG } from './env'
+import { BytecodeTag, FIRST_ATOM_ID, JS_FUNCTION_BYTECODE_FLAG_HAS_DEBUG } from './env'
 
 export interface ParsedBytecodeModule {
   version: number
   atoms: string[]
   func: FunctionBytecode
+  module?: ParsedModuleBytecode
+}
+
+export interface ParsedReqModuleEntry {
+  moduleNameAtom: number
+  moduleName?: string
+  attributes: unknown
+}
+
+export interface ParsedExportEntry {
+  exportType: number
+  localVarIdx?: number
+  reqModuleIdx?: number
+  localNameAtom?: number
+  localName?: string
+  exportNameAtom: number
+  exportName?: string
+}
+
+export interface ParsedStarExportEntry {
+  reqModuleIdx: number
+}
+
+export interface ParsedImportEntry {
+  varIdx: number
+  isStar: boolean
+  importNameAtom: number
+  importName?: string
+  reqModuleIdx: number
+}
+
+export interface ParsedModuleBytecode {
+  tag: BytecodeTag.TC_TAG_MODULE
+  moduleNameAtom: number
+  moduleName?: string
+  reqModuleEntries: ParsedReqModuleEntry[]
+  exportEntries: ParsedExportEntry[]
+  starExportEntries: ParsedStarExportEntry[]
+  importEntries: ParsedImportEntry[]
+  hasTla: boolean
+  funcObj: FunctionBytecode
 }
 
 export interface FunctionDebugInfo {
@@ -120,8 +161,8 @@ class Reader {
 }
 
 function decodeAtomName(atom: number, atoms: string[]): string | undefined {
-  if (atom >= firstAtomId) {
-    const idx = atom - firstAtomId
+  if (atom >= FIRST_ATOM_ID) {
+    const idx = atom - FIRST_ATOM_ID
     return atoms[idx]
   }
   return undefined
@@ -274,6 +315,126 @@ function readFunctionBytecode(reader: Reader, atoms: string[]): FunctionBytecode
   }
 }
 
+function readAnyObject(reader: Reader, atoms: string[]): unknown {
+  const tag = reader.readU8()
+  switch (tag) {
+    case BytecodeTag.TC_TAG_NULL:
+      return null
+    case BytecodeTag.TC_TAG_UNDEFINED:
+      return undefined
+    case BytecodeTag.TC_TAG_BOOL_FALSE:
+      return false
+    case BytecodeTag.TC_TAG_BOOL_TRUE:
+      return true
+    case BytecodeTag.TC_TAG_INT32:
+      return (reader.readU32LE() | 0) as number
+    case BytecodeTag.TC_TAG_FLOAT64:
+      return reader.readF64LE()
+    case BytecodeTag.TC_TAG_STRING:
+      return reader.readString()
+    case BytecodeTag.TC_TAG_TEMPLATE_OBJECT: {
+      const len = reader.readULEB128()
+      const elements: unknown[] = []
+      for (let i = 0; i < len; i++) elements.push(readAnyObject(reader, atoms))
+      const raw = readAnyObject(reader, atoms)
+      return { tag: 'template_object', elements, raw }
+    }
+    case BytecodeTag.TC_TAG_FUNCTION_BYTECODE:
+      reader.ptr -= 1
+      return readFunctionBytecode(reader, atoms)
+    case BytecodeTag.TC_TAG_MODULE:
+      reader.ptr -= 1
+      return readModuleBytecode(reader, atoms)
+    default:
+      // Unknown tag: bail out with null to avoid desync.
+      return null
+  }
+}
+
+function readModuleBytecode(reader: Reader, atoms: string[]): ParsedModuleBytecode {
+  const tag = reader.readU8()
+  if (tag !== BytecodeTag.TC_TAG_MODULE) {
+    throw new Error(`Unsupported tag: ${tag} (expected TC_TAG_MODULE=${BytecodeTag.TC_TAG_MODULE})`)
+  }
+
+  const moduleNameAtom = readAtom(reader)
+  const reqCount = reader.readULEB128()
+  const reqModuleEntries: ParsedReqModuleEntry[] = []
+  for (let i = 0; i < reqCount; i++) {
+    const mn = readAtom(reader)
+    const attributes = readAnyObject(reader, atoms)
+    reqModuleEntries.push({ moduleNameAtom: mn, moduleName: decodeAtomName(mn, atoms), attributes })
+  }
+
+  const exportCount = reader.readULEB128()
+  const exportEntries: ParsedExportEntry[] = []
+  for (let i = 0; i < exportCount; i++) {
+    const exportType = reader.readU8()
+    if (exportType === 0) {
+      const localVarIdx = reader.readULEB128()
+      const exportNameAtom = readAtom(reader)
+      exportEntries.push({
+        exportType,
+        localVarIdx,
+        exportNameAtom,
+        exportName: decodeAtomName(exportNameAtom, atoms),
+      })
+    } else {
+      const reqModuleIdx = reader.readULEB128()
+      const localNameAtom = readAtom(reader)
+      const exportNameAtom = readAtom(reader)
+      exportEntries.push({
+        exportType,
+        reqModuleIdx,
+        localNameAtom,
+        localName: decodeAtomName(localNameAtom, atoms),
+        exportNameAtom,
+        exportName: decodeAtomName(exportNameAtom, atoms),
+      })
+    }
+  }
+
+  const starCount = reader.readULEB128()
+  const starExportEntries: ParsedStarExportEntry[] = []
+  for (let i = 0; i < starCount; i++) {
+    starExportEntries.push({ reqModuleIdx: reader.readULEB128() })
+  }
+
+  const importCount = reader.readULEB128()
+  const importEntries: ParsedImportEntry[] = []
+  for (let i = 0; i < importCount; i++) {
+    const varIdx = reader.readULEB128()
+    const isStar = reader.readU8() !== 0
+    const importNameAtom = readAtom(reader)
+    const reqModuleIdx = reader.readULEB128()
+    importEntries.push({
+      varIdx,
+      isStar,
+      importNameAtom,
+      importName: decodeAtomName(importNameAtom, atoms),
+      reqModuleIdx,
+    })
+  }
+
+  const hasTla = reader.readU8() !== 0
+  const funcObj = readAnyObject(reader, atoms) as FunctionBytecode
+  if (!funcObj || (funcObj as any).tag !== BytecodeTag.TC_TAG_FUNCTION_BYTECODE) {
+    throw new Error('Invalid module func_obj: expected function bytecode')
+  }
+
+  return {
+    tag: BytecodeTag.TC_TAG_MODULE,
+    moduleNameAtom,
+    moduleName: decodeAtomName(moduleNameAtom, atoms),
+    reqModuleEntries,
+    exportEntries,
+    starExportEntries,
+    importEntries,
+    hasTla,
+    funcObj,
+  }
+}
+
 export function parseBytecodeModule(input: Uint8Array | ArrayBuffer | Buffer): ParsedBytecodeModule {
   const buf =
     input instanceof Uint8Array
@@ -291,6 +452,13 @@ export function parseBytecodeModule(input: Uint8Array | ArrayBuffer | Buffer): P
     atoms.push(reader.readString())
   }
 
+  // Root can be a function or a module.
+  const tag = reader.readU8()
+  reader.ptr -= 1
+  if (tag === BytecodeTag.TC_TAG_MODULE) {
+    const module = readModuleBytecode(reader, atoms)
+    return { version, atoms, func: module.funcObj, module }
+  }
   const func = readFunctionBytecode(reader, atoms)
   return { version, atoms, func }
 }

@@ -1,7 +1,7 @@
 import ts from 'typescript'
 import { Compiler } from './compiler/Compiler'
-import { FunctionDef, JSVarScope } from './compiler/FunctionDef'
-import { Opcode, OPCODE_BY_CODE, TempOpcode, TEMP_OPCODE_BY_CODE, JS_EVAL_TYPE_GLOBAL } from './env'
+import { FunctionDef, JSFunctionKindEnum, JSModuleDef, JSImportExportTypeEnum, JSVarScope } from './compiler/FunctionDef'
+import { Opcode, OPCODE_BY_CODE, TempOpcode, TEMP_OPCODE_BY_CODE, JS_EVAL_TYPE_GLOBAL, JS_EVAL_TYPE_MODULE, JS_MODE_STRICT_DEFAULT } from './env'
 
 import { CompilerContext } from './compiler/CompilerContext'
 import { StatementVisitor } from './compiler/visitors/StatementVisitor'
@@ -14,7 +14,7 @@ import { ThisVisitor } from './compiler/visitors/ThisVisitor'
 import { VariableResolver } from './compiler/VariableResolver'
 import { LabelResolver } from './compiler/LabelResolver'
 import { StackSizeComputer } from './compiler/StackSizeComputer'
-import { FunctionBuilder, BytecodeWriter } from './compiler/FunctionBuilder'
+import { FunctionBuilder, BytecodeWriter, JSExportTypeEnum, JSModuleBytecode } from './compiler/FunctionBuilder'
 import { DebugInfoBuilder } from './compiler/DebugInfoBuilder'
 
 export class TypeScriptCompiler implements CompilerContext {
@@ -35,8 +35,10 @@ export class TypeScriptCompiler implements CompilerContext {
   private literalVisitor: LiteralVisitor
   private identifierVisitor: IdentifierVisitor
   private thisVisitor: ThisVisitor
+  private options: any
 
   constructor(options?: any) {
+    this.options = options
     this.compiler = new Compiler(options)
     this.variableResolver = new VariableResolver(this)
     this.statementVisitor = new StatementVisitor(this)
@@ -87,6 +89,8 @@ export class TypeScriptCompiler implements CompilerContext {
       ts.ScriptTarget.ESNext,
       true,
       ts.ScriptKind.TS)
+
+    const isModule = ((sourceFile as any).externalModuleIndicator != null) || this.options?.forceModule === true
     
     // 设置 sourceFile 到 compiler
     this.compiler.setSourceFile(sourceFile)
@@ -94,8 +98,7 @@ export class TypeScriptCompiler implements CompilerContext {
     // 2. 创建根 FunctionDef - 对应 js_new_function_def (parser.c:8215-8285)
     const fd = new FunctionDef()
     fd.isEval = true
-    // QuickJS: JS_EVAL_TYPE_GLOBAL = (0 << 0)
-    fd.evalType = JS_EVAL_TYPE_GLOBAL
+    fd.evalType = isModule ? JS_EVAL_TYPE_MODULE : JS_EVAL_TYPE_GLOBAL
     fd.isGlobalVar = true
     fd.hasThisBinding = true
     fd.newTargetAllowed = false
@@ -112,12 +115,23 @@ export class TypeScriptCompiler implements CompilerContext {
     fd.sourceLen = source.length
     fd.sourcePos = 0
 
+    // 模块顶层按规范为 strict mode；同时 QuickJS 模块以 async 形式返回（支持 TLA）。
+    if (isModule) {
+      fd.jsMode |= JS_MODE_STRICT_DEFAULT
+      fd.funcKind = JSFunctionKindEnum.JS_FUNC_ASYNC
+    }
+
     // 初始化行列缓存 - 对应 QuickJS get_line_col_cached (parser.c:148-180)
     // 供后续 DebugInfoBuilder.computePc2LineInfo 使用。
     DebugInfoBuilder.initLineColCache(fd, source)
     
     // 初始化作用域数组 - parser.c:8261-8268
-    fd.scopes = [new JSVarScope(), new JSVarScope(), new JSVarScope(), new JSVarScope()]
+    fd.scopes = [
+      new JSVarScope(), 
+      new JSVarScope(), 
+      new JSVarScope(), 
+      new JSVarScope()]
+
     fd.scopeSize = 4
     fd.scopeCount = 1
     fd.scopes[0].first = -1
@@ -128,6 +142,12 @@ export class TypeScriptCompiler implements CompilerContext {
     
     // 设置当前函数定义
     this.setFuncDef(fd)
+
+    if (isModule) {
+      const m = new JSModuleDef()
+      m.moduleName = this.compiler.addAtom(filename)
+      fd.module = m
+    }
     
     // 3. 推入 body scope - 对应 push_scope(s) (parser.c:13659)
     this.compiler.pushScope(fd)
@@ -135,20 +155,36 @@ export class TypeScriptCompiler implements CompilerContext {
     
     // 4. 添加隐藏变量 <ret> 用于返回值 - 对应 parser.c:13499-13502
     // 注意: QuickJS 中 JS_ATOM__ret_ 的实际字符串是 '<ret>' (见 quickjs-atom.h:116)
-    const retAtom = this.compiler.addAtom('<ret>')
-    const retIdx = this.compiler.addVar(fd, retAtom)
-    fd.evalRetIdx = retIdx
+    // 模块顶层不需要 eval 返回值：QuickJS 对模块结尾直接 emit OP_return_undef。
+    // 保持 evalRetIdx=-1 可以让 setEvalRetUndefined() 变为 no-op。
+    if (!fd.module) {
+      const retAtom = this.compiler.addAtom('<ret>')
+      const retIdx = this.compiler.addVar(fd, retAtom)
+      fd.evalRetIdx = retIdx
+    } else {
+      fd.evalRetIdx = -1
+    }
     
     // 5. 遍历源文件的每个语句并发射字节码
     for (const statement of sourceFile.statements) {
       this.visitStatement(statement)
     }
+
+    // Finalize module: add module globals closure vars and resolve local exports.
+    if (fd.module) {
+      this.finalizeModule(fd)
+    }
     
     // 6. 发射 return 指令 - 对应 parser.c:13504-13533
-    // 对于全局 eval，返回 _ret_ 变量的值
-    this.compiler.emitOp(fd, Opcode.OP_get_loc)
-    this.compiler.emitU16(fd, fd.evalRetIdx)
-    this.compiler.emitReturn(fd, true)
+    if (fd.module) {
+      // 模块: 以 async 返回（QuickJS: undefined; return_async）
+      this.compiler.emitReturn(fd, false)
+    } else {
+      // 全局 eval: 返回 _ret_ 变量的值
+      this.compiler.emitOp(fd, Opcode.OP_get_loc)
+      this.compiler.emitU16(fd, fd.evalRetIdx)
+      this.compiler.emitReturn(fd, true)
+    }
     
     // 7. 递归处理所有函数 - 对应 js_create_function (parser.c:12439-12705)
     // QuickJS 的 js_create_function 是递归的，先处理子函数再处理父函数
@@ -156,17 +192,100 @@ export class TypeScriptCompiler implements CompilerContext {
     
     // 8. 构建最终字节码 - 对应 parser.c:12572-12700
     const builder = new FunctionBuilder()
-    const bytecode = builder.build(fd)
+    const funcBytecode = builder.build(fd)
     
     // 9. 序列化字节码 - 对应 bytecode.cpp:450-530
     const writer = new BytecodeWriter(this.compiler)
-    const result = writer.write(bytecode)
+
+    const result = fd.module
+      ? writer.write(this.buildModuleBytecode(fd.module, funcBytecode))
+      : writer.write(funcBytecode)
     
     if (process.env.DEBUG_JUMP) {
       console.log(`[TypeScriptCompiler.compile] result.length=${result.length}, result[83]=0x${result[83]?.toString(16) ?? 'undefined'}`)
     }
     
     return result
+  }
+
+  private finalizeModule(fd: FunctionDef): void {
+    const m = fd.module!
+
+    // Add module global vars as closure vars (after imports), matching QuickJS behavior.
+    for (let i = 0; i < fd.globalVarCount; i++) {
+      const gv = fd.globalVars[i]
+      const varName = gv.varName
+      const exists = fd.closureVar.slice(0, fd.closureVarCount).some(cv => cv.varName === varName)
+      if (exists) {
+        // Import bindings and module globals must not collide.
+        continue
+      }
+      fd.closureVar.push({
+        // Module-defined globals are created in the module function.
+        // Match QuickJS module.c: js_create_module_bytecode_function() creates
+        // var refs for closure vars where is_local = TRUE.
+        isLocal: true,
+        isArg: false,
+        isConst: gv.isConst,
+        isLexical: gv.isLexical,
+        varKind: 0,
+        varIdx: i,
+        varName,
+      } as any)
+      fd.closureVarCount++
+    }
+
+    // Resolve LOCAL exports to closure var indices.
+    // 将 LOCAL 导出解析为闭包变量索引。
+    for (const e of m.exportEntries) {
+      if (e.exportType !== JSImportExportTypeEnum.JS_EXPORT_TYPE_LOCAL) continue
+      const localName = e.localName
+      const idx = fd.closureVar.slice(0, fd.closureVarCount).findIndex(cv => cv.varName === localName)
+      if (idx < 0) {
+        throw new Error('未找到导出的本地绑定')
+      }
+      ;(e as any).localVarIdx = idx
+    }
+    for (const e of m.exportEntries) {
+      if (e.exportType !== JSImportExportTypeEnum.JS_EXPORT_TYPE_LOCAL) continue
+      const localName = e.localName
+      const idx = fd.closureVar.slice(0, fd.closureVarCount).findIndex(cv => cv.varName === localName)
+      if (idx < 0) {
+        throw new Error('exported local binding not found')
+      }
+      ;(e as any).localVarIdx = idx
+    }
+  }
+
+  private buildModuleBytecode(m: JSModuleDef, funcObj: any): JSModuleBytecode {
+    const out = new JSModuleBytecode()
+    out.moduleNameAtom = m.moduleName
+    out.reqModuleEntries = m.reqModuleEntries.map(e => ({ moduleNameAtom: e.moduleName, attributes: e.attributes }))
+    out.importEntries = m.importEntries.map(e => ({
+      varIdx: e.varIdx,
+      isStar: e.isStar,
+      importNameAtom: e.importName,
+      reqModuleIdx: e.reqModuleIdx,
+    }))
+    out.starExportEntries = m.starExportEntries.map(e => ({ reqModuleIdx: e.reqModuleIdx }))
+    out.exportEntries = m.exportEntries.map(e => {
+      if (e.exportType === JSImportExportTypeEnum.JS_EXPORT_TYPE_LOCAL) {
+        return {
+          exportType: JSExportTypeEnum.JS_EXPORT_TYPE_LOCAL,
+          localVarIdx: (e as any).localVarIdx as number,
+          exportNameAtom: e.exportName,
+        }
+      }
+      return {
+        exportType: JSExportTypeEnum.JS_EXPORT_TYPE_INDIRECT,
+        reqModuleIdx: (e as any).reqModuleIdx as number,
+        localNameAtom: e.localName,
+        exportNameAtom: e.exportName,
+      }
+    })
+    out.hasTla = m.hasTla
+    out.funcObj = funcObj
+    return out
   }
   
   /**
@@ -242,6 +361,7 @@ export class TypeScriptCompiler implements CompilerContext {
     if (!fd.getLineColCache && fd.source) {
       DebugInfoBuilder.initLineColCache(fd, fd.source)
     }
+
     DebugInfoBuilder.computePc2LineInfo(fd)
   }
 
@@ -266,6 +386,15 @@ export class TypeScriptCompiler implements CompilerContext {
     switch (node.kind) {
       case ts.SyntaxKind.SourceFile:
         // TODO
+        break
+      case ts.SyntaxKind.ImportDeclaration:
+        this.statementVisitor.visitImportDeclaration(node as ts.ImportDeclaration)
+        break
+      case ts.SyntaxKind.ExportDeclaration:
+        this.statementVisitor.visitExportDeclaration(node as ts.ExportDeclaration)
+        break
+      case ts.SyntaxKind.ExportAssignment:
+        this.statementVisitor.visitExportAssignment(node as ts.ExportAssignment)
         break
       case ts.SyntaxKind.FunctionDeclaration:
         this.functionVisitor.visitFunctionDeclaration(node as ts.FunctionDeclaration)

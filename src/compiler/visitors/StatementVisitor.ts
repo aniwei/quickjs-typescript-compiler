@@ -2,7 +2,7 @@ import ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
 import { CompilerContext } from '../CompilerContext'
 import { Opcode, TempOpcode, JSAtom, JS_ATOM_NULL, COPY_DATA_PROPERTIES_FLAGS_DEPTH0, FOR_OF_NEXT_OPERAND_DEFAULT } from '../../env'
-import { BlockEnv } from '../FunctionDef'
+import { BlockEnv, JSImportExportTypeEnum, JSModuleDef } from '../FunctionDef'
 import { JSVarDefEnum } from '../Compiler'
 
 /**
@@ -67,6 +67,7 @@ export class StatementVisitor extends VisitorContext {
     // 并不会对这条 store 指令调用 emit_source_pos。
     // 参考：third_party/QuickJS/src/core/parser.c: js_parse_var() -> emit_op(s, OP_scope_put_var_init/OP_scope_put_var)
 
+    const isExported = node.modifiers?.some(m => m.kind === ts.SyntaxKind.ExportKeyword) ?? false
     for (const declaration of decl.declarations) {
       // 处理标识符声明
       if (ts.isIdentifier(declaration.name)) {
@@ -80,6 +81,14 @@ export class StatementVisitor extends VisitorContext {
           this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_LET)
         } else {
           this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_VAR)
+        }
+
+        // export const/let/var x ...
+        if (isExported) {
+          if (!fd.module) {
+            throw new Error('export declarations require module compilation')
+          }
+          this.addLocalExport(fd.module, atom, atom)
         }
 
         // 处理初始化器 - 对应 parser.c:6541-6566
@@ -354,6 +363,213 @@ export class StatementVisitor extends VisitorContext {
 
         this.compiler.emitLabelInt(fd, labelDone)
       }
+    }
+  }
+
+  // ============================================================================
+  // ESM import/export declarations (module mode)
+  // ============================================================================
+
+  private ensureModule(fd: any): JSModuleDef {
+    if (!fd.module) {
+      throw new Error('import/export declarations require module compilation')
+    }
+    return fd.module as JSModuleDef
+  }
+
+  private addReqModule(m: JSModuleDef, moduleNameAtom: number): number {
+    // Deduplicate by moduleName (matching QuickJS add_req_module_entry behavior).
+    const idx = m.reqModuleEntries.findIndex(e => e.moduleName === moduleNameAtom)
+    if (idx >= 0) return idx
+    m.reqModuleEntries.push({ moduleName: moduleNameAtom, attributes: undefined })
+    return m.reqModuleEntries.length - 1
+  }
+
+  private addLocalExport(m: JSModuleDef, localNameAtom: number, exportNameAtom: number): void {
+    // Minimal duplicate export-name guard.
+    for (const e of m.exportEntries) {
+      if ('exportName' in e && e.exportName === exportNameAtom) {
+        throw new Error('duplicate exported name')
+      }
+    }
+    m.exportEntries.push({
+      exportType: JSImportExportTypeEnum.JS_EXPORT_TYPE_LOCAL,
+      localName: localNameAtom,
+      exportName: exportNameAtom,
+    })
+  }
+
+  private addIndirectExport(m: JSModuleDef, reqModuleIdx: number, localNameAtom: number, exportNameAtom: number): void {
+    for (const e of m.exportEntries) {
+      if ('exportName' in e && e.exportName === exportNameAtom) {
+        throw new Error('duplicate exported name')
+      }
+    }
+    m.exportEntries.push({
+      exportType: JSImportExportTypeEnum.JS_EXPORT_TYPE_INDIRECT,
+      reqModuleIdx,
+      localName: localNameAtom,
+      exportName: exportNameAtom,
+    })
+  }
+
+  private addImportBinding(
+    fd: any, 
+    m: JSModuleDef, 
+    localNameAtom: number, 
+    importNameAtom: number, 
+    isStar: boolean, 
+    reqModuleIdx: number): void {
+    // Align with QuickJS: create a module import binding as a closure var.
+    // NOTE: we do NOT dedupe by (varIdx,isLocal) because module globals can share indices.
+    // We only guard by local name.
+    if (localNameAtom !== JSAtom.JS_ATOM_default) {
+      if (fd.closureVar?.some((cv: any) => cv.varName === localNameAtom)) {
+        throw new Error('duplicate import binding')
+      }
+    }
+
+    const cv: any = {
+      // Imported bindings are provided by other modules (not created locally).
+      // Match QuickJS module.c: imported closure vars have is_local = FALSE.
+      isLocal: false,
+      isArg: false,
+      isConst: true,
+      isLexical: true,
+      varKind: 0,
+      varIdx: m.importEntries.length,
+      varName: localNameAtom,
+    }
+    fd.closureVar.push(cv)
+    fd.closureVarCount++
+
+    m.importEntries.push({
+      varIdx: fd.closureVarCount - 1,
+      isStar,
+      importName: importNameAtom,
+      reqModuleIdx,
+    })
+  }
+
+  visitImportDeclaration(node: ts.ImportDeclaration): void {
+    const fd: any = this.funcDef!
+    const m = this.ensureModule(fd)
+
+    if (!node.moduleSpecifier || !ts.isStringLiteral(node.moduleSpecifier)) {
+      throw new Error('import moduleSpecifier must be a string literal')
+    }
+    const moduleNameAtom = this.compiler.addAtom(node.moduleSpecifier.text)
+    const reqModuleIdx = this.addReqModule(m, moduleNameAtom)
+
+    // Side-effect import: import "x";
+    if (!node.importClause) return
+
+    const clause = node.importClause
+
+    // import defaultName from "x"
+    if (clause.name) {
+      const localNameAtom = this.compiler.addAtom(clause.name.text)
+      this.addImportBinding(fd, m, localNameAtom, JSAtom.JS_ATOM_default, false, reqModuleIdx)
+    }
+
+    const nb = clause.namedBindings
+    if (!nb) return
+
+    if (ts.isNamespaceImport(nb)) {
+      // import * as ns from "x"
+      const localNameAtom = this.compiler.addAtom(nb.name.text)
+      this.addImportBinding(fd, m, localNameAtom, JSAtom.JS_ATOM__star_, true, reqModuleIdx)
+      return
+    }
+
+    if (ts.isNamedImports(nb)) {
+      for (const spec of nb.elements) {
+        const importNameAtom = this.compiler.addAtom((spec.propertyName ?? spec.name).text)
+        const localNameAtom = this.compiler.addAtom(spec.name.text)
+        this.addImportBinding(fd, m, localNameAtom, importNameAtom, false, reqModuleIdx)
+      }
+      return
+    }
+  }
+
+  visitExportDeclaration(node: ts.ExportDeclaration): void {
+    const fd: any = this.funcDef!
+    const m = this.ensureModule(fd)
+
+    const from = node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)
+      ? node.moduleSpecifier.text
+      : null
+
+    let reqModuleIdx = -1
+    if (from != null) {
+      const moduleNameAtom = this.compiler.addAtom(from)
+      reqModuleIdx = this.addReqModule(m, moduleNameAtom)
+    }
+
+    // export * from 'x'
+    if (!node.exportClause) {
+      if (reqModuleIdx < 0) {
+        throw new Error('export * requires a from clause')
+      }
+      m.starExportEntries.push({ reqModuleIdx })
+      return
+    }
+
+    // export * as ns from 'x'
+    if ((ts as any).isNamespaceExport && (ts as any).isNamespaceExport(node.exportClause)) {
+      if (reqModuleIdx < 0) {
+        throw new Error('export * as ns requires a from clause')
+      }
+      const ns = (node.exportClause as any).name as ts.Identifier
+      const exportNameAtom = this.compiler.addAtom(ns.text)
+      this.addIndirectExport(m, reqModuleIdx, JSAtom.JS_ATOM__star_, exportNameAtom)
+      return
+    }
+
+    // export { a as b, c } [from 'x']
+    if (ts.isNamedExports(node.exportClause)) {
+      for (const spec of node.exportClause.elements) {
+        const localNameAtom = this.compiler.addAtom((spec.propertyName ?? spec.name).text)
+        const exportNameAtom = this.compiler.addAtom(spec.name.text)
+        if (reqModuleIdx >= 0) {
+          this.addIndirectExport(m, reqModuleIdx, localNameAtom, exportNameAtom)
+        } else {
+          this.addLocalExport(m, localNameAtom, exportNameAtom)
+        }
+      }
+      return
+    }
+
+    throw new Error('Unsupported export declaration form')
+  }
+
+  visitExportAssignment(node: ts.ExportAssignment): void {
+    const fd = this.funcDef!
+    const m = this.ensureModule(fd as any)
+
+    if (node.isExportEquals) {
+      throw new Error('export = is not supported (ESM only)')
+    }
+
+    // export default <expr>
+    const localNameAtom = JSAtom.JS_ATOM__default_
+    const exportNameAtom = JSAtom.JS_ATOM_default
+
+    // Ensure local binding exists.
+    this.compiler.defineVar(fd, localNameAtom, JSVarDefEnum.JS_VAR_DEF_LET)
+    this.addLocalExport(m, localNameAtom, exportNameAtom)
+
+    // Evaluate expression and store into *default*.
+    this.context.visit(node.expression)
+
+    const prevSuppress = (fd as any).suppressSourcePos
+    try {
+      ;(fd as any).suppressSourcePos = true
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
+      this.compiler.emitU32(fd, localNameAtom)
+      this.compiler.emitU16(fd, fd.scopeLevel)
+    } finally {
+      ;(fd as any).suppressSourcePos = prevSuppress
     }
   }
 

@@ -95,6 +95,59 @@ export enum JSFunctionKindEnum {
 }
 
 // ============================================================================
+// Module bytecode structures (QuickJS JSModuleDef subset)
+// ============================================================================
+
+/**
+ * Export entry type - aligns with QuickJS JSExportTypeEnum.
+ * - LOCAL: exports a local binding (resolved to a closure var index during module finalize).
+ * - INDIRECT: re-export from another module.
+ */
+export enum JSImportExportTypeEnum {
+  JS_EXPORT_TYPE_LOCAL = 0,
+  JS_EXPORT_TYPE_INDIRECT = 1,
+}
+
+export type JSReqModuleEntry = {
+  moduleName: number
+  attributes: any
+}
+
+export type JSImportEntry = {
+  varIdx: number
+  isStar: boolean
+  importName: number
+  reqModuleIdx: number
+}
+
+export type JSStarExportEntry = {
+  reqModuleIdx: number
+}
+
+export type JSExportEntry =
+  | {
+      exportType: JSImportExportTypeEnum.JS_EXPORT_TYPE_LOCAL
+      localName: number
+      exportName: number
+      localVarIdx?: number
+    }
+  | {
+      exportType: JSImportExportTypeEnum.JS_EXPORT_TYPE_INDIRECT
+      localName: number
+      exportName: number
+      reqModuleIdx: number
+    }
+
+export class JSModuleDef {
+  moduleName: number = 0
+  reqModuleEntries: JSReqModuleEntry[] = []
+  exportEntries: JSExportEntry[] = []
+  starExportEntries: JSStarExportEntry[] = []
+  importEntries: JSImportEntry[] = []
+  hasTla: boolean = false
+}
+
+// ============================================================================
 // 数据结构定义 - 对应 QuickJS types.h / parser.h
 // ============================================================================
 
@@ -588,6 +641,9 @@ export class FunctionDef {
   
   /** 全局变量数组 */
   globalVars: JSGlobalVar[] = []
+
+  // === Module metadata (when compiling as ESM) ===
+  module: JSModuleDef | null = null
 
   // ========== 字节码 - parser.h:302-305 ==========
   /** 字节码缓冲区 */

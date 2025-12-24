@@ -7,6 +7,7 @@ import {
   JSParseFunctionEnum,
   JSFunctionKindEnum,
   ARGUMENT_VAR_OFFSET,
+  JSImportExportTypeEnum,
 } from '../FunctionDef'
 import { JSVarDefEnum } from '../Compiler'
 
@@ -27,6 +28,25 @@ import { JSVarDefEnum } from '../Compiler'
 export class FunctionVisitor extends VisitorContext {
   /** 缓存已提升的函数声明 */
   private hoisted: Map<ts.FunctionDeclaration, { fd: FunctionDef, childIdx: number, cpoolIdx: number }> = new Map()
+
+  private addLocalExportForFunctionDecl(parentFd: FunctionDef, node: ts.FunctionDeclaration, localNameAtom: number): void {
+    const isExported = node.modifiers?.some(m => m.kind === ts.SyntaxKind.ExportKeyword) ?? false
+    if (!isExported) return
+    if (!parentFd.module) {
+      throw new Error('export declarations require module compilation')
+    }
+    // 与 StatementVisitor.addLocalExport 的行为一致：按 exportName 去重。
+    for (const e of parentFd.module.exportEntries) {
+      if ((e as any).exportName === localNameAtom) {
+        throw new Error('duplicate exported name')
+      }
+    }
+    parentFd.module.exportEntries.push({
+      exportType: JSImportExportTypeEnum.JS_EXPORT_TYPE_LOCAL,
+      localName: localNameAtom,
+      exportName: localNameAtom,
+    } as any)
+  }
 
   private inferSetNameAtomFromContext(expr: ts.Expression): number {
     // 处理多层括号：例如 `const x = ((...) => ...)`
@@ -93,7 +113,20 @@ export class FunctionVisitor extends VisitorContext {
    */
   visitFunctionDeclaration(node: ts.FunctionDeclaration): void {
     const parentFd = this.funcDef!
-    const sourcePos = node.getStart()
+    let sourcePos = node.getStart()
+
+    // 对齐 QuickJS：`export function ...` 的 debug 起点按 `function` 关键字定位。
+    // QuickJS dumper 中会显示为 `...:line:col: function: name`，此处 col 对齐到 `function`。
+    const hasExport = (node.modifiers ?? []).some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
+    const src = parentFd.source
+    if (hasExport && src) {
+      const start = sourcePos
+      const end = node.getEnd()
+      const idx = src.indexOf('function', start)
+      if (idx >= 0 && idx < end) {
+        sourcePos = idx
+      }
+    }
 
     // 确定函数类型和种类
     let funcType = JSParseFunctionEnum.JS_PARSE_FUNC_STATEMENT
@@ -154,6 +187,12 @@ export class FunctionVisitor extends VisitorContext {
       // OP_enter_scope 处理中完成
     }
 
+    // export function name() {}: 写入 module export entries（用于生成 module header）。
+    if (funcName === JS_ATOM_NULL) {
+      throw new Error('exported function declaration must have a name')
+    }
+    this.addLocalExportForFunctionDecl(parentFd, node, funcName)
+
     // 缓存用于后续引用
     this.hoisted.set(node, { fd, childIdx, cpoolIdx })
   }
@@ -182,8 +221,8 @@ export class FunctionVisitor extends VisitorContext {
       ? this.compiler.addAtom(node.name.text)
       : JS_ATOM_NULL
 
-    // 创建子函数定义 - 对应 parser.c:13004-13015
-    const fd = new FunctionDef(parentFd, false, true) // isFuncExpr = true
+        // 创建子函数定义 - 对应 parser.c:13004-13015
+        const fd = new FunctionDef(parentFd, false, true) // isFuncExpr = true
     fd.funcName = funcName
     fd.funcType = funcType
     fd.funcKind = funcKind
