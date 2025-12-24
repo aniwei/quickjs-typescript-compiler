@@ -1,0 +1,33 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/for-in.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/for-in/trace",
+  "tsEventCount": 122,
+  "wasmEventCount": 139,
+  "differenceCount": 116,
+  "wasmEmitLocationsTop": [
+    {
+      "loc": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/src/core/parser.c:1799",
+      "count": 62
+    },
+    {
+      "loc": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/src/core/parser.c:1772",
+      "count": 27
+    },
+    {
+      "loc": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/src/core/parser.c:1777",
+      "count": 25
+    },
+    {
+      "loc": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/src/core/parser.c:1786",
+      "count": 9
+    },
+    {
+      "loc": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/src/core/parser.c:1788",
+      "count": 9
+    },
+    {
+      "loc": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/src/core/parser.c:1807",
+      "count": 7
+    }
+  ]
+}

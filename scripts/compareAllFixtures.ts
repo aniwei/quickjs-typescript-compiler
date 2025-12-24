@@ -19,6 +19,8 @@ interface RunnerOptions {
   artifactsDir: string
   bail: boolean
   failOnMismatch: boolean
+  qtsTrace: boolean
+  qtsTraceLevel: 1 | 2 | 3
 }
 
 interface CliStageSummary {
@@ -61,6 +63,12 @@ interface FixtureResult {
 
 async function main() {
   const options = parseArgs(process.argv.slice(2))
+
+  if (options.qtsTrace) {
+    process.env.QTS_TRACE_ENABLED = '1'
+    process.env.QTS_TRACE_LEVEL = String(options.qtsTraceLevel)
+  }
+
   console.log('Looking for fixtures in:', options.fixturesDir)
   const fixtureFiles = await collectFixtureFiles(options.fixturesDir, options.filter)
 
@@ -133,6 +141,8 @@ function parseArgs(args: string[]): RunnerOptions {
     artifactsDir: path.resolve('artifacts'),
     bail: false,
     failOnMismatch: true,
+    qtsTrace: false,
+    qtsTraceLevel: 2,
   }
 
   for (let index = 0; index < args.length; index += 1) {
@@ -178,6 +188,23 @@ function parseArgs(args: string[]): RunnerOptions {
       case '--normalizeShort':
         options.normalizeShort = true
         break
+      case '--qts-trace':
+      case '--qtsTrace':
+        options.qtsTrace = true
+        break
+      case '--qts-trace-level':
+      case '--qtsTraceLevel': {
+        const value = args[index + 1]
+        if (!value) {
+          throw new Error(`${arg} requires a value: 1|2|3`)
+        }
+        if (value !== '1' && value !== '2' && value !== '3') {
+          throw new Error(`${arg} must be 1, 2, or 3`)
+        }
+        options.qtsTraceLevel = Number(value) as 1 | 2 | 3
+        index += 1
+        break
+      }
       case '--artifacts-dir':
       case '--artifacts': {
         const value = args[index + 1]

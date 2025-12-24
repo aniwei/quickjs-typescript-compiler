@@ -33,6 +33,10 @@ interface CompilationResult {
   assembly?: string
   size: number
   opcodes?: string[]
+  qtsTrace?: {
+    stdout: string[]
+    stderr: string[]
+  }
 }
 
 export interface ComparisonSummary {
@@ -169,7 +173,10 @@ class BytecodeComparator {
       }
       
       // 用 QuickJS WASM 编译（需要 WASM binding；这里是占位实现）
-      const bytecode = await this.compileJavaScriptWithWasm(reference.code, reference.path)
+      const { result: bytecode, stdout, stderr } = await QuickJSLib.withCapturedOutput(() => {
+        // 使用 script 模式（全局 eval），用于对齐 TS 侧输出
+        return QuickJSLib.compileSourceAsScript(reference.code, reference.path)
+      })
       
       let disassembly: string | undefined
       if (this.options.disasm) {
@@ -186,7 +193,11 @@ class BytecodeComparator {
         assembly,
         disassembly,
         size: bytecode.length,
-        opcodes: this.extractOpcodes(bytecode)
+        opcodes: this.extractOpcodes(bytecode),
+        qtsTrace: {
+          stdout,
+          stderr,
+        },
       }
       
     } catch (error) {
@@ -440,6 +451,22 @@ class BytecodeComparator {
 
     // Save detailed analysis dumps
     await this.saveDumpAnalysis(baseName, tsResult, wasmResult)
+
+    if (wasmResult.qtsTrace) {
+      const { stdout, stderr } = wasmResult.qtsTrace
+      if (stdout.length) {
+        await fs.writeFile(
+          path.join(this.artifactsDir, `${baseName}.qts.stdout.log`),
+          stdout.join('\n') + '\n'
+        )
+      }
+      if (stderr.length) {
+        await fs.writeFile(
+          path.join(this.artifactsDir, `${baseName}.qts.stderr.log`),
+          stderr.join('\n') + '\n'
+        )
+      }
+    }
     
     console.log(`💾 Artifacts saved to ${this.artifactsDir}/`)
   }

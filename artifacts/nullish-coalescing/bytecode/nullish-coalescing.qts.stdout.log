@@ -1,0 +1,42 @@
+__tests__/fixtures/nullish-coalescing.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 5
+  opcodes:
+        check_define_var a,128
+        check_define_var b,128
+        define_var a,128
+        define_var b,128
+        null
+        put_var_init a
+        get_var a
+        dup
+        is_undefined_or_null
+        if_false8 45
+        drop
+        push_atom_value fallback
+   45:  put_var_init b
+        get_var console
+        get_field2 log
+        get_var b
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_0 0
+        dup
+        is_undefined_or_null
+        if_false8 86
+        drop
+        push_1 1
+   86:  get_var undefined
+        dup
+        is_undefined_or_null
+        if_false8 97
+        drop
+        push_2 2
+   97:  add
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

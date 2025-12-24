@@ -1,0 +1,9 @@
+[QTS:EMIT] pos=0 op=182
+[QTS:EMIT] pos=1 u16=0x0001 (1)
+[QTS:EMIT] pos=3 op=1
+[QTS:EMIT] pos=4 u32=0x0000007b (123)
+[QTS:EMIT] pos=8 op=91
+[QTS:EMIT] pos=9 u16=0x0000 (0)
+[QTS:EMIT] pos=11 op=90
+[QTS:EMIT] pos=12 u16=0x0000 (0)
+[QTS:EMIT] pos=14 op=40
