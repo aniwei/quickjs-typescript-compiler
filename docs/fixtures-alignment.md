@@ -47,11 +47,16 @@
 **QuickJS 源码（权威）**
 - `third_party/QuickJS/src/core/parser.c`
   - 解构赋值/解构声明的 lowering（含 `{...rest}` / `[...]`）
-  - 对象 rest 会走 `copy_data_properties` 路径，并通过 `emit_u8` 编码 flags：
-    - `0 | ((depth_lvalue + 1) << 2) | ((depth_lvalue + 2) << 5)`
+  - 对象 rest 会走 `copy_data_properties` 路径，并通过 `emit_u8` 编码操作数：
+    - 解构 rest（`{a, ...rest}`）路径：
+      - `0 | ((depth_lvalue + 1) << 2) | ((depth_lvalue + 2) << 5)`（parser.c:4386-4388）
+    - 对象字面量展开（`{ ...obj }`）路径：
+      - `2 | (1 << 2) | (0 << 5)`（parser.c:2947-2952）
 
 **TS 编译器侧对应实现**
 - `src/compiler/visitors/StatementVisitor.ts`
+- `src/compiler/visitors/ExpressionVisitor.ts`（对象字面量的 `{ ...obj }`）
+- `scripts/getEnv.ts` → `src/env.ts`（收口 copy_data_properties 操作数的编码函数与常量）
 
 **代表 fixtures（非穷举）**
 - `__tests__/fixtures/destructuring-nested.ts`
@@ -59,7 +64,8 @@
 - `__tests__/fixtures/for-of-destructuring.ts`
 
 **对齐要点（byte-identical 关注）**
-- `{...rest}` 的 flags 编码属于典型“魔数来源”，必须保持与 QuickJS 公式一致。
+- `copy_data_properties` 的 u8 操作数编码属于典型“魔数来源”，必须保持与 QuickJS 一致。
+  - TS 侧通过 `encodeCopyDataPropertiesOperand(...)` 与 `COPY_DATA_PROPERTIES_OPERAND_SPREAD` 消除魔数，避免散落 `2 | (1<<2) | (0<<5)`。
 - 解构过程中的 atom 插入顺序（包括一些“看似无用”的 atom）也会影响 atom 表与后续 bytecode。
 
 ---
@@ -214,7 +220,9 @@
 - `__tests__/fixtures/if-else.ts`
 - `__tests__/fixtures/switch-*.ts`
 - `__tests__/fixtures/loop-break-continue.ts`
+- `__tests__/fixtures/for-in.ts`
 - `__tests__/fixtures/try-*.ts`
+- `__tests__/fixtures/complex-control-flow.ts`
 
 **对齐要点（byte-identical 关注）**
 - 跳转修补（reloc）与 label slot 计算必须严格复现 QuickJS 的编码（包含短跳转/长跳转）。

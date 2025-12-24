@@ -101,7 +101,7 @@ function parseArgs(): Options {
 }
 
 function ensureEmsdk(opts: Options, repoRoot: string): { emsdkDir: string, envScript: string } {
-  // Priority: provided --emsdk, then EMSDK env, else local third_party/emsdk install
+  // 优先级：命令行 --emsdk > 环境变量 EMSDK > 本地 third_party/emsdk 安装
   let emsdkDir = opts.emsdk || process.env.EMSDK || ''
   
   if (emsdkDir) {
@@ -115,13 +115,13 @@ function ensureEmsdk(opts: Options, repoRoot: string): { emsdkDir: string, envSc
     return { emsdkDir, envScript }
   }
 
-  // Detect existing emcc/emcmake in PATH
+  // 尝试从 PATH 中检测现有的 emcc/emcmake
   const emcc = which('emcc')
   const emcmake = which('emcmake')
 
   if (emcc && emcmake) {
-    // Try to infer emsdk root via emcc path
-    // If not determinable, allow using PATH and source no script.
+    // 尝试通过 emcc 路径推断 emsdk 根目录。
+    // 如果推断不出来，则允许直接使用 PATH（不 source env 脚本）。
     const guessed = process.env.EMSDK || ''
 
     if (guessed && existsSync(join(guessed, 'emsdk_env.sh'))) {
@@ -131,11 +131,11 @@ function ensureEmsdk(opts: Options, repoRoot: string): { emsdkDir: string, envSc
       }
     }
 
-    // PATH-based use without env script
+    // 直接使用 PATH（不依赖 env 脚本）
     return { emsdkDir: '', envScript: '' }
   }
 
-  // Install locally into third_party/emsdk
+  // 本地安装到 third_party/emsdk
   const thirdParty = join(repoRoot, 'third_party')
   const localEmsdk = join(thirdParty, 'emsdk')
   
@@ -179,12 +179,12 @@ function buildWasm(opts: Options) {
   if (!existsSync(buildDir)) mkdirSync(buildDir, { recursive: true })
 
   const prefix = envScript ? `source ${envScript} && ` : ''
-  // Configure
+  // 配置
   const traceArgs: string[] = []
   const traceEnabled = Boolean(opts.trace)
   const traceLevel = traceEnabled ? (opts.traceLevel ?? 1) : 1
 
-  // Always pass explicit values so CMake cache can't "stick" between builds.
+  // 总是显式传值，避免 CMake cache 在多次构建之间“粘住”旧值。
   traceArgs.push(`-DQTS_TRACE_ENABLED=${traceEnabled ? 1 : 0}`)
   traceArgs.push(`-DQTS_TRACE_LEVEL=${traceLevel}`)
 
@@ -216,7 +216,7 @@ function buildWasm(opts: Options) {
   ].join(' ')
 
   runBash(`${prefix}${cmakeArgs}`, { cwd: repoRoot, verbose: opts.verbose })
-  // Build
+  // 构建
   runBash(`${prefix}cmake --build ${JSON.stringify(buildDir)} -j`, { cwd: repoRoot, verbose: opts.verbose })
 
   if (!existsSync(outJs) || !existsSync(outWasm)) {
@@ -250,7 +250,7 @@ function buildWasm(opts: Options) {
     fs.mkdirSync(resolve(wasmRoot, 'output'), { recursive: true })
     fs.writeFileSync(outConfig, JSON.stringify(buildConfig, null, 2), 'utf8')
   } catch {
-    // best-effort marker only
+    // 尽力写入标记文件（失败也不影响主流程）
   }
 
   console.log('WASM build outputs ready:')

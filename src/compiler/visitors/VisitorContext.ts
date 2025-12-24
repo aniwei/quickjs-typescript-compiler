@@ -1,8 +1,6 @@
 import { CompilerContext } from '../CompilerContext'
 import { FunctionDef } from '../FunctionDef'
 import { Compiler } from '../Compiler'
-import { ScopeManager } from '../ScopeManager'
-import { LabelManager } from '../LabelManager'
 
 export abstract class VisitorContext {
   protected context: CompilerContext
@@ -13,14 +11,6 @@ export abstract class VisitorContext {
 
   protected get funcDef(): FunctionDef | null {
     return this.context.funcDef
-  }
-
-  protected get scopeManager(): ScopeManager {
-    return this.context.scopeManager
-  }
-
-  protected get labelManager(): LabelManager {
-    return this.context.labelManager
   }
 
   

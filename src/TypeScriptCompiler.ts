@@ -1,9 +1,7 @@
 import ts from 'typescript'
-import { Compiler, Label } from './compiler/Compiler'
-import { FunctionDef, JSVarKind, JSVarDef, JSClosureVar, JSVarScope } from './compiler/FunctionDef'
-import { JSAtom, JSMode, Opcode, FunctionKind, OPCODE_BY_CODE, TempOpcode, TEMP_OPCODE_BY_CODE, JS_EVAL_TYPE_GLOBAL } from './env'
-import { ScopeManager, VarInfo, Scope } from './compiler/ScopeManager'
-import { LabelManager, LoopInfo } from './compiler/LabelManager'
+import { Compiler } from './compiler/Compiler'
+import { FunctionDef, JSVarScope } from './compiler/FunctionDef'
+import { Opcode, OPCODE_BY_CODE, TempOpcode, TEMP_OPCODE_BY_CODE, JS_EVAL_TYPE_GLOBAL } from './env'
 
 import { CompilerContext } from './compiler/CompilerContext'
 import { StatementVisitor } from './compiler/visitors/StatementVisitor'
@@ -13,7 +11,6 @@ import { ClassVisitor } from './compiler/visitors/ClassVisitor'
 import { LiteralVisitor } from './compiler/visitors/LiteralVisitor'
 import { IdentifierVisitor } from './compiler/visitors/IdentifierVisitor'
 import { ThisVisitor } from './compiler/visitors/ThisVisitor'
-import { HoistVariablesVisitor } from './compiler/HoistVariablesVisitor'
 import { VariableResolver } from './compiler/VariableResolver'
 import { LabelResolver } from './compiler/LabelResolver'
 import { StackSizeComputer } from './compiler/StackSizeComputer'
@@ -22,11 +19,11 @@ import { DebugInfoBuilder } from './compiler/DebugInfoBuilder'
 
 export class TypeScriptCompiler implements CompilerContext {
   public compiler: Compiler
-  public scopeManager: ScopeManager
-  public labelManager: LabelManager
   public variableResolver: VariableResolver
   public funcDef: FunctionDef | null = null
   public currentNode: ts.Node | null = null
+  public onVisitNode?: (node: ts.Node, sourceFile: ts.SourceFile) => void
+  public onUnhandledNode?: (node: ts.Node, sourceFile: ts.SourceFile) => void
   public deferredTasks: (() => void)[] = []
   public isTerminated = false
   public expressionValueUsed = true
@@ -38,13 +35,9 @@ export class TypeScriptCompiler implements CompilerContext {
   private literalVisitor: LiteralVisitor
   private identifierVisitor: IdentifierVisitor
   private thisVisitor: ThisVisitor
-  private variableHoister: HoistVariablesVisitor
 
   constructor(options?: any) {
-    // console.log('TypeScriptCompiler constructor called')
     this.compiler = new Compiler(options)
-    this.scopeManager = new ScopeManager(this.compiler)
-    this.labelManager = new LabelManager(this.compiler)
     this.variableResolver = new VariableResolver(this)
     this.statementVisitor = new StatementVisitor(this)
     this.expressionVisitor = new ExpressionVisitor(this)
@@ -53,8 +46,6 @@ export class TypeScriptCompiler implements CompilerContext {
     this.literalVisitor = new LiteralVisitor(this)
     this.identifierVisitor = new IdentifierVisitor(this)
     this.thisVisitor = new ThisVisitor(this)
-    this.variableHoister = new HoistVariablesVisitor(this)
-    // this.compiler.addAtom('undefined')
   }
 
   setFuncDef(funcDef: FunctionDef | null) {
@@ -70,6 +61,7 @@ export class TypeScriptCompiler implements CompilerContext {
     const fs = await import('fs/promises')
     const source = await fs.readFile(filename, 'utf-8')
     const bytecode = this.compile(source, filename)
+
     return { bytecode, functionDef: this.funcDef! }
   }
 
@@ -94,8 +86,7 @@ export class TypeScriptCompiler implements CompilerContext {
       source,
       ts.ScriptTarget.ESNext,
       true,
-      ts.ScriptKind.TS
-    )
+      ts.ScriptKind.TS)
     
     // 设置 sourceFile 到 compiler
     this.compiler.setSourceFile(sourceFile)
@@ -267,11 +258,11 @@ export class TypeScriptCompiler implements CompilerContext {
   /**
    * 访问表达式节点
    */
-  private visitExpression(node: ts.Expression): void {
-    this.visit(node)
-  }
-
   visit(node: ts.Node) {
+    const sf = this.compiler.sourceFile
+    if (sf && this.onVisitNode) {
+      this.onVisitNode(node, sf)
+    }
     switch (node.kind) {
       case ts.SyntaxKind.SourceFile:
         // TODO
@@ -321,6 +312,9 @@ export class TypeScriptCompiler implements CompilerContext {
       case ts.SyntaxKind.TryStatement:
         this.statementVisitor.visitTryStatement(node as ts.TryStatement)
         break
+      case ts.SyntaxKind.EmptyStatement:
+        // `;` is a no-op at runtime.
+        break
       case ts.SyntaxKind.VariableStatement:
         this.statementVisitor.visitVariableStatement(node as ts.VariableStatement)
         break
@@ -363,7 +357,7 @@ export class TypeScriptCompiler implements CompilerContext {
       case ts.SyntaxKind.CallExpression:
         this.expressionVisitor.visitCallExpression(node as ts.CallExpression)
         break
-      case ts.SyntaxKind.CallChain:
+      case (ts.SyntaxKind as any).CallChain:
         this.expressionVisitor.visitCallChain(node as any)
         break
       case ts.SyntaxKind.NewExpression:
@@ -378,13 +372,13 @@ export class TypeScriptCompiler implements CompilerContext {
       case ts.SyntaxKind.PropertyAccessExpression:
         this.expressionVisitor.visitPropertyAccessExpression(node as ts.PropertyAccessExpression)
         break
-      case ts.SyntaxKind.PropertyAccessChain:
+      case (ts.SyntaxKind as any).PropertyAccessChain:
         this.expressionVisitor.visitPropertyAccessChain(node as any)
         break
       case ts.SyntaxKind.ElementAccessExpression:
         this.expressionVisitor.visitElementAccessExpression(node as ts.ElementAccessExpression)
         break
-      case ts.SyntaxKind.ElementAccessChain:
+      case (ts.SyntaxKind as any).ElementAccessChain:
         this.expressionVisitor.visitElementAccessChain(node as any)
         break
       case ts.SyntaxKind.NullKeyword:
@@ -404,6 +398,9 @@ export class TypeScriptCompiler implements CompilerContext {
         break
       case ts.SyntaxKind.TemplateExpression:
         this.expressionVisitor.visitTemplateExpression(node as ts.TemplateExpression)
+        break
+      case ts.SyntaxKind.TaggedTemplateExpression:
+        this.expressionVisitor.visitTaggedTemplateExpression(node as ts.TaggedTemplateExpression)
         break
       case ts.SyntaxKind.ParenthesizedExpression:
         // Parentheses do not change semantics; just visit the inner expression.
@@ -443,7 +440,13 @@ export class TypeScriptCompiler implements CompilerContext {
       case ts.SyntaxKind.YieldExpression:
         this.expressionVisitor.visitYieldExpression(node as ts.YieldExpression)
         break
+      case ts.SyntaxKind.MetaProperty:
+        this.expressionVisitor.visitMetaProperty(node as ts.MetaProperty)
+        break
       default:
+        if (sf && this.onUnhandledNode) {
+          this.onUnhandledNode(node, sf)
+        }
         // console.warn('Unhandled node kind:', node.kind)
         break
     }

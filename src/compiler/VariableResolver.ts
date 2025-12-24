@@ -1,20 +1,15 @@
 import { CompilerContext } from './CompilerContext'
 import { 
   FunctionDef, 
-  JSVarDef, 
   JSVarKindEnum,
-  JSClosureVar,
   ARGUMENT_VAR_OFFSET,
   ARG_SCOPE_END,
-  LabelSlot,
 } from './FunctionDef'
 import {
   Opcode,
   TempOpcode,
-  OPCODE_DEFS,
   OPCODE_BY_CODE,
   TEMP_OPCODE_BY_CODE,
-  TEMP_OPCODE_DEFS,
   JSAtom,
   JSMode,
   TEMP_OPCODE_MIN,
@@ -25,33 +20,15 @@ import {
   JS_PROP_WRITABLE,
   JS_EVAL_TYPE_GLOBAL,
   JS_THROW_VAR_RO,
-  JS_THROW_VAR_REDECL,
-  JS_THROW_VAR_UNINITIALIZED,
 } from '../env'
 import { BytecodeBuilder } from './BytecodeBuilder'
 import { Compiler } from './Compiler'
-import { u32ToI32 } from './int32'
 
 // ============================================================================
 // 代码上下文 - 对应 parser.c:CodeContext
 // 
 // QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:10006-10016
 // ============================================================================
-
-/**
- * CodeContext 用于遍历字节码中的指令
- */
-interface CodeContext {
-  bcBuf: Uint8Array      // 原始字节码缓冲区
-  bcLen: number          // 字节码长度
-  pos: number            // 当前位置
-  lineNum: number        // 行号
-  op: number             // 当前操作码
-  idx: number            // 索引参数
-  label: number          // 标签参数
-  val: number            // 值参数
-  atom: number           // atom 参数
-}
 
 /**
  * 变量解析器 - 对应 parser.c:resolve_variables
@@ -115,7 +92,7 @@ export class VariableResolver {
     
     // 第一遍: 添加全局变量定义检查 (仅用于全局变量模式)
     if (fd.isGlobalVar) {
-      this.addGlobalVarChecks(fd, bcBuf, bcLen, bcOut)
+      this.addGlobalVarChecks(fd, bcOut)
     }
     
     // 第二遍: 解析 scope 变量
@@ -190,14 +167,6 @@ export class VariableResolver {
   }
 
   /**
-   * 文档兼容别名：对应 QuickJS `add_eval_variables`。
-   * 实际实现为 `addSpecialVariables()`。
-   */
-  private addEvalVariables(fd: FunctionDef): void {
-    this.addSpecialVariables(fd)
-  }
-
-  /**
    * 添加 arguments 变量 - 对应 parser.c:add_arguments_var
    */
   private addArgumentsVar(fd: FunctionDef): void {
@@ -221,12 +190,8 @@ export class VariableResolver {
    */
   private addGlobalVarChecks(
     fd: FunctionDef,
-    bcBuf: Uint8Array,
-    bcLen: number,
     bcOut: BytecodeBuilder
   ): void {
-    const isStrict = (fd.jsMode & JSMode.JS_MODE_STRICT) !== 0
-    
     // 遍历全局变量，添加检查指令
     // 对应 parser.c:10458-10502
     for (let i = 0; i < fd.globalVarCount; i++) {
@@ -302,7 +267,7 @@ export class VariableResolver {
           pos += 2
           
           // 解析 scope 变量
-          this.resolveScopeVar(fd, atom, scopeLevel, op, bcOut, bcBuf, label, startPos)
+            this.resolveScopeVar(fd, atom, scopeLevel, op, bcOut, bcBuf, label)
           break
         }
         
@@ -651,12 +616,10 @@ export class VariableResolver {
     op: number,
     bcOut: BytecodeBuilder,
     bcBuf: Uint8Array,
-    labelIdx: number,
-    posInOriginal: number
+    labelIdx: number
   ): void {
     let varIdx = -1
     let isPseudoVar = false
-    let labelDone = -1
     
     // 检查是否为伪变量 (this, new.target, home_object, this_active_func)
     isPseudoVar = (
@@ -667,7 +630,7 @@ export class VariableResolver {
     )
     
     // === 步骤1: 在当前词法作用域中查找 ===
-    varIdx = this.findInLocalScope(fd, varName, scopeLevel, isPseudoVar)
+    varIdx = this.findInLocalScope(fd, varName, scopeLevel)
     
     if (varIdx >= 0) {
       // 检查 const 赋值
@@ -692,7 +655,7 @@ export class VariableResolver {
     }
     
     // === 步骤3: 在父函数中查找 (闭包) ===
-    const closureResult = this.findInParentScopes(fd, varName, scopeLevel, op, isPseudoVar)
+    const closureResult = this.findInParentScopes(fd, varName, scopeLevel, isPseudoVar)
     if (closureResult.found) {
       if (closureResult.varIdx >= 0) {
         this.emitClosureVarAccess(fd, closureResult.varIdx, varName, op, bcOut, bcBuf, labelIdx)
@@ -714,8 +677,7 @@ export class VariableResolver {
   private findInLocalScope(
     fd: FunctionDef,
     varName: number,
-    scopeLevel: number,
-    isPseudoVar: boolean
+    scopeLevel: number
   ): number {
     // 遍历作用域链
     for (let idx = fd.scopes[scopeLevel]?.first ?? -1; idx >= 0;) {
@@ -849,7 +811,6 @@ export class VariableResolver {
     fd: FunctionDef,
     varName: number,
     scopeLevel: number,
-    op: number,
     isPseudoVar: boolean
   ): { found: boolean; varIdx: number } {
     let currentFd = fd
@@ -1680,20 +1641,11 @@ export class VariableResolver {
   // 字节码读取辅助方法
   // ============================================================================
 
-  private getU8(buf: Uint8Array, pos: number): number {
-    return buf[pos]
-  }
-
   private getU16(buf: Uint8Array, pos: number): number {
     return buf[pos] | (buf[pos + 1] << 8)
   }
 
   private getU32(buf: Uint8Array, pos: number): number {
     return buf[pos] | (buf[pos + 1] << 8) | (buf[pos + 2] << 16) | (buf[pos + 3] << 24)
-  }
-
-  private getI32(buf: Uint8Array, pos: number): number {
-    const val = this.getU32(buf, pos)
-    return u32ToI32(val >>> 0)
   }
 }

@@ -7,14 +7,13 @@ import {
   JSVarKindEnum,
   JSFunctionKindEnum,
   LabelSlot,
-  RelocEntry,
   JSGlobalVar,
   BlockEnv,
   ARGUMENT_VAR_OFFSET,
   ARG_SCOPE_INDEX,
   JS_MAX_LOCAL_VARS,
 } from './FunctionDef'
-import { Opcode, TempOpcode, env, BytecodeTag, JSAtom, PC2Line, OPCODE_DEFS, JSMode, JS_EVAL_TYPE_GLOBAL, JS_EVAL_TYPE_MODULE } from '../env'
+import { Opcode, TempOpcode, env, JSAtom, JSMode, JS_EVAL_TYPE_GLOBAL, JS_EVAL_TYPE_MODULE } from '../env'
 import { BytecodeBuilder } from './BytecodeBuilder'
 import { DebugInfoBuilder } from './DebugInfoBuilder'
 
@@ -625,7 +624,7 @@ export class Compiler {
    * 
    * QuickJS 中使用 js_is_live_code 检查，这里简化为总是返回 true
    */
-  isLiveCode(fd: FunctionDef): boolean {
+  isLiveCode(_fd: FunctionDef): boolean {
     // TODO: 实现更完整的死代码检测
     return true
   }
@@ -1173,7 +1172,7 @@ export class Compiler {
   /**
    * 在指定偏移处标记 Label
    */
-  markLabelAt(fd: FunctionDef, label: Label, offset: number): void {
+  markLabelAt(_fd: FunctionDef, label: Label, offset: number): void {
     label.addr = offset
   }
 
@@ -1196,53 +1195,6 @@ export class Compiler {
       // Label 未定义，记录待回填
       label.jumps.push({ fd, pos, size: 4 })
     }
-  }
-
-  writeOutput(fd: FunctionDef): Uint8Array {
-    throw new Error('Not implemented - use BytecodeBuilder')
-  }
-
-  writeFunctionBytecode(out: BytecodeBuilder, fd: FunctionDef) {
-    
-    const setFlag = (val: boolean | number, n: number) => {
-      
-    }
-
-    setFlag(fd.hasPrototype, 1)
-    setFlag(fd.hasSimpleParameterList, 1)
-    setFlag(fd.isDerivedClassConstructor, 1)
-    setFlag(fd.needHomeObject, 1)
-    setFlag(fd.funcKind, 2)
-    setFlag(fd.newTargetAllowed, 1)
-    setFlag(fd.superCallAllowed, 1)
-    setFlag(fd.superAllowed, 1)
-    setFlag(fd.argumentsAllowed, 1)
-    setFlag(fd.hasDebug, 1)
-    setFlag(fd.isDirectOrIndirectEval, 1)
-    
-    for (const arg of fd.args) {
-      this.putAtom(out, arg.varName)
-      out.putULEB128(arg.scopeLevel)
-      out.putULEB128(arg.scopeNext + 1)
-      
-      let flags = 0
-      let idx = 0
-      const setLocalFlag = (val: boolean | number, n: number) => {
-        
-      }
-      
-      setLocalFlag(arg.varKind, 4)
-      setLocalFlag(arg.isConst, 1)
-      setLocalFlag(arg.isLexical, 1)
-      setLocalFlag(arg.isCaptured, 1)
-      out.putByte(flags)
-    }
-    
-    
-  }
-
-  writeUnitOfWork(out: BytecodeBuilder, unitOfWork: any): void {
-    
   }
 
   // ============================================================================

@@ -2945,6 +2945,7 @@ static __exception int js_parse_object_literal(JSParseState* s) {
         return -1;
       emit_op(s, OP_null); /* dummy excludeList */
       emit_op(s, OP_copy_data_properties);
+      QTS_TRACE_EMIT_COPY_DATA_PROPERTIES("object_literal_spread", 2 | (1 << 2) | (0 << 5), s->cur_func->byte_code.size);
       emit_u8(s, 2 | (1 << 2) | (0 << 5));
       emit_op(s, OP_drop); /* pop excludeList */
       emit_op(s, OP_drop); /* pop src object */
@@ -3836,6 +3837,7 @@ static __exception int js_parse_array_literal(JSParseState* s) {
       emit_label(s, label_next);
       /* on stack: enum_rec array idx */
       emit_op(s, OP_for_of_next);
+      QTS_TRACE_EMIT_FOR_OF_NEXT(2, s->cur_func->byte_code.size);
       emit_u8(s, 2);
       emit_goto(s, OP_if_true, label_done);
       /* append element */
@@ -4213,6 +4215,7 @@ static void js_emit_spread_code(JSParseState* s, int depth) {
   emit_u32(s, 0);
   emit_label(s, label_rest_next = new_label(s));
   emit_op(s, OP_for_of_next);
+  QTS_TRACE_EMIT_FOR_OF_NEXT(2 + depth, s->cur_func->byte_code.size);
   emit_u8(s, 2 + depth);
   label_rest_done = emit_goto(s, OP_if_true, -1);
   /* array idx val -- array idx */
@@ -4384,6 +4387,7 @@ static int js_parse_destructuring_element(
         }
         emit_op(s, OP_object); /* target */
         emit_op(s, OP_copy_data_properties);
+        QTS_TRACE_EMIT_COPY_DATA_PROPERTIES("destructuring_rest", 0 | ((depth_lvalue + 1) << 2) | ((depth_lvalue + 2) << 5), s->cur_func->byte_code.size);
         emit_u8(s, 0 | ((depth_lvalue + 1) << 2) | ((depth_lvalue + 2) << 5));
         goto set_val;
       }
@@ -4652,6 +4656,7 @@ static int js_parse_destructuring_element(
       if (s->token.val == ',') {
         /* do nothing, skip the value, has_spread is false */
         emit_op(s, OP_for_of_next);
+        QTS_TRACE_EMIT_FOR_OF_NEXT(0, s->cur_func->byte_code.size);
         emit_u8(s, 0);
         emit_op(s, OP_drop);
         emit_op(s, OP_drop);
@@ -4666,6 +4671,7 @@ static int js_parse_destructuring_element(
           js_emit_spread_code(s, 0);
         } else {
           emit_op(s, OP_for_of_next);
+          QTS_TRACE_EMIT_FOR_OF_NEXT(0, s->cur_func->byte_code.size);
           emit_u8(s, 0);
           emit_op(s, OP_drop);
         }
@@ -6899,6 +6905,7 @@ js_parse_for_in_of(JSParseState* s, int label_name, BOOL is_async) {
       emit_op(s, OP_iterator_get_value_done);
     } else {
       emit_op(s, OP_for_of_next);
+      QTS_TRACE_EMIT_FOR_OF_NEXT(0, s->cur_func->byte_code.size);
       emit_u8(s, 0);
     }
   } else {

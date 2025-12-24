@@ -28,6 +28,7 @@ import {
   PC2Line,
   env,
 } from '../env'
+import { TemplateObjectConst } from './TemplateObjectConst'
 
 // ============================================================================
 // 常量定义 - 从 env.ts 导入
@@ -606,6 +607,15 @@ export class BytecodeWriter {
       this.out.putByte(BytecodeTag.TC_TAG_NULL)
     } else if (val === undefined) {
       this.out.putByte(BytecodeTag.TC_TAG_UNDEFINED)
+    } else if (val instanceof TemplateObjectConst) {
+      // 模板对象常量：按 QuickJS BC_TAG_TEMPLATE_OBJECT 编码：tag + len + elements + raw。
+      this.out.putByte(BytecodeTag.TC_TAG_TEMPLATE_OBJECT)
+      this.out.putULEB128(val.elements.length)
+      for (const el of val.elements) {
+        this.writeConstant(el)
+      }
+      // raw 属性（无 raw 时写 undefined）。
+      this.writeConstant(val.raw ?? undefined)
     } else if (typeof val === 'boolean') {
       this.out.putByte(val ? BytecodeTag.TC_TAG_BOOL_TRUE : BytecodeTag.TC_TAG_BOOL_FALSE)
     } else if (typeof val === 'bigint') {

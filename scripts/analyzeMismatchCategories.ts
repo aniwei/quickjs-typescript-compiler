@@ -67,7 +67,7 @@ function functionEq(a: ReturnType<typeof parseBytecodeModule>['func'], b: Return
   if (!eqJsonLike(a.closureVars, b.closureVars)) return false
   if (!eqBytes(a.bytecode, b.bytecode)) return false
 
-  // debug
+  // debug 信息
   if (a.hasDebug !== b.hasDebug) return false
   if (a.hasDebug) {
     if (!a.debug || !b.debug) return false
@@ -76,7 +76,7 @@ function functionEq(a: ReturnType<typeof parseBytecodeModule>['func'], b: Return
     if (!eqBytes(a.debug.source, b.debug.source)) return false
   }
 
-  // cpool (best-effort; includes nested functions)
+  // 常量池（best-effort；包含嵌套函数）
   if (!eqJsonLike(a.cpool ?? [], b.cpool ?? [])) return false
 
   return true
@@ -212,7 +212,7 @@ function categorize(tsMod: ReturnType<typeof parseBytecodeModule>, wasmMod: Retu
 
   const atomsDiff = !atomsEq
 
-  // Split “function diff” into debug vs non-debug components for clustering.
+  // 将“函数差异”拆成 debug / 非 debug 两部分，方便聚类分析。
   const debugEq =
     tsMod.func.hasDebug === wasmMod.func.hasDebug &&
     (!tsMod.func.hasDebug ||
@@ -321,7 +321,7 @@ async function main() {
     if (names.length === 0) continue
     md += `### ${cat} (${names.length})\n\n`
 
-    // For debug-related categories, also group by which debug fields differ.
+    // 对 debug 相关类别：再按具体差异字段分组。
     if (cat.includes('debug')) {
       const byKind = new Map<string, string[]>()
       for (const r of rows.filter((r) => r.category === cat)) {
@@ -351,7 +351,7 @@ async function main() {
   await fs.mkdir(path.dirname(outPath), { recursive: true })
   await fs.writeFile(outPath, md, 'utf8')
 
-  // Also print short console summary for quick iteration
+  // 同时输出简短的控制台摘要，便于快速迭代
   const consoleSummary = order
     .filter((c) => counts.has(c))
     .map((c) => `${c}=${counts.get(c)}`)

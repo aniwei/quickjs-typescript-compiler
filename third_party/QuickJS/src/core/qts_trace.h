@@ -93,6 +93,20 @@ extern "C" {
 #define QTS_TRACE_EMIT_U8(val, pos) \
     fprintf(stderr, "[QTS:EMIT] pos=%zu u8=0x%02x\n", (size_t)(pos), (uint8_t)(val))
 
+/* 语义化埋点：用于标记特定 opcode 的操作数含义（不改变任何 emit 行为） */
+#if QTS_TRACE_LEVEL >= 2
+#define QTS_TRACE_EMIT_COPY_DATA_PROPERTIES(kind, operand, pos) \
+    fprintf(stderr, "[QTS:EMIT] pos=%zu copy_data_properties(%s) operand=0x%02x\n", \
+            (size_t)(pos), (kind), (uint8_t)(operand))
+
+#define QTS_TRACE_EMIT_FOR_OF_NEXT(operand, pos) \
+    fprintf(stderr, "[QTS:EMIT] pos=%zu for_of_next operand=0x%02x\n", \
+            (size_t)(pos), (uint8_t)(operand))
+#else
+#define QTS_TRACE_EMIT_COPY_DATA_PROPERTIES(kind, operand, pos)
+#define QTS_TRACE_EMIT_FOR_OF_NEXT(operand, pos)
+#endif
+
 #define QTS_TRACE_EMIT_U16(val, pos) \
     fprintf(stderr, "[QTS:EMIT] pos=%zu u16=0x%04x (%d)\n", (size_t)(pos), (uint16_t)(val), (int)(val))
 
@@ -107,6 +121,8 @@ extern "C" {
 #define QTS_TRACE_EMIT_U16(val, pos)
 #define QTS_TRACE_EMIT_U32(val, pos)
 #define QTS_TRACE_EMIT_ATOM(atom, pos)
+#define QTS_TRACE_EMIT_COPY_DATA_PROPERTIES(kind, operand, pos)
+#define QTS_TRACE_EMIT_FOR_OF_NEXT(operand, pos)
 #endif
 
 /* Variable resolution tracing */

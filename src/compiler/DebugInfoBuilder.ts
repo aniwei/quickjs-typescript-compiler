@@ -428,7 +428,7 @@ export class SourceMapBuilder {
     sourceIndex: number,
     sourceLine: number,
     sourceColumn: number,
-    nameIndex?: number
+    _nameIndex?: number
   ): void {
     // VLQ 编码实现 (简化版)
     const segment = this.encodeVLQ(generatedColumn) +

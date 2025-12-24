@@ -2,7 +2,6 @@ import ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
 import { CompilerContext } from '../CompilerContext'
 import { Opcode, JSAtom } from '../../env'
-import { FunctionDef } from '../FunctionDef'
 
 export class LiteralVisitor extends VisitorContext {
 
@@ -15,7 +14,7 @@ export class LiteralVisitor extends VisitorContext {
    * 
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:4744
    */
-  visitNullKeyword(node: ts.Node) {
+  visitNullKeyword(_node: ts.Node) {
     const fd = this.funcDef
     if (!fd) return
     
@@ -27,7 +26,7 @@ export class LiteralVisitor extends VisitorContext {
    * 
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:4745
    */
-  visitTrueKeyword(node: ts.Node) {
+  visitTrueKeyword(_node: ts.Node) {
     const fd = this.funcDef
     if (!fd) return
     
@@ -39,7 +38,7 @@ export class LiteralVisitor extends VisitorContext {
    * 
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:4746
    */
-  visitFalseKeyword(node: ts.Node) {
+  visitFalseKeyword(_node: ts.Node) {
     const fd = this.funcDef
     if (!fd) return
     

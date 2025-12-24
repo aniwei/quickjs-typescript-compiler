@@ -5,7 +5,7 @@ import path from 'path'
 import { TypeScriptCompiler } from '../src'
 import { createAdvancedDisassembly } from '../src/disasm'
 import { PC2Line } from '../src/env'
-// import { compareModuleTrace } from './compareModuleTrace'
+// import { compareModuleTrace } from './compareModuleTrace' // 模块 trace 对比：暂未启用
 import { BytecodeComparator, type ComparisonOptions, type ComparisonSummary } from './compareWithWasm'
 
 interface RunnerOptions {

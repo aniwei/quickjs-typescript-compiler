@@ -1,0 +1,36 @@
+# Fixtures 覆盖审计
+- fixtures: 89
+- SyntaxKind visited (via TypeScriptCompiler.visit): 49
+- SyntaxKind unhandled (hit default): 0
+
+## Top 30 常见 SyntaxKind（实际进入 visit()）
+- Identifier (80) x420
+- FirstLiteralToken (9) x298
+- ExpressionStatement (245) x274
+- CallExpression (214) x220
+- BinaryExpression (227) x146
+- FirstStatement (244) x114
+- PropertyAccessExpression (212) x61
+- ThisKeyword (110) x47
+- StringLiteral (11) x38
+- ReturnStatement (254) x33
+- PostfixUnaryExpression (226) x32
+- ObjectLiteralExpression (211) x29
+- Block (242) x27
+- FunctionDeclaration (263) x19
+- IfStatement (246) x16
+- ClassDeclaration (264) x16
+- BigIntLiteral (10) x13
+- ArrayLiteralExpression (210) x11
+- ElementAccessExpression (213) x11
+- NewExpression (215) x11
+- BreakStatement (253) x10
+- ParenthesizedExpression (218) x9
+- NullKeyword (106) x9
+- PrefixUnaryExpression (225) x8
+- YieldExpression (230) x7
+- ContinueStatement (252) x7
+- ForOfStatement (251) x6
+- TryStatement (259) x6
+- ArrowFunction (220) x5
+- SwitchStatement (256) x5

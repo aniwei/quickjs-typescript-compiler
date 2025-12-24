@@ -1,8 +1,8 @@
 import ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
 import { CompilerContext } from '../CompilerContext'
-import { Opcode, TempOpcode, JSAtom, JS_ATOM_NULL, COPY_DATA_PROPERTIES_FLAGS_DEPTH0 } from '../../env'
-import { BlockEnv, JSVarKindEnum } from '../FunctionDef'
+import { Opcode, TempOpcode, JSAtom, JS_ATOM_NULL, COPY_DATA_PROPERTIES_FLAGS_DEPTH0, FOR_OF_NEXT_OPERAND_DEFAULT } from '../../env'
+import { BlockEnv } from '../FunctionDef'
 import { JSVarDefEnum } from '../Compiler'
 
 /**
@@ -62,7 +62,6 @@ export class StatementVisitor extends VisitorContext {
     const decl = node.declarationList
     const isConst = (decl.flags & ts.NodeFlags.Const) !== 0
     const isLet = (decl.flags & ts.NodeFlags.Let) !== 0
-    const isVar = !isConst && !isLet
 
     // QuickJS: js_parse_var() 在变量 initializer 分支里直接 emit_op(OP_scope_put_var[_init])，
     // 并不会对这条 store 指令调用 emit_source_pos。
@@ -73,7 +72,6 @@ export class StatementVisitor extends VisitorContext {
       if (ts.isIdentifier(declaration.name)) {
         const name = declaration.name.text
         const atom = this.compiler.addAtom(name)
-        const sourcePos = declaration.getStart()
 
         // 定义变量 - 对应 parser.c:6532-6538 js_define_var
         if (isConst) {
@@ -337,7 +335,7 @@ export class StatementVisitor extends VisitorContext {
         // Rest：复制源对象的可枚举自有属性，并排除 exclude keys
         this.compiler.emitOp(fd, Opcode.OP_object)
         this.compiler.emitOp(fd, Opcode.OP_copy_data_properties)
-        // 对齐 QuickJS: emit_u8(s, 0 | ((depth_lvalue + 1) << 2) | ((depth_lvalue + 2) << 5))，此处 depth=0 => 0x44
+        // 对齐 QuickJS: emit_u8(s, 0 | ((depth_lvalue + 1) << 2) | ((depth_lvalue + 2) << 5))
         this.compiler.emitU8(fd, COPY_DATA_PROPERTIES_FLAGS_DEPTH0)
         this.compiler.emitOp(fd, Opcode.OP_put_var_init)
         this.compiler.emitU32(fd, restAtom)
@@ -430,7 +428,7 @@ export class StatementVisitor extends VisitorContext {
    * 
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:7056-7084
    */
-  visitWhileStatement(node: ts.WhileStatement, labelName = 0): void {
+  visitWhileStatement(node: ts.WhileStatement, labelName = JS_ATOM_NULL): void {
     const fd = this.funcDef!
 
     // QuickJS: TOK_WHILE branch does not explicitly call emit_source_pos for the `while` keyword.
@@ -479,7 +477,7 @@ export class StatementVisitor extends VisitorContext {
    * 
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:7085-7119
    */
-  visitDoStatement(node: ts.DoStatement, labelName = 0): void {
+  visitDoStatement(node: ts.DoStatement, labelName = JS_ATOM_NULL): void {
     const fd = this.funcDef!
 
     // 创建标签 - 对应 parser.c:7090-7092
@@ -527,7 +525,7 @@ export class StatementVisitor extends VisitorContext {
    * 
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:7122-7216
    */
-  visitForStatement(node: ts.ForStatement, labelName = 0): void {
+  visitForStatement(node: ts.ForStatement, labelName = JS_ATOM_NULL): void {
     const fd = this.funcDef!
 
     // QuickJS: TOK_FOR branch does not explicitly call emit_source_pos for the `for` keyword.
@@ -578,6 +576,12 @@ export class StatementVisitor extends VisitorContext {
       labelTest = labelBody
     }
 
+    // 关键修复：当没有 incrementor 时，continue 目标应为 labelTest。
+    // 否则循环体内的 continue 会在此处之前被编译，仍指向未发射的 labelCont，导致 label.addr 维持为 -1。
+    if (!node.incrementor) {
+      breakEntry.labelCont = labelTest
+    }
+
     // 循环体 - 对应 parser.c:7222-7225
     this.compiler.emitLabelInt(fd, labelBody)
     this.context.visit(node.statement)
@@ -595,7 +599,6 @@ export class StatementVisitor extends VisitorContext {
       this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelTest)
     } else {
       // 无增量表达式：continue 指向测试，并在循环体末尾回到测试
-      breakEntry.labelCont = labelTest
       this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelTest)
     }
 
@@ -665,7 +668,7 @@ export class StatementVisitor extends VisitorContext {
    * 
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:6659-6825
    */
-  visitForOfStatement(node: ts.ForOfStatement, labelName = 0): void {
+  visitForOfStatement(node: ts.ForOfStatement, labelName = JS_ATOM_NULL): void {
     const fd = this.funcDef!
     const blockScopeLevel = fd.scopeLevel
 
@@ -757,7 +760,7 @@ export class StatementVisitor extends VisitorContext {
       this.compiler.emitOp(fd, Opcode.OP_iterator_get_value_done)
     } else {
       this.compiler.emitOp(fd, Opcode.OP_for_of_next)
-      this.compiler.emitU8(fd, 0)
+      this.compiler.emitU8(fd, FOR_OF_NEXT_OPERAND_DEFAULT)
     }
 
     // on stack: enum_rec value bool
@@ -783,19 +786,23 @@ export class StatementVisitor extends VisitorContext {
    * 
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:6659-6825
    */
-  visitForInStatement(node: ts.ForInStatement, labelName = 0): void {
+  visitForInStatement(node: ts.ForInStatement, labelName = JS_ATOM_NULL): void {
     const fd = this.funcDef!
     const blockScopeLevel = fd.scopeLevel
 
     // 设置 eval 返回值为 undefined - for-in 从 for 语句分支进入，继承 parser.c:7134
     this.compiler.setEvalRetUndefined(fd)
 
-    const labelCont = this.compiler.newLabelInt(fd)
-    const labelBody = this.compiler.newLabelInt(fd)
-    const labelBreak = this.compiler.newLabelInt(fd)
-    const labelNext = this.compiler.newLabelInt(fd)
-    const labelExpr = this.compiler.newLabelInt(fd)
+    // 对齐 QuickJS: js_parse_for_in_of (parser.c:6659-6910)
+    // QuickJS 在 OPTIMIZE 开启时会把“next”代码块搬到表达式求值之后。
+    // TS 侧直接按优化后的最终布局发射，避免依赖后处理重排。
 
+    const labelCont = this.compiler.newLabelInt(fd)
+    const labelBreak = this.compiler.newLabelInt(fd)
+    // QuickJS: labelNext 是 loop body entry（每次迭代把 key 赋给目标，然后 fallthrough 执行 body）
+    const labelNext = this.compiler.newLabelInt(fd)
+
+    // create scope
     this.compiler.pushScope(fd)
 
     // for-in: drop_count = 1, has_iterator = false
@@ -803,26 +810,27 @@ export class StatementVisitor extends VisitorContext {
     this.compiler.pushBreakEntry(fd, breakEntry, labelName, labelBreak, labelCont, 1)
     breakEntry.scopeLevel = blockScopeLevel
 
-    this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelExpr)
-
-    // label_next: assign value, goto body
-    this.compiler.emitLabelInt(fd, labelNext)
-
+    // 1) 先在当前作用域里定义 loop target（QuickJS 在 for_in_start 之前会 set_loc_uninitialized）
+    // 2) 每次迭代在 labelNext 里把 key 赋给 target
+    let assignTarget: (() => void) | undefined
     if (ts.isVariableDeclarationList(node.initializer)) {
       const decl = node.initializer.declarations[0]
-      if (decl && ts.isIdentifier(decl.name)) {
-        const atom = this.compiler.addAtom(decl.name.text)
-        const isConst = (node.initializer.flags & ts.NodeFlags.Const) !== 0
-        const isLet = (node.initializer.flags & ts.NodeFlags.Let) !== 0
+      if (!decl || !ts.isIdentifier(decl.name)) {
+        throw new Error('Unsupported for-in initializer')
+      }
+      const atom = this.compiler.addAtom(decl.name.text)
+      const isConst = (node.initializer.flags & ts.NodeFlags.Const) !== 0
+      const isLet = (node.initializer.flags & ts.NodeFlags.Let) !== 0
 
-        if (isConst) {
-          this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_CONST)
-        } else if (isLet) {
-          this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_LET)
-        } else {
-          this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_VAR)
-        }
+      if (isConst) {
+        this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_CONST)
+      } else if (isLet) {
+        this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_LET)
+      } else {
+        this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_VAR)
+      }
 
+      assignTarget = () => {
         const opcode = (isConst || isLet)
           ? TempOpcode.OP_scope_put_var_init
           : TempOpcode.OP_scope_put_var
@@ -832,23 +840,25 @@ export class StatementVisitor extends VisitorContext {
       }
     } else if (ts.isIdentifier(node.initializer)) {
       const atom = this.compiler.addAtom(node.initializer.text)
-      this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var)
-      this.compiler.emitU32(fd, atom)
-      this.compiler.emitU16(fd, fd.scopeLevel)
+      assignTarget = () => {
+        this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var)
+        this.compiler.emitU32(fd, atom)
+        this.compiler.emitU16(fd, fd.scopeLevel)
+      }
     } else {
       throw new Error('Unsupported for-in initializer')
     }
 
-    this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelBody)
-
     // label_expr: eval object + start, goto cont
-    this.compiler.emitLabelInt(fd, labelExpr)
     this.context.visit(node.expression)
     this.compiler.emitOp(fd, Opcode.OP_for_in_start)
     this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelCont)
 
-    // label_body
-    this.compiler.emitLabelInt(fd, labelBody)
+    // label_next: assign iteration key to target, then fallthrough to body
+    this.compiler.emitLabelInt(fd, labelNext)
+    assignTarget()
+
+    // loop body
     this.context.visit(node.statement)
     this.compiler.closeScopes(fd, fd.scopeLevel, breakEntry.scopeLevel)
 
@@ -1265,41 +1275,47 @@ export class StatementVisitor extends VisitorContext {
       this.compiler.emitLabelInt(fd, labelFinally)
 
       // finally 块 - 对应 parser.c:7500-7530
-      // QuickJS: 为 finally/gosub 预留一个额外的 <ret> 局部变量 (gosub_ret_value)
-      // 在 try-catch-finally 中通常是 loc2；在 try-finally(无 catch 绑定) 中可能是 loc1。
-      if (fd.gosubRetIdx < 0) {
-        const retAtom = this.compiler.addAtom('<ret>')
-        fd.gosubRetIdx = this.compiler.addVar(fd, retAtom)
-      }
       const retValueIdx = fd.evalRetIdx
-      const gosubRetIdx = fd.gosubRetIdx
 
       // 压入 break 条目 (dropCount=2 用于 ret_value 和 gosub_ret_value)
       const finallyBlockEnv = new BlockEnv()
       this.compiler.pushBreakEntry(fd, finallyBlockEnv, 0, -1, -1, 2)
 
-      // QuickJS: 进入 finally 前保存/清理 ret_value，避免 finally 语句污染 loc0
-      // 对应 WASM 反汇编序列: get_loc0; put_loc2; undefined; put_loc0
-      // 注意: 不能直接发射 OP_get_loc0/OP_put_loc2 等短操作码，
-      // 因为它们与 TempOpcode(182-200) 重叠，会在 resolve_variables/resolve_labels 阶段被误判。
-      // 这里使用长格式 OP_get_loc/OP_put_loc，后续由 LabelResolver 收缩为短操作码。
-      this.compiler.emitOp(fd, Opcode.OP_get_loc)
-      this.compiler.emitU16(fd, retValueIdx)
-      this.compiler.emitOp(fd, Opcode.OP_put_loc)
-      this.compiler.emitU16(fd, gosubRetIdx)
-      this.compiler.emitOp(fd, Opcode.OP_undefined)
-      this.compiler.emitOp(fd, Opcode.OP_put_loc)
-      this.compiler.emitU16(fd, retValueIdx)
+      // QuickJS: 只有在 eval_ret_idx >= 0 时才需要保存/清理 eval_ret。
+      // 对应 parser.c:7533-7554
+      let savedEvalRetIdx = -1
+      if (retValueIdx >= 0) {
+        if (fd.gosubRetIdx < 0) {
+          const retAtom = this.compiler.addAtom('<ret>')
+          fd.gosubRetIdx = this.compiler.addVar(fd, retAtom)
+        }
+        savedEvalRetIdx = fd.gosubRetIdx
+
+        // 进入 finally 前保存/清理 eval_ret，避免 finally 语句污染 loc0
+        // 对应 WASM 反汇编序列: get_loc0; put_loc2; undefined; put_loc0
+        // 注意: 不能直接发射 OP_get_loc0/OP_put_loc2 等短操作码，
+        // 因为它们与 TempOpcode(182-200) 重叠，会在 resolve_variables/resolve_labels 阶段被误判。
+        // 这里使用长格式 OP_get_loc/OP_put_loc，后续由 LabelResolver 收缩为短操作码。
+        this.compiler.emitOp(fd, Opcode.OP_get_loc)
+        this.compiler.emitU16(fd, retValueIdx)
+        this.compiler.emitOp(fd, Opcode.OP_put_loc)
+        this.compiler.emitU16(fd, savedEvalRetIdx)
+        this.compiler.emitOp(fd, Opcode.OP_undefined)
+        this.compiler.emitOp(fd, Opcode.OP_put_loc)
+        this.compiler.emitU16(fd, retValueIdx)
+      }
 
       // 编译 finally 块
       this.visitBlock(node.finallyBlock)
 
-      // QuickJS: finally 结束后恢复 ret_value
-      // 对应 WASM 反汇编序列: get_loc2; put_loc0
-      this.compiler.emitOp(fd, Opcode.OP_get_loc)
-      this.compiler.emitU16(fd, gosubRetIdx)
-      this.compiler.emitOp(fd, Opcode.OP_put_loc)
-      this.compiler.emitU16(fd, retValueIdx)
+      if (retValueIdx >= 0) {
+        // QuickJS: finally 结束后恢复 eval_ret
+        // 对应 WASM 反汇编序列: get_loc2; put_loc0
+        this.compiler.emitOp(fd, Opcode.OP_get_loc)
+        this.compiler.emitU16(fd, savedEvalRetIdx)
+        this.compiler.emitOp(fd, Opcode.OP_put_loc)
+        this.compiler.emitU16(fd, retValueIdx)
+      }
 
       // 弹出 break 条目
       this.compiler.popBreakEntry(fd)

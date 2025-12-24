@@ -18,7 +18,8 @@ type Pc2LineEntry = {
   deltaColumn: number
 }
 
-// Mirrors QuickJS constants (see parser.c: compute_pc2line_info / dump_pc2line)
+// 这里使用的是 pc2line v2 编码常量（用于差异分析）。
+// 注意：它与 src/env.ts 里的 PC2Line（base=-1/range=5）不是同一套。
 const PC2LINE_BASE = -3
 const PC2LINE_RANGE = 15
 const PC2LINE_OP_FIRST = 1

@@ -1,3 +1,3 @@
 module.exports = async () => {
-  // Global setup for Jest
+  // Jest 的全局初始化
 };

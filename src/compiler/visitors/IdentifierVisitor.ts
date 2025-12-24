@@ -1,12 +1,10 @@
 import ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
 import { CompilerContext } from '../CompilerContext'
-import { Opcode, TempOpcode, JSAtom } from '../../env'
+import { TempOpcode } from '../../env'
 import { FunctionDef } from '../FunctionDef'
 
 export class IdentifierVisitor extends VisitorContext {
-  
-
   constructor(context: CompilerContext) {
     super(context)
   }

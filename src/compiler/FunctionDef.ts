@@ -1,6 +1,5 @@
 import { BytecodeBuilder } from './BytecodeBuilder'
 import { 
-  JSAtom,
   JS_ATOM_NULL,
   ARGUMENT_VAR_OFFSET as ENV_ARGUMENT_VAR_OFFSET,
   ARG_SCOPE_INDEX as ENV_ARG_SCOPE_INDEX,

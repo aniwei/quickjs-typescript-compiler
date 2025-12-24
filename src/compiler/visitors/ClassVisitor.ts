@@ -3,7 +3,6 @@ import { VisitorContext } from './VisitorContext'
 import {
   Opcode,
   TempOpcode,
-  FunctionKind,
   JSMode,
   JSAtom,
   JS_ATOM_NULL,
@@ -14,7 +13,6 @@ import {
 } from '../../env'
 import { 
   FunctionDef, 
-  JSVarKind,
   JSVarKindEnum,
   JSParseFunctionEnum,
   JSFunctionKindEnum,
@@ -64,29 +62,6 @@ interface ClassFieldsDef {
 export class ClassVisitor extends VisitorContext {
   constructor(context: CompilerContext) {
     super(context)
-  }
-
-  // --------------------------------------------------------------------------
-  // 文档兼容包装：用于对照 TRANSPILATION_SPEC.md 的函数命名
-  // --------------------------------------------------------------------------
-
-  /** 对应 QuickJS js_parse_class_default_ctor (parser.c:3044+) */
-  private visitClassDefaultCtor(
-    fd: FunctionDef,
-    classFlags: number,
-    node: ts.ClassLikeDeclaration
-  ): FunctionDef {
-    return this.createDefaultConstructor(fd, classFlags, node)
-  }
-
-  /** 对应 QuickJS class fields init helper（内部创建初始化函数） */
-  private visitClassFieldsInit(fd: FunctionDef, isStatic: boolean): FunctionDef {
-    return this.createFieldsInitFunction(fd, isStatic)
-  }
-
-  /** 对应 QuickJS property name 处理（这里返回 atom） */
-  private visitPropertyName(name: ts.PropertyName): number {
-    return this.getPropertyNameAtom(name)
   }
 
   private bodyContainsSuper(body: ts.ConciseBody | undefined): boolean {
@@ -166,7 +141,6 @@ export class ClassVisitor extends VisitorContext {
     isClassExpr: boolean
   ): void {
     const fd = this.funcDef!
-    const sourcePos = node.getStart()
 
     // 保存当前 JS 模式，类在严格模式下解析 - 对应 parser.c:3228-3229
     const savedJsMode = fd.jsMode
@@ -274,7 +248,7 @@ export class ClassVisitor extends VisitorContext {
     }
 
     // 存储字段初始化函数
-    const varIdx = this.compiler.defineVar(fd, JSAtom.JS_ATOM_class_fields_init, JSVarDefEnum.JS_VAR_DEF_CONST)
+    this.compiler.defineVar(fd, JSAtom.JS_ATOM_class_fields_init, JSVarDefEnum.JS_VAR_DEF_CONST)
     if (cf.fieldsInitFd) {
       // 在字段初始化函数末尾发射 return_undef - 对应 parser.c:emit_class_init_end
       this.compiler.emitOp(cf.fieldsInitFd, Opcode.OP_return_undef)
@@ -359,8 +333,6 @@ export class ClassVisitor extends VisitorContext {
     classFlags: number,
     classFields: [ClassFieldsDef, ClassFieldsDef]
   ): FunctionDef | null {
-    const sourcePos = member.getStart()
-
     // 检查是否为静态成员
     const isStatic = ts.canHaveModifiers(member) && 
       (member.modifiers?.some(m => m.kind === ts.SyntaxKind.StaticKeyword) ?? false)

@@ -13,7 +13,7 @@ export class ThisVisitor extends VisitorContext {
    * 
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:4923-4928
    */
-  visitThisKeyword(node: ts.ThisExpression): void {
+  visitThisKeyword(_node: ts.ThisExpression): void {
     const fd = this.funcDef!
 
     // QuickJS: TOK_THIS 分支只 emit_op(OP_scope_get_var)，不调用 emit_source_pos。

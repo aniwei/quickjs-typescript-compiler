@@ -3,9 +3,7 @@
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 
-const PC2LINE_BASE = -1
-const PC2LINE_RANGE = 5
-const PC2LINE_OP_FIRST = 1
+import { BytecodeTag, PC2Line } from '../src/env'
 
 interface Pc2LineEntry {
   pc: number
@@ -296,9 +294,9 @@ function decodePc2line(buffer: Uint8Array): Pc2LineEntry[] {
       diffPc = readULEB()
       diffLine = readSLEB()
     } else {
-      const encoded = op - PC2LINE_OP_FIRST
-      diffPc = Math.floor(encoded / PC2LINE_RANGE)
-      diffLine = (encoded % PC2LINE_RANGE) + PC2LINE_BASE
+      const encoded = op - PC2Line.PC2LINE_OP_FIRST
+      diffPc = Math.floor(encoded / PC2Line.PC2LINE_RANGE)
+      diffLine = (encoded % PC2Line.PC2LINE_RANGE) + PC2Line.PC2LINE_BASE
     }
     const diffColumn = readSLEB()
 
@@ -318,21 +316,4 @@ function decodePc2line(buffer: Uint8Array): Pc2LineEntry[] {
 
   return entries
 }
-
-enum BytecodeTag {
-  TC_TAG_NULL = 1,
-  TC_TAG_UNDEFINED = 2,
-  TC_TAG_BOOL_FALSE = 3,
-  TC_TAG_BOOL_TRUE = 4,
-  TC_TAG_INT32 = 5,
-  TC_TAG_FLOAT64 = 6,
-  TC_TAG_STRING = 7,
-  TC_TAG_OBJECT = 8,
-  TC_TAG_ARRAY = 9,
-  TC_TAG_BIG_INT = 10,
-  TC_TAG_TEMPLATE_OBJECT = 11,
-  TC_TAG_FUNCTION_BYTECODE = 12,
-  TC_TAG_MODULE = 13,
-}
-
 main()

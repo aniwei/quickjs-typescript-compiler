@@ -1,9 +1,12 @@
 #!/usr/bin/env tsx
 
 /**
- * Compare TypeScript compiler output with WASM QuickJS compilation
- * This script compiles TypeScript files using both our compiler and QuickJS WASM,
- * then compares the bytecode output for verification.
+ * 对比 TypeScript 编译器输出与 QuickJS WASM 编译结果。
+ *
+ * 该脚本会分别用：
+ * - 本项目的 TypeScriptCompiler
+ * - QuickJS WASM
+ * 编译同一份输入，并做字节码 byte-for-byte 对比，用于回归与对齐验证。
  */
 
 import fs from 'fs/promises'
@@ -55,21 +58,21 @@ class BytecodeComparator {
   async compare(): Promise<ComparisonSummary> {
     console.log('🔍 Starting bytecode comparison...')
     
-    // Ensure artifacts directory exists
+    // 确保 artifacts 输出目录存在
     await this.ensureArtifactsDir()
     
-    // Compile with our TypeScript compiler
+    // 用我们自己的 TypeScript 编译器编译
     console.log('📦 Compiling with TypeScript compiler...')
     const tsResult = await this.compileWithTypeScript()
     
-    // Compile with QuickJS WASM (if available)
+    // 用 QuickJS WASM 编译（若可用）
     console.log('🌐 Compiling with QuickJS WASM...')
     const wasmResult = await this.compileWithWasm()
     
-    // Save artifacts
+    // 写出 artifacts
     await this.saveArtifacts(tsResult, wasmResult)
     
-    // Compare results
+    // 对比结果
     const summary = this.compareResults(tsResult, wasmResult)
     this.lastSummary = summary
     return summary
@@ -83,7 +86,7 @@ class BytecodeComparator {
     try {
       await fs.mkdir(this.artifactsDir, { recursive: true })
     } catch (error) {
-      // Directory might already exist
+      // 目录可能已存在
     }
   }
 
@@ -109,7 +112,7 @@ class BytecodeComparator {
       shortCode: !this.options.normalizeShort,
       debug: false,
       strictMode: false,
-      module: true, // Default to script mode to match WASM default
+      module: true, // 默认按模块模式编译
       firstAtomId
     } as const
 
@@ -117,9 +120,9 @@ class BytecodeComparator {
       ...(flags as any),
       referenceJsSource: reference?.code,
     })
-    // Use JS filename to match WASM output
+    // 使用 JS 文件名，以对齐 WASM 侧输出
     let filename = reference ? reference.path : this.options.inputTs;
-    // Ensure filename is relative to CWD, matching QuickJSLib behavior
+    // 确保 filename 相对当前工作目录，和 QuickJSLib 行为保持一致
     filename = path.relative(process.cwd(), filename);
 
     const bytecode = await compiler.compile(sourceCode, filename);
@@ -150,14 +153,14 @@ class BytecodeComparator {
 
   private async compileWithWasm(): Promise<CompilationResult> {
     try {
-      // Check if QuickJS WASM is available
+      // 检测 QuickJS WASM 是否可用
       const wasmPath = path.join('third_party', 'QuickJS', 'wasm', 'output', 'quickjs_wasm.wasm')
       
       try {
         await fs.access(wasmPath)
       } catch {
         console.log('⚠️  QuickJS WASM not found, skipping WASM build...')
-        // Could implement WASM building here
+        // 这里也可以做自动构建 WASM（当前未实现）
       }
       
       const reference = await this.resolveReferenceJavaScript()
@@ -165,7 +168,7 @@ class BytecodeComparator {
         throw new Error('Unable to resolve JavaScript source for QuickJS compilation')
       }
       
-      // Compile with QuickJS WASM (placeholder - would need actual WASM binding)
+      // 用 QuickJS WASM 编译（需要 WASM binding；这里是占位实现）
       const bytecode = await this.compileJavaScriptWithWasm(reference.code, reference.path)
       
       let disassembly: string | undefined
@@ -189,7 +192,7 @@ class BytecodeComparator {
     } catch (error) {
       console.log('⚠️  WASM compilation failed, creating mock result:', error)
       
-      // Return mock result for comparison
+      // 返回 mock 结果用于对比流程不中断
       const mockBytecode = new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05])
       return {
         bytecode: mockBytecode,
@@ -310,17 +313,17 @@ class BytecodeComparator {
 
   private basicStripTypeScript(tsCode: string): string {
     return tsCode
-      // Remove basic type annotations after colons (e.g., const x: number = ...)
+      // 移除冒号后的基础类型标注（例如：const x: number = ...）
       .replace(/:\s*[^=;,){}]+(?=[=;,){}])/g, '')
-      // Remove function return type annotations before block or arrow
+      // 移除函数返回类型标注（块或箭头之前）
       .replace(/([)\]])\s*:\s*[^=;{=>]+(?=\s*(\{|=>))/g, '$1')
-      // Remove generic type parameters in simple cases (e.g., Array<number>)
+      // 在简单场景中移除泛型参数（例如：Array<number>）
       .replace(/<\s*[^>]+\s*>/g, '')
-      // Remove interface and type declarations (very naive)
+      // 移除 interface/type 声明（非常朴素的实现）
       .replace(/\b(interface|type)\s+\w+[^{;]*[{][^}]*}[;]?/g, '')
-      // Remove declare keywords
+      // 移除 declare 关键字
       .replace(/\bdeclare\s+/g, '')
-      // Remove TS-only assertion syntax as const, satisfies, etc. (naive)
+      // 移除 TS 专有断言语法（as const、satisfies 等；朴素实现）
       .replace(/\s+as\s+const\b/g, '')
       .replace(/\s+satisfies\s+[^;]+/g, '')
   }
@@ -358,7 +361,7 @@ class BytecodeComparator {
   }
 
   private async compileJavaScriptWithWasm(jsCode: string, jsPath?: string): Promise<Uint8Array> {
-    // Use script mode (global eval) to match TypeScript compiler output
+    // 使用 script 模式（全局 eval），用于对齐 TS 侧输出
     const result = await QuickJSLib.compileSourceAsScript(jsCode, jsPath);
     return result
   }
@@ -369,7 +372,7 @@ class BytecodeComparator {
     lines.push(`Bytecode size: ${bytecode.length} bytes`)
     lines.push('')
     
-    // Simple hex dump
+    // 简单 hex dump
     for (let i = 0; i < bytecode.length; i += 16) {
       const chunk = bytecode.slice(i, i + 16)
       const hex = Array.from(chunk).map(b => b.toString(16).padStart(2, '0')).join(' ')
@@ -384,7 +387,7 @@ class BytecodeComparator {
   private extractOpcodes(bytecode: Uint8Array): string[] {
     const opcodes = []
     
-    // Simple opcode extraction - would need proper QuickJS opcode parsing
+    // 简单提取：严格解析需要 QuickJS 的 opcode 规则
     for (let i = 0; i < Math.min(bytecode.length, 10); i++) {
       opcodes.push(`0x${bytecode[i].toString(16).padStart(2, '0')}`)
     }

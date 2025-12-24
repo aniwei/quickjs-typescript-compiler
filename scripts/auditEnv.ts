@@ -1,6 +1,6 @@
 import { QuickJSLib } from './QuickJSLib'
 
-// NOTE: env.ts is auto-generated; this script validates it matches the WASM exports.
+// 注意：env.ts 是自动生成文件；本脚本用于校验它与 WASM 导出是否一致。
 import * as Env from '../src/env'
 
 type Diff = { key: string; expected: unknown; actual: unknown }
@@ -50,7 +50,7 @@ function printSection(result: AuditSectionResult) {
 async function main() {
   const results: AuditSectionResult[] = []
 
-  // Basic constants
+  // 基础常量
   {
     const expected = {
       compileOptions: Env.compileOptions,
@@ -86,7 +86,7 @@ async function main() {
     results.push({ name: 'Constants', ok: diffs.length === 0, diffs })
   }
 
-  // Enums and numeric maps
+  // 枚举与数值映射
   {
     const wasm = await QuickJSLib.getCompileEnums()
     const env = extractEnumForwardMapping(Env.CompileFlags)
@@ -136,7 +136,7 @@ async function main() {
     results.push({ name: 'OPSpecialObjectEnum', ok: diffs.length === 0, diffs })
   }
 
-  // Opcodes
+  // 操作码
   {
     const all = await QuickJSLib.getAllOpcodes()
     const wasmFinal: Record<string, number> = {}
@@ -153,7 +153,7 @@ async function main() {
     results.push({ name: 'Opcodes (temp)', ok: diffsTemp.length === 0, diffs: diffsTemp })
   }
 
-  // Minimal Atom sanity checks (avoid huge diffs by default)
+  // Atom 基本一致性检查（默认只做少量检查，避免输出过大）
   {
     const diffs: Diff[] = []
     const emptyId = (Env as any).JSAtom?.JS_ATOM_empty_string
@@ -173,7 +173,7 @@ async function main() {
     results.push({ name: 'Atoms (sanity)', ok: diffs.length === 0, diffs })
   }
 
-  // Print and exit code
+  // 输出结果并设置退出码
   for (const r of results) printSection(r)
 
   const failed = results.filter(r => !r.ok)

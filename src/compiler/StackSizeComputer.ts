@@ -3,8 +3,7 @@ import {
   FunctionDef, 
   JS_STACK_SIZE_MAX,
 } from './FunctionDef'
-import { Opcode, OPCODE_DEFS, OPCODE_BY_CODE, OpFormat, STACK_LEVEL_UNSET } from '../env'
-import { Compiler } from './Compiler'
+import { Opcode, OPCODE_BY_CODE, OpFormat, STACK_LEVEL_UNSET, OP_COUNT } from '../env'
 import { u32ToI32 } from './int32'
 
 // ============================================================================
@@ -12,9 +11,6 @@ import { u32ToI32 } from './int32'
 // 
 // QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:12191-12380
 // ============================================================================
-
-/** 操作码数量上限 */
-const OP_COUNT = 256
 
 /**
  * 栈大小状态
@@ -42,11 +38,7 @@ interface StackSizeState {
  * 4. 确保一致性 (同一位置的栈大小必须相同)
  */
 export class StackSizeComputer {
-  constructor(private context: CompilerContext) {}
-
-  private get compiler(): Compiler {
-    return this.context.compiler
-  }
+  constructor(_context: CompilerContext) {}
 
   // ============================================================================
   // 主入口方法 - 对应 parser.c:compute_stack_size
@@ -352,7 +344,11 @@ export class StackSizeComputer {
     catchPos: number
   ): boolean {
     if (pos < 0 || pos >= s.bcLen) {
-      throw new Error(`Bytecode buffer overflow (op=${op}, pc=${pos})`)
+      const op8 = op & 0xff
+      const opName = OPCODE_BY_CODE[op8]?.id ?? `unknown_${op8}`
+      throw new Error(
+        `Bytecode buffer overflow (pc=${pos}, op=${opName}(${op8}), from_pc=${fromPos}, stack=${stackLen}, bcLen=${s.bcLen})`
+      )
     }
     
     if (stackLen > s.stackLenMax) {
@@ -590,10 +586,6 @@ export class StackSizeComputer {
   // ============================================================================
   // 字节码读取辅助方法
   // ============================================================================
-
-  private getU8(buf: Uint8Array, pos: number): number {
-    return buf[pos]
-  }
 
   private getI8(buf: Uint8Array, pos: number): number {
     const val = buf[pos]

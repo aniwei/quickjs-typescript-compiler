@@ -135,7 +135,9 @@ function readAtom(reader: Reader): number {
 function readFunctionBytecode(reader: Reader, atoms: string[]): FunctionBytecode {
   const tag = reader.readU8()
   if (tag !== BytecodeTag.TC_TAG_FUNCTION_BYTECODE) {
-    throw new Error(`Unsupported tag: ${tag} (expected TC_TAG_FUNCTION_BYTECODE=12)`)
+    throw new Error(
+      `Unsupported tag: ${tag} (expected TC_TAG_FUNCTION_BYTECODE=${BytecodeTag.TC_TAG_FUNCTION_BYTECODE})`
+    )
   }
 
   const flags = reader.readU16LE()
@@ -195,58 +197,59 @@ function readFunctionBytecode(reader: Reader, atoms: string[]): FunctionBytecode
 
   const cpool: unknown[] = []
   for (let i = 0; i < cpoolCount; i++) {
-    const ctag = reader.readU8()
-    switch (ctag) {
-      case BytecodeTag.TC_TAG_NULL:
-        cpool.push(null)
-        break
-      case BytecodeTag.TC_TAG_UNDEFINED:
-        cpool.push(undefined)
-        break
-      case BytecodeTag.TC_TAG_BOOL_FALSE:
-        cpool.push(false)
-        break
-      case BytecodeTag.TC_TAG_BOOL_TRUE:
-        cpool.push(true)
-        break
-      case BytecodeTag.TC_TAG_INT32:
-        cpool.push((reader.readU32LE() | 0) as number)
-        break
-      case BytecodeTag.TC_TAG_FLOAT64:
-        cpool.push(reader.readF64LE())
-        break
-      case BytecodeTag.TC_TAG_STRING:
-        cpool.push(reader.readString())
-        break
-      case BytecodeTag.TC_TAG_BIG_INT: {
-        const len = reader.readULEB128()
-        if (len === 0) {
-          cpool.push(0n)
-          break
+    const readCpoolValue = (): unknown => {
+      const ctag = reader.readU8()
+      switch (ctag) {
+        case BytecodeTag.TC_TAG_NULL:
+          return null
+        case BytecodeTag.TC_TAG_UNDEFINED:
+          return undefined
+        case BytecodeTag.TC_TAG_BOOL_FALSE:
+          return false
+        case BytecodeTag.TC_TAG_BOOL_TRUE:
+          return true
+        case BytecodeTag.TC_TAG_INT32:
+          return (reader.readU32LE() | 0) as number
+        case BytecodeTag.TC_TAG_FLOAT64:
+          return reader.readF64LE()
+        case BytecodeTag.TC_TAG_STRING:
+          return reader.readString()
+        case BytecodeTag.TC_TAG_BIG_INT: {
+          const len = reader.readULEB128()
+          if (len === 0) return 0n
+          const bytes = reader.readBytes(len)
+          // 二进制补码，小端序
+          let x = 0n
+          for (let j = 0; j < bytes.length; j++) {
+            x |= BigInt(bytes[j]) << (BigInt(j) * 8n)
+          }
+          // 若为负数则做符号扩展（sign extend）
+          const signBit = bytes[bytes.length - 1] & 0x80
+          if (signBit !== 0) {
+            const bits = BigInt(bytes.length) * 8n
+            x -= 1n << bits
+          }
+          return x
         }
-        const bytes = reader.readBytes(len)
-        // 二进制补码，小端序（two's complement little-endian）
-        let x = 0n
-        for (let j = 0; j < bytes.length; j++) {
-          x |= BigInt(bytes[j]) << (BigInt(j) * 8n)
+        case BytecodeTag.TC_TAG_TEMPLATE_OBJECT: {
+          const len = reader.readULEB128()
+          const elements: unknown[] = []
+          for (let j = 0; j < len; j++) {
+            elements.push(readCpoolValue())
+          }
+          const raw = readCpoolValue()
+          return { tag: 'template_object', elements, raw }
         }
-        // 若为负数则做符号扩展（sign extend）
-        const signBit = bytes[bytes.length - 1] & 0x80
-        if (signBit !== 0) {
-          const bits = BigInt(bytes.length) * 8n
-          x -= 1n << bits
-        }
-        cpool.push(x)
-        break
+        case BytecodeTag.TC_TAG_FUNCTION_BYTECODE:
+          reader.ptr -= 1
+          return readFunctionBytecode(reader, atoms)
+        default:
+          // 未识别的 tag：尽量不让解析错位（按 null 占位）。
+          return null
       }
-      case BytecodeTag.TC_TAG_FUNCTION_BYTECODE:
-        reader.ptr -= 1
-        cpool.push(readFunctionBytecode(reader, atoms))
-        break
-      default:
-        cpool.push(null)
-        break
     }
+
+    cpool.push(readCpoolValue())
   }
 
   return {

@@ -69,33 +69,33 @@ function findIdentifierInFiles(identifier: string, files: string[]): boolean {
   return false
 }
 
-// Spec uses conceptual TS names; real implementation sometimes differs.
+// Spec 使用的是“概念化”的 TS 名称；实际实现中可能存在命名差异。
 const TS_ALIASES: Record<string, string[]> = {
-  // Compiler label helpers
+  // 编译器 label 辅助函数
   emitLabel: ['emitLabelInt', 'emitLabelRaw'],
   emitGoto: ['emitGotoInt'],
   newLabel: ['newLabelInt', 'newLabelFd'],
   newLabelFd: ['newLabelFd'],
 
-  // Variable lookup naming
+  // 变量查找命名
   findVar: ['findVarByAtom', 'findVarInScope'],
 
-  // Function def lifecycle is implemented across classes, not 1:1 free functions
+  // 函数定义生命周期分散在多个类中，不是一组 1:1 的自由函数
   jsNewFunctionDef: ['js_new_function_def', 'FunctionDef'],
   jsFreeFunctionDef: ['js_free_function_def'],
   jsCreateFunction: ['js_create_function', 'FunctionBuilder'],
 
-  // Label + stack stages are class-based
+  // label 与栈计算是基于类的阶段实现
   resolveLabels: ['LabelResolver', 'resolve'],
   computeStackSize: ['StackSizeComputer', 'compute'],
 
-  // Visitor naming differences / conceptual spec rows
+  // visitor 命名差异 / spec 中的概念化条目
   visitMethodDeclaration: ['visitMethodDefinition'],
   visitSpreadElement: ['ts.isSpreadElement', 'SpreadElement'],
 }
 
-// Spec entries that are currently known-unimplemented in TS.
-// Keep them visible in output, but do not fail the audit.
+// Spec 中已知尚未在 TS 侧实现的条目。
+// 保持输出可见，但不让审计失败。
 const TS_KNOWN_MISSING: Set<string> = new Set([
   'visitTemplateExpression',
   'visitRegExpLiteral',
@@ -105,7 +105,7 @@ const TS_KNOWN_MISSING: Set<string> = new Set([
 ])
 
 const TS_SKIP: Set<string> = new Set([
-  // Memory management is not modeled as 1:1 exported function.
+  // 内存管理不是 1:1 的导出函数建模。
   'jsFreeFunctionDef',
 ])
 
@@ -127,7 +127,7 @@ function findTsWithAliases(tsIdentifier: string | undefined, files: string[]): {
 
 function isPlaceholderCMapping(cell: string): boolean {
   const c = cell.trim()
-  // Examples: (js_parse_statement_or_decl), (js_parse_postfix_expr), etc.
+  // 例如：(js_parse_statement_or_decl)、(js_parse_postfix_expr) 等。
   return c.startsWith('(') && c.endsWith(')')
 }
 
@@ -156,16 +156,16 @@ function parseSpecMappings(specText: string): MappingRow[] {
     const cells = raw.split('|').map(s => s.trim()).filter(Boolean)
     if (cells.length < 3) continue
 
-    // Try to interpret as one of:
-    // - 3 cols: TS | C | note
-    // - 4 cols: TS | C | line | note
+    // 尝试按以下形式解析：
+    // - 3 列：TS | C | note
+    // - 4 列：TS | C | line | note
     const tsCell = cells[0]
     const cCell = cells[1]
 
     let line: number | undefined
     if (cells.length >= 4) {
       const lineCell = stripBackticks(cells[2])
-      // Accept forms like: 8215, 6914+
+      // 支持形如：8215、6914+
       if (/^-?\d+\+?$/.test(lineCell)) {
         const maybeNum = Number.parseInt(lineCell, 10)
         if (!Number.isNaN(maybeNum)) line = maybeNum
@@ -236,7 +236,7 @@ async function main() {
     })
   }
 
-  // Fail only on TS symbol missing, or C symbol not found at all.
+  // 仅在 TS 符号缺失 或 C 符号完全找不到 时失败。
   const knownMissing = findings.filter(
     f => !f.tsFound && !!f.tsIdentifier && TS_KNOWN_MISSING.has(f.tsIdentifier)
   )

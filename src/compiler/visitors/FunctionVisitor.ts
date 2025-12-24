@@ -1,11 +1,9 @@
 import ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
 import { CompilerContext } from '../CompilerContext'
-import { Opcode, TempOpcode, FunctionKind, JSMode, JSAtom, JS_ATOM_NULL } from '../../env'
+import { Opcode, TempOpcode, JSAtom, JS_ATOM_NULL } from '../../env'
 import { 
   FunctionDef, 
-  JSVarKind,
-  JSVarKindEnum,
   JSParseFunctionEnum,
   JSFunctionKindEnum,
   ARGUMENT_VAR_OFFSET,
@@ -682,7 +680,6 @@ export class FunctionVisitor extends VisitorContext {
 
     for (let i = 0; i < parameters.length; i++) {
       const param = parameters[i]
-      const paramSourcePos = param.getStart()
 
       // 检查 rest 参数 - 对应 parser.c:13078-13085
       if (param.dotDotDotToken) {
@@ -740,7 +737,7 @@ export class FunctionVisitor extends VisitorContext {
   /**
    * 编译 rest 参数 - 对应 parser.c:13078-13085
    */
-  private compileRestParameter(fd: FunctionDef, param: ts.ParameterDeclaration, argIndex: number): void {
+  private compileRestParameter(fd: FunctionDef, param: ts.ParameterDeclaration, _argIndex: number): void {
     if (!ts.isIdentifier(param.name)) {
       throw new Error('Rest parameter must be an identifier')
     }

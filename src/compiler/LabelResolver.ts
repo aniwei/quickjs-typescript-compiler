@@ -6,12 +6,10 @@ import {
   LineNumberSlot,
   JumpSlot,
   JSVarKindEnum,
-  JS_STACK_SIZE_MAX,
 } from './FunctionDef'
 import { 
   Opcode,
   TempOpcode,
-  OPCODE_DEFS, 
   OPCODE_BY_CODE, 
   TEMP_OPCODE_BY_CODE,
   JSAtom, 
@@ -21,7 +19,6 @@ import {
   OPSpecialObjectEnum,
 } from '../env'
 import { BytecodeBuilder } from './BytecodeBuilder'
-import { Compiler } from './Compiler'
 import { u32ToI32 } from './int32'
 
 // ============================================================================
@@ -100,11 +97,7 @@ interface CodeContext {
  * 6. 生成 pc2line 调试信息
  */
 export class LabelResolver {
-  constructor(private context: CompilerContext) {}
-
-  private get compiler(): Compiler {
-    return this.context.compiler
-  }
+  constructor(_context: CompilerContext) {}
 
   /**
    * 查找 opcode 定义，支持临时 opcodes
@@ -877,7 +870,7 @@ export class LabelResolver {
     const buf = bcOut.buffer
     const size = bcOut.size
 
-    // Pattern length: 1 (push_true) + 2 (if_false8 imm8) + 3 (brand ops) = 6 bytes
+    // 模式长度: 1 (push_true) + 2 (if_false8 imm8) + 3 (brand ops) = 6 字节
     for (let pc = 0; pc + 6 <= size; pc++) {
       if (
         buf[pc] === Opcode.OP_push_true &&
@@ -896,7 +889,7 @@ export class LabelResolver {
   }
 
   // ============================================================================
-  // 辅助方法: 短操作码
+  // 辅助方法：短操作码
   // ============================================================================
 
   /**
@@ -915,7 +908,9 @@ export class LabelResolver {
       }
       if (val === (val << 16 >> 16)) { // int16
         bcOut.putU8(Opcode.OP_push_i16)
-        bcOut.putU16(val & 0xffff)
+        // QuickJS: emit_u16(JSParseState* s, uint16_t val)
+        // 参见: third_party/QuickJS/src/core/parser.c:1771
+        bcOut.putU16(val)
         return
       }
     }
@@ -1107,7 +1102,9 @@ export class LabelResolver {
           }
 
           bcOut.putU8(Opcode.OP_goto16)
-          bcOut.putU16(diff & 0xffff)
+          // QuickJS: resolve_labels 中 diff 经过 (int16_t) 校验后写入 OP_goto16
+          // 参见: third_party/QuickJS/src/core/parser.c (resolve_labels)
+          bcOut.putU16(diff)
           return
         }
       }
@@ -1143,7 +1140,7 @@ export class LabelResolver {
   /**
    * 添加重定位条目 - 对应 parser.c:add_reloc
    */
-  private addReloc(fd: FunctionDef, ls: LabelSlot, addr: number, size: number): void {
+  private addReloc(_fd: FunctionDef, ls: LabelSlot, addr: number, size: number): void {
     const re = new RelocEntry()
     re.addr = addr
     re.size = size
@@ -1154,7 +1151,7 @@ export class LabelResolver {
   /**
    * 解析重定位条目
    */
-  private resolveRelocations(fd: FunctionDef, ls: LabelSlot, bcOut: BytecodeBuilder): void {
+  private resolveRelocations(_fd: FunctionDef, ls: LabelSlot, bcOut: BytecodeBuilder): void {
     let re = ls.firstReloc
     while (re) {
       const diff = ls.addr - re.addr
@@ -1481,7 +1478,7 @@ export class LabelResolver {
   /**
    * 计算 pc2line 信息 - 对应 parser.c:compute_pc2line_info
    */
-  private computePc2lineInfo(fd: FunctionDef): void {
+  private computePc2lineInfo(_fd: FunctionDef): void {
     // TODO: 实现完整的 pc2line 计算
     // 这需要源码位置信息的支持
   }
@@ -1563,13 +1560,22 @@ export class LabelResolver {
               
               this.shrinkJump(fd, bcOut, jp, newOp, newSize, delta, i)
               patchOffsets++
-            } else if (jp.size === 4) {
-              // 无法收缩，但需要填充偏移
+            } else {
+              // 无法收缩：仍然必须回填偏移。
+              // QuickJS: 即使没有发生收缩，也要在每一轮根据最新的 pos/addr 重新计算 diff。
+              // 否则当其它跳转收缩导致字节码整体移动时，这里的 diff 会变成“陈旧值”。
               const buf = bcOut.buffer
-              buf[pos] = diff & 0xff
-              buf[pos + 1] = (diff >> 8) & 0xff
-              buf[pos + 2] = (diff >> 16) & 0xff
-              buf[pos + 3] = (diff >> 24) & 0xff
+              if (jp.size === 1) {
+                buf[pos] = diff & 0xff
+              } else if (jp.size === 2) {
+                buf[pos] = diff & 0xff
+                buf[pos + 1] = (diff >> 8) & 0xff
+              } else if (jp.size === 4) {
+                buf[pos] = diff & 0xff
+                buf[pos + 1] = (diff >> 8) & 0xff
+                buf[pos + 2] = (diff >> 16) & 0xff
+                buf[pos + 3] = (diff >> 24) & 0xff
+              }
             }
             break
             
@@ -1632,7 +1638,6 @@ export class LabelResolver {
     }
     
     // 移动后续字节码
-    const oldEnd = pos + newSize + delta
     const newEnd = pos + newSize
     for (let k = newEnd; k < bcOut.size - delta; k++) {
       buf[k] = buf[k + delta]
@@ -1725,10 +1730,6 @@ export class LabelResolver {
   // ============================================================================
   // 字节码读取辅助方法
   // ============================================================================
-
-  private getU8(buf: Uint8Array, pos: number): number {
-    return buf[pos]
-  }
 
   private getU16(buf: Uint8Array, pos: number): number {
     return buf[pos] | (buf[pos + 1] << 8)

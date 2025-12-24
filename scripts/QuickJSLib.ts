@@ -138,12 +138,12 @@ export class QuickJSLib {
           built?.categories?.ASSIGN === desired.categories.ASSIGN
         if (same) return path
       } catch {
-        // fall through to rebuild
+        // 继续走后续逻辑：触发重建
       }
     }
 
     if (existsSync(path) && desiredEnabled === 0 && !existsSync(configPath)) {
-      // legacy build without marker: assume non-trace
+      // 旧版构建没有 marker：默认认为是 non-trace
       return path
     }
 

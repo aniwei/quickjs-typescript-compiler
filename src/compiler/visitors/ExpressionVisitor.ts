@@ -1,9 +1,18 @@
 import * as ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
-import { Opcode, TempOpcode, JSAtom, PutLValueEnum } from '../../env'
+import {
+  Opcode,
+  TempOpcode,
+  JSAtom,
+  COPY_DATA_PROPERTIES_OPERAND_SPREAD,
+  OP_DEFINE_METHOD_METHOD,
+  OP_DEFINE_METHOD_GETTER,
+  OP_DEFINE_METHOD_SETTER,
+  OP_DEFINE_METHOD_ENUMERABLE,
+} from '../../env'
 import { CompilerContext } from '../CompilerContext'
-import { FunctionDef, ARGUMENT_VAR_OFFSET, JSFunctionKindEnum } from '../FunctionDef'
-import { Label } from '../Compiler'
+import { FunctionDef, JSFunctionKindEnum } from '../FunctionDef'
+import { TemplateObjectConst } from '../TemplateObjectConst'
 
 /**
  * LValue 信息结构
@@ -49,35 +58,35 @@ export class ExpressionVisitor extends VisitorContext {
   /**
    * 模板表达式: `a${b}c${d}`
    *
-   * QuickJS lowering (js_parse_template(call=0)):
-   *   push head
-   *   get_field2 'concat'
-   *   (push expr, push non-empty literal)*
-   *   call_method argc
+    * QuickJS 对齐（js_parse_template(call=0)）：
+    * - push head
+    * - 取 concat
+    * - 依次 push 插值与非空尾片段
+    * - call_method
    */
   visitTemplateExpression(node: ts.TemplateExpression): void {
     const fd = this.funcDef!
 
-    // First cooked chunk is always pushed (even if empty), like QuickJS (depth==0 rule).
+    // 第一个 cooked 片段即使为空也要 push（对齐 QuickJS depth==0 规则）。
     this.emitCookedTemplateString(fd, node.head.text)
 
-    // TemplateExpression always has at least one span, but keep this safe.
+    // 理论上一定有 span，这里做防御。
     if (node.templateSpans.length === 0) {
       return
     }
 
-    // QuickJS emits OP_get_field2 + atom('concat') + ic('concat') (no source-pos).
+    // QuickJS：OP_get_field2 + atom('concat') + ic('concat')（不绑定 sourcePos）。
     this.compiler.emitOp(fd, Opcode.OP_get_field2)
     this.compiler.emitAtom(fd, JSAtom.JS_ATOM_concat)
     this.compiler.emitIc(fd, JSAtom.JS_ATOM_concat)
 
     let argc = 0
     for (const span of node.templateSpans) {
-      // Expression part
+      // 插值表达式
       this.context.visit(span.expression)
       argc++
 
-      // Cooked literal part after the expression (skip empty chunks like QuickJS).
+      // 插值后的 cooked 片段（对齐 QuickJS：跳过空片段）。
       const tailText = span.literal.text
       if (tailText.length !== 0) {
         this.emitCookedTemplateString(fd, tailText)
@@ -90,8 +99,7 @@ export class ExpressionVisitor extends VisitorContext {
   }
 
   private emitCookedTemplateString(fd: FunctionDef, text: string): void {
-    // QuickJS uses emit_push_const(..., as_atom=1) for both TOK_STRING and template parts.
-    // That results in OP_push_atom_value with an interned atom.
+    // QuickJS 会把字符串常量当作 atom 常量写入（OP_push_atom_value）。
     if (text === '') {
       this.compiler.emitAtomOp(fd, Opcode.OP_push_atom_value, JSAtom.JS_ATOM_empty_string)
       return
@@ -102,23 +110,133 @@ export class ExpressionVisitor extends VisitorContext {
     this.compiler.emitIc(fd, atom)
   }
 
+  // ============================================================================
+  // Tagged template - 对应 parser.c: js_parse_postfix_expr + js_parse_template(call=1)
+  // ============================================================================
+
   /**
-   * Derived class constructor: after `super()` returns, QuickJS initializes the
-   * lexical `this` binding and runs `<class_fields_init>`.
+   * Tagged template: tag`a${x}b`
    *
-   * This also ensures the constructor captures `class_fields_init` as a closure
-   * variable when needed.
+    * QuickJS 对齐（js_parse_template(call=1)）：
+    * - 先准备 callee（普通调用 vs 方法调用）
+    * - push_const(template_object)
+    * - push 各插值
+    * - call/call_method，argc = 1 + 插值数（sourcePos 锚定到反引号）
+   */
+  visitTaggedTemplateExpression(node: ts.TaggedTemplateExpression): void {
+    const fd = this.funcDef!
+    const sf = node.getSourceFile()
+    const callSourcePos = node.template.getStart(sf)
+
+    let isMethodCall = false
+
+    // callee 的栈布局对齐普通 CallExpression。
+    const tag = node.tag
+    if (ts.isPropertyAccessExpression(tag)) {
+      this.context.visit(tag.expression)
+      const methodName = this.compiler.addAtom(tag.name.text)
+      // sourcePos 对齐到 '.'。
+      const text2 = sf.text
+      const exprEnd2 = tag.expression.getEnd()
+      const nameStart2 = tag.name.getStart(sf)
+      let dotPos2 = -1
+      for (let i = nameStart2 - 1; i >= exprEnd2; i--) {
+        const ch = text2.charCodeAt(i)
+        if (ch === '.'.charCodeAt(0)) {
+          dotPos2 = i
+          break
+        }
+      }
+      const memberSourcePos = dotPos2 >= 0 ? dotPos2 : tag.name.getStart(sf)
+
+      this.compiler.emitOp(fd, Opcode.OP_get_field2, memberSourcePos)
+      this.compiler.emitAtom(fd, methodName)
+      this.compiler.emitIc(fd, methodName)
+      isMethodCall = true
+    } else if (ts.isElementAccessExpression(tag)) {
+      this.context.visit(tag.expression)
+      // sourcePos 对齐到 '['。
+      const text2 = sf.text
+      const exprEnd2 = tag.expression.getEnd()
+      const argStart2 = tag.argumentExpression.getStart(sf)
+      let bracketPos2 = -1
+      for (let i = argStart2 - 1; i >= exprEnd2; i--) {
+        if (text2.charCodeAt(i) === '['.charCodeAt(0)) {
+          bracketPos2 = i
+          break
+        }
+      }
+      const elementSourcePos = bracketPos2 >= 0 ? bracketPos2 : tag.getStart(sf)
+      this.context.visit(tag.argumentExpression)
+      this.compiler.emitOp(fd, Opcode.OP_get_array_el2, elementSourcePos)
+      isMethodCall = true
+    } else {
+      this.context.visit(tag)
+      isMethodCall = false
+    }
+
+    // 构造 template_object（含 raw 数组）。
+    const cookedParts: Array<unknown> = []
+    const rawParts: Array<unknown> = []
+    const substitutions: ts.Expression[] = []
+
+    if (ts.isNoSubstitutionTemplateLiteral(node.template)) {
+      cookedParts.push(node.template.text)
+      rawParts.push(((node.template as any).rawText ?? node.template.text) as string)
+    } else if (ts.isTemplateExpression(node.template)) {
+      cookedParts.push(node.template.head.text)
+      rawParts.push((((node.template.head as any).rawText ?? node.template.head.text) as string))
+      for (const span of node.template.templateSpans) {
+        substitutions.push(span.expression)
+        cookedParts.push(span.literal.text)
+        rawParts.push((((span.literal as any).rawText ?? span.literal.text) as string))
+      }
+    } else {
+      cookedParts.push('')
+      rawParts.push('')
+    }
+
+    const rawArray = new TemplateObjectConst(rawParts, undefined)
+    const templateObject = new TemplateObjectConst(cookedParts, rawArray)
+
+    // push_const(template_object) 不绑定 sourcePos，避免影响 pc2line。
+    const prevSuppressSourcePos = fd.suppressSourcePos
+    try {
+      fd.suppressSourcePos = true
+      this.compiler.emitPushConst(fd, templateObject, false)
+    } finally {
+      fd.suppressSourcePos = prevSuppressSourcePos
+    }
+
+    // push 插值表达式。
+    for (const expr of substitutions) {
+      this.context.visit(expr)
+    }
+
+    const argc = 1 + substitutions.length
+    if (isMethodCall) {
+      this.compiler.emitOp(fd, Opcode.OP_call_method, callSourcePos)
+      this.compiler.emitU16(fd, argc)
+    } else {
+      this.compiler.emitOp(fd, Opcode.OP_call, callSourcePos)
+      this.compiler.emitU16(fd, argc)
+    }
+  }
+
+  /**
+   * 派生类构造函数：`super()` 返回后，QuickJS 会初始化词法 this，并执行 `<class_fields_init>`。
+   * 同时确保在需要时能把 `class_fields_init` 捕获为闭包变量。
    */
   private emitDerivedCtorPostSuperInit(fd: FunctionDef): void {
-    // Keep the `super()` return value on stack as the call expression result.
+    // 保留 `super()` 的返回值作为表达式结果。
     this.compiler.emitOp(fd, Opcode.OP_dup)
 
-    // Initialize `this` (lexical, uninitialized until first super()).
+    // 初始化 `this`（词法 this：第一次 super() 前为未初始化）。
     this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var_init)
     this.compiler.emitAtom(fd, JSAtom.JS_ATOM_this)
     this.compiler.emitU16(fd, 0)
 
-    // Call `<class_fields_init>` if present.
+    // 若存在 `<class_fields_init>`，则调用。
     this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var)
     this.compiler.emitAtom(fd, JSAtom.JS_ATOM_class_fields_init)
     this.compiler.emitU16(fd, fd.scopeLevel)
@@ -242,7 +360,7 @@ export class ExpressionVisitor extends VisitorContext {
    * 
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:4919-4922
    */
-  visitNullKeyword(node: ts.NullLiteral): void {
+  visitNullKeyword(_node: ts.NullLiteral): void {
     const fd = this.funcDef!
     this.compiler.emitOp(fd, Opcode.OP_null)
   }
@@ -352,7 +470,6 @@ export class ExpressionVisitor extends VisitorContext {
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:5678-5697
    */
   visitPostfixUnaryExpression(node: ts.PostfixUnaryExpression): void {
-    const fd = this.funcDef!
     // QuickJS: postfix ++/-- 的 source position 绑定到运算符 token（op_token_ptr）
     // third_party/QuickJS/src/core/parser.c: js_parse_unary() default 分支 -> emit_source_pos(s, op_token_ptr); emit_op(s, OP_post_dec + ...)
     const sf = node.getSourceFile()
@@ -646,6 +763,15 @@ export class ExpressionVisitor extends VisitorContext {
       return
     }
 
+    // 逗号运算符（sequence）：先计算左边并丢弃结果，再计算右边并保留
+    // 对应 QuickJS 中的 sequence expression 语义。
+    if (op === ts.SyntaxKind.CommaToken) {
+      this.context.visit(node.left)
+      this.compiler.emitOp(fd, Opcode.OP_drop)
+      this.context.visit(node.right)
+      return
+    }
+
     // 私有 brand 检查: #name in obj
     // QuickJS lowers this via OP_scope_in_private_field and resolves it in resolve_scope_private_field()
     // to get_var_ref*/get_private_in.
@@ -869,13 +995,11 @@ export class ExpressionVisitor extends VisitorContext {
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:6177-6275
    */
   private visitAssignmentExpression(node: ts.BinaryExpression): void {
-    const fd = this.funcDef!
     const op = node.operatorToken.kind
-    const sourcePos = node.operatorToken.getStart()
 
     // 简单赋值 =
     if (op === ts.SyntaxKind.EqualsToken) {
-      this.emitSimpleAssignment(node)
+      this.emitSimpleAssignment(node, node.left.getStart())
       return
     }
 
@@ -896,13 +1020,16 @@ export class ExpressionVisitor extends VisitorContext {
    * 
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:6177-6195
    */
-  private emitSimpleAssignment(node: ts.BinaryExpression): void {
+  private emitSimpleAssignment(node: ts.BinaryExpression, sourcePos?: number): void {
     const fd = this.funcDef!
 
     const keepResult = this.context.expressionValueUsed
 
     // 对于简单标识符赋值，直接使用 scope_put_var
     if (ts.isIdentifier(node.left)) {
+      if (typeof sourcePos === 'number') {
+        this.compiler.emitSourcePos(fd, sourcePos)
+      }
       // 计算右值
       this.context.visit(node.right)
 
@@ -1041,6 +1168,7 @@ export class ExpressionVisitor extends VisitorContext {
     // For tokens like "+=", QuickJS uses the token start (the "+"), not the trailing "=".
     const sf = node.getSourceFile()
     const sourcePos = Math.max(0, node.operatorToken.getStart(sf))
+    const lhsSourcePos = Math.max(0, node.left.getStart(sf))
 
     // QuickJS distinguishes whether the assignment expression value is used.
     // When the value is not used (expression statement), it does not preserve the
@@ -1075,6 +1203,10 @@ export class ExpressionVisitor extends VisitorContext {
       }
 
       if (isLocalOrArg) {
+        // QuickJS emits a source position for the LHS load, then another one for the operator.
+        // This yields two pc2line entries (e.g. for `b += 2`: one at `get_var b`, one at `add`).
+        this.compiler.emitSourcePos(fd, lhsSourcePos)
+
         // 局部变量/参数：scope_get_var; rhs; op; (dup?); scope_put_var
         this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var)
         this.compiler.emitU32(fd, name)
@@ -1093,6 +1225,8 @@ export class ExpressionVisitor extends VisitorContext {
       }
 
       // 非局部/非参数：使用 get_var/put_var（QuickJS: get_var x; rhs; op; dup; put_var x）
+      // 同样先对齐 LHS 的 sourcePos，再对齐 operator 的 sourcePos。
+      this.compiler.emitSourcePos(fd, lhsSourcePos)
       this.compiler.emitOp(fd, Opcode.OP_get_var)
       this.compiler.emitU32(fd, name)
 
@@ -1467,35 +1601,6 @@ export class ExpressionVisitor extends VisitorContext {
     throw new Error('Invalid logical assignment target')
   }
 
-  /**
-   * 根据深度发射 insert 指令
-   */
-  private emitInsertForDepth(depth: number): void {
-    const fd = this.funcDef!
-    switch (depth) {
-      case 1:
-        this.compiler.emitOp(fd, Opcode.OP_insert2)
-        break
-      case 2:
-        this.compiler.emitOp(fd, Opcode.OP_insert3)
-        break
-      case 3:
-        this.compiler.emitOp(fd, Opcode.OP_insert4)
-        break
-    }
-  }
-
-  /**
-   * 根据深度发射 nip 指令移除 lvalue 栈元素
-   */
-  private emitNipForDepth(depth: number): void {
-    const fd = this.funcDef!
-    while (depth > 0) {
-      this.compiler.emitOp(fd, Opcode.OP_nip)
-      depth--
-    }
-  }
-
   // ============================================================================
   // 调用表达式 - 对应 parser.c:5128-5380
   // ============================================================================
@@ -1505,13 +1610,46 @@ export class ExpressionVisitor extends VisitorContext {
    * 
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:5128-5380
    */
-  visitCallExpression(node: ts.CallExpression, isTailCall: boolean = false, tailCallPos: number = -1): void {
+  visitCallExpression(node: ts.CallExpression, _isTailCall: boolean = false, _tailCallPos: number = -1): void {
     const fd = this.funcDef!
     // QuickJS: js_parse_call (parser.c:5128-5380)
     // 调用点的 source-pos 更接近 callee 结束处（通常是 '(' 位置）。
     const callSourcePos = node.expression.getEnd()
     let isMethodCall = false
     let isSuperCall = false
+
+    // Dynamic import: import(specifier, [options])
+    // QuickJS lowering (parser.c:5058-5099):
+    //   parse specifier expr
+    //   parse optional 2nd arg (or push undefined)
+    //   OP_import
+    if (node.expression.kind === ts.SyntaxKind.ImportKeyword) {
+      const prevSuppressSourcePos = fd.suppressSourcePos
+      try {
+        // Align with QuickJS: OP_import is emitted without an explicit emit_source_pos.
+        // Also suppress sourcePos for the implicit undefined to avoid extra pc2line churn.
+        fd.suppressSourcePos = true
+
+        const args = node.arguments
+        if (args.length >= 1) {
+          this.context.visit(args[0])
+        } else {
+          // Invalid JS, but keep stack behavior deterministic.
+          this.compiler.emitOp(fd, Opcode.OP_undefined)
+        }
+
+        if (args.length >= 2) {
+          this.context.visit(args[1])
+        } else {
+          this.compiler.emitOp(fd, Opcode.OP_undefined)
+        }
+
+        this.compiler.emitOp(fd, Opcode.OP_import)
+      } finally {
+        fd.suppressSourcePos = prevSuppressSourcePos
+      }
+      return
+    }
 
     // Optional call: callee?.(args)
     // QuickJS: optional_chain_test() around the call-site (parser.c: optional_chain_test + js_parse_postfix_expr)
@@ -1814,6 +1952,57 @@ export class ExpressionVisitor extends VisitorContext {
       this.compiler.emitOp(fd, Opcode.OP_call, callSourcePos)
       this.compiler.emitU16(fd, argCount)
     }
+  }
+
+  /**
+   * 访问 new 表达式
+   *
+   * 语法: new Callee(...args)
+   * 对齐 QuickJS：callee + args 后发射 OP_call_constructor。
+   */
+  visitNewExpression(node: ts.NewExpression): void {
+    const fd = this.funcDef!
+    const callSourcePos = node.expression.getEnd()
+
+    // 计算构造函数表达式
+    this.context.visit(node.expression)
+
+    // QuickJS: OP_call_constructor 需要 [ctor, new_target, ...args]
+    // 对于普通 `new ctor(...)`，new_target == ctor。
+    this.compiler.emitOp(fd, Opcode.OP_dup)
+
+    const args = node.arguments ?? []
+    const argCount = args.length
+
+    // 参数处理逻辑尽量与普通 call 保持一致：对简单字面量抑制 source-pos。
+    const prevSuppressSourcePos = fd.suppressSourcePos
+    try {
+      for (const arg of args) {
+        const expr = ts.isSpreadElement(arg) ? arg.expression : arg
+        const isSimpleLiteralArg =
+          ts.isNumericLiteral(expr) ||
+          ts.isStringLiteral(expr) ||
+          ts.isNoSubstitutionTemplateLiteral(expr) ||
+          expr.kind === ts.SyntaxKind.TrueKeyword ||
+          expr.kind === ts.SyntaxKind.FalseKeyword ||
+          expr.kind === ts.SyntaxKind.NullKeyword ||
+          ts.isBigIntLiteral(expr)
+
+        fd.suppressSourcePos = prevSuppressSourcePos || isSimpleLiteralArg
+
+        if (ts.isSpreadElement(arg)) {
+          // TODO: 处理展开参数
+          this.context.visit(arg.expression)
+        } else {
+          this.context.visit(arg)
+        }
+      }
+    } finally {
+      fd.suppressSourcePos = prevSuppressSourcePos
+    }
+
+    this.compiler.emitOp(fd, Opcode.OP_call_constructor, callSourcePos)
+    this.compiler.emitU16(fd, argCount)
   }
 
   // ============================================================================
@@ -2177,7 +2366,6 @@ export class ExpressionVisitor extends VisitorContext {
    */
   visitArrayLiteralExpression(node: ts.ArrayLiteralExpression): void {
     const fd = this.funcDef!
-    const sourcePos = node.getStart()
     const elements = node.elements
 
     // 检查是否有展开元素
@@ -2185,8 +2373,6 @@ export class ExpressionVisitor extends VisitorContext {
 
     if (!hasSpread) {
       // 简单数组: 使用 array_from
-      const nonEmptyCount = elements.filter(e => !ts.isOmittedExpression(e)).length
-      
       // 计算所有元素
       for (const elem of elements) {
         if (ts.isOmittedExpression(elem)) {
@@ -2248,7 +2434,6 @@ export class ExpressionVisitor extends VisitorContext {
    */
   visitObjectLiteralExpression(node: ts.ObjectLiteralExpression): void {
     const fd = this.funcDef!
-    const sourcePos = node.getStart()
 
     // 创建空对象
     // QuickJS: js_parse_object_literal() 里对 OP_object 使用 emit_op(s, OP_object)
@@ -2259,6 +2444,82 @@ export class ExpressionVisitor extends VisitorContext {
 
     // 处理每个属性
     for (const prop of node.properties) {
+      if (ts.isMethodDeclaration(prop)) {
+        // 对象字面量方法: { foo() {} }
+        const flags = OP_DEFINE_METHOD_METHOD | OP_DEFINE_METHOD_ENUMERABLE
+
+        if (ts.isComputedPropertyName(prop.name)) {
+          // computed method: { [expr]() {} }
+          this.context.visit(prop.name.expression)
+          this.compiler.emitOp(fd, Opcode.OP_to_propkey)
+
+          // push closure
+          this.context.visit(prop)
+
+          // define method
+          this.compiler.emitOp(fd, Opcode.OP_define_method_computed)
+          this.compiler.emitU8(fd, flags)
+        } else {
+          // non-computed method
+          const nameText = ts.isIdentifier(prop.name)
+            ? prop.name.text
+            : ts.isStringLiteral(prop.name)
+              ? prop.name.text
+              : ts.isNumericLiteral(prop.name)
+                ? prop.name.text
+                : null
+
+          if (nameText !== null) {
+            const nameAtom = this.compiler.addAtom(nameText)
+
+            // push closure
+            this.context.visit(prop)
+
+            this.compiler.emitOp(fd, Opcode.OP_define_method)
+            this.compiler.emitAtom(fd, nameAtom)
+            this.compiler.emitU8(fd, flags)
+          }
+        }
+        continue
+      }
+
+      if (ts.isGetAccessorDeclaration(prop) || ts.isSetAccessorDeclaration(prop)) {
+        const isSetter = ts.isSetAccessorDeclaration(prop)
+        const accessorKind = isSetter ? OP_DEFINE_METHOD_SETTER : OP_DEFINE_METHOD_GETTER
+        const flags = accessorKind | OP_DEFINE_METHOD_ENUMERABLE
+
+        if (ts.isComputedPropertyName(prop.name)) {
+          this.context.visit(prop.name.expression)
+          this.compiler.emitOp(fd, Opcode.OP_to_propkey)
+
+          // push closure
+          this.context.visit(prop)
+
+          this.compiler.emitOp(fd, Opcode.OP_define_method_computed)
+          this.compiler.emitU8(fd, flags)
+        } else {
+          const nameText = ts.isIdentifier(prop.name)
+            ? prop.name.text
+            : ts.isStringLiteral(prop.name)
+              ? prop.name.text
+              : ts.isNumericLiteral(prop.name)
+                ? prop.name.text
+                : null
+
+          if (nameText !== null) {
+            const nameAtom = this.compiler.addAtom(nameText)
+
+            // push closure
+            this.context.visit(prop)
+
+            this.compiler.emitOp(fd, Opcode.OP_define_method)
+            this.compiler.emitAtom(fd, nameAtom)
+            this.compiler.emitU8(fd, flags)
+          }
+        }
+        continue
+      }
+
       if (ts.isPropertyAssignment(prop)) {
         // 普通属性: key: value
         if (ts.isIdentifier(prop.name)) {
@@ -2332,121 +2593,23 @@ export class ExpressionVisitor extends VisitorContext {
         // 发射 OP_null 作为 excludeList
         // QuickJS 输出顺序为: src -> null -> copy_data_properties
         this.compiler.emitOp(fd, Opcode.OP_null)
-        
+
         // 发射 OP_copy_data_properties
         // 参数格式: (copy_flags) | (exclude_first_idx << 2) | (exclude_second_idx << 5)
-        // copy_flags = 2: copy enumerable only
-        // exclude_first_idx = 1: excludeList 在 src 下面
-        // exclude_second_idx = 0: no second exclude
-        // QuickJS: spread 路径 emit_op(OP_copy_data_properties) 不绑定 source。
-        // 参见: third_party/QuickJS/src/core/parser.c: js_parse_object_literal (token == TOK_ELLIPSIS).
         this.compiler.emitOp(fd, Opcode.OP_copy_data_properties)
-        this.compiler.emitU8(fd, 2 | (1 << 2) | (0 << 5))
-        
-        // 弹出 excludeList
+        this.compiler.emitU8(fd, COPY_DATA_PROPERTIES_OPERAND_SPREAD)
+
+        // QuickJS: copy_data_properties 之后会连续 drop 两次，确保只保留对象本身。
+        // 参见 third_party/QuickJS/src/core/parser.c: js_parse_object_literal (spread 分支)
         this.compiler.emitOp(fd, Opcode.OP_drop)
-        // 弹出 src
         this.compiler.emitOp(fd, Opcode.OP_drop)
-      } else if (ts.isMethodDeclaration(prop)) {
-        // 方法声明: { foo() {} }
-        // QuickJS: js_parse_object_literal() 对方法使用 fclosure + define_method，且方法是可枚举的。
-        // WASM 参考: artifacts/optional-chaining (profile.greet) -> `fclosure8 ...` + `define_method greet,4`
-
-        const isComputedName = ts.isComputedPropertyName(prop.name)
-
-        if (isComputedName) {
-          this.context.visit((prop.name as ts.ComputedPropertyName).expression)
-        }
-
-        // 生成闭包（由 FunctionVisitor.visitMethodDefinition 发射 OP_fclosure）
-        this.context.visit(prop)
-
-        if (isComputedName) {
-          this.compiler.emitOp(fd, Opcode.OP_define_method_computed)
-        } else {
-          let methodNameText: string
-          if (ts.isIdentifier(prop.name)) {
-            methodNameText = prop.name.text
-          } else if (ts.isStringLiteral(prop.name) || ts.isNumericLiteral(prop.name)) {
-            methodNameText = prop.name.text
-          } else {
-            // Fallback (should be covered by computed)
-            methodNameText = prop.name.getText(prop.getSourceFile())
-          }
-          const methodName = this.compiler.addAtom(methodNameText)
-          this.compiler.emitOp(fd, Opcode.OP_define_method)
-          this.compiler.emitAtom(fd, methodName)
-        }
-
-        // flags: enumerable(4) | method(0)
-        this.compiler.emitU8(fd, 4)
-      } else if (ts.isGetAccessorDeclaration(prop) || ts.isSetAccessorDeclaration(prop)) {
-        // getter/setter
-        // TODO: 实现 getter/setter
       }
     }
   }
 
-  // ============================================================================
-  // new 表达式 - 对应 parser.c:4984-5011
-  // ============================================================================
-
-  /**
-   * 访问 new 表达式 - 对应 parser.c:4984-5011
-   * 
-   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:4984-5011
-   */
-  visitNewExpression(node: ts.NewExpression): void {
-    const fd = this.funcDef!
-    const sourcePos = node.getStart()
-
-    // 计算构造函数
-    this.context.visit(node.expression)
-
-    // dup 作为 new.target
-    this.compiler.emitOp(fd, Opcode.OP_dup)
-
-    // 处理参数
-    const args = node.arguments || []
-    const argCount = args.length
-    for (const arg of args) {
-      this.context.visit(arg)
-    }
-
-    // QuickJS 会把 call/construct 相关的 source pos 更贴近参数列表的 '(' 位置。
-    // 对于 `new Foo(...)`，这里用 callee 表达式的 end 作为 '(' 的位置对齐列号。
-    const callSourcePos = node.arguments ? node.expression.getEnd() : sourcePos
-
-    // 发射 call_constructor 指令
-    this.compiler.emitOp(fd, Opcode.OP_call_constructor, callSourcePos)
-    this.compiler.emitU16(fd, argCount)
-  }
-
-  // ============================================================================
-  // 特殊表达式 - void, delete, typeof
-  // ============================================================================
-
-  /**
-   * 访问 void 表达式 - 对应 parser.c:5608-5611
-   * 
-   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:5608-5611
-   */
-  visitVoidExpression(node: ts.VoidExpression): void {
-    const fd = this.funcDef!
-
-    // 计算表达式 (为了副作用)
-    this.context.visit(node.expression)
-
-    // 丢弃结果
-    this.compiler.emitOp(fd, Opcode.OP_drop)
-
-    // 推送 undefined
-    this.compiler.emitOp(fd, Opcode.OP_undefined)
-  }
-
   /**
    * 访问 delete 表达式 - 对应 parser.c:5495-5580
-   * 
+   *
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:5495-5580
    */
   visitDeleteExpression(node: ts.DeleteExpression): void {
@@ -2545,118 +2708,16 @@ export class ExpressionVisitor extends VisitorContext {
     this.compiler.emitOp(fd, Opcode.OP_typeof)
   }
 
-  // ============================================================================
-  // LValue 处理 - 对应 parser.c:3888-4135
-  // ============================================================================
-
   /**
-   * 获取 LValue 信息 - 对应 parser.c:3888-4012
-   * 
-   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:3888-4012
-   * 
-   * 注意: 这是简化版本，完整版本需要检查最后一个操作码
+   * 访问 void 表达式
+   *
+   * 语义: 计算表达式并丢弃结果，返回 undefined。
    */
-  private getLValue(node: ts.Expression, keep: boolean): LValueInfo | null {
+  visitVoidExpression(node: ts.VoidExpression): void {
     const fd = this.funcDef!
-
-    if (ts.isIdentifier(node)) {
-      const name = this.compiler.addAtom(node.text)
-      const label = keep ? this.compiler.newLabelInt(fd) : -1
-      return {
-        opcode: TempOpcode.OP_scope_get_var,
-        scope: fd.scopeLevel,
-        name: name,
-        label: label,
-        depth: keep ? 2 : 0
-      }
-    }
-
-    if (ts.isPropertyAccessExpression(node)) {
-      const name = this.compiler.addAtom(node.name.text)
-      return {
-        opcode: Opcode.OP_get_field,
-        scope: 0,
-        name: name,
-        label: -1,
-        depth: 1
-      }
-    }
-
-    if (ts.isElementAccessExpression(node)) {
-      return {
-        opcode: Opcode.OP_get_array_el,
-        scope: 0,
-        name: 0,
-        label: -1,
-        depth: 2
-      }
-    }
-
-    return null
-  }
-
-  /**
-   * 放置 LValue - 对应 parser.c:4026-4135
-   * 
-   * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:4026-4135
-   */
-  private putLValue(lvalue: LValueInfo, special: PutLValueEnum, isLet: boolean): void {
-    const fd = this.funcDef!
-
-    // 根据 opcode 和 special 处理栈操作
-    switch (lvalue.opcode) {
-      case Opcode.OP_get_field:
-        // depth = 1
-        switch (special) {
-          case PutLValueEnum.PUT_LVALUE_NOKEEP:
-          case PutLValueEnum.PUT_LVALUE_NOKEEP_DEPTH:
-            break
-          case PutLValueEnum.PUT_LVALUE_KEEP_TOP:
-            this.compiler.emitOp(fd, Opcode.OP_insert2)
-            break
-          case PutLValueEnum.PUT_LVALUE_KEEP_SECOND:
-            this.compiler.emitOp(fd, Opcode.OP_perm3)
-            break
-          case PutLValueEnum.PUT_LVALUE_NOKEEP_BOTTOM:
-            this.compiler.emitOp(fd, Opcode.OP_swap)
-            break
-        }
-        this.compiler.emitOp(fd, Opcode.OP_put_field)
-        this.compiler.emitU32(fd, lvalue.name)
-        this.compiler.emitIc(fd, lvalue.name)
-        break
-
-      case Opcode.OP_get_array_el:
-        // depth = 2
-        switch (special) {
-          case PutLValueEnum.PUT_LVALUE_NOKEEP:
-            this.compiler.emitOp(fd, Opcode.OP_nop)
-            break
-          case PutLValueEnum.PUT_LVALUE_NOKEEP_DEPTH:
-            break
-          case PutLValueEnum.PUT_LVALUE_KEEP_TOP:
-            this.compiler.emitOp(fd, Opcode.OP_insert3)
-            break
-          case PutLValueEnum.PUT_LVALUE_KEEP_SECOND:
-            this.compiler.emitOp(fd, Opcode.OP_perm4)
-            break
-          case PutLValueEnum.PUT_LVALUE_NOKEEP_BOTTOM:
-            this.compiler.emitOp(fd, Opcode.OP_rot3l)
-            break
-        }
-        this.compiler.emitOp(fd, Opcode.OP_put_array_el)
-        break
-
-      case TempOpcode.OP_scope_get_var:
-        // 简单变量赋值
-        if (lvalue.label >= 0) {
-          this.compiler.emitLabelInt(fd, lvalue.label)
-        }
-        this.compiler.emitOp(fd, isLet ? TempOpcode.OP_scope_put_var_init : TempOpcode.OP_scope_put_var)
-        this.compiler.emitU32(fd, lvalue.name)
-        this.compiler.emitU16(fd, lvalue.scope)
-        break
-    }
+    this.context.visit(node.expression)
+    this.compiler.emitOp(fd, Opcode.OP_drop)
+    this.compiler.emitOp(fd, Opcode.OP_undefined)
   }
 
   // ============================================================================
@@ -2729,5 +2790,29 @@ export class ExpressionVisitor extends VisitorContext {
         this.compiler.emitLabelInt(fd, labelNext)
       }
     }
+  }
+
+  // ============================================================================
+  // MetaProperty - new.target / import.meta
+  // ============================================================================
+
+  visitMetaProperty(node: ts.MetaProperty): void {
+    const fd = this.funcDef!
+    const sf = node.getSourceFile()
+    const text = node.getText(sf)
+
+    if (text === 'new.target') {
+      // Treat `new.target` as a pseudo variable. VariableResolver will map it to
+      // the dedicated new.target local slot when allowed.
+      const atom = this.compiler.addAtom('new.target')
+      // QuickJS does not add a dedicated pc2line entry for the pseudo-var load.
+      this.compiler.emitOp(fd, TempOpcode.OP_scope_get_var)
+      this.compiler.emitAtom(fd, atom)
+      this.compiler.emitU16(fd, fd.scopeLevel)
+      return
+    }
+
+    // Keep behavior explicit so missing support fails loudly in fixtures.
+    throw new Error(`Unsupported meta property: ${text}`)
   }
 }
