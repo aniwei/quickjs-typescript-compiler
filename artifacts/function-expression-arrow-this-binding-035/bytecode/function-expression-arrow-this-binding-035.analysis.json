@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-25T08:56:16.421Z",
+  "timestamp": "2025-12-25T17:39:29.155Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/function-expression-arrow-this-binding-035.ts",
   "compilation": {
     "typescript": {

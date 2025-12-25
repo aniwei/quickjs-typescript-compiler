@@ -231,14 +231,33 @@ function parseArgs(args: string[]): RunnerOptions {
 }
 
 async function collectFixtureFiles(fixturesDir: string, filter?: string): Promise<string[]> {
+  const files: string[] = []
+
+  const walk = async (dir: string) => {
+    const entries = await fs.readdir(dir, { withFileTypes: true })
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name)
+      if (entry.isDirectory()) {
+        await walk(fullPath)
+        continue
+      }
+      if (!entry.isFile()) {
+        continue
+      }
+      if (!entry.name.endsWith('.ts') || entry.name.endsWith('.d.ts')) {
+        continue
+      }
+      if (filter && !entry.name.includes(filter) && !fullPath.includes(filter)) {
+        continue
+      }
+      files.push(fullPath)
+    }
+  }
+
   try {
-    const entries = await fs.readdir(fixturesDir)
-    console.log(`Found ${entries.length} entries in ${fixturesDir}`)
-    const files = entries
-      .filter((entry) => entry.endsWith('.ts') && !entry.endsWith('.d.ts'))
-      .filter((entry) => (filter ? entry.includes(filter) : true))
-      .map((entry) => path.join(fixturesDir, entry))
-      .sort((a, b) => a.localeCompare(b))
+    await walk(fixturesDir)
+    console.log(`Found ${files.length} fixture(s) under ${fixturesDir}`)
+    files.sort((a, b) => a.localeCompare(b))
     return files
   } catch (err) {
     console.error('Error reading fixtures dir:', err)

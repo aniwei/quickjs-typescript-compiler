@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/object-nested.ts
-**生成时间**: 2025-12-25T08:56:16.600Z
+**生成时间**: 2025-12-25T17:39:29.327Z
 
 ## 大小对比
 

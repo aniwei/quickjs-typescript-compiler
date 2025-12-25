@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/optional-chaining-nested.ts
-**生成时间**: 2025-12-25T08:56:16.624Z
+**生成时间**: 2025-12-25T17:39:29.345Z
 
 ## 大小对比
 
