@@ -1,0 +1,31 @@
+__tests__/fixtures/bitwise-unary-typeof-031.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 6
+  opcodes:
+        check_define_var x,128
+        check_define_var y,128
+        define_var x,128
+        define_var y,128
+        push_i8 31
+        push_3 3
+        or
+        push_5 5
+        xor
+        put_var_init x
+        get_var x
+        not
+        put_var_init y
+        get_var console
+        get_field2 log
+        get_var x
+        get_var y
+        get_var_undef y
+        typeof
+        get_var y
+        lnot
+        lnot
+        call_method 4
+        set_loc0 0: "<ret>"
+        return
+

@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/async-await-promise-chain-no-top-level-await-025.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-await-promise-chain-no-top-level-await-025",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-await-promise-chain-no-top-level-await-025/cli/async-await-promise-chain-no-top-level-await-025.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-await-promise-chain-no-top-level-await-025/cli/async-await-promise-chain-no-top-level-await-025.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-await-promise-chain-no-top-level-await-025/cli/async-await-promise-chain-no-top-level-await-025.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-await-promise-chain-no-top-level-await-025/cli/async-await-promise-chain-no-top-level-await-025.pc2line.txt",
+    "bytecodeSize": 389,
+    "pc2lineLength": 12,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": true,
+    "tsSize": 328,
+    "wasmSize": 328,
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}

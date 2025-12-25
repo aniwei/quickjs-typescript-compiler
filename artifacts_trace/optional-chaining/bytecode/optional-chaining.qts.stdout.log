@@ -1,0 +1,162 @@
+__tests__/fixtures/optional-chaining.js:5:9: function: <null>
+  stack_size: 1
+  opcodes:
+        push_atom_value hi
+        return
+
+__tests__/fixtures/optional-chaining.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 5
+  opcodes:
+        check_define_var user,128
+        check_define_var list,128
+        define_var user,128
+        define_var list,128
+        object
+        object
+        push_atom_value alice
+        define_field name
+        object
+        push_atom_value "a@example.com"
+        define_field email
+        define_field contact
+        fclosure8 0: [bytecode <null>]
+        define_method greet,4
+        define_field profile
+        put_var_init user
+        get_var console
+        get_field2 log
+        get_var user
+        dup
+        is_undefined_or_null
+        if_false8 93
+        drop
+        undefined
+        goto8 111
+   93:  get_field profile
+        dup
+        is_undefined_or_null
+        if_false8 106
+        drop
+        undefined
+        goto8 111
+  106:  get_field name
+  111:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var user
+        dup
+        is_undefined_or_null
+        if_false8 138
+        drop
+        undefined
+        goto8 168
+  138:  get_field profile
+        dup
+        is_undefined_or_null
+        if_false8 151
+        drop
+        undefined
+        goto8 168
+  151:  get_field2 greet
+        dup
+        is_undefined_or_null
+        if_false8 165
+        drop
+        drop
+        undefined
+        goto8 168
+  165:  call_method 0
+  168:  call_method 1
+        put_loc0 0: "<ret>"
+        object
+        push_1 1
+        define_field value
+        null
+        object
+        object
+        push_3 3
+        define_field deep
+        define_field nested
+        array_from 3
+        put_var_init list
+        get_var console
+        get_field2 log
+        get_var list
+        dup
+        is_undefined_or_null
+        if_false8 224
+        drop
+        undefined
+        goto8 239
+  224:  push_1 1
+        get_array_el
+        dup
+        is_undefined_or_null
+        if_false8 234
+        drop
+        undefined
+        goto8 239
+  234:  get_field value
+  239:  dup
+        is_undefined_or_null
+        if_false8 249
+        drop
+        push_atom_value missing
+  249:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var list
+        dup
+        is_undefined_or_null
+        if_false8 276
+        drop
+        undefined
+        goto8 304
+  276:  push_2 2
+        get_array_el
+        dup
+        is_undefined_or_null
+        if_false8 286
+        drop
+        undefined
+        goto8 304
+  286:  get_field nested
+        dup
+        is_undefined_or_null
+        if_false8 299
+        drop
+        undefined
+        goto8 304
+  299:  get_field deep
+  304:  dup
+        is_undefined_or_null
+        if_false8 310
+        drop
+        push_0 0
+  310:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var user
+        dup
+        is_undefined_or_null
+        if_false8 337
+        drop
+        undefined
+        goto8 355
+  337:  get_field missing
+        dup
+        is_undefined_or_null
+        if_false8 350
+        drop
+        undefined
+        goto8 355
+  350:  get_field prop
+  355:  call_method 1
+        set_loc0 0: "<ret>"
+        return
+

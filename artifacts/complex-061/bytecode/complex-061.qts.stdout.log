@@ -1,0 +1,59 @@
+__tests__/fixtures_generated/complex-061.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: let t [level:3 next:-1]
+  stack_size: 4
+  opcodes:
+        check_define_var x,128
+        check_define_var r,128
+        define_var x,130
+        define_var r,130
+        push_i8 61
+        push_4 4
+        mod
+        put_var_init x
+        push_0 0
+        put_var_init r
+        undefined
+        put_loc0 0: "<ret>"
+        get_var x
+        dup
+        push_0 0
+        strict_eq
+        if_false8 67
+        get_var r
+        push_1 1
+        add
+        dup
+        put_var r
+        put_loc0 0: "<ret>"
+        goto8 72
+   67:  dup
+        push_1 1
+        strict_eq
+        if_false8 88
+   72:  get_var r
+        push_2 2
+        add
+        dup
+        put_var r
+        put_loc0 0: "<ret>"
+        goto8 109
+   88:  set_loc_uninitialized 1: t
+        push_3 3
+        put_loc1 1: t
+        get_var r
+        get_loc_check 1: t
+        add
+        dup
+        put_var r
+        put_loc0 0: "<ret>"
+  109:  drop
+        get_var console
+        get_field2 log
+        get_var x
+        get_var r
+        call_method 2
+        set_loc0 0: "<ret>"
+        return
+

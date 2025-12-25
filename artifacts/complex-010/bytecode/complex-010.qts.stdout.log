@@ -1,0 +1,96 @@
+__tests__/fixtures_generated/complex-010.js:2:1: function: *g10
+  stack_size: 6
+  opcodes:
+        initial_yield
+        push_i8 10
+        yield
+        if_false8 7
+        return_async
+    7:  drop
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        for_of_start
+        drop
+        undefined
+        undefined
+   18:  iterator_next
+        iterator_check_object
+        get_field2 done
+        if_true8 82
+   27:  yield_star
+        dup
+        if_true8 34
+        drop
+        goto8 18
+   34:  push_2 2
+        strict_eq
+        if_true8 59
+        iterator_call 0
+        if_true8 55
+        iterator_check_object
+        get_field2 done
+        if_false8 27
+        get_field value
+   55:  nip
+        nip
+        nip
+        return_async
+   59:  iterator_call 1
+        if_true8 73
+        iterator_check_object
+        get_field2 done
+        if_false8 27
+        goto8 82
+   73:  iterator_call 2
+        drop
+        throw_error <null>,4
+   82:  get_field value
+        nip
+        nip
+        nip
+        drop
+        push_i8 10
+        push_1 1
+        add
+        return_async
+
+__tests__/fixtures_generated/complex-010.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const v [level:2 next:-1]
+  stack_size: 5
+  opcodes:
+        check_define_var g10,64
+        check_define_var t,128
+        fclosure8 0: [bytecode g10]
+        define_func g10,0
+        define_var t,130
+        push_0 0
+        put_var_init t
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 1: v
+        get_var g10
+        call0 0
+        for_of_start
+        goto8 63
+   46:  put_loc1 1: v
+        get_var t
+        get_loc_check 1: v
+        add
+        dup
+        put_var t
+        put_loc0 0: "<ret>"
+   63:  for_of_next 0
+        if_false8 46
+        drop
+        iterator_close
+        get_var console
+        get_field2 log
+        get_var t
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

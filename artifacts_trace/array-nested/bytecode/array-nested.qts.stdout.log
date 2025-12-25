@@ -1,0 +1,37 @@
+__tests__/fixtures/array-nested.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var arr,128
+        define_var arr,128
+        push_1 1
+        push_2 2
+        array_from 2
+        push_3 3
+        push_4 4
+        array_from 2
+        object
+        push_5 5
+        define_field a
+        array_from 3
+        put_var_init arr
+        get_var console
+        get_field2 log
+        get_var arr
+        push_0 0
+        get_array_el
+        push_1 1
+        get_array_el
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var arr
+        push_2 2
+        get_array_el
+        get_field a
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

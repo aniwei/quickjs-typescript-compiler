@@ -1,0 +1,56 @@
+__tests__/fixtures/async-await.js:1:1: function: fetchValue
+  stack_size: 1
+  opcodes:
+        push_i8 42
+        return_async
+
+__tests__/fixtures/async-await.js:4:1: function: run
+  locals:
+    0: const value [level:1 next:-1]
+  stack_size: 4
+  opcodes:
+        set_loc_uninitialized 0: value
+        get_var fetchValue
+        call0 0
+        await
+        put_loc0 0: value
+        get_var console
+        get_field2 log
+        push_atom_value value
+        get_loc_check 0: value
+        call_method 2
+        drop
+        get_loc_check 0: value
+        push_1 1
+        add
+        return_async
+
+__tests__/fixtures/async-await.js:9:12: function: <null>
+  args: next
+  stack_size: 4
+  opcodes:
+        get_var console
+        get_field2 log
+        push_atom_value next
+        get_arg0 0: next
+        tail_call_method 2
+
+__tests__/fixtures/async-await.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var fetchValue,64
+        check_define_var run,64
+        fclosure8 0: [bytecode fetchValue]
+        define_func fetchValue,0
+        fclosure8 1: [bytecode run]
+        define_func run,0
+        get_var run
+        call0 0
+        get_field2 then
+        fclosure8 2: [bytecode <null>]
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

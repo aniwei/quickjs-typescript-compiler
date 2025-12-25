@@ -388,6 +388,57 @@
 			"isBackground": false,
 			"problemMatcher": [],
 			"group": "build"
+		},
+		{
+			"label": "debug: decode pc2line try-catch-003",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import fs from 'node:fs'; import { parseBytecodeModule } from './src/bytecodeReader'; const PC2LINE_BASE=-1,PC2LINE_RANGE=5,PC2LINE_OP_FIRST=1; function readULEB(data, st){let r=0,sh=0; while(st.i<data.length){const b=data[st.i++]; r|=(b&0x7f)<<sh; if((b&0x80)===0) break; sh+=7;} return r>>>0;} function readSLEB(data, st){let r=0,sh=0,b=0; do{b=data[st.i++]; r|=(b&0x7f)<<sh; sh+=7;}while((b&0x80)!==0); if(sh<32 && (b&0x40)!==0){r|=(~0<<sh);} return r|0;} function decode(pc2){const st={i:0}; const initLine=readULEB(pc2,st); const initCol=readULEB(pc2,st); let pc=0,line=initLine,col=initCol; const out=[{pc,line,col,kind:'init'}]; while(st.i<pc2.length){const op=pc2[st.i++]; if(op===0){const dpc=readULEB(pc2,st); const dl=readSLEB(pc2,st); const dc=readSLEB(pc2,st); pc+=dpc; line+=dl; col+=dc; out.push({pc,line,col,op:'long',dpc,dl,dc}); } else { const opVal=op-PC2LINE_OP_FIRST; const dpc=Math.floor(opVal/PC2LINE_RANGE); const dl=(opVal%PC2LINE_RANGE)+PC2LINE_BASE; const dc=readSLEB(pc2,st); pc+=dpc; line+=dl; col+=dc; out.push({pc,line,col,op:'short',raw:op,dpc,dl,dc}); } } return out; }\nconst ts=parseBytecodeModule(fs.readFileSync('artifacts/try-catch-finally-throw-instanceof-new-003/bytecode/try-catch-finally-throw-instanceof-new-003.ts.qbc')); const wasm=parseBytecodeModule(fs.readFileSync('artifacts/try-catch-finally-throw-instanceof-new-003/bytecode/try-catch-finally-throw-instanceof-new-003.wasm.qbc')); const td=decode(ts.func.debug.pc2line); const wd=decode(wasm.func.debug.pc2line); console.log('TS entries around 110-130', td.filter(e=>e.pc>=108&&e.pc<=130)); console.log('WASM entries around 110-130', wd.filter(e=>e.pc>=108&&e.pc<=130));\"",
+			"args": [],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "debug: typeof node positions",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import ts from 'typescript'; import { readFileSync } from 'node:fs'; const file='__tests__/fixtures/try-catch-finally-throw-instanceof-new-003.ts'; const code=readFileSync(file,'utf8'); const js=ts.transpileModule(code,{fileName:file,compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ESNext}}).outputText; const sf=ts.createSourceFile(file.replace(/\\.ts$/,'.js'), js, ts.ScriptTarget.ESNext, true, ts.ScriptKind.JS);\nlet found:any=null;\nfunction walk(n:ts.Node){ if(n.kind===ts.SyntaxKind.TypeOfExpression){ found=n; } ts.forEachChild(n,walk); }\nwalk(sf);\nif(!found){ console.log('no TypeOfExpression'); process.exit(0);} const n=found as any; const expr=n.expression as ts.Node; console.log({nodeKind: ts.SyntaxKind[n.kind], pos:n.pos, end:n.end, getStart:n.getStart(sf), exprStart:expr.getStart(sf)});\nconsole.log('slice(node.pos..node.end)=', JSON.stringify(sf.text.slice(n.pos,n.end)));\nconsole.log('slice(getStart..end)=', JSON.stringify(sf.text.slice(n.getStart(sf),n.end)));\n\"",
+			"args": [],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "compare try-catch-003",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/try-catch-finally-throw-instanceof-new-003.ts --input-js __tests__/fixtures/try-catch-finally-throw-instanceof-new-003.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts --show-diff",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "debug: opcode values typeof/line_num",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import { Opcode, TempOpcode } from './src/env'; console.log({OP_typeof: Opcode.OP_typeof, OP_push_atom_value: Opcode.OP_push_atom_value, OP_strict_eq: Opcode.OP_strict_eq, OP_line_num: TempOpcode.OP_line_num});\"",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "compare try-catch-003 (DEBUG_TYPEOF_TESTS)",
+			"type": "shell",
+			"command": "DEBUG_TYPEOF_TESTS=1 pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/try-catch-finally-throw-instanceof-new-003.ts --input-js __tests__/fixtures/try-catch-finally-throw-instanceof-new-003.ts --normalize-short --artifacts-dir artifacts",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "debug: strict_eq operatorToken.getStart",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import ts from 'typescript'; import { readFileSync } from 'node:fs'; const file='__tests__/fixtures/try-catch-finally-throw-instanceof-new-003.ts'; const code=readFileSync(file,'utf8'); const js=ts.transpileModule(code,{fileName:file,compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ESNext}}).outputText; const sf=ts.createSourceFile(file.replace(/\\.ts$/,'.js'), js, ts.ScriptTarget.ESNext, true, ts.ScriptKind.TS);\nlet target: ts.BinaryExpression|null=null;\nfunction walk(n:ts.Node){ if(ts.isBinaryExpression(n) && n.operatorToken.kind===ts.SyntaxKind.EqualsEqualsEqualsToken){ target=n; } ts.forEachChild(n,walk);} walk(sf);\nif(!target){ console.log('no strict-eq binary'); process.exit(0);} const opTok=target.operatorToken; console.log({binStart:target.getStart(sf), opTokStart:opTok.getStart(sf), opTokPos: (opTok as any).pos, opTokEnd:(opTok as any).end});\nconsole.log('line slice:', JSON.stringify(sf.text.slice(target.getStart(sf), target.getEnd())));\n\"",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "debug: opcode size push_atom_value",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import { OPCODE_BY_CODE, TempOpcode, TEMP_OPCODE_BY_CODE } from './src/env'; console.log('push_atom_value', OPCODE_BY_CODE[4]); console.log('line_num', TEMP_OPCODE_BY_CODE[TempOpcode.OP_line_num]);\"",
+			"isBackground": false,
+			"group": "build"
 		}
 	]
 }

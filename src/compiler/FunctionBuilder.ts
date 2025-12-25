@@ -353,11 +353,11 @@ export class FunctionBuilder {
       }
     }
 
-    // QuickJS: special pseudo vars (this/new.target/home_object/this_active_func/arguments/var_object)
-    // are created via add_var() which zero-inits the vardef. In practice these
-    // vars should keep scope_next = 0 in the serialized vardefs.
-    // This is required for byte-perfect output (e.g. object literal methods).
-    // Source: third_party/QuickJS/src/core/parser.c: add_var() + js_create_function() vardefs.
+    // QuickJS：一些“伪变量”(this/new.target/home_object/this_active_func/arguments/var_object)
+    // 是通过 add_var() 创建的；该路径会把 vardef 结构体按 0 初始化。
+    // 因此在序列化后的 vardefs 中，这些变量应该保持 scope_next = 0。
+    // 这对 byte-for-byte 对齐是必要条件（例如 object literal methods）。
+    // 参考：third_party/QuickJS/src/core/parser.c: add_var() + js_create_function() 的 vardefs 生成逻辑。
     const specialVarIdxs = [
       fd.thisVarIdx,
       fd.newTargetVarIdx,
@@ -380,7 +380,7 @@ export class FunctionBuilder {
 // ============================================================================
 
 import { Compiler } from './Compiler'
-import { OpFormat, OPCODE_BY_CODE, env } from '../env'
+import { OpFormat, OPCODE_BY_CODE } from '../env'
 
 /**
  * BytecodeWriter - 将 JSFunctionBytecode 序列化为二进制格式

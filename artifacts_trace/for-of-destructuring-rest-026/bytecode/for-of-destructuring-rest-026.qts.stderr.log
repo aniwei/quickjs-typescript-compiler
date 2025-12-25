@@ -1,0 +1,9 @@
+[QTS:PARSE] pos=3 array_literal begin
+[QTS:PARSE] pos=37 array_literal end
+[QTS:PARSE] pos=235 destructuring array_rest depth=0
+[QTS:PARSE] pos=235 emit_spread_code begin depth=0
+[QTS:EMIT] pos=249 for_of_next operand=0x02
+[QTS:PARSE] pos=269 emit_spread_code end depth=0
+[QTS:PARSE] pos=288 array_literal begin
+[QTS:PARSE] pos=349 array_literal end
+[QTS:EMIT] pos=462 for_of_next operand=0x00

@@ -1,0 +1,184 @@
+__tests__/fixtures_generated/complex-096.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  closure vars:
+    0: #x local:loc2 const
+  stack_size: 3
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        goto8 7
+    7:  get_loc0 0: this
+        get_var_ref_check 0: "#x"
+        push_i8 96
+        define_private_field
+        return_undef
+
+__tests__/fixtures_generated/complex-096.js:4:5: function: <null>
+  mode: strict
+  args: v
+  locals:
+    0: var this
+  closure vars:
+    0: #x local:loc2 const
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        dup
+        get_var_ref0 0: "#x"
+        get_private_field
+        get_arg0 0: v
+        add
+        insert2
+        get_var_ref0 0: "#x"
+        put_private_field
+        drop
+        get_loc0 0: this
+        get_var_ref0 0: "#x"
+        get_private_field
+        return
+
+__tests__/fixtures_generated/complex-096.js:5:5: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: #x local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_var_ref0 0: "#x"
+        get_private_field
+        return
+
+__tests__/fixtures_generated/complex-096.js:6:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc3 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  return_undef
+
+__tests__/fixtures_generated/complex-096.js:12:24: function: <null>
+  args: x y
+  stack_size: 2
+  opcodes:
+        get_arg0 0: x
+        get_arg1 1: y
+        add
+        return
+
+__tests__/fixtures_generated/complex-096.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const Acc96 [level:2 next:-1]
+    2: const #x [level:3 next:1]
+    3: const <class_fields_init> [level:3 next:2]
+    4: let i [level:4 next:-1]
+  stack_size: 7
+  opcodes:
+        check_define_var Acc96,128
+        check_define_var a,128
+        check_define_var sum,128
+        check_define_var add,128
+        define_var Acc96,130
+        define_var a,128
+        define_var sum,130
+        define_var add,128
+        set_loc_uninitialized 1: Acc96
+        undefined
+        set_loc_uninitialized 3: "<class_fields_init>"
+        set_loc_uninitialized 2: "#x"
+        push_const8 2: [bytecode <null>]
+        define_class Acc96,0
+        private_symbol "#x"
+        put_loc2 2: "#x"
+        fclosure8 0: [bytecode <null>]
+        define_method add,0
+        fclosure8 1: [bytecode <null>]
+        define_method getX,0
+        fclosure8 3: [bytecode <null>]
+        set_home_object
+        put_loc3 3: "<class_fields_init>"
+        drop
+        set_loc1 1: Acc96
+        close_loc 3: "<class_fields_init>"
+        close_loc 2: "#x"
+        put_var_init Acc96
+        get_var Acc96
+        dup
+        call_constructor 0
+        put_var_init a
+        push_0 0
+        put_var_init sum
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 4: i
+        push_0 0
+        put_loc8 4: i
+  133:  get_loc_check 4: i
+        push_3 3
+        lt
+        if_false8 179
+        get_var sum
+        get_var a
+        get_field2 add
+        get_loc_check 4: i
+        call_method 1
+        add
+        dup
+        put_var sum
+        put_loc0 0: "<ret>"
+        get_loc_check 4: i
+        post_inc
+        put_loc_check 4: i
+        drop
+        goto8 133
+  179:  undefined
+        dup
+        is_undefined
+        if_true8 198
+  184:  to_object
+        get_field2 add
+        put_var_init add
+        drop
+        goto8 214
+  198:  drop
+        object
+        fclosure8 4: [bytecode <null>]
+        set_name add
+        define_field add
+        goto8 184
+  214:  get_var console
+        get_field2 log
+        get_var a
+        get_field2 getX
+        call_method 0
+        get_var sum
+        get_var add
+        push_1 1
+        push_2 2
+        call2 2
+        call_method 3
+        set_loc0 0: "<ret>"
+        return
+

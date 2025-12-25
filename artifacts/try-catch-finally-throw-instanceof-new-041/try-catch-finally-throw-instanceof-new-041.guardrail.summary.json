@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/try-catch-finally-throw-instanceof-new-041.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/try-catch-finally-throw-instanceof-new-041",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/try-catch-finally-throw-instanceof-new-041/cli/try-catch-finally-throw-instanceof-new-041.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/try-catch-finally-throw-instanceof-new-041/cli/try-catch-finally-throw-instanceof-new-041.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/try-catch-finally-throw-instanceof-new-041/cli/try-catch-finally-throw-instanceof-new-041.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/try-catch-finally-throw-instanceof-new-041/cli/try-catch-finally-throw-instanceof-new-041.pc2line.txt",
+    "bytecodeSize": 482,
+    "pc2lineLength": 48,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": true,
+    "tsSize": 421,
+    "wasmSize": 421,
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}

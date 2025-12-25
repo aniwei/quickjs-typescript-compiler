@@ -1,0 +1,4 @@
+[QTS:PARSE] pos=9 array_literal begin
+[QTS:PARSE] pos=36 array_literal end
+[QTS:PARSE] pos=62 template begin call=1
+[QTS:PARSE] pos=79 template end call=1 argc=2

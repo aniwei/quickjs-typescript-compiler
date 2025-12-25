@@ -1,0 +1,43 @@
+__tests__/fixtures_generated/complex-051.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 6
+  opcodes:
+        check_define_var a,128
+        check_define_var b,128
+        define_var a,128
+        define_var b,128
+        push_1 1
+        push_2 2
+        array_from 2
+        put_var_init a
+        push_0 0
+        array_from 1
+        push_1 1
+        get_var a
+        append
+        push_i8 51
+        push_7 7
+        mod
+        define_array_el
+        inc
+        push_3 3
+        push_4 4
+        array_from 2
+        append
+        drop
+        put_var_init b
+        get_var console
+        get_field2 log
+        get_var b
+        get_length
+        get_var b
+        push_2 2
+        get_array_el
+        get_var b
+        push_3 3
+        get_array_el
+        call_method 3
+        set_loc0 0: "<ret>"
+        return
+

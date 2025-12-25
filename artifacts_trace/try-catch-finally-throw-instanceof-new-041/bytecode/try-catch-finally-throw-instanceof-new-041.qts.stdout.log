@@ -1,0 +1,106 @@
+__tests__/fixtures/try-catch-finally-throw-instanceof-new-041.js:2:1: function: C41
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        push_i8 41
+        put_field v
+        return_undef
+
+__tests__/fixtures/try-catch-finally-throw-instanceof-new-041.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const x [level:2 next:-1]
+    2: catch e [level:5 next:-1]
+    3: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var C41,64
+        check_define_var out,128
+        fclosure8 0: [bytecode C41]
+        define_func C41,0
+        define_var out,130
+        push_0 0
+        put_var_init out
+        undefined
+        put_loc0 0: "<ret>"
+        catch 110
+        set_loc_uninitialized 1: x
+        get_var C41
+        dup
+        call_constructor 0
+        put_loc1 1: x
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 1: x
+        get_var C41
+        instanceof
+        lnot
+        if_false8 72
+        push_atom_value bad
+        throw
+   72:  get_loc_check 1: x
+        get_field v
+        dup
+        put_var out
+        put_loc0 0: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        push_i8 41
+        push_7 7
+        mod
+        push_0 0
+        strict_eq
+        if_false8 100
+        push_i8 41
+        throw
+  100:  drop
+        undefined
+        gosub 155
+        drop
+        goto8 177
+  110:  put_loc2 2: e
+        catch 149
+        get_loc2 2: e
+        typeof
+        push_atom_value number
+        strict_eq
+        if_false8 131
+        get_loc2 2: e
+        push_1 1
+        add
+        goto8 132
+  131:  push_minus1 -1
+  132:  dup
+        put_var out
+        put_loc0 0: "<ret>"
+        drop
+        undefined
+        gosub 155
+        drop
+        goto8 177
+  149:  gosub 155
+        throw
+  155:  get_loc0 0: "<ret>"
+        put_loc3 3: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        get_var out
+        push_i8 10
+        add
+        dup
+        put_var out
+        put_loc0 0: "<ret>"
+        get_loc3 3: "<ret>"
+        put_loc0 0: "<ret>"
+        ret
+  177:  get_var console
+        get_field2 log
+        get_var out
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

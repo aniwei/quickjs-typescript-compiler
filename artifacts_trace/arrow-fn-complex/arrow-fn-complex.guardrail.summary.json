@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/arrow-fn-complex.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_trace/arrow-fn-complex",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_trace/arrow-fn-complex/cli/arrow-fn-complex.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_trace/arrow-fn-complex/cli/arrow-fn-complex.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_trace/arrow-fn-complex/cli/arrow-fn-complex.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_trace/arrow-fn-complex/cli/arrow-fn-complex.pc2line.txt",
+    "bytecodeSize": 286,
+    "pc2lineLength": 14,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": true,
+    "tsSize": 224,
+    "wasmSize": 224,
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}

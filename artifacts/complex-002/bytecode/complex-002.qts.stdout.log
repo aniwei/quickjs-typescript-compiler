@@ -1,0 +1,155 @@
+__tests__/fixtures_generated/complex-002.js:2:38: function: <null>
+  stack_size: 2
+  opcodes:
+        push_2 2
+        push_1 1
+        add
+        return
+
+__tests__/fixtures_generated/complex-002.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 7
+  opcodes:
+        check_define_var obj,128
+        check_define_var v1,128
+        check_define_var v2,128
+        check_define_var v3,128
+        check_define_var list,128
+        define_var obj,128
+        define_var v1,128
+        define_var v2,128
+        define_var v3,128
+        define_var list,128
+        object
+        object
+        object
+        push_2 2
+        define_field c
+        define_field b
+        define_field a
+        fclosure8 0: [bytecode <null>]
+        set_name f
+        define_field f
+        put_var_init obj
+        get_var obj
+        dup
+        is_undefined_or_null
+        if_false8 109
+        drop
+        undefined
+        goto8 140
+  109:  get_field a
+        dup
+        is_undefined_or_null
+        if_false8 122
+        drop
+        undefined
+        goto8 140
+  122:  get_field b
+        dup
+        is_undefined_or_null
+        if_false8 135
+        drop
+        undefined
+        goto8 140
+  135:  get_field c
+  140:  dup
+        is_undefined_or_null
+        if_false8 146
+        drop
+        push_0 0
+  146:  put_var_init v1
+        null
+        dup
+        is_undefined_or_null
+        if_false8 160
+        drop
+        undefined
+        goto8 178
+  160:  get_field a
+        dup
+        is_undefined_or_null
+        if_false8 173
+        drop
+        undefined
+        goto8 178
+  173:  get_field b
+  178:  dup
+        is_undefined_or_null
+        if_false8 186
+        drop
+        push_2 2
+        push_2 2
+        add
+  186:  put_var_init v2
+        get_var obj
+        dup
+        is_undefined_or_null
+        if_false8 204
+        drop
+        undefined
+        goto8 221
+  204:  get_field2 f
+        dup
+        is_undefined_or_null
+        if_false8 218
+        drop
+        drop
+        undefined
+        goto8 221
+  218:  call_method 0
+  221:  dup
+        is_undefined_or_null
+        if_false8 227
+        drop
+        push_0 0
+  227:  put_var_init v3
+        object
+        push_1 1
+        define_field x
+        null
+        object
+        object
+        push_2 2
+        define_field z
+        define_field y
+        array_from 3
+        put_var_init list
+        get_var console
+        get_field2 log
+        get_var v1
+        get_var v2
+        get_var v3
+        get_var list
+        dup
+        is_undefined_or_null
+        if_false8 299
+        drop
+        undefined
+        goto8 327
+  299:  push_2 2
+        get_array_el
+        dup
+        is_undefined_or_null
+        if_false8 309
+        drop
+        undefined
+        goto8 327
+  309:  get_field y
+        dup
+        is_undefined_or_null
+        if_false8 322
+        drop
+        undefined
+        goto8 327
+  322:  get_field z
+  327:  dup
+        is_undefined_or_null
+        if_false8 333
+        drop
+        push_minus1 -1
+  333:  call_method 4
+        set_loc0 0: "<ret>"
+        return
+

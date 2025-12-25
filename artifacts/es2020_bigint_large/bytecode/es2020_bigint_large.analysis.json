@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-24T18:20:00.502Z",
+  "timestamp": "2025-12-25T08:56:16.334Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/es2020_bigint_large.ts",
   "compilation": {
     "typescript": {

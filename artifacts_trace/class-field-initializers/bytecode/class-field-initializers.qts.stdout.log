@@ -1,0 +1,114 @@
+__tests__/fixtures/class-field-initializers.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 4
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        goto8 7
+    7:  get_loc0 0: this
+        push_1 1
+        define_field a
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field a
+        push_1 1
+        add
+        define_field b
+        return_undef
+
+__tests__/fixtures/class-field-initializers.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: C local:loc1 const
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        push_i8 10
+        define_field s
+        get_loc0 0: this
+        get_var_ref_check 0: C
+        get_field s
+        push_1 1
+        add
+        define_field t
+        return_undef
+
+__tests__/fixtures/class-field-initializers.js:7:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  return_undef
+
+__tests__/fixtures/class-field-initializers.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const C [level:2 next:-1]
+    2: const <class_fields_init> [level:3 next:1]
+  stack_size: 3
+  opcodes:
+        check_define_var C,128
+        check_define_var c,128
+        define_var C,130
+        define_var c,128
+        set_loc_uninitialized 1: C
+        undefined
+        set_loc_uninitialized 2: "<class_fields_init>"
+        push_const8 0: [bytecode <null>]
+        define_class C,0
+        swap
+        swap
+        swap
+        swap
+        fclosure8 1: [bytecode <null>]
+        set_home_object
+        put_loc2 2: "<class_fields_init>"
+        drop
+        set_loc1 1: C
+        dup
+        fclosure8 2: [bytecode <null>]
+        set_home_object
+        call_method 0
+        drop
+        close_loc 2: "<class_fields_init>"
+        close_loc 1: C
+        put_var_init C
+        get_var C
+        dup
+        call_constructor 0
+        put_var_init c
+        get_var console
+        get_field2 log
+        get_var c
+        get_field b
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var C
+        get_field t
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

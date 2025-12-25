@@ -1,0 +1,6 @@
+[QTS:PARSE] pos=49 array_literal begin
+[QTS:PARSE] pos=72 array_literal end
+[QTS:PARSE] pos=110 try begin catch=5 catch2=6 finally=7 end=8
+[QTS:PARSE] pos=585 try catch catch=5 catch2=6 finally=7 end=8
+[QTS:PARSE] pos=691 try finally catch=5 catch2=6 finally=7 end=8
+[QTS:EMIT] pos=769 for_of_next operand=0x00

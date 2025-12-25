@@ -1,0 +1,5 @@
+[QTS:PARSE] pos=14 yield is_star=0 is_async=1
+[QTS:PARSE] pos=40 yield is_star=0 is_async=1
+[QTS:PARSE] pos=15 try begin catch=0 catch2=1 finally=2 end=3
+[QTS:PARSE] pos=289 try finally_without_catch catch=0 catch2=1 finally=2 end=3
+[QTS:PARSE] pos=300 try finally catch=0 catch2=1 finally=2 end=3

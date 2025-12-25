@@ -211,19 +211,18 @@ export class TypeScriptCompiler implements CompilerContext {
   private finalizeModule(fd: FunctionDef): void {
     const m = fd.module!
 
-    // Add module global vars as closure vars (after imports), matching QuickJS behavior.
+    // 将模块级全局变量追加为闭包变量（位于 imports 之后），对齐 QuickJS 行为。
     for (let i = 0; i < fd.globalVarCount; i++) {
       const gv = fd.globalVars[i]
       const varName = gv.varName
       const exists = fd.closureVar.slice(0, fd.closureVarCount).some(cv => cv.varName === varName)
       if (exists) {
-        // Import bindings and module globals must not collide.
+        // import 绑定与模块 globals 不应发生名字碰撞。
         continue
       }
       fd.closureVar.push({
-        // Module-defined globals are created in the module function.
-        // Match QuickJS module.c: js_create_module_bytecode_function() creates
-        // var refs for closure vars where is_local = TRUE.
+        // 模块中定义的 globals 由模块函数本身创建。
+        // 对齐 QuickJS module.c：js_create_module_bytecode_function() 会为这些闭包变量创建引用，且 is_local = TRUE。
         isLocal: true,
         isArg: false,
         isConst: gv.isConst,
@@ -235,7 +234,6 @@ export class TypeScriptCompiler implements CompilerContext {
       fd.closureVarCount++
     }
 
-    // Resolve LOCAL exports to closure var indices.
     // 将 LOCAL 导出解析为闭包变量索引。
     for (const e of m.exportEntries) {
       if (e.exportType !== JSImportExportTypeEnum.JS_EXPORT_TYPE_LOCAL) continue
@@ -243,15 +241,6 @@ export class TypeScriptCompiler implements CompilerContext {
       const idx = fd.closureVar.slice(0, fd.closureVarCount).findIndex(cv => cv.varName === localName)
       if (idx < 0) {
         throw new Error('未找到导出的本地绑定')
-      }
-      ;(e as any).localVarIdx = idx
-    }
-    for (const e of m.exportEntries) {
-      if (e.exportType !== JSImportExportTypeEnum.JS_EXPORT_TYPE_LOCAL) continue
-      const localName = e.localName
-      const idx = fd.closureVar.slice(0, fd.closureVarCount).findIndex(cv => cv.varName === localName)
-      if (idx < 0) {
-        throw new Error('exported local binding not found')
       }
       ;(e as any).localVarIdx = idx
     }

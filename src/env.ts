@@ -1,6 +1,6 @@
 // 本文件由 scripts/getEnv.ts 自动生成
 // 请勿手工编辑。
-// 生成时间: 2025-12-24T18:02:23.556Z
+// 生成时间: 2025-12-25T03:15:13.879Z
 
 export const GLOBAL_VAR_OFFSET = 1073741824
 export const ARGUMENT_VAR_OFFSET = 536870912
@@ -16,6 +16,11 @@ export const SHORT_OPCODES = true
 export const JS_MODE_STRICT_DEFAULT = 1
 export const BYTECODE_VERSION = 5
 export const FIRST_ATOM_ID = 228
+
+// 兼容导出：与 WASM 导出名称保持一致（供 auditEnv.ts 校验与 TS 侧直接引用）
+export const compileOptions = COMPILE_OPTIONS
+export const bytecodeVersion = BYTECODE_VERSION
+export const firstAtomId = FIRST_ATOM_ID
 
 // QuickJS 常量（来自 QuickJS 头文件；用于 TS 侧对齐与消除魔数）
 // third_party/QuickJS/include/QuickJS/quickjs.h:61-62

@@ -19,6 +19,144 @@ export class StatementVisitor extends VisitorContext {
     super(context)
   }
 
+  private emitArrayDestructuringFromStack(
+    fd: any,
+    pattern: ts.ArrayBindingPattern,
+    tok: 'const' | 'let' | 'var',
+    opts: { allowInitializer: boolean }
+  ): void {
+    // 对齐 QuickJS js_parse_destructuring_element() 的 '[' 分支。
+    // QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:4583-4765
+    // 约束：仅支持 identifier bindings、可选默认值、可选末尾 rest。
+
+    // value on stack -> start iterator
+    this.compiler.emitOp(fd, Opcode.OP_for_of_start)
+
+    const emitStore = (atom: number) => {
+      const opcode = (tok === 'const' || tok === 'let')
+        ? TempOpcode.OP_scope_put_var_init
+        : TempOpcode.OP_scope_put_var
+      this.compiler.emitOp(fd, opcode)
+      this.compiler.emitU32(fd, atom)
+      this.compiler.emitU16(fd, fd.scopeLevel)
+    }
+
+    const emitDefault = (expr: ts.Expression) => {
+      const labelHasVal = this.compiler.newLabelInt(fd)
+      // QuickJS optimize: undefined strict_eq -> is_undefined
+      // QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:11670-11677
+      this.compiler.emitOp(fd, Opcode.OP_dup)
+      this.compiler.emitOp(fd, Opcode.OP_is_undefined)
+      this.compiler.emitGotoInt(fd, Opcode.OP_if_false, labelHasVal)
+      this.compiler.emitOp(fd, Opcode.OP_drop)
+      this.context.visit(expr)
+      this.compiler.emitLabelInt(fd, labelHasVal)
+    }
+
+    const emitSpreadCode = (depth: number) => {
+      // 对齐 QuickJS js_emit_spread_code()
+      // QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:4205-4240
+      const labelRestNext = this.compiler.newLabelInt(fd)
+      const labelRestDone = this.compiler.newLabelInt(fd)
+
+      this.compiler.emitOp(fd, Opcode.OP_array_from)
+      this.compiler.emitU16(fd, 0)
+      this.compiler.emitOp(fd, Opcode.OP_push_i32)
+      this.compiler.emitU32(fd, 0)
+
+      this.compiler.emitLabelInt(fd, labelRestNext)
+      this.compiler.emitOp(fd, Opcode.OP_for_of_next)
+      this.compiler.emitU8(fd, 2 + depth)
+      this.compiler.emitGotoInt(fd, Opcode.OP_if_true, labelRestDone)
+
+      this.compiler.emitOp(fd, Opcode.OP_define_array_el)
+      this.compiler.emitOp(fd, Opcode.OP_inc)
+      this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelRestNext)
+
+      this.compiler.emitLabelInt(fd, labelRestDone)
+      // enum_rec xxx array idx undef -- enum_rec xxx array
+      this.compiler.emitOp(fd, Opcode.OP_drop)
+      this.compiler.emitOp(fd, Opcode.OP_drop)
+    }
+
+    const bindingElements = pattern.elements
+    for (let i = 0; i < bindingElements.length; i++) {
+      const element = bindingElements[i]
+
+      if (ts.isOmittedExpression(element)) {
+        // hole: emit for_of_next; drop; drop
+        this.compiler.emitOp(fd, Opcode.OP_for_of_next)
+        this.compiler.emitU8(fd, 0)
+        this.compiler.emitOp(fd, Opcode.OP_drop)
+        this.compiler.emitOp(fd, Opcode.OP_drop)
+        continue
+      }
+
+      const isRest = element.dotDotDotToken != null
+      if (isRest && i !== bindingElements.length - 1) {
+        throw new Error('rest element must be the last one')
+      }
+
+      if (!ts.isIdentifier(element.name)) {
+        throw new Error('Only identifier bindings are supported in array destructuring')
+      }
+
+      const atom = this.compiler.addAtom(element.name.text)
+
+      if (isRest) {
+        if (element.initializer && opts.allowInitializer) {
+          throw new Error('rest element cannot have a default value')
+        }
+        emitSpreadCode(0)
+        emitStore(atom)
+        continue
+      }
+
+      this.compiler.emitOp(fd, Opcode.OP_for_of_next)
+      this.compiler.emitU8(fd, 0)
+      // drop bool (leave value)
+      this.compiler.emitOp(fd, Opcode.OP_drop)
+
+      if (element.initializer && opts.allowInitializer) {
+        emitDefault(element.initializer)
+      }
+
+      emitStore(atom)
+    }
+
+    // close iterator
+    this.compiler.emitOp(fd, Opcode.OP_iterator_close)
+  }
+
+  private emitArrayDestructuringDeclaration(
+    fd: any,
+    pattern: ts.ArrayBindingPattern,
+    initializer: ts.Expression,
+    tok: 'const' | 'let' | 'var'
+  ): void {
+    // 对齐 QuickJS js_parse_var() 的 destructuring 入口：先 push undefined sentinel。
+    // QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:6576-6594
+    const labelStart = this.compiler.newLabelInt(fd)
+    const labelLoad = this.compiler.newLabelInt(fd)
+    const labelDone = this.compiler.newLabelInt(fd)
+
+    this.compiler.emitOp(fd, Opcode.OP_undefined)
+    this.compiler.emitOp(fd, Opcode.OP_dup)
+    this.compiler.emitOp(fd, Opcode.OP_is_undefined)
+    this.compiler.emitGotoInt(fd, Opcode.OP_if_true, labelLoad)
+
+    this.compiler.emitLabelInt(fd, labelStart)
+    this.emitArrayDestructuringFromStack(fd, pattern, tok, { allowInitializer: true })
+    this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelDone)
+
+    this.compiler.emitLabelInt(fd, labelLoad)
+    this.compiler.emitOp(fd, Opcode.OP_drop)
+    this.context.visit(initializer)
+    this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelStart)
+
+    this.compiler.emitLabelInt(fd, labelDone)
+  }
+
   // ============================================================================
   // 块语句 - 对应 parser.c:6491-6510 js_parse_block
   // ============================================================================
@@ -122,13 +260,38 @@ export class StatementVisitor extends VisitorContext {
           // var 声明没有初始化器时不需要做任何事
         }
       } else {
-        // 解构声明 (目前仅实现 object binding + defaults + rest)
+        // 解构声明
         if (!declaration.initializer) {
           throw new Error('Destructuring declaration requires an initializer')
         }
 
+        // array destructuring（最小实现：支持 for-of-destructuring-rest fixtures）
+        if (ts.isArrayBindingPattern(declaration.name)) {
+          const pattern = declaration.name
+          const tok: 'const' | 'let' | 'var' = isConst ? 'const' : isLet ? 'let' : 'var'
+
+          // 1) 定义绑定变量（对齐 QuickJS：先 define var 再 eval initializer）
+          for (const element of pattern.elements) {
+            if (ts.isOmittedExpression(element)) continue
+            if (!ts.isIdentifier(element.name)) {
+              throw new Error('Only identifier bindings are supported in array destructuring')
+            }
+            const atom = this.compiler.addAtom(element.name.text)
+            if (tok === 'const') {
+              this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_CONST)
+            } else if (tok === 'let') {
+              this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_LET)
+            } else {
+              this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_VAR)
+            }
+          }
+
+          this.emitArrayDestructuringDeclaration(fd, pattern, declaration.initializer, tok)
+          continue
+        }
+
         if (!ts.isObjectBindingPattern(declaration.name)) {
-          throw new Error('Only object destructuring declarations are currently supported')
+          throw new Error('Only object/array destructuring declarations are currently supported')
         }
 
         const pattern = declaration.name
@@ -206,9 +369,17 @@ export class StatementVisitor extends VisitorContext {
                   ? this.compiler.addAtom(element.propertyName.text)
                   : (() => { throw new Error('Computed property names in destructuring are not yet supported') })()
 
-            this.compiler.emitOp(fd, Opcode.OP_dup)
-            this.compiler.emitOp(fd, Opcode.OP_get_field)
-            this.compiler.emitAtom(fd, keyAtom)
+            if (element.propertyName == null) {
+              // QuickJS: PROP_TYPE_VAR + let/const path emits OP_get_field2 (no preceding dup)
+              // parser.c: js_parse_destructuring_element(): "source -- source val"
+              this.compiler.emitOp(fd, Opcode.OP_get_field2)
+              this.compiler.emitAtom(fd, keyAtom)
+            } else {
+              // QuickJS: renamed binding uses an explicit dup, then OP_get_field
+              this.compiler.emitOp(fd, Opcode.OP_dup)
+              this.compiler.emitOp(fd, Opcode.OP_get_field)
+              this.compiler.emitAtom(fd, keyAtom)
+            }
 
             if (element.initializer) {
               const labelKeep = this.compiler.newLabelInt(fd)
@@ -420,9 +591,9 @@ export class StatementVisitor extends VisitorContext {
     importNameAtom: number, 
     isStar: boolean, 
     reqModuleIdx: number): void {
-    // Align with QuickJS: create a module import binding as a closure var.
-    // NOTE: we do NOT dedupe by (varIdx,isLocal) because module globals can share indices.
-    // We only guard by local name.
+    // 对齐 QuickJS：为模块 import 绑定创建一个 closure var。
+    // 注意：这里不按 (varIdx,isLocal) 去重，因为 module globals 可能共享索引。
+    // 这里只按本地名字去重。
     if (localNameAtom !== JSAtom.JS_ATOM_default) {
       if (fd.closureVar?.some((cv: any) => cv.varName === localNameAtom)) {
         throw new Error('duplicate import binding')
@@ -430,8 +601,8 @@ export class StatementVisitor extends VisitorContext {
     }
 
     const cv: any = {
-      // Imported bindings are provided by other modules (not created locally).
-      // Match QuickJS module.c: imported closure vars have is_local = FALSE.
+      // import 绑定由其他模块提供（不是本模块本地创建的变量）。
+      // 对齐 QuickJS module.c：imported closure vars 的 is_local = FALSE。
       isLocal: false,
       isArg: false,
       isConst: true,
@@ -911,28 +1082,60 @@ export class StatementVisitor extends VisitorContext {
     let assignTarget: (() => void) | undefined
     if (ts.isVariableDeclarationList(node.initializer)) {
       const decl = node.initializer.declarations[0]
-      if (!decl || !ts.isIdentifier(decl.name)) {
+      if (!decl) {
         throw new Error('Unsupported for-of initializer')
       }
-      const atom = this.compiler.addAtom(decl.name.text)
+
       const isConst = (node.initializer.flags & ts.NodeFlags.Const) !== 0
       const isLet = (node.initializer.flags & ts.NodeFlags.Let) !== 0
+      const tok: 'const' | 'let' | 'var' = isConst ? 'const' : isLet ? 'let' : 'var'
 
-      if (isConst) {
-        this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_CONST)
-      } else if (isLet) {
-        this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_LET)
+      if (ts.isIdentifier(decl.name)) {
+        const atom = this.compiler.addAtom(decl.name.text)
+
+        if (isConst) {
+          this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_CONST)
+        } else if (isLet) {
+          this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_LET)
+        } else {
+          this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_VAR)
+        }
+
+        assignTarget = () => {
+          const opcode = (isConst || isLet)
+            ? TempOpcode.OP_scope_put_var_init
+            : TempOpcode.OP_scope_put_var
+          this.compiler.emitOp(fd, opcode)
+          this.compiler.emitU32(fd, atom)
+          this.compiler.emitU16(fd, fd.scopeLevel)
+        }
+      } else if (ts.isArrayBindingPattern(decl.name)) {
+        // 对齐 QuickJS: js_parse_for_in_of() 在 label_next 里调用 js_parse_destructuring_element(tok, hasval=TRUE)
+        // QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:6712-6765
+        const pattern = decl.name
+
+        // define bindings (compile-time)
+        for (const element of pattern.elements) {
+          if (ts.isOmittedExpression(element)) continue
+          if (!ts.isIdentifier(element.name)) {
+            throw new Error('Only identifier bindings are supported in for-of array destructuring')
+          }
+          const atom = this.compiler.addAtom(element.name.text)
+          if (tok === 'const') {
+            this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_CONST)
+          } else if (tok === 'let') {
+            this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_LET)
+          } else {
+            this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_VAR)
+          }
+        }
+
+        assignTarget = () => {
+          // hasval=TRUE, allow_initializer=FALSE
+          this.emitArrayDestructuringFromStack(fd, pattern, tok, { allowInitializer: false })
+        }
       } else {
-        this.compiler.defineVar(fd, atom, JSVarDefEnum.JS_VAR_DEF_VAR)
-      }
-
-      assignTarget = () => {
-        const opcode = (isConst || isLet)
-          ? TempOpcode.OP_scope_put_var_init
-          : TempOpcode.OP_scope_put_var
-        this.compiler.emitOp(fd, opcode)
-        this.compiler.emitU32(fd, atom)
-        this.compiler.emitU16(fd, fd.scopeLevel)
+        throw new Error('Unsupported for-of initializer')
       }
     } else if (ts.isIdentifier(node.initializer)) {
       const atom = this.compiler.addAtom(node.initializer.text)

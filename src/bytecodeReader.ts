@@ -346,7 +346,7 @@ function readAnyObject(reader: Reader, atoms: string[]): unknown {
       reader.ptr -= 1
       return readModuleBytecode(reader, atoms)
     default:
-      // Unknown tag: bail out with null to avoid desync.
+      // 未知 tag：返回 null 以避免解析错位。
       return null
   }
 }
@@ -452,7 +452,7 @@ export function parseBytecodeModule(input: Uint8Array | ArrayBuffer | Buffer): P
     atoms.push(reader.readString())
   }
 
-  // Root can be a function or a module.
+  // 根对象可能是 function 或 module。
   const tag = reader.readU8()
   reader.ptr -= 1
   if (tag === BytecodeTag.TC_TAG_MODULE) {

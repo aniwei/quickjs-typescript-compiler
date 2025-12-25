@@ -65,6 +65,10 @@ const M2 = (op1: number, op2: number) => (op1) | ((op2) << 8)
 /** 打包 3 个操作码用于模式匹配 */
 const M3 = (op1: number, op2: number, op3: number) => (op1) | ((op2) << 8) | ((op3) << 16)
 
+/** 打包 4 个操作码用于模式匹配 */
+const M4 = (op1: number, op2: number, op3: number, op4: number) =>
+  ((op1) | ((op2) << 8) | ((op3) << 16) | ((op4) << 24)) >>> 0
+
 // ============================================================================
 // 代码上下文 - 用于模式匹配
 // 
@@ -507,6 +511,25 @@ export class LabelResolver {
           this.pushShortInt(bcOut, val)
           break
         }
+
+        // === get_field 优化: length → get_length ===
+        // QuickJS 源码出处：third_party/QuickJS/src/core/parser.c:11590-11628 (resolve_labels)
+        //
+        // 在 SHORT_OPCODES + OPTIMIZE 模式下：
+        //   OP_get_field JS_ATOM_length  → OP_get_length
+        // 这会将 5 bytes 指令压缩为 1 byte。
+        case Opcode.OP_get_field: {
+          const atom = this.getU32(bcBuf, pos + 1)
+          if (USE_SHORT_OPCODES && OPTIMIZE && atom === JSAtom.JS_ATOM_length) {
+            this.addPc2lineInfo(fd, bcOut.size, lineNum)
+            bcOut.putU8(Opcode.OP_get_length)
+            break
+          }
+          this.addPc2lineInfo(fd, bcOut.size, lineNum)
+          bcOut.putU8(op)
+          bcOut.putU32(atom)
+          break
+        }
         
         // === get_loc 优化 ===
         case Opcode.OP_get_loc: {
@@ -710,6 +733,45 @@ export class LabelResolver {
           // no optimization, output as-is
           this.addPc2lineInfo(fd, bcOut.size, lineNum)
           bcOut.putU8(op)
+          break
+        }
+
+        // === typeof tests: line_num hoist ===
+        // QuickJS（parser.c:12007-12067）在 SHORT_OPCODES 分支里会尝试匹配：
+        //   OP_typeof OP_push_atom_value (==|!=|===|!==)
+        // 即使最终没有做 typeof_is_* 的 opcode 替换（例如比较 'number'），
+        // 仍然会把 code_match 捕获到的 cc.line_num 提前赋给 line_num。
+        // 这会让 add_pc2line_info 绑定在 OP_typeof 上，从而影响 pc2line 表。
+        // 为对齐 WASM（QuickJS）输出，我们在这里复现这段“仅更新 line_num”的副作用。
+        case Opcode.OP_typeof: {
+          if (OPTIMIZE) {
+            if (this.codeMatch(cc, posNext, [
+              Opcode.OP_push_atom_value,
+              M4(Opcode.OP_strict_eq, Opcode.OP_strict_neq, Opcode.OP_eq, Opcode.OP_neq),
+              -1,
+            ])) {
+              if (process.env.DEBUG_TYPEOF_TESTS) {
+                console.log('[typeof-tests] matched', {
+                  pos,
+                  posNext,
+                  lineNumBefore: lineNum,
+                  ccLineNum: cc.lineNum,
+                  ccOp: cc.op,
+                  ccAtom: cc.atom,
+                  nextBytes: Array.from(bcBuf.slice(posNext, Math.min(bcLen, posNext + 40))),
+                })
+              }
+              if (cc.lineNum >= 0) lineNum = cc.lineNum
+            } else if (process.env.DEBUG_TYPEOF_TESTS) {
+              console.log('[typeof-tests] no match', {
+                pos,
+                posNext,
+                nextBytes: Array.from(bcBuf.slice(posNext, Math.min(bcLen, posNext + 24))),
+              })
+            }
+          }
+          this.addPc2lineInfo(fd, bcOut.size, lineNum)
+          bcOut.put(bcBuf.slice(pos, pos + len))
           break
         }
         
@@ -1335,6 +1397,9 @@ export class LabelResolver {
         const op = cc.bcBuf[pos]
         if (op === TempOpcode.OP_line_num) {
           lineNum = this.getU32(cc.bcBuf, pos + 1)
+          if (process.env.DEBUG_TYPEOF_TESTS) {
+            console.log('[codeMatch] saw OP_line_num', { pos, lineNum })
+          }
           pos += 5
         } else {
           break

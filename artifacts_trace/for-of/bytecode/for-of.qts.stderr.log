@@ -1,0 +1,3 @@
+[QTS:PARSE] pos=3 array_literal begin
+[QTS:PARSE] pos=21 array_literal end
+[QTS:EMIT] pos=165 for_of_next operand=0x00

@@ -12013,8 +12013,10 @@ static __exception int resolve_labels(JSContext* ctx, JSFunctionDef* s) {
                   OP_push_atom_value,
                   M4(OP_strict_eq, OP_strict_neq, OP_eq, OP_neq),
                   -1)) {
+            int line_before = line_num;
             if (cc.line_num >= 0)
               line_num = cc.line_num;
+            QTS_TRACE_LABEL_TYPEOF_TEST_MATCH(pos, pos_next, line_before, line_num, cc.atom, cc.op);
             int op1 = (cc.op == OP_strict_eq || cc.op == OP_eq) ? OP_strict_eq
                                                                 : OP_strict_neq;
             int op2 = -1;

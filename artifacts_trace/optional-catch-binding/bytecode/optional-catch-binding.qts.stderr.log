@@ -1,0 +1,3 @@
+[QTS:PARSE] pos=7 try begin catch=0 catch2=1 finally=2 end=3
+[QTS:PARSE] pos=71 try catch catch=0 catch2=1 finally=2 end=3
+[QTS:PARSE] pos=159 try finally catch=0 catch2=1 finally=2 end=3

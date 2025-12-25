@@ -2368,57 +2368,95 @@ export class ExpressionVisitor extends VisitorContext {
     const fd = this.funcDef!
     const elements = node.elements
 
-    // 检查是否有展开元素
-    const hasSpread = elements.some(e => ts.isSpreadElement(e))
+    // 按 QuickJS js_parse_array_literal() 的三段式策略对齐：
+    // 1) 前 32 个“连续普通元素”直接压栈 + OP_array_from(idx)
+    // 2) 剩余普通元素/holes：用显式 index 的 OP_define_field
+    // 3) 一旦出现 spread / huge：切换为 (array, index) 栈形态 + OP_append/OP_define_array_el
+    // QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:3743-3895 (js_parse_array_literal)
 
-    if (!hasSpread) {
-      // 简单数组: 使用 array_from
-      // 计算所有元素
-      for (const elem of elements) {
-        if (ts.isOmittedExpression(elem)) {
-          // 空洞元素
-          this.compiler.emitOp(fd, Opcode.OP_undefined)
-        } else {
-          this.context.visit(elem)
-        }
+    // QuickJS: __JS_AtomFromUInt32(v) = v | JS_ATOM_TAG_INT
+    // third_party/QuickJS/include/QuickJS/quickjs.h:238
+    const atomFromUInt32 = (v: number): number => ((v | 0x80000000) >>> 0)
+
+    let idx = 0
+    while (idx < elements.length && idx < 32) {
+      const elem = elements[idx]
+      if (ts.isSpreadElement(elem) || ts.isOmittedExpression(elem)) {
+        break
+      }
+      this.context.visit(elem)
+      idx++
+    }
+
+    // QuickJS: js_parse_array_literal() 对 OP_array_from 不绑定 sourcePos。
+    this.compiler.emitOp(fd, Opcode.OP_array_from)
+    this.compiler.emitU16(fd, idx)
+
+    let needLength = false
+
+    // larger arrays and holes are handled with explicit indices (直到遇到 spread)
+    while (idx < elements.length) {
+      const elem = elements[idx]
+      if (ts.isSpreadElement(elem)) {
+        break
       }
 
-      // 发射 array_from 指令
-      // QuickJS: js_parse_array_literal() 里对 OP_array_from 使用 emit_op(s, OP_array_from)
-      // 并不会为该结构性指令调用 emit_source_pos()。
-      // 参见: third_party/QuickJS/src/core/parser.c: js_parse_array_literal (emit_op(s, OP_array_from)).
-      // 为了对齐 pc2line 采样点，这里不绑定 sourcePos。
-      this.compiler.emitOp(fd, Opcode.OP_array_from)
-      this.compiler.emitU16(fd, elements.length)
-    } else {
-      // 有展开元素的数组
-      // 创建空数组
-      // QuickJS: js_parse_array_literal() 里同样不会为 OP_array_from 绑定 source 位置。
-      // 参见: third_party/QuickJS/src/core/parser.c: js_parse_array_literal.
-      this.compiler.emitOp(fd, Opcode.OP_array_from)
-      this.compiler.emitU16(fd, 0)
+      needLength = true
+      if (!ts.isOmittedExpression(elem)) {
+        this.context.visit(elem)
+        this.compiler.emitOp(fd, Opcode.OP_define_field)
+        this.compiler.emitU32(fd, atomFromUInt32(idx))
+        needLength = false
+      }
+      idx++
+    }
 
-      // 初始化索引
-      this.compiler.emitOp(fd, Opcode.OP_push_i32)
-      this.compiler.emitU32(fd, 0)
+    // no spread/huge part: set length if last was a hole
+    if (idx >= elements.length) {
+      if (needLength) {
+        // Set the length: cannot use OP_define_field because length is not configurable
+        // QuickJS: parser.c:3804-3814
+        this.compiler.emitOp(fd, Opcode.OP_dup)
+        this.compiler.emitOp(fd, Opcode.OP_push_i32)
+        this.compiler.emitU32(fd, idx)
+        this.compiler.emitOp(fd, Opcode.OP_put_field)
+        this.compiler.emitAtom(fd, JSAtom.JS_ATOM_length)
+        this.compiler.emitIc(fd, JSAtom.JS_ATOM_length)
+      }
+      return
+    }
 
-      for (const elem of elements) {
-        if (ts.isSpreadElement(elem)) {
-          // 展开元素
-          this.context.visit(elem.expression)
-          this.compiler.emitOp(fd, Opcode.OP_append)
-        } else if (ts.isOmittedExpression(elem)) {
-          // 空洞: 只增加索引
-          this.compiler.emitOp(fd, Opcode.OP_inc)
-        } else {
-          // 普通元素
+    // huge arrays and spread elements require a dynamic index on the stack
+    // stack has array, index
+    this.compiler.emitOp(fd, Opcode.OP_push_i32)
+    this.compiler.emitU32(fd, idx)
+
+    while (idx < elements.length) {
+      const elem = elements[idx]
+      if (ts.isSpreadElement(elem)) {
+        this.context.visit(elem.expression)
+        this.compiler.emitOp(fd, Opcode.OP_append)
+      } else {
+        needLength = true
+        if (!ts.isOmittedExpression(elem)) {
           this.context.visit(elem)
           this.compiler.emitOp(fd, Opcode.OP_define_array_el)
-          this.compiler.emitOp(fd, Opcode.OP_inc)
+          needLength = false
         }
+        this.compiler.emitOp(fd, Opcode.OP_inc)
       }
+      idx++
+    }
 
-      // 丢弃索引
+    if (needLength) {
+      // array length - array array length
+      // QuickJS: parser.c:3872-3878
+      this.compiler.emitOp(fd, Opcode.OP_dup1)
+      this.compiler.emitOp(fd, Opcode.OP_put_field)
+      this.compiler.emitAtom(fd, JSAtom.JS_ATOM_length)
+      this.compiler.emitIc(fd, JSAtom.JS_ATOM_length)
+    } else {
+      // drop length: array length - array
       this.compiler.emitOp(fd, Opcode.OP_drop)
     }
   }
@@ -2703,8 +2741,8 @@ export class ExpressionVisitor extends VisitorContext {
     }
 
     // 发射 typeof
-    // QuickJS: typeof 分支不会 emit_source_pos，只 emit_op(OP_typeof)
-    // third_party/QuickJS/src/core/parser.c: js_parse_unary() TOK_TYPEOF -> emit_op(s, OP_typeof)
+    // QuickJS: js_parse_unary() 的 TOK_TYPEOF 分支是直接 emit_op(OP_typeof)
+    // （无 emit_source_pos），因此这里不绑定 sourcePos，避免额外插入 OP_line_num。
     this.compiler.emitOp(fd, Opcode.OP_typeof)
   }
 
@@ -2758,7 +2796,137 @@ export class ExpressionVisitor extends VisitorContext {
 
     if (node.asteriskToken) {
       // yield* 表达式
-      this.compiler.emitOp(fd, Opcode.OP_yield_star)
+      //
+      // QuickJS 源码出处：third_party/QuickJS/src/core/parser.c
+      // - js_parse_assign_expr2() 的 TOK_YIELD 分支 (is_star)
+      //   大约位于 parser.c:6007-6150
+      //
+      // 关键点：QuickJS 不会直接对 iterable 做一次 OP_yield_star。
+      // 它会生成 iterator loop，并实现 return/throw 协议以符合规范。
+
+      const isAsync = (fd.funcKind === JSFunctionKindEnum.JS_FUNC_ASYNC_GENERATOR)
+
+      // JS_THROW_ERROR_ITERATOR_THROW
+      // QuickJS 源码出处：third_party/QuickJS/src/core/function.h:44
+      const JS_THROW_ERROR_ITERATOR_THROW = 4
+
+      const labelLoop = this.compiler.newLabelInt(fd)
+      const labelYield = this.compiler.newLabelInt(fd)
+
+      this.compiler.emitOp(fd, isAsync ? Opcode.OP_for_await_of_start : Opcode.OP_for_of_start)
+
+      // remove the catch offset (QuickJS emits OP_drop; OP_undefined)
+      this.compiler.emitOp(fd, Opcode.OP_drop)
+      this.compiler.emitOp(fd, Opcode.OP_undefined)
+
+      // initial value
+      this.compiler.emitOp(fd, Opcode.OP_undefined)
+
+      this.compiler.emitLabelInt(fd, labelLoop)
+      this.compiler.emitOp(fd, Opcode.OP_iterator_next)
+      if (isAsync) {
+        this.compiler.emitOp(fd, Opcode.OP_await)
+      }
+      this.compiler.emitOp(fd, Opcode.OP_iterator_check_object)
+      this.compiler.emitOp(fd, Opcode.OP_get_field2)
+      this.compiler.emitAtom(fd, JSAtom.JS_ATOM_done)
+      this.compiler.emitIc(fd, JSAtom.JS_ATOM_done)
+
+      const labelNext = this.compiler.newLabelInt(fd)
+      this.compiler.emitGotoInt(fd, Opcode.OP_if_true, labelNext) // end of loop
+
+      this.compiler.emitLabelInt(fd, labelYield)
+      if (isAsync) {
+        // OP_async_yield_star takes the value as parameter
+        this.compiler.emitOp(fd, Opcode.OP_get_field)
+        this.compiler.emitAtom(fd, JSAtom.JS_ATOM_value)
+        this.compiler.emitIc(fd, JSAtom.JS_ATOM_value)
+        this.compiler.emitOp(fd, Opcode.OP_await)
+        this.compiler.emitOp(fd, Opcode.OP_async_yield_star)
+      } else {
+        // OP_yield_star takes (value, done) as parameter
+        this.compiler.emitOp(fd, Opcode.OP_yield_star)
+      }
+
+      this.compiler.emitOp(fd, Opcode.OP_dup)
+      const labelReturn = this.compiler.newLabelInt(fd)
+      this.compiler.emitGotoInt(fd, Opcode.OP_if_true, labelReturn)
+      this.compiler.emitOp(fd, Opcode.OP_drop)
+      this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelLoop)
+
+      // return handling
+      this.compiler.emitLabelInt(fd, labelReturn)
+      this.compiler.emitOp(fd, Opcode.OP_push_i32)
+      this.compiler.emitU32(fd, 2)
+      this.compiler.emitOp(fd, Opcode.OP_strict_eq)
+      const labelThrow = this.compiler.newLabelInt(fd)
+      this.compiler.emitGotoInt(fd, Opcode.OP_if_true, labelThrow)
+
+      if (isAsync) {
+        this.compiler.emitOp(fd, Opcode.OP_await)
+      }
+      this.compiler.emitOp(fd, Opcode.OP_iterator_call)
+      this.compiler.emitU8(fd, 0)
+      const labelReturn1 = this.compiler.newLabelInt(fd)
+      this.compiler.emitGotoInt(fd, Opcode.OP_if_true, labelReturn1)
+      if (isAsync) {
+        this.compiler.emitOp(fd, Opcode.OP_await)
+      }
+      this.compiler.emitOp(fd, Opcode.OP_iterator_check_object)
+      this.compiler.emitOp(fd, Opcode.OP_get_field2)
+      this.compiler.emitAtom(fd, JSAtom.JS_ATOM_done)
+      this.compiler.emitIc(fd, JSAtom.JS_ATOM_done)
+      this.compiler.emitGotoInt(fd, Opcode.OP_if_false, labelYield)
+
+      this.compiler.emitOp(fd, Opcode.OP_get_field)
+      this.compiler.emitAtom(fd, JSAtom.JS_ATOM_value)
+      this.compiler.emitIc(fd, JSAtom.JS_ATOM_value)
+
+      this.compiler.emitLabelInt(fd, labelReturn1)
+      this.compiler.emitOp(fd, Opcode.OP_nip)
+      this.compiler.emitOp(fd, Opcode.OP_nip)
+      this.compiler.emitOp(fd, Opcode.OP_nip)
+      this.compiler.emitReturn(fd, true)
+
+      // throw handling
+      this.compiler.emitLabelInt(fd, labelThrow)
+      this.compiler.emitOp(fd, Opcode.OP_iterator_call)
+      this.compiler.emitU8(fd, 1)
+      const labelThrow1 = this.compiler.newLabelInt(fd)
+      this.compiler.emitGotoInt(fd, Opcode.OP_if_true, labelThrow1)
+      if (isAsync) {
+        this.compiler.emitOp(fd, Opcode.OP_await)
+      }
+      this.compiler.emitOp(fd, Opcode.OP_iterator_check_object)
+      this.compiler.emitOp(fd, Opcode.OP_get_field2)
+      this.compiler.emitAtom(fd, JSAtom.JS_ATOM_done)
+      this.compiler.emitIc(fd, JSAtom.JS_ATOM_done)
+      this.compiler.emitGotoInt(fd, Opcode.OP_if_false, labelYield)
+      this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelNext)
+
+      // close the iterator and throw a type error exception
+      this.compiler.emitLabelInt(fd, labelThrow1)
+      this.compiler.emitOp(fd, Opcode.OP_iterator_call)
+      this.compiler.emitU8(fd, 2)
+      const labelThrow2 = this.compiler.newLabelInt(fd)
+      this.compiler.emitGotoInt(fd, Opcode.OP_if_true, labelThrow2)
+      if (isAsync) {
+        this.compiler.emitOp(fd, Opcode.OP_await)
+      }
+      this.compiler.emitLabelInt(fd, labelThrow2)
+
+      this.compiler.emitOp(fd, Opcode.OP_throw_error)
+      this.compiler.emitAtom(fd, JSAtom.JS_ATOM_NULL)
+      this.compiler.emitU8(fd, JS_THROW_ERROR_ITERATOR_THROW)
+
+      // label_next: keep the value associated with done = true
+      this.compiler.emitLabelInt(fd, labelNext)
+      this.compiler.emitOp(fd, Opcode.OP_get_field)
+      this.compiler.emitAtom(fd, JSAtom.JS_ATOM_value)
+      this.compiler.emitIc(fd, JSAtom.JS_ATOM_value)
+      this.compiler.emitOp(fd, Opcode.OP_nip)
+      this.compiler.emitOp(fd, Opcode.OP_nip)
+      this.compiler.emitOp(fd, Opcode.OP_nip)
     } else {
       // yield 表达式
       // QuickJS (parser.c: js_parse_assign_expr2 -> TOK_YIELD) emits:

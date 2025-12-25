@@ -642,7 +642,7 @@ export class FunctionDef {
   /** 全局变量数组 */
   globalVars: JSGlobalVar[] = []
 
-  // === Module metadata (when compiling as ESM) ===
+  // === 模块元数据（当以 ESM 模式编译时） ===
   module: JSModuleDef | null = null
 
   // ========== 字节码 - parser.h:302-305 ==========
@@ -766,10 +766,6 @@ export class FunctionDef {
   /** 源码长度 */
   sourceLen: number = 0
 
-  // ========== 模块 - parser.h:354-355 ==========
-  /** 模块定义 (!= NULL when parsing a module) */
-  module: any = null
-  
   /** TRUE if await is used (used in module eval) */
   hasAwait: boolean = false
 

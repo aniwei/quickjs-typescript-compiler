@@ -196,6 +196,15 @@ extern "C" {
 
 #define QTS_TRACE_LABEL_RESOLVE(label, addr) \
     fprintf(stderr, "[QTS:LABEL] resolve: label=%d addr=%d\n", (int)(label), (int)(addr))
+
+/* resolve_labels(): typeof-test side effects (parser.c:12007+) */
+#if QTS_TRACE_LEVEL >= 2
+#define QTS_TRACE_LABEL_TYPEOF_TEST_MATCH(pos, pos_next, line_before, line_after, atom, cmp_op) \
+    fprintf(stderr, "[QTS:LABEL] typeof_test: pos=%d pos_next=%d line_num:%d->%d atom=%d cmp_op=%d\n", \
+            (int)(pos), (int)(pos_next), (int)(line_before), (int)(line_after), (int)(atom), (int)(cmp_op))
+#else
+#define QTS_TRACE_LABEL_TYPEOF_TEST_MATCH(pos, pos_next, line_before, line_after, atom, cmp_op)
+#endif
 #else
 #define QTS_TRACE_LABEL_BEGIN(bc_len, label_count, jump_size, line_number_size, strip_debug)
 #define QTS_TRACE_LABEL_END(out_len)
@@ -203,6 +212,7 @@ extern "C" {
 #define QTS_TRACE_LABEL_EMIT(label, pos)
 #define QTS_TRACE_LABEL_GOTO(opcode, label)
 #define QTS_TRACE_LABEL_RESOLVE(label, addr)
+#define QTS_TRACE_LABEL_TYPEOF_TEST_MATCH(pos, pos_next, line_before, line_after, atom, cmp_op)
 #endif
 
 /* Stack size tracing */

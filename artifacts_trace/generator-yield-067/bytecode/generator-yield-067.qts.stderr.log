@@ -1,0 +1,5 @@
+[QTS:PARSE] pos=14 yield is_star=0 is_async=0
+[QTS:PARSE] pos=32 array_literal begin
+[QTS:PARSE] pos=50 array_literal end
+[QTS:PARSE] pos=50 yield is_star=1 is_async=0
+[QTS:EMIT] pos=154 for_of_next operand=0x00

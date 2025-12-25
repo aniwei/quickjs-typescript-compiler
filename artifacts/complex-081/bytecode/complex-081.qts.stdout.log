@@ -1,0 +1,75 @@
+__tests__/fixtures_generated/complex-081.js:3:5: function: f
+  args: k
+  locals:
+    0: let k [level:1 next:-2]
+  closure vars:
+    0: base local:arg0 var
+    1: f local:loc1 var
+  stack_size: 3
+  opcodes:
+        set_loc_uninitialized 0: k
+        get_arg0 0: k
+        dup
+        is_undefined
+        if_false8 11
+        drop
+        push_2 2
+        set_arg0 0: k
+   11:  put_loc0 0: k
+        get_arg0 0: k
+        push_0 0
+        lte
+        if_false8 19
+        get_var_ref0 0: base
+        return
+   19:  get_var_ref1 1: f
+        get_arg0 0: k
+        push_1 1
+        sub
+        call1 1
+        push_1 1
+        add
+        return
+
+__tests__/fixtures_generated/complex-081.js:2:1: function: make81
+  args: base
+  locals:
+    0: let base [level:1 next:-2]
+    1: var f
+  stack_size: 2
+  opcodes:
+        set_loc_uninitialized 0: base
+        get_arg0 0: base
+        dup
+        is_undefined
+        if_false8 12
+        drop
+        push_i8 81
+        set_arg0 0: base
+   12:  put_loc0 0: base
+        fclosure8 0: [bytecode f]
+        set_loc1 1: f
+        return
+
+__tests__/fixtures_generated/complex-081.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var make81,64
+        check_define_var g,128
+        fclosure8 0: [bytecode make81]
+        define_func make81,0
+        define_var g,128
+        get_var make81
+        call0 0
+        put_var_init g
+        get_var console
+        get_field2 log
+        get_var g
+        push_3 3
+        call1 1
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

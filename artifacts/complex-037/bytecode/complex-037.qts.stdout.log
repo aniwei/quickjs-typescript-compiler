@@ -1,0 +1,69 @@
+__tests__/fixtures_generated/complex-037.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 6
+  opcodes:
+        check_define_var src,128
+        check_define_var a,128
+        check_define_var b,128
+        check_define_var rest,128
+        define_var src,128
+        define_var a,128
+        define_var b,128
+        define_var rest,128
+        object
+        push_i8 37
+        define_field a
+        get_var undefined
+        define_field b
+        push_3 3
+        define_field c
+        push_4 4
+        define_field d
+        put_var_init src
+        undefined
+        dup
+        is_undefined
+        if_true8 145
+   88:  to_object
+        object
+        swap
+        swap
+        null
+        define_field a
+        swap
+        get_field2 a
+        put_var_init a
+        swap
+        null
+        define_field b
+        swap
+        get_field2 b
+        dup
+        is_undefined
+        if_false8 128
+        drop
+        push_2 2
+  128:  put_var_init b
+        object
+        copy_data_properties 68
+        put_var_init rest
+        drop
+        drop
+        goto8 153
+  145:  drop
+        get_var src
+        goto8 88
+  153:  get_var console
+        get_field2 log
+        get_var a
+        get_var b
+        get_var rest
+        get_field c
+        get_var rest
+        get_field d
+        add
+        call_method 3
+        set_loc0 0: "<ret>"
+        return
+

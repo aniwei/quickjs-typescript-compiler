@@ -1,0 +1,50 @@
+__tests__/fixtures/template-literal-tagged-template-047.js:2:1: function: tag47
+  args: s v
+  stack_size: 2
+  opcodes:
+        rest 1
+        put_arg1 1: v
+        get_arg0 0: s
+        push_0 0
+        get_array_el
+        get_length
+        get_arg1 1: v
+        get_length
+        add
+        return
+
+__tests__/fixtures/template-literal-tagged-template-047.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var tag47,64
+        check_define_var x,128
+        check_define_var r1,128
+        check_define_var r2,128
+        fclosure8 0: [bytecode tag47]
+        define_func tag47,0
+        define_var x,128
+        define_var r1,128
+        define_var r2,128
+        push_i8 47
+        push_i8 10
+        mod
+        put_var_init x
+        get_var tag47
+        push_const8 1: [ 0: "a", 1: "b" ]
+        get_var x
+        call2 2
+        put_var_init r1
+        get_var tag47
+        push_const8 2: [ 0: "no_subs" ]
+        call1 1
+        put_var_init r2
+        get_var console
+        get_field2 log
+        get_var r1
+        get_var r2
+        call_method 2
+        set_loc0 0: "<ret>"
+        return
+

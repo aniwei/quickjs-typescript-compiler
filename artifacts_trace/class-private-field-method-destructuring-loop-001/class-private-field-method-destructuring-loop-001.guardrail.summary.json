@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/class-private-field-method-destructuring-loop-001.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_trace/class-private-field-method-destructuring-loop-001",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_trace/class-private-field-method-destructuring-loop-001/cli/class-private-field-method-destructuring-loop-001.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_trace/class-private-field-method-destructuring-loop-001/cli/class-private-field-method-destructuring-loop-001.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_trace/class-private-field-method-destructuring-loop-001/cli/class-private-field-method-destructuring-loop-001.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_trace/class-private-field-method-destructuring-loop-001/cli/class-private-field-method-destructuring-loop-001.pc2line.txt",
+    "bytecodeSize": 747,
+    "pc2lineLength": 48,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": false,
+    "tsSize": 686,
+    "wasmSize": 685,
+    "sizeDiff": 1,
+    "sizeDiffPercent": 0.145985401459854
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}
