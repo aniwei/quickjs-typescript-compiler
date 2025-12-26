@@ -1,0 +1,51 @@
+__tests__/fixtures/tagged-template-basic.js:1:1: function: tag
+  args: strings values
+  stack_size: 2
+  opcodes:
+        rest 1
+        put_arg1 1: values
+        get_arg0 0: strings
+        get_arg1 1: values
+        array_from 2
+        return
+
+__tests__/fixtures/tagged-template-basic.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var tag,64
+        check_define_var x,128
+        check_define_var y,128
+        check_define_var r1,128
+        check_define_var r2,128
+        fclosure8 0: [bytecode tag]
+        define_func tag,0
+        define_var x,128
+        define_var y,128
+        define_var r1,128
+        define_var r2,128
+        push_1 1
+        put_var_init x
+        push_atom_value z
+        put_var_init y
+        get_var tag
+        push_const8 1: [ 0: "a", 1: "b", 2: "c" ]
+        get_var x
+        get_var y
+        call3 3
+        put_var_init r1
+        get_var tag
+        push_const8 2: [ 0: "no_subs" ]
+        call1 1
+        put_var_init r2
+        get_var r1
+        drop
+        undefined
+        put_loc0 0: "<ret>"
+        get_var r2
+        drop
+        undefined
+        set_loc0 0: "<ret>"
+        return
+

@@ -91,6 +91,7 @@ export class QuickJSLib {
       process.env.QTS_TRACE_CLOSURE ||
       process.env.QTS_TRACE_LABEL ||
       process.env.QTS_TRACE_STACK ||
+      process.env.QTS_TRACE_PC2LINE ||
       process.env.QTS_TRACE_SCOPE ||
       process.env.QTS_TRACE_ASSIGN,
     )
@@ -117,6 +118,7 @@ export class QuickJSLib {
         CLOSURE: desiredCategory('QTS_TRACE_CLOSURE'),
         LABEL: desiredCategory('QTS_TRACE_LABEL'),
         STACK: desiredCategory('QTS_TRACE_STACK'),
+        PC2LINE: desiredCategory('QTS_TRACE_PC2LINE'),
         SCOPE: desiredCategory('QTS_TRACE_SCOPE'),
         ASSIGN: desiredCategory('QTS_TRACE_ASSIGN'),
       },
@@ -134,6 +136,7 @@ export class QuickJSLib {
           built?.categories?.CLOSURE === desired.categories.CLOSURE &&
           built?.categories?.LABEL === desired.categories.LABEL &&
           built?.categories?.STACK === desired.categories.STACK &&
+          built?.categories?.PC2LINE === desired.categories.PC2LINE &&
           built?.categories?.SCOPE === desired.categories.SCOPE &&
           built?.categories?.ASSIGN === desired.categories.ASSIGN
         if (same) return path

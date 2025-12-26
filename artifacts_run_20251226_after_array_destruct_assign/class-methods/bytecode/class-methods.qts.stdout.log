@@ -1,0 +1,103 @@
+__tests__/fixtures/class-methods.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 2
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        goto8 7
+    7:  get_loc0 0: this
+        undefined
+        define_field value
+        return_undef
+
+__tests__/fixtures/class-methods.js:3:5: function: <null>
+  mode: strict
+  args: val
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  drop
+        get_loc0 0: this
+        get_arg0 0: val
+        put_field value
+        return_undef
+
+__tests__/fixtures/class-methods.js:6:5: function: <null>
+  mode: strict
+  args: n
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 value
+        get_arg0 0: n
+        add
+        put_field value
+        get_loc0 0: this
+        get_field value
+        return
+
+__tests__/fixtures/class-methods.js:10:12: function: <null>
+  mode: strict
+  args: val
+  closure vars:
+    0: Calculator local:loc1 const
+  stack_size: 3
+  opcodes:
+        get_var_ref_check 0: Calculator
+        dup
+        get_arg0 0: val
+        call_constructor 1
+        return
+
+__tests__/fixtures/class-methods.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const Calculator [level:2 next:-1]
+    2: const <class_fields_init> [level:3 next:1]
+  stack_size: 3
+  opcodes:
+        check_define_var Calculator,128
+        define_var Calculator,130
+        set_loc_uninitialized 1: Calculator
+        undefined
+        set_loc_uninitialized 2: "<class_fields_init>"
+        push_const8 0: [bytecode <null>]
+        define_class Calculator,0
+        fclosure8 1: [bytecode <null>]
+        define_method add,0
+        swap
+        fclosure8 2: [bytecode <null>]
+        define_method create,0
+        swap
+        fclosure8 3: [bytecode <null>]
+        set_home_object
+        put_loc2 2: "<class_fields_init>"
+        drop
+        set_loc1 1: Calculator
+        close_loc 2: "<class_fields_init>"
+        close_loc 1: Calculator
+        put_var_init Calculator
+        get_loc0 0: "<ret>"
+        return
+

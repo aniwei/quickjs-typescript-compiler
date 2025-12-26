@@ -29,6 +29,7 @@ import {
   env,
 } from '../env'
 import { TemplateObjectConst } from './TemplateObjectConst'
+import { RawStringConst } from './RawStringConst'
 
 // ============================================================================
 // 常量定义 - 从 env.ts 导入
@@ -732,6 +733,9 @@ export class BytecodeWriter {
     } else if (typeof val === 'string') {
       this.out.putByte(BytecodeTag.TC_TAG_STRING)
       this.writeString(val)
+    } else if (val instanceof RawStringConst) {
+      this.out.putByte(BytecodeTag.TC_TAG_STRING)
+      this.writeRawStringBytes(val.bytes)
     } else if (val instanceof JSFunctionBytecode) {
       // 嵌套函数
       this.writeFunctionBytecode(val)
@@ -786,6 +790,15 @@ export class BytecodeWriter {
     // 长度 << 1 | is_wide_char (UTF-8 不是 wide char)
     this.out.putULEB128(bytes.length << 1)
     this.out.put(bytes)
+  }
+
+  private writeRawStringBytes(bytes: Uint8Array): void {
+    // QuickJS bytecode string encoding: ULEB128((len<<1)|wideFlag) + bytes.
+    // Here we always write 8-bit raw bytes (wideFlag=0) and do not re-encode.
+    this.out.putULEB128(bytes.length << 1)
+    if (bytes.length > 0) {
+      this.out.put(bytes)
+    }
   }
   
   /**

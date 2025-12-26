@@ -1,0 +1,5793 @@
+__tests__/fixtures/quickjs-tests/test_builtin.js:7:1: function: throw_error
+  mode: strict
+  args: msg
+  stack_size: 3
+  opcodes:
+        get_var throw_errors
+        if_false8 15
+        get_var Error
+        get_arg0 0: msg
+        call1 1
+        throw
+   15:  get_var console
+        get_field2 log
+        get_arg0 0: msg
+        call_method 1
+        drop
+        check_var status
+        push_1 1
+        put_var_strict status
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:14:5: function: get_full_type
+  mode: strict
+  args: o
+  locals:
+    0: var type
+  stack_size: 2
+  opcodes:
+        get_arg0 0: o
+        typeof
+        set_loc0 0: type
+        push_atom_value object
+        strict_eq
+        if_false8 54
+        get_arg0 0: o
+        is_null
+        if_false8 21
+        push_atom_value null
+        return
+   21:  get_arg0 0: o
+        get_field constructor
+        if_false8 54
+        get_arg0 0: o
+        get_field constructor
+        get_field name
+        if_false8 54
+        get_arg0 0: o
+        get_field constructor
+        get_field name
+        return
+   54:  get_loc0 0: type
+        return
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:13:1: function: assert
+  mode: strict
+  args: actual expected message
+  locals:
+    0: var get_full_type
+    1: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 0
+        put_loc1 1: arguments
+        fclosure8 0: [bytecode get_full_type]
+        put_loc0 0: get_full_type
+        get_loc1 1: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 14
+        push_true
+        put_arg1 1: expected
+   14:  get_arg0 0: actual
+        typeof
+        get_arg1 1: expected
+        typeof
+        strict_eq
+        if_false8 128
+        get_arg0 0: actual
+        get_arg1 1: expected
+        strict_eq
+        if_false8 43
+        get_arg0 0: actual
+        push_0 0
+        strict_neq
+        dup
+        if_true8 40
+        drop
+        push_1 1
+        get_arg0 0: actual
+        div
+        push_1 1
+        get_arg1 1: expected
+        div
+        strict_eq
+   40:  if_false8 43
+        return_undef
+   43:  get_arg0 0: actual
+        typeof
+        push_atom_value number
+        strict_eq
+        if_false8 73
+        get_var isNaN
+        get_arg0 0: actual
+        call1 1
+        if_false8 73
+        get_var isNaN
+        get_arg1 1: expected
+        call1 1
+        if_false8 73
+        push_true
+        return
+   73:  get_arg0 0: actual
+        typeof
+        push_atom_value object
+        strict_eq
+        if_false8 128
+        get_arg0 0: actual
+        is_null
+        if_true8 128
+        get_arg1 1: expected
+        is_null
+        if_true8 128
+        get_arg0 0: actual
+        get_field constructor
+        get_arg1 1: expected
+        get_field constructor
+        strict_eq
+        if_false8 128
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 128
+        return_undef
+  128:  get_var throw_error
+        push_atom_value "assertion failed: got "
+        get_loc0 0: get_full_type
+        get_arg0 0: actual
+        call1 1
+        add
+        push_atom_value ":|"
+        add
+        get_arg0 0: actual
+        add
+        push_atom_value "|, expected "
+        add
+        get_loc0 0: get_full_type
+        get_arg1 1: expected
+        call1 1
+        add
+        push_atom_value ":|"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 192
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 193
+  192:  push_empty_string
+  193:  add
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:49:1: function: assert_throws
+  mode: strict
+  args: expected_error func
+  locals:
+    0: var err
+    1: catch e [level:3 next:-1]
+  stack_size: 3
+  opcodes:
+        push_false
+        put_loc0 0: err
+        catch 13
+        get_arg1 1: func
+        call0 0
+        drop
+        drop
+        goto8 46
+   13:  put_loc1 1: e
+        catch 45
+        push_true
+        put_loc0 0: err
+        get_loc1 1: e
+        get_arg0 0: expected_error
+        instanceof
+        lnot
+        if_false8 42
+        get_var throw_error
+        push_atom_value "unexpected exception type"
+        call1 1
+        drop
+        undefined
+        nip_catch
+        return
+   42:  drop
+        goto8 46
+   45:  throw
+   46:  get_loc0 0: err
+        lnot
+        if_false8 62
+        get_var throw_error
+        push_atom_value "expected exception"
+        call1 1
+        drop
+   62:  return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:75:1: function: my_func
+  mode: strict
+  args: a b
+  stack_size: 2
+  opcodes:
+        get_arg0 0: a
+        get_arg1 1: b
+        add
+        return
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:79:5: function: f
+  mode: strict
+  args: a b
+  locals:
+    0: var i
+    1: var tab
+    2: var this
+    3: var arguments
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc2 2: this
+        special_object 0
+        put_loc3 3: arguments
+        array_from 0
+        set_loc1 1: tab
+        get_field2 push
+        get_loc2 2: this
+        call_method 1
+        drop
+        push_0 0
+        put_loc0 0: i
+   21:  get_loc0 0: i
+        get_loc3 3: arguments
+        get_length
+        lt
+        if_false8 44
+        get_loc1 1: tab
+        get_field2 push
+        get_loc3 3: arguments
+        get_loc0 0: i
+        get_array_el
+        call_method 1
+        drop
+        inc_loc 0: i
+        goto8 21
+   44:  get_loc1 1: tab
+        return
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:86:5: function: constructor1
+  mode: strict
+  args: a
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: a
+        put_field x
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:94:10: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_1 1
+        return
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:97:24: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_1 1
+        return
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:96:31: function: <null>
+  mode: strict
+  stack_size: 5
+  opcodes:
+        get_var Reflect
+        get_field2 apply
+        fclosure8 0: [bytecode <null>]
+        null
+        get_var undefined
+        call_method 3
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:78:1: function: test_function
+  mode: strict
+  locals:
+    0: var f
+    1: var constructor1
+    2: var r
+    3: var g
+  stack_size: 5
+  opcodes:
+        fclosure8 0: [bytecode f]
+        put_loc0 0: f
+        fclosure8 1: [bytecode constructor1]
+        put_loc1 1: constructor1
+        get_var my_func
+        get_field2 call
+        null
+        push_1 1
+        push_2 2
+        call_method 3
+        put_loc2 2: r
+        get_var assert
+        get_loc2 2: r
+        push_3 3
+        push_atom_value call
+        call3 3
+        drop
+        get_var my_func
+        get_field2 apply
+        null
+        push_1 1
+        push_2 2
+        array_from 2
+        call_method 2
+        put_loc2 2: r
+        get_var assert
+        get_loc2 2: r
+        push_3 3
+        push_atom_value apply
+        call3 3
+        drop
+        fclosure8 2: [bytecode <null>]
+        get_field2 apply
+        null
+        get_var undefined
+        call_method 2
+        put_loc2 2: r
+        get_var assert
+        get_loc2 2: r
+        push_1 1
+        call2 2
+        drop
+        get_var assert_throws
+        get_var TypeError
+        fclosure8 3: [bytecode <null>]
+        call2 2
+        drop
+        get_var Function
+        dup
+        push_atom_value a
+        push_atom_value b
+        push_atom_value "return a + b;"
+        call_constructor 3
+        put_loc2 2: r
+        get_var assert
+        get_loc2 2: r
+        push_2 2
+        push_3 3
+        call2 2
+        push_5 5
+        push_atom_value function
+        call3 3
+        drop
+        get_loc0 0: f
+        get_field2 bind
+        push_1 1
+        push_2 2
+        call_method 2
+        put_loc3 3: g
+        get_var assert
+        get_loc3 3: g
+        get_length
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        get_loc3 3: g
+        get_field name
+        push_atom_value "bound f"
+        call2 2
+        drop
+        get_var assert
+        get_loc3 3: g
+        push_3 3
+        call1 1
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        call2 2
+        drop
+        get_loc1 1: constructor1
+        get_field2 bind
+        null
+        push_1 1
+        call_method 2
+        set_loc3 3: g
+        dup
+        call_constructor 0
+        put_loc2 2: r
+        get_var assert
+        get_loc2 2: r
+        get_field x
+        push_1 1
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:119:42: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_4 4
+        return
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:119:74: function: <null>
+  mode: strict
+  args: val
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: val
+        put_field z_val
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:123:11: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_4 4
+        return
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:123:34: function: <null>
+  mode: strict
+  args: val
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: val
+        put_field z_val
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:109:1: function: test
+  mode: strict
+  locals:
+    0: var r
+    1: var a
+    2: var b
+    3: var c
+    4: var err
+    5: catch e [level:3 next:-1]
+  stack_size: 6
+  opcodes:
+        get_var Error
+        push_atom_value hello
+        call1 1
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        get_field message
+        push_atom_value hello
+        push_atom_value Error
+        call3 3
+        drop
+        get_var Object
+        dup
+        call_constructor 0
+        set_loc1 1: a
+        push_1 1
+        put_field x
+        get_var assert
+        get_loc1 1: a
+        get_field x
+        push_1 1
+        push_atom_value Object
+        call3 3
+        drop
+        get_var assert
+        get_var Object
+        get_field2 getPrototypeOf
+        get_loc1 1: a
+        call_method 1
+        get_var Object
+        get_field prototype
+        push_atom_value getPrototypeOf
+        call3 3
+        drop
+        get_var Object
+        get_field2 defineProperty
+        get_loc1 1: a
+        push_atom_value y
+        object
+        push_3 3
+        define_field value
+        push_true
+        define_field writable
+        push_true
+        define_field configurable
+        push_true
+        define_field enumerable
+        call_method 3
+        drop
+        get_var assert
+        get_loc1 1: a
+        get_field y
+        push_3 3
+        push_atom_value defineProperty
+        call3 3
+        drop
+        get_var Object
+        get_field2 defineProperty
+        get_loc1 1: a
+        push_atom_value z
+        object
+        fclosure8 0: [bytecode <null>]
+        set_name get
+        define_field get
+        fclosure8 1: [bytecode <null>]
+        set_name set
+        define_field set
+        push_true
+        define_field configurable
+        push_true
+        define_field enumerable
+        call_method 3
+        drop
+        get_var assert
+        get_loc1 1: a
+        get_field z
+        push_4 4
+        push_atom_value get
+        call3 3
+        drop
+        get_loc1 1: a
+        push_5 5
+        put_field z
+        get_var assert
+        get_loc1 1: a
+        get_field z_val
+        push_5 5
+        push_atom_value set
+        call3 3
+        drop
+        object
+        fclosure8 2: [bytecode <null>]
+        define_method z,5
+        fclosure8 3: [bytecode <null>]
+        define_method z,6
+        put_loc1 1: a
+        get_var assert
+        get_loc1 1: a
+        get_field z
+        push_4 4
+        push_atom_value get
+        call3 3
+        drop
+        get_loc1 1: a
+        push_5 5
+        put_field z
+        get_var assert
+        get_loc1 1: a
+        get_field z_val
+        push_5 5
+        push_atom_value set
+        call3 3
+        drop
+        get_var Object
+        get_field2 create
+        get_loc1 1: a
+        call_method 1
+        put_loc2 2: b
+        get_var assert
+        get_var Object
+        get_field2 getPrototypeOf
+        get_loc2 2: b
+        call_method 1
+        get_loc1 1: a
+        push_atom_value create
+        call3 3
+        drop
+        object
+        push_2 2
+        define_field u
+        put_loc3 3: c
+        get_var Object
+        get_field2 setPrototypeOf
+        get_loc1 1: a
+        get_loc3 3: c
+        call_method 2
+        drop
+        get_var assert
+        get_var Object
+        get_field2 getPrototypeOf
+        get_loc1 1: a
+        call_method 1
+        get_loc3 3: c
+        push_atom_value setPrototypeOf
+        call3 3
+        drop
+        object
+        put_loc1 1: a
+        get_var assert
+        get_loc1 1: a
+        get_field2 toString
+        call_method 0
+        push_atom_value "[object Object]"
+        push_atom_value toString
+        call3 3
+        drop
+        object
+        push_1 1
+        define_field x
+        put_loc1 1: a
+        get_var assert
+        get_var Object
+        get_field2 isExtensible
+        get_loc1 1: a
+        call_method 1
+        push_true
+        push_atom_value extensible
+        call3 3
+        drop
+        get_var Object
+        get_field2 preventExtensions
+        get_loc1 1: a
+        call_method 1
+        drop
+        push_false
+        put_loc8 4: err
+        catch 524
+        get_loc1 1: a
+        push_2 2
+        put_field y
+        drop
+        goto8 538
+  524:  put_loc8 5: e
+        catch 537
+        push_true
+        put_loc8 4: err
+        drop
+        goto8 538
+  537:  throw
+  538:  get_var assert
+        get_var Object
+        get_field2 isExtensible
+        get_loc1 1: a
+        call_method 1
+        push_false
+        push_atom_value extensible
+        call3 3
+        drop
+        get_var assert
+        get_loc1 1: a
+        get_field y
+        typeof
+        push_atom_value undefined
+        push_atom_value extensible
+        call3 3
+        drop
+        get_var assert
+        get_loc8 4: err
+        push_true
+        push_atom_value extensible
+        call3 3
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:149:1: function: test_enum
+  mode: strict
+  locals:
+    0: var a
+    1: var tab
+  stack_size: 11
+  opcodes:
+        object
+        push_1 1
+        define_field x
+        push_1 1
+        define_field "18014398509481984"
+        push_1 1
+        define_field "9007199254740992"
+        push_1 1
+        define_field "9007199254740991"
+        push_1 1
+        define_field "4294967296"
+        push_1 1
+        define_field "4294967295"
+        push_1 1
+        define_field y
+        push_1 1
+        define_field "4294967294"
+        push_2 2
+        define_field 1
+        put_loc0 0: a
+        get_var Object
+        get_field2 keys
+        get_loc0 0: a
+        call_method 1
+        put_loc1 1: tab
+        get_var assert
+        get_loc1 1: tab
+        push_const8 0: "1"
+        push_atom_value "4294967294"
+        push_atom_value x
+        push_atom_value "18014398509481984"
+        push_atom_value "9007199254740992"
+        push_atom_value "9007199254740991"
+        push_atom_value "4294967296"
+        push_atom_value "4294967295"
+        push_atom_value y
+        array_from 9
+        push_atom_value keys
+        call3 3
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:164:1: function: test_array
+  mode: strict
+  locals:
+    0: var a
+    1: var err
+    2: catch e [level:3 next:-1]
+  stack_size: 6
+  opcodes:
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_length
+        push_3 3
+        push_atom_value array
+        call3 3
+        drop
+        get_var assert
+        get_loc0 0: a
+        push_2 2
+        get_array_el
+        push_3 3
+        push_atom_value array1
+        call3 3
+        drop
+        get_var Array
+        dup
+        push_i8 10
+        call_constructor 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_length
+        push_i8 10
+        push_atom_value array2
+        call3 3
+        drop
+        get_var Array
+        dup
+        push_1 1
+        push_2 2
+        call_constructor 2
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_length
+        push_2 2
+        strict_eq
+        dup
+        if_false8 105
+        drop
+        get_loc0 0: a
+        push_0 0
+        get_array_el
+        push_1 1
+        strict_eq
+        dup
+        if_false8 105
+        drop
+        get_loc0 0: a
+        push_1 1
+        get_array_el
+        push_2 2
+        strict_eq
+  105:  push_true
+        push_atom_value array3
+        call3 3
+        drop
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        set_loc0 0: a
+        push_2 2
+        put_field length
+        get_var assert
+        get_loc0 0: a
+        get_length
+        push_2 2
+        strict_eq
+        dup
+        if_false8 153
+        drop
+        get_loc0 0: a
+        push_0 0
+        get_array_el
+        push_1 1
+        strict_eq
+        dup
+        if_false8 153
+        drop
+        get_loc0 0: a
+        push_1 1
+        get_array_el
+        push_2 2
+        strict_eq
+  153:  push_true
+        push_atom_value array4
+        call3 3
+        drop
+        array_from 0
+        set_loc0 0: a
+        push_1 1
+        push_i8 10
+        put_array_el
+        get_loc0 0: a
+        push_4 4
+        push_3 3
+        put_array_el
+        get_var assert
+        get_loc0 0: a
+        get_length
+        push_5 5
+        call2 2
+        drop
+        push_1 1
+        push_2 2
+        array_from 2
+        set_loc0 0: a
+        push_5 5
+        put_field length
+        get_loc0 0: a
+        push_4 4
+        push_1 1
+        put_array_el
+        get_loc0 0: a
+        push_4 4
+        put_field length
+        get_var assert
+        get_loc0 0: a
+        push_4 4
+        get_array_el
+        push_1 1
+        strict_neq
+        push_true
+        push_atom_value array5
+        call3 3
+        drop
+        push_1 1
+        push_2 2
+        array_from 2
+        set_loc0 0: a
+        get_field2 push
+        push_3 3
+        push_4 4
+        call_method 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field2 join
+        call_method 0
+        push_atom_value "1,2,3,4"
+        push_atom_value join
+        call3 3
+        drop
+        push_1 1
+        push_2 2
+        push_3 3
+        push_4 4
+        push_5 5
+        array_from 5
+        put_loc0 0: a
+        get_var Object
+        get_field2 defineProperty
+        get_loc0 0: a
+        push_const8 0: "3"
+        object
+        push_false
+        define_field configurable
+        call_method 3
+        drop
+        push_false
+        put_loc1 1: err
+        catch 317
+        get_loc0 0: a
+        push_2 2
+        put_field length
+        drop
+        goto8 329
+  317:  put_loc2 2: e
+        catch 328
+        push_true
+        put_loc1 1: err
+        drop
+        goto8 329
+  328:  throw
+  329:  get_var assert
+        get_loc1 1: err
+        dup
+        if_false8 354
+        drop
+        get_loc0 0: a
+        get_field2 toString
+        call_method 0
+        push_atom_value "1,2,3,4"
+        strict_eq
+  354:  call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:199:1: function: test_string
+  mode: strict
+  locals:
+    0: var a
+    1: var this
+    2: var new.target
+    3: var arguments
+  stack_size: 7
+  opcodes:
+        special_object 3
+        put_loc2 2: "new.target"
+        push_this
+        put_loc1 1: this
+        special_object 0
+        put_loc3 3: arguments
+        get_var String
+        push_atom_value abc
+        call1 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_length
+        push_3 3
+        push_atom_value string
+        call3 3
+        drop
+        get_var assert
+        get_loc0 0: a
+        push_1 1
+        get_array_el
+        push_atom_value b
+        push_atom_value string
+        call3 3
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field2 charCodeAt
+        push_1 1
+        call_method 1
+        push_i8 98
+        push_atom_value string
+        call3 3
+        drop
+        get_var assert
+        get_var String
+        get_field2 fromCharCode
+        push_i8 65
+        call_method 1
+        push_atom_value A
+        push_atom_value string
+        call3 3
+        drop
+        get_var assert
+        get_var String
+        get_field fromCharCode
+        get_field2 apply
+        null
+        push_i8 65
+        push_i8 66
+        push_i8 67
+        array_from 3
+        call_method 2
+        push_atom_value ABC
+        push_atom_value string
+        call3 3
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field2 charAt
+        push_1 1
+        call_method 1
+        push_atom_value b
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field2 charAt
+        push_minus1 -1
+        call_method 1
+        push_empty_string
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field2 charAt
+        push_3 3
+        call_method 1
+        push_empty_string
+        call2 2
+        drop
+        push_atom_value abcd
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_field2 substring
+        push_1 1
+        push_3 3
+        call_method 2
+        push_atom_value bc
+        push_atom_value substring
+        call3 3
+        drop
+        get_var String
+        get_field2 fromCharCode
+        push_i16 8364
+        call_method 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_field2 charCodeAt
+        push_0 0
+        call_method 1
+        push_i16 8364
+        push_atom_value unicode
+        call3 3
+        drop
+        get_var assert
+        get_loc0 0: a
+        push_atom_value "\u20ac"
+        push_atom_value unicode
+        call3 3
+        drop
+        get_var assert
+        get_loc0 0: a
+        push_atom_value "\u20ac"
+        push_atom_value unicode
+        call3 3
+        drop
+        get_var assert
+        get_loc0 0: a
+        push_atom_value "\u20ac"
+        push_atom_value unicode
+        call3 3
+        drop
+        get_var assert
+        push_atom_value a
+        push_atom_value a
+        push_atom_value unicode
+        call3 3
+        drop
+        push_atom_value "\udbff\udfff"
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_length
+        push_2 2
+        push_atom_value unicode
+        call3 3
+        drop
+        get_var assert
+        get_loc0 0: a
+        push_atom_value "\udbff\udfff"
+        push_atom_value unicode
+        call3 3
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field2 codePointAt
+        push_0 0
+        call_method 1
+        push_i32 1114111
+        call2 2
+        drop
+        get_var assert
+        get_var String
+        get_field2 fromCodePoint
+        push_i32 1114111
+        call_method 1
+        get_loc0 0: a
+        call2 2
+        drop
+        get_var assert
+        push_atom_value a
+        get_field2 concat
+        push_atom_value b
+        push_atom_value c
+        call_method 2
+        push_atom_value abc
+        call2 2
+        drop
+        get_var assert
+        push_atom_value abcabc
+        get_field2 indexOf
+        push_atom_value cab
+        call_method 1
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value abcabc
+        get_field2 indexOf
+        push_atom_value cab2
+        call_method 1
+        push_minus1 -1
+        call2 2
+        drop
+        get_var assert
+        push_atom_value abc
+        get_field2 indexOf
+        push_atom_value c
+        call_method 1
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_atom_value a
+        call_method 1
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_atom_value a
+        get_var NaN
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_atom_value a
+        get_var Infinity
+        neg
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_atom_value a
+        push_minus1 -1
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_atom_value a
+        push_0 0
+        neg
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_atom_value a
+        push_0 0
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_atom_value a
+        push_1 1
+        call_method 2
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_atom_value a
+        push_2 2
+        call_method 2
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_atom_value a
+        push_3 3
+        call_method 2
+        push_minus1 -1
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_atom_value a
+        push_4 4
+        call_method 2
+        push_minus1 -1
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_atom_value a
+        get_var Infinity
+        call_method 2
+        push_minus1 -1
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_empty_string
+        call_method 1
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_empty_string
+        get_var NaN
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_empty_string
+        get_var Infinity
+        neg
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_empty_string
+        push_minus1 -1
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_empty_string
+        push_0 0
+        neg
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_empty_string
+        push_0 0
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_empty_string
+        push_1 1
+        call_method 2
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_empty_string
+        push_2 2
+        call_method 2
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_empty_string
+        push_3 3
+        call_method 2
+        push_3 3
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_empty_string
+        push_4 4
+        call_method 2
+        push_3 3
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 indexOf
+        push_empty_string
+        get_var Infinity
+        call_method 2
+        push_3 3
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_atom_value a
+        call_method 1
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_atom_value a
+        get_var NaN
+        call_method 2
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_atom_value a
+        get_var Infinity
+        neg
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_atom_value a
+        push_minus1 -1
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_atom_value a
+        push_0 0
+        neg
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_atom_value a
+        push_0 0
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_atom_value a
+        push_1 1
+        call_method 2
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_atom_value a
+        push_2 2
+        call_method 2
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_atom_value a
+        push_3 3
+        call_method 2
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_atom_value a
+        push_4 4
+        call_method 2
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_atom_value a
+        get_var Infinity
+        call_method 2
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_empty_string
+        call_method 1
+        push_3 3
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_empty_string
+        get_var NaN
+        call_method 2
+        push_3 3
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_empty_string
+        get_var Infinity
+        neg
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_empty_string
+        push_minus1 -1
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_empty_string
+        push_0 0
+        neg
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_empty_string
+        push_0 0
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_empty_string
+        push_1 1
+        call_method 2
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_empty_string
+        push_2 2
+        call_method 2
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_empty_string
+        push_3 3
+        call_method 2
+        push_3 3
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_empty_string
+        push_4 4
+        call_method 2
+        push_3 3
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaa
+        get_field2 lastIndexOf
+        push_empty_string
+        get_var Infinity
+        call_method 2
+        push_3 3
+        call2 2
+        drop
+        get_var assert
+        push_atom_value "a,b,c"
+        get_field2 split
+        push_atom_value ","
+        call_method 1
+        push_atom_value a
+        push_atom_value b
+        push_atom_value c
+        array_from 3
+        call2 2
+        drop
+        get_var assert
+        push_atom_value ",b,c"
+        get_field2 split
+        push_atom_value ","
+        call_method 1
+        push_empty_string
+        push_atom_value b
+        push_atom_value c
+        array_from 3
+        call2 2
+        drop
+        get_var assert
+        push_atom_value "a,b,"
+        get_field2 split
+        push_atom_value ","
+        call_method 1
+        push_atom_value a
+        push_atom_value b
+        push_empty_string
+        array_from 3
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        call_method 0
+        push_atom_value aaaa
+        array_from 1
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        get_var undefined
+        push_0 0
+        call_method 2
+        array_from 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        push_empty_string
+        call_method 1
+        push_atom_value a
+        push_atom_value a
+        push_atom_value a
+        push_atom_value a
+        array_from 4
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        push_empty_string
+        push_0 0
+        call_method 2
+        array_from 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        push_empty_string
+        push_1 1
+        call_method 2
+        push_atom_value a
+        array_from 1
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        push_empty_string
+        push_2 2
+        call_method 2
+        push_atom_value a
+        push_atom_value a
+        array_from 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        push_atom_value a
+        call_method 1
+        push_empty_string
+        push_empty_string
+        push_empty_string
+        push_empty_string
+        push_empty_string
+        array_from 5
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        push_atom_value a
+        push_2 2
+        call_method 2
+        push_empty_string
+        push_empty_string
+        array_from 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        push_atom_value aa
+        call_method 1
+        push_empty_string
+        push_empty_string
+        push_empty_string
+        array_from 3
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        push_atom_value aa
+        push_0 0
+        call_method 2
+        array_from 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        push_atom_value aa
+        push_1 1
+        call_method 2
+        push_empty_string
+        array_from 1
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        push_atom_value aa
+        push_2 2
+        call_method 2
+        push_empty_string
+        push_empty_string
+        array_from 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        push_atom_value aaa
+        call_method 1
+        push_empty_string
+        push_atom_value a
+        array_from 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        push_atom_value aaaa
+        call_method 1
+        push_empty_string
+        push_empty_string
+        array_from 2
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        push_atom_value aaaaa
+        call_method 1
+        push_atom_value aaaa
+        array_from 1
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        push_atom_value aaaaa
+        push_0 0
+        call_method 2
+        array_from 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aaaa
+        get_field2 split
+        push_atom_value aaaaa
+        push_1 1
+        call_method 2
+        push_atom_value aaaa
+        array_from 1
+        call2 2
+        drop
+        get_var assert
+        get_var eval
+        push_atom_value "\"\u0000\""
+        eval 1,1
+        push_atom_value "\u0000"
+        call2 2
+        drop
+        get_var assert
+        push_atom_value abc
+        get_field2 padStart
+        get_var Infinity
+        push_empty_string
+        call_method 2
+        push_atom_value abc
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:294:1: function: test_math
+  mode: strict
+  locals:
+    0: var a
+  stack_size: 8
+  opcodes:
+        push_const8 0: 1.4
+        put_loc0 0: a
+        get_var assert
+        get_var Math
+        get_field2 floor
+        get_loc0 0: a
+        call_method 1
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        get_var Math
+        get_field2 ceil
+        get_loc0 0: a
+        call_method 1
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        get_var Math
+        get_field2 imul
+        push_i32 305419896
+        push_i8 123
+        call_method 2
+        push_i32 -1088058456
+        call2 2
+        drop
+        get_var assert
+        get_var Math
+        get_field2 imul
+        push_i32 46341
+        push_i32 46340
+        call_method 2
+        push_i32 2147441940
+        call2 2
+        drop
+        get_var assert
+        get_var Math
+        get_field2 imul
+        push_i32 46341
+        push_i32 46341
+        call_method 2
+        push_i32 -2147479015
+        call2 2
+        drop
+        get_var assert
+        get_var Math
+        get_field2 imul
+        push_i8 -2
+        push_i8 31
+        pow
+        push_i8 -2
+        push_i8 31
+        pow
+        call_method 2
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        get_var Math
+        get_field2 imul
+        push_2 2
+        push_i8 31
+        pow
+        push_1 1
+        sub
+        push_2 2
+        push_i8 31
+        pow
+        push_1 1
+        sub
+        call_method 2
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        get_var Math
+        get_field2 fround
+        push_const8 1: 0.1
+        call_method 1
+        push_const8 2: 0.10000000149011612
+        call2 2
+        drop
+        get_var assert
+        get_var Math
+        get_field2 hypot
+        call_method 0
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        get_var Math
+        get_field2 hypot
+        push_i8 -2
+        call_method 1
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        get_var Math
+        get_field2 hypot
+        push_3 3
+        push_4 4
+        call_method 2
+        push_5 5
+        call2 2
+        drop
+        get_var assert
+        get_var Math
+        get_field2 abs
+        get_var Math
+        get_field2 hypot
+        push_3 3
+        push_4 4
+        push_5 5
+        call_method 3
+        push_const8 3: 7.0710678118654755
+        sub
+        call_method 1
+        push_const8 4: 1e-15
+        lte
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:310:1: function: test_number
+  mode: strict
+  stack_size: 5
+  opcodes:
+        get_var assert
+        get_var parseInt
+        push_const8 0: "123"
+        call1 1
+        push_i8 123
+        call2 2
+        drop
+        get_var assert
+        get_var parseInt
+        push_atom_value "  123r"
+        call1 1
+        push_i8 123
+        call2 2
+        drop
+        get_var assert
+        get_var parseInt
+        push_atom_value "0x123"
+        call1 1
+        push_i16 291
+        call2 2
+        drop
+        get_var assert
+        get_var parseInt
+        push_atom_value "0o123"
+        call1 1
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        push_atom_value "  123   "
+        plus
+        push_i8 123
+        call2 2
+        drop
+        get_var assert
+        push_atom_value "0b111"
+        plus
+        push_7 7
+        call2 2
+        drop
+        get_var assert
+        push_atom_value "0o123"
+        plus
+        push_i8 83
+        call2 2
+        drop
+        get_var assert
+        get_var parseFloat
+        push_const8 1: "2147483647"
+        call1 1
+        push_i32 2147483647
+        call2 2
+        drop
+        get_var assert
+        get_var parseFloat
+        push_atom_value "2147483648"
+        call1 1
+        push_const8 2: 2147483648
+        call2 2
+        drop
+        get_var assert
+        get_var parseFloat
+        push_atom_value "-2147483647"
+        call1 1
+        push_i32 -2147483647
+        call2 2
+        drop
+        get_var assert
+        get_var parseFloat
+        push_atom_value "-2147483648"
+        call1 1
+        push_const8 3: 2147483648
+        neg
+        call2 2
+        drop
+        get_var assert
+        get_var parseFloat
+        push_atom_value "0x1234"
+        call1 1
+        push_0 0
+        call2 2
+        drop
+        get_var assert
+        get_var parseFloat
+        push_atom_value Infinity
+        call1 1
+        get_var Infinity
+        call2 2
+        drop
+        get_var assert
+        get_var parseFloat
+        push_atom_value "-Infinity"
+        call1 1
+        get_var Infinity
+        neg
+        call2 2
+        drop
+        get_var assert
+        get_var parseFloat
+        push_atom_value "123.2"
+        call1 1
+        push_const8 4: 123.2
+        call2 2
+        drop
+        get_var assert
+        get_var parseFloat
+        push_atom_value "123.2e3"
+        call1 1
+        push_i32 123200
+        call2 2
+        drop
+        get_var assert
+        get_var Number
+        get_field2 isNaN
+        get_var Number
+        push_atom_value "+"
+        call1 1
+        call_method 1
+        call1 1
+        drop
+        get_var assert
+        get_var Number
+        get_field2 isNaN
+        get_var Number
+        push_atom_value "-"
+        call1 1
+        call_method 1
+        call1 1
+        drop
+        get_var assert
+        get_var Number
+        get_field2 isNaN
+        get_var Number
+        push_atom_value "\u0000a"
+        call1 1
+        call_method 1
+        call1 1
+        drop
+        get_var assert
+        push_1 1
+        push_2 2
+        push_i8 -53
+        pow
+        sub
+        get_field2 toString
+        push_i8 12
+        call_method 1
+        push_atom_value "0.bbbbbbbbbbbbbba"
+        call2 2
+        drop
+        get_var assert
+        push_const8 5: 1000000000000000100
+        get_field2 toString
+        call_method 0
+        push_atom_value "1000000000000000100"
+        call2 2
+        drop
+        get_var assert
+        push_const8 6: 1000000000000000100
+        get_field2 toFixed
+        push_0 0
+        call_method 1
+        push_atom_value "1000000000000000128"
+        call2 2
+        drop
+        get_var assert
+        push_i8 25
+        get_field2 toExponential
+        push_0 0
+        call_method 1
+        push_atom_value "3e+1"
+        call2 2
+        drop
+        get_var assert
+        push_i8 -25
+        get_field2 toExponential
+        push_0 0
+        call_method 1
+        push_atom_value "-3e+1"
+        call2 2
+        drop
+        get_var assert
+        push_const8 7: 2.5
+        get_field2 toPrecision
+        push_1 1
+        call_method 1
+        push_const8 8: "3"
+        call2 2
+        drop
+        get_var assert
+        push_const8 9: 2.5
+        neg
+        get_field2 toPrecision
+        push_1 1
+        call_method 1
+        push_atom_value "-3"
+        call2 2
+        drop
+        get_var assert
+        push_i8 25
+        get_field2 toPrecision
+        push_1 1
+        call_method 1
+        push_atom_value "3e+1"
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        push_const8 10: 1.125
+        get_field2 toFixed
+        push_2 2
+        call_method 1
+        push_atom_value "1.13"
+        call2 2
+        drop
+        get_var assert
+        push_const8 11: 1.125
+        neg
+        get_field2 toFixed
+        push_2 2
+        call_method 1
+        push_atom_value "-1.13"
+        call2 2
+        drop
+        get_var assert
+        push_const8 12: 0.5
+        get_field2 toFixed
+        push_0 0
+        call_method 1
+        push_const8 13: "1"
+        call2 2
+        drop
+        get_var assert
+        push_const8 14: 0.5
+        neg
+        get_field2 toFixed
+        push_0 0
+        call_method 1
+        push_atom_value "-1"
+        call2 2
+        drop
+        get_var assert
+        push_const8 15: 1e-10
+        neg
+        get_field2 toFixed
+        push_0 0
+        call_method 1
+        push_atom_value "-0"
+        call2 2
+        drop
+        get_var assert
+        push_const8 16: 1.3
+        get_field2 toString
+        push_7 7
+        call_method 1
+        push_atom_value "1.2046204620462046205"
+        call2 2
+        drop
+        get_var assert
+        push_const8 17: 1.3
+        get_field2 toString
+        push_i8 35
+        call_method 1
+        push_atom_value "1.ahhhhhhhhhm"
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:351:5: function: g
+  mode: strict
+  args: a b
+  closure vars:
+    0: g_call_count local:loc0 var
+  stack_size: 3
+  opcodes:
+        get_var assert
+        get_arg0 0: a
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        get_arg1 1: b
+        push_2 2
+        call2 2
+        drop
+        get_var_ref0 0: g_call_count
+        inc
+        put_var_ref0 0: g_call_count
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:346:1: function: test_eval2
+  mode: strict
+  locals:
+    0: var g_call_count
+    1: var f1
+    2: var f2
+    3: var g
+  stack_size: 4
+  opcodes:
+        fclosure8 0: [bytecode g]
+        put_loc3 3: g
+        push_0 0
+        put_loc0 0: g_call_count
+        get_var Function
+        dup
+        push_atom_value eval
+        push_atom_value "eval(1, 2)"
+        call_constructor 2
+        put_loc1 1: f1
+        get_var Function
+        dup
+        push_atom_value eval
+        push_atom_value "eval(...[1, 2])"
+        call_constructor 2
+        put_loc2 2: f2
+        get_loc1 1: f1
+        get_loc3 3: g
+        call1 1
+        drop
+        get_loc2 2: f2
+        get_loc3 3: g
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: g_call_count
+        push_2 2
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:361:5: function: f
+  mode: strict
+  args: b
+  locals:
+    0: var x
+    1: var this
+    2: var new.target
+    3: var arguments
+  closure vars:
+    0: f local:loc0 var
+    1: r local:loc1 var
+    2: a local:loc2 var
+    3: this local:loc3 var
+    4: new.target local:loc4 var
+    5: arguments local:loc5 var
+  stack_size: 2
+  opcodes:
+        special_object 3
+        put_loc2 2: "new.target"
+        push_this
+        put_loc1 1: this
+        special_object 0
+        put_loc3 3: arguments
+        push_1 1
+        put_loc0 0: x
+        get_var eval
+        get_arg0 0: b
+        eval 1,1
+        return
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:360:1: function: test_eval
+  mode: strict
+  locals:
+    0: var f
+    1: var r
+    2: var a
+    3: var this
+    4: var new.target
+    5: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 3
+        put_loc8 4: "new.target"
+        push_this
+        put_loc3 3: this
+        special_object 0
+        put_loc8 5: arguments
+        fclosure8 0: [bytecode f]
+        put_loc0 0: f
+        get_var eval
+        push_atom_value "1+1;"
+        eval 1,1
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_2 2
+        push_atom_value eval
+        call3 3
+        drop
+        get_var eval
+        push_atom_value "var my_var=2; my_var;"
+        eval 1,1
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_2 2
+        push_atom_value eval
+        call3 3
+        drop
+        get_var assert
+        get_var_undef my_var
+        typeof
+        push_atom_value undefined
+        call2 2
+        drop
+        get_var assert
+        get_var eval
+        push_atom_value "if (1) 2; else 3;"
+        eval 1,1
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        get_var eval
+        push_atom_value "if (0) 2; else 3;"
+        eval 1,1
+        push_3 3
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: f
+        get_field2 call
+        push_1 1
+        push_atom_value this
+        call_method 2
+        push_1 1
+        call2 2
+        drop
+        push_2 2
+        put_loc2 2: a
+        get_var assert
+        get_var eval
+        push_atom_value a
+        eval 1,1
+        push_2 2
+        call2 2
+        drop
+        get_var eval
+        push_atom_value "a = 3"
+        eval 1,1
+        drop
+        get_var assert
+        get_loc2 2: a
+        push_3 3
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: f
+        push_atom_value "arguments.length"
+        push_1 1
+        call2 2
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: f
+        push_atom_value "arguments[1]"
+        push_1 1
+        call2 2
+        push_1 1
+        call2 2
+        drop
+        push_4 4
+        put_loc2 2: a
+        get_var assert
+        get_loc0 0: f
+        push_atom_value a
+        call1 1
+        push_4 4
+        call2 2
+        drop
+        get_loc0 0: f
+        push_atom_value "a=3"
+        call1 1
+        drop
+        get_var assert
+        get_loc2 2: a
+        push_3 3
+        call2 2
+        drop
+        get_var test_eval2
+        call0 0
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:386:1: function: test_typed_array
+  mode: strict
+  locals:
+    0: var buffer
+    1: var a
+    2: var i
+    3: var str
+  stack_size: 6
+  opcodes:
+        get_var Uint8Array
+        dup
+        push_4 4
+        call_constructor 1
+        put_loc1 1: a
+        get_var assert
+        get_loc1 1: a
+        get_length
+        push_4 4
+        call2 2
+        drop
+        push_0 0
+        put_loc2 2: i
+   23:  get_loc2 2: i
+        get_loc1 1: a
+        get_length
+        lt
+        if_false8 37
+        get_loc1 1: a
+        get_loc2 2: i
+        get_loc2 2: i
+        put_array_el
+        inc_loc 2: i
+        goto8 23
+   37:  get_var assert
+        get_loc1 1: a
+        get_field2 join
+        push_atom_value ","
+        call_method 1
+        push_atom_value "0,1,2,3"
+        call2 2
+        drop
+        get_loc1 1: a
+        push_0 0
+        push_minus1 -1
+        put_array_el
+        get_var assert
+        get_loc1 1: a
+        push_0 0
+        get_array_el
+        push_i16 255
+        call2 2
+        drop
+        get_var Int8Array
+        dup
+        push_3 3
+        call_constructor 1
+        set_loc1 1: a
+        push_0 0
+        push_i16 255
+        put_array_el
+        get_var assert
+        get_loc1 1: a
+        push_0 0
+        get_array_el
+        push_minus1 -1
+        call2 2
+        drop
+        get_var Int32Array
+        dup
+        push_3 3
+        call_constructor 1
+        set_loc1 1: a
+        push_0 0
+        get_var Math
+        get_field2 pow
+        push_2 2
+        push_i8 32
+        call_method 2
+        push_1 1
+        sub
+        put_array_el
+        get_var assert
+        get_loc1 1: a
+        push_0 0
+        get_array_el
+        push_minus1 -1
+        call2 2
+        drop
+        get_var assert
+        get_loc1 1: a
+        get_field BYTES_PER_ELEMENT
+        push_4 4
+        call2 2
+        drop
+        get_var Uint8ClampedArray
+        dup
+        push_4 4
+        call_constructor 1
+        set_loc1 1: a
+        push_0 0
+        push_i8 -100
+        put_array_el
+        get_loc1 1: a
+        push_1 1
+        push_const8 0: 1.5
+        put_array_el
+        get_loc1 1: a
+        push_2 2
+        push_const8 1: 0.5
+        put_array_el
+        get_loc1 1: a
+        push_3 3
+        push_const8 2: 1233.5
+        put_array_el
+        get_var assert
+        get_loc1 1: a
+        get_field2 toString
+        call_method 0
+        push_atom_value "0,2,0,255"
+        call2 2
+        drop
+        get_var ArrayBuffer
+        dup
+        push_i8 16
+        call_constructor 1
+        put_loc0 0: buffer
+        get_var assert
+        get_loc0 0: buffer
+        get_field byteLength
+        push_i8 16
+        call2 2
+        drop
+        get_var Uint32Array
+        dup
+        get_loc0 0: buffer
+        push_i8 12
+        push_1 1
+        call_constructor 3
+        put_loc1 1: a
+        get_var assert
+        get_loc1 1: a
+        get_length
+        push_1 1
+        call2 2
+        drop
+        get_loc1 1: a
+        push_0 0
+        push_minus1 -1
+        put_array_el
+        get_var Uint16Array
+        dup
+        get_loc0 0: buffer
+        push_2 2
+        call_constructor 2
+        set_loc1 1: a
+        push_0 0
+        push_minus1 -1
+        put_array_el
+        get_var Float16Array
+        dup
+        get_loc0 0: buffer
+        push_i8 8
+        push_1 1
+        call_constructor 3
+        set_loc1 1: a
+        push_0 0
+        push_1 1
+        put_array_el
+        get_var Float32Array
+        dup
+        get_loc0 0: buffer
+        push_i8 8
+        push_1 1
+        call_constructor 3
+        set_loc1 1: a
+        push_0 0
+        push_1 1
+        put_array_el
+        get_var Uint8Array
+        dup
+        get_loc0 0: buffer
+        call_constructor 1
+        set_loc1 1: a
+        get_field2 toString
+        call_method 0
+        set_loc3 3: str
+        push_atom_value "0,0,255,255,0,0,0,0,0,0,128,63,255,255,255,255"
+        strict_neq
+        if_false8 363
+        get_loc3 3: str
+        push_atom_value "0,0,255,255,0,0,0,0,63,128,0,0,255,255,255,255"
+        strict_neq
+        if_false8 363
+        get_var assert
+        push_false
+        call1 1
+        drop
+  363:  get_var assert
+        get_loc1 1: a
+        get_field buffer
+        get_loc0 0: buffer
+        call2 2
+        drop
+        get_var Uint8Array
+        dup
+        push_1 1
+        push_2 2
+        push_3 3
+        push_4 4
+        array_from 4
+        call_constructor 1
+        put_loc1 1: a
+        get_var assert
+        get_loc1 1: a
+        get_field2 toString
+        call_method 0
+        push_atom_value "1,2,3,4"
+        call2 2
+        drop
+        get_loc1 1: a
+        get_field2 set
+        push_i8 10
+        push_i8 11
+        array_from 2
+        push_2 2
+        call_method 2
+        drop
+        get_var assert
+        get_loc1 1: a
+        get_field2 toString
+        call_method 0
+        push_atom_value "1,2,10,11"
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:435:1: function: get_string_pos
+  mode: strict
+  args: str
+  locals:
+    0: var p
+    1: var line_num
+    2: var col_num
+    3: var s
+    4: var q
+    5: var r
+  stack_size: 5
+  opcodes:
+        get_arg0 0: str
+        get_field2 indexOf
+        push_atom_value "@"
+        call_method 1
+        put_loc0 0: p
+        get_var assert
+        get_loc0 0: p
+        push_0 0
+        gte
+        push_true
+        call2 2
+        drop
+        push_0 0
+        put_loc8 4: q
+        push_1 1
+        put_loc1 1: line_num
+   31:  get_arg0 0: str
+        get_field2 indexOf
+        push_atom_value "\n"
+        get_loc8 4: q
+        call_method 2
+        set_loc8 5: r
+        push_0 0
+        lt
+        dup
+        if_true8 59
+        drop
+        get_loc8 5: r
+        get_loc0 0: p
+        gte
+   59:  if_true8 71
+        get_loc8 5: r
+        push_1 1
+        add
+        put_loc8 4: q
+        inc_loc 1: line_num
+        goto8 31
+   71:  get_loc0 0: p
+        get_loc8 4: q
+        sub
+        push_1 1
+        add
+        put_loc2 2: col_num
+        get_arg0 0: str
+        get_field2 slice
+        push_0 0
+        get_loc0 0: p
+        call_method 2
+        get_arg0 0: str
+        get_field2 slice
+        get_loc0 0: p
+        push_1 1
+        add
+        call_method 1
+        add
+        set_loc3 3: s
+        get_loc1 1: line_num
+        get_loc2 2: col_num
+        array_from 3
+        return
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:452:1: function: check_error_pos
+  mode: strict
+  args: e expected_error line_num col_num level
+  locals:
+    0: var expected_pos
+    1: var tab
+    2: var line
+  stack_size: 4
+  opcodes:
+        get_arg 4: level
+        push_0 0
+        or
+        put_arg 4: level
+        push_atom_value ":"
+        get_arg2 2: line_num
+        add
+        push_atom_value ":"
+        add
+        get_arg3 3: col_num
+        add
+        put_loc0 0: expected_pos
+        get_arg0 0: e
+        get_field stack
+        get_field2 split
+        push_atom_value "\n"
+        call_method 1
+        set_loc1 1: tab
+        get_arg 4: level
+        get_array_el
+        set_loc2 2: line
+        get_field2 slice
+        push_minus1 -1
+        call_method 1
+        push_atom_value ")"
+        eq
+        if_false8 78
+        get_loc2 2: line
+        get_field2 slice
+        push_0 0
+        push_minus1 -1
+        call_method 2
+        put_loc2 2: line
+   78:  get_loc2 2: line
+        get_field2 indexOf
+        get_loc0 0: expected_pos
+        call_method 1
+        push_0 0
+        lt
+        if_false8 133
+        get_var throw_error
+        push_atom_value "unexpected line or column number. error="
+        get_arg0 0: e
+        get_field message
+        add
+        push_atom_value ".got |"
+        add
+        get_loc2 2: line
+        add
+        push_atom_value "|, expected |"
+        add
+        get_loc0 0: expected_pos
+        add
+        push_atom_value "|"
+        add
+        call1 1
+        drop
+  133:  return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:465:1: function: assert_json_error
+  mode: strict
+  args: str line_num col_num
+  locals:
+    0: var err
+    1: var expected_pos
+    2: var tab
+    3: catch e [level:3 next:-1]
+  stack_size: 7
+  opcodes:
+        push_false
+        put_loc0 0: err
+        get_var get_string_pos
+        get_arg0 0: str
+        call1 1
+        put_loc2 2: tab
+        catch 35
+        get_var JSON
+        get_field2 parse
+        get_loc2 2: tab
+        push_0 0
+        get_array_el
+        call_method 1
+        drop
+        drop
+        goto8 93
+   35:  put_loc3 3: e
+        catch 92
+        push_true
+        put_loc0 0: err
+        get_loc3 3: e
+        get_var SyntaxError
+        instanceof
+        lnot
+        if_false8 68
+        get_var throw_error
+        push_atom_value "unexpected exception type"
+        call1 1
+        drop
+        undefined
+        nip_catch
+        return
+   68:  get_var check_error_pos
+        get_loc3 3: e
+        get_var SyntaxError
+        get_loc2 2: tab
+        push_1 1
+        get_array_el
+        get_loc2 2: tab
+        push_2 2
+        get_array_el
+        call 4
+        drop
+        drop
+        goto8 93
+   92:  throw
+   93:  get_loc0 0: err
+        lnot
+        if_false8 109
+        get_var throw_error
+        push_atom_value "expected exception"
+        call1 1
+        drop
+  109:  return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:485:1: function: test_json
+  mode: strict
+  locals:
+    0: var a
+    1: var s
+  stack_size: 6
+  opcodes:
+        push_atom_value "{\"x\":1,\"y\":true,\"z\":null,\"a\":[1,2,3],\"s\":\"str\"}"
+        put_loc1 1: s
+        get_var JSON
+        get_field2 parse
+        get_loc1 1: s
+        call_method 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_field x
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field y
+        push_true
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field z
+        null
+        call2 2
+        drop
+        get_var assert
+        get_var JSON
+        get_field2 stringify
+        get_loc0 0: a
+        call_method 1
+        get_loc1 1: s
+        call2 2
+        drop
+        get_var assert
+        get_var JSON
+        get_field2 stringify
+        object
+        push_1 1
+        define_field x
+        object
+        define_field y
+        array_from 0
+        define_field z
+        push_2 2
+        push_3 3
+        array_from 3
+        array_from 1
+        get_var undefined
+        push_1 1
+        call_method 3
+        push_atom_value "[\n [\n  {\n   \"x\": 1,\n   \"y\": {},\n   \"z\": []\n  },\n  2,\n  3\n ]\n]"
+        call2 2
+        drop
+        get_var assert_json_error
+        push_atom_value "\n\"  \\@x\""
+        call1 1
+        drop
+        get_var assert_json_error
+        push_atom_value "\n{ \"a\": @x }\""
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:508:1: function: test_date
+  mode: strict
+  locals:
+    0: var d
+    1: var a
+  stack_size: 11
+  opcodes:
+        get_var assert
+        get_var Date
+        get_field2 parse
+        push_empty_string
+        call_method 1
+        get_var NaN
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 parse
+        push_const8 0: "2000"
+        call_method 1
+        push_const8 1: 946684800000
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 parse
+        push_atom_value "2000-01"
+        call_method 1
+        push_const8 2: 946684800000
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 parse
+        push_atom_value "2000-01-01"
+        call_method 1
+        push_const8 3: 946684800000
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 parse
+        push_atom_value "2000-01-01T00:00Z"
+        call_method 1
+        push_const8 4: 946684800000
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 parse
+        push_atom_value "2000-01-01T00:00:00Z"
+        call_method 1
+        push_const8 5: 946684800000
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 parse
+        push_atom_value "2000-01-01T00:00:00.1Z"
+        call_method 1
+        push_const8 6: 946684800100
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 parse
+        push_atom_value "2000-01-01T00:00:00.10Z"
+        call_method 1
+        push_const8 7: 946684800100
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 parse
+        push_atom_value "2000-01-01T00:00:00.100Z"
+        call_method 1
+        push_const8 8: 946684800100
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 parse
+        push_atom_value "2000-01-01T00:00:00.1000Z"
+        call_method 1
+        push_const8 9: 946684800100
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 parse
+        push_atom_value "2000-01-01T00:00:00+00:00"
+        call_method 1
+        push_const8 10: 946684800000
+        call2 2
+        drop
+        get_var Date
+        dup
+        push_atom_value "2000T00:00"
+        call_constructor 1
+        put_loc0 0: d
+        get_var assert
+        get_loc0 0: d
+        typeof
+        push_atom_value object
+        strict_eq
+        dup
+        if_false8 340
+        drop
+        get_loc0 0: d
+        get_field2 toString
+        call_method 0
+        push_atom_value "Invalid Date"
+        neq
+  340:  call1 1
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "Jan 1 2000"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        get_loc0 0: d
+        get_field2 toISOString
+        call_method 0
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "Jan 1 2000 00:00"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        get_loc0 0: d
+        get_field2 toISOString
+        call_method 0
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "Jan 1 2000 00:00:00"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        get_loc0 0: d
+        get_field2 toISOString
+        call_method 0
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "Jan 1 2000 00:00:00 GMT+0100"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        push_atom_value "1999-12-31T23:00:00.000Z"
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "Jan 1 2000 00:00:00 GMT+0200"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        push_atom_value "1999-12-31T22:00:00.000Z"
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "Sat Jan 1 2000"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        get_loc0 0: d
+        get_field2 toISOString
+        call_method 0
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "Sat Jan 1 2000 00:00"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        get_loc0 0: d
+        get_field2 toISOString
+        call_method 0
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "Sat Jan 1 2000 00:00:00"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        get_loc0 0: d
+        get_field2 toISOString
+        call_method 0
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "Sat Jan 1 2000 00:00:00 GMT+0100"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        push_atom_value "1999-12-31T23:00:00.000Z"
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "Sat Jan 1 2000 00:00:00 GMT+0200"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        push_atom_value "1999-12-31T22:00:00.000Z"
+        call2 2
+        drop
+        get_var Date
+        dup
+        push_const8 11: 1506098258091
+        call_constructor 1
+        put_loc0 0: d
+        get_var assert
+        get_loc0 0: d
+        get_field2 toISOString
+        call_method 0
+        push_atom_value "2017-09-22T16:37:38.091Z"
+        call2 2
+        drop
+        get_loc0 0: d
+        get_field2 setUTCHours
+        push_i8 18
+        push_i8 10
+        push_i8 11
+        call_method 3
+        drop
+        get_var assert
+        get_loc0 0: d
+        get_field2 toISOString
+        call_method 0
+        push_atom_value "2017-09-22T18:10:11.091Z"
+        call2 2
+        drop
+        get_var Date
+        get_field2 parse
+        get_loc0 0: d
+        get_field2 toISOString
+        call_method 0
+        call_method 1
+        put_loc1 1: a
+        get_var assert
+        get_var Date
+        dup
+        get_loc1 1: a
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        get_loc0 0: d
+        get_field2 toISOString
+        call_method 0
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "2020-01-01T01:01:01.123Z"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        push_atom_value "2020-01-01T01:01:01.123Z"
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "2020-01-01T01:01:01.1Z"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        push_atom_value "2020-01-01T01:01:01.100Z"
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "2020-01-01T01:01:01.12Z"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        push_atom_value "2020-01-01T01:01:01.120Z"
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "2020-01-01T01:01:01.1234Z"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        push_atom_value "2020-01-01T01:01:01.123Z"
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "2020-01-01T01:01:01.12345Z"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        push_atom_value "2020-01-01T01:01:01.123Z"
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "2020-01-01T01:01:01.1235Z"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        push_atom_value "2020-01-01T01:01:01.123Z"
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        dup
+        push_atom_value "2020-01-01T01:01:01.9999Z"
+        call_constructor 1
+        get_field2 toISOString
+        call_method 0
+        push_atom_value "2020-01-01T01:01:01.999Z"
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        call_method 1
+        push_const8 12: 1483228800000
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        call_method 2
+        push_const8 13: 1506816000000
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        push_i8 22
+        call_method 3
+        push_const8 14: 1508630400000
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        push_i8 22
+        push_i8 18
+        call_method 4
+        push_const8 15: 1508695200000
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        push_i8 22
+        push_i8 18
+        push_i8 10
+        call_method 5
+        push_const8 16: 1508695800000
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        push_i8 22
+        push_i8 18
+        push_i8 10
+        push_i8 11
+        call_method 6
+        push_const8 17: 1508695811000
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        push_i8 22
+        push_i8 18
+        push_i8 10
+        push_i8 11
+        push_i8 91
+        call_method 7
+        push_const8 18: 1508695811091
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        get_var NaN
+        call_method 1
+        get_var NaN
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        get_var NaN
+        call_method 2
+        get_var NaN
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        get_var NaN
+        call_method 3
+        get_var NaN
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        push_i8 22
+        get_var NaN
+        call_method 4
+        get_var NaN
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        push_i8 22
+        push_i8 18
+        get_var NaN
+        call_method 5
+        get_var NaN
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        push_i8 22
+        push_i8 18
+        push_i8 10
+        get_var NaN
+        call_method 6
+        get_var NaN
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        push_i8 22
+        push_i8 18
+        push_i8 10
+        push_i8 11
+        get_var NaN
+        call_method 7
+        get_var NaN
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        push_i8 22
+        push_i8 18
+        push_i8 10
+        push_i8 11
+        push_i8 91
+        get_var NaN
+        call_method 8
+        push_const8 19: 1508695811091
+        call2 2
+        drop
+        get_var_undef os
+        typeof
+        push_atom_value undefined
+        strict_neq
+        dup
+        if_false8 1635
+        drop
+        push_atom_value win32
+        push_atom_value cygwin
+        array_from 2
+        get_field2 includes
+        get_var os
+        get_field platform
+        call_method 1
+ 1635:  lnot
+        if_false8 1721
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 1970
+        push_0 0
+        push_1 1
+        push_const8 20: 80063993375
+        push_i8 29
+        push_1 1
+        push_const8 21: 288230376151711740
+        neg
+        call_method 7
+        push_i16 29312
+        push_atom_value "order of operations / precision in MakeTime"
+        call3 3
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 1970
+        push_0 0
+        push_const8 22: 213503982336
+        push_0 0
+        push_0 0
+        push_0 0
+        push_const8 23: 18446744073709552000
+        neg
+        call_method 7
+        push_i32 34447360
+        push_atom_value "precision in MakeDate"
+        call3 3
+        drop
+ 1721:  get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        push_i8 22
+        push_const8 24: 10000000000
+        sub
+        push_i8 18
+        push_const8 25: 240000000000
+        add
+        call_method 4
+        push_const8 26: 1508695200000
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        push_i8 22
+        push_i8 18
+        push_const8 27: 10000000000
+        sub
+        push_i8 10
+        push_const8 28: 600000000000
+        add
+        call_method 5
+        push_const8 29: 1508695800000
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        push_i8 22
+        push_i8 18
+        push_i8 10
+        push_const8 30: 10000000000
+        sub
+        push_i8 11
+        push_const8 31: 600000000000
+        add
+        call_method 6
+        push_const8 32: 1508695811000
+        call2 2
+        drop
+        get_var assert
+        get_var Date
+        get_field2 UTC
+        push_i16 2017
+        push_i8 9
+        push_i8 22
+        push_i8 18
+        push_i8 10
+        push_i8 11
+        push_const8 33: 1000000000000
+        sub
+        push_i8 91
+        push_const8 34: 1000000000000000
+        add
+        call_method 7
+        push_const8 35: 1508695811091
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:585:1: function: test_regexp
+  mode: strict
+  locals:
+    0: var a
+    1: var str
+    2: var this
+    3: var new.target
+    4: var arguments
+  stack_size: 6
+  opcodes:
+        special_object 3
+        put_loc3 3: "new.target"
+        push_this
+        put_loc2 2: this
+        special_object 0
+        put_loc8 4: arguments
+        push_atom_value abbbbbc
+        put_loc1 1: str
+        push_const8 0: "(b+)c"
+        push_const8 1: "\u0000\u0000\u0002\u0000,\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u000f\u0001&\u0004\u0000\u0000\u0000\u0001\u0000\u0000\u0000\u00ff\u00ff\u00ff\u007f\u0001\u0000\u0000\u0000\u0001b\u0000\u000e\u0010\u0001\u0001c\u0000\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        get_loc1 1: str
+        call_method 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_0 0
+        get_array_el
+        push_atom_value bbbbbc
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        push_1 1
+        get_array_el
+        push_atom_value bbbbb
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field index
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field input
+        get_loc1 1: str
+        call2 2
+        drop
+        push_const8 2: "(b+)c"
+        push_const8 3: "\u0000\u0000\u0002\u0000,\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u000f\u0001&\u0004\u0000\u0000\u0000\u0001\u0000\u0000\u0000\u00ff\u00ff\u00ff\u007f\u0001\u0000\u0000\u0000\u0001b\u0000\u000e\u0010\u0001\u0001c\u0000\u0010\u0000\u000e"
+        regexp
+        get_field2 test
+        get_loc1 1: str
+        call_method 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_true
+        call2 2
+        drop
+        get_var assert
+        push_const8 4: "\\x61"
+        push_const8 5: "\u0000\u0000\u0001\u0000\u0013\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0001a\u0000\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        push_atom_value a
+        call_method 1
+        push_0 0
+        get_array_el
+        push_atom_value a
+        call2 2
+        drop
+        get_var assert
+        push_const8 6: "\\u0061"
+        push_const8 7: "\u0000\u0000\u0001\u0000\u0013\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0001a\u0000\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        push_atom_value a
+        call_method 1
+        push_0 0
+        get_array_el
+        push_atom_value a
+        call2 2
+        drop
+        get_var assert
+        push_const8 8: "\\ca"
+        push_const8 9: "\u0000\u0000\u0001\u0000\u0013\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0001\u0001\u0000\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        push_atom_value "\u0001"
+        call_method 1
+        push_0 0
+        get_array_el
+        push_atom_value "\u0001"
+        call2 2
+        drop
+        get_var assert
+        push_const8 10: "\\\\a"
+        push_const8 11: "\u0000\u0000\u0001\u0000\u0016\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0001\\\u0000\u0001a\u0000\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        push_atom_value "\\a"
+        call_method 1
+        push_0 0
+        get_array_el
+        push_atom_value "\\a"
+        call2 2
+        drop
+        get_var assert
+        push_const8 12: "\\c0"
+        push_const8 13: "\u0000\u0000\u0001\u0000\u0019\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0001\\\u0000\u0001c\u0000\u00010\u0000\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        push_atom_value "\\c0"
+        call_method 1
+        push_0 0
+        get_array_el
+        push_atom_value "\\c0"
+        call2 2
+        drop
+        push_const8 14: "(\\.(?=com|org)|\\/)"
+        push_const8 15: "\u0000\u0000\u0002\u0000F\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u000f\u0001\u000d*\u0000\u0000\u0000\u0001.\u0000!\u001d\u0000\u0000\u0000\u000d\u000e\u0000\u0000\u0000\u0001c\u0000\u0001o\u0000\u0001m\u0000\u000b\u0009\u0000\u0000\u0000\u0001o\u0000\u0001r\u0000\u0001g\u0000\u000e\u000b\u0003\u0000\u0000\u0000\u0001/\u0000\u0010\u0001\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        push_atom_value "ah.com"
+        call_method 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_field index
+        push_2 2
+        strict_eq
+        dup
+        if_false8 317
+        drop
+        get_loc0 0: a
+        push_0 0
+        get_array_el
+        push_atom_value "."
+        strict_eq
+  317:  call1 1
+        drop
+        push_const8 16: "(\\.(?!com|org)|\\/)"
+        push_const8 17: "\u0000\u0000\u0002\u0000F\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u000f\u0001\u000d*\u0000\u0000\u0000\u0001.\u0000\"\u001d\u0000\u0000\u0000\u000d\u000e\u0000\u0000\u0000\u0001c\u0000\u0001o\u0000\u0001m\u0000\u000b\u0009\u0000\u0000\u0000\u0001o\u0000\u0001r\u0000\u0001g\u0000\u000e\u000b\u0003\u0000\u0000\u0000\u0001/\u0000\u0010\u0001\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        push_atom_value "ah.com"
+        call_method 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        null
+        call2 2
+        drop
+        push_const8 18: "(?=(a+))"
+        push_const8 19: "\u0000\u0000\u0002\u0000/\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000!\u001a\u0000\u0000\u0000\u000f\u0001&\u0004\u0000\u0000\u0000\u0001\u0000\u0000\u0000\u00ff\u00ff\u00ff\u007f\u0001\u0000\u0000\u0000\u0001a\u0000\u000e\u0010\u0001\u000e\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        push_atom_value baaabac
+        call_method 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_field index
+        push_1 1
+        strict_eq
+        dup
+        if_false8 401
+        drop
+        get_loc0 0: a
+        push_0 0
+        get_array_el
+        push_empty_string
+        strict_eq
+        dup
+        if_false8 401
+        drop
+        get_loc0 0: a
+        push_1 1
+        get_array_el
+        push_atom_value aaa
+        strict_eq
+  401:  call1 1
+        drop
+        push_const8 20: "(z)((a+)?(b+)?(c))*"
+        push_const8 21: "\u0000\u0000\u0006\u0002w\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u000f\u0001\u0001z\u0000\u0010\u0001\u0011\u0002\u0005\u000dX\u0000\u0000\u0000#\u000f\u0002\u0011\u0003\u0003\u000d\u001b\u0000\u0000\u0000#\u000f\u0003&\u0004\u0000\u0000\u0000\u0001\u0000\u0000\u0000\u00ff\u00ff\u00ff\u007f\u0001\u0000\u0000\u0000\u0001a\u0000\u000e\u0010\u0003$\u0011\u0004\u0004\u000d\u001b\u0000\u0000\u0000#\u000f\u0004&\u0004\u0000\u0000\u0000\u0001\u0000\u0000\u0000\u00ff\u00ff\u00ff\u007f\u0001\u0000\u0000\u0000\u0001b\u0000\u000e\u0010\u0004$\u000f\u0005\u0001c\u0000\u0010\u0005\u0010\u0002$\u000b\u00a3\u00ff\u00ff\u00ff\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        push_atom_value zaacbbbcac
+        call_method 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_atom_value zaacbbbcac
+        push_atom_value z
+        push_atom_value ac
+        push_atom_value a
+        array_from 4
+        push_atom_value c
+        define_field 5
+        call2 2
+        drop
+        get_var eval
+        push_atom_value "/\u0000a/"
+        eval 1,1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_field2 toString
+        call_method 0
+        push_atom_value "/\u0000a/"
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field2 exec
+        push_atom_value "\u0000a"
+        call_method 1
+        push_0 0
+        get_array_el
+        push_atom_value "\u0000a"
+        call2 2
+        drop
+        get_var assert
+        push_const8 22: "{1a}"
+        push_const8 23: "\u0000\u0000\u0001\u0000\u001c\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0001{\u0000\u00011\u0000\u0001a\u0000\u0001}\u0000\u0010\u0000\u000e"
+        regexp
+        get_field2 toString
+        call_method 0
+        push_atom_value "/{1a}/"
+        call2 2
+        drop
+        push_const8 24: "a{1+"
+        push_const8 25: "\u0000\u0000\u0001\u0000+\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0001a\u0000\u0001{\u0000&\u0004\u0000\u0000\u0000\u0001\u0000\u0000\u0000\u00ff\u00ff\u00ff\u007f\u0001\u0000\u0000\u0000\u00011\u0000\u000e\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        push_atom_value "a{11"
+        call_method 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_atom_value "a{11"
+        array_from 1
+        call2 2
+        drop
+        push_const8 26: "(?:(?=(abc)))a"
+        push_const8 27: "\u0000\u0000\u0002\u0000&\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000!\u000e\u0000\u0000\u0000\u000f\u0001\u0001a\u0000\u0001b\u0000\u0001c\u0000\u0010\u0001\u000e\u0001a\u0000\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        push_atom_value abc
+        call_method 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_atom_value a
+        push_atom_value abc
+        array_from 2
+        call2 2
+        drop
+        push_const8 28: "(?:(?=(abc)))?a"
+        push_const8 29: "\u0000\u0000\u0002\u00010\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0011\u0001\u0001\u000d\u0015\u0000\u0000\u0000#!\u000e\u0000\u0000\u0000\u000f\u0001\u0001a\u0000\u0001b\u0000\u0001c\u0000\u0010\u0001\u000e$\u0001a\u0000\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        push_atom_value abc
+        call_method 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_atom_value a
+        get_var undefined
+        array_from 2
+        call2 2
+        drop
+        push_const8 30: "(?:(?=(abc))){0,2}a"
+        push_const8 31: "\u0000\u0000\u0002\u0002;\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0011\u0001\u0001\u0013\u0002\u0000\u0000\u0000\u000d\u001a\u0000\u0000\u0000#!\u000e\u0000\u0000\u0000\u000f\u0001\u0001a\u0000\u0001b\u0000\u0001c\u0000\u0010\u0001\u000e$\u0012\u00e1\u00ff\u00ff\u00ff\u0014\u0001a\u0000\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        push_atom_value abc
+        call_method 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_atom_value a
+        get_var undefined
+        array_from 2
+        call2 2
+        drop
+        push_const8 32: "(?:|[\\w])+([0-9])"
+        push_const8 33: "\u0000\u0000\u0002\u0001a\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u000d\u0005\u0000\u0000\u0000\u000b\u0013\u0000\u0000\u0000\u001d\u0004\u00000\u00009\u0000A\u0000Z\u0000_\u0000_\u0000a\u0000z\u0000\u000d$\u0000\u0000\u0000#\u000d\u0005\u0000\u0000\u0000\u000b\u0013\u0000\u0000\u0000\u001d\u0004\u00000\u00009\u0000A\u0000Z\u0000_\u0000_\u0000a\u0000z\u0000$\u000b\u00d7\u00ff\u00ff\u00ff\u000f\u0001\u001d\u0001\u00000\u00009\u0000\u0010\u0001\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        push_atom_value "123a23"
+        call_method 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_atom_value "123a23"
+        push_const8 34: "3"
+        array_from 2
+        call2 2
+        drop
+        push_const8 35: "()*?a"
+        push_const8 36: "\u0000\u0000\u0002\u0001&\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0011\u0001\u0001\u000c\u000b\u0000\u0000\u0000#\u000f\u0001\u0010\u0001$\u000b\u00f0\u00ff\u00ff\u00ff\u0001a\u0000\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        push_atom_value ","
+        call_method 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        null
+        call2 2
+        drop
+        get_var assert
+        push_const8 37: "[\\q{a\\b}]"
+        push_const8 38: "\u0000\u0000\u0001\u0000'\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u001d\u0005\u0000\u0008\u0000\u0008\u0000a\u0000a\u0000q\u0000q\u0000{\u0000{\u0000}\u0000}\u0000\u0010\u0000\u000e"
+        regexp
+        get_field2 test
+        push_atom_value "a\u0008"
+        call_method 1
+        push_true
+        call2 2
+        drop
+        get_var assert
+        push_const8 39: "[\\b]"
+        push_const8 40: "\u0000\u0000\u0001\u0000\u0017\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u001d\u0001\u0000\u0008\u0000\u0008\u0000\u0010\u0000\u000e"
+        regexp
+        get_field2 test
+        push_atom_value "\u0008"
+        call_method 1
+        push_true
+        call2 2
+        drop
+        get_var assert
+        push_atom_value "aAbBcC#4"
+        get_field2 replace
+        push_const8 41: "\\p{Lower}"
+        push_const8 42: "\u0011\u0000\u0001\u0000+\u0015\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u001f\u00a3\u0002a\u0000\u0000\u0000z\u0000\u0000\u0000\u00aa\u0000\u0000\u0000\u00aa\u0000\u0000\u0000\u00b5\u0000\u0000\u0000\u00b5\u0000\u0000\u0000\u00ba\u0000\u0000\u0000\u00ba\u0000\u0000\u0000\u00df\u0000\u0000\u0000\u00f6\u0000\u0000\u0000\u00f8\u0000\u0000\u0000\u00ff\u0000\u0000\u0000\u0001\u0001\u0000\u0000\u0001\u0001\u0000\u0000\u0003\u0001\u0000\u0000\u0003\u0001\u0000\u0000\u0005\u0001\u0000\u0000\u0005\u0001\u0000\u0000\u0007\u0001\u0000\u0000\u0007\u0001\u0000\u0000\u0009\u0001\u0000\u0000\u0009\u0001\u0000\u0000\u000b\u0001\u0000\u0000\u000b\u0001\u0000\u0000\u000d\u0001\u0000\u0000\u000d\u0001\u0000\u0000\u000f\u0001\u0000\u0000\u000f\u0001\u0000\u0000\u0011\u0001\u0000\u0000\u0011\u0001\u0000\u0000\u0013\u0001\u0000\u0000\u0013\u0001\u0000\u0000\u0015\u0001\u0000\u0000\u0015\u0001\u0000\u0000\u0017\u0001\u0000\u0000\u0017\u0001\u0000\u0000\u0019\u0001\u0000\u0000\u0019\u0001\u0000\u0000\u001b\u0001\u0000\u0000\u001b\u0001\u0000\u0000\u001d\u0001\u0000\u0000\u001d\u0001\u0000\u0000\u001f\u0001\u0000\u0000\u001f\u0001\u0000\u0000!\u0001\u0000\u0000!\u0001\u0000\u0000#\u0001\u0000\u0000#\u0001\u0000\u0000%\u0001\u0000\u0000%\u0001\u0000\u0000'\u0001\u0000\u0000'\u0001\u0000\u0000)\u0001\u0000\u0000)\u0001\u0000\u0000+\u0001\u0000\u0000+\u0001\u0000\u0000-\u0001\u0000\u0000-\u0001\u0000\u0000/\u0001\u0000\u0000/\u0001\u0000\u00001\u0001\u0000\u00001\u0001\u0000\u00003\u0001\u0000\u00003\u0001\u0000\u00005\u0001\u0000\u00005\u0001\u0000\u00007\u0001\u0000\u00008\u0001\u0000\u0000:\u0001\u0000\u0000:\u0001\u0000\u0000<\u0001\u0000\u0000<\u0001\u0000\u0000>\u0001\u0000\u0000>\u0001\u0000\u0000@\u0001\u0000\u0000@\u0001\u0000\u0000B\u0001\u0000\u0000B\u0001\u0000\u0000D\u0001\u0000\u0000D\u0001\u0000\u0000F\u0001\u0000\u0000F\u0001\u0000\u0000H\u0001\u0000\u0000I\u0001\u0000\u0000K\u0001\u0000\u0000K\u0001\u0000\u0000M\u0001\u0000\u0000M\u0001\u0000\u0000O\u0001\u0000\u0000O\u0001\u0000\u0000Q\u0001\u0000\u0000Q\u0001\u0000\u0000S\u0001\u0000\u0000S\u0001\u0000\u0000U\u0001\u0000\u0000U\u0001\u0000\u0000W\u0001\u0000\u0000W\u0001\u0000\u0000Y\u0001\u0000\u0000Y\u0001\u0000\u0000[\u0001\u0000\u0000[\u0001\u0000\u0000]\u0001\u0000\u0000]\u0001\u0000\u0000_\u0001\u0000\u0000_\u0001\u0000\u0000a\u0001\u0000\u0000a\u0001\u0000\u0000c\u0001\u0000\u0000c\u0001\u0000\u0000e\u0001\u0000\u0000e\u0001\u0000\u0000g\u0001\u0000\u0000g\u0001\u0000\u0000i\u0001\u0000\u0000i\u0001\u0000\u0000k\u0001\u0000\u0000k\u0001\u0000\u0000m\u0001\u0000\u0000m\u0001\u0000\u0000o\u0001\u0000\u0000o\u0001\u0000\u0000q\u0001\u0000\u0000q\u0001\u0000\u0000s\u0001\u0000\u0000s\u0001\u0000\u0000u\u0001\u0000\u0000u\u0001\u0000\u0000w\u0001\u0000\u0000w\u0001\u0000\u0000z\u0001\u0000\u0000z\u0001\u0000\u0000|\u0001\u0000\u0000|\u0001\u0000\u0000~\u0001\u0000\u0000\u0080\u0001\u0000\u0000\u0083\u0001\u0000\u0000\u0083\u0001\u0000\u0000\u0085\u0001\u0000\u0000\u0085\u0001\u0000\u0000\u0088\u0001\u0000\u0000\u0088\u0001\u0000\u0000\u008c\u0001\u0000\u0000\u008d\u0001\u0000\u0000\u0092\u0001\u0000\u0000\u0092\u0001\u0000\u0000\u0095\u0001\u0000\u0000\u0095\u0001\u0000\u0000\u0099\u0001\u0000\u0000\u009b\u0001\u0000\u0000\u009e\u0001\u0000\u0000\u009e\u0001\u0000\u0000\u00a1\u0001\u0000\u0000\u00a1\u0001\u0000\u0000\u00a3\u0001\u0000\u0000\u00a3\u0001\u0000\u0000\u00a5\u0001\u0000\u0000\u00a5\u0001\u0000\u0000\u00a8\u0001\u0000\u0000\u00a8\u0001\u0000\u0000\u00aa\u0001\u0000\u0000\u00ab\u0001\u0000\u0000\u00ad\u0001\u0000\u0000\u00ad\u0001\u0000\u0000\u00b0\u0001\u0000\u0000\u00b0\u0001\u0000\u0000\u00b4\u0001\u0000\u0000\u00b4\u0001\u0000\u0000\u00b6\u0001\u0000\u0000\u00b6\u0001\u0000\u0000\u00b9\u0001\u0000\u0000\u00ba\u0001\u0000\u0000\u00bd\u0001\u0000\u0000\u00bf\u0001\u0000\u0000\u00c6\u0001\u0000\u0000\u00c6\u0001\u0000\u0000\u00c9\u0001\u0000\u0000\u00c9\u0001\u0000\u0000\u00cc\u0001\u0000\u0000\u00cc\u0001\u0000\u0000\u00ce\u0001\u0000\u0000\u00ce\u0001\u0000\u0000\u00d0\u0001\u0000\u0000\u00d0\u0001\u0000\u0000\u00d2\u0001\u0000\u0000\u00d2\u0001\u0000\u0000\u00d4\u0001\u0000\u0000\u00d4\u0001\u0000\u0000\u00d6\u0001\u0000\u0000\u00d6\u0001\u0000\u0000\u00d8\u0001\u0000\u0000\u00d8\u0001\u0000\u0000\u00da\u0001\u0000\u0000\u00da\u0001\u0000\u0000\u00dc\u0001\u0000\u0000\u00dd\u0001\u0000\u0000\u00df\u0001\u0000\u0000\u00df\u0001\u0000\u0000\u00e1\u0001\u0000\u0000\u00e1\u0001\u0000\u0000\u00e3\u0001\u0000\u0000\u00e3\u0001\u0000\u0000\u00e5\u0001\u0000\u0000\u00e5\u0001\u0000\u0000\u00e7\u0001\u0000\u0000\u00e7\u0001\u0000\u0000\u00e9\u0001\u0000\u0000\u00e9\u0001\u0000\u0000\u00eb\u0001\u0000\u0000\u00eb\u0001\u0000\u0000\u00ed\u0001\u0000\u0000\u00ed\u0001\u0000\u0000\u00ef\u0001\u0000\u0000\u00f0\u0001\u0000\u0000\u00f3\u0001\u0000\u0000\u00f3\u0001\u0000\u0000\u00f5\u0001\u0000\u0000\u00f5\u0001\u0000\u0000\u00f9\u0001\u0000\u0000\u00f9\u0001\u0000\u0000\u00fb\u0001\u0000\u0000\u00fb\u0001\u0000\u0000\u00fd\u0001\u0000\u0000\u00fd\u0001\u0000\u0000\u00ff\u0001\u0000\u0000\u00ff\u0001\u0000\u0000\u0001\u0002\u0000\u0000\u0001\u0002\u0000\u0000\u0003\u0002\u0000\u0000\u0003\u0002\u0000\u0000\u0005\u0002\u0000\u0000\u0005\u0002\u0000\u0000\u0007\u0002\u0000\u0000\u0007\u0002\u0000\u0000\u0009\u0002\u0000\u0000\u0009\u0002\u0000\u0000\u000b\u0002\u0000\u0000\u000b\u0002\u0000\u0000\u000d\u0002\u0000\u0000\u000d\u0002\u0000\u0000\u000f\u0002\u0000\u0000\u000f\u0002\u0000\u0000\u0011\u0002\u0000\u0000\u0011\u0002\u0000\u0000"... 4427 more characters
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value "XAXBXC#4"
+        call2 2
+        drop
+        get_var assert
+        push_atom_value "aAbBcC#4"
+        get_field2 replace
+        push_const8 43: "\\p{Lower}"
+        push_const8 44: "\u0013\u0000\u0001\u0000\u001b\u0015\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000 \u00a1\u0002a\u0000\u0000\u0000z\u0000\u0000\u0000\u00aa\u0000\u0000\u0000\u00aa\u0000\u0000\u0000\u00ba\u0000\u0000\u0000\u00ba\u0000\u0000\u0000\u00df\u0000\u0000\u0000\u00f6\u0000\u0000\u0000\u00f8\u0000\u0000\u0000\u00ff\u0000\u0000\u0000\u0001\u0001\u0000\u0000\u0001\u0001\u0000\u0000\u0003\u0001\u0000\u0000\u0003\u0001\u0000\u0000\u0005\u0001\u0000\u0000\u0005\u0001\u0000\u0000\u0007\u0001\u0000\u0000\u0007\u0001\u0000\u0000\u0009\u0001\u0000\u0000\u0009\u0001\u0000\u0000\u000b\u0001\u0000\u0000\u000b\u0001\u0000\u0000\u000d\u0001\u0000\u0000\u000d\u0001\u0000\u0000\u000f\u0001\u0000\u0000\u000f\u0001\u0000\u0000\u0011\u0001\u0000\u0000\u0011\u0001\u0000\u0000\u0013\u0001\u0000\u0000\u0013\u0001\u0000\u0000\u0015\u0001\u0000\u0000\u0015\u0001\u0000\u0000\u0017\u0001\u0000\u0000\u0017\u0001\u0000\u0000\u0019\u0001\u0000\u0000\u0019\u0001\u0000\u0000\u001b\u0001\u0000\u0000\u001b\u0001\u0000\u0000\u001d\u0001\u0000\u0000\u001d\u0001\u0000\u0000\u001f\u0001\u0000\u0000\u001f\u0001\u0000\u0000!\u0001\u0000\u0000!\u0001\u0000\u0000#\u0001\u0000\u0000#\u0001\u0000\u0000%\u0001\u0000\u0000%\u0001\u0000\u0000'\u0001\u0000\u0000'\u0001\u0000\u0000)\u0001\u0000\u0000)\u0001\u0000\u0000+\u0001\u0000\u0000+\u0001\u0000\u0000-\u0001\u0000\u0000-\u0001\u0000\u0000/\u0001\u0000\u0000/\u0001\u0000\u00001\u0001\u0000\u00001\u0001\u0000\u00003\u0001\u0000\u00003\u0001\u0000\u00005\u0001\u0000\u00005\u0001\u0000\u00007\u0001\u0000\u00008\u0001\u0000\u0000:\u0001\u0000\u0000:\u0001\u0000\u0000<\u0001\u0000\u0000<\u0001\u0000\u0000>\u0001\u0000\u0000>\u0001\u0000\u0000@\u0001\u0000\u0000@\u0001\u0000\u0000B\u0001\u0000\u0000B\u0001\u0000\u0000D\u0001\u0000\u0000D\u0001\u0000\u0000F\u0001\u0000\u0000F\u0001\u0000\u0000H\u0001\u0000\u0000I\u0001\u0000\u0000K\u0001\u0000\u0000K\u0001\u0000\u0000M\u0001\u0000\u0000M\u0001\u0000\u0000O\u0001\u0000\u0000O\u0001\u0000\u0000Q\u0001\u0000\u0000Q\u0001\u0000\u0000S\u0001\u0000\u0000S\u0001\u0000\u0000U\u0001\u0000\u0000U\u0001\u0000\u0000W\u0001\u0000\u0000W\u0001\u0000\u0000Y\u0001\u0000\u0000Y\u0001\u0000\u0000[\u0001\u0000\u0000[\u0001\u0000\u0000]\u0001\u0000\u0000]\u0001\u0000\u0000_\u0001\u0000\u0000_\u0001\u0000\u0000a\u0001\u0000\u0000a\u0001\u0000\u0000c\u0001\u0000\u0000c\u0001\u0000\u0000e\u0001\u0000\u0000e\u0001\u0000\u0000g\u0001\u0000\u0000g\u0001\u0000\u0000i\u0001\u0000\u0000i\u0001\u0000\u0000k\u0001\u0000\u0000k\u0001\u0000\u0000m\u0001\u0000\u0000m\u0001\u0000\u0000o\u0001\u0000\u0000o\u0001\u0000\u0000q\u0001\u0000\u0000q\u0001\u0000\u0000s\u0001\u0000\u0000s\u0001\u0000\u0000u\u0001\u0000\u0000u\u0001\u0000\u0000w\u0001\u0000\u0000w\u0001\u0000\u0000z\u0001\u0000\u0000z\u0001\u0000\u0000|\u0001\u0000\u0000|\u0001\u0000\u0000~\u0001\u0000\u0000~\u0001\u0000\u0000\u0080\u0001\u0000\u0000\u0080\u0001\u0000\u0000\u0083\u0001\u0000\u0000\u0083\u0001\u0000\u0000\u0085\u0001\u0000\u0000\u0085\u0001\u0000\u0000\u0088\u0001\u0000\u0000\u0088\u0001\u0000\u0000\u008c\u0001\u0000\u0000\u008d\u0001\u0000\u0000\u0092\u0001\u0000\u0000\u0092\u0001\u0000\u0000\u0095\u0001\u0000\u0000\u0095\u0001\u0000\u0000\u0099\u0001\u0000\u0000\u009b\u0001\u0000\u0000\u009e\u0001\u0000\u0000\u009e\u0001\u0000\u0000\u00a1\u0001\u0000\u0000\u00a1\u0001\u0000\u0000\u00a3\u0001\u0000\u0000\u00a3\u0001\u0000\u0000\u00a5\u0001\u0000\u0000\u00a5\u0001\u0000\u0000\u00a8\u0001\u0000\u0000\u00a8\u0001\u0000\u0000\u00aa\u0001\u0000\u0000\u00ab\u0001\u0000\u0000\u00ad\u0001\u0000\u0000\u00ad\u0001\u0000\u0000\u00b0\u0001\u0000\u0000\u00b0\u0001\u0000\u0000\u00b4\u0001\u0000\u0000\u00b4\u0001\u0000\u0000\u00b6\u0001\u0000\u0000\u00b6\u0001\u0000\u0000\u00b9\u0001\u0000\u0000\u00ba\u0001\u0000\u0000\u00bd\u0001\u0000\u0000\u00bf\u0001\u0000\u0000\u00c6\u0001\u0000\u0000\u00c6\u0001\u0000\u0000\u00c9\u0001\u0000\u0000\u00c9\u0001\u0000\u0000\u00cc\u0001\u0000\u0000\u00cc\u0001\u0000\u0000\u00ce\u0001\u0000\u0000\u00ce\u0001\u0000\u0000\u00d0\u0001\u0000\u0000\u00d0\u0001\u0000\u0000\u00d2\u0001\u0000\u0000\u00d2\u0001\u0000\u0000\u00d4\u0001\u0000\u0000\u00d4\u0001\u0000\u0000\u00d6\u0001\u0000\u0000\u00d6\u0001\u0000\u0000\u00d8\u0001\u0000\u0000\u00d8\u0001\u0000\u0000\u00da\u0001\u0000\u0000\u00da\u0001\u0000\u0000\u00dc\u0001\u0000\u0000\u00dd\u0001\u0000\u0000\u00df\u0001\u0000\u0000\u00df\u0001\u0000\u0000\u00e1\u0001\u0000\u0000\u00e1\u0001\u0000\u0000\u00e3\u0001\u0000\u0000\u00e3\u0001\u0000\u0000\u00e5\u0001\u0000\u0000\u00e5\u0001\u0000\u0000\u00e7\u0001\u0000\u0000\u00e7\u0001\u0000\u0000\u00e9\u0001\u0000\u0000\u00e9\u0001\u0000\u0000\u00eb\u0001\u0000\u0000\u00eb\u0001\u0000\u0000\u00ed\u0001\u0000\u0000\u00ed\u0001\u0000\u0000\u00ef\u0001\u0000\u0000\u00f0\u0001\u0000\u0000\u00f3\u0001\u0000\u0000\u00f3\u0001\u0000\u0000\u00f5\u0001\u0000\u0000\u00f5\u0001\u0000\u0000\u00f9\u0001\u0000\u0000\u00f9\u0001\u0000\u0000\u00fb\u0001\u0000\u0000\u00fb\u0001\u0000\u0000\u00fd\u0001\u0000\u0000\u00fd\u0001\u0000\u0000\u00ff\u0001\u0000\u0000\u00ff\u0001\u0000\u0000\u0001\u0002\u0000\u0000\u0001\u0002\u0000\u0000\u0003\u0002\u0000\u0000\u0003\u0002\u0000\u0000\u0005\u0002\u0000\u0000\u0005\u0002\u0000\u0000\u0007\u0002\u0000\u0000\u0007\u0002\u0000\u0000\u0009\u0002\u0000\u0000\u0009\u0002\u0000\u0000\u000b\u0002\u0000\u0000\u000b\u0002\u0000\u0000\u000d\u0002\u0000\u0000\u000d\u0002\u0000\u0000\u000f\u0002\u0000\u0000\u000f\u0002\u0000\u0000\u0011\u0002\u0000\u0000\u0011\u0002\u0000\u0000"... 4411 more characters
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value "XXXXXX#4"
+        call2 2
+        drop
+        get_var assert
+        push_atom_value "aAbBcC#4"
+        get_field2 replace
+        push_const8 45: "\\p{Upper}"
+        push_const8 46: "\u0013\u0000\u0001\u0000\u00e3\u0014\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000 \u009a\u0002a\u0000\u0000\u0000z\u0000\u0000\u0000\u00df\u0000\u0000\u0000\u00f6\u0000\u0000\u0000\u00f8\u0000\u0000\u0000\u00ff\u0000\u0000\u0000\u0001\u0001\u0000\u0000\u0001\u0001\u0000\u0000\u0003\u0001\u0000\u0000\u0003\u0001\u0000\u0000\u0005\u0001\u0000\u0000\u0005\u0001\u0000\u0000\u0007\u0001\u0000\u0000\u0007\u0001\u0000\u0000\u0009\u0001\u0000\u0000\u0009\u0001\u0000\u0000\u000b\u0001\u0000\u0000\u000b\u0001\u0000\u0000\u000d\u0001\u0000\u0000\u000d\u0001\u0000\u0000\u000f\u0001\u0000\u0000\u000f\u0001\u0000\u0000\u0011\u0001\u0000\u0000\u0011\u0001\u0000\u0000\u0013\u0001\u0000\u0000\u0013\u0001\u0000\u0000\u0015\u0001\u0000\u0000\u0015\u0001\u0000\u0000\u0017\u0001\u0000\u0000\u0017\u0001\u0000\u0000\u0019\u0001\u0000\u0000\u0019\u0001\u0000\u0000\u001b\u0001\u0000\u0000\u001b\u0001\u0000\u0000\u001d\u0001\u0000\u0000\u001d\u0001\u0000\u0000\u001f\u0001\u0000\u0000\u001f\u0001\u0000\u0000!\u0001\u0000\u0000!\u0001\u0000\u0000#\u0001\u0000\u0000#\u0001\u0000\u0000%\u0001\u0000\u0000%\u0001\u0000\u0000'\u0001\u0000\u0000'\u0001\u0000\u0000)\u0001\u0000\u0000)\u0001\u0000\u0000+\u0001\u0000\u0000+\u0001\u0000\u0000-\u0001\u0000\u0000-\u0001\u0000\u0000/\u0001\u0000\u00000\u0001\u0000\u00003\u0001\u0000\u00003\u0001\u0000\u00005\u0001\u0000\u00005\u0001\u0000\u00007\u0001\u0000\u00007\u0001\u0000\u0000:\u0001\u0000\u0000:\u0001\u0000\u0000<\u0001\u0000\u0000<\u0001\u0000\u0000>\u0001\u0000\u0000>\u0001\u0000\u0000@\u0001\u0000\u0000@\u0001\u0000\u0000B\u0001\u0000\u0000B\u0001\u0000\u0000D\u0001\u0000\u0000D\u0001\u0000\u0000F\u0001\u0000\u0000F\u0001\u0000\u0000H\u0001\u0000\u0000H\u0001\u0000\u0000K\u0001\u0000\u0000K\u0001\u0000\u0000M\u0001\u0000\u0000M\u0001\u0000\u0000O\u0001\u0000\u0000O\u0001\u0000\u0000Q\u0001\u0000\u0000Q\u0001\u0000\u0000S\u0001\u0000\u0000S\u0001\u0000\u0000U\u0001\u0000\u0000U\u0001\u0000\u0000W\u0001\u0000\u0000W\u0001\u0000\u0000Y\u0001\u0000\u0000Y\u0001\u0000\u0000[\u0001\u0000\u0000[\u0001\u0000\u0000]\u0001\u0000\u0000]\u0001\u0000\u0000_\u0001\u0000\u0000_\u0001\u0000\u0000a\u0001\u0000\u0000a\u0001\u0000\u0000c\u0001\u0000\u0000c\u0001\u0000\u0000e\u0001\u0000\u0000e\u0001\u0000\u0000g\u0001\u0000\u0000g\u0001\u0000\u0000i\u0001\u0000\u0000i\u0001\u0000\u0000k\u0001\u0000\u0000k\u0001\u0000\u0000m\u0001\u0000\u0000m\u0001\u0000\u0000o\u0001\u0000\u0000o\u0001\u0000\u0000q\u0001\u0000\u0000q\u0001\u0000\u0000s\u0001\u0000\u0000s\u0001\u0000\u0000u\u0001\u0000\u0000u\u0001\u0000\u0000w\u0001\u0000\u0000w\u0001\u0000\u0000z\u0001\u0000\u0000z\u0001\u0000\u0000|\u0001\u0000\u0000|\u0001\u0000\u0000~\u0001\u0000\u0000~\u0001\u0000\u0000\u0080\u0001\u0000\u0000\u0080\u0001\u0000\u0000\u0083\u0001\u0000\u0000\u0083\u0001\u0000\u0000\u0085\u0001\u0000\u0000\u0085\u0001\u0000\u0000\u0088\u0001\u0000\u0000\u0088\u0001\u0000\u0000\u008c\u0001\u0000\u0000\u008c\u0001\u0000\u0000\u0092\u0001\u0000\u0000\u0092\u0001\u0000\u0000\u0095\u0001\u0000\u0000\u0095\u0001\u0000\u0000\u0099\u0001\u0000\u0000\u009b\u0001\u0000\u0000\u009e\u0001\u0000\u0000\u009e\u0001\u0000\u0000\u00a1\u0001\u0000\u0000\u00a1\u0001\u0000\u0000\u00a3\u0001\u0000\u0000\u00a3\u0001\u0000\u0000\u00a5\u0001\u0000\u0000\u00a5\u0001\u0000\u0000\u00a8\u0001\u0000\u0000\u00a8\u0001\u0000\u0000\u00ad\u0001\u0000\u0000\u00ad\u0001\u0000\u0000\u00b0\u0001\u0000\u0000\u00b0\u0001\u0000\u0000\u00b4\u0001\u0000\u0000\u00b4\u0001\u0000\u0000\u00b6\u0001\u0000\u0000\u00b6\u0001\u0000\u0000\u00b9\u0001\u0000\u0000\u00b9\u0001\u0000\u0000\u00bd\u0001\u0000\u0000\u00bd\u0001\u0000\u0000\u00bf\u0001\u0000\u0000\u00bf\u0001\u0000\u0000\u00c6\u0001\u0000\u0000\u00c6\u0001\u0000\u0000\u00c9\u0001\u0000\u0000\u00c9\u0001\u0000\u0000\u00cc\u0001\u0000\u0000\u00cc\u0001\u0000\u0000\u00ce\u0001\u0000\u0000\u00ce\u0001\u0000\u0000\u00d0\u0001\u0000\u0000\u00d0\u0001\u0000\u0000\u00d2\u0001\u0000\u0000\u00d2\u0001\u0000\u0000\u00d4\u0001\u0000\u0000\u00d4\u0001\u0000\u0000\u00d6\u0001\u0000\u0000\u00d6\u0001\u0000\u0000\u00d8\u0001\u0000\u0000\u00d8\u0001\u0000\u0000\u00da\u0001\u0000\u0000\u00da\u0001\u0000\u0000\u00dc\u0001\u0000\u0000\u00dd\u0001\u0000\u0000\u00df\u0001\u0000\u0000\u00df\u0001\u0000\u0000\u00e1\u0001\u0000\u0000\u00e1\u0001\u0000\u0000\u00e3\u0001\u0000\u0000\u00e3\u0001\u0000\u0000\u00e5\u0001\u0000\u0000\u00e5\u0001\u0000\u0000\u00e7\u0001\u0000\u0000\u00e7\u0001\u0000\u0000\u00e9\u0001\u0000\u0000\u00e9\u0001\u0000\u0000\u00eb\u0001\u0000\u0000\u00eb\u0001\u0000\u0000\u00ed\u0001\u0000\u0000\u00ed\u0001\u0000\u0000\u00ef\u0001\u0000\u0000\u00ef\u0001\u0000\u0000\u00f3\u0001\u0000\u0000\u00f3\u0001\u0000\u0000\u00f5\u0001\u0000\u0000\u00f5\u0001\u0000\u0000\u00f9\u0001\u0000\u0000\u00f9\u0001\u0000\u0000\u00fb\u0001\u0000\u0000\u00fb\u0001\u0000\u0000\u00fd\u0001\u0000\u0000\u00fd\u0001\u0000\u0000\u00ff\u0001\u0000\u0000\u00ff\u0001\u0000\u0000\u0001\u0002\u0000\u0000\u0001\u0002\u0000\u0000\u0003\u0002\u0000\u0000\u0003\u0002\u0000\u0000\u0005\u0002\u0000\u0000\u0005\u0002\u0000\u0000\u0007\u0002\u0000\u0000\u0007\u0002\u0000\u0000\u0009\u0002\u0000\u0000\u0009\u0002\u0000\u0000\u000b\u0002\u0000\u0000\u000b\u0002\u0000\u0000\u000d\u0002\u0000\u0000\u000d\u0002\u0000\u0000\u000f\u0002\u0000\u0000\u000f\u0002\u0000\u0000\u0011\u0002\u0000\u0000\u0011\u0002\u0000\u0000\u0013\u0002\u0000\u0000\u0013\u0002\u0000\u0000\u0015\u0002\u0000\u0000\u0015\u0002\u0000\u0000\u0017\u0002\u0000\u0000\u0017\u0002\u0000\u0000"... 4355 more characters
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value "XXXXXX#4"
+        call2 2
+        drop
+        get_var assert
+        push_atom_value "aAbBcC#4"
+        get_field2 replace
+        push_const8 47: "\\P{Lower}"
+        push_const8 48: "\u0013\u0000\u0001\u0000s\u0016\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000 \u00cc\u0002\u0000\u0000\u0000\u0000@\u0000\u0000\u0000[\u0000\u0000\u0000\u00a9\u0000\u0000\u0000\u00ab\u0000\u0000\u0000\u00b4\u0000\u0000\u0000\u00b6\u0000\u0000\u0000\u00b9\u0000\u0000\u0000\u00bb\u0000\u0000\u0000\u00bf\u0000\u0000\u0000\u00d7\u0000\u0000\u0000\u00d7\u0000\u0000\u0000\u00df\u0000\u0000\u0000\u00ff\u0000\u0000\u0000\u0001\u0001\u0000\u0000\u0001\u0001\u0000\u0000\u0003\u0001\u0000\u0000\u0003\u0001\u0000\u0000\u0005\u0001\u0000\u0000\u0005\u0001\u0000\u0000\u0007\u0001\u0000\u0000\u0007\u0001\u0000\u0000\u0009\u0001\u0000\u0000\u0009\u0001\u0000\u0000\u000b\u0001\u0000\u0000\u000b\u0001\u0000\u0000\u000d\u0001\u0000\u0000\u000d\u0001\u0000\u0000\u000f\u0001\u0000\u0000\u000f\u0001\u0000\u0000\u0011\u0001\u0000\u0000\u0011\u0001\u0000\u0000\u0013\u0001\u0000\u0000\u0013\u0001\u0000\u0000\u0015\u0001\u0000\u0000\u0015\u0001\u0000\u0000\u0017\u0001\u0000\u0000\u0017\u0001\u0000\u0000\u0019\u0001\u0000\u0000\u0019\u0001\u0000\u0000\u001b\u0001\u0000\u0000\u001b\u0001\u0000\u0000\u001d\u0001\u0000\u0000\u001d\u0001\u0000\u0000\u001f\u0001\u0000\u0000\u001f\u0001\u0000\u0000!\u0001\u0000\u0000!\u0001\u0000\u0000#\u0001\u0000\u0000#\u0001\u0000\u0000%\u0001\u0000\u0000%\u0001\u0000\u0000'\u0001\u0000\u0000'\u0001\u0000\u0000)\u0001\u0000\u0000)\u0001\u0000\u0000+\u0001\u0000\u0000+\u0001\u0000\u0000-\u0001\u0000\u0000-\u0001\u0000\u0000/\u0001\u0000\u00000\u0001\u0000\u00003\u0001\u0000\u00003\u0001\u0000\u00005\u0001\u0000\u00005\u0001\u0000\u00007\u0001\u0000\u00007\u0001\u0000\u0000:\u0001\u0000\u0000:\u0001\u0000\u0000<\u0001\u0000\u0000<\u0001\u0000\u0000>\u0001\u0000\u0000>\u0001\u0000\u0000@\u0001\u0000\u0000@\u0001\u0000\u0000B\u0001\u0000\u0000B\u0001\u0000\u0000D\u0001\u0000\u0000D\u0001\u0000\u0000F\u0001\u0000\u0000F\u0001\u0000\u0000H\u0001\u0000\u0000H\u0001\u0000\u0000K\u0001\u0000\u0000K\u0001\u0000\u0000M\u0001\u0000\u0000M\u0001\u0000\u0000O\u0001\u0000\u0000O\u0001\u0000\u0000Q\u0001\u0000\u0000Q\u0001\u0000\u0000S\u0001\u0000\u0000S\u0001\u0000\u0000U\u0001\u0000\u0000U\u0001\u0000\u0000W\u0001\u0000\u0000W\u0001\u0000\u0000Y\u0001\u0000\u0000Y\u0001\u0000\u0000[\u0001\u0000\u0000[\u0001\u0000\u0000]\u0001\u0000\u0000]\u0001\u0000\u0000_\u0001\u0000\u0000_\u0001\u0000\u0000a\u0001\u0000\u0000a\u0001\u0000\u0000c\u0001\u0000\u0000c\u0001\u0000\u0000e\u0001\u0000\u0000e\u0001\u0000\u0000g\u0001\u0000\u0000g\u0001\u0000\u0000i\u0001\u0000\u0000i\u0001\u0000\u0000k\u0001\u0000\u0000k\u0001\u0000\u0000m\u0001\u0000\u0000m\u0001\u0000\u0000o\u0001\u0000\u0000o\u0001\u0000\u0000q\u0001\u0000\u0000q\u0001\u0000\u0000s\u0001\u0000\u0000s\u0001\u0000\u0000u\u0001\u0000\u0000u\u0001\u0000\u0000w\u0001\u0000\u0000w\u0001\u0000\u0000z\u0001\u0000\u0000z\u0001\u0000\u0000|\u0001\u0000\u0000|\u0001\u0000\u0000~\u0001\u0000\u0000~\u0001\u0000\u0000\u0080\u0001\u0000\u0000\u0080\u0001\u0000\u0000\u0083\u0001\u0000\u0000\u0083\u0001\u0000\u0000\u0085\u0001\u0000\u0000\u0085\u0001\u0000\u0000\u0088\u0001\u0000\u0000\u0088\u0001\u0000\u0000\u008c\u0001\u0000\u0000\u008c\u0001\u0000\u0000\u0092\u0001\u0000\u0000\u0092\u0001\u0000\u0000\u0095\u0001\u0000\u0000\u0095\u0001\u0000\u0000\u0099\u0001\u0000\u0000\u009b\u0001\u0000\u0000\u009e\u0001\u0000\u0000\u009e\u0001\u0000\u0000\u00a1\u0001\u0000\u0000\u00a1\u0001\u0000\u0000\u00a3\u0001\u0000\u0000\u00a3\u0001\u0000\u0000\u00a5\u0001\u0000\u0000\u00a5\u0001\u0000\u0000\u00a8\u0001\u0000\u0000\u00a8\u0001\u0000\u0000\u00ad\u0001\u0000\u0000\u00ad\u0001\u0000\u0000\u00b0\u0001\u0000\u0000\u00b0\u0001\u0000\u0000\u00b4\u0001\u0000\u0000\u00b4\u0001\u0000\u0000\u00b6\u0001\u0000\u0000\u00b6\u0001\u0000\u0000\u00b9\u0001\u0000\u0000\u00b9\u0001\u0000\u0000\u00bb\u0001\u0000\u0000\u00bb\u0001\u0000\u0000\u00bd\u0001\u0000\u0000\u00bd\u0001\u0000\u0000\u00bf\u0001\u0000\u0000\u00c3\u0001\u0000\u0000\u00c6\u0001\u0000\u0000\u00c6\u0001\u0000\u0000\u00c9\u0001\u0000\u0000\u00c9\u0001\u0000\u0000\u00cc\u0001\u0000\u0000\u00cc\u0001\u0000\u0000\u00ce\u0001\u0000\u0000\u00ce\u0001\u0000\u0000\u00d0\u0001\u0000\u0000\u00d0\u0001\u0000\u0000\u00d2\u0001\u0000\u0000\u00d2\u0001\u0000\u0000\u00d4\u0001\u0000\u0000\u00d4\u0001\u0000\u0000\u00d6\u0001\u0000\u0000\u00d6\u0001\u0000\u0000\u00d8\u0001\u0000\u0000\u00d8\u0001\u0000\u0000\u00da\u0001\u0000\u0000\u00da\u0001\u0000\u0000\u00dc\u0001\u0000\u0000\u00dd\u0001\u0000\u0000\u00df\u0001\u0000\u0000\u00df\u0001\u0000\u0000\u00e1\u0001\u0000\u0000\u00e1\u0001\u0000\u0000\u00e3\u0001\u0000\u0000\u00e3\u0001\u0000\u0000\u00e5\u0001\u0000\u0000\u00e5\u0001\u0000\u0000\u00e7\u0001\u0000\u0000\u00e7\u0001\u0000\u0000\u00e9\u0001\u0000\u0000\u00e9\u0001\u0000\u0000\u00eb\u0001\u0000\u0000\u00eb\u0001\u0000\u0000\u00ed\u0001\u0000\u0000\u00ed\u0001\u0000\u0000\u00ef\u0001\u0000\u0000\u00ef\u0001\u0000\u0000\u00f3\u0001\u0000\u0000\u00f3\u0001\u0000\u0000\u00f5\u0001\u0000\u0000\u00f5\u0001\u0000\u0000\u00f9\u0001\u0000\u0000\u00f9\u0001\u0000\u0000\u00fb\u0001\u0000\u0000\u00fb\u0001\u0000\u0000\u00fd\u0001\u0000\u0000\u00fd\u0001\u0000\u0000\u00ff\u0001\u0000\u0000\u00ff\u0001\u0000\u0000\u0001\u0002\u0000\u0000\u0001\u0002\u0000\u0000\u0003\u0002\u0000\u0000\u0003\u0002\u0000\u0000\u0005\u0002\u0000\u0000\u0005\u0002\u0000\u0000\u0007\u0002\u0000\u0000\u0007\u0002\u0000\u0000\u0009\u0002\u0000\u0000\u0009\u0002\u0000\u0000\u000b\u0002\u0000\u0000\u000b\u0002\u0000\u0000\u000d\u0002\u0000\u0000\u000d\u0002\u0000\u0000"... 4755 more characters
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value XXXXXXXX
+        call2 2
+        drop
+        get_var assert
+        push_atom_value "aAbBcC#4"
+        get_field2 replace
+        push_const8 49: "\\P{Upper}"
+        push_const8 50: "\u0013\u0000\u0001\u0000\u0003\u0015\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000 \u009e\u0002\u0000\u0000\u0000\u0000@\u0000\u0000\u0000[\u0000\u0000\u0000\u00b4\u0000\u0000\u0000\u00b6\u0000\u0000\u0000\u00bf\u0000\u0000\u0000\u00d7\u0000\u0000\u0000\u00d7\u0000\u0000\u0000\u00df\u0000\u0000\u0000\u00ff\u0000\u0000\u0000\u0001\u0001\u0000\u0000\u0001\u0001\u0000\u0000\u0003\u0001\u0000\u0000\u0003\u0001\u0000\u0000\u0005\u0001\u0000\u0000\u0005\u0001\u0000\u0000\u0007\u0001\u0000\u0000\u0007\u0001\u0000\u0000\u0009\u0001\u0000\u0000\u0009\u0001\u0000\u0000\u000b\u0001\u0000\u0000\u000b\u0001\u0000\u0000\u000d\u0001\u0000\u0000\u000d\u0001\u0000\u0000\u000f\u0001\u0000\u0000\u000f\u0001\u0000\u0000\u0011\u0001\u0000\u0000\u0011\u0001\u0000\u0000\u0013\u0001\u0000\u0000\u0013\u0001\u0000\u0000\u0015\u0001\u0000\u0000\u0015\u0001\u0000\u0000\u0017\u0001\u0000\u0000\u0017\u0001\u0000\u0000\u0019\u0001\u0000\u0000\u0019\u0001\u0000\u0000\u001b\u0001\u0000\u0000\u001b\u0001\u0000\u0000\u001d\u0001\u0000\u0000\u001d\u0001\u0000\u0000\u001f\u0001\u0000\u0000\u001f\u0001\u0000\u0000!\u0001\u0000\u0000!\u0001\u0000\u0000#\u0001\u0000\u0000#\u0001\u0000\u0000%\u0001\u0000\u0000%\u0001\u0000\u0000'\u0001\u0000\u0000'\u0001\u0000\u0000)\u0001\u0000\u0000)\u0001\u0000\u0000+\u0001\u0000\u0000+\u0001\u0000\u0000-\u0001\u0000\u0000-\u0001\u0000\u0000/\u0001\u0000\u0000/\u0001\u0000\u00001\u0001\u0000\u00001\u0001\u0000\u00003\u0001\u0000\u00003\u0001\u0000\u00005\u0001\u0000\u00005\u0001\u0000\u00007\u0001\u0000\u00008\u0001\u0000\u0000:\u0001\u0000\u0000:\u0001\u0000\u0000<\u0001\u0000\u0000<\u0001\u0000\u0000>\u0001\u0000\u0000>\u0001\u0000\u0000@\u0001\u0000\u0000@\u0001\u0000\u0000B\u0001\u0000\u0000B\u0001\u0000\u0000D\u0001\u0000\u0000D\u0001\u0000\u0000F\u0001\u0000\u0000F\u0001\u0000\u0000H\u0001\u0000\u0000I\u0001\u0000\u0000K\u0001\u0000\u0000K\u0001\u0000\u0000M\u0001\u0000\u0000M\u0001\u0000\u0000O\u0001\u0000\u0000O\u0001\u0000\u0000Q\u0001\u0000\u0000Q\u0001\u0000\u0000S\u0001\u0000\u0000S\u0001\u0000\u0000U\u0001\u0000\u0000U\u0001\u0000\u0000W\u0001\u0000\u0000W\u0001\u0000\u0000Y\u0001\u0000\u0000Y\u0001\u0000\u0000[\u0001\u0000\u0000[\u0001\u0000\u0000]\u0001\u0000\u0000]\u0001\u0000\u0000_\u0001\u0000\u0000_\u0001\u0000\u0000a\u0001\u0000\u0000a\u0001\u0000\u0000c\u0001\u0000\u0000c\u0001\u0000\u0000e\u0001\u0000\u0000e\u0001\u0000\u0000g\u0001\u0000\u0000g\u0001\u0000\u0000i\u0001\u0000\u0000i\u0001\u0000\u0000k\u0001\u0000\u0000k\u0001\u0000\u0000m\u0001\u0000\u0000m\u0001\u0000\u0000o\u0001\u0000\u0000o\u0001\u0000\u0000q\u0001\u0000\u0000q\u0001\u0000\u0000s\u0001\u0000\u0000s\u0001\u0000\u0000u\u0001\u0000\u0000u\u0001\u0000\u0000w\u0001\u0000\u0000w\u0001\u0000\u0000z\u0001\u0000\u0000z\u0001\u0000\u0000|\u0001\u0000\u0000|\u0001\u0000\u0000~\u0001\u0000\u0000~\u0001\u0000\u0000\u0080\u0001\u0000\u0000\u0080\u0001\u0000\u0000\u0083\u0001\u0000\u0000\u0083\u0001\u0000\u0000\u0085\u0001\u0000\u0000\u0085\u0001\u0000\u0000\u0088\u0001\u0000\u0000\u0088\u0001\u0000\u0000\u008c\u0001\u0000\u0000\u008d\u0001\u0000\u0000\u0092\u0001\u0000\u0000\u0092\u0001\u0000\u0000\u0095\u0001\u0000\u0000\u0095\u0001\u0000\u0000\u0099\u0001\u0000\u0000\u009b\u0001\u0000\u0000\u009e\u0001\u0000\u0000\u009e\u0001\u0000\u0000\u00a1\u0001\u0000\u0000\u00a1\u0001\u0000\u0000\u00a3\u0001\u0000\u0000\u00a3\u0001\u0000\u0000\u00a5\u0001\u0000\u0000\u00a5\u0001\u0000\u0000\u00a8\u0001\u0000\u0000\u00a8\u0001\u0000\u0000\u00aa\u0001\u0000\u0000\u00ab\u0001\u0000\u0000\u00ad\u0001\u0000\u0000\u00ad\u0001\u0000\u0000\u00b0\u0001\u0000\u0000\u00b0\u0001\u0000\u0000\u00b4\u0001\u0000\u0000\u00b4\u0001\u0000\u0000\u00b6\u0001\u0000\u0000\u00b6\u0001\u0000\u0000\u00b9\u0001\u0000\u0000\u00bb\u0001\u0000\u0000\u00bd\u0001\u0000\u0000\u00c3\u0001\u0000\u0000\u00c6\u0001\u0000\u0000\u00c6\u0001\u0000\u0000\u00c9\u0001\u0000\u0000\u00c9\u0001\u0000\u0000\u00cc\u0001\u0000\u0000\u00cc\u0001\u0000\u0000\u00ce\u0001\u0000\u0000\u00ce\u0001\u0000\u0000\u00d0\u0001\u0000\u0000\u00d0\u0001\u0000\u0000\u00d2\u0001\u0000\u0000\u00d2\u0001\u0000\u0000\u00d4\u0001\u0000\u0000\u00d4\u0001\u0000\u0000\u00d6\u0001\u0000\u0000\u00d6\u0001\u0000\u0000\u00d8\u0001\u0000\u0000\u00d8\u0001\u0000\u0000\u00da\u0001\u0000\u0000\u00da\u0001\u0000\u0000\u00dc\u0001\u0000\u0000\u00dd\u0001\u0000\u0000\u00df\u0001\u0000\u0000\u00df\u0001\u0000\u0000\u00e1\u0001\u0000\u0000\u00e1\u0001\u0000\u0000\u00e3\u0001\u0000\u0000\u00e3\u0001\u0000\u0000\u00e5\u0001\u0000\u0000\u00e5\u0001\u0000\u0000\u00e7\u0001\u0000\u0000\u00e7\u0001\u0000\u0000\u00e9\u0001\u0000\u0000\u00e9\u0001\u0000\u0000\u00eb\u0001\u0000\u0000\u00eb\u0001\u0000\u0000\u00ed\u0001\u0000\u0000\u00ed\u0001\u0000\u0000\u00ef\u0001\u0000\u0000\u00f0\u0001\u0000\u0000\u00f3\u0001\u0000\u0000\u00f3\u0001\u0000\u0000\u00f5\u0001\u0000\u0000\u00f5\u0001\u0000\u0000\u00f9\u0001\u0000\u0000\u00f9\u0001\u0000\u0000\u00fb\u0001\u0000\u0000\u00fb\u0001\u0000\u0000\u00fd\u0001\u0000\u0000\u00fd\u0001\u0000\u0000\u00ff\u0001\u0000\u0000\u00ff\u0001\u0000\u0000\u0001\u0002\u0000\u0000\u0001\u0002\u0000\u0000\u0003\u0002\u0000\u0000\u0003\u0002\u0000\u0000\u0005\u0002\u0000\u0000\u0005\u0002\u0000\u0000\u0007\u0002\u0000\u0000\u0007\u0002\u0000\u0000\u0009\u0002\u0000\u0000\u0009\u0002\u0000\u0000\u000b\u0002\u0000\u0000\u000b\u0002\u0000\u0000\u000d\u0002\u0000\u0000\u000d\u0002\u0000\u0000\u000f\u0002\u0000\u0000\u000f\u0002\u0000\u0000\u0011\u0002\u0000\u0000\u0011\u0002\u0000\u0000"... 4387 more characters
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value XXXXXXXX
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aAbBcC
+        get_field2 replace
+        push_const8 51: "[^b]"
+        push_const8 52: "\u0013\u0000\u0001\u0000\u001b\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u001e\u0002\u0000\u0000\u0000a\u0000c\u0000\u00ff\u00ff\u0010\u0000\u000e"
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value XXbBXX
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aAbBcC
+        get_field2 replace
+        push_const8 53: "[^A-B]"
+        push_const8 54: "\u0013\u0000\u0001\u0000\u001b\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u001e\u0002\u0000\u0000\u0000`\u0000c\u0000\u00ff\u00ff\u0010\u0000\u000e"
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value aAbBXX
+        call2 2
+        drop
+        get_var assert
+        push_atom_value "aAbBcC#4"
+        get_field2 replace
+        push_const8 55: "\\p{Lower}"
+        push_const8 56: "\u0003\u0001\u0001\u0000\u001b\u0015\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000 \u00a1\u0002a\u0000\u0000\u0000z\u0000\u0000\u0000\u00aa\u0000\u0000\u0000\u00aa\u0000\u0000\u0000\u00ba\u0000\u0000\u0000\u00ba\u0000\u0000\u0000\u00df\u0000\u0000\u0000\u00f6\u0000\u0000\u0000\u00f8\u0000\u0000\u0000\u00ff\u0000\u0000\u0000\u0001\u0001\u0000\u0000\u0001\u0001\u0000\u0000\u0003\u0001\u0000\u0000\u0003\u0001\u0000\u0000\u0005\u0001\u0000\u0000\u0005\u0001\u0000\u0000\u0007\u0001\u0000\u0000\u0007\u0001\u0000\u0000\u0009\u0001\u0000\u0000\u0009\u0001\u0000\u0000\u000b\u0001\u0000\u0000\u000b\u0001\u0000\u0000\u000d\u0001\u0000\u0000\u000d\u0001\u0000\u0000\u000f\u0001\u0000\u0000\u000f\u0001\u0000\u0000\u0011\u0001\u0000\u0000\u0011\u0001\u0000\u0000\u0013\u0001\u0000\u0000\u0013\u0001\u0000\u0000\u0015\u0001\u0000\u0000\u0015\u0001\u0000\u0000\u0017\u0001\u0000\u0000\u0017\u0001\u0000\u0000\u0019\u0001\u0000\u0000\u0019\u0001\u0000\u0000\u001b\u0001\u0000\u0000\u001b\u0001\u0000\u0000\u001d\u0001\u0000\u0000\u001d\u0001\u0000\u0000\u001f\u0001\u0000\u0000\u001f\u0001\u0000\u0000!\u0001\u0000\u0000!\u0001\u0000\u0000#\u0001\u0000\u0000#\u0001\u0000\u0000%\u0001\u0000\u0000%\u0001\u0000\u0000'\u0001\u0000\u0000'\u0001\u0000\u0000)\u0001\u0000\u0000)\u0001\u0000\u0000+\u0001\u0000\u0000+\u0001\u0000\u0000-\u0001\u0000\u0000-\u0001\u0000\u0000/\u0001\u0000\u0000/\u0001\u0000\u00001\u0001\u0000\u00001\u0001\u0000\u00003\u0001\u0000\u00003\u0001\u0000\u00005\u0001\u0000\u00005\u0001\u0000\u00007\u0001\u0000\u00008\u0001\u0000\u0000:\u0001\u0000\u0000:\u0001\u0000\u0000<\u0001\u0000\u0000<\u0001\u0000\u0000>\u0001\u0000\u0000>\u0001\u0000\u0000@\u0001\u0000\u0000@\u0001\u0000\u0000B\u0001\u0000\u0000B\u0001\u0000\u0000D\u0001\u0000\u0000D\u0001\u0000\u0000F\u0001\u0000\u0000F\u0001\u0000\u0000H\u0001\u0000\u0000I\u0001\u0000\u0000K\u0001\u0000\u0000K\u0001\u0000\u0000M\u0001\u0000\u0000M\u0001\u0000\u0000O\u0001\u0000\u0000O\u0001\u0000\u0000Q\u0001\u0000\u0000Q\u0001\u0000\u0000S\u0001\u0000\u0000S\u0001\u0000\u0000U\u0001\u0000\u0000U\u0001\u0000\u0000W\u0001\u0000\u0000W\u0001\u0000\u0000Y\u0001\u0000\u0000Y\u0001\u0000\u0000[\u0001\u0000\u0000[\u0001\u0000\u0000]\u0001\u0000\u0000]\u0001\u0000\u0000_\u0001\u0000\u0000_\u0001\u0000\u0000a\u0001\u0000\u0000a\u0001\u0000\u0000c\u0001\u0000\u0000c\u0001\u0000\u0000e\u0001\u0000\u0000e\u0001\u0000\u0000g\u0001\u0000\u0000g\u0001\u0000\u0000i\u0001\u0000\u0000i\u0001\u0000\u0000k\u0001\u0000\u0000k\u0001\u0000\u0000m\u0001\u0000\u0000m\u0001\u0000\u0000o\u0001\u0000\u0000o\u0001\u0000\u0000q\u0001\u0000\u0000q\u0001\u0000\u0000s\u0001\u0000\u0000s\u0001\u0000\u0000u\u0001\u0000\u0000u\u0001\u0000\u0000w\u0001\u0000\u0000w\u0001\u0000\u0000z\u0001\u0000\u0000z\u0001\u0000\u0000|\u0001\u0000\u0000|\u0001\u0000\u0000~\u0001\u0000\u0000~\u0001\u0000\u0000\u0080\u0001\u0000\u0000\u0080\u0001\u0000\u0000\u0083\u0001\u0000\u0000\u0083\u0001\u0000\u0000\u0085\u0001\u0000\u0000\u0085\u0001\u0000\u0000\u0088\u0001\u0000\u0000\u0088\u0001\u0000\u0000\u008c\u0001\u0000\u0000\u008d\u0001\u0000\u0000\u0092\u0001\u0000\u0000\u0092\u0001\u0000\u0000\u0095\u0001\u0000\u0000\u0095\u0001\u0000\u0000\u0099\u0001\u0000\u0000\u009b\u0001\u0000\u0000\u009e\u0001\u0000\u0000\u009e\u0001\u0000\u0000\u00a1\u0001\u0000\u0000\u00a1\u0001\u0000\u0000\u00a3\u0001\u0000\u0000\u00a3\u0001\u0000\u0000\u00a5\u0001\u0000\u0000\u00a5\u0001\u0000\u0000\u00a8\u0001\u0000\u0000\u00a8\u0001\u0000\u0000\u00aa\u0001\u0000\u0000\u00ab\u0001\u0000\u0000\u00ad\u0001\u0000\u0000\u00ad\u0001\u0000\u0000\u00b0\u0001\u0000\u0000\u00b0\u0001\u0000\u0000\u00b4\u0001\u0000\u0000\u00b4\u0001\u0000\u0000\u00b6\u0001\u0000\u0000\u00b6\u0001\u0000\u0000\u00b9\u0001\u0000\u0000\u00ba\u0001\u0000\u0000\u00bd\u0001\u0000\u0000\u00bf\u0001\u0000\u0000\u00c6\u0001\u0000\u0000\u00c6\u0001\u0000\u0000\u00c9\u0001\u0000\u0000\u00c9\u0001\u0000\u0000\u00cc\u0001\u0000\u0000\u00cc\u0001\u0000\u0000\u00ce\u0001\u0000\u0000\u00ce\u0001\u0000\u0000\u00d0\u0001\u0000\u0000\u00d0\u0001\u0000\u0000\u00d2\u0001\u0000\u0000\u00d2\u0001\u0000\u0000\u00d4\u0001\u0000\u0000\u00d4\u0001\u0000\u0000\u00d6\u0001\u0000\u0000\u00d6\u0001\u0000\u0000\u00d8\u0001\u0000\u0000\u00d8\u0001\u0000\u0000\u00da\u0001\u0000\u0000\u00da\u0001\u0000\u0000\u00dc\u0001\u0000\u0000\u00dd\u0001\u0000\u0000\u00df\u0001\u0000\u0000\u00df\u0001\u0000\u0000\u00e1\u0001\u0000\u0000\u00e1\u0001\u0000\u0000\u00e3\u0001\u0000\u0000\u00e3\u0001\u0000\u0000\u00e5\u0001\u0000\u0000\u00e5\u0001\u0000\u0000\u00e7\u0001\u0000\u0000\u00e7\u0001\u0000\u0000\u00e9\u0001\u0000\u0000\u00e9\u0001\u0000\u0000\u00eb\u0001\u0000\u0000\u00eb\u0001\u0000\u0000\u00ed\u0001\u0000\u0000\u00ed\u0001\u0000\u0000\u00ef\u0001\u0000\u0000\u00f0\u0001\u0000\u0000\u00f3\u0001\u0000\u0000\u00f3\u0001\u0000\u0000\u00f5\u0001\u0000\u0000\u00f5\u0001\u0000\u0000\u00f9\u0001\u0000\u0000\u00f9\u0001\u0000\u0000\u00fb\u0001\u0000\u0000\u00fb\u0001\u0000\u0000\u00fd\u0001\u0000\u0000\u00fd\u0001\u0000\u0000\u00ff\u0001\u0000\u0000\u00ff\u0001\u0000\u0000\u0001\u0002\u0000\u0000\u0001\u0002\u0000\u0000\u0003\u0002\u0000\u0000\u0003\u0002\u0000\u0000\u0005\u0002\u0000\u0000\u0005\u0002\u0000\u0000\u0007\u0002\u0000\u0000\u0007\u0002\u0000\u0000\u0009\u0002\u0000\u0000\u0009\u0002\u0000\u0000\u000b\u0002\u0000\u0000\u000b\u0002\u0000\u0000\u000d\u0002\u0000\u0000\u000d\u0002\u0000\u0000\u000f\u0002\u0000\u0000\u000f\u0002\u0000\u0000\u0011\u0002\u0000\u0000\u0011\u0002\u0000\u0000"... 4411 more characters
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value "XXXXXX#4"
+        call2 2
+        drop
+        get_var assert
+        push_atom_value "aAbBcC#4"
+        get_field2 replace
+        push_const8 57: "\\P{Lower}"
+        push_const8 58: "\u0003\u0001\u0001\u0000#\u0015\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000 \u00a2\u0002\u0000\u0000\u0000\u0000`\u0000\u0000\u0000{\u0000\u0000\u0000\u00a9\u0000\u0000\u0000\u00ab\u0000\u0000\u0000\u00b9\u0000\u0000\u0000\u00bb\u0000\u0000\u0000\u00de\u0000\u0000\u0000\u00f7\u0000\u0000\u0000\u00f7\u0000\u0000\u0000\u0000\u0001\u0000\u0000\u0000\u0001\u0000\u0000\u0002\u0001\u0000\u0000\u0002\u0001\u0000\u0000\u0004\u0001\u0000\u0000\u0004\u0001\u0000\u0000\u0006\u0001\u0000\u0000\u0006\u0001\u0000\u0000\u0008\u0001\u0000\u0000\u0008\u0001\u0000\u0000\n\u0001\u0000\u0000\n\u0001\u0000\u0000\u000c\u0001\u0000\u0000\u000c\u0001\u0000\u0000\u000e\u0001\u0000\u0000\u000e\u0001\u0000\u0000\u0010\u0001\u0000\u0000\u0010\u0001\u0000\u0000\u0012\u0001\u0000\u0000\u0012\u0001\u0000\u0000\u0014\u0001\u0000\u0000\u0014\u0001\u0000\u0000\u0016\u0001\u0000\u0000\u0016\u0001\u0000\u0000\u0018\u0001\u0000\u0000\u0018\u0001\u0000\u0000\u001a\u0001\u0000\u0000\u001a\u0001\u0000\u0000\u001c\u0001\u0000\u0000\u001c\u0001\u0000\u0000\u001e\u0001\u0000\u0000\u001e\u0001\u0000\u0000 \u0001\u0000\u0000 \u0001\u0000\u0000\"\u0001\u0000\u0000\"\u0001\u0000\u0000$\u0001\u0000\u0000$\u0001\u0000\u0000&\u0001\u0000\u0000&\u0001\u0000\u0000(\u0001\u0000\u0000(\u0001\u0000\u0000*\u0001\u0000\u0000*\u0001\u0000\u0000,\u0001\u0000\u0000,\u0001\u0000\u0000.\u0001\u0000\u0000.\u0001\u0000\u00000\u0001\u0000\u00000\u0001\u0000\u00002\u0001\u0000\u00002\u0001\u0000\u00004\u0001\u0000\u00004\u0001\u0000\u00006\u0001\u0000\u00006\u0001\u0000\u00009\u0001\u0000\u00009\u0001\u0000\u0000;\u0001\u0000\u0000;\u0001\u0000\u0000=\u0001\u0000\u0000=\u0001\u0000\u0000?\u0001\u0000\u0000?\u0001\u0000\u0000A\u0001\u0000\u0000A\u0001\u0000\u0000C\u0001\u0000\u0000C\u0001\u0000\u0000E\u0001\u0000\u0000E\u0001\u0000\u0000G\u0001\u0000\u0000G\u0001\u0000\u0000J\u0001\u0000\u0000J\u0001\u0000\u0000L\u0001\u0000\u0000L\u0001\u0000\u0000N\u0001\u0000\u0000N\u0001\u0000\u0000P\u0001\u0000\u0000P\u0001\u0000\u0000R\u0001\u0000\u0000R\u0001\u0000\u0000T\u0001\u0000\u0000T\u0001\u0000\u0000V\u0001\u0000\u0000V\u0001\u0000\u0000X\u0001\u0000\u0000X\u0001\u0000\u0000Z\u0001\u0000\u0000Z\u0001\u0000\u0000\\\u0001\u0000\u0000\\\u0001\u0000\u0000^\u0001\u0000\u0000^\u0001\u0000\u0000`\u0001\u0000\u0000`\u0001\u0000\u0000b\u0001\u0000\u0000b\u0001\u0000\u0000d\u0001\u0000\u0000d\u0001\u0000\u0000f\u0001\u0000\u0000f\u0001\u0000\u0000h\u0001\u0000\u0000h\u0001\u0000\u0000j\u0001\u0000\u0000j\u0001\u0000\u0000l\u0001\u0000\u0000l\u0001\u0000\u0000n\u0001\u0000\u0000n\u0001\u0000\u0000p\u0001\u0000\u0000p\u0001\u0000\u0000r\u0001\u0000\u0000r\u0001\u0000\u0000t\u0001\u0000\u0000t\u0001\u0000\u0000v\u0001\u0000\u0000v\u0001\u0000\u0000x\u0001\u0000\u0000y\u0001\u0000\u0000{\u0001\u0000\u0000{\u0001\u0000\u0000}\u0001\u0000\u0000}\u0001\u0000\u0000\u007f\u0001\u0000\u0000\u007f\u0001\u0000\u0000\u0081\u0001\u0000\u0000\u0082\u0001\u0000\u0000\u0084\u0001\u0000\u0000\u0084\u0001\u0000\u0000\u0086\u0001\u0000\u0000\u0087\u0001\u0000\u0000\u0089\u0001\u0000\u0000\u008b\u0001\u0000\u0000\u008e\u0001\u0000\u0000\u0091\u0001\u0000\u0000\u0093\u0001\u0000\u0000\u0094\u0001\u0000\u0000\u0096\u0001\u0000\u0000\u0098\u0001\u0000\u0000\u009c\u0001\u0000\u0000\u009d\u0001\u0000\u0000\u009f\u0001\u0000\u0000\u00a0\u0001\u0000\u0000\u00a2\u0001\u0000\u0000\u00a2\u0001\u0000\u0000\u00a4\u0001\u0000\u0000\u00a4\u0001\u0000\u0000\u00a6\u0001\u0000\u0000\u00a7\u0001\u0000\u0000\u00a9\u0001\u0000\u0000\u00a9\u0001\u0000\u0000\u00ac\u0001\u0000\u0000\u00ac\u0001\u0000\u0000\u00ae\u0001\u0000\u0000\u00af\u0001\u0000\u0000\u00b1\u0001\u0000\u0000\u00b3\u0001\u0000\u0000\u00b5\u0001\u0000\u0000\u00b5\u0001\u0000\u0000\u00b7\u0001\u0000\u0000\u00b8\u0001\u0000\u0000\u00bb\u0001\u0000\u0000\u00bc\u0001\u0000\u0000\u00c0\u0001\u0000\u0000\u00c5\u0001\u0000\u0000\u00c7\u0001\u0000\u0000\u00c8\u0001\u0000\u0000\u00ca\u0001\u0000\u0000\u00cb\u0001\u0000\u0000\u00cd\u0001\u0000\u0000\u00cd\u0001\u0000\u0000\u00cf\u0001\u0000\u0000\u00cf\u0001\u0000\u0000\u00d1\u0001\u0000\u0000\u00d1\u0001\u0000\u0000\u00d3\u0001\u0000\u0000\u00d3\u0001\u0000\u0000\u00d5\u0001\u0000\u0000\u00d5\u0001\u0000\u0000\u00d7\u0001\u0000\u0000\u00d7\u0001\u0000\u0000\u00d9\u0001\u0000\u0000\u00d9\u0001\u0000\u0000\u00db\u0001\u0000\u0000\u00db\u0001\u0000\u0000\u00de\u0001\u0000\u0000\u00de\u0001\u0000\u0000\u00e0\u0001\u0000\u0000\u00e0\u0001\u0000\u0000\u00e2\u0001\u0000\u0000\u00e2\u0001\u0000\u0000\u00e4\u0001\u0000\u0000\u00e4\u0001\u0000\u0000\u00e6\u0001\u0000\u0000\u00e6\u0001\u0000\u0000\u00e8\u0001\u0000\u0000\u00e8\u0001\u0000\u0000\u00ea\u0001\u0000\u0000\u00ea\u0001\u0000\u0000\u00ec\u0001\u0000\u0000\u00ec\u0001\u0000\u0000\u00ee\u0001\u0000\u0000\u00ee\u0001\u0000\u0000\u00f1\u0001\u0000\u0000\u00f2\u0001\u0000\u0000\u00f4\u0001\u0000\u0000\u00f4\u0001\u0000\u0000\u00f6\u0001\u0000\u0000\u00f8\u0001\u0000\u0000\u00fa\u0001\u0000\u0000\u00fa\u0001\u0000\u0000\u00fc\u0001\u0000\u0000\u00fc\u0001\u0000\u0000\u00fe\u0001\u0000\u0000\u00fe\u0001\u0000\u0000\u0000\u0002\u0000\u0000\u0000\u0002\u0000\u0000\u0002\u0002\u0000\u0000\u0002\u0002\u0000\u0000\u0004\u0002\u0000\u0000\u0004\u0002\u0000\u0000\u0006\u0002\u0000\u0000\u0006\u0002\u0000\u0000\u0008\u0002\u0000\u0000\u0008\u0002\u0000\u0000\n\u0002\u0000\u0000\n\u0002\u0000\u0000\u000c\u0002\u0000\u0000\u000c\u0002\u0000\u0000\u000e\u0002\u0000\u0000\u000e\u0002\u0000\u0000\u0010\u0002\u0000\u0000\u0010\u0002\u0000\u0000"... 4419 more characters
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value aAbBcCXX
+        call2 2
+        drop
+        get_var assert
+        push_atom_value "aAbBcC#4"
+        get_field2 replace
+        push_const8 59: "[^\\P{Lower}]"
+        push_const8 60: "\u0003\u0001\u0001\u0000\u001b\u0015\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000 \u00a1\u0002a\u0000\u0000\u0000z\u0000\u0000\u0000\u00aa\u0000\u0000\u0000\u00aa\u0000\u0000\u0000\u00ba\u0000\u0000\u0000\u00ba\u0000\u0000\u0000\u00df\u0000\u0000\u0000\u00f6\u0000\u0000\u0000\u00f8\u0000\u0000\u0000\u00ff\u0000\u0000\u0000\u0001\u0001\u0000\u0000\u0001\u0001\u0000\u0000\u0003\u0001\u0000\u0000\u0003\u0001\u0000\u0000\u0005\u0001\u0000\u0000\u0005\u0001\u0000\u0000\u0007\u0001\u0000\u0000\u0007\u0001\u0000\u0000\u0009\u0001\u0000\u0000\u0009\u0001\u0000\u0000\u000b\u0001\u0000\u0000\u000b\u0001\u0000\u0000\u000d\u0001\u0000\u0000\u000d\u0001\u0000\u0000\u000f\u0001\u0000\u0000\u000f\u0001\u0000\u0000\u0011\u0001\u0000\u0000\u0011\u0001\u0000\u0000\u0013\u0001\u0000\u0000\u0013\u0001\u0000\u0000\u0015\u0001\u0000\u0000\u0015\u0001\u0000\u0000\u0017\u0001\u0000\u0000\u0017\u0001\u0000\u0000\u0019\u0001\u0000\u0000\u0019\u0001\u0000\u0000\u001b\u0001\u0000\u0000\u001b\u0001\u0000\u0000\u001d\u0001\u0000\u0000\u001d\u0001\u0000\u0000\u001f\u0001\u0000\u0000\u001f\u0001\u0000\u0000!\u0001\u0000\u0000!\u0001\u0000\u0000#\u0001\u0000\u0000#\u0001\u0000\u0000%\u0001\u0000\u0000%\u0001\u0000\u0000'\u0001\u0000\u0000'\u0001\u0000\u0000)\u0001\u0000\u0000)\u0001\u0000\u0000+\u0001\u0000\u0000+\u0001\u0000\u0000-\u0001\u0000\u0000-\u0001\u0000\u0000/\u0001\u0000\u0000/\u0001\u0000\u00001\u0001\u0000\u00001\u0001\u0000\u00003\u0001\u0000\u00003\u0001\u0000\u00005\u0001\u0000\u00005\u0001\u0000\u00007\u0001\u0000\u00008\u0001\u0000\u0000:\u0001\u0000\u0000:\u0001\u0000\u0000<\u0001\u0000\u0000<\u0001\u0000\u0000>\u0001\u0000\u0000>\u0001\u0000\u0000@\u0001\u0000\u0000@\u0001\u0000\u0000B\u0001\u0000\u0000B\u0001\u0000\u0000D\u0001\u0000\u0000D\u0001\u0000\u0000F\u0001\u0000\u0000F\u0001\u0000\u0000H\u0001\u0000\u0000I\u0001\u0000\u0000K\u0001\u0000\u0000K\u0001\u0000\u0000M\u0001\u0000\u0000M\u0001\u0000\u0000O\u0001\u0000\u0000O\u0001\u0000\u0000Q\u0001\u0000\u0000Q\u0001\u0000\u0000S\u0001\u0000\u0000S\u0001\u0000\u0000U\u0001\u0000\u0000U\u0001\u0000\u0000W\u0001\u0000\u0000W\u0001\u0000\u0000Y\u0001\u0000\u0000Y\u0001\u0000\u0000[\u0001\u0000\u0000[\u0001\u0000\u0000]\u0001\u0000\u0000]\u0001\u0000\u0000_\u0001\u0000\u0000_\u0001\u0000\u0000a\u0001\u0000\u0000a\u0001\u0000\u0000c\u0001\u0000\u0000c\u0001\u0000\u0000e\u0001\u0000\u0000e\u0001\u0000\u0000g\u0001\u0000\u0000g\u0001\u0000\u0000i\u0001\u0000\u0000i\u0001\u0000\u0000k\u0001\u0000\u0000k\u0001\u0000\u0000m\u0001\u0000\u0000m\u0001\u0000\u0000o\u0001\u0000\u0000o\u0001\u0000\u0000q\u0001\u0000\u0000q\u0001\u0000\u0000s\u0001\u0000\u0000s\u0001\u0000\u0000u\u0001\u0000\u0000u\u0001\u0000\u0000w\u0001\u0000\u0000w\u0001\u0000\u0000z\u0001\u0000\u0000z\u0001\u0000\u0000|\u0001\u0000\u0000|\u0001\u0000\u0000~\u0001\u0000\u0000~\u0001\u0000\u0000\u0080\u0001\u0000\u0000\u0080\u0001\u0000\u0000\u0083\u0001\u0000\u0000\u0083\u0001\u0000\u0000\u0085\u0001\u0000\u0000\u0085\u0001\u0000\u0000\u0088\u0001\u0000\u0000\u0088\u0001\u0000\u0000\u008c\u0001\u0000\u0000\u008d\u0001\u0000\u0000\u0092\u0001\u0000\u0000\u0092\u0001\u0000\u0000\u0095\u0001\u0000\u0000\u0095\u0001\u0000\u0000\u0099\u0001\u0000\u0000\u009b\u0001\u0000\u0000\u009e\u0001\u0000\u0000\u009e\u0001\u0000\u0000\u00a1\u0001\u0000\u0000\u00a1\u0001\u0000\u0000\u00a3\u0001\u0000\u0000\u00a3\u0001\u0000\u0000\u00a5\u0001\u0000\u0000\u00a5\u0001\u0000\u0000\u00a8\u0001\u0000\u0000\u00a8\u0001\u0000\u0000\u00aa\u0001\u0000\u0000\u00ab\u0001\u0000\u0000\u00ad\u0001\u0000\u0000\u00ad\u0001\u0000\u0000\u00b0\u0001\u0000\u0000\u00b0\u0001\u0000\u0000\u00b4\u0001\u0000\u0000\u00b4\u0001\u0000\u0000\u00b6\u0001\u0000\u0000\u00b6\u0001\u0000\u0000\u00b9\u0001\u0000\u0000\u00ba\u0001\u0000\u0000\u00bd\u0001\u0000\u0000\u00bf\u0001\u0000\u0000\u00c6\u0001\u0000\u0000\u00c6\u0001\u0000\u0000\u00c9\u0001\u0000\u0000\u00c9\u0001\u0000\u0000\u00cc\u0001\u0000\u0000\u00cc\u0001\u0000\u0000\u00ce\u0001\u0000\u0000\u00ce\u0001\u0000\u0000\u00d0\u0001\u0000\u0000\u00d0\u0001\u0000\u0000\u00d2\u0001\u0000\u0000\u00d2\u0001\u0000\u0000\u00d4\u0001\u0000\u0000\u00d4\u0001\u0000\u0000\u00d6\u0001\u0000\u0000\u00d6\u0001\u0000\u0000\u00d8\u0001\u0000\u0000\u00d8\u0001\u0000\u0000\u00da\u0001\u0000\u0000\u00da\u0001\u0000\u0000\u00dc\u0001\u0000\u0000\u00dd\u0001\u0000\u0000\u00df\u0001\u0000\u0000\u00df\u0001\u0000\u0000\u00e1\u0001\u0000\u0000\u00e1\u0001\u0000\u0000\u00e3\u0001\u0000\u0000\u00e3\u0001\u0000\u0000\u00e5\u0001\u0000\u0000\u00e5\u0001\u0000\u0000\u00e7\u0001\u0000\u0000\u00e7\u0001\u0000\u0000\u00e9\u0001\u0000\u0000\u00e9\u0001\u0000\u0000\u00eb\u0001\u0000\u0000\u00eb\u0001\u0000\u0000\u00ed\u0001\u0000\u0000\u00ed\u0001\u0000\u0000\u00ef\u0001\u0000\u0000\u00f0\u0001\u0000\u0000\u00f3\u0001\u0000\u0000\u00f3\u0001\u0000\u0000\u00f5\u0001\u0000\u0000\u00f5\u0001\u0000\u0000\u00f9\u0001\u0000\u0000\u00f9\u0001\u0000\u0000\u00fb\u0001\u0000\u0000\u00fb\u0001\u0000\u0000\u00fd\u0001\u0000\u0000\u00fd\u0001\u0000\u0000\u00ff\u0001\u0000\u0000\u00ff\u0001\u0000\u0000\u0001\u0002\u0000\u0000\u0001\u0002\u0000\u0000\u0003\u0002\u0000\u0000\u0003\u0002\u0000\u0000\u0005\u0002\u0000\u0000\u0005\u0002\u0000\u0000\u0007\u0002\u0000\u0000\u0007\u0002\u0000\u0000\u0009\u0002\u0000\u0000\u0009\u0002\u0000\u0000\u000b\u0002\u0000\u0000\u000b\u0002\u0000\u0000\u000d\u0002\u0000\u0000\u000d\u0002\u0000\u0000\u000f\u0002\u0000\u0000\u000f\u0002\u0000\u0000\u0011\u0002\u0000\u0000\u0011\u0002\u0000\u0000"... 4411 more characters
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value "XXXXXX#4"
+        call2 2
+        drop
+        get_var assert
+        push_atom_value "aAbBcC#4"
+        get_field2 replace
+        push_const8 61: "\\P{Upper}"
+        push_const8 62: "\u0003\u0001\u0001\u0000\u00eb\u0014\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000 \u009b\u0002\u0000\u0000\u0000\u0000`\u0000\u0000\u0000{\u0000\u0000\u0000\u00de\u0000\u0000\u0000\u00f7\u0000\u0000\u0000\u00f7\u0000\u0000\u0000\u0000\u0001\u0000\u0000\u0000\u0001\u0000\u0000\u0002\u0001\u0000\u0000\u0002\u0001\u0000\u0000\u0004\u0001\u0000\u0000\u0004\u0001\u0000\u0000\u0006\u0001\u0000\u0000\u0006\u0001\u0000\u0000\u0008\u0001\u0000\u0000\u0008\u0001\u0000\u0000\n\u0001\u0000\u0000\n\u0001\u0000\u0000\u000c\u0001\u0000\u0000\u000c\u0001\u0000\u0000\u000e\u0001\u0000\u0000\u000e\u0001\u0000\u0000\u0010\u0001\u0000\u0000\u0010\u0001\u0000\u0000\u0012\u0001\u0000\u0000\u0012\u0001\u0000\u0000\u0014\u0001\u0000\u0000\u0014\u0001\u0000\u0000\u0016\u0001\u0000\u0000\u0016\u0001\u0000\u0000\u0018\u0001\u0000\u0000\u0018\u0001\u0000\u0000\u001a\u0001\u0000\u0000\u001a\u0001\u0000\u0000\u001c\u0001\u0000\u0000\u001c\u0001\u0000\u0000\u001e\u0001\u0000\u0000\u001e\u0001\u0000\u0000 \u0001\u0000\u0000 \u0001\u0000\u0000\"\u0001\u0000\u0000\"\u0001\u0000\u0000$\u0001\u0000\u0000$\u0001\u0000\u0000&\u0001\u0000\u0000&\u0001\u0000\u0000(\u0001\u0000\u0000(\u0001\u0000\u0000*\u0001\u0000\u0000*\u0001\u0000\u0000,\u0001\u0000\u0000,\u0001\u0000\u0000.\u0001\u0000\u0000.\u0001\u0000\u00001\u0001\u0000\u00002\u0001\u0000\u00004\u0001\u0000\u00004\u0001\u0000\u00006\u0001\u0000\u00006\u0001\u0000\u00008\u0001\u0000\u00009\u0001\u0000\u0000;\u0001\u0000\u0000;\u0001\u0000\u0000=\u0001\u0000\u0000=\u0001\u0000\u0000?\u0001\u0000\u0000?\u0001\u0000\u0000A\u0001\u0000\u0000A\u0001\u0000\u0000C\u0001\u0000\u0000C\u0001\u0000\u0000E\u0001\u0000\u0000E\u0001\u0000\u0000G\u0001\u0000\u0000G\u0001\u0000\u0000I\u0001\u0000\u0000J\u0001\u0000\u0000L\u0001\u0000\u0000L\u0001\u0000\u0000N\u0001\u0000\u0000N\u0001\u0000\u0000P\u0001\u0000\u0000P\u0001\u0000\u0000R\u0001\u0000\u0000R\u0001\u0000\u0000T\u0001\u0000\u0000T\u0001\u0000\u0000V\u0001\u0000\u0000V\u0001\u0000\u0000X\u0001\u0000\u0000X\u0001\u0000\u0000Z\u0001\u0000\u0000Z\u0001\u0000\u0000\\\u0001\u0000\u0000\\\u0001\u0000\u0000^\u0001\u0000\u0000^\u0001\u0000\u0000`\u0001\u0000\u0000`\u0001\u0000\u0000b\u0001\u0000\u0000b\u0001\u0000\u0000d\u0001\u0000\u0000d\u0001\u0000\u0000f\u0001\u0000\u0000f\u0001\u0000\u0000h\u0001\u0000\u0000h\u0001\u0000\u0000j\u0001\u0000\u0000j\u0001\u0000\u0000l\u0001\u0000\u0000l\u0001\u0000\u0000n\u0001\u0000\u0000n\u0001\u0000\u0000p\u0001\u0000\u0000p\u0001\u0000\u0000r\u0001\u0000\u0000r\u0001\u0000\u0000t\u0001\u0000\u0000t\u0001\u0000\u0000v\u0001\u0000\u0000v\u0001\u0000\u0000x\u0001\u0000\u0000y\u0001\u0000\u0000{\u0001\u0000\u0000{\u0001\u0000\u0000}\u0001\u0000\u0000}\u0001\u0000\u0000\u007f\u0001\u0000\u0000\u007f\u0001\u0000\u0000\u0081\u0001\u0000\u0000\u0082\u0001\u0000\u0000\u0084\u0001\u0000\u0000\u0084\u0001\u0000\u0000\u0086\u0001\u0000\u0000\u0087\u0001\u0000\u0000\u0089\u0001\u0000\u0000\u008b\u0001\u0000\u0000\u008d\u0001\u0000\u0000\u0091\u0001\u0000\u0000\u0093\u0001\u0000\u0000\u0094\u0001\u0000\u0000\u0096\u0001\u0000\u0000\u0098\u0001\u0000\u0000\u009c\u0001\u0000\u0000\u009d\u0001\u0000\u0000\u009f\u0001\u0000\u0000\u00a0\u0001\u0000\u0000\u00a2\u0001\u0000\u0000\u00a2\u0001\u0000\u0000\u00a4\u0001\u0000\u0000\u00a4\u0001\u0000\u0000\u00a6\u0001\u0000\u0000\u00a7\u0001\u0000\u0000\u00a9\u0001\u0000\u0000\u00ac\u0001\u0000\u0000\u00ae\u0001\u0000\u0000\u00af\u0001\u0000\u0000\u00b1\u0001\u0000\u0000\u00b3\u0001\u0000\u0000\u00b5\u0001\u0000\u0000\u00b5\u0001\u0000\u0000\u00b7\u0001\u0000\u0000\u00b8\u0001\u0000\u0000\u00ba\u0001\u0000\u0000\u00bc\u0001\u0000\u0000\u00be\u0001\u0000\u0000\u00be\u0001\u0000\u0000\u00c0\u0001\u0000\u0000\u00c5\u0001\u0000\u0000\u00c7\u0001\u0000\u0000\u00c8\u0001\u0000\u0000\u00ca\u0001\u0000\u0000\u00cb\u0001\u0000\u0000\u00cd\u0001\u0000\u0000\u00cd\u0001\u0000\u0000\u00cf\u0001\u0000\u0000\u00cf\u0001\u0000\u0000\u00d1\u0001\u0000\u0000\u00d1\u0001\u0000\u0000\u00d3\u0001\u0000\u0000\u00d3\u0001\u0000\u0000\u00d5\u0001\u0000\u0000\u00d5\u0001\u0000\u0000\u00d7\u0001\u0000\u0000\u00d7\u0001\u0000\u0000\u00d9\u0001\u0000\u0000\u00d9\u0001\u0000\u0000\u00db\u0001\u0000\u0000\u00db\u0001\u0000\u0000\u00de\u0001\u0000\u0000\u00de\u0001\u0000\u0000\u00e0\u0001\u0000\u0000\u00e0\u0001\u0000\u0000\u00e2\u0001\u0000\u0000\u00e2\u0001\u0000\u0000\u00e4\u0001\u0000\u0000\u00e4\u0001\u0000\u0000\u00e6\u0001\u0000\u0000\u00e6\u0001\u0000\u0000\u00e8\u0001\u0000\u0000\u00e8\u0001\u0000\u0000\u00ea\u0001\u0000\u0000\u00ea\u0001\u0000\u0000\u00ec\u0001\u0000\u0000\u00ec\u0001\u0000\u0000\u00ee\u0001\u0000\u0000\u00ee\u0001\u0000\u0000\u00f0\u0001\u0000\u0000\u00f2\u0001\u0000\u0000\u00f4\u0001\u0000\u0000\u00f4\u0001\u0000\u0000\u00f6\u0001\u0000\u0000\u00f8\u0001\u0000\u0000\u00fa\u0001\u0000\u0000\u00fa\u0001\u0000\u0000\u00fc\u0001\u0000\u0000\u00fc\u0001\u0000\u0000\u00fe\u0001\u0000\u0000\u00fe\u0001\u0000\u0000\u0000\u0002\u0000\u0000\u0000\u0002\u0000\u0000\u0002\u0002\u0000\u0000\u0002\u0002\u0000\u0000\u0004\u0002\u0000\u0000\u0004\u0002\u0000\u0000\u0006\u0002\u0000\u0000\u0006\u0002\u0000\u0000\u0008\u0002\u0000\u0000\u0008\u0002\u0000\u0000\n\u0002\u0000\u0000\n\u0002\u0000\u0000\u000c\u0002\u0000\u0000\u000c\u0002\u0000\u0000\u000e\u0002\u0000\u0000\u000e\u0002\u0000\u0000\u0010\u0002\u0000\u0000\u0010\u0002\u0000\u0000\u0012\u0002\u0000\u0000\u0012\u0002\u0000\u0000\u0014\u0002\u0000\u0000\u0014\u0002\u0000\u0000\u0016\u0002\u0000\u0000\u0016\u0002\u0000\u0000"... 4363 more characters
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value aAbBcCXX
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aAbBcC
+        get_field2 replace
+        push_const8 63: "[^b]"
+        push_const8 64: "\u0003\u0001\u0001\u0000\u001b\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u001e\u0002\u0000\u0000\u0000a\u0000c\u0000\u00ff\u00ff\u0010\u0000\u000e"
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value XXbBXX
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aAbBcC
+        get_field2 replace
+        push_const8 65: "[^A-B]"
+        push_const8 66: "\u0003\u0001\u0001\u0000\u001b\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u001e\u0002\u0000\u0000\u0000`\u0000c\u0000\u00ff\u00ff\u0010\u0000\u000e"
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value aAbBXX
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aAbBcC
+        get_field2 replace
+        push_const8 67: "[[a-c]&&B]"
+        push_const8 68: "\u0003\u0001\u0001\u0000\u0017\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u001e\u0001\u0000b\u0000b\u0000\u0010\u0000\u000e"
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value aAXXcC
+        call2 2
+        drop
+        get_var assert
+        push_atom_value aAbBcC
+        get_field2 replace
+        push_const8 69: "[[a-c]--B]"
+        push_const8 70: "\u0003\u0001\u0001\u0000\u001b\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u001e\u0002\u0000a\u0000a\u0000c\u0000c\u0000\u0010\u0000\u000e"
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value XXbBXX
+        call2 2
+        drop
+        get_var assert
+        push_atom_value abcAbC
+        get_field2 replace
+        push_const8 71: "[\\q{AbC}]"
+        push_const8 72: "\u0003\u0001\u0001\u0000\u0019\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0002a\u0000\u0002b\u0000\u0002c\u0000\u0010\u0000\u000e"
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value XX
+        call2 2
+        drop
+        get_var assert
+        push_atom_value abcAbC
+        get_field2 replace
+        push_const8 73: "[\\q{BC|A}]"
+        push_const8 74: "\u0003\u0001\u0001\u0000'\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u000d\u000b\u0000\u0000\u0000\u0002b\u0000\u0002c\u0000\u000b\u0007\u0000\u0000\u0000\u001e\u0001\u0000a\u0000a\u0000\u0010\u0000\u000e"
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value XXXX
+        call2 2
+        drop
+        get_var assert
+        push_atom_value abcAbC
+        get_field2 replace
+        push_const8 75: "[\\q{BC|A}--a]"
+        push_const8 76: "\u0003\u0001\u0001\u0000\u0016\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0002b\u0000\u0002c\u0000\u0010\u0000\u000e"
+        regexp
+        push_atom_value X
+        call_method 2
+        push_atom_value aXAX
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:649:1: function: test_symbol
+  mode: strict
+  locals:
+    0: var a
+    1: var b
+    2: var obj
+    3: var c
+  stack_size: 4
+  opcodes:
+        get_var Symbol
+        push_atom_value abc
+        call1 1
+        put_loc0 0: a
+        object
+        set_loc2 2: obj
+        get_loc0 0: a
+        push_2 2
+        put_array_el
+        get_var assert
+        get_loc2 2: obj
+        get_loc0 0: a
+        get_array_el
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        get_loc2 2: obj
+        push_atom_value abc
+        get_array_el
+        typeof
+        push_atom_value undefined
+        call2 2
+        drop
+        get_var assert
+        get_var String
+        get_loc0 0: a
+        call1 1
+        push_atom_value "Symbol(abc)"
+        call2 2
+        drop
+        get_var Symbol
+        push_atom_value abc
+        call1 1
+        put_loc1 1: b
+        get_var assert
+        get_loc0 0: a
+        get_loc0 0: a
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_loc0 0: a
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_loc1 1: b
+        neq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_loc1 1: b
+        strict_neq
+        call1 1
+        drop
+        get_var Symbol
+        get_field2 for
+        push_atom_value abc
+        call_method 1
+        put_loc1 1: b
+        get_var Symbol
+        get_field2 for
+        push_atom_value abc
+        call_method 1
+        put_loc3 3: c
+        get_var assert
+        get_loc1 1: b
+        get_loc3 3: c
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc1 1: b
+        get_loc0 0: a
+        strict_neq
+        call1 1
+        drop
+        get_var assert
+        get_var Symbol
+        get_field2 keyFor
+        get_loc1 1: b
+        call_method 1
+        push_atom_value abc
+        call2 2
+        drop
+        get_var assert
+        get_var Symbol
+        get_field2 keyFor
+        get_loc0 0: a
+        call_method 1
+        get_var undefined
+        call2 2
+        drop
+        get_var Symbol
+        push_atom_value aaa
+        call1 1
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_field2 valueOf
+        call_method 0
+        get_loc0 0: a
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field2 toString
+        call_method 0
+        push_atom_value "Symbol(aaa)"
+        call2 2
+        drop
+        get_var Object
+        get_loc0 0: a
+        call1 1
+        put_loc1 1: b
+        get_var assert
+        get_loc1 1: b
+        get_field2 valueOf
+        call_method 0
+        get_loc0 0: a
+        call2 2
+        drop
+        get_var assert
+        get_loc1 1: b
+        get_field2 toString
+        call_method 0
+        push_atom_value "Symbol(aaa)"
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:702:15: function: <null>
+  mode: strict
+  args: v o
+  closure vars:
+    0: tab local:loc2 var
+    1: i local:loc1 var
+    2: a local:loc0 var
+  stack_size: 5
+  opcodes:
+        get_var assert
+        get_arg1 1: o
+        get_var_ref0 0: tab
+        get_var_ref1 1: i
+        post_inc
+        put_var_ref1 1: i
+        get_array_el
+        push_0 0
+        get_array_el
+        call2 2
+        drop
+        get_var assert
+        get_var_ref2 2: a
+        get_field2 has
+        get_arg1 1: o
+        call_method 1
+        call1 1
+        drop
+        get_var assert
+        get_var_ref2 2: a
+        get_field2 delete
+        get_arg1 1: o
+        call_method 1
+        call1 1
+        drop
+        get_var assert
+        get_var_ref2 2: a
+        get_field2 has
+        get_arg1 1: o
+        call_method 1
+        lnot
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:675:1: function: test_map1
+  mode: strict
+  args: key_type n
+  locals:
+    0: var a
+    1: var i
+    2: var tab
+    3: var o
+    4: var v
+  stack_size: 5
+  opcodes:
+        get_var Map
+        dup
+        call_constructor 0
+        put_loc0 0: a
+        array_from 0
+        put_loc2 2: tab
+        push_0 0
+        put_loc1 1: i
+   16:  get_loc1 1: i
+        get_arg1 1: n
+        lt
+        if_false8 129
+        object
+        put_loc8 4: v
+        get_arg0 0: key_type
+        dup
+        push_atom_value small_bigint
+        strict_eq
+        if_false8 44
+        get_var BigInt
+        get_loc1 1: i
+        call1 1
+        put_loc3 3: o
+        goto8 102
+   44:  dup
+        push_atom_value bigint
+        strict_eq
+        if_false8 75
+        get_var BigInt
+        get_loc1 1: i
+        call1 1
+        push_bigint_i32 1
+        push_bigint_i32 128
+        shl
+        add
+        put_loc3 3: o
+        goto8 102
+   75:  dup
+        push_atom_value object
+        strict_eq
+        if_false8 94
+        object
+        get_loc1 1: i
+        define_field id
+        put_loc3 3: o
+        goto8 102
+   94:  get_var assert
+        push_false
+        call1 1
+        drop
+  102:  drop
+        get_loc2 2: tab
+        get_loc1 1: i
+        get_loc3 3: o
+        get_loc8 4: v
+        array_from 2
+        put_array_el
+        get_loc0 0: a
+        get_field2 set
+        get_loc3 3: o
+        get_loc8 4: v
+        call_method 2
+        drop
+        inc_loc 1: i
+        goto8 16
+  129:  get_var assert
+        get_loc0 0: a
+        get_field size
+        get_arg1 1: n
+        call2 2
+        drop
+        push_0 0
+        put_loc1 1: i
+  145:  get_loc1 1: i
+        get_arg1 1: n
+        lt
+        if_false8 180
+        get_var assert
+        get_loc0 0: a
+        get_field2 get
+        get_loc2 2: tab
+        get_loc1 1: i
+        get_array_el
+        push_0 0
+        get_array_el
+        call_method 1
+        get_loc2 2: tab
+        get_loc1 1: i
+        get_array_el
+        push_1 1
+        get_array_el
+        call2 2
+        drop
+        inc_loc 1: i
+        goto8 145
+  180:  push_0 0
+        put_loc1 1: i
+        get_loc0 0: a
+        get_field2 forEach
+        fclosure8 0: [bytecode <null>]
+        call_method 1
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field size
+        push_0 0
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:710:1: function: test_map
+  mode: strict
+  locals:
+    0: var a
+    1: var i
+    2: var n
+    3: var tab
+    4: var o
+    5: var v
+  stack_size: 6
+  opcodes:
+        push_i16 1000
+        put_loc2 2: n
+        get_var Map
+        dup
+        call_constructor 0
+        put_loc0 0: a
+        push_0 0
+        put_loc1 1: i
+   16:  get_loc1 1: i
+        get_loc2 2: n
+        lt
+        if_false8 37
+        get_loc0 0: a
+        get_field2 set
+        get_loc1 1: i
+        get_loc1 1: i
+        call_method 2
+        drop
+        inc_loc 1: i
+        goto8 16
+   37:  get_loc0 0: a
+        get_field2 set
+        push_const8 0: 2147483648
+        neg
+        push_1 1
+        call_method 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field2 get
+        push_const8 1: 2147483648
+        neg
+        call_method 1
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field2 get
+        push_i32 -2147483647
+        push_1 1
+        sub
+        call_method 1
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field2 get
+        push_const8 2: 2147483647.5
+        neg
+        push_const8 3: 0.5
+        sub
+        call_method 1
+        push_1 1
+        call2 2
+        drop
+        get_loc0 0: a
+        get_field2 set
+        push_bigint_i32 1
+        push_bigint_i32 1
+        call_method 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field2 get
+        push_bigint_i32 1
+        call_method 1
+        push_bigint_i32 1
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field2 get
+        push_bigint_i32 2
+        push_bigint_i32 1000
+        pow
+        push_bigint_i32 2
+        push_bigint_i32 1000
+        pow
+        push_bigint_i32 1
+        sub
+        sub
+        call_method 1
+        push_bigint_i32 1
+        call2 2
+        drop
+        get_var test_map1
+        push_atom_value object
+        get_loc2 2: n
+        call2 2
+        drop
+        get_var test_map1
+        push_atom_value small_bigint
+        get_loc2 2: n
+        call2 2
+        drop
+        get_var test_map1
+        push_atom_value bigint
+        get_loc2 2: n
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:728:1: function: test_weak_map
+  mode: strict
+  locals:
+    0: var a
+    1: var i
+    2: var n
+    3: var tab
+    4: var o
+    5: var v
+    6: var n2
+  stack_size: 4
+  opcodes:
+        get_var WeakMap
+        dup
+        call_constructor 0
+        put_loc0 0: a
+        push_i8 10
+        put_loc2 2: n
+        array_from 0
+        put_loc3 3: tab
+        push_0 0
+        put_loc1 1: i
+   19:  get_loc1 1: i
+        get_loc2 2: n
+        lt
+        if_false8 86
+        object
+        put_loc8 5: v
+        get_loc1 1: i
+        push_1 1
+        and
+        if_false8 49
+        get_var Symbol
+        push_atom_value x
+        get_loc1 1: i
+        add
+        call1 1
+        put_loc8 4: o
+        goto8 58
+   49:  object
+        get_loc1 1: i
+        define_field id
+        put_loc8 4: o
+   58:  get_loc3 3: tab
+        get_loc1 1: i
+        get_loc8 4: o
+        get_loc8 5: v
+        array_from 2
+        put_array_el
+        get_loc0 0: a
+        get_field2 set
+        get_loc8 4: o
+        get_loc8 5: v
+        call_method 2
+        drop
+        inc_loc 1: i
+        goto8 19
+   86:  null
+        put_loc8 4: o
+        push_5 5
+        put_loc8 6: n2
+        push_0 0
+        put_loc1 1: i
+   94:  get_loc1 1: i
+        get_loc8 6: n2
+        lt
+        if_false8 119
+        get_loc0 0: a
+        get_field2 delete
+        get_loc3 3: tab
+        get_loc1 1: i
+        get_array_el
+        push_0 0
+        get_array_el
+        call_method 1
+        drop
+        inc_loc 1: i
+        goto8 94
+  119:  get_loc8 6: n2
+        put_loc1 1: i
+  122:  get_loc1 1: i
+        get_loc2 2: n
+        lt
+        if_false8 137
+        get_loc3 3: tab
+        get_loc1 1: i
+        get_array_el
+        push_0 0
+        null
+        put_array_el
+        inc_loc 1: i
+        goto8 122
+  137:  get_var std
+        get_field2 gc
+        call_method 0
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:756:5: function: createCyclicKey
+  mode: strict
+  locals:
+    0: const parent [level:1 next:-1]
+    1: const child [level:1 next:0]
+  stack_size: 2
+  opcodes:
+        set_loc_uninitialized 1: child
+        set_loc_uninitialized 0: parent
+        object
+        put_loc0 0: parent
+        object
+        get_loc_check 0: parent
+        define_field parent
+        put_loc1 1: child
+        get_loc_check 0: parent
+        get_loc_check 1: child
+        put_field child
+        get_loc_check 1: child
+        return
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:762:5: function: testWeakMap
+  mode: strict
+  locals:
+    0: const cyclicKey [level:1 next:-1]
+    1: const valueOfCyclicKey [level:1 next:0]
+  closure vars:
+    0: createCyclicKey local:loc2 var
+    1: weak1 local:loc0 const
+    2: weak2 local:loc1 const
+  stack_size: 4
+  opcodes:
+        set_loc_uninitialized 1: valueOfCyclicKey
+        set_loc_uninitialized 0: cyclicKey
+        get_var_ref0 0: createCyclicKey
+        call0 0
+        put_loc0 0: cyclicKey
+        object
+        put_loc1 1: valueOfCyclicKey
+        get_var_ref_check 1: weak1
+        get_field2 set
+        get_loc_check 0: cyclicKey
+        get_loc_check 1: valueOfCyclicKey
+        call_method 2
+        drop
+        get_var_ref_check 2: weak2
+        get_field2 set
+        get_loc_check 1: valueOfCyclicKey
+        push_1 1
+        call_method 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:753:1: function: test_weak_map_cycles
+  mode: strict
+  locals:
+    0: const weak1 [level:1 next:-1]
+    1: const weak2 [level:1 next:0]
+    2: var createCyclicKey
+    3: var testWeakMap
+  stack_size: 3
+  opcodes:
+        fclosure8 0: [bytecode createCyclicKey]
+        put_loc2 2: createCyclicKey
+        fclosure8 1: [bytecode testWeakMap]
+        put_loc3 3: testWeakMap
+        set_loc_uninitialized 1: weak2
+        set_loc_uninitialized 0: weak1
+        get_var WeakMap
+        dup
+        call_constructor 0
+        put_loc0 0: weak1
+        get_var WeakMap
+        dup
+        call_constructor 0
+        put_loc1 1: weak2
+        get_loc3 3: testWeakMap
+        call0 0
+        drop
+        get_var std
+        get_field2 gc
+        call_method 0
+        drop
+        get_loc_check 1: weak2
+        get_field2 get
+        object
+        call_method 1
+        drop
+        get_var std
+        get_field2 gc
+        call_method 0
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:776:1: function: test_weak_ref
+  mode: strict
+  locals:
+    0: var w1
+    1: var w2
+    2: var o
+    3: var i
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc3 3: i
+    2:  get_loc3 3: i
+        push_2 2
+        lt
+        if_false 192
+        get_loc3 3: i
+        push_0 0
+        eq
+        if_false8 19
+        object
+        put_loc2 2: o
+        goto8 31
+   19:  get_var Symbol
+        push_atom_value x
+        call1 1
+        put_loc2 2: o
+   31:  get_var WeakRef
+        dup
+        get_loc2 2: o
+        call_constructor 1
+        put_loc0 0: w1
+        get_var assert
+        get_loc0 0: w1
+        get_field2 deref
+        call_method 0
+        get_loc2 2: o
+        call2 2
+        drop
+        get_var WeakRef
+        dup
+        get_loc2 2: o
+        call_constructor 1
+        put_loc1 1: w2
+        get_var assert
+        get_loc1 1: w2
+        get_field2 deref
+        call_method 0
+        get_loc2 2: o
+        call2 2
+        drop
+        null
+        put_loc2 2: o
+        get_var assert
+        get_loc0 0: w1
+        get_field2 deref
+        call_method 0
+        get_var undefined
+        call2 2
+        drop
+        get_var assert
+        get_loc1 1: w2
+        get_field2 deref
+        call_method 0
+        get_var undefined
+        call2 2
+        drop
+        get_var std
+        get_field2 gc
+        call_method 0
+        drop
+        get_var assert
+        get_loc0 0: w1
+        get_field2 deref
+        call_method 0
+        get_var undefined
+        call2 2
+        drop
+        get_var assert
+        get_loc1 1: w2
+        get_field2 deref
+        call_method 0
+        get_var undefined
+        call2 2
+        drop
+        inc_loc 3: i
+        goto16 2
+  192:  return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:799:47: function: <null>
+  mode: strict
+  args: v
+  closure vars:
+    0: actual local:loc1 let
+  stack_size: 2
+  opcodes:
+        get_arg0 0: v
+        dup
+        put_var_ref_check 0: actual
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:801:23: function: <null>
+  mode: strict
+  closure vars:
+    0: actual local:loc1 let
+    1: expected local:loc0 let
+  stack_size: 3
+  opcodes:
+        get_var assert
+        get_var_ref_check 0: actual
+        get_var_ref_check 1: expected
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:808:47: function: <null>
+  mode: strict
+  args: v
+  closure vars:
+    0: actual local:loc4 let
+  stack_size: 2
+  opcodes:
+        get_arg0 0: v
+        dup
+        put_var_ref_check 0: actual
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:810:23: function: <null>
+  mode: strict
+  closure vars:
+    0: actual local:loc4 let
+    1: expected local:loc3 let
+  stack_size: 3
+  opcodes:
+        get_var assert
+        get_var_ref_check 0: actual
+        get_var_ref_check 1: expected
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:795:1: function: test_finalization_registry
+  mode: strict
+  locals:
+    0: let expected [level:2 next:-1]
+    1: let actual [level:2 next:0]
+    2: let finrec [level:2 next:1]
+    3: let expected [level:3 next:-1]
+    4: let actual [level:3 next:3]
+    5: let finrec [level:3 next:4]
+  stack_size: 4
+  opcodes:
+        set_loc_uninitialized 2: finrec
+        set_loc_uninitialized 1: actual
+        set_loc_uninitialized 0: expected
+        object
+        put_loc0 0: expected
+        undefined
+        put_loc1 1: actual
+        get_var FinalizationRegistry
+        dup
+        fclosure8 0: [bytecode <null>]
+        call_constructor 1
+        put_loc2 2: finrec
+        get_loc_check 2: finrec
+        get_field2 register
+        object
+        get_loc_check 0: expected
+        call_method 2
+        drop
+        get_var os
+        get_field2 setTimeout
+        fclosure8 1: [bytecode <null>]
+        push_0 0
+        call_method 2
+        drop
+        close_loc 1: actual
+        close_loc 0: expected
+        set_loc_uninitialized 5: finrec
+        set_loc_uninitialized 4: actual
+        set_loc_uninitialized 3: expected
+        push_i8 42
+        put_loc3 3: expected
+        undefined
+        put_loc8 4: actual
+        get_var FinalizationRegistry
+        dup
+        fclosure8 2: [bytecode <null>]
+        call_constructor 1
+        put_loc8 5: finrec
+        get_loc_check 5: finrec
+        get_field2 register
+        object
+        get_loc_check 3: expected
+        call_method 2
+        drop
+        get_var os
+        get_field2 setTimeout
+        fclosure8 3: [bytecode <null>]
+        push_0 0
+        call_method 2
+        drop
+        close_loc 4: actual
+        close_loc 3: expected
+        get_var std
+        get_field2 gc
+        call_method 0
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:817:5: function: *f
+  mode: strict
+  locals:
+    0: var ret
+  stack_size: 3
+  opcodes:
+        initial_yield
+        push_1 1
+        yield
+        if_false8 6
+        return_async
+    6:  drop
+        push_2 2
+        yield
+        if_false8 12
+        return_async
+   12:  put_loc0 0: ret
+        get_var assert
+        get_loc0 0: ret
+        push_atom_value next_arg
+        call2 2
+        drop
+        push_3 3
+        return_async
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:824:5: function: *f2
+  mode: strict
+  stack_size: 2
+  opcodes:
+        initial_yield
+        push_1 1
+        yield
+        if_false8 6
+        return_async
+    6:  drop
+        push_2 2
+        yield
+        if_false8 12
+        return_async
+   12:  drop
+        push_atom_value ret_val
+        return_async
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:829:5: function: *f1
+  mode: strict
+  locals:
+    0: var ret
+  closure vars:
+    0: f2 local:loc1 var
+  stack_size: 6
+  opcodes:
+        initial_yield
+        get_var_ref0 0: f2
+        call0 0
+        for_of_start
+        drop
+        undefined
+        undefined
+    7:  iterator_next
+        iterator_check_object
+        get_field2 done
+        if_true8 71
+   16:  yield_star
+        dup
+        if_true8 23
+        drop
+        goto8 7
+   23:  push_2 2
+        strict_eq
+        if_true8 48
+        iterator_call 0
+        if_true8 44
+        iterator_check_object
+        get_field2 done
+        if_false8 16
+        get_field value
+   44:  nip
+        nip
+        nip
+        return_async
+   48:  iterator_call 1
+        if_true8 62
+        iterator_check_object
+        get_field2 done
+        if_false8 16
+        goto8 71
+   62:  iterator_call 2
+        drop
+        throw_error <null>,4
+   71:  get_field value
+        nip
+        nip
+        nip
+        put_loc0 0: ret
+        get_var assert
+        get_loc0 0: ret
+        push_atom_value ret_val
+        call2 2
+        drop
+        push_3 3
+        return_async
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:834:5: function: *f3
+  mode: strict
+  locals:
+    0: var ret
+    1: catch e [level:3 next:-1]
+  stack_size: 4
+  opcodes:
+        initial_yield
+        catch 30
+        push_2 2
+        push_1 1
+        yield
+        if_false8 18
+        nip_catch
+        gosub 52
+        return_async
+   18:  add
+        put_loc0 0: ret
+        drop
+        undefined
+        gosub 52
+        drop
+        goto8 55
+   30:  put_loc1 1: e
+        catch 46
+        drop
+        undefined
+        gosub 52
+        drop
+        goto8 55
+   46:  gosub 52
+        throw
+   52:  inc_loc 0: ret
+        ret
+   55:  get_loc0 0: ret
+        return_async
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:816:1: function: test_generator
+  mode: strict
+  locals:
+    0: var f
+    1: var f2
+    2: var f1
+    3: var f3
+    4: var g
+    5: var v
+  stack_size: 3
+  opcodes:
+        fclosure8 0: [bytecode f]
+        put_loc0 0: f
+        fclosure8 1: [bytecode f2]
+        put_loc1 1: f2
+        fclosure8 2: [bytecode f1]
+        put_loc2 2: f1
+        fclosure8 3: [bytecode f3]
+        put_loc3 3: f3
+        get_loc0 0: f
+        call0 0
+        set_loc8 4: g
+        get_field2 next
+        call_method 0
+        put_loc8 5: v
+        get_var assert
+        get_loc8 5: v
+        get_field value
+        push_1 1
+        strict_eq
+        dup
+        if_false8 53
+        drop
+        get_loc8 5: v
+        get_field done
+        push_false
+        strict_eq
+   53:  call1 1
+        drop
+        get_loc8 4: g
+        get_field2 next
+        call_method 0
+        put_loc8 5: v
+        get_var assert
+        get_loc8 5: v
+        get_field value
+        push_2 2
+        strict_eq
+        dup
+        if_false8 94
+        drop
+        get_loc8 5: v
+        get_field done
+        push_false
+        strict_eq
+   94:  call1 1
+        drop
+        get_loc8 4: g
+        get_field2 next
+        push_atom_value next_arg
+        call_method 1
+        put_loc8 5: v
+        get_var assert
+        get_loc8 5: v
+        get_field value
+        push_3 3
+        strict_eq
+        dup
+        if_false8 140
+        drop
+        get_loc8 5: v
+        get_field done
+        push_true
+        strict_eq
+  140:  call1 1
+        drop
+        get_loc8 4: g
+        get_field2 next
+        call_method 0
+        put_loc8 5: v
+        get_var assert
+        get_loc8 5: v
+        get_field value
+        get_var undefined
+        strict_eq
+        dup
+        if_false8 185
+        drop
+        get_loc8 5: v
+        get_field done
+        push_true
+        strict_eq
+  185:  call1 1
+        drop
+        get_loc2 2: f1
+        call0 0
+        set_loc8 4: g
+        get_field2 next
+        call_method 0
+        put_loc8 5: v
+        get_var assert
+        get_loc8 5: v
+        get_field value
+        push_1 1
+        strict_eq
+        dup
+        if_false8 228
+        drop
+        get_loc8 5: v
+        get_field done
+        push_false
+        strict_eq
+  228:  call1 1
+        drop
+        get_loc8 4: g
+        get_field2 next
+        call_method 0
+        put_loc8 5: v
+        get_var assert
+        get_loc8 5: v
+        get_field value
+        push_2 2
+        strict_eq
+        dup
+        if_false8 269
+        drop
+        get_loc8 5: v
+        get_field done
+        push_false
+        strict_eq
+  269:  call1 1
+        drop
+        get_loc8 4: g
+        get_field2 next
+        call_method 0
+        put_loc8 5: v
+        get_var assert
+        get_loc8 5: v
+        get_field value
+        push_3 3
+        strict_eq
+        dup
+        if_false8 310
+        drop
+        get_loc8 5: v
+        get_field done
+        push_true
+        strict_eq
+  310:  call1 1
+        drop
+        get_loc8 4: g
+        get_field2 next
+        call_method 0
+        put_loc8 5: v
+        get_var assert
+        get_loc8 5: v
+        get_field value
+        get_var undefined
+        strict_eq
+        dup
+        if_false8 355
+        drop
+        get_loc8 5: v
+        get_field done
+        push_true
+        strict_eq
+  355:  call1 1
+        drop
+        get_loc3 3: f3
+        call0 0
+        set_loc8 4: g
+        get_field2 next
+        call_method 0
+        put_loc8 5: v
+        get_var assert
+        get_loc8 5: v
+        get_field value
+        push_1 1
+        strict_eq
+        dup
+        if_false8 398
+        drop
+        get_loc8 5: v
+        get_field done
+        push_false
+        strict_eq
+  398:  call1 1
+        drop
+        get_loc8 4: g
+        get_field2 next
+        push_3 3
+        call_method 1
+        put_loc8 5: v
+        get_var assert
+        get_loc8 5: v
+        get_field value
+        push_6 6
+        strict_eq
+        dup
+        if_false8 440
+        drop
+        get_loc8 5: v
+        get_field done
+        push_true
+        strict_eq
+  440:  call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:873:1: function: rope_concat
+  mode: strict
+  args: n dir
+  locals:
+    0: var i
+    1: var s
+  stack_size: 5
+  opcodes:
+        push_empty_string
+        put_loc1 1: s
+        get_arg1 1: dir
+        push_0 0
+        gt
+        if_false8 41
+        push_0 0
+        put_loc0 0: i
+    9:  get_loc0 0: i
+        get_arg0 0: n
+        lt
+        if_false8 77
+        get_loc1 1: s
+        get_var String
+        get_field2 fromCharCode
+        get_loc0 0: i
+        push_i32 65535
+        and
+        call_method 1
+        add
+        put_loc1 1: s
+        inc_loc 0: i
+        goto8 9
+   41:  get_arg0 0: n
+        push_1 1
+        sub
+        put_loc0 0: i
+   45:  get_loc0 0: i
+        push_0 0
+        gte
+        if_false8 77
+        get_var String
+        get_field2 fromCharCode
+        get_loc0 0: i
+        push_i32 65535
+        and
+        call_method 1
+        get_loc1 1: s
+        add
+        put_loc1 1: s
+        dec_loc 0: i
+        goto8 45
+   77:  push_0 0
+        put_loc0 0: i
+   79:  get_loc0 0: i
+        get_arg0 0: n
+        lt
+        if_false8 132
+        get_loc1 1: s
+        get_field2 charCodeAt
+        get_loc0 0: i
+        call_method 1
+        get_loc0 0: i
+        push_i32 65535
+        and
+        neq
+        if_false8 128
+        get_var assert
+        get_loc1 1: s
+        get_field2 charCodeAt
+        get_loc0 0: i
+        call_method 1
+        get_loc0 0: i
+        push_i32 65535
+        and
+        call2 2
+        drop
+  128:  inc_loc 0: i
+        goto8 79
+  132:  return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:891:1: function: test_rope
+  mode: strict
+  stack_size: 3
+  opcodes:
+        get_var rope_concat
+        push_i32 100000
+        push_1 1
+        call2 2
+        drop
+        get_var rope_concat
+        push_i32 100000
+        push_minus1 -1
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:895:1: function: eval_error
+  mode: strict
+  args: eval_str expected_error level
+  locals:
+    0: var err
+    1: var expected_pos
+    2: var tab
+    3: catch e [level:3 next:-1]
+    4: var this
+    5: var new.target
+    6: var arguments
+  stack_size: 7
+  opcodes:
+        special_object 3
+        put_loc8 5: "new.target"
+        push_this
+        put_loc8 4: this
+        special_object 0
+        put_loc8 6: arguments
+        push_false
+        put_loc0 0: err
+        get_var get_string_pos
+        get_arg0 0: eval_str
+        call1 1
+        put_loc2 2: tab
+        catch 43
+        get_var eval
+        get_loc2 2: tab
+        push_0 0
+        get_array_el
+        eval 1,1
+        drop
+        drop
+        goto8 94
+   43:  put_loc3 3: e
+        catch 93
+        push_true
+        put_loc0 0: err
+        get_loc3 3: e
+        get_arg1 1: expected_error
+        instanceof
+        lnot
+        if_false8 72
+        get_var throw_error
+        push_atom_value "unexpected exception type"
+        call1 1
+        drop
+        undefined
+        nip_catch
+        return
+   72:  get_var check_error_pos
+        get_loc3 3: e
+        get_arg1 1: expected_error
+        get_loc2 2: tab
+        push_1 1
+        get_array_el
+        get_loc2 2: tab
+        push_2 2
+        get_array_el
+        get_arg2 2: level
+        call 5
+        drop
+        drop
+        goto8 94
+   93:  throw
+   94:  get_loc0 0: err
+        lnot
+        if_false8 110
+        get_var throw_error
+        push_atom_value "expected exception"
+        call1 1
+        drop
+  110:  return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:915:14: function: <null>
+  mode: strict
+  stack_size: 2
+  opcodes:
+        get_var Error
+        push_atom_value "poisoned number"
+        call1 1
+        throw
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:917:1: function: test_line_column_numbers
+  mode: strict
+  locals:
+    0: var f
+    1: var e
+    2: var tab
+    3: var this
+    4: var new.target
+    5: var arguments
+  stack_size: 6
+  opcodes:
+        special_object 3
+        put_loc8 4: "new.target"
+        push_this
+        put_loc3 3: this
+        special_object 0
+        put_loc8 5: arguments
+        get_var eval_error
+        push_atom_value "\n 123 @a "
+        get_var SyntaxError
+        call2 2
+        drop
+        get_var eval_error
+        push_atom_value "\n  @/*  "
+        get_var SyntaxError
+        call2 2
+        drop
+        get_var eval_error
+        push_atom_value "function f  @a"
+        get_var SyntaxError
+        call2 2
+        drop
+        get_var eval_error
+        push_atom_value "\n  @/aaa]/u"
+        get_var SyntaxError
+        call2 2
+        drop
+        get_var get_string_pos
+        push_atom_value "\n   @function f() { }; f;"
+        call1 1
+        put_loc2 2: tab
+        get_var eval
+        get_loc2 2: tab
+        push_0 0
+        get_array_el
+        eval 1,1
+        put_loc1 1: e
+        get_var assert
+        get_loc1 1: e
+        get_field lineNumber
+        get_loc2 2: tab
+        push_1 1
+        get_array_el
+        call2 2
+        drop
+        get_var assert
+        get_loc1 1: e
+        get_field columnNumber
+        get_loc2 2: tab
+        push_2 2
+        get_array_el
+        call2 2
+        drop
+        get_var get_string_pos
+        push_atom_value "\n  Error@(\"hello\");"
+        call1 1
+        put_loc2 2: tab
+        get_var eval
+        get_loc2 2: tab
+        push_0 0
+        get_array_el
+        eval 1,1
+        put_loc1 1: e
+        get_var check_error_pos
+        get_loc1 1: e
+        get_var Error
+        get_loc2 2: tab
+        push_1 1
+        get_array_el
+        get_loc2 2: tab
+        push_2 2
+        get_array_el
+        call 4
+        drop
+        get_var eval_error
+        push_atom_value "\n  throw Error@(\"hello\");"
+        get_var Error
+        call2 2
+        drop
+        get_var eval_error
+        push_atom_value "\n  1 + 2 @* poisoned_number;"
+        get_var Error
+        push_1 1
+        call3 3
+        drop
+        get_var eval_error
+        push_atom_value "\n  1 + \"caf\u00e9\" @* poisoned_number;"
+        get_var Error
+        push_1 1
+        call3 3
+        drop
+        get_var eval_error
+        push_atom_value "\n  1 + 2 @** poisoned_number;"
+        get_var Error
+        push_1 1
+        call3 3
+        drop
+        get_var eval_error
+        push_atom_value "\n  2 * @+ poisoned_number;"
+        get_var Error
+        push_1 1
+        call3 3
+        drop
+        get_var eval_error
+        push_atom_value "\n  2 * @- poisoned_number;"
+        get_var Error
+        push_1 1
+        call3 3
+        drop
+        get_var eval_error
+        push_atom_value "\n  2 * @~ poisoned_number;"
+        get_var Error
+        push_1 1
+        call3 3
+        drop
+        get_var eval_error
+        push_atom_value "\n  2 * @++ poisoned_number;"
+        get_var Error
+        push_1 1
+        call3 3
+        drop
+        get_var eval_error
+        push_atom_value "\n  2 * @-- poisoned_number;"
+        get_var Error
+        push_1 1
+        call3 3
+        drop
+        get_var eval_error
+        push_atom_value "\n  2 * poisoned_number @++;"
+        get_var Error
+        push_1 1
+        call3 3
+        drop
+        get_var eval_error
+        push_atom_value "\n  2 * poisoned_number @--;"
+        get_var Error
+        push_1 1
+        call3 3
+        drop
+        get_var eval_error
+        push_atom_value "\n 1 + null@[0];"
+        get_var TypeError
+        call2 2
+        drop
+        get_var eval_error
+        push_atom_value "\n 1 + null @. abcd;"
+        get_var TypeError
+        call2 2
+        drop
+        get_var eval_error
+        push_atom_value "\n 1 + null @( 1234 );"
+        get_var TypeError
+        call2 2
+        drop
+        get_var eval_error
+        push_atom_value "var obj = { get a() { throw Error(\"test\"); } }\n 1 + obj @. a;"
+        get_var Error
+        push_1 1
+        call3 3
+        drop
+        get_var eval_error
+        push_atom_value "var obj = { set a(b) { throw Error(\"test\"); } }\n obj @. a = 1;"
+        get_var Error
+        push_1 1
+        call3 3
+        drop
+        get_var eval_error
+        push_atom_value "\n  1 + @not_def"
+        get_var ReferenceError
+        push_0 0
+        call3 3
+        drop
+        get_var eval_error
+        push_atom_value "1 + (@not_def = 1)"
+        get_var ReferenceError
+        push_0 0
+        call3 3
+        drop
+        get_var eval_error
+        push_atom_value "1 + (@not_def += 2)"
+        get_var ReferenceError
+        push_0 0
+        call3 3
+        drop
+        get_var eval_error
+        push_atom_value "var a;\n 1 + (a @+= poisoned_number);"
+        get_var Error
+        push_1 1
+        call3 3
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_builtin.js:1:1: function: <eval>
+  mode: strict
+  locals:
+    0: var <ret>
+    1: catch e [level:3 next:-1]
+  stack_size: 3
+  opcodes:
+        check_define_var status,0
+        check_define_var throw_errors,0
+        check_define_var throw_error,64
+        check_define_var assert,64
+        check_define_var assert_throws,64
+        check_define_var my_func,64
+        check_define_var test_function,64
+        check_define_var test,64
+        check_define_var test_enum,64
+        check_define_var test_array,64
+        check_define_var test_string,64
+        check_define_var test_math,64
+        check_define_var test_number,64
+        check_define_var test_eval2,64
+        check_define_var test_eval,64
+        check_define_var test_typed_array,64
+        check_define_var get_string_pos,64
+        check_define_var check_error_pos,64
+        check_define_var assert_json_error,64
+        check_define_var test_json,64
+        check_define_var test_date,64
+        check_define_var test_regexp,64
+        check_define_var test_symbol,64
+        check_define_var test_map1,64
+        check_define_var test_map,64
+        check_define_var test_weak_map,64
+        check_define_var test_weak_map_cycles,64
+        check_define_var test_weak_ref,64
+        check_define_var test_finalization_registry,64
+        check_define_var test_generator,64
+        check_define_var rope_concat,64
+        check_define_var test_rope,64
+        check_define_var eval_error,64
+        check_define_var poisoned_number,0
+        check_define_var test_line_column_numbers,64
+        define_var status,0
+        define_var throw_errors,0
+        fclosure8 0: [bytecode throw_error]
+        define_func throw_error,0
+        fclosure8 1: [bytecode assert]
+        define_func assert,0
+        fclosure8 2: [bytecode assert_throws]
+        define_func assert_throws,0
+        fclosure8 3: [bytecode my_func]
+        define_func my_func,0
+        fclosure8 4: [bytecode test_function]
+        define_func test_function,0
+        fclosure8 5: [bytecode test]
+        define_func test,0
+        fclosure8 6: [bytecode test_enum]
+        define_func test_enum,0
+        fclosure8 7: [bytecode test_array]
+        define_func test_array,0
+        fclosure8 8: [bytecode test_string]
+        define_func test_string,0
+        fclosure8 9: [bytecode test_math]
+        define_func test_math,0
+        fclosure8 10: [bytecode test_number]
+        define_func test_number,0
+        fclosure8 11: [bytecode test_eval2]
+        define_func test_eval2,0
+        fclosure8 12: [bytecode test_eval]
+        define_func test_eval,0
+        fclosure8 13: [bytecode test_typed_array]
+        define_func test_typed_array,0
+        fclosure8 14: [bytecode get_string_pos]
+        define_func get_string_pos,0
+        fclosure8 15: [bytecode check_error_pos]
+        define_func check_error_pos,0
+        fclosure8 16: [bytecode assert_json_error]
+        define_func assert_json_error,0
+        fclosure8 17: [bytecode test_json]
+        define_func test_json,0
+        fclosure8 18: [bytecode test_date]
+        define_func test_date,0
+        fclosure8 19: [bytecode test_regexp]
+        define_func test_regexp,0
+        fclosure8 20: [bytecode test_symbol]
+        define_func test_symbol,0
+        fclosure8 21: [bytecode test_map1]
+        define_func test_map1,0
+        fclosure8 22: [bytecode test_map]
+        define_func test_map,0
+        fclosure8 23: [bytecode test_weak_map]
+        define_func test_weak_map,0
+        fclosure8 24: [bytecode test_weak_map_cycles]
+        define_func test_weak_map_cycles,0
+        fclosure8 25: [bytecode test_weak_ref]
+        define_func test_weak_ref,0
+        fclosure8 26: [bytecode test_finalization_registry]
+        define_func test_finalization_registry,0
+        fclosure8 27: [bytecode test_generator]
+        define_func test_generator,0
+        fclosure8 28: [bytecode rope_concat]
+        define_func rope_concat,0
+        fclosure8 29: [bytecode test_rope]
+        define_func test_rope,0
+        fclosure8 30: [bytecode eval_error]
+        define_func eval_error,0
+        define_var poisoned_number,0
+        fclosure8 32: [bytecode test_line_column_numbers]
+        define_func test_line_column_numbers,0
+        push_atom_value "use strict"
+        put_loc0 0: "<ret>"
+        check_var status
+        push_0 0
+        put_var_strict status
+        check_var throw_errors
+        push_true
+        put_var_strict throw_errors
+        undefined
+        put_loc0 0: "<ret>"
+        catch 534
+        get_var __loadScript
+        push_atom_value "test_assert.js"
+        call1 1
+        put_loc0 0: "<ret>"
+        drop
+        goto8 544
+  534:  put_loc1 1: e
+        catch 543
+        drop
+        goto8 544
+  543:  throw
+  544:  check_var poisoned_number
+        object
+        fclosure8 31: [bytecode <null>]
+        set_name valueOf
+        define_field valueOf
+        put_var_strict poisoned_number
+        get_var test
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_function
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_enum
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_array
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_string
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_math
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_number
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_eval
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_typed_array
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_json
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_date
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_regexp
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_symbol
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_map
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_weak_map
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_weak_map_cycles
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_weak_ref
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_finalization_registry
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_generator
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_rope
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_line_column_numbers
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

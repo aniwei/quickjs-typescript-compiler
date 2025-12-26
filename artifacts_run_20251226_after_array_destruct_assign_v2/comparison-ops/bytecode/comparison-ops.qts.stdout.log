@@ -1,0 +1,63 @@
+__tests__/fixtures/comparison-ops.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        lt
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        gt
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        lte
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        gte
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        eq
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        neq
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        strict_eq
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        push_2 2
+        strict_neq
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

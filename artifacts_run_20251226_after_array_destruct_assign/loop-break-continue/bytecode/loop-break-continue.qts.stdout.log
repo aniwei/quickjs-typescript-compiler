@@ -1,0 +1,42 @@
+__tests__/fixtures/loop-break-continue.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: let i [level:2 next:-1]
+  stack_size: 3
+  opcodes:
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 1: i
+        push_0 0
+        put_loc1 1: i
+    7:  get_loc_check 1: i
+        push_i8 10
+        lt
+        if_false8 62
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 1: i
+        push_5 5
+        strict_eq
+        if_true8 62
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 1: i
+        push_2 2
+        mod
+        push_0 0
+        strict_eq
+        if_true8 52
+        get_var console
+        get_field2 log
+        get_loc_check 1: i
+        call_method 1
+        put_loc0 0: "<ret>"
+   52:  get_loc_check 1: i
+        post_inc
+        put_loc_check 1: i
+        drop
+        goto8 7
+   62:  get_loc0 0: "<ret>"
+        return
+

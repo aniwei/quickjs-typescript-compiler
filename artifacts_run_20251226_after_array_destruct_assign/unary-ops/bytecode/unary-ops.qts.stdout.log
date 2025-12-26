@@ -1,0 +1,41 @@
+__tests__/fixtures/unary-ops.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        get_var console
+        get_field2 log
+        push_true
+        lnot
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        not
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        plus
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_minus1 -1
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        typeof
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        undefined
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

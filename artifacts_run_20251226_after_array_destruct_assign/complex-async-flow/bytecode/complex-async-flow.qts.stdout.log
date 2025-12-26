@@ -1,0 +1,95 @@
+__tests__/fixtures/complex-async-flow.js:1:1: function: gen
+  stack_size: 2
+  opcodes:
+        initial_yield
+        push_1 1
+        await
+        yield
+        if_false8 9
+        await
+        await
+        return_async
+    9:  drop
+        push_2 2
+        await
+        yield
+        if_false8 18
+        await
+        await
+        return_async
+   18:  drop
+        undefined
+        await
+        return_async
+
+__tests__/fixtures/complex-async-flow.js:5:1: function: run
+  locals:
+    0: let sum [level:1 next:-1]
+    1: const x [level:3 next:0]
+  stack_size: 6
+  opcodes:
+        set_loc_uninitialized 0: sum
+        push_0 0
+        put_loc0 0: sum
+        catch 70
+        set_loc_uninitialized 1: x
+        get_var gen
+        call0 0
+        for_await_of_start
+        goto8 53
+   22:  put_loc1 1: x
+        get_loc_check 0: sum
+        get_loc_check 1: x
+        add
+        dup
+        put_loc_check 0: sum
+        drop
+        get_loc_check 1: x
+        push_1 1
+        strict_eq
+        if_true8 53
+        get_loc_check 0: sum
+        push_i8 10
+        add
+        dup
+        put_loc_check 0: sum
+        drop
+   53:  for_await_of_next
+        await
+        iterator_get_value_done
+        if_false8 22
+        drop
+        iterator_close
+        drop
+        undefined
+        gosub 76
+        drop
+        goto8 88
+   70:  gosub 76
+        throw
+   76:  get_loc_check 0: sum
+        push_i8 100
+        add
+        dup
+        put_loc_check 0: sum
+        drop
+        ret
+   88:  get_loc_check 0: sum
+        return_async
+
+__tests__/fixtures/complex-async-flow.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var gen,64
+        check_define_var run,64
+        fclosure8 0: [bytecode gen]
+        define_func gen,0
+        fclosure8 1: [bytecode run]
+        define_func run,0
+        get_var run
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

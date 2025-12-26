@@ -1,0 +1,53 @@
+__tests__/fixtures/logical-operators.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        get_var console
+        get_field2 log
+        push_true
+        dup
+        if_false8 16
+        drop
+        push_false
+   16:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_false
+        dup
+        if_true8 36
+        drop
+        push_true
+   36:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        null
+        dup
+        is_undefined_or_null
+        if_false8 61
+        drop
+        push_atom_value default
+   61:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_1 1
+        dup
+        if_false8 81
+        drop
+        push_2 2
+   81:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_0 0
+        dup
+        if_true8 101
+        drop
+        push_3 3
+  101:  call_method 1
+        set_loc0 0: "<ret>"
+        return
+

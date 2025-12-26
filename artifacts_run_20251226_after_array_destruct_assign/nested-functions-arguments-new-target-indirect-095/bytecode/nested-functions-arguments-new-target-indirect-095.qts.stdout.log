@@ -1,0 +1,43 @@
+__tests__/fixtures/nested-functions-arguments-new-target-indirect-095.js:3:5: function: inner
+  locals:
+    0: var arguments
+  stack_size: 3
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_i8 95
+        push_3 3
+        mod
+        add
+        return
+
+__tests__/fixtures/nested-functions-arguments-new-target-indirect-095.js:2:1: function: outer95
+  locals:
+    0: var inner
+  stack_size: 4
+  opcodes:
+        fclosure8 0: [bytecode inner]
+        set_loc0 0: inner
+        push_1 1
+        push_2 2
+        push_3 3
+        tail_call 3
+
+__tests__/fixtures/nested-functions-arguments-new-target-indirect-095.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var outer95,64
+        fclosure8 0: [bytecode outer95]
+        define_func outer95,0
+        get_var console
+        get_field2 log
+        get_var outer95
+        call0 0
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

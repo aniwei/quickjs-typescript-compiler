@@ -1,0 +1,4831 @@
+__tests__/fixtures/quickjs-tests/repl.js:107:5: function: termInit
+  mode: strict
+  locals:
+    0: var tab
+  closure vars:
+    0: term_fd local:loc36 var
+    1: std parent:loc0 const
+    2: term_width local:loc38 var
+    3: os parent:loc1 const
+    4: sigint_handler local:loc41 var
+    5: term_read_buf local:loc37 var
+    6: term_read_handler local:loc42 var
+  stack_size: 4
+  opcodes:
+        get_var_ref_check 1: std
+        get_field in
+        get_field2 fileno
+        call_method 0
+        put_var_ref0 0: term_fd
+        push_i8 80
+        put_var_ref2 2: term_width
+        get_var_ref_check 3: os
+        get_field2 isatty
+        get_var_ref0 0: term_fd
+        call_method 1
+        if_false8 86
+        get_var_ref_check 3: os
+        get_field ttyGetWinSize
+        if_false8 63
+        get_var_ref_check 3: os
+        get_field2 ttyGetWinSize
+        get_var_ref0 0: term_fd
+        call_method 1
+        set_loc0 0: tab
+        if_false8 63
+        get_loc0 0: tab
+        push_0 0
+        get_array_el
+        put_var_ref2 2: term_width
+   63:  get_var_ref_check 3: os
+        get_field ttySetRaw
+        if_false8 86
+        get_var_ref_check 3: os
+        get_field2 ttySetRaw
+        get_var_ref0 0: term_fd
+        call_method 1
+        drop
+   86:  get_var_ref_check 3: os
+        get_field2 signal
+        get_var_ref_check 3: os
+        get_field SIGINT
+        get_var_ref 4: sigint_handler
+        call_method 2
+        drop
+        get_var Uint8Array
+        dup
+        push_i8 64
+        call_constructor 1
+        put_var_ref 5: term_read_buf
+        get_var_ref_check 3: os
+        get_field2 setReadHandler
+        get_var_ref0 0: term_fd
+        get_var_ref 6: term_read_handler
+        call_method 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:129:5: function: sigint_handler
+  mode: strict
+  closure vars:
+    0: handle_byte local:loc43 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: handle_byte
+        push_3 3
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:133:5: function: term_read_handler
+  mode: strict
+  locals:
+    0: var l
+    1: var i
+  closure vars:
+    0: os parent:loc1 const
+    1: term_fd local:loc36 var
+    2: term_read_buf local:loc37 var
+    3: handle_byte local:loc43 var
+  stack_size: 6
+  opcodes:
+        get_var_ref_check 0: os
+        get_field2 read
+        get_var_ref1 1: term_fd
+        get_var_ref2 2: term_read_buf
+        get_field buffer
+        push_0 0
+        get_var_ref2 2: term_read_buf
+        get_length
+        call_method 4
+        put_loc0 0: l
+        push_0 0
+        put_loc1 1: i
+   24:  get_loc1 1: i
+        get_loc0 0: l
+        lt
+        if_false8 39
+        get_var_ref3 3: handle_byte
+        get_var_ref2 2: term_read_buf
+        get_loc1 1: i
+        get_array_el
+        call1 1
+        drop
+        inc_loc 1: i
+        goto8 24
+   39:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:139:5: function: handle_byte
+  mode: strict
+  args: c
+  closure vars:
+    0: utf8 local:loc19 var
+    1: handle_char local:loc100 var
+    2: utf8_state local:loc34 var
+    3: utf8_val local:loc35 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: utf8
+        lnot
+        if_false8 9
+        get_var_ref1 1: handle_char
+        get_arg0 0: c
+        call1 1
+        drop
+        return_undef
+    9:  get_var_ref2 2: utf8_state
+        push_0 0
+        strict_neq
+        if_false8 49
+        get_arg0 0: c
+        push_i16 128
+        gte
+        if_false8 49
+        get_arg0 0: c
+        push_i16 192
+        lt
+        if_false8 49
+        get_var_ref3 3: utf8_val
+        push_6 6
+        shl
+        get_arg0 0: c
+        push_i8 63
+        and
+        or
+        put_var_ref3 3: utf8_val
+        get_var_ref2 2: utf8_state
+        dec
+        set_var_ref2 2: utf8_state
+        push_0 0
+        strict_eq
+        if_false8 94
+        get_var_ref1 1: handle_char
+        get_var_ref3 3: utf8_val
+        call1 1
+        drop
+        return_undef
+   49:  get_arg0 0: c
+        push_i16 192
+        gte
+        if_false8 88
+        get_arg0 0: c
+        push_i16 248
+        lt
+        if_false8 88
+        push_1 1
+        get_arg0 0: c
+        push_i16 224
+        gte
+        add
+        get_arg0 0: c
+        push_i16 240
+        gte
+        add
+        put_var_ref2 2: utf8_state
+        get_arg0 0: c
+        push_1 1
+        push_6 6
+        get_var_ref2 2: utf8_state
+        sub
+        shl
+        push_1 1
+        sub
+        and
+        put_var_ref3 3: utf8_val
+        return_undef
+   88:  push_0 0
+        put_var_ref2 2: utf8_state
+        get_var_ref1 1: handle_char
+        get_arg0 0: c
+        call1 1
+        drop
+   94:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:159:5: function: is_alpha
+  mode: strict
+  args: c
+  stack_size: 2
+  opcodes:
+        get_arg0 0: c
+        typeof
+        push_atom_value string
+        strict_eq
+        dup
+        if_false8 52
+        drop
+        get_arg0 0: c
+        push_atom_value A
+        gte
+        dup
+        if_false8 30
+        drop
+        get_arg0 0: c
+        push_atom_value Z
+        lte
+   30:  dup
+        if_true8 52
+        drop
+        get_arg0 0: c
+        push_atom_value a
+        gte
+        dup
+        if_false8 52
+        drop
+        get_arg0 0: c
+        push_atom_value z
+        lte
+   52:  return
+
+__tests__/fixtures/quickjs-tests/repl.js:163:5: function: is_digit
+  mode: strict
+  args: c
+  stack_size: 2
+  opcodes:
+        get_arg0 0: c
+        typeof
+        push_atom_value string
+        strict_eq
+        dup
+        if_false8 24
+        drop
+        get_arg0 0: c
+        push_const8 0: "0"
+        gte
+        dup
+        if_false8 24
+        drop
+        get_arg0 0: c
+        push_const8 1: "9"
+        lte
+   24:  return
+
+__tests__/fixtures/quickjs-tests/repl.js:166:5: function: is_word
+  mode: strict
+  args: c
+  closure vars:
+    0: is_alpha local:loc44 var
+    1: is_digit local:loc45 var
+  stack_size: 2
+  opcodes:
+        get_arg0 0: c
+        typeof
+        push_atom_value string
+        strict_eq
+        dup
+        if_false8 44
+        drop
+        get_var_ref0 0: is_alpha
+        get_arg0 0: c
+        call1 1
+        dup
+        if_true8 44
+        drop
+        get_var_ref1 1: is_digit
+        get_arg0 0: c
+        call1 1
+        dup
+        if_true8 44
+        drop
+        get_arg0 0: c
+        push_atom_value _
+        eq
+        dup
+        if_true8 44
+        drop
+        get_arg0 0: c
+        push_atom_value $
+        eq
+   44:  return
+
+__tests__/fixtures/quickjs-tests/repl.js:170:5: function: ucs_length
+  mode: strict
+  args: str
+  locals:
+    0: var len
+    1: var c
+    2: var i
+    3: var str_len
+  stack_size: 3
+  opcodes:
+        get_arg0 0: str
+        get_length
+        put_loc3 3: str_len
+        push_0 0
+        put_loc0 0: len
+        push_0 0
+        put_loc2 2: i
+    7:  get_loc2 2: i
+        get_loc3 3: str_len
+        lt
+        if_false8 48
+        get_arg0 0: str
+        get_field2 charCodeAt
+        get_loc2 2: i
+        call_method 1
+        set_loc1 1: c
+        push_i32 56320
+        lt
+        dup
+        if_true8 40
+        drop
+        get_loc1 1: c
+        push_i32 57344
+        gte
+   40:  if_false8 44
+        inc_loc 0: len
+   44:  inc_loc 2: i
+        goto8 7
+   48:  get_loc0 0: len
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:184:5: function: is_trailing_surrogate
+  mode: strict
+  args: c
+  locals:
+    0: var d
+  stack_size: 3
+  opcodes:
+        get_arg0 0: c
+        typeof
+        push_atom_value string
+        strict_neq
+        if_false8 12
+        push_false
+        return
+   12:  get_arg0 0: c
+        get_field2 codePointAt
+        push_0 0
+        call_method 1
+        set_loc0 0: d
+        push_i32 56320
+        gte
+        dup
+        if_false8 40
+        drop
+        get_loc0 0: d
+        push_i32 57344
+        lt
+   40:  return
+
+__tests__/fixtures/quickjs-tests/repl.js:191:5: function: is_balanced
+  mode: strict
+  args: a b
+  stack_size: 3
+  opcodes:
+        get_arg0 0: a
+        get_arg1 1: b
+        add
+        dup
+        push_atom_value "()"
+        strict_eq
+        if_true8 30
+        dup
+        push_atom_value "[]"
+        strict_eq
+        if_true8 30
+        dup
+        push_atom_value "{}"
+        strict_eq
+        if_false8 32
+   30:  push_true
+        return
+   32:  drop
+        push_false
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:200:5: function: print_color_text
+  mode: strict
+  args: str start style_names
+  locals:
+    0: var i
+    1: var j
+    2: var style
+  closure vars:
+    0: std parent:loc0 const
+    1: colors local:loc7 var
+    2: styles local:loc8 var
+  stack_size: 6
+  opcodes:
+        get_arg1 1: start
+        put_loc1 1: j
+    2:  get_loc1 1: j
+        get_arg0 0: str
+        get_length
+        lt
+        if_false8 98
+        get_arg2 2: style_names
+        get_loc1 1: j
+        set_loc0 0: i
+        get_array_el
+        put_loc2 2: style
+   13:  get_loc1 1: j
+        inc
+        set_loc1 1: j
+        get_arg0 0: str
+        get_length
+        lt
+        if_false8 28
+        get_arg2 2: style_names
+        get_loc1 1: j
+        get_array_el
+        get_loc2 2: style
+        eq
+        if_true8 13
+   28:  get_var_ref_check 0: std
+        get_field2 puts
+        get_var_ref1 1: colors
+        get_var_ref2 2: styles
+        get_loc2 2: style
+        get_array_el
+        dup
+        if_true8 49
+        drop
+        push_atom_value default
+   49:  get_array_el
+        call_method 1
+        drop
+        get_var_ref_check 0: std
+        get_field2 puts
+        get_arg0 0: str
+        get_field2 substring
+        get_loc0 0: i
+        get_loc1 1: j
+        call_method 2
+        call_method 1
+        drop
+        get_var_ref_check 0: std
+        get_field2 puts
+        get_var_ref1 1: colors
+        push_atom_value none
+        get_array_el
+        call_method 1
+        drop
+        goto8 2
+   98:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:211:5: function: print_csi
+  mode: strict
+  args: n code
+  closure vars:
+    0: std parent:loc0 const
+  stack_size: 5
+  opcodes:
+        get_var_ref_check 0: std
+        get_field2 puts
+        push_atom_value "\u001b["
+        get_arg0 0: n
+        push_1 1
+        neq
+        if_false8 21
+        get_arg0 0: n
+        goto8 22
+   21:  push_empty_string
+   22:  add
+        get_arg1 1: code
+        add
+        call_method 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:215:5: function: move_cursor
+  mode: strict
+  args: delta
+  locals:
+    0: var i
+    1: var l
+  closure vars:
+    0: term_cursor_x local:loc39 var
+    1: term_width local:loc38 var
+    2: std parent:loc0 const
+    3: Math local:loc4 var
+    4: print_csi local:loc51 var
+  stack_size: 4
+  opcodes:
+        get_arg0 0: delta
+        push_0 0
+        gt
+        if_false8 81
+    5:  get_arg0 0: delta
+        push_0 0
+        neq
+        if_false 160
+        get_var_ref0 0: term_cursor_x
+        get_var_ref1 1: term_width
+        push_1 1
+        sub
+        eq
+        if_false8 44
+        get_var_ref_check 2: std
+        get_field2 puts
+        push_atom_value "\n"
+        call_method 1
+        drop
+        push_0 0
+        put_var_ref0 0: term_cursor_x
+        get_arg0 0: delta
+        dec
+        put_arg0 0: delta
+        goto8 5
+   44:  get_var_ref3 3: Math
+        get_field2 min
+        get_var_ref1 1: term_width
+        push_1 1
+        sub
+        get_var_ref0 0: term_cursor_x
+        sub
+        get_arg0 0: delta
+        call_method 2
+        put_loc1 1: l
+        get_var_ref 4: print_csi
+        get_loc1 1: l
+        push_atom_value C
+        call2 2
+        drop
+        get_arg0 0: delta
+        get_loc1 1: l
+        sub
+        put_arg0 0: delta
+        get_var_ref0 0: term_cursor_x
+        get_loc1 1: l
+        add
+        put_var_ref0 0: term_cursor_x
+        goto8 5
+   81:  get_arg0 0: delta
+        neg
+        put_arg0 0: delta
+   84:  get_arg0 0: delta
+        push_0 0
+        neq
+        if_false8 160
+        get_var_ref0 0: term_cursor_x
+        push_0 0
+        eq
+        if_false8 127
+        get_var_ref 4: print_csi
+        push_1 1
+        push_atom_value A
+        call2 2
+        drop
+        get_var_ref 4: print_csi
+        get_var_ref1 1: term_width
+        push_1 1
+        sub
+        push_atom_value C
+        call2 2
+        drop
+        get_arg0 0: delta
+        dec
+        put_arg0 0: delta
+        get_var_ref1 1: term_width
+        push_1 1
+        sub
+        put_var_ref0 0: term_cursor_x
+        goto8 84
+  127:  get_var_ref3 3: Math
+        get_field2 min
+        get_arg0 0: delta
+        get_var_ref0 0: term_cursor_x
+        call_method 2
+        put_loc1 1: l
+        get_var_ref 4: print_csi
+        get_loc1 1: l
+        push_atom_value D
+        call2 2
+        drop
+        get_arg0 0: delta
+        get_loc1 1: l
+        sub
+        put_arg0 0: delta
+        get_var_ref0 0: term_cursor_x
+        get_loc1 1: l
+        sub
+        put_var_ref0 0: term_cursor_x
+        goto8 84
+  160:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:250:5: function: update
+  mode: strict
+  locals:
+    0: var i
+    1: var cmd_len
+    2: var str
+    3: var start
+    4: var colorstate
+  closure vars:
+    0: cmd local:loc26 var
+    1: last_cmd local:loc28 var
+    2: show_colors local:loc21 var
+    3: last_cursor_pos local:loc29 var
+    4: std parent:loc0 const
+    5: move_cursor local:loc52 var
+    6: ucs_length local:loc47 var
+    7: mexpr local:loc24 var
+    8: colorize_js local:loc115 var
+    9: print_color_text local:loc50 var
+   10: term_cursor_x local:loc39 var
+   11: term_width local:loc38 var
+   12: cursor_pos local:loc27 var
+  stack_size: 6
+  opcodes:
+        get_var_ref0 0: cmd
+        get_var_ref1 1: last_cmd
+        neq
+        if_false 202
+        get_var_ref2 2: show_colors
+        lnot
+        if_false8 61
+        get_var_ref1 1: last_cmd
+        get_field2 substring
+        push_0 0
+        get_var_ref3 3: last_cursor_pos
+        call_method 2
+        get_var_ref0 0: cmd
+        get_field2 substring
+        push_0 0
+        get_var_ref3 3: last_cursor_pos
+        call_method 2
+        eq
+        if_false8 61
+        get_var_ref_check 4: std
+        get_field2 puts
+        get_var_ref0 0: cmd
+        get_field2 substring
+        get_var_ref3 3: last_cursor_pos
+        call_method 1
+        call_method 1
+        drop
+        goto8 143
+   61:  get_var_ref 5: move_cursor
+        get_var_ref 6: ucs_length
+        get_var_ref1 1: last_cmd
+        get_field2 substring
+        push_0 0
+        get_var_ref3 3: last_cursor_pos
+        call_method 2
+        call1 1
+        neg
+        call1 1
+        drop
+        get_var_ref2 2: show_colors
+        if_false8 130
+        get_var_ref 7: mexpr
+        if_false8 103
+        get_var_ref 7: mexpr
+        push_atom_value "\n"
+        add
+        get_var_ref0 0: cmd
+        add
+        goto8 104
+  103:  get_var_ref0 0: cmd
+  104:  set_loc2 2: str
+        get_length
+        get_var_ref0 0: cmd
+        get_length
+        sub
+        put_loc3 3: start
+        get_var_ref 8: colorize_js
+        get_loc2 2: str
+        call1 1
+        put_loc8 4: colorstate
+        get_var_ref 9: print_color_text
+        get_loc2 2: str
+        get_loc3 3: start
+        get_loc8 4: colorstate
+        push_2 2
+        get_array_el
+        call3 3
+        drop
+        goto8 143
+  130:  get_var_ref_check 4: std
+        get_field2 puts
+        get_var_ref0 0: cmd
+        call_method 1
+        drop
+  143:  get_var_ref 10: term_cursor_x
+        get_var_ref 6: ucs_length
+        get_var_ref0 0: cmd
+        call1 1
+        add
+        get_var_ref 11: term_width
+        mod
+        set_var_ref 10: term_cursor_x
+        push_0 0
+        eq
+        if_false8 180
+        get_var_ref_check 4: std
+        get_field2 puts
+        push_atom_value " \u0008"
+        call_method 1
+        drop
+  180:  get_var_ref_check 4: std
+        get_field2 puts
+        push_atom_value "\u001b[J"
+        call_method 1
+        drop
+        get_var_ref0 0: cmd
+        put_var_ref1 1: last_cmd
+        get_var_ref0 0: cmd
+        get_length
+        put_var_ref3 3: last_cursor_pos
+  202:  get_var_ref 12: cursor_pos
+        get_var_ref3 3: last_cursor_pos
+        gt
+        if_false8 233
+        get_var_ref 5: move_cursor
+        get_var_ref 6: ucs_length
+        get_var_ref0 0: cmd
+        get_field2 substring
+        get_var_ref3 3: last_cursor_pos
+        get_var_ref 12: cursor_pos
+        call_method 2
+        call1 1
+        call1 1
+        drop
+        goto8 263
+  233:  get_var_ref 12: cursor_pos
+        get_var_ref3 3: last_cursor_pos
+        lt
+        if_false8 263
+        get_var_ref 5: move_cursor
+        get_var_ref 6: ucs_length
+        get_var_ref0 0: cmd
+        get_field2 substring
+        get_var_ref 12: cursor_pos
+        get_var_ref3 3: last_cursor_pos
+        call_method 2
+        call1 1
+        neg
+        call1 1
+        drop
+  263:  get_var_ref 12: cursor_pos
+        put_var_ref3 3: last_cursor_pos
+        get_var_ref_check 4: std
+        get_field out
+        get_field2 flush
+        call_method 0
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:292:5: function: insert
+  mode: strict
+  args: str
+  closure vars:
+    0: cmd local:loc26 var
+    1: cursor_pos local:loc27 var
+  stack_size: 4
+  opcodes:
+        get_arg0 0: str
+        if_false8 33
+        get_var_ref0 0: cmd
+        get_field2 substring
+        push_0 0
+        get_var_ref1 1: cursor_pos
+        call_method 2
+        get_arg0 0: str
+        add
+        get_var_ref0 0: cmd
+        get_field2 substring
+        get_var_ref1 1: cursor_pos
+        call_method 1
+        add
+        put_var_ref0 0: cmd
+        get_var_ref1 1: cursor_pos
+        get_arg0 0: str
+        get_length
+        add
+        put_var_ref1 1: cursor_pos
+   33:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:298:5: function: quoted_insert
+  mode: strict
+  closure vars:
+    0: quote_flag local:loc33 var
+  stack_size: 1
+  opcodes:
+        push_true
+        put_var_ref0 0: quote_flag
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:301:5: function: abort
+  mode: strict
+  closure vars:
+    0: cmd local:loc26 var
+    1: cursor_pos local:loc27 var
+  stack_size: 1
+  opcodes:
+        push_empty_string
+        put_var_ref0 0: cmd
+        push_0 0
+        put_var_ref1 1: cursor_pos
+        push_i8 -2
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:306:5: function: alert
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:308:5: function: beginning_of_line
+  mode: strict
+  closure vars:
+    0: cursor_pos local:loc27 var
+  stack_size: 1
+  opcodes:
+        push_0 0
+        put_var_ref0 0: cursor_pos
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:311:5: function: end_of_line
+  mode: strict
+  closure vars:
+    0: cursor_pos local:loc27 var
+    1: cmd local:loc26 var
+  stack_size: 1
+  opcodes:
+        get_var_ref1 1: cmd
+        get_length
+        put_var_ref0 0: cursor_pos
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:314:5: function: forward_char
+  mode: strict
+  closure vars:
+    0: cursor_pos local:loc27 var
+    1: cmd local:loc26 var
+    2: is_trailing_surrogate local:loc48 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: cursor_pos
+        get_var_ref1 1: cmd
+        get_length
+        lt
+        if_false8 28
+        get_var_ref0 0: cursor_pos
+        inc
+        put_var_ref0 0: cursor_pos
+    9:  get_var_ref2 2: is_trailing_surrogate
+        get_var_ref1 1: cmd
+        get_field2 charAt
+        get_var_ref0 0: cursor_pos
+        call_method 1
+        call1 1
+        if_false8 28
+        get_var_ref0 0: cursor_pos
+        inc
+        put_var_ref0 0: cursor_pos
+        goto8 9
+   28:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:321:5: function: backward_char
+  mode: strict
+  closure vars:
+    0: cursor_pos local:loc27 var
+    1: is_trailing_surrogate local:loc48 var
+    2: cmd local:loc26 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: cursor_pos
+        push_0 0
+        gt
+        if_false8 27
+        get_var_ref0 0: cursor_pos
+        dec
+        put_var_ref0 0: cursor_pos
+    8:  get_var_ref1 1: is_trailing_surrogate
+        get_var_ref2 2: cmd
+        get_field2 charAt
+        get_var_ref0 0: cursor_pos
+        call_method 1
+        call1 1
+        if_false8 27
+        get_var_ref0 0: cursor_pos
+        dec
+        put_var_ref0 0: cursor_pos
+        goto8 8
+   27:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:328:5: function: skip_word_forward
+  mode: strict
+  args: pos
+  closure vars:
+    0: cmd local:loc26 var
+    1: is_word local:loc46 var
+  stack_size: 4
+  opcodes:
+    0:  get_arg0 0: pos
+        get_var_ref0 0: cmd
+        get_length
+        lt
+        if_false8 26
+        get_var_ref1 1: is_word
+        get_var_ref0 0: cmd
+        get_field2 charAt
+        get_arg0 0: pos
+        call_method 1
+        call1 1
+        lnot
+        if_false8 26
+        get_arg0 0: pos
+        inc
+        put_arg0 0: pos
+        goto8 0
+   26:  get_arg0 0: pos
+        get_var_ref0 0: cmd
+        get_length
+        lt
+        if_false8 51
+        get_var_ref1 1: is_word
+        get_var_ref0 0: cmd
+        get_field2 charAt
+        get_arg0 0: pos
+        call_method 1
+        call1 1
+        if_false8 51
+        get_arg0 0: pos
+        inc
+        put_arg0 0: pos
+        goto8 26
+   51:  get_arg0 0: pos
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:335:5: function: skip_word_backward
+  mode: strict
+  args: pos
+  closure vars:
+    0: is_word local:loc46 var
+    1: cmd local:loc26 var
+  stack_size: 5
+  opcodes:
+    0:  get_arg0 0: pos
+        push_0 0
+        gt
+        if_false8 27
+        get_var_ref0 0: is_word
+        get_var_ref1 1: cmd
+        get_field2 charAt
+        get_arg0 0: pos
+        push_1 1
+        sub
+        call_method 1
+        call1 1
+        lnot
+        if_false8 27
+        get_arg0 0: pos
+        dec
+        put_arg0 0: pos
+        goto8 0
+   27:  get_arg0 0: pos
+        push_0 0
+        gt
+        if_false8 53
+        get_var_ref0 0: is_word
+        get_var_ref1 1: cmd
+        get_field2 charAt
+        get_arg0 0: pos
+        push_1 1
+        sub
+        call_method 1
+        call1 1
+        if_false8 53
+        get_arg0 0: pos
+        dec
+        put_arg0 0: pos
+        goto8 27
+   53:  get_arg0 0: pos
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:342:5: function: forward_word
+  mode: strict
+  closure vars:
+    0: cursor_pos local:loc27 var
+    1: skip_word_forward local:loc62 var
+  stack_size: 2
+  opcodes:
+        get_var_ref1 1: skip_word_forward
+        get_var_ref0 0: cursor_pos
+        call1 1
+        put_var_ref0 0: cursor_pos
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:345:5: function: backward_word
+  mode: strict
+  closure vars:
+    0: cursor_pos local:loc27 var
+    1: skip_word_backward local:loc63 var
+  stack_size: 2
+  opcodes:
+        get_var_ref1 1: skip_word_backward
+        get_var_ref0 0: cursor_pos
+        call1 1
+        put_var_ref0 0: cursor_pos
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:348:5: function: accept_line
+  mode: strict
+  closure vars:
+    0: std parent:loc0 const
+    1: history_add local:loc67 var
+    2: cmd local:loc26 var
+  stack_size: 3
+  opcodes:
+        get_var_ref_check 0: std
+        get_field2 puts
+        push_atom_value "\n"
+        call_method 1
+        drop
+        get_var_ref1 1: history_add
+        get_var_ref2 2: cmd
+        call1 1
+        drop
+        push_minus1 -1
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:353:5: function: history_add
+  mode: strict
+  args: str
+  closure vars:
+    0: history local:loc9 var
+    1: history_index local:loc30 var
+  stack_size: 3
+  opcodes:
+        get_arg0 0: str
+        if_false8 14
+        get_var_ref0 0: history
+        get_field2 push
+        get_arg0 0: str
+        call_method 1
+        drop
+   14:  get_var_ref0 0: history
+        get_length
+        put_var_ref1 1: history_index
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:359:5: function: previous_history
+  mode: strict
+  closure vars:
+    0: history_index local:loc30 var
+    1: history local:loc9 var
+    2: cmd local:loc26 var
+    3: cursor_pos local:loc27 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: history_index
+        push_0 0
+        gt
+        if_false8 31
+        get_var_ref0 0: history_index
+        get_var_ref1 1: history
+        get_length
+        eq
+        if_false8 22
+        get_var_ref1 1: history
+        get_field2 push
+        get_var_ref2 2: cmd
+        call_method 1
+        drop
+   22:  get_var_ref0 0: history_index
+        dec
+        put_var_ref0 0: history_index
+        get_var_ref1 1: history
+        get_var_ref0 0: history_index
+        get_array_el
+        set_var_ref2 2: cmd
+        get_length
+        put_var_ref3 3: cursor_pos
+   31:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:369:5: function: next_history
+  mode: strict
+  closure vars:
+    0: history_index local:loc30 var
+    1: history local:loc9 var
+    2: cmd local:loc26 var
+    3: cursor_pos local:loc27 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: history_index
+        get_var_ref1 1: history
+        get_length
+        push_1 1
+        sub
+        lt
+        if_false8 17
+        get_var_ref0 0: history_index
+        inc
+        put_var_ref0 0: history_index
+        get_var_ref1 1: history
+        get_var_ref0 0: history_index
+        get_array_el
+        set_var_ref2 2: cmd
+        get_length
+        put_var_ref3 3: cursor_pos
+   17:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:376:5: function: history_search
+  mode: strict
+  args: dir
+  locals:
+    0: var pos
+    1: var i
+    2: var index
+  closure vars:
+    0: cursor_pos local:loc27 var
+    1: history local:loc9 var
+    2: history_index local:loc30 var
+    3: cmd local:loc26 var
+  stack_size: 5
+  opcodes:
+        get_var_ref0 0: cursor_pos
+        put_loc0 0: pos
+        push_1 1
+        put_loc1 1: i
+    4:  get_loc1 1: i
+        get_var_ref1 1: history
+        get_length
+        lte
+        if_false8 60
+        get_var_ref1 1: history
+        get_length
+        get_loc1 1: i
+        get_arg0 0: dir
+        mul
+        add
+        get_var_ref2 2: history_index
+        add
+        get_var_ref1 1: history
+        get_length
+        mod
+        put_loc2 2: index
+        get_var_ref1 1: history
+        get_loc2 2: index
+        get_array_el
+        get_field2 substring
+        push_0 0
+        get_loc0 0: pos
+        call_method 2
+        get_var_ref3 3: cmd
+        get_field2 substring
+        push_0 0
+        get_loc0 0: pos
+        call_method 2
+        eq
+        if_false8 56
+        get_loc2 2: index
+        put_var_ref2 2: history_index
+        get_var_ref1 1: history
+        get_loc2 2: index
+        get_array_el
+        put_var_ref3 3: cmd
+        return_undef
+   56:  inc_loc 1: i
+        goto8 4
+   60:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:387:5: function: history_search_backward
+  mode: strict
+  closure vars:
+    0: history_search local:loc70 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: history_search
+        push_minus1 -1
+        tail_call 1
+
+__tests__/fixtures/quickjs-tests/repl.js:390:5: function: history_search_forward
+  mode: strict
+  closure vars:
+    0: history_search local:loc70 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: history_search
+        push_1 1
+        tail_call 1
+
+__tests__/fixtures/quickjs-tests/repl.js:393:5: function: delete_char_dir
+  mode: strict
+  args: dir
+  locals:
+    0: var start
+    1: var end
+  closure vars:
+    0: cursor_pos local:loc27 var
+    1: is_trailing_surrogate local:loc48 var
+    2: cmd local:loc26 var
+    3: last_fun local:loc32 var
+    4: kill_region local:loc81 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: cursor_pos
+        put_loc0 0: start
+        get_arg0 0: dir
+        push_0 0
+        lt
+        if_false8 27
+        dec_loc 0: start
+    9:  get_var_ref1 1: is_trailing_surrogate
+        get_var_ref2 2: cmd
+        get_field2 charAt
+        get_loc0 0: start
+        call_method 1
+        call1 1
+        if_false8 27
+        dec_loc 0: start
+        goto8 9
+   27:  get_loc0 0: start
+        push_1 1
+        add
+        put_loc1 1: end
+   31:  get_var_ref1 1: is_trailing_surrogate
+        get_var_ref2 2: cmd
+        get_field2 charAt
+        get_loc1 1: end
+        call_method 1
+        call1 1
+        if_false8 49
+        inc_loc 1: end
+        goto8 31
+   49:  get_loc0 0: start
+        push_0 0
+        gte
+        if_false8 101
+        get_loc0 0: start
+        get_var_ref2 2: cmd
+        get_length
+        lt
+        if_false8 101
+        get_var_ref3 3: last_fun
+        get_var_ref 4: kill_region
+        strict_eq
+        if_false8 76
+        get_var_ref 4: kill_region
+        get_loc0 0: start
+        get_loc1 1: end
+        get_arg0 0: dir
+        call3 3
+        drop
+        return_undef
+   76:  get_var_ref2 2: cmd
+        get_field2 substring
+        push_0 0
+        get_loc0 0: start
+        call_method 2
+        get_var_ref2 2: cmd
+        get_field2 substring
+        get_loc1 1: end
+        call_method 1
+        add
+        put_var_ref2 2: cmd
+        get_loc0 0: start
+        put_var_ref0 0: cursor_pos
+  101:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:414:5: function: delete_char
+  mode: strict
+  closure vars:
+    0: delete_char_dir local:loc73 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: delete_char_dir
+        push_1 1
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:417:5: function: control_d
+  mode: strict
+  closure vars:
+    0: cmd local:loc26 var
+    1: std parent:loc0 const
+    2: delete_char_dir local:loc73 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: cmd
+        get_length
+        push_0 0
+        eq
+        if_false8 26
+        get_var_ref_check 1: std
+        get_field2 puts
+        push_atom_value "\n"
+        call_method 1
+        drop
+        push_i8 -3
+        return
+   26:  get_var_ref2 2: delete_char_dir
+        push_1 1
+        call1 1
+        drop
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:426:5: function: backward_delete_char
+  mode: strict
+  closure vars:
+    0: delete_char_dir local:loc73 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: delete_char_dir
+        push_minus1 -1
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:429:5: function: transpose_chars
+  mode: strict
+  locals:
+    0: var pos
+  closure vars:
+    0: cursor_pos local:loc27 var
+    1: cmd local:loc26 var
+  stack_size: 6
+  opcodes:
+        get_var_ref0 0: cursor_pos
+        put_loc0 0: pos
+        get_var_ref1 1: cmd
+        get_length
+        push_1 1
+        gt
+        if_false8 80
+        get_loc0 0: pos
+        push_0 0
+        gt
+        if_false8 80
+        get_loc0 0: pos
+        get_var_ref1 1: cmd
+        get_length
+        eq
+        if_false8 21
+        dec_loc 0: pos
+   21:  get_var_ref1 1: cmd
+        get_field2 substring
+        push_0 0
+        get_loc0 0: pos
+        push_1 1
+        sub
+        call_method 2
+        get_var_ref1 1: cmd
+        get_field2 substring
+        get_loc0 0: pos
+        get_loc0 0: pos
+        push_1 1
+        add
+        call_method 2
+        add
+        get_var_ref1 1: cmd
+        get_field2 substring
+        get_loc0 0: pos
+        push_1 1
+        sub
+        get_loc0 0: pos
+        call_method 2
+        add
+        get_var_ref1 1: cmd
+        get_field2 substring
+        get_loc0 0: pos
+        push_1 1
+        add
+        call_method 1
+        add
+        put_var_ref1 1: cmd
+        get_loc0 0: pos
+        push_1 1
+        add
+        put_var_ref0 0: cursor_pos
+   80:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:439:5: function: transpose_words
+  mode: strict
+  locals:
+    0: var p1
+    1: var p2
+    2: var p4
+    3: var p3
+  closure vars:
+    0: skip_word_backward local:loc63 var
+    1: cursor_pos local:loc27 var
+    2: skip_word_forward local:loc62 var
+    3: cmd local:loc26 var
+  stack_size: 5
+  opcodes:
+        get_var_ref0 0: skip_word_backward
+        get_var_ref1 1: cursor_pos
+        call1 1
+        put_loc0 0: p1
+        get_var_ref2 2: skip_word_forward
+        get_loc0 0: p1
+        call1 1
+        put_loc1 1: p2
+        get_var_ref2 2: skip_word_forward
+        get_var_ref1 1: cursor_pos
+        call1 1
+        put_loc2 2: p4
+        get_var_ref0 0: skip_word_backward
+        get_loc2 2: p4
+        call1 1
+        put_loc3 3: p3
+        get_loc0 0: p1
+        get_loc1 1: p2
+        lt
+        if_false8 86
+        get_loc1 1: p2
+        get_var_ref1 1: cursor_pos
+        lte
+        if_false8 86
+        get_var_ref1 1: cursor_pos
+        get_loc3 3: p3
+        lte
+        if_false8 86
+        get_loc3 3: p3
+        get_loc2 2: p4
+        lt
+        if_false8 86
+        get_var_ref3 3: cmd
+        get_field2 substring
+        push_0 0
+        get_loc0 0: p1
+        call_method 2
+        get_var_ref3 3: cmd
+        get_field2 substring
+        get_loc3 3: p3
+        get_loc2 2: p4
+        call_method 2
+        add
+        get_var_ref3 3: cmd
+        get_field2 substring
+        get_loc1 1: p2
+        get_loc3 3: p3
+        call_method 2
+        add
+        get_var_ref3 3: cmd
+        get_field2 substring
+        get_loc0 0: p1
+        get_loc1 1: p2
+        call_method 2
+        add
+        put_var_ref3 3: cmd
+        get_loc2 2: p4
+        put_var_ref1 1: cursor_pos
+   86:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:450:5: function: upcase_word
+  mode: strict
+  locals:
+    0: var end
+  closure vars:
+    0: skip_word_forward local:loc62 var
+    1: cursor_pos local:loc27 var
+    2: cmd local:loc26 var
+  stack_size: 5
+  opcodes:
+        get_var_ref0 0: skip_word_forward
+        get_var_ref1 1: cursor_pos
+        call1 1
+        put_loc0 0: end
+        get_var_ref2 2: cmd
+        get_field2 substring
+        push_0 0
+        get_var_ref1 1: cursor_pos
+        call_method 2
+        get_var_ref2 2: cmd
+        get_field2 substring
+        get_var_ref1 1: cursor_pos
+        get_loc0 0: end
+        call_method 2
+        get_field2 toUpperCase
+        call_method 0
+        add
+        get_var_ref2 2: cmd
+        get_field2 substring
+        get_loc0 0: end
+        call_method 1
+        add
+        put_var_ref2 2: cmd
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:456:5: function: downcase_word
+  mode: strict
+  locals:
+    0: var end
+  closure vars:
+    0: skip_word_forward local:loc62 var
+    1: cursor_pos local:loc27 var
+    2: cmd local:loc26 var
+  stack_size: 5
+  opcodes:
+        get_var_ref0 0: skip_word_forward
+        get_var_ref1 1: cursor_pos
+        call1 1
+        put_loc0 0: end
+        get_var_ref2 2: cmd
+        get_field2 substring
+        push_0 0
+        get_var_ref1 1: cursor_pos
+        call_method 2
+        get_var_ref2 2: cmd
+        get_field2 substring
+        get_var_ref1 1: cursor_pos
+        get_loc0 0: end
+        call_method 2
+        get_field2 toLowerCase
+        call_method 0
+        add
+        get_var_ref2 2: cmd
+        get_field2 substring
+        get_loc0 0: end
+        call_method 1
+        add
+        put_var_ref2 2: cmd
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:462:5: function: kill_region
+  mode: strict
+  args: start end dir
+  locals:
+    0: var s
+  closure vars:
+    0: cmd local:loc26 var
+    1: last_fun local:loc32 var
+    2: kill_region local:loc81 var
+    3: clip_board local:loc10 var
+    4: cursor_pos local:loc27 var
+    5: this_fun local:loc31 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: cmd
+        get_field2 substring
+        get_arg0 0: start
+        get_arg1 1: end
+        call_method 2
+        put_loc0 0: s
+        get_var_ref1 1: last_fun
+        get_var_ref2 2: kill_region
+        strict_neq
+        if_false8 21
+        get_loc0 0: s
+        put_var_ref3 3: clip_board
+        goto8 36
+   21:  get_arg2 2: dir
+        push_0 0
+        lt
+        if_false8 32
+        get_loc0 0: s
+        get_var_ref3 3: clip_board
+        add
+        put_var_ref3 3: clip_board
+        goto8 36
+   32:  get_var_ref3 3: clip_board
+        get_loc0 0: s
+        add
+        put_var_ref3 3: clip_board
+   36:  get_var_ref0 0: cmd
+        get_field2 substring
+        push_0 0
+        get_arg0 0: start
+        call_method 2
+        get_var_ref0 0: cmd
+        get_field2 substring
+        get_arg1 1: end
+        call_method 1
+        add
+        put_var_ref0 0: cmd
+        get_var_ref 4: cursor_pos
+        get_arg1 1: end
+        gt
+        if_false8 78
+        get_var_ref 4: cursor_pos
+        get_arg1 1: end
+        get_arg0 0: start
+        sub
+        sub
+        put_var_ref 4: cursor_pos
+        goto8 89
+   78:  get_var_ref 4: cursor_pos
+        get_arg0 0: start
+        gt
+        if_false8 89
+        get_arg0 0: start
+        put_var_ref 4: cursor_pos
+   89:  get_var_ref2 2: kill_region
+        put_var_ref 5: this_fun
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:477:5: function: kill_line
+  mode: strict
+  closure vars:
+    0: kill_region local:loc81 var
+    1: cursor_pos local:loc27 var
+    2: cmd local:loc26 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: kill_region
+        get_var_ref1 1: cursor_pos
+        get_var_ref2 2: cmd
+        get_length
+        push_1 1
+        call3 3
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:480:5: function: backward_kill_line
+  mode: strict
+  closure vars:
+    0: kill_region local:loc81 var
+    1: cursor_pos local:loc27 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: kill_region
+        push_0 0
+        get_var_ref1 1: cursor_pos
+        push_minus1 -1
+        call3 3
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:483:5: function: kill_word
+  mode: strict
+  closure vars:
+    0: kill_region local:loc81 var
+    1: cursor_pos local:loc27 var
+    2: skip_word_forward local:loc62 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: kill_region
+        get_var_ref1 1: cursor_pos
+        get_var_ref2 2: skip_word_forward
+        get_var_ref1 1: cursor_pos
+        call1 1
+        push_1 1
+        call3 3
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:486:5: function: backward_kill_word
+  mode: strict
+  closure vars:
+    0: kill_region local:loc81 var
+    1: skip_word_backward local:loc63 var
+    2: cursor_pos local:loc27 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: kill_region
+        get_var_ref1 1: skip_word_backward
+        get_var_ref2 2: cursor_pos
+        call1 1
+        get_var_ref2 2: cursor_pos
+        push_minus1 -1
+        call3 3
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:489:5: function: yank
+  mode: strict
+  closure vars:
+    0: insert local:loc54 var
+    1: clip_board local:loc10 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: insert
+        get_var_ref1 1: clip_board
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:492:5: function: control_c
+  mode: strict
+  closure vars:
+    0: last_fun local:loc32 var
+    1: control_c local:loc87 var
+    2: std parent:loc0 const
+    3: readline_print_prompt local:loc98 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: last_fun
+        get_var_ref1 1: control_c
+        strict_eq
+        if_false8 36
+        get_var_ref_check 2: std
+        get_field2 puts
+        push_atom_value "\n"
+        call_method 1
+        drop
+        get_var_ref_check 2: std
+        get_field2 exit
+        push_0 0
+        call_method 1
+        drop
+        return_undef
+   36:  get_var_ref_check 2: std
+        get_field2 puts
+        push_atom_value "\n(Press Ctrl-C again to quit)\n"
+        call_method 1
+        drop
+        get_var_ref3 3: readline_print_prompt
+        call0 0
+        drop
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:502:5: function: reset
+  mode: strict
+  closure vars:
+    0: cmd local:loc26 var
+    1: cursor_pos local:loc27 var
+  stack_size: 1
+  opcodes:
+        push_empty_string
+        put_var_ref0 0: cmd
+        push_0 0
+        put_var_ref1 1: cursor_pos
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:506:5: function: get_context_word
+  mode: strict
+  args: line pos
+  locals:
+    0: var s
+  closure vars:
+    0: is_word local:loc46 var
+  stack_size: 4
+  opcodes:
+        push_empty_string
+        put_loc0 0: s
+    2:  get_arg1 1: pos
+        push_0 0
+        gt
+        if_false8 27
+        get_var_ref0 0: is_word
+        get_arg0 0: line
+        get_arg1 1: pos
+        push_1 1
+        sub
+        get_array_el
+        call1 1
+        if_false8 27
+        get_arg1 1: pos
+        dec
+        put_arg1 1: pos
+        get_arg0 0: line
+        get_arg1 1: pos
+        get_array_el
+        get_loc0 0: s
+        add
+        put_loc0 0: s
+        goto8 2
+   27:  get_loc0 0: s
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:514:5: function: get_context_object
+  mode: strict
+  args: line pos
+  locals:
+    0: var obj
+    1: var base
+    2: var c
+    3: var this
+    4: var new.target
+    5: var arguments
+  closure vars:
+    0: g local:arg0 var
+    1: Object local:loc0 var
+    2: String local:loc1 var
+    3: Array local:loc2 var
+    4: Date local:loc3 var
+    5: Math local:loc4 var
+    6: isFinite local:loc5 var
+    7: parseFloat local:loc6 var
+    8: colors local:loc7 var
+    9: styles local:loc8 var
+   10: history local:loc9 var
+   11: clip_board local:loc10 var
+   12: prec local:loc11 var
+   13: expBits local:loc12 var
+   14: log2_10 local:loc13 var
+   15: pstate local:loc14 var
+   16: prompt local:loc15 var
+   17: plen local:loc16 var
+   18: ps1 local:loc17 var
+   19: ps2 local:loc18 var
+   20: utf8 local:loc19 var
+   21: show_time local:loc20 var
+   22: show_colors local:loc21 var
+   23: eval_start_time local:loc22 var
+   24: eval_time local:loc23 var
+   25: mexpr local:loc24 var
+   26: level local:loc25 var
+   27: cmd local:loc26 var
+   28: cursor_pos local:loc27 var
+   29: last_cmd local:loc28 var
+   30: last_cursor_pos local:loc29 var
+   31: history_index local:loc30 var
+   32: this_fun local:loc31 var
+   33: last_fun local:loc32 var
+   34: quote_flag local:loc33 var
+   35: utf8_state local:loc34 var
+   36: utf8_val local:loc35 var
+   37: term_fd local:loc36 var
+   38: term_read_buf local:loc37 var
+   39: term_width local:loc38 var
+   40: term_cursor_x local:loc39 var
+   41: termInit local:loc40 var
+   42: sigint_handler local:loc41 var
+   43: term_read_handler local:loc42 var
+   44: handle_byte local:loc43 var
+   45: is_alpha local:loc44 var
+   46: is_digit local:loc45 var
+   47: is_word local:loc46 var
+   48: ucs_length local:loc47 var
+   49: is_trailing_surrogate local:loc48 var
+   50: is_balanced local:loc49 var
+   51: print_color_text local:loc50 var
+   52: print_csi local:loc51 var
+   53: move_cursor local:loc52 var
+   54: update local:loc53 var
+   55: insert local:loc54 var
+   56: quoted_insert local:loc55 var
+   57: abort local:loc56 var
+   58: alert local:loc57 var
+   59: beginning_of_line local:loc58 var
+   60: end_of_line local:loc59 var
+   61: forward_char local:loc60 var
+   62: backward_char local:loc61 var
+   63: skip_word_forward local:loc62 var
+   64: skip_word_backward local:loc63 var
+   65: forward_word local:loc64 var
+   66: backward_word local:loc65 var
+   67: accept_line local:loc66 var
+   68: history_add local:loc67 var
+   69: previous_history local:loc68 var
+   70: next_history local:loc69 var
+   71: history_search local:loc70 var
+   72: history_search_backward local:loc71 var
+   73: history_search_forward local:loc72 var
+   74: delete_char_dir local:loc73 var
+   75: delete_char local:loc74 var
+   76: control_d local:loc75 var
+   77: backward_delete_char local:loc76 var
+   78: transpose_chars local:loc77 var
+   79: transpose_words local:loc78 var
+   80: upcase_word local:loc79 var
+   81: downcase_word local:loc80 var
+   82: kill_region local:loc81 var
+   83: kill_line local:loc82 var
+   84: backward_kill_line local:loc83 var
+   85: kill_word local:loc84 var
+   86: backward_kill_word local:loc85 var
+   87: yank local:loc86 var
+   88: control_c local:loc87 var
+   89: reset local:loc88 var
+   90: get_context_word local:loc89 var
+   91: get_context_object local:loc90 var
+   92: get_completions local:loc91 var
+   93: completion local:loc92 var
+   94: commands local:loc93 var
+   95: dupstr local:loc94 var
+   96: readline_keys local:loc95 var
+   97: readline_state local:loc96 var
+   98: readline_cb local:loc97 var
+   99: readline_print_prompt local:loc98 var
+  100: readline_start local:loc99 var
+  101: handle_char local:loc100 var
+  102: handle_key local:loc101 var
+  103: hex_mode local:loc102 var
+  104: number_to_string_hex local:loc103 var
+  105: extract_directive local:loc104 var
+  106: handle_directive local:loc105 var
+  107: help local:loc106 var
+  108: cmd_start local:loc107 var
+  109: cmd_readline_start local:loc108 var
+  110: readline_handle_cmd local:loc109 var
+  111: handle_cmd local:loc110 var
+  112: eval_and_print_start local:loc111 var
+  113: print_eval_result local:loc112 var
+  114: print_eval_error local:loc113 var
+  115: handle_cmd_end local:loc114 var
+  116: colorize_js local:loc115 var
+  117: std parent:loc0 const
+  118: os parent:loc1 const
+  stack_size: 5
+  opcodes:
+        special_object 3
+        put_loc8 4: "new.target"
+        push_this
+        put_loc3 3: this
+        special_object 0
+        put_loc8 5: arguments
+        get_arg1 1: pos
+        push_0 0
+        lte
+        dup
+        if_true8 37
+        drop
+        push_atom_value " ~!%^&*(-+={[|:;,<>?/"
+        get_field2 indexOf
+        get_arg0 0: line
+        get_arg1 1: pos
+        push_1 1
+        sub
+        get_array_el
+        call_method 1
+        push_0 0
+        gte
+   37:  if_false8 41
+        get_var_ref0 0: g
+        return
+   41:  get_arg1 1: pos
+        push_2 2
+        gte
+        if_false 301
+        get_arg0 0: line
+        get_arg1 1: pos
+        push_1 1
+        sub
+        get_array_el
+        push_atom_value "."
+        strict_eq
+        if_false 301
+        get_arg1 1: pos
+        dec
+        put_arg1 1: pos
+        object
+        put_loc0 0: obj
+        get_arg0 0: line
+        get_arg1 1: pos
+        push_1 1
+        sub
+        get_array_el
+        set_loc2 2: c
+        dup
+        push_atom_value "'"
+        strict_eq
+        if_true8 94
+        dup
+        push_atom_value "\""
+        strict_eq
+        if_false8 100
+   94:  push_atom_value a
+        return
+  100:  dup
+        push_atom_value "]"
+        strict_eq
+        if_false8 113
+        array_from 0
+        return
+  113:  dup
+        push_atom_value "}"
+        strict_eq
+        if_false8 124
+        object
+        return
+  124:  dup
+        push_atom_value "/"
+        strict_eq
+        if_false8 139
+        push_const8 0: " "
+        push_const8 1: "\u0000\u0000\u0001\u0000\u0013\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0001 \u0000\u0010\u0000\u000e"
+        regexp
+        return
+  139:  get_var_ref 47: is_word
+        get_loc2 2: c
+        call1 1
+        if_false 299
+        get_var_ref 90: get_context_word
+        get_arg0 0: line
+        get_arg1 1: pos
+        call2 2
+        put_loc1 1: base
+        push_atom_value true
+        push_atom_value false
+        push_atom_value null
+        push_atom_value this
+        array_from 4
+        get_field2 includes
+        get_loc1 1: base
+        call_method 1
+        dup
+        if_true8 201
+        drop
+        get_var isNaN
+        get_loc1 1: base
+        plus
+        call1 1
+        lnot
+  201:  if_false8 215
+        get_var eval
+        get_loc1 1: base
+        eval 1,1
+        return
+  215:  get_arg1 1: pos
+        get_loc1 1: base
+        get_length
+        sub
+        push_3 3
+        gte
+        if_false8 251
+        get_arg0 0: line
+        get_arg1 1: pos
+        get_loc1 1: base
+        get_length
+        sub
+        push_1 1
+        sub
+        get_array_el
+        push_atom_value "/"
+        strict_eq
+        if_false8 251
+        get_var RegExp
+        dup
+        push_empty_string
+        get_loc1 1: base
+        call_constructor 2
+        return
+  251:  get_var_ref 91: get_context_object
+        get_arg0 0: line
+        get_arg1 1: pos
+        get_loc1 1: base
+        get_length
+        sub
+        call2 2
+        set_loc0 0: obj
+        is_null
+        dup
+        if_true8 268
+        drop
+        get_loc0 0: obj
+        is_undefined
+  268:  if_false8 272
+        get_loc0 0: obj
+        return
+  272:  get_loc0 0: obj
+        get_var_ref0 0: g
+        strict_eq
+        if_false8 295
+        get_loc0 0: obj
+        get_loc1 1: base
+        get_array_el
+        is_undefined
+        if_false8 295
+        get_var eval
+        get_loc1 1: base
+        eval 1,1
+        return
+  295:  get_loc0 0: obj
+        get_loc1 1: base
+        get_array_el
+        return
+  299:  object
+        return
+  301:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:572:13: function: symcmp
+  mode: strict
+  args: a b
+  stack_size: 3
+  opcodes:
+        get_arg0 0: a
+        push_0 0
+        get_array_el
+        get_arg1 1: b
+        push_0 0
+        get_array_el
+        neq
+        if_false8 35
+        get_arg0 0: a
+        push_0 0
+        get_array_el
+        push_atom_value _
+        eq
+        if_false8 22
+        push_1 1
+        return
+   22:  get_arg1 1: b
+        push_0 0
+        get_array_el
+        push_atom_value _
+        eq
+        if_false8 35
+        push_minus1 -1
+        return
+   35:  get_arg0 0: a
+        get_arg1 1: b
+        lt
+        if_false8 42
+        push_minus1 -1
+        return
+   42:  get_arg0 0: a
+        get_arg1 1: b
+        gt
+        if_false8 50
+        push_1 1
+        plus
+        return
+   50:  push_0 0
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:552:5: function: get_completions
+  mode: strict
+  args: line pos
+  locals:
+    0: var s
+    1: var obj
+    2: var ctx_obj
+    3: var r
+    4: var i
+    5: var j
+    6: var paren
+    7: var props
+    8: var prop
+    9: function symcmp [level:8 next:-1]
+  closure vars:
+    0: get_context_word local:loc89 var
+    1: get_context_object local:loc90 var
+    2: Object local:loc0 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: get_context_word
+        get_arg0 0: line
+        get_arg1 1: pos
+        call2 2
+        put_loc0 0: s
+        get_var_ref1 1: get_context_object
+        get_arg0 0: line
+        get_arg1 1: pos
+        get_loc0 0: s
+        get_length
+        sub
+        call2 2
+        put_loc2 2: ctx_obj
+        array_from 0
+        put_loc3 3: r
+        push_0 0
+        put_loc8 4: i
+        get_loc2 2: ctx_obj
+        put_loc1 1: obj
+   22:  get_loc8 4: i
+        push_i8 10
+        lt
+        if_false8 131
+        get_loc1 1: obj
+        is_null
+        if_true8 131
+        get_loc1 1: obj
+        undefined
+        strict_neq
+        if_false8 131
+        get_var_ref2 2: Object
+        get_field2 getOwnPropertyNames
+        get_loc1 1: obj
+        call_method 1
+        put_loc8 7: props
+        push_0 0
+        put_loc8 5: j
+   53:  get_loc8 5: j
+        get_loc8 7: props
+        get_length
+        lt
+        if_false8 116
+        get_loc8 7: props
+        get_loc8 5: j
+        get_array_el
+        set_loc8 8: prop
+        typeof
+        push_atom_value string
+        eq
+        if_false8 112
+        push_empty_string
+        get_loc8 8: prop
+        plus
+        add
+        get_loc8 8: prop
+        neq
+        if_false8 112
+        get_loc8 8: prop
+        get_field2 startsWith
+        get_loc0 0: s
+        call_method 1
+        if_false8 112
+        get_loc3 3: r
+        get_field2 push
+        get_loc8 8: prop
+        call_method 1
+        drop
+  112:  inc_loc 5: j
+        goto8 53
+  116:  get_var_ref2 2: Object
+        get_field2 getPrototypeOf
+        get_loc1 1: obj
+        call_method 1
+        put_loc1 1: obj
+        inc_loc 4: i
+        goto8 22
+  131:  get_loc3 3: r
+        get_length
+        push_1 1
+        gt
+        if_false8 205
+        fclosure8 0: [bytecode symcmp]
+        put_loc8 9: symcmp
+        fclosure8 0: [bytecode symcmp]
+        drop
+        get_loc3 3: r
+        get_field2 sort
+        get_loc_check 9: symcmp
+        call_method 1
+        drop
+        push_1 1
+        set_loc8 5: j
+        put_loc8 4: i
+  162:  get_loc8 4: i
+        get_loc3 3: r
+        get_length
+        lt
+        if_false8 197
+        get_loc3 3: r
+        get_loc8 4: i
+        get_array_el
+        get_loc3 3: r
+        get_loc8 4: i
+        push_1 1
+        sub
+        get_array_el
+        neq
+        if_false8 193
+        get_loc3 3: r
+        get_loc8 5: j
+        post_inc
+        put_loc8 5: j
+        get_loc3 3: r
+        get_loc8 4: i
+        get_array_el
+        put_array_el
+  193:  inc_loc 4: i
+        goto8 162
+  197:  get_loc3 3: r
+        get_loc8 5: j
+        put_field length
+  205:  object
+        get_loc3 3: r
+        define_field tab
+        get_loc0 0: s
+        get_length
+        define_field pos
+        get_loc2 2: ctx_obj
+        define_field ctx
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:596:5: function: completion
+  mode: strict
+  locals:
+    0: var tab
+    1: var res
+    2: var s
+    3: var i
+    4: var j
+    5: var len
+    6: var t
+    7: var max_width
+    8: var col
+    9: var n_cols
+   10: var row
+   11: var n_rows
+   12: var m
+  closure vars:
+    0: get_completions local:loc91 var
+    1: cmd local:loc26 var
+    2: cursor_pos local:loc27 var
+    3: insert local:loc54 var
+    4: last_fun local:loc32 var
+    5: completion local:loc92 var
+    6: Math local:loc4 var
+    7: term_width local:loc38 var
+    8: std parent:loc0 const
+    9: readline_print_prompt local:loc98 var
+  stack_size: 7
+  opcodes:
+        get_var_ref0 0: get_completions
+        get_var_ref1 1: cmd
+        get_var_ref2 2: cursor_pos
+        call2 2
+        set_loc1 1: res
+        get_field tab
+        set_loc0 0: tab
+        get_length
+        push_0 0
+        strict_eq
+        if_false8 17
+        return_undef
+   17:  get_loc0 0: tab
+        push_0 0
+        get_array_el
+        set_loc2 2: s
+        get_length
+        put_loc8 5: len
+        push_1 1
+        put_loc3 3: i
+   26:  get_loc3 3: i
+        get_loc0 0: tab
+        get_length
+        lt
+        if_false8 73
+        get_loc0 0: tab
+        get_loc3 3: i
+        get_array_el
+        put_loc8 6: t
+        push_0 0
+        put_loc8 4: j
+   40:  get_loc8 4: j
+        get_loc8 5: len
+        lt
+        if_false8 69
+        get_loc8 6: t
+        get_loc8 4: j
+        get_array_el
+        get_loc2 2: s
+        get_loc8 4: j
+        get_array_el
+        strict_neq
+        if_false8 65
+        get_loc8 4: j
+        put_loc8 5: len
+        goto8 69
+   65:  inc_loc 4: j
+        goto8 40
+   69:  inc_loc 3: i
+        goto8 26
+   73:  get_loc1 1: res
+        get_field pos
+        put_loc3 3: i
+   80:  get_loc3 3: i
+        get_loc8 5: len
+        lt
+        if_false8 96
+        get_var_ref3 3: insert
+        get_loc2 2: s
+        get_loc3 3: i
+        get_array_el
+        call1 1
+        drop
+        inc_loc 3: i
+        goto8 80
+   96:  get_var_ref 4: last_fun
+        get_var_ref 5: completion
+        strict_eq
+        if_false8 170
+        get_loc0 0: tab
+        get_length
+        push_1 1
+        eq
+        if_false8 170
+        get_loc1 1: res
+        get_field ctx
+        get_loc0 0: tab
+        push_0 0
+        get_array_el
+        get_array_el
+        set_loc8 12: m
+        typeof_is_function
+        if_false8 151
+        get_var_ref3 3: insert
+        push_atom_value "("
+        call1 1
+        drop
+        get_loc8 12: m
+        get_length
+        push_0 0
+        eq
+        if_false8 170
+        get_var_ref3 3: insert
+        push_atom_value ")"
+        call1 1
+        drop
+        goto8 170
+  151:  get_loc8 12: m
+        typeof
+        push_atom_value object
+        eq
+        if_false8 170
+        get_var_ref3 3: insert
+        push_atom_value "."
+        call1 1
+        drop
+  170:  get_var_ref 4: last_fun
+        get_var_ref 5: completion
+        strict_eq
+        if_false 398
+        get_loc0 0: tab
+        get_length
+        push_2 2
+        gte
+        if_false 398
+        push_0 0
+        put_loc8 7: max_width
+        push_0 0
+        put_loc3 3: i
+  196:  get_loc3 3: i
+        get_loc0 0: tab
+        get_length
+        lt
+        if_false8 225
+        get_var_ref 6: Math
+        get_field2 max
+        get_loc8 7: max_width
+        get_loc0 0: tab
+        get_loc3 3: i
+        get_array_el
+        get_length
+        call_method 2
+        put_loc8 7: max_width
+        inc_loc 3: i
+        goto8 196
+  225:  push_2 2
+        add_loc 7: max_width
+        get_var_ref 6: Math
+        get_field2 max
+        push_1 1
+        get_var_ref 6: Math
+        get_field2 floor
+        get_var_ref 7: term_width
+        push_1 1
+        add
+        get_loc8 7: max_width
+        div
+        call_method 1
+        call_method 2
+        put_loc8 9: n_cols
+        get_var_ref 6: Math
+        get_field2 ceil
+        get_loc0 0: tab
+        get_length
+        get_loc8 9: n_cols
+        div
+        call_method 1
+        put_loc8 11: n_rows
+        get_var_ref_check 8: std
+        get_field2 puts
+        push_atom_value "\n"
+        call_method 1
+        drop
+        push_0 0
+        put_loc8 10: row
+  299:  get_loc8 10: row
+        get_loc8 11: n_rows
+        lt
+        if_false8 393
+        push_0 0
+        put_loc8 8: col
+  309:  get_loc8 8: col
+        get_loc8 9: n_cols
+        lt
+        if_false8 372
+        get_loc8 8: col
+        get_loc8 11: n_rows
+        mul
+        get_loc8 10: row
+        add
+        set_loc3 3: i
+        get_loc0 0: tab
+        get_length
+        gte
+        if_true8 372
+        get_loc0 0: tab
+        get_loc3 3: i
+        get_array_el
+        put_loc2 2: s
+        get_loc8 8: col
+        get_loc8 9: n_cols
+        push_1 1
+        sub
+        neq
+        if_false8 355
+        get_loc2 2: s
+        get_field2 padEnd
+        get_loc8 7: max_width
+        call_method 1
+        put_loc2 2: s
+  355:  get_var_ref_check 8: std
+        get_field2 puts
+        get_loc2 2: s
+        call_method 1
+        drop
+        inc_loc 8: col
+        goto8 309
+  372:  get_var_ref_check 8: std
+        get_field2 puts
+        push_atom_value "\n"
+        call_method 1
+        drop
+        inc_loc 10: row
+        goto8 299
+  393:  get_var_ref 9: readline_print_prompt
+        call0 0
+        drop
+  398:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:705:5: function: dupstr
+  mode: strict
+  args: str count
+  locals:
+    0: var res
+  stack_size: 2
+  opcodes:
+        push_empty_string
+        put_loc0 0: res
+    2:  get_arg1 1: count
+        post_dec
+        put_arg1 1: count
+        push_0 0
+        gt
+        if_false8 14
+        get_arg0 0: str
+        add_loc 0: res
+        goto8 2
+   14:  get_loc0 0: res
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:714:5: function: readline_print_prompt
+  mode: strict
+  closure vars:
+    0: std parent:loc0 const
+    1: prompt local:loc15 var
+    2: term_cursor_x local:loc39 var
+    3: ucs_length local:loc47 var
+    4: term_width local:loc38 var
+    5: last_cmd local:loc28 var
+    6: last_cursor_pos local:loc29 var
+  stack_size: 3
+  opcodes:
+        get_var_ref_check 0: std
+        get_field2 puts
+        get_var_ref1 1: prompt
+        call_method 1
+        drop
+        get_var_ref3 3: ucs_length
+        get_var_ref1 1: prompt
+        call1 1
+        get_var_ref 4: term_width
+        mod
+        put_var_ref2 2: term_cursor_x
+        push_empty_string
+        put_var_ref 5: last_cmd
+        push_0 0
+        put_var_ref 6: last_cursor_pos
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:720:5: function: readline_start
+  mode: strict
+  args: defstr cb
+  locals:
+    0: var t
+  closure vars:
+    0: cmd local:loc26 var
+    1: cursor_pos local:loc27 var
+    2: history_index local:loc30 var
+    3: history local:loc9 var
+    4: readline_cb local:loc97 var
+    5: prompt local:loc15 var
+    6: pstate local:loc14 var
+    7: mexpr local:loc24 var
+    8: dupstr local:loc94 var
+    9: plen local:loc16 var
+   10: ps2 local:loc18 var
+   11: show_time local:loc20 var
+   12: eval_time local:loc23 var
+   13: ps1 local:loc17 var
+   14: readline_print_prompt local:loc98 var
+   15: update local:loc53 var
+   16: readline_state local:loc96 var
+  stack_size: 5
+  opcodes:
+        get_arg0 0: defstr
+        dup
+        if_true8 6
+        drop
+        push_empty_string
+    6:  set_var_ref0 0: cmd
+        get_length
+        put_var_ref1 1: cursor_pos
+        get_var_ref3 3: history
+        get_length
+        put_var_ref2 2: history_index
+        get_arg1 1: cb
+        put_var_ref 4: readline_cb
+        get_var_ref 6: pstate
+        put_var_ref 5: prompt
+        get_var_ref 7: mexpr
+        if_false8 60
+        get_var_ref 5: prompt
+        get_var_ref 8: dupstr
+        push_atom_value " "
+        get_var_ref 9: plen
+        get_var_ref 5: prompt
+        get_length
+        sub
+        call2 2
+        add
+        set_var_ref 5: prompt
+        get_var_ref 10: ps2
+        add
+        put_var_ref 5: prompt
+        goto8 113
+   60:  get_var_ref 11: show_time
+        if_false8 96
+        get_var_ref 12: eval_time
+        push_i16 1000
+        div
+        put_loc0 0: t
+        get_var_ref 5: prompt
+        get_loc0 0: t
+        get_field2 toFixed
+        push_6 6
+        call_method 1
+        push_atom_value " "
+        add
+        add
+        put_var_ref 5: prompt
+   96:  get_var_ref 5: prompt
+        get_length
+        put_var_ref 9: plen
+        get_var_ref 5: prompt
+        get_var_ref 13: ps1
+        add
+        put_var_ref 5: prompt
+  113:  get_var_ref 14: readline_print_prompt
+        call0 0
+        drop
+        get_var_ref 15: update
+        call0 0
+        drop
+        push_0 0
+        put_var_ref 16: readline_state
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:742:5: function: handle_char
+  mode: strict
+  args: c1
+  locals:
+    0: var c
+  closure vars:
+    0: String local:loc1 var
+    1: readline_state local:loc96 var
+    2: readline_keys local:loc95 var
+    3: handle_key local:loc101 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: String
+        get_field2 fromCodePoint
+        get_arg0 0: c1
+        call_method 1
+        put_loc0 0: c
+        get_var_ref1 1: readline_state
+        dup
+        push_0 0
+        strict_eq
+        if_false8 36
+        get_loc0 0: c
+        push_atom_value "\u001b"
+        eq
+        if_false8 31
+        get_loc0 0: c
+        put_var_ref2 2: readline_keys
+        push_1 1
+        put_var_ref1 1: readline_state
+        return_undef
+   31:  get_var_ref3 3: handle_key
+        get_loc0 0: c
+        call1 1
+        drop
+        return_undef
+   36:  dup
+        push_1 1
+        strict_eq
+        if_false8 76
+        get_var_ref2 2: readline_keys
+        get_loc0 0: c
+        add
+        put_var_ref2 2: readline_keys
+        get_loc0 0: c
+        push_atom_value "["
+        eq
+        if_false8 57
+        push_2 2
+        put_var_ref1 1: readline_state
+        return_undef
+   57:  get_loc0 0: c
+        push_atom_value O
+        eq
+        if_false8 69
+        push_3 3
+        put_var_ref1 1: readline_state
+        return_undef
+   69:  get_var_ref3 3: handle_key
+        get_var_ref2 2: readline_keys
+        call1 1
+        drop
+        push_0 0
+        put_var_ref1 1: readline_state
+        return_undef
+   76:  dup
+        push_2 2
+        strict_eq
+        if_false8 118
+        get_var_ref2 2: readline_keys
+        get_loc0 0: c
+        add
+        put_var_ref2 2: readline_keys
+        get_loc0 0: c
+        push_atom_value ";"
+        eq
+        dup
+        if_true8 108
+        drop
+        get_loc0 0: c
+        push_const8 0: "0"
+        gte
+        dup
+        if_false8 108
+        drop
+        get_loc0 0: c
+        push_const8 1: "9"
+        lte
+  108:  lnot
+        if_false8 133
+        get_var_ref3 3: handle_key
+        get_var_ref2 2: readline_keys
+        call1 1
+        drop
+        push_0 0
+        put_var_ref1 1: readline_state
+        return_undef
+  118:  dup
+        push_3 3
+        strict_eq
+        if_false8 133
+        get_var_ref2 2: readline_keys
+        get_loc0 0: c
+        add
+        put_var_ref2 2: readline_keys
+        get_var_ref3 3: handle_key
+        get_var_ref2 2: readline_keys
+        call1 1
+        drop
+        push_0 0
+        put_var_ref1 1: readline_state
+  133:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:782:5: function: handle_key
+  mode: strict
+  args: keys
+  locals:
+    0: var fun
+  closure vars:
+    0: quote_flag local:loc33 var
+    1: ucs_length local:loc47 var
+    2: insert local:loc54 var
+    3: commands local:loc93 var
+    4: this_fun local:loc31 var
+    5: readline_cb local:loc97 var
+    6: cmd local:loc26 var
+    7: os parent:loc1 const
+    8: term_fd local:loc36 var
+    9: last_fun local:loc32 var
+   10: alert local:loc57 var
+   11: cursor_pos local:loc27 var
+   12: update local:loc53 var
+  stack_size: 5
+  opcodes:
+        get_var_ref0 0: quote_flag
+        if_false8 18
+        get_var_ref1 1: ucs_length
+        get_arg0 0: keys
+        call1 1
+        push_1 1
+        strict_eq
+        if_false8 14
+        get_var_ref2 2: insert
+        get_arg0 0: keys
+        call1 1
+        drop
+   14:  push_false
+        put_var_ref0 0: quote_flag
+        goto8 139
+   18:  get_var_ref3 3: commands
+        get_arg0 0: keys
+        get_array_el
+        set_loc0 0: fun
+        if_false8 108
+        get_loc0 0: fun
+        put_var_ref 4: this_fun
+        get_loc0 0: fun
+        get_arg0 0: keys
+        call1 1
+        dup
+        push_minus1 -1
+        strict_eq
+        if_false8 44
+        get_var_ref 5: readline_cb
+        get_var_ref 6: cmd
+        call1 1
+        return_undef
+   44:  dup
+        push_i8 -2
+        strict_eq
+        if_false8 56
+        get_var_ref 5: readline_cb
+        null
+        call1 1
+        return_undef
+   56:  dup
+        push_i8 -3
+        strict_eq
+        if_false8 99
+        get_var_ref_check 7: os
+        get_field2 signal
+        get_var_ref_check 7: os
+        get_field SIGINT
+        null
+        call_method 2
+        drop
+        get_var_ref_check 7: os
+        get_field2 setReadHandler
+        get_var_ref 8: term_fd
+        null
+        call_method 2
+        return_undef
+   99:  drop
+        get_var_ref 4: this_fun
+        put_var_ref 9: last_fun
+        goto8 139
+  108:  get_var_ref1 1: ucs_length
+        get_arg0 0: keys
+        call1 1
+        push_1 1
+        strict_eq
+        if_false8 134
+        get_arg0 0: keys
+        push_atom_value " "
+        gte
+        if_false8 134
+        get_var_ref2 2: insert
+        get_arg0 0: keys
+        call1 1
+        drop
+        get_var_ref2 2: insert
+        put_var_ref 9: last_fun
+        goto8 139
+  134:  get_var_ref 10: alert
+        call0 0
+        drop
+  139:  get_var_ref 11: cursor_pos
+        push_0 0
+        lt
+        if_false8 149
+        push_0 0
+        goto8 168
+  149:  get_var_ref 11: cursor_pos
+        get_var_ref 6: cmd
+        get_length
+        gt
+        if_false8 165
+        get_var_ref 6: cmd
+        get_length
+        goto8 168
+  165:  get_var_ref 11: cursor_pos
+  168:  put_var_ref 11: cursor_pos
+        get_var_ref 12: update
+        call0 0
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:819:5: function: number_to_string_hex
+  mode: strict
+  args: a
+  locals:
+    0: var s
+  stack_size: 5
+  opcodes:
+        get_arg0 0: a
+        push_0 0
+        lt
+        if_false8 16
+        get_arg0 0: a
+        neg
+        put_arg0 0: a
+        push_atom_value "-"
+        put_loc0 0: s
+        goto8 18
+   16:  push_empty_string
+        put_loc0 0: s
+   18:  get_loc0 0: s
+        push_atom_value "0x"
+        get_arg0 0: a
+        get_field2 toString
+        push_i8 16
+        call_method 1
+        add
+        add
+        set_loc0 0: s
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:831:5: function: extract_directive
+  mode: strict
+  args: a
+  locals:
+    0: var pos
+  closure vars:
+    0: is_alpha local:loc44 var
+  stack_size: 4
+  opcodes:
+        get_arg0 0: a
+        push_0 0
+        get_array_el
+        push_atom_value "\\"
+        strict_neq
+        if_false8 13
+        push_empty_string
+        return
+   13:  push_1 1
+        put_loc0 0: pos
+   15:  get_loc0 0: pos
+        get_arg0 0: a
+        get_length
+        lt
+        if_false8 33
+        get_var_ref0 0: is_alpha
+        get_arg0 0: a
+        get_loc0 0: pos
+        get_array_el
+        call1 1
+        lnot
+        if_true8 33
+        inc_loc 0: pos
+        goto8 15
+   33:  get_arg0 0: a
+        get_field2 substring
+        push_1 1
+        get_loc0 0: pos
+        tail_call_method 2
+
+__tests__/fixtures/quickjs-tests/repl.js:842:5: function: handle_directive
+  mode: strict
+  args: cmd expr
+  locals:
+    0: var param
+    1: var prec1
+    2: var expBits1
+    3: var filename
+  closure vars:
+    0: help local:loc106 var
+    1: std parent:loc0 const
+    2: hex_mode local:loc102 var
+    3: show_time local:loc20 var
+  stack_size: 4
+  opcodes:
+        get_arg0 0: cmd
+        push_atom_value h
+        strict_eq
+        dup
+        if_true8 29
+        drop
+        get_arg0 0: cmd
+        push_atom_value "?"
+        strict_eq
+        dup
+        if_true8 29
+        drop
+        get_arg0 0: cmd
+        push_atom_value help
+        eq
+   29:  if_false8 37
+        get_var_ref0 0: help
+        call0 0
+        drop
+        goto16 239
+   37:  get_arg0 0: cmd
+        push_atom_value load
+        strict_eq
+        if_false8 120
+        get_arg1 1: expr
+        get_field2 substring
+        get_arg0 0: cmd
+        get_length
+        push_1 1
+        add
+        call_method 1
+        get_field2 trim
+        call_method 0
+        set_loc3 3: filename
+        get_field2 lastIndexOf
+        push_atom_value "."
+        call_method 1
+        get_loc3 3: filename
+        get_field2 lastIndexOf
+        push_atom_value "/"
+        call_method 1
+        lte
+        if_false8 105
+        push_atom_value ".js"
+        add_loc 3: filename
+  105:  get_var_ref_check 1: std
+        get_field2 loadScript
+        get_loc3 3: filename
+        call_method 1
+        drop
+        push_false
+        return
+  120:  get_arg0 0: cmd
+        push_atom_value x
+        strict_eq
+        if_false8 133
+        push_true
+        put_var_ref2 2: hex_mode
+        goto8 239
+  133:  get_arg0 0: cmd
+        push_atom_value d
+        strict_eq
+        if_false8 146
+        push_false
+        put_var_ref2 2: hex_mode
+        goto8 239
+  146:  get_arg0 0: cmd
+        push_atom_value t
+        strict_eq
+        if_false8 160
+        get_var_ref3 3: show_time
+        lnot
+        put_var_ref3 3: show_time
+        goto8 239
+  160:  get_arg0 0: cmd
+        push_atom_value clear
+        strict_eq
+        if_false8 188
+        get_var_ref_check 1: std
+        get_field2 puts
+        push_atom_value "\u001b[H\u001b[J"
+        call_method 1
+        drop
+        goto8 239
+  188:  get_arg0 0: cmd
+        push_atom_value q
+        strict_eq
+        if_false8 212
+        get_var_ref_check 1: std
+        get_field2 exit
+        push_0 0
+        call_method 1
+        drop
+        goto8 239
+  212:  get_var_ref_check 1: std
+        get_field2 puts
+        push_atom_value "Unknown directive: "
+        get_arg0 0: cmd
+        add
+        push_atom_value "\n"
+        add
+        call_method 1
+        drop
+        push_false
+        return
+  239:  push_true
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:876:9: function: sel
+  mode: strict
+  args: n
+  stack_size: 1
+  opcodes:
+        get_arg0 0: n
+        if_false8 9
+        push_atom_value "*"
+        return
+    9:  push_atom_value " "
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:875:5: function: help
+  mode: strict
+  locals:
+    0: var sel
+  closure vars:
+    0: std parent:loc0 const
+    1: hex_mode local:loc102 var
+    2: show_time local:loc20 var
+  stack_size: 5
+  opcodes:
+        fclosure8 0: [bytecode sel]
+        put_loc0 0: sel
+        get_var_ref_check 0: std
+        get_field2 puts
+        push_atom_value "\\h          this help\n"
+        push_atom_value "\\x         "
+        add
+        get_loc0 0: sel
+        get_var_ref1 1: hex_mode
+        call1 1
+        add
+        push_atom_value "hexadecimal number display\n"
+        add
+        push_atom_value "\\d         "
+        add
+        get_loc0 0: sel
+        get_var_ref1 1: hex_mode
+        lnot
+        call1 1
+        add
+        push_atom_value "decimal number display\n"
+        add
+        push_atom_value "\\t         "
+        add
+        get_loc0 0: sel
+        get_var_ref2 2: show_time
+        call1 1
+        add
+        push_atom_value "toggle timing display\n"
+        add
+        push_atom_value "\\clear      clear the terminal\n"
+        add
+        push_atom_value "\\q          exit\n"
+        add
+        call_method 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:886:5: function: cmd_start
+  mode: strict
+  closure vars:
+    0: std parent:loc0 const
+    1: cmd_readline_start local:loc108 var
+  stack_size: 3
+  opcodes:
+        get_var_ref_check 0: std
+        get_field2 puts
+        push_atom_value "QuickJS - Type \"\\h\" for help\n"
+        call_method 1
+        drop
+        get_var_ref1 1: cmd_readline_start
+        call0 0
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:890:5: function: cmd_readline_start
+  mode: strict
+  closure vars:
+    0: readline_start local:loc99 var
+    1: dupstr local:loc94 var
+    2: level local:loc25 var
+    3: readline_handle_cmd local:loc109 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: readline_start
+        get_var_ref1 1: dupstr
+        push_atom_value "    "
+        get_var_ref2 2: level
+        call2 2
+        get_var_ref3 3: readline_handle_cmd
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:893:5: function: readline_handle_cmd
+  mode: strict
+  args: expr
+  closure vars:
+    0: handle_cmd local:loc110 var
+    1: cmd_readline_start local:loc108 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: handle_cmd
+        get_arg0 0: expr
+        call1 1
+        lnot
+        if_false8 9
+        get_var_ref1 1: cmd_readline_start
+        call0 0
+        drop
+    9:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:899:5: function: handle_cmd
+  mode: strict
+  args: expr
+  locals:
+    0: var colorstate
+    1: var cmd
+  closure vars:
+    0: help local:loc106 var
+    1: extract_directive local:loc104 var
+    2: handle_directive local:loc105 var
+    3: mexpr local:loc24 var
+    4: colorize_js local:loc115 var
+    5: pstate local:loc14 var
+    6: level local:loc25 var
+    7: eval_and_print_start local:loc111 var
+  stack_size: 4
+  opcodes:
+        get_arg0 0: expr
+        is_null
+        if_false8 8
+        push_empty_string
+        put_arg0 0: expr
+        push_false
+        return
+    8:  get_arg0 0: expr
+        push_atom_value "?"
+        strict_eq
+        if_false8 22
+        get_var_ref0 0: help
+        call0 0
+        drop
+        push_false
+        return
+   22:  get_var_ref1 1: extract_directive
+        get_arg0 0: expr
+        call1 1
+        set_loc1 1: cmd
+        get_length
+        push_0 0
+        gt
+        if_false8 54
+        get_var_ref2 2: handle_directive
+        get_loc1 1: cmd
+        get_arg0 0: expr
+        call2 2
+        lnot
+        if_false8 40
+        push_false
+        return
+   40:  get_arg0 0: expr
+        get_field2 substring
+        get_loc1 1: cmd
+        get_length
+        push_1 1
+        add
+        call_method 1
+        put_arg0 0: expr
+   54:  get_arg0 0: expr
+        push_empty_string
+        strict_eq
+        if_false8 61
+        push_false
+        return
+   61:  get_var_ref3 3: mexpr
+        if_false8 74
+        get_var_ref3 3: mexpr
+        push_atom_value "\n"
+        add
+        get_arg0 0: expr
+        add
+        put_arg0 0: expr
+   74:  get_var_ref 4: colorize_js
+        get_arg0 0: expr
+        call1 1
+        set_loc0 0: colorstate
+        push_0 0
+        get_array_el
+        put_var_ref 5: pstate
+        get_loc0 0: colorstate
+        push_1 1
+        get_array_el
+        put_var_ref 6: level
+        get_var_ref 5: pstate
+        if_false8 100
+        get_arg0 0: expr
+        put_var_ref3 3: mexpr
+        push_false
+        return
+  100:  push_empty_string
+        put_var_ref3 3: mexpr
+        get_var_ref 7: eval_and_print_start
+        get_arg0 0: expr
+        call1 1
+        drop
+        push_true
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:931:5: function: eval_and_print_start
+  mode: strict
+  args: expr
+  locals:
+    0: var result
+    1: catch error [level:3 next:-1]
+  closure vars:
+    0: eval_start_time local:loc22 var
+    1: os parent:loc1 const
+    2: std parent:loc0 const
+    3: print_eval_result local:loc112 var
+    4: print_eval_error local:loc113 var
+  stack_size: 6
+  opcodes:
+        catch 58
+        get_var_ref_check 1: os
+        get_field2 now
+        call_method 0
+        put_var_ref0 0: eval_start_time
+        get_var_ref_check 2: std
+        get_field2 evalScript
+        get_arg0 0: expr
+        object
+        push_true
+        define_field backtrace_barrier
+        push_true
+        define_field async
+        call_method 2
+        set_loc0 0: result
+        get_field2 then
+        get_var_ref3 3: print_eval_result
+        get_var_ref 4: print_eval_error
+        call_method 2
+        drop
+        drop
+        return_undef
+   58:  put_loc1 1: error
+        catch 72
+        get_var_ref 4: print_eval_error
+        get_loc1 1: error
+        call1 1
+        drop
+        drop
+        return_undef
+   72:  throw
+
+__tests__/fixtures/quickjs-tests/repl.js:944:5: function: print_eval_result
+  mode: strict
+  args: result
+  locals:
+    0: var default_print
+  closure vars:
+    0: eval_time local:loc23 var
+    1: os parent:loc1 const
+    2: eval_start_time local:loc22 var
+    3: std parent:loc0 const
+    4: colors local:loc7 var
+    5: styles local:loc8 var
+    6: hex_mode local:loc102 var
+    7: Math local:loc4 var
+    8: number_to_string_hex local:loc103 var
+    9: g local:arg0 var
+   10: handle_cmd_end local:loc114 var
+  stack_size: 4
+  opcodes:
+        push_true
+        put_loc0 0: default_print
+        get_arg0 0: result
+        get_field value
+        put_arg0 0: result
+        get_var_ref_check 1: os
+        get_field2 now
+        call_method 0
+        get_var_ref2 2: eval_start_time
+        sub
+        put_var_ref0 0: eval_time
+        get_var_ref_check 3: std
+        get_field2 puts
+        get_var_ref 4: colors
+        get_var_ref 5: styles
+        get_field result
+        get_array_el
+        call_method 1
+        drop
+        get_var_ref 6: hex_mode
+        if_false8 145
+        get_arg0 0: result
+        typeof
+        push_atom_value number
+        eq
+        if_false8 99
+        get_arg0 0: result
+        get_var_ref 7: Math
+        get_field2 floor
+        get_arg0 0: result
+        call_method 1
+        strict_eq
+        if_false8 99
+        get_var_ref_check 3: std
+        get_field2 puts
+        get_var_ref 8: number_to_string_hex
+        get_arg0 0: result
+        call1 1
+        call_method 1
+        drop
+        push_false
+        put_loc0 0: default_print
+        goto8 145
+   99:  get_arg0 0: result
+        typeof
+        push_atom_value bigint
+        eq
+        if_false8 145
+        get_var_ref_check 3: std
+        get_field2 puts
+        get_var_ref 8: number_to_string_hex
+        get_arg0 0: result
+        call1 1
+        call_method 1
+        drop
+        get_var_ref_check 3: std
+        get_field2 puts
+        push_atom_value n
+        call_method 1
+        drop
+        push_false
+        put_loc0 0: default_print
+  145:  get_loc0 0: default_print
+        if_false8 161
+        get_var_ref_check 3: std
+        get_field2 __printObject
+        get_arg0 0: result
+        call_method 1
+        drop
+  161:  get_var_ref_check 3: std
+        get_field2 puts
+        push_atom_value "\n"
+        call_method 1
+        drop
+        get_var_ref_check 3: std
+        get_field2 puts
+        get_var_ref 4: colors
+        get_field none
+        call_method 1
+        drop
+        get_var_ref 9: g
+        get_arg0 0: result
+        put_field _
+        get_var_ref 10: handle_cmd_end
+        call0 0
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:970:5: function: print_eval_error
+  mode: strict
+  args: error
+  closure vars:
+    0: std parent:loc0 const
+    1: colors local:loc7 var
+    2: styles local:loc8 var
+    3: handle_cmd_end local:loc114 var
+  stack_size: 4
+  opcodes:
+        get_var_ref_check 0: std
+        get_field2 puts
+        get_var_ref1 1: colors
+        get_var_ref2 2: styles
+        get_field error_msg
+        get_array_el
+        call_method 1
+        drop
+        get_arg0 0: error
+        get_var Error
+        instanceof
+        lnot
+        if_false8 47
+        get_var_ref_check 0: std
+        get_field2 puts
+        push_atom_value "Throw: "
+        call_method 1
+        drop
+   47:  get_var_ref_check 0: std
+        get_field2 __printObject
+        get_arg0 0: error
+        call_method 1
+        drop
+        get_var_ref_check 0: std
+        get_field2 puts
+        push_atom_value "\n"
+        call_method 1
+        drop
+        get_var_ref_check 0: std
+        get_field2 puts
+        get_var_ref1 1: colors
+        get_field none
+        call_method 1
+        drop
+        get_var_ref3 3: handle_cmd_end
+        call0 0
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:979:5: function: handle_cmd_end
+  mode: strict
+  closure vars:
+    0: level local:loc25 var
+    1: std parent:loc0 const
+    2: cmd_readline_start local:loc108 var
+  stack_size: 2
+  opcodes:
+        push_0 0
+        put_var_ref0 0: level
+        get_var_ref_check 1: std
+        get_field2 gc
+        call_method 0
+        drop
+        get_var_ref2 2: cmd_readline_start
+        call0 0
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:990:9: function: push_state
+  mode: strict
+  args: c
+  closure vars:
+    0: state local:loc5 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: state
+        get_arg0 0: c
+        add
+        put_var_ref0 0: state
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:991:9: function: last_state
+  mode: strict
+  args: c
+  closure vars:
+    0: state local:loc5 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: state
+        get_field2 substring
+        get_var_ref0 0: state
+        get_length
+        push_1 1
+        sub
+        tail_call_method 1
+
+__tests__/fixtures/quickjs-tests/repl.js:992:9: function: pop_state
+  mode: strict
+  args: c
+  closure vars:
+    0: last_state local:loc11 var
+    1: state local:loc5 var
+  stack_size: 5
+  opcodes:
+        get_var_ref0 0: last_state
+        call0 0
+        put_arg0 0: c
+        get_var_ref1 1: state
+        get_field2 substring
+        push_0 0
+        get_var_ref1 1: state
+        get_length
+        push_1 1
+        sub
+        call_method 2
+        put_var_ref1 1: state
+        get_arg0 0: c
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:997:9: function: parse_block_comment
+  mode: strict
+  closure vars:
+    0: style local:loc4 var
+    1: push_state local:loc10 var
+    2: i local:loc0 var
+    3: n local:loc3 var
+    4: str local:arg0 var
+    5: pop_state local:loc12 var
+  stack_size: 3
+  opcodes:
+        push_atom_value comment
+        put_var_ref0 0: style
+        get_var_ref1 1: push_state
+        push_atom_value "/"
+        call1 1
+        drop
+        get_var_ref2 2: i
+        inc
+        put_var_ref2 2: i
+   17:  get_var_ref2 2: i
+        get_var_ref3 3: n
+        push_1 1
+        sub
+        lt
+        if_false8 72
+        get_var_ref 4: str
+        get_var_ref2 2: i
+        get_array_el
+        push_atom_value "*"
+        eq
+        if_false8 67
+        get_var_ref 4: str
+        get_var_ref2 2: i
+        push_1 1
+        add
+        get_array_el
+        push_atom_value "/"
+        eq
+        if_false8 67
+        get_var_ref2 2: i
+        push_2 2
+        add
+        put_var_ref2 2: i
+        get_var_ref 5: pop_state
+        push_atom_value "/"
+        call1 1
+        drop
+        return_undef
+   67:  get_var_ref2 2: i
+        inc
+        put_var_ref2 2: i
+        goto8 17
+   72:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:1008:9: function: parse_line_comment
+  mode: strict
+  closure vars:
+    0: style local:loc4 var
+    1: i local:loc0 var
+    2: n local:loc3 var
+    3: str local:arg0 var
+  stack_size: 2
+  opcodes:
+        push_atom_value comment
+        put_var_ref0 0: style
+        get_var_ref1 1: i
+        inc
+        put_var_ref1 1: i
+    9:  get_var_ref1 1: i
+        get_var_ref2 2: n
+        lt
+        if_false8 30
+        get_var_ref3 3: str
+        get_var_ref1 1: i
+        get_array_el
+        push_atom_value "\n"
+        eq
+        if_true8 30
+        get_var_ref1 1: i
+        inc
+        put_var_ref1 1: i
+        goto8 9
+   30:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:1016:9: function: parse_string
+  mode: strict
+  args: delim
+  closure vars:
+    0: style local:loc4 var
+    1: push_state local:loc10 var
+    2: i local:loc0 var
+    3: n local:loc3 var
+    4: c local:loc1 var
+    5: str local:arg0 var
+    6: pop_state local:loc12 var
+  stack_size: 3
+  opcodes:
+        push_atom_value string
+        put_var_ref0 0: style
+        get_var_ref1 1: push_state
+        get_arg0 0: delim
+        call1 1
+        drop
+   10:  get_var_ref2 2: i
+        get_var_ref3 3: n
+        lt
+        if_false8 75
+        get_var_ref 5: str
+        get_var_ref2 2: i
+        post_inc
+        put_var_ref2 2: i
+        get_array_el
+        set_var_ref 4: c
+        push_atom_value "\n"
+        eq
+        if_false8 41
+        push_atom_value error
+        put_var_ref0 0: style
+        goto8 10
+   41:  get_var_ref 4: c
+        push_atom_value "\\"
+        eq
+        if_false8 62
+        get_var_ref2 2: i
+        get_var_ref3 3: n
+        gte
+        if_true8 75
+        get_var_ref2 2: i
+        inc
+        put_var_ref2 2: i
+        goto8 10
+   62:  get_var_ref 4: c
+        get_arg0 0: delim
+        eq
+        if_false8 10
+        get_var_ref 6: pop_state
+        call0 0
+        drop
+        return_undef
+   75:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:1036:9: function: parse_regex
+  mode: strict
+  closure vars:
+    0: style local:loc4 var
+    1: push_state local:loc10 var
+    2: i local:loc0 var
+    3: n local:loc3 var
+    4: c local:loc1 var
+    5: str local:arg0 var
+    6: last_state local:loc11 var
+    7: pop_state local:loc12 var
+    8: is_word parent:loc0 var
+  stack_size: 3
+  opcodes:
+        push_atom_value regex
+        put_var_ref0 0: style
+        get_var_ref1 1: push_state
+        push_atom_value "/"
+        call1 1
+        drop
+   14:  get_var_ref2 2: i
+        get_var_ref3 3: n
+        lt
+        if_false 195
+        get_var_ref 5: str
+        get_var_ref2 2: i
+        post_inc
+        put_var_ref2 2: i
+        get_array_el
+        set_var_ref 4: c
+        push_atom_value "\n"
+        eq
+        if_false8 48
+        push_atom_value error
+        put_var_ref0 0: style
+        goto8 14
+   48:  get_var_ref 4: c
+        push_atom_value "\\"
+        eq
+        if_false8 69
+        get_var_ref2 2: i
+        get_var_ref3 3: n
+        lt
+        if_false8 14
+        get_var_ref2 2: i
+        inc
+        put_var_ref2 2: i
+        goto8 14
+   69:  get_var_ref 6: last_state
+        call0 0
+        push_atom_value "["
+        eq
+        if_false8 99
+        get_var_ref 4: c
+        push_atom_value "]"
+        eq
+        if_false8 14
+        get_var_ref 7: pop_state
+        call0 0
+        drop
+        goto8 14
+   99:  get_var_ref 4: c
+        push_atom_value "["
+        eq
+        if_false8 155
+        get_var_ref1 1: push_state
+        push_atom_value "["
+        call1 1
+        drop
+        get_var_ref 5: str
+        get_var_ref2 2: i
+        get_array_el
+        push_atom_value "["
+        eq
+        dup
+        if_true8 144
+        drop
+        get_var_ref 5: str
+        get_var_ref2 2: i
+        get_array_el
+        push_atom_value "]"
+        eq
+  144:  if_false 14
+        get_var_ref2 2: i
+        inc
+        put_var_ref2 2: i
+        goto16 14
+  155:  get_var_ref 4: c
+        push_atom_value "/"
+        eq
+        if_false 14
+        get_var_ref 7: pop_state
+        call0 0
+        drop
+  174:  get_var_ref2 2: i
+        get_var_ref3 3: n
+        lt
+        if_false8 195
+        get_var_ref 8: is_word
+        get_var_ref 5: str
+        get_var_ref2 2: i
+        get_array_el
+        call1 1
+        if_false8 195
+        get_var_ref2 2: i
+        inc
+        put_var_ref2 2: i
+        goto8 174
+  195:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:1072:9: function: parse_number
+  mode: strict
+  closure vars:
+    0: style local:loc4 var
+    1: i local:loc0 var
+    2: n local:loc3 var
+    3: is_word parent:loc0 var
+    4: str local:arg0 var
+  stack_size: 3
+  opcodes:
+        push_atom_value number
+        put_var_ref0 0: style
+    6:  get_var_ref1 1: i
+        get_var_ref2 2: n
+        lt
+        if_false8 64
+        get_var_ref3 3: is_word
+        get_var_ref 4: str
+        get_var_ref1 1: i
+        get_array_el
+        call1 1
+        dup
+        if_true8 57
+        drop
+        get_var_ref 4: str
+        get_var_ref1 1: i
+        get_array_el
+        push_atom_value "."
+        eq
+        if_false8 64
+        get_var_ref1 1: i
+        get_var_ref2 2: n
+        push_1 1
+        sub
+        eq
+        dup
+        if_true8 57
+        drop
+        get_var_ref 4: str
+        get_var_ref1 1: i
+        push_1 1
+        add
+        get_array_el
+        push_atom_value "."
+        neq
+   57:  if_false8 64
+        get_var_ref1 1: i
+        inc
+        put_var_ref1 1: i
+        goto8 6
+   64:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:1090:9: function: parse_identifier
+  mode: strict
+  locals:
+    0: var w
+    1: var i1
+  closure vars:
+    0: can_regex local:loc8 var
+    1: i local:loc0 var
+    2: n local:loc3 var
+    3: is_word parent:loc0 var
+    4: str local:arg0 var
+    5: start local:loc2 var
+    6: js_keywords local:loc18 var
+    7: style local:loc4 var
+    8: js_no_regex local:loc19 var
+    9: js_types local:loc20 var
+  stack_size: 5
+  opcodes:
+        push_1 1
+        put_var_ref0 0: can_regex
+    2:  get_var_ref1 1: i
+        get_var_ref2 2: n
+        lt
+        if_false8 21
+        get_var_ref3 3: is_word
+        get_var_ref 4: str
+        get_var_ref1 1: i
+        get_array_el
+        call1 1
+        if_false8 21
+        get_var_ref1 1: i
+        inc
+        put_var_ref1 1: i
+        goto8 2
+   21:  push_atom_value "|"
+        get_var_ref 4: str
+        get_field2 substring
+        get_var_ref 5: start
+        get_var_ref1 1: i
+        call_method 2
+        add
+        push_atom_value "|"
+        add
+        put_loc0 0: w
+        get_var_ref 6: js_keywords
+        get_field2 indexOf
+        get_loc0 0: w
+        call_method 1
+        push_0 0
+        gte
+        if_false8 92
+        push_atom_value keyword
+        put_var_ref 7: style
+        get_var_ref 8: js_no_regex
+        get_field2 indexOf
+        get_loc0 0: w
+        call_method 1
+        push_0 0
+        gte
+        if_false8 91
+        push_0 0
+        put_var_ref0 0: can_regex
+   91:  return_undef
+   92:  get_var_ref1 1: i
+        put_loc1 1: i1
+   94:  get_loc1 1: i1
+        get_var_ref2 2: n
+        lt
+        if_false8 116
+        get_var_ref 4: str
+        get_loc1 1: i1
+        get_array_el
+        push_atom_value " "
+        eq
+        if_false8 116
+        inc_loc 1: i1
+        goto8 94
+  116:  get_loc1 1: i1
+        get_var_ref2 2: n
+        lt
+        if_false8 143
+        get_var_ref 4: str
+        get_loc1 1: i1
+        get_array_el
+        push_atom_value "("
+        eq
+        if_false8 143
+        push_atom_value function
+        put_var_ref 7: style
+        return_undef
+  143:  get_var_ref 9: js_types
+        get_field2 indexOf
+        get_loc0 0: w
+        call_method 1
+        push_0 0
+        gte
+        if_false8 168
+        push_atom_value type
+        put_var_ref 7: style
+        return_undef
+  168:  push_atom_value identifier
+        put_var_ref 7: style
+        push_0 0
+        put_var_ref0 0: can_regex
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:1115:9: function: set_style
+  mode: strict
+  args: from to
+  closure vars:
+    0: r local:loc9 var
+    1: style local:loc4 var
+  stack_size: 3
+  opcodes:
+    0:  get_var_ref0 0: r
+        get_length
+        get_arg0 0: from
+        lt
+        if_false8 23
+        get_var_ref0 0: r
+        get_field2 push
+        push_atom_value default
+        call_method 1
+        drop
+        goto8 0
+   23:  get_var_ref0 0: r
+        get_length
+        get_arg1 1: to
+        lt
+        if_false8 42
+        get_var_ref0 0: r
+        get_field2 push
+        get_var_ref1 1: style
+        call_method 1
+        drop
+        goto8 23
+   42:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:985:5: function: colorize_js
+  mode: strict
+  args: str
+  locals:
+    0: var i
+    1: var c
+    2: var start
+    3: var n
+    4: var style
+    5: var state
+    6: var level
+    7: var primary
+    8: var can_regex
+    9: var r
+   10: var push_state
+   11: var last_state
+   12: var pop_state
+   13: var parse_block_comment
+   14: var parse_line_comment
+   15: var parse_string
+   16: var parse_regex
+   17: var parse_number
+   18: var js_keywords
+   19: var js_no_regex
+   20: var js_types
+   21: var parse_identifier
+   22: var set_style
+  closure vars:
+    0: is_word local:loc46 var
+    1: is_balanced local:loc49 var
+    2: is_digit local:loc45 var
+  stack_size: 4
+  opcodes:
+        fclosure8 0: [bytecode push_state]
+        put_loc8 10: push_state
+        fclosure8 1: [bytecode last_state]
+        put_loc8 11: last_state
+        fclosure8 2: [bytecode pop_state]
+        put_loc8 12: pop_state
+        fclosure8 3: [bytecode parse_block_comment]
+        put_loc8 13: parse_block_comment
+        fclosure8 4: [bytecode parse_line_comment]
+        put_loc8 14: parse_line_comment
+        fclosure8 5: [bytecode parse_string]
+        put_loc8 15: parse_string
+        fclosure8 6: [bytecode parse_regex]
+        put_loc8 16: parse_regex
+        fclosure8 7: [bytecode parse_number]
+        put_loc8 17: parse_number
+        fclosure8 8: [bytecode parse_identifier]
+        put_loc8 21: parse_identifier
+        fclosure8 9: [bytecode set_style]
+        put_loc8 22: set_style
+        get_arg0 0: str
+        get_length
+        put_loc3 3: n
+        push_empty_string
+        put_loc8 5: state
+        push_0 0
+        put_loc8 6: level
+        push_1 1
+        put_loc8 8: can_regex
+        array_from 0
+        put_loc8 9: r
+        push_atom_value "|"
+        push_atom_value "break|case|catch|continue|debugger|default|delete|do|"
+        add
+        push_atom_value "else|finally|for|function|if|in|instanceof|new|"
+        add
+        push_atom_value "return|switch|this|throw|try|typeof|while|with|"
+        add
+        push_atom_value "class|const|enum|import|export|extends|super|"
+        add
+        push_atom_value "implements|interface|let|package|private|protected|"
+        add
+        push_atom_value "public|static|yield|"
+        add
+        push_atom_value "undefined|null|true|false|Infinity|NaN|"
+        add
+        push_atom_value "eval|arguments|"
+        add
+        push_atom_value "await|"
+        add
+        put_loc8 18: js_keywords
+        push_atom_value "|this|super|undefined|null|true|false|Infinity|NaN|arguments|"
+        put_loc8 19: js_no_regex
+        push_atom_value "|void|var|"
+        put_loc8 20: js_types
+        push_0 0
+        put_loc0 0: i
+  134:  get_loc0 0: i
+        get_loc3 3: n
+        lt
+        if_false 511
+        null
+        put_loc8 4: style
+        get_loc0 0: i
+        put_loc2 2: start
+        get_arg0 0: str
+        get_loc0 0: i
+        post_inc
+        put_loc0 0: i
+        get_array_el
+        set_loc1 1: c
+        dup
+        push_atom_value " "
+        strict_eq
+        if_true8 189
+        dup
+        push_atom_value "\u0009"
+        strict_eq
+        if_true8 189
+        dup
+        push_atom_value "\u000d"
+        strict_eq
+        if_true8 189
+        dup
+        push_atom_value "\n"
+        strict_eq
+        if_false8 192
+  189:  drop
+        goto8 134
+  192:  dup
+        push_atom_value "+"
+        strict_eq
+        if_true8 210
+        dup
+        push_atom_value "-"
+        strict_eq
+        if_false8 233
+  210:  get_loc0 0: i
+        get_loc3 3: n
+        lt
+        if_false8 227
+        get_arg0 0: str
+        get_loc0 0: i
+        get_array_el
+        get_loc1 1: c
+        eq
+        if_false8 227
+        inc_loc 0: i
+        drop
+        goto8 134
+  227:  push_1 1
+        put_loc8 8: can_regex
+        drop
+        goto8 134
+  233:  dup
+        push_atom_value "/"
+        strict_eq
+        if_false8 309
+        get_loc0 0: i
+        get_loc3 3: n
+        lt
+        if_false8 265
+        get_arg0 0: str
+        get_loc0 0: i
+        get_array_el
+        push_atom_value "*"
+        eq
+        if_false8 265
+        get_loc8 13: parse_block_comment
+        call0 0
+        drop
+        goto16 494
+  265:  get_loc0 0: i
+        get_loc3 3: n
+        lt
+        if_false8 288
+        get_arg0 0: str
+        get_loc0 0: i
+        get_array_el
+        push_atom_value "/"
+        eq
+        if_false8 288
+        get_loc8 14: parse_line_comment
+        call0 0
+        drop
+        goto16 494
+  288:  get_loc8 8: can_regex
+        if_false8 302
+        get_loc8 16: parse_regex
+        call0 0
+        drop
+        push_0 0
+        put_loc8 8: can_regex
+        goto16 494
+  302:  push_1 1
+        put_loc8 8: can_regex
+        drop
+        goto16 134
+  309:  dup
+        push_atom_value "'"
+        strict_eq
+        if_true8 336
+        dup
+        push_atom_value "\""
+        strict_eq
+        if_true8 336
+        dup
+        push_atom_value "`"
+        strict_eq
+        if_false8 347
+  336:  get_loc8 15: parse_string
+        get_loc1 1: c
+        call1 1
+        drop
+        push_0 0
+        put_loc8 8: can_regex
+        goto16 494
+  347:  dup
+        push_atom_value "("
+        strict_eq
+        if_true8 374
+        dup
+        push_atom_value "["
+        strict_eq
+        if_true8 374
+        dup
+        push_atom_value "{"
+        strict_eq
+        if_false8 388
+  374:  push_1 1
+        put_loc8 8: can_regex
+        inc_loc 6: level
+        get_loc8 10: push_state
+        get_loc1 1: c
+        call1 1
+        drop
+        drop
+        goto16 134
+  388:  dup
+        push_atom_value ")"
+        strict_eq
+        if_true8 415
+        dup
+        push_atom_value "]"
+        strict_eq
+        if_true8 415
+        dup
+        push_atom_value "}"
+        strict_eq
+        if_false8 451
+  415:  push_0 0
+        put_loc8 8: can_regex
+        get_loc8 6: level
+        push_0 0
+        gt
+        if_false8 442
+        get_var_ref1 1: is_balanced
+        get_loc8 11: last_state
+        call0 0
+        get_loc1 1: c
+        call2 2
+        if_false8 442
+        dec_loc 6: level
+        get_loc8 12: pop_state
+        call0 0
+        drop
+        drop
+        goto16 134
+  442:  push_atom_value error
+        put_loc8 4: style
+        goto8 494
+  451:  get_var_ref2 2: is_digit
+        get_loc1 1: c
+        call1 1
+        if_false8 465
+        get_loc8 17: parse_number
+        call0 0
+        drop
+        push_0 0
+        put_loc8 8: can_regex
+        goto8 494
+  465:  get_var_ref0 0: is_word
+        get_loc1 1: c
+        call1 1
+        dup
+        if_true8 479
+        drop
+        get_loc1 1: c
+        push_atom_value $
+        eq
+  479:  if_false8 487
+        get_loc8 21: parse_identifier
+        call0 0
+        drop
+        goto8 494
+  487:  push_1 1
+        put_loc8 8: can_regex
+        drop
+        goto16 134
+  494:  drop
+        get_loc8 4: style
+        if_false 134
+        get_loc8 22: set_style
+        get_loc2 2: start
+        get_loc0 0: i
+        call2 2
+        drop
+        goto16 134
+  511:  get_loc8 22: set_style
+        get_loc3 3: n
+        get_loc3 3: n
+        call2 2
+        drop
+        get_loc8 5: state
+        get_loc8 6: level
+        get_loc8 9: r
+        array_from 3
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:30:2: function: <null>
+  mode: strict
+  args: g
+  locals:
+    0: var Object
+    1: var String
+    2: var Array
+    3: var Date
+    4: var Math
+    5: var isFinite
+    6: var parseFloat
+    7: var colors
+    8: var styles
+    9: var history
+   10: var clip_board
+   11: var prec
+   12: var expBits
+   13: var log2_10
+   14: var pstate
+   15: var prompt
+   16: var plen
+   17: var ps1
+   18: var ps2
+   19: var utf8
+   20: var show_time
+   21: var show_colors
+   22: var eval_start_time
+   23: var eval_time
+   24: var mexpr
+   25: var level
+   26: var cmd
+   27: var cursor_pos
+   28: var last_cmd
+   29: var last_cursor_pos
+   30: var history_index
+   31: var this_fun
+   32: var last_fun
+   33: var quote_flag
+   34: var utf8_state
+   35: var utf8_val
+   36: var term_fd
+   37: var term_read_buf
+   38: var term_width
+   39: var term_cursor_x
+   40: var termInit
+   41: var sigint_handler
+   42: var term_read_handler
+   43: var handle_byte
+   44: var is_alpha
+   45: var is_digit
+   46: var is_word
+   47: var ucs_length
+   48: var is_trailing_surrogate
+   49: var is_balanced
+   50: var print_color_text
+   51: var print_csi
+   52: var move_cursor
+   53: var update
+   54: var insert
+   55: var quoted_insert
+   56: var abort
+   57: var alert
+   58: var beginning_of_line
+   59: var end_of_line
+   60: var forward_char
+   61: var backward_char
+   62: var skip_word_forward
+   63: var skip_word_backward
+   64: var forward_word
+   65: var backward_word
+   66: var accept_line
+   67: var history_add
+   68: var previous_history
+   69: var next_history
+   70: var history_search
+   71: var history_search_backward
+   72: var history_search_forward
+   73: var delete_char_dir
+   74: var delete_char
+   75: var control_d
+   76: var backward_delete_char
+   77: var transpose_chars
+   78: var transpose_words
+   79: var upcase_word
+   80: var downcase_word
+   81: var kill_region
+   82: var kill_line
+   83: var backward_kill_line
+   84: var kill_word
+   85: var backward_kill_word
+   86: var yank
+   87: var control_c
+   88: var reset
+   89: var get_context_word
+   90: var get_context_object
+   91: var get_completions
+   92: var completion
+   93: var commands
+   94: var dupstr
+   95: var readline_keys
+   96: var readline_state
+   97: var readline_cb
+   98: var readline_print_prompt
+   99: var readline_start
+  100: var handle_char
+  101: var handle_key
+  102: var hex_mode
+  103: var number_to_string_hex
+  104: var extract_directive
+  105: var handle_directive
+  106: var help
+  107: var cmd_start
+  108: var cmd_readline_start
+  109: var readline_handle_cmd
+  110: var handle_cmd
+  111: var eval_and_print_start
+  112: var print_eval_result
+  113: var print_eval_error
+  114: var handle_cmd_end
+  115: var colorize_js
+  closure vars:
+    0: std parent:loc0 const
+    1: os parent:loc1 const
+  stack_size: 2
+  opcodes:
+        fclosure8 0: [bytecode termInit]
+        put_loc8 40: termInit
+        fclosure8 1: [bytecode sigint_handler]
+        put_loc8 41: sigint_handler
+        fclosure8 2: [bytecode term_read_handler]
+        put_loc8 42: term_read_handler
+        fclosure8 3: [bytecode handle_byte]
+        put_loc8 43: handle_byte
+        fclosure8 4: [bytecode is_alpha]
+        put_loc8 44: is_alpha
+        fclosure8 5: [bytecode is_digit]
+        put_loc8 45: is_digit
+        fclosure8 6: [bytecode is_word]
+        put_loc8 46: is_word
+        fclosure8 7: [bytecode ucs_length]
+        put_loc8 47: ucs_length
+        fclosure8 8: [bytecode is_trailing_surrogate]
+        put_loc8 48: is_trailing_surrogate
+        fclosure8 9: [bytecode is_balanced]
+        put_loc8 49: is_balanced
+        fclosure8 10: [bytecode print_color_text]
+        put_loc8 50: print_color_text
+        fclosure8 11: [bytecode print_csi]
+        put_loc8 51: print_csi
+        fclosure8 12: [bytecode move_cursor]
+        put_loc8 52: move_cursor
+        fclosure8 13: [bytecode update]
+        put_loc8 53: update
+        fclosure8 14: [bytecode insert]
+        put_loc8 54: insert
+        fclosure8 15: [bytecode quoted_insert]
+        put_loc8 55: quoted_insert
+        fclosure8 16: [bytecode abort]
+        put_loc8 56: abort
+        fclosure8 17: [bytecode alert]
+        put_loc8 57: alert
+        fclosure8 18: [bytecode beginning_of_line]
+        put_loc8 58: beginning_of_line
+        fclosure8 19: [bytecode end_of_line]
+        put_loc8 59: end_of_line
+        fclosure8 20: [bytecode forward_char]
+        put_loc8 60: forward_char
+        fclosure8 21: [bytecode backward_char]
+        put_loc8 61: backward_char
+        fclosure8 22: [bytecode skip_word_forward]
+        put_loc8 62: skip_word_forward
+        fclosure8 23: [bytecode skip_word_backward]
+        put_loc8 63: skip_word_backward
+        fclosure8 24: [bytecode forward_word]
+        put_loc8 64: forward_word
+        fclosure8 25: [bytecode backward_word]
+        put_loc8 65: backward_word
+        fclosure8 26: [bytecode accept_line]
+        put_loc8 66: accept_line
+        fclosure8 27: [bytecode history_add]
+        put_loc8 67: history_add
+        fclosure8 28: [bytecode previous_history]
+        put_loc8 68: previous_history
+        fclosure8 29: [bytecode next_history]
+        put_loc8 69: next_history
+        fclosure8 30: [bytecode history_search]
+        put_loc8 70: history_search
+        fclosure8 31: [bytecode history_search_backward]
+        put_loc8 71: history_search_backward
+        fclosure8 32: [bytecode history_search_forward]
+        put_loc8 72: history_search_forward
+        fclosure8 33: [bytecode delete_char_dir]
+        put_loc8 73: delete_char_dir
+        fclosure8 34: [bytecode delete_char]
+        put_loc8 74: delete_char
+        fclosure8 35: [bytecode control_d]
+        put_loc8 75: control_d
+        fclosure8 36: [bytecode backward_delete_char]
+        put_loc8 76: backward_delete_char
+        fclosure8 37: [bytecode transpose_chars]
+        put_loc8 77: transpose_chars
+        fclosure8 38: [bytecode transpose_words]
+        put_loc8 78: transpose_words
+        fclosure8 39: [bytecode upcase_word]
+        put_loc8 79: upcase_word
+        fclosure8 40: [bytecode downcase_word]
+        put_loc8 80: downcase_word
+        fclosure8 41: [bytecode kill_region]
+        put_loc8 81: kill_region
+        fclosure8 42: [bytecode kill_line]
+        put_loc8 82: kill_line
+        fclosure8 43: [bytecode backward_kill_line]
+        put_loc8 83: backward_kill_line
+        fclosure8 44: [bytecode kill_word]
+        put_loc8 84: kill_word
+        fclosure8 45: [bytecode backward_kill_word]
+        put_loc8 85: backward_kill_word
+        fclosure8 46: [bytecode yank]
+        put_loc8 86: yank
+        fclosure8 47: [bytecode control_c]
+        put_loc8 87: control_c
+        fclosure8 48: [bytecode reset]
+        put_loc8 88: reset
+        fclosure8 49: [bytecode get_context_word]
+        put_loc8 89: get_context_word
+        fclosure8 50: [bytecode get_context_object]
+        put_loc8 90: get_context_object
+        fclosure8 51: [bytecode get_completions]
+        put_loc8 91: get_completions
+        fclosure8 52: [bytecode completion]
+        put_loc8 92: completion
+        fclosure8 53: [bytecode dupstr]
+        put_loc8 94: dupstr
+        fclosure8 54: [bytecode readline_print_prompt]
+        put_loc8 98: readline_print_prompt
+        fclosure8 55: [bytecode readline_start]
+        put_loc8 99: readline_start
+        fclosure8 56: [bytecode handle_char]
+        put_loc8 100: handle_char
+        fclosure8 57: [bytecode handle_key]
+        put_loc8 101: handle_key
+        fclosure8 58: [bytecode number_to_string_hex]
+        put_loc8 103: number_to_string_hex
+        fclosure8 59: [bytecode extract_directive]
+        put_loc8 104: extract_directive
+        fclosure8 60: [bytecode handle_directive]
+        put_loc8 105: handle_directive
+        fclosure8 61: [bytecode help]
+        put_loc8 106: help
+        fclosure8 62: [bytecode cmd_start]
+        put_loc8 107: cmd_start
+        fclosure8 63: [bytecode cmd_readline_start]
+        put_loc8 108: cmd_readline_start
+        fclosure8 64: [bytecode readline_handle_cmd]
+        put_loc8 109: readline_handle_cmd
+        fclosure8 65: [bytecode handle_cmd]
+        put_loc8 110: handle_cmd
+        fclosure8 66: [bytecode eval_and_print_start]
+        put_loc8 111: eval_and_print_start
+        fclosure8 67: [bytecode print_eval_result]
+        put_loc8 112: print_eval_result
+        fclosure8 68: [bytecode print_eval_error]
+        put_loc8 113: print_eval_error
+        fclosure8 69: [bytecode handle_cmd_end]
+        put_loc8 114: handle_cmd_end
+        fclosure8 70: [bytecode colorize_js]
+        put_loc8 115: colorize_js
+        get_arg0 0: g
+        get_var_ref_check 1: os
+        put_field os
+        get_arg0 0: g
+        get_var_ref_check 0: std
+        put_field std
+        get_arg0 0: g
+        get_field Object
+        put_loc0 0: Object
+        get_arg0 0: g
+        get_field String
+        put_loc1 1: String
+        get_arg0 0: g
+        get_field Array
+        put_loc2 2: Array
+        get_arg0 0: g
+        get_field Date
+        put_loc3 3: Date
+        get_arg0 0: g
+        get_field Math
+        put_loc8 4: Math
+        get_arg0 0: g
+        get_field isFinite
+        put_loc8 5: isFinite
+        get_arg0 0: g
+        get_field parseFloat
+        put_loc8 6: parseFloat
+        object
+        push_atom_value "\u001b[0m"
+        define_field none
+        push_atom_value "\u001b[30m"
+        define_field black
+        push_atom_value "\u001b[31m"
+        define_field red
+        push_atom_value "\u001b[32m"
+        define_field green
+        push_atom_value "\u001b[33m"
+        define_field yellow
+        push_atom_value "\u001b[34m"
+        define_field blue
+        push_atom_value "\u001b[35m"
+        define_field magenta
+        push_atom_value "\u001b[36m"
+        define_field cyan
+        push_atom_value "\u001b[37m"
+        define_field white
+        push_atom_value "\u001b[30;1m"
+        define_field gray
+        push_atom_value "\u001b[30;1m"
+        define_field grey
+        push_atom_value "\u001b[31;1m"
+        define_field bright_red
+        push_atom_value "\u001b[32;1m"
+        define_field bright_green
+        push_atom_value "\u001b[33;1m"
+        define_field bright_yellow
+        push_atom_value "\u001b[34;1m"
+        define_field bright_blue
+        push_atom_value "\u001b[35;1m"
+        define_field bright_magenta
+        push_atom_value "\u001b[36;1m"
+        define_field bright_cyan
+        push_atom_value "\u001b[37;1m"
+        define_field bright_white
+        put_loc8 7: colors
+        object
+        push_atom_value bright_green
+        define_field default
+        push_atom_value white
+        define_field comment
+        push_atom_value bright_cyan
+        define_field string
+        push_atom_value cyan
+        define_field regex
+        push_atom_value green
+        define_field number
+        push_atom_value bright_white
+        define_field keyword
+        push_atom_value bright_yellow
+        define_field function
+        push_atom_value bright_magenta
+        define_field type
+        push_atom_value bright_green
+        define_field identifier
+        push_atom_value red
+        define_field error
+        push_atom_value bright_white
+        define_field result
+        push_atom_value bright_red
+        define_field error_msg
+        put_loc8 8: styles
+        array_from 0
+        put_loc8 9: history
+        push_empty_string
+        put_loc8 10: clip_board
+        push_empty_string
+        put_loc8 14: pstate
+        push_empty_string
+        put_loc8 15: prompt
+        push_0 0
+        put_loc8 16: plen
+        push_atom_value "qjs > "
+        put_loc8 17: ps1
+        push_atom_value "  ... "
+        put_loc8 18: ps2
+        push_true
+        put_loc8 19: utf8
+        push_false
+        put_loc8 20: show_time
+        push_true
+        put_loc8 21: show_colors
+        push_0 0
+        put_loc8 23: eval_time
+        push_empty_string
+        put_loc8 24: mexpr
+        push_0 0
+        put_loc8 25: level
+        push_empty_string
+        put_loc8 26: cmd
+        push_0 0
+        put_loc8 27: cursor_pos
+        push_empty_string
+        put_loc8 28: last_cmd
+        push_0 0
+        put_loc8 29: last_cursor_pos
+        push_false
+        put_loc8 33: quote_flag
+        push_0 0
+        put_loc8 34: utf8_state
+        push_0 0
+        put_loc8 35: utf8_val
+        push_0 0
+        put_loc8 39: term_cursor_x
+        object
+        get_loc8 58: beginning_of_line
+        define_field "\u0001"
+        get_loc8 61: backward_char
+        define_field "\u0002"
+        get_loc8 87: control_c
+        define_field "\u0003"
+        get_loc8 75: control_d
+        define_field "\u0004"
+        get_loc8 59: end_of_line
+        define_field "\u0005"
+        get_loc8 60: forward_char
+        define_field "\u0006"
+        get_loc8 56: abort
+        define_field "\u0007"
+        get_loc8 76: backward_delete_char
+        define_field "\u0008"
+        get_loc8 92: completion
+        define_field "\u0009"
+        get_loc8 66: accept_line
+        define_field "\n"
+        get_loc8 82: kill_line
+        define_field "\u000b"
+        get_loc8 66: accept_line
+        define_field "\u000d"
+        get_loc8 69: next_history
+        define_field "\u000e"
+        get_loc8 68: previous_history
+        define_field "\u0010"
+        get_loc8 55: quoted_insert
+        define_field "\u0011"
+        get_loc8 57: alert
+        define_field "\u0012"
+        get_loc8 57: alert
+        define_field "\u0013"
+        get_loc8 77: transpose_chars
+        define_field "\u0014"
+        get_loc8 88: reset
+        define_field "\u0018"
+        get_loc8 86: yank
+        define_field "\u0019"
+        get_loc8 68: previous_history
+        define_field "\u001bOA"
+        get_loc8 69: next_history
+        define_field "\u001bOB"
+        get_loc8 60: forward_char
+        define_field "\u001bOC"
+        get_loc8 61: backward_char
+        define_field "\u001bOD"
+        get_loc8 64: forward_word
+        define_field "\u001bOF"
+        get_loc8 65: backward_word
+        define_field "\u001bOH"
+        get_loc8 64: forward_word
+        define_field "\u001b[1;5C"
+        get_loc8 65: backward_word
+        define_field "\u001b[1;5D"
+        get_loc8 58: beginning_of_line
+        define_field "\u001b[1~"
+        get_loc8 74: delete_char
+        define_field "\u001b[3~"
+        get_loc8 59: end_of_line
+        define_field "\u001b[4~"
+        get_loc8 71: history_search_backward
+        define_field "\u001b[5~"
+        get_loc8 72: history_search_forward
+        define_field "\u001b[6~"
+        get_loc8 68: previous_history
+        define_field "\u001b[A"
+        get_loc8 69: next_history
+        define_field "\u001b[B"
+        get_loc8 60: forward_char
+        define_field "\u001b[C"
+        get_loc8 61: backward_char
+        define_field "\u001b[D"
+        get_loc8 59: end_of_line
+        define_field "\u001b[F"
+        get_loc8 58: beginning_of_line
+        define_field "\u001b[H"
+        get_loc8 85: backward_kill_word
+        define_field "\u001b\u007f"
+        get_loc8 65: backward_word
+        define_field "\u001bb"
+        get_loc8 84: kill_word
+        define_field "\u001bd"
+        get_loc8 64: forward_word
+        define_field "\u001bf"
+        get_loc8 83: backward_kill_line
+        define_field "\u001bk"
+        get_loc8 80: downcase_word
+        define_field "\u001bl"
+        get_loc8 78: transpose_words
+        define_field "\u001bt"
+        get_loc8 79: upcase_word
+        define_field "\u001bu"
+        get_loc8 76: backward_delete_char
+        define_field "\u007f"
+        put_loc8 93: commands
+        push_false
+        put_loc8 102: hex_mode
+        get_loc8 40: termInit
+        call0 0
+        drop
+        get_loc8 107: cmd_start
+        call0 0
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: std local:loc0 const
+    1: os local:loc1 const
+  stack_size: 2
+  opcodes:
+        push_this
+        if_false8 4
+        return_undef
+    4:  fclosure8 0: [bytecode <null>]
+        get_var globalThis
+        call1 1
+        drop
+        undefined
+        return_async
+

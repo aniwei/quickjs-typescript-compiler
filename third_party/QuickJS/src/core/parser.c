@@ -10885,6 +10885,7 @@ add_pc2line_info(JSFunctionDef* s, uint32_t pc, uint32_t source_pos) {
     s->line_number_slots[s->line_number_count].pc = pc;
     s->line_number_slots[s->line_number_count].source_pos = source_pos;
     s->line_number_count++;
+    QTS_TRACE_PC2LINE_ADD(pc, source_pos, s->line_number_count);
     s->line_number_last_pc = pc;
     s->line_number_last = source_pos;
   }
@@ -10904,15 +10905,21 @@ static void compute_pc2line_info(JSFunctionDef* s) {
     const uint8_t* buf_start = s->get_line_col_cache->buf_start;
     js_dbuf_init(s->ctx, &s->pc2line);
 
+    QTS_TRACE_PC2LINE_BEGIN(s->line_number_count, s->source_pos);
+
     last_line_num = get_line_col_cached(
         s->get_line_col_cache, &last_col_num, buf_start + s->source_pos);
     dbuf_put_leb128(&s->pc2line, last_line_num); /* line number minus 1 */
     dbuf_put_leb128(&s->pc2line, last_col_num); /* column number minus 1 */
 
+    QTS_TRACE_PC2LINE_INIT(last_line_num, last_col_num);
+
     for (i = 0; i < s->line_number_count; i++) {
       uint32_t pc = s->line_number_slots[i].pc;
       uint32_t source_pos = s->line_number_slots[i].source_pos;
       int diff_pc, diff_line, diff_col;
+      int is_short = 0;
+      int op = 0;
 
       if (source_pos == -1)
         continue;
@@ -10930,22 +10937,27 @@ static void compute_pc2line_info(JSFunctionDef* s) {
       if (diff_line >= PC2LINE_BASE &&
           diff_line < PC2LINE_BASE + PC2LINE_RANGE &&
           diff_pc <= PC2LINE_DIFF_PC_MAX) {
-        dbuf_putc(
-            &s->pc2line,
-            (diff_line - PC2LINE_BASE) + diff_pc * PC2LINE_RANGE +
-                PC2LINE_OP_FIRST);
+        op = (diff_line - PC2LINE_BASE) + diff_pc * PC2LINE_RANGE + PC2LINE_OP_FIRST;
+        is_short = 1;
+        dbuf_putc(&s->pc2line, op);
       } else {
         /* longer encoding */
         dbuf_putc(&s->pc2line, 0);
         dbuf_put_leb128(&s->pc2line, diff_pc);
         dbuf_put_sleb128(&s->pc2line, diff_line);
+        op = 0;
+        is_short = 0;
       }
       dbuf_put_sleb128(&s->pc2line, diff_col);
+
+      QTS_TRACE_PC2LINE_SLOT(i, pc, source_pos, line_num, col_num, diff_pc, diff_line, diff_col, is_short, op);
 
       last_pc = pc;
       last_line_num = line_num;
       last_col_num = col_num;
     }
+
+    QTS_TRACE_PC2LINE_END(s->pc2line.size);
   }
 }
 

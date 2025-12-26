@@ -1,0 +1,54 @@
+__tests__/fixtures/function-expression-arrow-this-binding-092.js:4:8: function: <null>
+  args: y
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field x
+        get_arg0 0: y
+        add
+        return
+
+__tests__/fixtures/function-expression-arrow-this-binding-092.js:5:8: function: <null>
+  args: z
+  stack_size: 2
+  opcodes:
+        get_arg0 0: z
+        push_i8 92
+        add
+        return
+
+__tests__/fixtures/function-expression-arrow-this-binding-092.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 6
+  opcodes:
+        check_define_var obj,128
+        define_var obj,128
+        object
+        push_i8 92
+        define_field x
+        fclosure8 0: [bytecode <null>]
+        set_name f
+        define_field f
+        fclosure8 1: [bytecode <null>]
+        set_name g
+        define_field g
+        put_var_init obj
+        get_var console
+        get_field2 log
+        get_var obj
+        get_field2 f
+        push_2 2
+        call_method 1
+        get_var obj
+        get_field2 g
+        push_3 3
+        call_method 1
+        call_method 2
+        set_loc0 0: "<ret>"
+        return
+

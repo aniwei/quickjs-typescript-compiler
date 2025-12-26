@@ -1,0 +1,76 @@
+__tests__/fixtures/async-generator-basic.js:2:1: function: gen
+  stack_size: 3
+  opcodes:
+        initial_yield
+        push_1 1
+        await
+        yield
+        if_false8 9
+        await
+        await
+        return_async
+    9:  drop
+        get_var Promise
+        get_field2 resolve
+        push_2 2
+        call_method 1
+        await
+        await
+        yield
+        if_false8 32
+        await
+        await
+        return_async
+   32:  drop
+        undefined
+        await
+        return_async
+
+__tests__/fixtures/async-generator-basic.js:7:2: function: <null>
+  locals:
+    0: let sum [level:1 next:-1]
+    1: const v [level:2 next:0]
+  stack_size: 5
+  opcodes:
+        set_loc_uninitialized 0: sum
+        push_0 0
+        put_loc0 0: sum
+        set_loc_uninitialized 1: v
+        get_var gen
+        call0 0
+        for_await_of_start
+        goto8 30
+   17:  put_loc1 1: v
+        get_loc_check 0: sum
+        get_loc_check 1: v
+        add
+        dup
+        put_loc_check 0: sum
+        drop
+   30:  for_await_of_next
+        await
+        iterator_get_value_done
+        if_false8 17
+        drop
+        iterator_close
+        get_var console
+        get_field2 log
+        get_loc_check 0: sum
+        call_method 1
+        drop
+        undefined
+        return_async
+
+__tests__/fixtures/async-generator-basic.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var gen,64
+        fclosure8 0: [bytecode gen]
+        define_func gen,0
+        fclosure8 1: [bytecode <null>]
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

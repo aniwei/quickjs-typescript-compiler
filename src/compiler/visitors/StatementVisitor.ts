@@ -749,6 +749,80 @@ export class StatementVisitor extends VisitorContext {
   // ============================================================================
 
   /**
+   * Emit a conditional jump to `labelFalse` when `expr` is falsy.
+   *
+  * This is a boolean/test-context emitter (unlike ExpressionVisitor's value-form
+  * logical expression emission which uses a `dup` + `if_true/if_false` + `drop` chain).
+  * QuickJS uses
+   * jump-based short-circuiting for conditions and it enables downstream
+   * peephole optimizations like `null strict_neq if_false -> is_null if_true`.
+   */
+  private emitCondJumpFalse(expr: ts.Expression, labelFalse: number): void {
+    const fd = this.funcDef!
+
+    if (ts.isParenthesizedExpression(expr)) {
+      this.emitCondJumpFalse(expr.expression, labelFalse)
+      return
+    }
+
+    if (ts.isBinaryExpression(expr) && expr.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) {
+      this.emitCondJumpFalse(expr.left, labelFalse)
+      this.emitCondJumpFalse(expr.right, labelFalse)
+      return
+    }
+
+    if (ts.isBinaryExpression(expr) && expr.operatorToken.kind === ts.SyntaxKind.BarBarToken) {
+      const labelTrue = this.compiler.newLabelInt(fd)
+      this.emitCondJumpTrue(expr.left, labelTrue)
+      this.emitCondJumpFalse(expr.right, labelFalse)
+      this.compiler.emitLabelInt(fd, labelTrue)
+      return
+    }
+
+    this.context.visit(expr)
+    this.compiler.emitGotoInt(fd, Opcode.OP_if_false, labelFalse)
+  }
+
+  /** Emit a conditional jump to `labelTrue` when `expr` is truthy. */
+  private emitCondJumpTrue(expr: ts.Expression, labelTrue: number): void {
+    const fd = this.funcDef!
+
+    if (ts.isParenthesizedExpression(expr)) {
+      this.emitCondJumpTrue(expr.expression, labelTrue)
+      return
+    }
+
+    if (ts.isBinaryExpression(expr) && expr.operatorToken.kind === ts.SyntaxKind.BarBarToken) {
+      this.emitCondJumpTrue(expr.left, labelTrue)
+      this.emitCondJumpTrue(expr.right, labelTrue)
+      return
+    }
+
+    if (ts.isBinaryExpression(expr) && expr.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) {
+      const labelFalse = this.compiler.newLabelInt(fd)
+      this.emitCondJumpFalse(expr.left, labelFalse)
+      this.emitCondJumpTrue(expr.right, labelTrue)
+      this.compiler.emitLabelInt(fd, labelFalse)
+      return
+    }
+
+    this.context.visit(expr)
+    this.compiler.emitGotoInt(fd, Opcode.OP_if_true, labelTrue)
+  }
+
+  private isPureAndChain(expr: ts.Expression): boolean {
+    if (ts.isParenthesizedExpression(expr)) return this.isPureAndChain(expr.expression)
+    if (ts.isBinaryExpression(expr) && expr.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) {
+      return this.isPureAndChain(expr.left) && this.isPureAndChain(expr.right)
+    }
+    if (ts.isBinaryExpression(expr) && expr.operatorToken.kind === ts.SyntaxKind.BarBarToken) {
+      return false
+    }
+    // leaf
+    return true
+  }
+
+  /**
    * 访问 if 语句 - 对应 parser.c:7026-7055
    * 
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:7026-7055
@@ -766,14 +840,19 @@ export class StatementVisitor extends VisitorContext {
     // 设置 eval 返回值为 undefined - 对应 parser.c:7033
     this.compiler.setEvalRetUndefined(fd)
 
-    // 编译条件表达式
-    this.context.visit(node.expression)
-
     // 创建标签
     const label1 = this.compiler.newLabelInt(fd)
 
-    // 条件为假跳转到 label1
-    this.compiler.emitGotoInt(fd, Opcode.OP_if_false, label1)
+    // QuickJS observes different shapes for condition emission:
+    // - pure `&&` chains often end up as jump-based tests (enabling is_null peepholes)
+    // - `||` conditions in practice still use the value-form `dup/if_*/drop` short-circuit
+    // To match QuickJS fixtures, only use boolean-context lowering for pure && chains.
+    if (this.isPureAndChain(node.expression)) {
+      this.emitCondJumpFalse(node.expression, label1)
+    } else {
+      this.context.visit(node.expression)
+      this.compiler.emitGotoInt(fd, Opcode.OP_if_false, label1)
+    }
 
 
     // 编译 then 分支
@@ -836,11 +915,13 @@ export class StatementVisitor extends VisitorContext {
     // 发射 continue 标签 - 对应 parser.c:7072
     this.compiler.emitLabelInt(fd, labelCont)
 
-    // 编译条件表达式 - 对应 parser.c:7073-7074
-    this.context.visit(node.expression)
-
-    // 条件为假跳转到 break 标签 - 对应 parser.c:7075
-    this.compiler.emitGotoInt(fd, Opcode.OP_if_false, labelBreak)
+    // 编译条件表达式：仅对纯 && 链做布尔上下文 lowering，其余保持 value-form
+    if (this.isPureAndChain(node.expression)) {
+      this.emitCondJumpFalse(node.expression, labelBreak)
+    } else {
+      this.context.visit(node.expression)
+      this.compiler.emitGotoInt(fd, Opcode.OP_if_false, labelBreak)
+    }
 
     // 编译循环体 - 对应 parser.c:7077-7078
     this.context.visit(node.statement)
@@ -890,11 +971,13 @@ export class StatementVisitor extends VisitorContext {
     // 发射 continue 标签 - 对应 parser.c:7109
     this.compiler.emitLabelInt(fd, labelCont)
 
-    // 编译条件表达式 - 对应 parser.c:7112-7113
-    this.context.visit(node.expression)
-
-    // 条件为真跳转回循环开始 - 对应 parser.c:7117
-    this.compiler.emitGotoInt(fd, Opcode.OP_if_true, label1)
+    // 编译条件表达式：仅对纯 && 链做布尔上下文 lowering，其余保持 value-form
+    if (this.isPureAndChain(node.expression)) {
+      this.emitCondJumpTrue(node.expression, label1)
+    } else {
+      this.context.visit(node.expression)
+      this.compiler.emitGotoInt(fd, Opcode.OP_if_true, label1)
+    }
 
     // 发射 break 标签 - 对应 parser.c:7119
     this.compiler.emitLabelInt(fd, labelBreak)
@@ -1547,7 +1630,13 @@ export class StatementVisitor extends VisitorContext {
     const sourcePos = node.getStart()
 
     // 编译 throw 表达式
-    this.context.visit(node.expression)
+    const prevExpressionValueUsed = this.context.expressionValueUsed
+    this.context.expressionValueUsed = true
+    try {
+      this.context.visit(node.expression)
+    } finally {
+      this.context.expressionValueUsed = prevExpressionValueUsed
+    }
 
     // 发射 throw
     this.compiler.emitOp(fd, Opcode.OP_throw, sourcePos)
@@ -1849,6 +1938,8 @@ export class StatementVisitor extends VisitorContext {
         op === ts.SyntaxKind.BarBarEqualsToken ||
         op === ts.SyntaxKind.QuestionQuestionEqualsToken
 
+      const isIdentifierLValue = ts.isIdentifier(expr.left)
+
       const isNonPrivatePropLValue =
         ts.isPropertyAccessExpression(expr.left) &&
         !ts.isPrivateIdentifier(expr.left.name)
@@ -1856,7 +1947,7 @@ export class StatementVisitor extends VisitorContext {
 
       const isPropOrElemLValue = isNonPrivatePropLValue || isElemLValue
 
-      if (isAssignmentOp && isPropOrElemLValue) {
+      if (isAssignmentOp && (isPropOrElemLValue || isIdentifierLValue)) {
         const prev = this.context.expressionValueUsed
         this.context.expressionValueUsed = false
         this.context.visit(expr)

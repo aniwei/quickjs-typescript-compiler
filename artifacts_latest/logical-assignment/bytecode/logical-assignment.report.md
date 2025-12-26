@@ -1,0 +1,333 @@
+# 字节码分析报告
+
+**输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/logical-assignment.ts
+**生成时间**: 2025-12-26T13:00:18.082Z
+
+## 大小对比
+
+- TypeScript编译器: 513 字节
+- WASM编译器: 513 字节
+- 差异: 0 字节 (0.00%)
+
+## 结构分析
+
+### TypeScript编译器输出
+```json
+{
+  "source": "TypeScript",
+  "bcVersion": "0x5",
+  "userAtomCount": 13,
+  "atoms": [
+    {
+      "index": 0,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "a",
+      "offset": 2
+    },
+    {
+      "index": 1,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "b",
+      "offset": 4
+    },
+    {
+      "index": 2,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "c",
+      "offset": 6
+    },
+    {
+      "index": 3,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "d",
+      "offset": 8
+    },
+    {
+      "index": 4,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "obj",
+      "offset": 10
+    },
+    {
+      "index": 5,
+      "rawLength": 16,
+      "actualLength": 8,
+      "isWideChar": 0,
+      "string": "fallback",
+      "offset": 14
+    },
+    {
+      "index": 6,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "init",
+      "offset": 23
+    },
+    {
+      "index": 7,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "console",
+      "offset": 28
+    },
+    {
+      "index": 8,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "log",
+      "offset": 36
+    },
+    {
+      "index": 9,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "x",
+      "offset": 40
+    },
+    {
+      "index": 10,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "y",
+      "offset": 42
+    },
+    {
+      "index": 11,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "z",
+      "offset": 44
+    },
+    {
+      "index": 12,
+      "rawLength": 80,
+      "actualLength": 40,
+      "isWideChar": 0,
+      "string": "__tests__/fixtures/logical-assignment.js",
+      "offset": 46
+    }
+  ],
+  "functionHeader": {
+    "offset": 87,
+    "tag": "0xc",
+    "remaining": 426
+  }
+}
+```
+
+### WASM编译器输出
+```json
+{
+  "source": "WASM",
+  "bcVersion": "0x5",
+  "userAtomCount": 13,
+  "atoms": [
+    {
+      "index": 0,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "a",
+      "offset": 2
+    },
+    {
+      "index": 1,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "b",
+      "offset": 4
+    },
+    {
+      "index": 2,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "c",
+      "offset": 6
+    },
+    {
+      "index": 3,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "d",
+      "offset": 8
+    },
+    {
+      "index": 4,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "obj",
+      "offset": 10
+    },
+    {
+      "index": 5,
+      "rawLength": 16,
+      "actualLength": 8,
+      "isWideChar": 0,
+      "string": "fallback",
+      "offset": 14
+    },
+    {
+      "index": 6,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "init",
+      "offset": 23
+    },
+    {
+      "index": 7,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "console",
+      "offset": 28
+    },
+    {
+      "index": 8,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "log",
+      "offset": 36
+    },
+    {
+      "index": 9,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "x",
+      "offset": 40
+    },
+    {
+      "index": 10,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "y",
+      "offset": 42
+    },
+    {
+      "index": 11,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "z",
+      "offset": 44
+    },
+    {
+      "index": 12,
+      "rawLength": 80,
+      "actualLength": 40,
+      "isWideChar": 0,
+      "string": "__tests__/fixtures/logical-assignment.js",
+      "offset": 46
+    }
+  ],
+  "functionHeader": {
+    "offset": 87,
+    "tag": "0xc",
+    "remaining": 426
+  }
+}
+```
+
+## 字节级差异
+
+共发现 0 个字节差异:
+
+
+## 十六进制转储对比
+
+### TypeScript
+```
+00000000: 05 0d 02 61 02 62 02 63 02 64 06 6f 62 6a 10 66 |...a.b.c.d.obj.f|
+00000010: 61 6c 6c 62 61 63 6b 08 69 6e 69 74 0e 63 6f 6e |allback.init.con|
+00000020: 73 6f 6c 65 06 6c 6f 67 02 78 02 79 02 7a 50 5f |sole.log.x.y.zP_|
+00000030: 5f 74 65 73 74 73 5f 5f 2f 66 69 78 74 75 72 65 |_tests__/fixture|
+00000040: 73 2f 6c 6f 67 69 63 61 6c 2d 61 73 73 69 67 6e |s/logical-assign|
+00000050: 6d 65 6e 74 2e 6a 73 0c 00 06 00 a4 01 00 01 00 |ment.js.........|
+00000060: 06 00 00 da 02 01 a6 01 00 00 00 40 e4 00 00 00 |...........@....|
+00000070: 80 40 e5 00 00 00 80 40 e6 00 00 00 80 40 e7 00 |.@.....@.....@..|
+00000080: 00 00 80 40 e8 00 00 00 80 3f e4 00 00 00 82 3f |...@.....?.....?|
+00000090: e5 00 00 00 82 3f e6 00 00 00 82 3f e7 00 00 00 |.....?.....?....|
+000000a0: 82 3f e8 00 00 00 80 b7 3b e4 00 00 00 c3 3b e5 |.?......;.....;.|
+000000b0: 00 00 00 07 3b e6 00 00 00 06 3b e7 00 00 00 7d |....;.....;....}|
+000000c0: e4 00 00 00 3d 11 ed 07 0e b8 16 3e ee 03 0f 0f |....=......>....|
+000000d0: cb 7d e5 00 00 00 3d 11 ec 0b 0e 04 e9 00 00 00 |.}....=.........|
+000000e0: 16 3e ee 03 0f 0f cb 7d e6 00 00 00 3d 11 b2 ec |.>.....}....=...|
+000000f0: 0b 0e 04 ea 00 00 00 16 3e ee 03 0f 0f cb 7d e7 |........>.....}.|
+00000100: 00 00 00 3d 11 b2 ec 07 0e b9 16 3e ee 03 0f 0f |...=.......>....|
+00000110: cb 39 eb 00 00 00 43 ec 00 00 00 39 e4 00 00 00 |.9....C....9....|
+00000120: 39 e5 00 00 00 39 e6 00 00 00 39 e7 00 00 00 24 |9....9....9....$|
+00000130: 04 00 cb 0b b7 4e ed 00 00 00 07 4e ee 00 00 00 |.....N.....N....|
+00000140: 09 4e ef 00 00 00 3b e8 00 00 00 39 e8 00 00 00 |.N....;....9....|
+00000150: 43 ed 00 00 00 11 ec 0b 0e bc 15 44 ed 00 00 00 |C..........D....|
+00000160: ee 02 0f cb 39 e8 00 00 00 43 ee 00 00 00 11 b2 |....9....C......|
+00000170: ec 0c 0e bf 0a 15 44 ee 00 00 00 ee 02 0f cb 39 |......D........9|
+00000180: e8 00 00 00 43 ef 00 00 00 11 ed 0b 0e 0a 15 44 |....C..........D|
+00000190: ef 00 00 00 ee 02 0f cb 39 eb 00 00 00 43 ec 00 |........9....C..|
+000001a0: 00 00 39 e8 00 00 00 42 ed 00 00 00 39 e8 00 00 |..9....B....9...|
+000001b0: 00 42 ee 00 00 00 39 e8 00 00 00 42 ef 00 00 00 |.B....9....B....|
+000001c0: 24 03 00 cf 28 e0 03 38 00 00 00 54 08 00 5d 00 |$...(..8...T..].|
+000001d0: 71 00 76 00 62 00 1b 0e 1b 0a 1b 06 1b 06 1b 06 |q.v.b...........|
+000001e0: 1b 13 90 15 1b 06 67 05 1b 06 71 05 1b 06 67 05 |......g...q...g.|
+000001f0: 1b 0e 1b 0a 1b 06 1b 08 1b 06 1b 08 1b 06 1b 23 |...............#|
+00000200: 00                                              |.|
+```
+
+### WASM
+```
+00000000: 05 0d 02 61 02 62 02 63 02 64 06 6f 62 6a 10 66 |...a.b.c.d.obj.f|
+00000010: 61 6c 6c 62 61 63 6b 08 69 6e 69 74 0e 63 6f 6e |allback.init.con|
+00000020: 73 6f 6c 65 06 6c 6f 67 02 78 02 79 02 7a 50 5f |sole.log.x.y.zP_|
+00000030: 5f 74 65 73 74 73 5f 5f 2f 66 69 78 74 75 72 65 |_tests__/fixture|
+00000040: 73 2f 6c 6f 67 69 63 61 6c 2d 61 73 73 69 67 6e |s/logical-assign|
+00000050: 6d 65 6e 74 2e 6a 73 0c 00 06 00 a4 01 00 01 00 |ment.js.........|
+00000060: 06 00 00 da 02 01 a6 01 00 00 00 40 e4 00 00 00 |...........@....|
+00000070: 80 40 e5 00 00 00 80 40 e6 00 00 00 80 40 e7 00 |.@.....@.....@..|
+00000080: 00 00 80 40 e8 00 00 00 80 3f e4 00 00 00 82 3f |...@.....?.....?|
+00000090: e5 00 00 00 82 3f e6 00 00 00 82 3f e7 00 00 00 |.....?.....?....|
+000000a0: 82 3f e8 00 00 00 80 b7 3b e4 00 00 00 c3 3b e5 |.?......;.....;.|
+000000b0: 00 00 00 07 3b e6 00 00 00 06 3b e7 00 00 00 7d |....;.....;....}|
+000000c0: e4 00 00 00 3d 11 ed 07 0e b8 16 3e ee 03 0f 0f |....=......>....|
+000000d0: cb 7d e5 00 00 00 3d 11 ec 0b 0e 04 e9 00 00 00 |.}....=.........|
+000000e0: 16 3e ee 03 0f 0f cb 7d e6 00 00 00 3d 11 b2 ec |.>.....}....=...|
+000000f0: 0b 0e 04 ea 00 00 00 16 3e ee 03 0f 0f cb 7d e7 |........>.....}.|
+00000100: 00 00 00 3d 11 b2 ec 07 0e b9 16 3e ee 03 0f 0f |...=.......>....|
+00000110: cb 39 eb 00 00 00 43 ec 00 00 00 39 e4 00 00 00 |.9....C....9....|
+00000120: 39 e5 00 00 00 39 e6 00 00 00 39 e7 00 00 00 24 |9....9....9....$|
+00000130: 04 00 cb 0b b7 4e ed 00 00 00 07 4e ee 00 00 00 |.....N.....N....|
+00000140: 09 4e ef 00 00 00 3b e8 00 00 00 39 e8 00 00 00 |.N....;....9....|
+00000150: 43 ed 00 00 00 11 ec 0b 0e bc 15 44 ed 00 00 00 |C..........D....|
+00000160: ee 02 0f cb 39 e8 00 00 00 43 ee 00 00 00 11 b2 |....9....C......|
+00000170: ec 0c 0e bf 0a 15 44 ee 00 00 00 ee 02 0f cb 39 |......D........9|
+00000180: e8 00 00 00 43 ef 00 00 00 11 ed 0b 0e 0a 15 44 |....C..........D|
+00000190: ef 00 00 00 ee 02 0f cb 39 eb 00 00 00 43 ec 00 |........9....C..|
+000001a0: 00 00 39 e8 00 00 00 42 ed 00 00 00 39 e8 00 00 |..9....B....9...|
+000001b0: 00 42 ee 00 00 00 39 e8 00 00 00 42 ef 00 00 00 |.B....9....B....|
+000001c0: 24 03 00 cf 28 e0 03 38 00 00 00 54 08 00 5d 00 |$...(..8...T..].|
+000001d0: 71 00 76 00 62 00 1b 0e 1b 0a 1b 06 1b 06 1b 06 |q.v.b...........|
+000001e0: 1b 13 90 15 1b 06 67 05 1b 06 71 05 1b 06 67 05 |......g...q...g.|
+000001f0: 1b 0e 1b 0a 1b 06 1b 08 1b 06 1b 08 1b 06 1b 23 |...............#|
+00000200: 00                                              |.|
+```

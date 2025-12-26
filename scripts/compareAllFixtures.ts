@@ -10,6 +10,8 @@ import { BytecodeComparator, type ComparisonOptions, type ComparisonSummary } fr
 
 interface RunnerOptions {
   fixturesDir: string
+  includeQuickjsTests: boolean
+  quickjsFixturesDir: string
   filter?: string
   disasm: boolean
   asm: boolean
@@ -69,8 +71,13 @@ async function main() {
     process.env.QTS_TRACE_LEVEL = String(options.qtsTraceLevel)
   }
 
-  console.log('Looking for fixtures in:', options.fixturesDir)
-  const fixtureFiles = await collectFixtureFiles(options.fixturesDir, options.filter)
+  const fixtureDirs = [options.fixturesDir]
+  if (options.includeQuickjsTests) {
+    fixtureDirs.push(options.quickjsFixturesDir)
+  }
+
+  console.log('Looking for fixtures in:', fixtureDirs.join(', '))
+  const fixtureFiles = await collectFixtureFilesFromDirs(fixtureDirs, options.filter)
 
   if (fixtureFiles.length === 0) {
     console.log('⚠️  No fixture files found that match the current criteria.')
@@ -133,6 +140,8 @@ async function main() {
 function parseArgs(args: string[]): RunnerOptions {
   const options: RunnerOptions = {
     fixturesDir: path.resolve('__tests__/fixtures'),
+    includeQuickjsTests: false,
+    quickjsFixturesDir: path.resolve('__tests__/fixtures_quickjs'),
     disasm: false,
     asm: false,
     sideBySide: false,
@@ -167,6 +176,20 @@ function parseArgs(args: string[]): RunnerOptions {
           throw new Error('--filter requires a string value')
         }
         options.filter = value
+        index += 1
+        break
+      }
+      case '--include-quickjs-tests':
+      case '--includeQuickjsTests':
+        options.includeQuickjsTests = true
+        break
+      case '--quickjs-fixtures-dir':
+      case '--quickjsFixturesDir': {
+        const value = args[index + 1]
+        if (!value) {
+          throw new Error(`${arg} requires a directory path`)
+        }
+        options.quickjsFixturesDir = path.resolve(value)
         index += 1
         break
       }
@@ -231,38 +254,44 @@ function parseArgs(args: string[]): RunnerOptions {
 }
 
 async function collectFixtureFiles(fixturesDir: string, filter?: string): Promise<string[]> {
-  const files: string[] = []
-
-  const walk = async (dir: string) => {
-    const entries = await fs.readdir(dir, { withFileTypes: true })
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name)
-      if (entry.isDirectory()) {
-        await walk(fullPath)
-        continue
-      }
-      if (!entry.isFile()) {
-        continue
-      }
-      if (!entry.name.endsWith('.ts') || entry.name.endsWith('.d.ts')) {
-        continue
-      }
-      if (filter && !entry.name.includes(filter) && !fullPath.includes(filter)) {
-        continue
-      }
-      files.push(fullPath)
-    }
-  }
-
   try {
+    const files: string[] = []
+
+    const walk = async (dir: string) => {
+      const entries = await fs.readdir(dir, { withFileTypes: true })
+      for (const entry of entries) {
+        const full = path.join(dir, entry.name)
+        if (entry.isDirectory()) {
+          await walk(full)
+          continue
+        }
+        if (!entry.isFile()) continue
+        if (!entry.name.endsWith('.ts') || entry.name.endsWith('.d.ts')) continue
+        const rel = path.relative(fixturesDir, full)
+        if (filter && !rel.includes(filter)) continue
+        files.push(full)
+      }
+    }
+
     await walk(fixturesDir)
-    console.log(`Found ${files.length} fixture(s) under ${fixturesDir}`)
     files.sort((a, b) => a.localeCompare(b))
+    console.log(`Found ${files.length} fixture file(s) under ${fixturesDir}`)
     return files
   } catch (err) {
     console.error('Error reading fixtures dir:', err)
     return []
   }
+}
+
+async function collectFixtureFilesFromDirs(dirs: string[], filter?: string): Promise<string[]> {
+  const all: string[] = []
+  for (const dir of dirs) {
+    const files = await collectFixtureFiles(dir, filter)
+    all.push(...files)
+  }
+  // Keep a stable order across multiple dirs
+  all.sort((a, b) => a.localeCompare(b))
+  return all
 }
 
 function reportSummary(results: FixtureResult[]) {

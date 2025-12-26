@@ -296,12 +296,11 @@ export class LabelResolver {
             const ls = fd.labelSlots[labelIdx]
             
             // 关键：pos2 用于后续 jump diff 的“静态预估”。
-            // QuickJS 在 pass2（resolve_variables）里设置：
-            //   third_party/QuickJS/src/core/parser.c: case OP_label: ls->pos2 = bc_out.size + opcode_info[op].size;
-            // 注意：这里的 bc_out 是 pass2 输出缓冲；我们在 resolve_labels 里没有独立的 pass2，
-            // 因此用当前 bcOut.size 来等价模拟。
-            // 另外：OP_label 本身不会输出到 bcOut，但它在输入字节码里占用 5 bytes（1 + u32 label）。
-            ls.pos2 = bcOut.size + len
+            // 在本实现里，emitJump() 用的是 srcPos（源字节码位置）去估计 diff：diff = ls.pos2 - srcPos - 1。
+            // 因此 ls.pos2 必须是“源字节码坐标”（fd.byteCode.buffer 的位置），否则会导致短跳转估计错误，
+            // 以及 findJumpTarget() 误判跳转目标（从而触发错误的 goto→throw 优化）。
+            // OP_label 在输入字节码里占用 len bytes（通常为 5），所以 pos2 应该指向下一条指令的源位置。
+            ls.pos2 = pos + len
             
             ls.addr = bcOut.size
             
@@ -474,10 +473,124 @@ export class LabelResolver {
               posNext = cc.pos
               break
             }
+
+            // transform undefined if_true(l1)/if_false(l1) -> nop/goto(l1)
+            // QuickJS: third_party/QuickJS/src/core/parser.c (case OP_undefined -> has_constant_test)
+            if (this.codeMatch(cc, posNext, [M2(Opcode.OP_if_false, Opcode.OP_if_true), -1])) {
+              if (cc.lineNum >= 0) lineNum = cc.lineNum
+              const val = 0
+              const label = cc.label
+
+              // cc.op is set only for M2 multi-match
+              if (val === (cc.op - Opcode.OP_if_false)) {
+                posNext = cc.pos
+                this.emitJump(fd, bcOut, Opcode.OP_goto, label, lineNum, pos)
+                {
+                  const state = { lineNum }
+                  posNext = this.skipDeadCode(fd, bcBuf, bcLen, posNext, state)
+                  lineNum = state.lineNum
+                }
+                break
+              } else {
+                posNext = cc.pos
+                this.updateLabel(fd, label, -1)
+                break
+              }
+            }
+
+            if (USE_SHORT_OPCODES) {
+              // transform undefined strict_eq -> is_undefined
+              if (this.codeMatch(cc, posNext, [Opcode.OP_strict_eq, -1])) {
+                if (cc.lineNum >= 0) lineNum = cc.lineNum
+                this.addPc2lineInfo(fd, bcOut.size, lineNum)
+                bcOut.putU8(Opcode.OP_is_undefined)
+                posNext = cc.pos
+                break
+              }
+
+              // transform undefined strict_neq if_false/if_true -> is_undefined if_true/if_false
+              if (this.codeMatch(cc, posNext, [
+                Opcode.OP_strict_neq,
+                M2(Opcode.OP_if_false, Opcode.OP_if_true),
+                -1,
+              ])) {
+                if (cc.lineNum >= 0) lineNum = cc.lineNum
+                this.addPc2lineInfo(fd, bcOut.size, lineNum)
+                bcOut.putU8(Opcode.OP_is_undefined)
+                posNext = cc.pos
+
+                const label = cc.label
+                const newOp = cc.op ^ Opcode.OP_if_false ^ Opcode.OP_if_true
+                this.emitJump(fd, bcOut, newOp, label, lineNum, pos)
+                break
+              }
+            }
           }
           this.addPc2lineInfo(fd, bcOut.size, lineNum)
           bcOut.putU8(op)
           break
+
+        // === null / true / false: constant-test folding + is_null peephole ===
+        // QuickJS: third_party/QuickJS/src/core/parser.c (case OP_null, OP_push_false, OP_push_true)
+        case Opcode.OP_null:
+        case Opcode.OP_push_false:
+        case Opcode.OP_push_true: {
+          if (OPTIMIZE) {
+            // SHORT_OPCODES peephole: null strict_eq/strict_neq+if -> is_null ...
+            if (USE_SHORT_OPCODES && op === Opcode.OP_null) {
+              if (this.codeMatch(cc, posNext, [Opcode.OP_strict_eq, -1])) {
+                if (cc.lineNum >= 0) lineNum = cc.lineNum
+                this.addPc2lineInfo(fd, bcOut.size, lineNum)
+                bcOut.putU8(Opcode.OP_is_null)
+                posNext = cc.pos
+                break
+              }
+
+              if (this.codeMatch(cc, posNext, [
+                Opcode.OP_strict_neq,
+                M2(Opcode.OP_if_false, Opcode.OP_if_true),
+                -1,
+              ])) {
+                if (cc.lineNum >= 0) lineNum = cc.lineNum
+                this.addPc2lineInfo(fd, bcOut.size, lineNum)
+                bcOut.putU8(Opcode.OP_is_null)
+                posNext = cc.pos
+
+                const label = cc.label
+                const newOp = cc.op ^ Opcode.OP_if_false ^ Opcode.OP_if_true
+                this.emitJump(fd, bcOut, newOp, label, lineNum, pos)
+                break
+              }
+
+            }
+
+            // constant-test folding: (null|false|true) if_true/if_false -> nop/goto
+            const val = op === Opcode.OP_push_true ? 1 : 0
+            if (this.codeMatch(cc, posNext, [M2(Opcode.OP_if_false, Opcode.OP_if_true), -1])) {
+              if (cc.lineNum >= 0) lineNum = cc.lineNum
+              const label = cc.label
+
+              if (val === (cc.op - Opcode.OP_if_false)) {
+                posNext = cc.pos
+                this.emitJump(fd, bcOut, Opcode.OP_goto, label, lineNum, pos)
+                {
+                  const state = { lineNum }
+                  posNext = this.skipDeadCode(fd, bcBuf, bcLen, posNext, state)
+                  lineNum = state.lineNum
+                }
+                break
+              } else {
+                posNext = cc.pos
+                this.updateLabel(fd, label, -1)
+                break
+              }
+            }
+          }
+
+          this.addPc2lineInfo(fd, bcOut.size, lineNum)
+          bcOut.putU8(op)
+          break
+        }
         
         // === push_i32 优化 ===
         case Opcode.OP_push_i32: {

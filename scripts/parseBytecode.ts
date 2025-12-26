@@ -3,6 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 import { parseBytecodeModule } from '../src/bytecodeReader'
+import { safeJsonStringify } from './utils/safeJson'
 
 interface CliOptions {
   output?: string
@@ -71,7 +72,7 @@ async function main() {
 
   const buffer = await readFile(absoluteInput)
   const parsed = parseBytecodeModule(buffer)
-  const json = JSON.stringify(parsed, null, options.pretty ? 2 : undefined)
+  const json = safeJsonStringify(parsed, { pretty: options.pretty })
 
   if (options.output) {
     const absoluteOutput = path.resolve(process.cwd(), options.output)
@@ -86,3 +87,4 @@ main().catch((error) => {
   console.error('❗️解析失败：', error)
   process.exit(1)
 })
+

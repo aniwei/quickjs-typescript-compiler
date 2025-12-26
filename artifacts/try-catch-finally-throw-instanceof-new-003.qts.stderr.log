@@ -1,0 +1,80 @@
+[QTS:LABEL] begin: bc_len=26 label_count=0 jump_size=0 line_number_size=2 strip_debug=0
+[QTS:PC2LINE] add: pc=2 source_pos=73 count=1
+[QTS:PC2LINE] add: pc=3 source_pos=77 count=2
+[QTS:PC2LINE] begin: slots=2 source_pos=57
+[QTS:PC2LINE] init: line=1 col=0
+[QTS:PC2LINE] slot[0]: pc=2 src=73 line=1 col=16 dpc=2 dline=0 dcol=16 short op=0x0c
+[QTS:PC2LINE] slot[1]: pc=3 src=77 line=1 col=20 dpc=1 dline=0 dcol=4 short op=0x07
+[QTS:PC2LINE] end: pc2line_len=6
+[QTS:LABEL] end: out_len=10
+[QTS:STACK] result: max_stack=2 var_count=1
+[QTS:LABEL] begin: bc_len=443 label_count=11 jump_size=11 line_number_size=24 strip_debug=0
+[QTS:LABEL] goto: opcode=111 label=0
+[QTS:PC2LINE] add: pc=42 source_pos=124 count=1
+[QTS:PC2LINE] add: pc=48 source_pos=126 count=2
+[QTS:PC2LINE] add: pc=54 source_pos=140 count=3
+[QTS:PC2LINE] add: pc=57 source_pos=153 count=4
+[QTS:PC2LINE] add: pc=62 source_pos=142 count=5
+[QTS:LABEL] goto: opcode=108 label=4
+[QTS:PC2LINE] add: pc=71 source_pos=166 count=6
+[QTS:LABEL] emit: label=4 pos=72
+[QTS:PC2LINE] add: pc=72 source_pos=189 count=7
+[QTS:PC2LINE] add: pc=75 source_pos=190 count=8
+[QTS:PC2LINE] add: pc=91 source_pos=204 count=9
+[QTS:PC2LINE] add: pc=93 source_pos=208 count=10
+[QTS:LABEL] goto: opcode=108 label=6
+[QTS:PC2LINE] add: pc=97 source_pos=223 count=11
+[QTS:LABEL] emit: label=6 pos=98
+[QTS:LABEL] goto: opcode=112 label=2
+[QTS:LABEL] goto: opcode=110 label=3
+[QTS:LABEL] emit: label=0 pos=109
+[QTS:LABEL] goto: opcode=111 label=1
+[QTS:PC2LINE] add: pc=115 source_pos=264 count=12
+[QTS:LABEL] typeof_test: pos=246 pos_next=247 line_num:264->266 atom=72 cmp_op=173
+[QTS:PC2LINE] add: pc=116 source_pos=266 count=13
+[QTS:LABEL] goto: opcode=108 label=8
+[QTS:PC2LINE] add: pc=125 source_pos=282 count=14
+[QTS:PC2LINE] add: pc=127 source_pos=284 count=15
+[QTS:LABEL] goto: opcode=110 label=9
+[QTS:LABEL] emit: label=8 pos=130
+[QTS:PC2LINE] add: pc=130 source_pos=290 count=16
+[QTS:LABEL] emit: label=9 pos=131
+[QTS:LABEL] goto: opcode=112 label=2
+[QTS:LABEL] goto: opcode=110 label=3
+[QTS:LABEL] emit: label=1 pos=148
+[QTS:LABEL] goto: opcode=112 label=2
+[QTS:LABEL] emit: label=2 pos=154
+[QTS:PC2LINE] add: pc=158 source_pos=310 count=17
+[QTS:PC2LINE] add: pc=165 source_pos=314 count=18
+[QTS:LABEL] emit: label=3 pos=176
+[QTS:PC2LINE] add: pc=176 source_pos=323 count=19
+[QTS:PC2LINE] add: pc=181 source_pos=330 count=20
+[QTS:PC2LINE] add: pc=186 source_pos=335 count=21
+[QTS:PC2LINE] add: pc=191 source_pos=334 count=22
+[QTS:PC2LINE] begin: slots=22 source_pos=0
+[QTS:PC2LINE] init: line=0 col=0
+[QTS:PC2LINE] slot[0]: pc=42 src=124 line=4 col=18 dpc=42 dline=4 dcol=18 long op=0x00
+[QTS:PC2LINE] slot[1]: pc=48 src=126 line=4 col=20 dpc=6 dline=0 dcol=2 short op=0x20
+[QTS:PC2LINE] slot[2]: pc=54 src=140 line=5 col=10 dpc=6 dline=1 dcol=-10 short op=0x21
+[QTS:PC2LINE] slot[3]: pc=57 src=153 line=5 col=23 dpc=3 dline=0 dcol=13 short op=0x11
+[QTS:PC2LINE] slot[4]: pc=62 src=142 line=5 col=12 dpc=5 dline=0 dcol=-11 short op=0x1b
+[QTS:PC2LINE] slot[5]: pc=71 src=166 line=6 col=8 dpc=9 dline=1 dcol=-4 short op=0x30
+[QTS:PC2LINE] slot[6]: pc=72 src=189 line=7 col=10 dpc=1 dline=1 dcol=2 short op=0x08
+[QTS:PC2LINE] slot[7]: pc=75 src=190 line=7 col=11 dpc=3 dline=0 dcol=1 short op=0x11
+[QTS:PC2LINE] slot[8]: pc=91 src=204 line=8 col=10 dpc=16 dline=1 dcol=-1 short op=0x53
+[QTS:PC2LINE] slot[9]: pc=93 src=208 line=8 col=14 dpc=2 dline=0 dcol=4 short op=0x0c
+[QTS:PC2LINE] slot[10]: pc=97 src=223 line=9 col=8 dpc=4 dline=1 dcol=-6 short op=0x17
+[QTS:PC2LINE] slot[11]: pc=114 src=264 line=12 col=18 dpc=17 dline=3 dcol=10 short op=0x5a
+[QTS:PC2LINE] slot[12]: pc=115 src=266 line=12 col=20 dpc=1 dline=0 dcol=2 short op=0x07
+[QTS:PC2LINE] slot[13]: pc=124 src=282 line=12 col=36 dpc=9 dline=0 dcol=16 short op=0x2f
+[QTS:PC2LINE] slot[14]: pc=126 src=284 line=12 col=38 dpc=2 dline=0 dcol=2 short op=0x0c
+[QTS:PC2LINE] slot[15]: pc=129 src=290 line=12 col=44 dpc=3 dline=0 dcol=6 short op=0x11
+[QTS:PC2LINE] slot[16]: pc=157 src=310 line=15 col=4 dpc=28 dline=3 dcol=-40 short op=0x91
+[QTS:PC2LINE] slot[17]: pc=164 src=314 line=15 col=8 dpc=7 dline=0 dcol=4 short op=0x25
+[QTS:PC2LINE] slot[18]: pc=175 src=323 line=17 col=0 dpc=11 dline=2 dcol=-8 short op=0x3b
+[QTS:PC2LINE] slot[19]: pc=180 src=330 line=17 col=7 dpc=5 dline=0 dcol=7 short op=0x1b
+[QTS:PC2LINE] slot[20]: pc=185 src=335 line=17 col=12 dpc=5 dline=0 dcol=5 short op=0x1b
+[QTS:PC2LINE] slot[21]: pc=190 src=334 line=17 col=11 dpc=5 dline=0 dcol=-1 short op=0x1b
+[QTS:PC2LINE] end: pc2line_len=48
+[QTS:LABEL] end: out_len=195
+[QTS:STACK] result: max_stack=4 var_count=4

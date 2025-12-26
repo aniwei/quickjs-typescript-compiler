@@ -1,0 +1,116 @@
+__tests__/fixtures/class-accessors.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 2
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        goto8 7
+    7:  get_loc0 0: this
+        push_0 0
+        define_field _value
+        return_undef
+
+__tests__/fixtures/class-accessors.js:3:5: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_var console
+        get_field2 log
+        push_atom_value "Getting value"
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_field _value
+        return
+
+__tests__/fixtures/class-accessors.js:7:5: function: <null>
+  mode: strict
+  args: v
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_var console
+        get_field2 log
+        push_atom_value "Setting value"
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_arg0 0: v
+        put_field _value
+        return_undef
+
+__tests__/fixtures/class-accessors.js:11:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  return_undef
+
+__tests__/fixtures/class-accessors.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const Box [level:2 next:-1]
+    2: const <class_fields_init> [level:3 next:1]
+  stack_size: 3
+  opcodes:
+        check_define_var Box,128
+        check_define_var b,128
+        define_var Box,130
+        define_var b,128
+        set_loc_uninitialized 1: Box
+        undefined
+        set_loc_uninitialized 2: "<class_fields_init>"
+        push_const8 2: [bytecode <null>]
+        define_class Box,0
+        fclosure8 0: [bytecode <null>]
+        define_method value,1
+        fclosure8 1: [bytecode <null>]
+        define_method value,2
+        fclosure8 3: [bytecode <null>]
+        set_home_object
+        put_loc2 2: "<class_fields_init>"
+        drop
+        set_loc1 1: Box
+        close_loc 2: "<class_fields_init>"
+        put_var_init Box
+        get_var Box
+        dup
+        call_constructor 0
+        put_var_init b
+        get_var b
+        push_i8 10
+        insert2
+        put_field value
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var b
+        get_field value
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

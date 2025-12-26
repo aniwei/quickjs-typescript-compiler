@@ -1,0 +1,47 @@
+__tests__/fixtures/es2020_bigint.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var a,128
+        check_define_var b,128
+        check_define_var c,128
+        check_define_var d,128
+        check_define_var e,128
+        define_var a,128
+        define_var b,128
+        define_var c,128
+        define_var d,128
+        define_var e,128
+        push_bigint_i32 10
+        put_var_init a
+        push_bigint_i32 20
+        put_var_init b
+        get_var a
+        get_var b
+        add
+        put_var_init c
+        get_var a
+        get_var b
+        mul
+        put_var_init d
+        get_var a
+        neg
+        put_var_init e
+        get_var console
+        get_field2 log
+        get_var c
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var d
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var e
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

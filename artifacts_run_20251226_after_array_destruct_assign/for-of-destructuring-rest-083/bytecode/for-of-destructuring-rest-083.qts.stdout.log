@@ -1,0 +1,94 @@
+__tests__/fixtures/for-of-destructuring-rest-083.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const i [level:2 next:-1]
+    2: const v [level:2 next:1]
+    3: const a [level:3 next:2]
+    4: const rest [level:3 next:3]
+  stack_size: 10
+  opcodes:
+        check_define_var arr,128
+        check_define_var s,128
+        define_var arr,128
+        define_var s,130
+        push_1 1
+        push_2 2
+        push_i8 83
+        push_5 5
+        mod
+        push_4 4
+        array_from 4
+        put_var_init arr
+        push_0 0
+        put_var_init s
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 2: v
+        set_loc_uninitialized 1: i
+        get_var arr
+        get_field2 entries
+        call_method 0
+        for_of_start
+        goto8 158
+   69:  for_of_start
+        for_of_next 0
+        drop
+        put_loc1 1: i
+        for_of_next 0
+        drop
+        put_loc2 2: v
+        iterator_close
+        set_loc_uninitialized 4: rest
+        set_loc_uninitialized 3: a
+        undefined
+        dup
+        is_undefined
+        if_true8 114
+   90:  for_of_start
+        for_of_next 0
+        drop
+        put_loc3 3: a
+        array_from 0
+        push_0 0
+   99:  for_of_next 2
+        if_true8 107
+        define_array_el
+        inc
+        goto8 99
+  107:  drop
+        drop
+        put_loc8 4: rest
+        iterator_close
+        goto8 133
+  114:  drop
+        get_loc_check 2: v
+        get_loc_check 2: v
+        push_1 1
+        add
+        get_loc_check 2: v
+        push_2 2
+        add
+        array_from 3
+        goto8 90
+  133:  get_var s
+        get_loc_check 3: a
+        get_loc_check 4: rest
+        get_length
+        add
+        get_loc_check 1: i
+        add
+        add
+        dup
+        put_var s
+        put_loc0 0: "<ret>"
+  158:  for_of_next 0
+        if_false8 69
+        drop
+        iterator_close
+        get_var console
+        get_field2 log
+        get_var s
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

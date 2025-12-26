@@ -1,7 +1,7 @@
 import ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
 import { CompilerContext } from '../CompilerContext'
-import { Opcode, TempOpcode, JSAtom, JS_ATOM_NULL } from '../../env'
+import { Opcode, TempOpcode, JSAtom, JS_ATOM_NULL, JSMode } from '../../env'
 import { 
   FunctionDef, 
   JSParseFunctionEnum,
@@ -634,8 +634,15 @@ export class FunctionVisitor extends VisitorContext {
 
     // 编译函数体语句
     if (body) {
-      for (const stmt of body.statements) {
-        this.context.visit(stmt)
+      // QuickJS: directive prologue is scanned first to enable strict mode, but the
+      // directive statements themselves are still compiled as regular expression
+      // statements (push string + drop).
+      const { useStrict } = this.scanDirectivePrologue(body.statements)
+      if (useStrict) {
+        fd.jsMode |= JSMode.JS_MODE_STRICT
+      }
+      for (let i = 0; i < body.statements.length; i++) {
+        this.context.visit(body.statements[i])
       }
     }
 
@@ -686,8 +693,12 @@ export class FunctionVisitor extends VisitorContext {
 
     if (ts.isBlock(body)) {
       // 块体: { statements }
-      for (const stmt of body.statements) {
-        this.context.visit(stmt)
+      const { useStrict } = this.scanDirectivePrologue(body.statements)
+      if (useStrict) {
+        fd.jsMode |= JSMode.JS_MODE_STRICT
+      }
+      for (let i = 0; i < body.statements.length; i++) {
+        this.context.visit(body.statements[i])
       }
 
       // 添加 return undefined
@@ -703,6 +714,24 @@ export class FunctionVisitor extends VisitorContext {
     }
 
     this.context.funcDef = prevFd
+  }
+
+  private scanDirectivePrologue(
+    statements: readonly ts.Statement[] | ts.NodeArray<ts.Statement>
+  ): { useStrict: boolean, firstNonDirectiveIndex: number } {
+    let useStrict = false
+    let i = 0
+    for (; i < statements.length; i++) {
+      const stmt = statements[i]
+      if (!ts.isExpressionStatement(stmt)) break
+      const expr = stmt.expression
+      const isStringLiteral = ts.isStringLiteral(expr) || ts.isNoSubstitutionTemplateLiteral(expr)
+      if (!isStringLiteral) break
+      if (expr.text === 'use strict') {
+        useStrict = true
+      }
+    }
+    return { useStrict, firstNonDirectiveIndex: i }
   }
 
   /**

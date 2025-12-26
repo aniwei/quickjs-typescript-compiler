@@ -1,0 +1,32 @@
+__tests__/fixtures/for-of.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const x [level:2 next:-1]
+  stack_size: 6
+  opcodes:
+        check_define_var arr,128
+        define_var arr,128
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        put_var_init arr
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 1: x
+        get_var arr
+        for_of_start
+        goto8 54
+   36:  put_loc1 1: x
+        get_var console
+        get_field2 log
+        get_loc_check 1: x
+        call_method 1
+        put_loc0 0: "<ret>"
+   54:  for_of_next 0
+        if_false8 36
+        drop
+        iterator_close
+        get_loc0 0: "<ret>"
+        return
+

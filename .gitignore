@@ -13,3 +13,10 @@ output/
 .joycode/
 dist-source
 dist-tests
+
+# Generated analysis / scan outputs
+artifacts/_scan_mismatches.json
+artifacts/_scan_mismatches.latest.txt
+artifacts/_scan_critical_fixtures.txt
+artifacts/**/mismatch-structure-summary.json
+artifacts/_tmp_*.qbc

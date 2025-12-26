@@ -1,0 +1,907 @@
+__tests__/fixtures/quickjs-tests/test_line_column_num.js:4:1: function: assert
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_arg0 0: actual
+        get_arg1 1: expected
+        strict_eq
+        if_false8 17
+        return_undef
+   17:  get_arg0 0: actual
+        is_null
+        if_true8 67
+        get_arg1 1: expected
+        is_null
+        if_true8 67
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 67
+        return_undef
+   67:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 117
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 118
+  117:  push_empty_string
+  118:  add
+        call1 1
+        throw
+
+__tests__/fixtures/quickjs-tests/test_line_column_num.js:16:1: function: test_line_column1
+  locals:
+    0: catch e [level:3 next:-1]
+    1: var <var>
+    2: var this
+    3: var new.target
+    4: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 3
+        put_loc3 3: "new.target"
+        push_this
+        put_loc2 2: this
+        special_object 1
+        put_loc8 4: arguments
+        special_object 5
+        put_loc1 1: "<var>"
+        catch 46
+        get_loc1 1: "<var>"
+        with_get_var eval,33,0
+        get_var eval
+   33:  push_atom_value "'\u3010';A;"
+        eval 1,1
+        drop
+        drop
+        return_undef
+   46:  put_loc0 0: e
+        catch 114
+        get_loc1 1: "<var>"
+        with_get_var assert,68,0
+        get_var assert
+   68:  get_loc0 0: e
+        get_field lineNumber
+        push_1 1
+        push_atom_value test_line_column1
+        call3 3
+        drop
+        get_loc1 1: "<var>"
+        with_get_var assert,98,0
+        get_var assert
+   98:  get_loc0 0: e
+        get_field columnNumber
+        push_5 5
+        push_atom_value test_line_column1
+        call3 3
+        drop
+        drop
+        return_undef
+  114:  throw
+
+__tests__/fixtures/quickjs-tests/test_line_column_num.js:29:1: function: test_line_column2
+  locals:
+    0: catch e [level:3 next:-1]
+    1: var <var>
+    2: var this
+    3: var new.target
+    4: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 3
+        put_loc3 3: "new.target"
+        push_this
+        put_loc2 2: this
+        special_object 1
+        put_loc8 4: arguments
+        special_object 5
+        put_loc1 1: "<var>"
+        catch 46
+        get_loc1 1: "<var>"
+        with_get_var eval,33,0
+        get_var eval
+   33:  push_atom_value "\nvar a = { b: { c: { d: null }} };\na.b.c.d();\n        "
+        eval 1,1
+        drop
+        drop
+        return_undef
+   46:  put_loc0 0: e
+        catch 114
+        get_loc1 1: "<var>"
+        with_get_var assert,68,0
+        get_var assert
+   68:  get_loc0 0: e
+        get_field lineNumber
+        push_3 3
+        push_atom_value test_line_column2
+        call3 3
+        drop
+        get_loc1 1: "<var>"
+        with_get_var assert,98,0
+        get_var assert
+   98:  get_loc0 0: e
+        get_field columnNumber
+        push_7 7
+        push_atom_value test_line_column2
+        call3 3
+        drop
+        drop
+        return_undef
+  114:  throw
+
+__tests__/fixtures/quickjs-tests/test_line_column_num.js:45:1: function: test_line_column3
+  locals:
+    0: catch e [level:3 next:-1]
+    1: var <var>
+    2: var this
+    3: var new.target
+    4: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 3
+        put_loc3 3: "new.target"
+        push_this
+        put_loc2 2: this
+        special_object 1
+        put_loc8 4: arguments
+        special_object 5
+        put_loc1 1: "<var>"
+        catch 46
+        get_loc1 1: "<var>"
+        with_get_var eval,33,0
+        get_var eval
+   33:  push_atom_value "\nvar a = { b: { c: { d: null }} };\na.f.c.d();\n        "
+        eval 1,1
+        drop
+        drop
+        return_undef
+   46:  put_loc0 0: e
+        catch 114
+        get_loc1 1: "<var>"
+        with_get_var assert,68,0
+        get_var assert
+   68:  get_loc0 0: e
+        get_field lineNumber
+        push_3 3
+        push_atom_value test_line_column3
+        call3 3
+        drop
+        get_loc1 1: "<var>"
+        with_get_var assert,98,0
+        get_var assert
+   98:  get_loc0 0: e
+        get_field columnNumber
+        push_5 5
+        push_atom_value test_line_column3
+        call3 3
+        drop
+        drop
+        return_undef
+  114:  throw
+
+__tests__/fixtures/quickjs-tests/test_line_column_num.js:58:1: function: test_line_column4
+  locals:
+    0: catch e [level:3 next:-1]
+    1: var <var>
+    2: var this
+    3: var new.target
+    4: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 3
+        put_loc3 3: "new.target"
+        push_this
+        put_loc2 2: this
+        special_object 1
+        put_loc8 4: arguments
+        special_object 5
+        put_loc1 1: "<var>"
+        catch 46
+        get_loc1 1: "<var>"
+        with_get_var eval,33,0
+        get_var eval
+   33:  push_atom_value "(function(){'use strict';a;}());"
+        eval 1,1
+        drop
+        drop
+        return_undef
+   46:  put_loc0 0: e
+        catch 115
+        get_loc1 1: "<var>"
+        with_get_var assert,68,0
+        get_var assert
+   68:  get_loc0 0: e
+        get_field lineNumber
+        push_1 1
+        push_atom_value test_line_column4
+        call3 3
+        drop
+        get_loc1 1: "<var>"
+        with_get_var assert,98,0
+        get_var assert
+   98:  get_loc0 0: e
+        get_field columnNumber
+        push_i8 26
+        push_atom_value test_line_column4
+        call3 3
+        drop
+        drop
+        return_undef
+  115:  throw
+
+__tests__/fixtures/quickjs-tests/test_line_column_num.js:68:1: function: test_line_column5
+  locals:
+    0: catch e [level:3 next:-1]
+    1: var <var>
+    2: var this
+    3: var new.target
+    4: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 3
+        put_loc3 3: "new.target"
+        push_this
+        put_loc2 2: this
+        special_object 1
+        put_loc8 4: arguments
+        special_object 5
+        put_loc1 1: "<var>"
+        catch 46
+        get_loc1 1: "<var>"
+        with_get_var eval,33,0
+        get_var eval
+   33:  push_atom_value "'\u3010';1+1;new A();"
+        eval 1,1
+        drop
+        drop
+        return_undef
+   46:  put_loc0 0: e
+        catch 115
+        get_loc1 1: "<var>"
+        with_get_var assert,68,0
+        get_var assert
+   68:  get_loc0 0: e
+        get_field lineNumber
+        push_1 1
+        push_atom_value test_line_column5
+        call3 3
+        drop
+        get_loc1 1: "<var>"
+        with_get_var assert,98,0
+        get_var assert
+   98:  get_loc0 0: e
+        get_field columnNumber
+        push_i8 13
+        push_atom_value test_line_column5
+        call3 3
+        drop
+        drop
+        return_undef
+  115:  throw
+
+__tests__/fixtures/quickjs-tests/test_line_column_num.js:78:1: function: test_line_column6
+  locals:
+    0: catch e [level:3 next:-1]
+    1: var <var>
+    2: var this
+    3: var new.target
+    4: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 3
+        put_loc3 3: "new.target"
+        push_this
+        put_loc2 2: this
+        special_object 1
+        put_loc8 4: arguments
+        special_object 5
+        put_loc1 1: "<var>"
+        catch 46
+        get_loc1 1: "<var>"
+        with_get_var eval,33,0
+        get_var eval
+   33:  push_atom_value "'\u3010';1+1;throw new Error();"
+        eval 1,1
+        drop
+        drop
+        return_undef
+   46:  put_loc0 0: e
+        catch 115
+        get_loc1 1: "<var>"
+        with_get_var assert,68,0
+        get_var assert
+   68:  get_loc0 0: e
+        get_field lineNumber
+        push_1 1
+        push_atom_value test_line_column6
+        call3 3
+        drop
+        get_loc1 1: "<var>"
+        with_get_var assert,98,0
+        get_var assert
+   98:  get_loc0 0: e
+        get_field columnNumber
+        push_i8 15
+        push_atom_value test_line_column6
+        call3 3
+        drop
+        drop
+        return_undef
+  115:  throw
+
+__tests__/fixtures/quickjs-tests/test_line_column_num.js:91:1: function: test_line_column7
+  locals:
+    0: catch e [level:3 next:-1]
+    1: var <var>
+    2: var this
+    3: var new.target
+    4: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 3
+        put_loc3 3: "new.target"
+        push_this
+        put_loc2 2: this
+        special_object 1
+        put_loc8 4: arguments
+        special_object 5
+        put_loc1 1: "<var>"
+        catch 46
+        get_loc1 1: "<var>"
+        with_get_var eval,33,0
+        get_var eval
+   33:  push_atom_value "1+1;a();"
+        eval 1,1
+        drop
+        drop
+        return_undef
+   46:  put_loc0 0: e
+        catch 114
+        get_loc1 1: "<var>"
+        with_get_var assert,68,0
+        get_var assert
+   68:  get_loc0 0: e
+        get_field lineNumber
+        push_1 1
+        push_atom_value test_line_column7
+        call3 3
+        drop
+        get_loc1 1: "<var>"
+        with_get_var assert,98,0
+        get_var assert
+   98:  get_loc0 0: e
+        get_field columnNumber
+        push_5 5
+        push_atom_value test_line_column7
+        call3 3
+        drop
+        drop
+        return_undef
+  114:  throw
+
+__tests__/fixtures/quickjs-tests/test_line_column_num.js:104:1: function: test_line_column8
+  locals:
+    0: catch e [level:3 next:-1]
+    1: var <var>
+    2: var this
+    3: var new.target
+    4: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 3
+        put_loc3 3: "new.target"
+        push_this
+        put_loc2 2: this
+        special_object 1
+        put_loc8 4: arguments
+        special_object 5
+        put_loc1 1: "<var>"
+        catch 46
+        get_loc1 1: "<var>"
+        with_get_var eval,33,0
+        get_var eval
+   33:  push_atom_value "\n/**\n * something\n * comment\n * here\n */\n1+1;a();\n        "
+        eval 1,1
+        drop
+        drop
+        return_undef
+   46:  put_loc0 0: e
+        catch 114
+        get_loc1 1: "<var>"
+        with_get_var assert,68,0
+        get_var assert
+   68:  get_loc0 0: e
+        get_field lineNumber
+        push_7 7
+        push_atom_value test_line_column8
+        call3 3
+        drop
+        get_loc1 1: "<var>"
+        with_get_var assert,98,0
+        get_var assert
+   98:  get_loc0 0: e
+        get_field columnNumber
+        push_5 5
+        push_atom_value test_line_column8
+        call3 3
+        drop
+        drop
+        return_undef
+  114:  throw
+
+__tests__/fixtures/quickjs-tests/test_line_column_num.js:121:1: function: test_line_column9
+  locals:
+    0: catch e [level:3 next:-1]
+    1: var <var>
+    2: var this
+    3: var new.target
+    4: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 3
+        put_loc3 3: "new.target"
+        push_this
+        put_loc2 2: this
+        special_object 1
+        put_loc8 4: arguments
+        special_object 5
+        put_loc1 1: "<var>"
+        catch 46
+        get_loc1 1: "<var>"
+        with_get_var eval,33,0
+        get_var eval
+   33:  push_atom_value "(function(){'\u3010'(function(){'use strict';a;}())}())"
+        eval 1,1
+        drop
+        drop
+        return_undef
+   46:  put_loc0 0: e
+        catch 115
+        get_loc1 1: "<var>"
+        with_get_var assert,68,0
+        get_var assert
+   68:  get_loc0 0: e
+        get_field lineNumber
+        push_1 1
+        push_atom_value test_line_column9
+        call3 3
+        drop
+        get_loc1 1: "<var>"
+        with_get_var assert,98,0
+        get_var assert
+   98:  get_loc0 0: e
+        get_field columnNumber
+        push_i8 41
+        push_atom_value test_line_column9
+        call3 3
+        drop
+        drop
+        return_undef
+  115:  throw
+
+__tests__/fixtures/quickjs-tests/test_line_column_num.js:131:1: function: test_line_column10
+  locals:
+    0: catch e [level:3 next:-1]
+    1: var <var>
+    2: var this
+    3: var new.target
+    4: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 3
+        put_loc3 3: "new.target"
+        push_this
+        put_loc2 2: this
+        special_object 1
+        put_loc8 4: arguments
+        special_object 5
+        put_loc1 1: "<var>"
+        catch 46
+        get_loc1 1: "<var>"
+        with_get_var eval,33,0
+        get_var eval
+   33:  push_atom_value "\nfunction a(){\n    throw new Error();\n}\n\nfunction b(){\n    a();\n}\n\nb();\n        "
+        eval 1,1
+        drop
+        drop
+        return_undef
+   46:  put_loc0 0: e
+        catch 115
+        get_loc1 1: "<var>"
+        with_get_var assert,68,0
+        get_var assert
+   68:  get_loc0 0: e
+        get_field lineNumber
+        push_3 3
+        push_atom_value test_line_column10
+        call3 3
+        drop
+        get_loc1 1: "<var>"
+        with_get_var assert,98,0
+        get_var assert
+   98:  get_loc0 0: e
+        get_field columnNumber
+        push_i8 11
+        push_atom_value test_line_column10
+        call3 3
+        drop
+        drop
+        return_undef
+  115:  throw
+
+__tests__/fixtures/quickjs-tests/test_line_column_num.js:151:1: function: test_line_column11
+  locals:
+    0: catch e [level:3 next:-1]
+    1: var <var>
+    2: var this
+    3: var new.target
+    4: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 3
+        put_loc3 3: "new.target"
+        push_this
+        put_loc2 2: this
+        special_object 1
+        put_loc8 4: arguments
+        special_object 5
+        put_loc1 1: "<var>"
+        catch 46
+        get_loc1 1: "<var>"
+        with_get_var eval,33,0
+        get_var eval
+   33:  push_atom_value "\nvar a = {\n    b: if(1){}\n}\n        "
+        eval 1,1
+        drop
+        drop
+        return_undef
+   46:  put_loc0 0: e
+        catch 114
+        get_loc1 1: "<var>"
+        with_get_var assert,68,0
+        get_var assert
+   68:  get_loc0 0: e
+        get_field lineNumber
+        push_3 3
+        push_atom_value test_line_column11
+        call3 3
+        drop
+        get_loc1 1: "<var>"
+        with_get_var assert,98,0
+        get_var assert
+   98:  get_loc0 0: e
+        get_field columnNumber
+        push_7 7
+        push_atom_value test_line_column11
+        call3 3
+        drop
+        drop
+        return_undef
+  114:  throw
+
+__tests__/fixtures/quickjs-tests/test_line_column_num.js:165:1: function: test_line_column12
+  locals:
+    0: catch e [level:3 next:-1]
+    1: catch e [level:7 next:-1]
+    2: catch e [level:11 next:-1]
+    3: catch e [level:15 next:-1]
+    4: var <var>
+    5: var this
+    6: var new.target
+    7: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 3
+        put_loc8 6: "new.target"
+        push_this
+        put_loc8 5: this
+        special_object 1
+        put_loc8 7: arguments
+        special_object 5
+        put_loc8 4: "<var>"
+        catch 51
+        get_loc8 4: "<var>"
+        with_get_var eval,37,0
+        get_var eval
+   37:  push_atom_value "\nvar a = `${b;}\n1+1\n`;\n        "
+        eval 1,1
+        drop
+        drop
+        goto8 124
+   51:  put_loc0 0: e
+        catch 123
+        get_loc8 4: "<var>"
+        with_get_var assert,74,0
+        get_var assert
+   74:  get_loc0 0: e
+        get_field lineNumber
+        push_2 2
+        push_atom_value test_line_column12
+        call3 3
+        drop
+        get_loc8 4: "<var>"
+        with_get_var assert,105,0
+        get_var assert
+  105:  get_loc0 0: e
+        get_field columnNumber
+        push_i8 12
+        push_atom_value test_line_column12
+        call3 3
+        drop
+        drop
+        goto8 124
+  123:  throw
+  124:  catch 160
+        get_loc8 4: "<var>"
+        with_get_var eval,146,0
+        get_var eval
+  146:  push_atom_value "\nvar a = `1+1\n${b;}\n2+2\n`;\n        "
+        eval 1,1
+        drop
+        drop
+        goto8 232
+  160:  put_loc1 1: e
+        catch 231
+        get_loc8 4: "<var>"
+        with_get_var assert,183,0
+        get_var assert
+  183:  get_loc1 1: e
+        get_field lineNumber
+        push_3 3
+        push_atom_value test_line_column12
+        call3 3
+        drop
+        get_loc8 4: "<var>"
+        with_get_var assert,214,0
+        get_var assert
+  214:  get_loc1 1: e
+        get_field columnNumber
+        push_3 3
+        push_atom_value test_line_column12
+        call3 3
+        drop
+        drop
+        goto8 232
+  231:  throw
+  232:  catch 268
+        get_loc8 4: "<var>"
+        with_get_var eval,254,0
+        get_var eval
+  254:  push_atom_value "\nvar a = `1+1\n2+2\n${b}`;\n            "
+        eval 1,1
+        drop
+        drop
+        goto8 340
+  268:  put_loc2 2: e
+        catch 339
+        get_loc8 4: "<var>"
+        with_get_var assert,291,0
+        get_var assert
+  291:  get_loc2 2: e
+        get_field lineNumber
+        push_4 4
+        push_atom_value test_line_column12
+        call3 3
+        drop
+        get_loc8 4: "<var>"
+        with_get_var assert,322,0
+        get_var assert
+  322:  get_loc2 2: e
+        get_field columnNumber
+        push_3 3
+        push_atom_value test_line_column12
+        call3 3
+        drop
+        drop
+        goto8 340
+  339:  throw
+  340:  catch 375
+        get_loc8 4: "<var>"
+        with_get_var eval,362,0
+        get_var eval
+  362:  push_atom_value "\nvar a = `1+1\n2+2\n${3+3}`;b;\n            "
+        eval 1,1
+        drop
+        drop
+        return_undef
+  375:  put_loc3 3: e
+        catch 446
+        get_loc8 4: "<var>"
+        with_get_var assert,398,0
+        get_var assert
+  398:  get_loc3 3: e
+        get_field lineNumber
+        push_4 4
+        push_atom_value test_line_column12
+        call3 3
+        drop
+        get_loc8 4: "<var>"
+        with_get_var assert,429,0
+        get_var assert
+  429:  get_loc3 3: e
+        get_field columnNumber
+        push_i8 9
+        push_atom_value test_line_column12
+        call3 3
+        drop
+        drop
+        return_undef
+  446:  throw
+
+__tests__/fixtures/quickjs-tests/test_line_column_num.js:217:1: function: test_line_column13
+  locals:
+    0: catch e [level:3 next:-1]
+    1: var <var>
+    2: var this
+    3: var new.target
+    4: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 3
+        put_loc3 3: "new.target"
+        push_this
+        put_loc2 2: this
+        special_object 1
+        put_loc8 4: arguments
+        special_object 5
+        put_loc1 1: "<var>"
+        catch 46
+        get_loc1 1: "<var>"
+        with_get_var eval,33,0
+        get_var eval
+   33:  push_atom_value "Function(\"===>\", \"a\");"
+        eval 1,1
+        drop
+        drop
+        return_undef
+   46:  put_loc0 0: e
+        catch 115
+        get_loc1 1: "<var>"
+        with_get_var assert,68,0
+        get_var assert
+   68:  get_loc0 0: e
+        get_field lineNumber
+        push_1 1
+        push_atom_value test_line_column13
+        call3 3
+        drop
+        get_loc1 1: "<var>"
+        with_get_var assert,98,0
+        get_var assert
+   98:  get_loc0 0: e
+        get_field columnNumber
+        push_i8 20
+        push_atom_value test_line_column13
+        call3 3
+        drop
+        drop
+        return_undef
+  115:  throw
+
+__tests__/fixtures/quickjs-tests/test_line_column_num.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var assert,64
+        check_define_var test_line_column1,64
+        check_define_var test_line_column2,64
+        check_define_var test_line_column3,64
+        check_define_var test_line_column4,64
+        check_define_var test_line_column5,64
+        check_define_var test_line_column6,64
+        check_define_var test_line_column7,64
+        check_define_var test_line_column8,64
+        check_define_var test_line_column9,64
+        check_define_var test_line_column10,64
+        check_define_var test_line_column11,64
+        check_define_var test_line_column12,64
+        check_define_var test_line_column13,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode test_line_column1]
+        define_func test_line_column1,0
+        fclosure8 2: [bytecode test_line_column2]
+        define_func test_line_column2,0
+        fclosure8 3: [bytecode test_line_column3]
+        define_func test_line_column3,0
+        fclosure8 4: [bytecode test_line_column4]
+        define_func test_line_column4,0
+        fclosure8 5: [bytecode test_line_column5]
+        define_func test_line_column5,0
+        fclosure8 6: [bytecode test_line_column6]
+        define_func test_line_column6,0
+        fclosure8 7: [bytecode test_line_column7]
+        define_func test_line_column7,0
+        fclosure8 8: [bytecode test_line_column8]
+        define_func test_line_column8,0
+        fclosure8 9: [bytecode test_line_column9]
+        define_func test_line_column9,0
+        fclosure8 10: [bytecode test_line_column10]
+        define_func test_line_column10,0
+        fclosure8 11: [bytecode test_line_column11]
+        define_func test_line_column11,0
+        fclosure8 12: [bytecode test_line_column12]
+        define_func test_line_column12,0
+        fclosure8 13: [bytecode test_line_column13]
+        define_func test_line_column13,0
+        get_var test_line_column1
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_line_column2
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_line_column3
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_line_column4
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_line_column5
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_line_column6
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_line_column7
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_line_column8
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_line_column9
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_line_column10
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_line_column11
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_line_column12
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_line_column13
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

@@ -1,0 +1,50 @@
+__tests__/fixtures/function-expressions.js:1:13: function: <null>
+  args: a b
+  stack_size: 2
+  opcodes:
+        get_arg0 0: a
+        get_arg1 1: b
+        add
+        return
+
+__tests__/fixtures/function-expressions.js:5:13: function: subName
+  args: a b
+  stack_size: 2
+  opcodes:
+        get_arg0 0: a
+        get_arg1 1: b
+        sub
+        return
+
+__tests__/fixtures/function-expressions.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 5
+  opcodes:
+        check_define_var add,128
+        check_define_var sub,128
+        define_var add,128
+        define_var sub,128
+        fclosure8 0: [bytecode <null>]
+        set_name add
+        put_var_init add
+        get_var console
+        get_field2 log
+        get_var add
+        push_3 3
+        push_4 4
+        call2 2
+        call_method 1
+        put_loc0 0: "<ret>"
+        fclosure8 1: [bytecode subName]
+        put_var_init sub
+        get_var console
+        get_field2 log
+        get_var sub
+        push_i8 10
+        push_2 2
+        call2 2
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

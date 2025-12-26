@@ -14,8 +14,8 @@
     "dump": "tsx scripts/dump.ts",
     "compare": "tsx scripts/compareWithWasm.ts",
     "compare:fixtures": "tsx scripts/compareAllFixtures.ts",
+    "import:quickjs-tests": "tsx scripts/importQuickJSTestsToFixtures.ts",
     "parse-bytecode": "tsx scripts/parseBytecode.ts",
-    "sync:quickjs-tests": "tsx scripts/syncQuickJsTestsToFixtures.ts",
     "test": "npm run gen:env && jest"
   },
   "devDependencies": {

@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-generator-basic/cli/async-generator-basic.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-generator-basic/cli/async-generator-basic.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/async-generator-basic/cli/async-generator-basic.pc2line.txt",
-    "bytecodeSize": 349,
+    "bytecodeSize": 347,
     "pc2lineLength": 10,
     "stackMax": 0
   },
   "bytecode": {
-    "identical": true,
-    "tsSize": 287,
+    "identical": false,
+    "tsSize": 285,
     "wasmSize": 287,
-    "sizeDiff": 0,
-    "sizeDiffPercent": 0
+    "sizeDiff": -2,
+    "sizeDiffPercent": -0.6968641114982579
   },
   "trace": {
     "differenceCount": 0,

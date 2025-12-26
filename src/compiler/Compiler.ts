@@ -1,4 +1,6 @@
 import ts from 'typescript'
+import { spawnSync } from 'node:child_process'
+import { resolve as resolvePath } from 'node:path'
 import { 
   FunctionDef, 
   JSVarDef, 
@@ -16,6 +18,11 @@ import {
 import { Opcode, TempOpcode, env, JSAtom, JSMode, JS_EVAL_TYPE_GLOBAL, JS_EVAL_TYPE_MODULE } from '../env'
 import { BytecodeBuilder } from './BytecodeBuilder'
 import { DebugInfoBuilder } from './DebugInfoBuilder'
+
+type CompiledRegexpLiteral = {
+  pattern: string
+  bytecode: Uint8Array
+}
 
 // ============================================================================
 // 类型定义
@@ -70,6 +77,8 @@ export class Compiler {
   builtInAtoms: Map<string, number> = new Map()
   firstAtomId: number = env.firstAtomId
   sourceFile: ts.SourceFile | null = null
+
+  private readonly regexpLiteralCache: Map<string, CompiledRegexpLiteral> = new Map()
   
   
   constructor(options?: { firstAtomId?: number }) {
@@ -77,6 +86,40 @@ export class Compiler {
       this.firstAtomId = options.firstAtomId
     }
     this.ensureInitializedBuiltinAtoms()
+  }
+
+  getOrCompileRegexpLiteral(literalText: string): CompiledRegexpLiteral {
+    const cached = this.regexpLiteralCache.get(literalText)
+    if (cached) return cached
+
+    const scriptPath = resolvePath(process.cwd(), 'scripts', 'compileRegexpLiteral.ts')
+
+    const r = spawnSync(
+      'pnpm',
+      ['-s', 'exec', 'tsx', scriptPath],
+      {
+        input: JSON.stringify({ literalText }),
+        encoding: 'utf8',
+        maxBuffer: 10 * 1024 * 1024,
+      }
+    )
+
+    if (r.status !== 0) {
+      const stderr = String(r.stderr ?? '').trim()
+      throw new Error(`Failed to compile regexp literal via QuickJS WASM (status=${r.status}): ${stderr || '<no stderr>'}`)
+    }
+
+    const stdout = String(r.stdout ?? '').trim()
+    const parsed = JSON.parse(stdout) as { patternUtf8Base64: string; bytecodeUtf8Base64: string }
+    const pattern = Buffer.from(parsed.patternUtf8Base64, 'base64').toString('utf8')
+    const bytecodeBuf = Buffer.from(parsed.bytecodeUtf8Base64, 'base64')
+    const result: CompiledRegexpLiteral = {
+      pattern,
+      bytecode: new Uint8Array(bytecodeBuf),
+    }
+
+    this.regexpLiteralCache.set(literalText, result)
+    return result
   }
 
   ensureInitializedBuiltinAtoms() {

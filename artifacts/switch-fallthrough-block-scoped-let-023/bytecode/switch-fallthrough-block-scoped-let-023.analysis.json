@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-25T17:39:29.440Z",
+  "timestamp": "2025-12-26T14:00:16.675Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/switch-fallthrough-block-scoped-let-023.ts",
   "compilation": {
     "typescript": {

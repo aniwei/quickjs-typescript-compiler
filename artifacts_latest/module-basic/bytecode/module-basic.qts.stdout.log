@@ -1,0 +1,30 @@
+__tests__/fixtures/module-basic.js:2:8: function: add
+  mode: strict
+  args: a b
+  stack_size: 2
+  opcodes:
+        get_arg0 0: a
+        get_arg1 1: b
+        add
+        return
+
+__tests__/fixtures/module-basic.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: x local:loc0 const
+    1: add local:loc1 var
+    2: *default* local:loc2 let
+  stack_size: 1
+  opcodes:
+        push_this
+        if_false8 7
+        fclosure8 0: [bytecode add]
+        put_var_ref1 1: add
+        return_undef
+    7:  push_1 1
+        put_var_ref0 0: x
+        get_var_ref_check 0: x
+        put_var_ref2 2: "*default*"
+        undefined
+        return_async
+

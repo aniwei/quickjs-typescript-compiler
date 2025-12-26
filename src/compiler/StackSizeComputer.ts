@@ -127,11 +127,13 @@ export class StackSizeComputer {
         const fromOp = s.fromOpTab[pos]
         const fromOpName = OPCODE_BY_CODE[fromOp]?.id ?? `unknown_${fromOp}`
 
+        const fdInfo = `fdId=${fd.id} funcNameAtom=${fd.funcName} filenameAtom=${fd.filename} sourceLen=${fd.sourceLen}`
+
         if (process.env.DEBUG_STACK) {
           this.dumpUnderflowWindow(s, pos)
         }
         throw new Error(
-          `Stack underflow at pc=${pos} op=${opName} (${op}) stackLen=${stackLen} nPop=${nPop} nPush=${nPush} bytes=${bytes} from_pc=${fromPc} from_op=${fromOpName} (${fromOp}) ctx[${ctxStart}..${ctxEnd})=${ctxBytes}`
+          `Stack underflow at pc=${pos} op=${opName} (${op}) stackLen=${stackLen} nPop=${nPop} nPush=${nPush} bytes=${bytes} from_pc=${fromPc} from_op=${fromOpName} (${fromOp}) ctx[${ctxStart}..${ctxEnd})=${ctxBytes} | ${fdInfo}`
         )
       }
       

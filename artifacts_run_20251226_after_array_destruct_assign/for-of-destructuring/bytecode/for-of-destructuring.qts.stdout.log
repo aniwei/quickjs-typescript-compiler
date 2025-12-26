@@ -1,0 +1,66 @@
+__tests__/fixtures/for-of-destructuring.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: let x [level:2 next:-1]
+  stack_size: 5
+  opcodes:
+        check_define_var arr,128
+        check_define_var sum,128
+        check_define_var y,128
+        define_var arr,128
+        define_var sum,130
+        define_var y,130
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        put_var_init arr
+        push_0 0
+        put_var_init sum
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 1: x
+        get_var arr
+        for_of_start
+        goto8 83
+   66:  put_loc1 1: x
+        get_var sum
+        get_loc_check 1: x
+        add
+        dup
+        put_var sum
+        put_loc0 0: "<ret>"
+   83:  for_of_next 0
+        if_false8 66
+        drop
+        iterator_close
+        get_var console
+        get_field2 log
+        get_var sum
+        call_method 1
+        put_loc0 0: "<ret>"
+        undefined
+        put_var_init y
+        undefined
+        put_loc0 0: "<ret>"
+        get_var arr
+        for_of_start
+        goto8 140
+  124:  put_var y
+        undefined
+        put_loc0 0: "<ret>"
+        get_var y
+        push_2 2
+        strict_eq
+        if_true8 145
+  140:  for_of_next 0
+        if_false8 124
+        drop
+  145:  iterator_close
+        get_var console
+        get_field2 log
+        get_var y
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

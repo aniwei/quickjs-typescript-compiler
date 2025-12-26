@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: __tests__/fixtures/try-catch-finally-throw-instanceof-new-003.ts
-**生成时间**: 2025-12-25T08:22:33.488Z
+**生成时间**: 2025-12-26T12:39:06.087Z
 
 ## 大小对比
 

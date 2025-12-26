@@ -1,0 +1,1859 @@
+__tests__/fixtures/quickjs-tests/test_bignum.js:5:1: function: assert
+  mode: strict
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 0
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_arg0 0: actual
+        get_arg1 1: expected
+        strict_eq
+        if_false8 17
+        return_undef
+   17:  get_arg0 0: actual
+        is_null
+        if_true8 67
+        get_arg1 1: expected
+        is_null
+        if_true8 67
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 67
+        return_undef
+   67:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 117
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 118
+  117:  push_empty_string
+  118:  add
+        call1 1
+        throw
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:18:1: function: assertThrows
+  mode: strict
+  args: err func
+  locals:
+    0: var ex
+    1: catch e [level:3 next:-1]
+  stack_size: 4
+  opcodes:
+        push_false
+        put_loc0 0: ex
+        catch 13
+        get_arg1 1: func
+        call0 0
+        drop
+        drop
+        goto8 35
+   13:  put_loc1 1: e
+        catch 34
+        push_true
+        put_loc0 0: ex
+        get_var assert
+        get_loc1 1: e
+        get_arg0 0: err
+        instanceof
+        call1 1
+        drop
+        drop
+        goto8 35
+   34:  throw
+   35:  get_var assert
+        get_loc0 0: ex
+        push_true
+        push_atom_value "exception expected"
+        call3 3
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:36:1: function: bigint_pow
+  mode: strict
+  args: a n
+  locals:
+    0: var r
+    1: var i
+  stack_size: 2
+  opcodes:
+        push_bigint_i32 1
+        put_loc0 0: r
+        push_bigint_i32 0
+        put_loc1 1: i
+   12:  get_loc1 1: i
+        get_arg1 1: n
+        lt
+        if_false8 25
+        get_loc0 0: r
+        get_arg0 0: a
+        mul
+        put_loc0 0: r
+        inc_loc 1: i
+        goto8 12
+   25:  get_loc0 0: r
+        return
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:44:1: function: test_less
+  mode: strict
+  args: a b
+  stack_size: 3
+  opcodes:
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        lt
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        lt
+        lnot
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        lte
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        lte
+        lnot
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        gt
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        gt
+        lnot
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        gte
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        gte
+        lnot
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        neq
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        eq
+        lnot
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:57:1: function: test_eq
+  mode: strict
+  args: a b
+  stack_size: 3
+  opcodes:
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        neq
+        lnot
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        neq
+        lnot
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        lte
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        lte
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        lt
+        lnot
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        gte
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        gte
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        gt
+        lnot
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:69:1: function: test_bigint1
+  mode: strict
+  locals:
+    0: var a
+    1: var r
+  stack_size: 4
+  opcodes:
+        get_var test_less
+        push_bigint_i32 2
+        push_bigint_i32 3
+        call2 2
+        drop
+        get_var test_eq
+        push_bigint_i32 3
+        push_bigint_i32 3
+        call2 2
+        drop
+        get_var test_less
+        push_2 2
+        push_bigint_i32 3
+        call2 2
+        drop
+        get_var test_eq
+        push_3 3
+        push_bigint_i32 3
+        call2 2
+        drop
+        get_var test_less
+        push_const8 0: 2.1
+        push_bigint_i32 3
+        call2 2
+        drop
+        get_var test_eq
+        get_var Math
+        get_field2 sqrt
+        push_4 4
+        call_method 1
+        push_bigint_i32 2
+        call2 2
+        drop
+        get_var bigint_pow
+        push_bigint_i32 3
+        push_bigint_i32 100
+        call2 2
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_bigint_i32 1
+        sub
+        get_loc0 0: a
+        neq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: a
+        push_const8 1: 515377520732011331036461129765621272702107522001n
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: a
+        push_const8 2: 515377520732011331036461129765621272702107522001n
+        eq
+        call1 1
+        drop
+        push_bigint_i32 1
+        push_bigint_i32 31
+        shl
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_const8 3: 2147483648n
+        push_atom_value "1 << 31n === 2147483648n"
+        call3 3
+        drop
+        push_bigint_i32 1
+        push_bigint_i32 32
+        shl
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_const8 4: 4294967296n
+        push_atom_value "1 << 32n === 4294967296n"
+        call3 3
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:90:31: function: <null>
+  mode: strict
+  stack_size: 2
+  opcodes:
+        get_var BigInt
+        push_atom_value "+"
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:91:31: function: <null>
+  mode: strict
+  stack_size: 2
+  opcodes:
+        get_var BigInt
+        push_atom_value "-"
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:92:31: function: <null>
+  mode: strict
+  stack_size: 2
+  opcodes:
+        get_var BigInt
+        push_atom_value "\u0000a"
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:93:31: function: <null>
+  mode: strict
+  stack_size: 2
+  opcodes:
+        get_var BigInt
+        push_atom_value "  123  r"
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:86:1: function: test_bigint2
+  mode: strict
+  stack_size: 3
+  opcodes:
+        get_var assert
+        get_var BigInt
+        push_empty_string
+        call1 1
+        push_bigint_i32 0
+        call2 2
+        drop
+        get_var assert
+        get_var BigInt
+        push_atom_value "  123"
+        call1 1
+        push_bigint_i32 123
+        call2 2
+        drop
+        get_var assert
+        get_var BigInt
+        push_atom_value "  123   "
+        call1 1
+        push_bigint_i32 123
+        call2 2
+        drop
+        get_var assertThrows
+        get_var SyntaxError
+        fclosure8 0: [bytecode <null>]
+        call2 2
+        drop
+        get_var assertThrows
+        get_var SyntaxError
+        fclosure8 1: [bytecode <null>]
+        call2 2
+        drop
+        get_var assertThrows
+        get_var SyntaxError
+        fclosure8 2: [bytecode <null>]
+        call2 2
+        drop
+        get_var assertThrows
+        get_var SyntaxError
+        fclosure8 3: [bytecode <null>]
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:95:1: function: test_divrem
+  mode: strict
+  args: div1 a b q
+  locals:
+    0: var div
+    1: var divrem
+    2: var t
+  stack_size: 5
+  opcodes:
+        get_var BigInt
+        get_arg0 0: div1
+        get_array_el
+        put_loc0 0: div
+        get_var BigInt
+        get_arg0 0: div1
+        push_atom_value rem
+        add
+        get_array_el
+        put_loc1 1: divrem
+        get_var assert
+        get_loc0 0: div
+        get_arg1 1: a
+        get_arg2 2: b
+        call2 2
+        get_arg3 3: q
+        eq
+        call1 1
+        drop
+        get_loc1 1: divrem
+        get_arg1 1: a
+        get_arg2 2: b
+        call2 2
+        put_loc2 2: t
+        get_var assert
+        get_loc2 2: t
+        push_0 0
+        get_array_el
+        get_arg3 3: q
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: a
+        get_arg2 2: b
+        get_arg3 3: q
+        mul
+        get_loc2 2: t
+        push_1 1
+        get_array_el
+        add
+        eq
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:104:1: function: test_idiv1
+  mode: strict
+  args: div a b r
+  stack_size: 6
+  opcodes:
+        get_var test_divrem
+        get_arg0 0: div
+        get_arg1 1: a
+        get_arg2 2: b
+        get_arg3 3: r
+        push_0 0
+        get_array_el
+        call 4
+        drop
+        get_var test_divrem
+        get_arg0 0: div
+        get_arg1 1: a
+        neg
+        get_arg2 2: b
+        get_arg3 3: r
+        push_1 1
+        get_array_el
+        call 4
+        drop
+        get_var test_divrem
+        get_arg0 0: div
+        get_arg1 1: a
+        get_arg2 2: b
+        neg
+        get_arg3 3: r
+        push_2 2
+        get_array_el
+        call 4
+        drop
+        get_var test_divrem
+        get_arg0 0: div
+        get_arg1 1: a
+        neg
+        get_arg2 2: b
+        neg
+        get_arg3 3: r
+        push_3 3
+        get_array_el
+        call 4
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:111:1: function: test_bigint_ext
+  mode: strict
+  locals:
+    0: var r
+  stack_size: 8
+  opcodes:
+        get_var assert
+        get_var BigInt
+        get_field2 floorLog2
+        push_bigint_i32 0
+        call_method 1
+        push_bigint_i32 -1
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_var BigInt
+        get_field2 floorLog2
+        push_bigint_i32 7
+        call_method 1
+        push_bigint_i32 2
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_var BigInt
+        get_field2 sqrt
+        push_const8 0: 309485005209659050297393152n
+        call_method 1
+        push_const8 1: 17592185913343n
+        strict_eq
+        call1 1
+        drop
+        get_var BigInt
+        get_field2 sqrtrem
+        push_const8 2: 309485005209659050297393152n
+        call_method 1
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_0 0
+        get_array_el
+        push_const8 3: 17592185913343n
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: r
+        push_1 1
+        get_array_el
+        push_const8 4: 35167191957503n
+        strict_eq
+        call1 1
+        drop
+        get_var test_idiv1
+        push_atom_value tdiv
+        push_bigint_i32 3
+        push_bigint_i32 2
+        push_bigint_i32 1
+        push_bigint_i32 -1
+        push_bigint_i32 -1
+        push_bigint_i32 1
+        array_from 4
+        call 4
+        drop
+        get_var test_idiv1
+        push_atom_value fdiv
+        push_bigint_i32 3
+        push_bigint_i32 2
+        push_bigint_i32 1
+        push_bigint_i32 -2
+        push_bigint_i32 -2
+        push_bigint_i32 1
+        array_from 4
+        call 4
+        drop
+        get_var test_idiv1
+        push_atom_value cdiv
+        push_bigint_i32 3
+        push_bigint_i32 2
+        push_bigint_i32 2
+        push_bigint_i32 -1
+        push_bigint_i32 -1
+        push_bigint_i32 2
+        array_from 4
+        call 4
+        drop
+        get_var test_idiv1
+        push_atom_value ediv
+        push_bigint_i32 3
+        push_bigint_i32 2
+        push_bigint_i32 1
+        push_bigint_i32 -2
+        push_bigint_i32 -1
+        push_bigint_i32 2
+        array_from 4
+        call 4
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:124:1: function: test_bigfloat
+  mode: strict
+  locals:
+    0: var e
+    1: var a
+    2: var b
+    3: var sqrt2
+  stack_size: 7
+  opcodes:
+        get_var assert
+        push_bigint_i32 1
+        typeof
+        push_atom_value bigint
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        push_1 1
+        typeof
+        get_var l
+        push_atom_value bigfloat
+        strict_eq
+        call2 2
+        drop
+        get_var assert
+        push_1 1
+        push_1 1
+        eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        push_1 1
+        push_1 1
+        strict_neq
+        get_var l
+        call2 2
+        drop
+        get_var test_less
+        push_2 2
+        get_var l
+        push_3 3
+        get_var l
+        call 4
+        drop
+        get_var test_eq
+        push_3 3
+        get_var l
+        push_3 3
+        get_var l
+        call 4
+        drop
+        get_var test_less
+        push_2 2
+        push_3 3
+        get_var l
+        call3 3
+        drop
+        get_var test_eq
+        push_3 3
+        push_3 3
+        get_var l
+        call3 3
+        drop
+        get_var test_less
+        push_const8 0: 2.1
+        push_3 3
+        get_var l
+        call3 3
+        drop
+        get_var test_eq
+        get_var Math
+        get_field2 sqrt
+        push_i8 9
+        call_method 1
+        push_3 3
+        get_var l
+        call3 3
+        drop
+        get_var test_less
+        push_bigint_i32 2
+        push_3 3
+        get_var l
+        call3 3
+        drop
+        get_var test_eq
+        push_bigint_i32 3
+        push_3 3
+        get_var l
+        call3 3
+        drop
+        get_var BigFloatEnv
+        dup
+        push_i16 128
+        call_constructor 1
+        put_loc0 0: e
+        get_var assert
+        get_loc0 0: e
+        get_field prec
+        push_i16 128
+        eq
+        call1 1
+        drop
+        get_var BigFloat
+        get_field2 sqrt
+        push_2 2
+        get_var l
+        get_loc0 0: e
+        call_method 3
+        put_loc1 1: a
+        get_var assert
+        get_loc1 1: a
+        get_var BigFloat
+        get_field2 parseFloat
+        push_atom_value "0x1.6a09e667f3bcc908b2fb1366ea957d3e"
+        push_0 0
+        get_loc0 0: e
+        call_method 3
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: e
+        get_field inexact
+        push_true
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 fpRound
+        get_loc1 1: a
+        call_method 1
+        push_1 1
+        eq
+        push_const8 1: 0.6
+        get_var a09e667f3bcc908b2fb1366ea95l
+        call3 3
+        drop
+        get_var BigFloatEnv
+        get_field2 setPrec
+        get_var BigFloat
+        get_field sqrt
+        get_field2 bind
+        null
+        push_2 2
+        call_method 2
+        push_i16 128
+        call_method 2
+        put_loc2 2: b
+        get_var assert
+        get_loc1 1: a
+        get_loc2 2: b
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 isNaN
+        get_var BigFloat
+        get_var NaN
+        call1 1
+        call_method 1
+        call1 1
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 isFinite
+        push_1 1
+        get_var l
+        call_method 2
+        call1 1
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 isFinite
+        push_1 1
+        get_var l
+        push_0 0
+        div
+        get_var l
+        call_method 3
+        lnot
+        call1 1
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 abs
+        push_i8 -3
+        get_var l
+        call_method 2
+        push_3 3
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 sign
+        push_i8 -3
+        get_var l
+        call_method 2
+        push_minus1 -1
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 exp
+        push_const8 2: 0.2
+        get_var l
+        call_method 2
+        push_const8 3: 1.2214027581601699
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 log
+        push_3 3
+        get_var l
+        call_method 2
+        push_const8 4: 1.0986122886681098
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 pow
+        push_const8 5: 2.1
+        get_var l
+        push_const8 6: 1.6
+        get_var l
+        call_method 4
+        push_const8 7: 3.277561666451862
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 sin
+        push_minus1 -1
+        get_var l
+        call_method 2
+        push_const8 8: 0.8414709848078965
+        neg
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 cos
+        push_1 1
+        get_var l
+        call_method 2
+        push_const8 9: 0.5403023058681398
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 tan
+        push_const8 10: 0.1
+        get_var l
+        call_method 2
+        push_const8 11: 0.10033467208545055
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 asin
+        push_const8 12: 0.3
+        get_var l
+        call_method 2
+        push_const8 13: 0.3046926540153975
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 acos
+        push_const8 14: 0.4
+        get_var l
+        call_method 2
+        push_const8 15: 1.1592794807274085
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 atan
+        push_const8 16: 0.7
+        get_var l
+        call_method 2
+        push_const8 17: 0.6107259643892086
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 atan2
+        push_const8 18: 7.1
+        get_var l
+        push_const8 19: 5.1
+        neg
+        get_var l
+        call_method 4
+        push_const8 20: 2.1937053809751417
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 floor
+        push_const8 21: 2.5
+        get_var l
+        call_method 2
+        push_2 2
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 ceil
+        push_const8 22: 2.5
+        get_var l
+        call_method 2
+        push_3 3
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 trunc
+        push_const8 23: 2.5
+        neg
+        get_var l
+        call_method 2
+        push_i8 -2
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 round
+        push_const8 24: 2.5
+        get_var l
+        call_method 2
+        push_3 3
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 fmod
+        push_3 3
+        get_var l
+        push_2 2
+        get_var l
+        call_method 4
+        push_1 1
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        get_var BigFloat
+        get_field2 remainder
+        push_3 3
+        get_var l
+        push_2 2
+        get_var l
+        call_method 4
+        push_minus1 -1
+        strict_eq
+        get_var l
+        call2 2
+        drop
+        get_var assert
+        push_const8 25: 1234.125
+        get_var l
+        call2 2
+        get_field2 toString
+        call_method 0
+        drop
+        get_var assert
+        push_const8 26: 1234.125
+        get_var l
+        call2 2
+        get_field2 toFixed
+        push_2 2
+        call_method 1
+        drop
+        get_var assert
+        push_const8 27: 1234.125
+        get_var l
+        call2 2
+        get_field2 toFixed
+        push_2 2
+        push_atom_value down
+        call_method 2
+        drop
+        get_var assert
+        push_const8 28: 1234.125
+        get_var l
+        call2 2
+        get_field2 toExponential
+        call_method 0
+        drop
+        get_var assert
+        push_const8 29: 1234.125
+        get_var l
+        call2 2
+        get_field2 toExponential
+        push_5 5
+        call_method 1
+        drop
+        get_var assert
+        push_const8 30: 1234.125
+        get_var l
+        call2 2
+        get_field2 toExponential
+        push_5 5
+        get_var BigFloatEnv
+        get_field RNDZ
+        call_method 2
+        drop
+        get_var assert
+        push_const8 31: 1234.125
+        get_var l
+        call2 2
+        get_field2 toPrecision
+        push_6 6
+        call_method 1
+        drop
+        get_var assert
+        push_const8 32: 1234.125
+        get_var l
+        call2 2
+        get_field2 toPrecision
+        push_6 6
+        get_var BigFloatEnv
+        get_field RNDZ
+        call_method 2
+        drop
+        get_var assert
+        push_i16 291
+        push_const8 33: 0.438
+        get_var l
+        call3 3
+        get_field2 toString
+        push_i8 16
+        call_method 1
+        drop
+        get_var assert
+        push_i16 803
+        push_const8 34: 0.438
+        get_var l
+        call3 3
+        get_field2 toString
+        push_i8 16
+        call_method 1
+        drop
+        get_var assert
+        push_i16 1827
+        push_const8 35: 0.438
+        get_var l
+        call3 3
+        get_field2 toString
+        push_i8 16
+        call_method 1
+        drop
+        get_var assert
+        push_i16 3875
+        push_const8 36: 0.438
+        get_var l
+        call3 3
+        get_field2 toString
+        push_i8 16
+        call_method 1
+        drop
+        get_var assert
+        push_i16 291
+        push_const8 37: 0.438
+        get_var l
+        call3 3
+        get_field2 toFixed
+        push_2 2
+        get_var BigFloatEnv
+        get_field RNDNA
+        push_i8 16
+        call_method 3
+        drop
+        get_var assert
+        push_i16 803
+        push_const8 38: 0.438
+        get_var l
+        call3 3
+        get_field2 toFixed
+        push_2 2
+        get_var BigFloatEnv
+        get_field RNDNA
+        push_i8 16
+        call_method 3
+        drop
+        get_var assert
+        push_i16 1827
+        push_const8 39: 0.438
+        get_var l
+        call3 3
+        get_field2 toFixed
+        push_2 2
+        get_var BigFloatEnv
+        get_field RNDNA
+        push_i8 16
+        call_method 3
+        drop
+        get_var assert
+        push_i16 3875
+        push_const8 40: 0.438
+        get_var l
+        call3 3
+        get_field2 toFixed
+        push_2 2
+        get_var BigFloatEnv
+        get_field RNDNA
+        push_i8 16
+        call_method 3
+        drop
+        get_var assert
+        push_0 0
+        push_const8 41: 0.0000438
+        get_var l
+        call3 3
+        get_field2 toFixed
+        push_6 6
+        get_var BigFloatEnv
+        get_field RNDNA
+        push_i8 16
+        call_method 3
+        drop
+        get_var assert
+        push_const8 42: 78114717696
+        get_var l
+        call2 2
+        get_field2 toFixed
+        push_1 1
+        get_var BigFloatEnv
+        get_field RNDNA
+        push_i8 16
+        call_method 3
+        drop
+        get_var assert
+        push_i16 291
+        push_const8 43: 0.438
+        get_var l
+        call3 3
+        get_field2 toPrecision
+        push_5 5
+        get_var BigFloatEnv
+        get_field RNDNA
+        push_i8 16
+        call_method 3
+        drop
+        get_var assert
+        push_i16 291
+        push_const8 44: 0.438
+        get_var l
+        call3 3
+        get_field2 toPrecision
+        push_5 5
+        get_var BigFloatEnv
+        get_field RNDZ
+        push_i8 16
+        call_method 3
+        drop
+        get_var assert
+        push_i16 803
+        push_const8 45: 0.438
+        get_var l
+        call3 3
+        get_field2 toPrecision
+        push_5 5
+        get_var BigFloatEnv
+        get_field RNDNA
+        push_i8 16
+        call_method 3
+        drop
+        get_var assert
+        push_i16 1827
+        push_const8 46: 0.438
+        get_var l
+        call3 3
+        get_field2 toPrecision
+        push_5 5
+        get_var BigFloatEnv
+        get_field RNDNA
+        push_i8 16
+        call_method 3
+        drop
+        get_var assert
+        push_i16 -3875
+        push_const8 47: 0.438
+        get_var l
+        call3 3
+        get_field2 toPrecision
+        push_5 5
+        get_var BigFloatEnv
+        get_field RNDD
+        push_i8 16
+        call_method 3
+        drop
+        get_var assert
+        push_i16 291
+        push_const8 48: 0.438
+        get_var l
+        call3 3
+        get_field2 toExponential
+        push_4 4
+        get_var BigFloatEnv
+        get_field RNDNA
+        push_i8 16
+        call_method 3
+        drop
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:239:30: function: <null>
+  mode: strict
+  stack_size: 2
+  opcodes:
+        get_var m
+        push_3 3
+        div
+        drop
+        get_var m
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:243:30: function: <null>
+  mode: strict
+  stack_size: 2
+  opcodes:
+        get_var m
+        push_const8 0: 3.1
+        pow
+        drop
+        get_var m
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:244:30: function: <null>
+  mode: strict
+  stack_size: 2
+  opcodes:
+        get_var m
+        push_i8 -3
+        pow
+        drop
+        get_var m
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:218:1: function: test_bigdecimal
+  mode: strict
+  stack_size: 9
+  opcodes:
+        get_var assert
+        push_1 1
+        get_var m
+        push_1 1
+        strict_eq
+        get_var m
+        call3 3
+        drop
+        get_var assert
+        push_1 1
+        get_var m
+        push_2 2
+        strict_neq
+        get_var m
+        call3 3
+        drop
+        get_var test_less
+        push_1 1
+        get_var m
+        push_2 2
+        get_var m
+        call 4
+        drop
+        get_var test_eq
+        push_2 2
+        get_var m
+        push_2 2
+        get_var m
+        call 4
+        drop
+        get_var test_less
+        push_1 1
+        push_2 2
+        get_var m
+        call3 3
+        drop
+        get_var test_eq
+        push_2 2
+        push_2 2
+        get_var m
+        call3 3
+        drop
+        get_var test_less
+        push_const8 0: 1.1
+        push_2 2
+        get_var m
+        call3 3
+        drop
+        get_var test_eq
+        get_var Math
+        get_field2 sqrt
+        push_4 4
+        call_method 1
+        push_2 2
+        get_var m
+        call3 3
+        drop
+        get_var test_less
+        push_bigint_i32 2
+        push_3 3
+        get_var m
+        call3 3
+        drop
+        get_var test_eq
+        push_bigint_i32 3
+        push_3 3
+        get_var m
+        call3 3
+        drop
+        get_var assert
+        get_var BigDecimal
+        push_atom_value "1234.1"
+        call1 1
+        push_const8 1: 1234.1
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        get_var BigDecimal
+        push_atom_value "    1234.1"
+        call1 1
+        push_const8 2: 1234.1
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        get_var BigDecimal
+        push_atom_value "    1234.1  "
+        call1 1
+        push_const8 3: 1234.1
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        get_var BigDecimal
+        push_const8 4: 0.1
+        call1 1
+        push_const8 5: 0.1
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        get_var BigDecimal
+        push_i8 123
+        call1 1
+        push_i8 123
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        get_var BigDecimal
+        push_true
+        call1 1
+        push_1 1
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        push_i8 123
+        get_var m
+        push_1 1
+        add
+        get_var m
+        push_i8 124
+        strict_eq
+        get_var m
+        call 4
+        drop
+        get_var assert
+        push_i8 123
+        get_var m
+        push_1 1
+        sub
+        get_var m
+        push_i8 122
+        strict_eq
+        get_var m
+        call 4
+        drop
+        get_var assert
+        push_const8 6: 3.2
+        get_var m
+        push_3 3
+        mul
+        get_var m
+        push_const8 7: 9.6
+        strict_eq
+        get_var m
+        call 4
+        drop
+        get_var assert
+        push_i8 10
+        get_var m
+        push_2 2
+        div
+        get_var m
+        push_5 5
+        strict_eq
+        get_var m
+        call 4
+        drop
+        get_var assertThrows
+        get_var RangeError
+        fclosure8 8: [bytecode <null>]
+        call2 2
+        drop
+        get_var assert
+        push_i8 10
+        get_var m
+        push_3 3
+        mod
+        get_var m
+        push_1 1
+        strict_eq
+        get_var m
+        call 4
+        drop
+        get_var assert
+        push_i8 -10
+        get_var m
+        push_3 3
+        mod
+        get_var m
+        push_minus1 -1
+        strict_eq
+        get_var m
+        call 4
+        drop
+        get_var assert
+        push_const8 9: 1234.5
+        get_var m
+        push_3 3
+        pow
+        get_var m
+        push_const8 10: 1881365963.625
+        strict_eq
+        get_var m
+        call 4
+        drop
+        get_var assertThrows
+        get_var RangeError
+        fclosure8 11: [bytecode <null>]
+        call2 2
+        drop
+        get_var assertThrows
+        get_var RangeError
+        fclosure8 12: [bytecode <null>]
+        call2 2
+        drop
+        get_var assert
+        get_var BigDecimal
+        get_field2 sqrt
+        push_2 2
+        get_var m
+        object
+        push_atom_value "half-even"
+        define_field roundingMode
+        push_4 4
+        define_field maximumSignificantDigits
+        call_method 3
+        push_const8 13: 1.414
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        get_var BigDecimal
+        get_field2 sqrt
+        push_i8 101
+        get_var m
+        object
+        push_atom_value "half-even"
+        define_field roundingMode
+        push_3 3
+        define_field maximumFractionDigits
+        call_method 3
+        push_const8 14: 10.05
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        get_var BigDecimal
+        get_field2 sqrt
+        push_const8 15: 0.002
+        get_var m
+        object
+        push_atom_value "half-even"
+        define_field roundingMode
+        push_3 3
+        define_field maximumFractionDigits
+        call_method 3
+        push_const8 16: 0.045
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        get_var BigDecimal
+        get_field2 round
+        push_const8 17: 3.14159
+        get_var m
+        object
+        push_atom_value "half-even"
+        define_field roundingMode
+        push_3 3
+        define_field maximumFractionDigits
+        call_method 3
+        push_const8 18: 3.142
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        get_var BigDecimal
+        get_field2 add
+        push_const8 19: 3.14159
+        get_var m
+        push_const8 20: 0.31212
+        get_var m
+        object
+        push_atom_value "half-even"
+        define_field roundingMode
+        push_2 2
+        define_field maximumFractionDigits
+        call_method 5
+        push_const8 21: 3.45
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        get_var BigDecimal
+        get_field2 sub
+        push_const8 22: 3.14159
+        get_var m
+        push_const8 23: 0.31212
+        get_var m
+        object
+        push_atom_value down
+        define_field roundingMode
+        push_2 2
+        define_field maximumFractionDigits
+        call_method 5
+        push_const8 24: 2.82
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        get_var BigDecimal
+        get_field2 mul
+        push_const8 25: 3.14159
+        get_var m
+        push_const8 26: 0.31212
+        get_var m
+        object
+        push_atom_value "half-even"
+        define_field roundingMode
+        push_3 3
+        define_field maximumFractionDigits
+        call_method 5
+        push_const8 27: 0.981
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        get_var BigDecimal
+        get_field2 mod
+        push_const8 28: 3.14159
+        get_var m
+        push_const8 29: 0.31211
+        get_var m
+        object
+        push_atom_value "half-even"
+        define_field roundingMode
+        push_4 4
+        define_field maximumFractionDigits
+        call_method 5
+        push_const8 30: 0.0205
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        get_var BigDecimal
+        get_field2 div
+        push_i8 20
+        get_var m
+        push_3 3
+        get_var m
+        object
+        push_atom_value "half-even"
+        define_field roundingMode
+        push_3 3
+        define_field maximumSignificantDigits
+        call_method 5
+        push_const8 31: 6.67
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        get_var BigDecimal
+        get_field2 div
+        push_i8 20
+        get_var m
+        push_3 3
+        get_var m
+        object
+        push_atom_value "half-even"
+        define_field roundingMode
+        push_i8 50
+        define_field maximumFractionDigits
+        call_method 5
+        push_const8 32: 6.666666666666667
+        strict_eq
+        get_var m
+        call2 2
+        drop
+        get_var assert
+        push_const8 33: 1234.125
+        get_var m
+        call2 2
+        get_field2 toString
+        call_method 0
+        drop
+        get_var assert
+        push_const8 34: 1234.125
+        get_var m
+        call2 2
+        get_field2 toFixed
+        push_2 2
+        call_method 1
+        drop
+        get_var assert
+        push_const8 35: 1234.125
+        get_var m
+        call2 2
+        get_field2 toFixed
+        push_2 2
+        push_atom_value down
+        call_method 2
+        drop
+        get_var assert
+        push_const8 36: 1234.125
+        get_var m
+        call2 2
+        get_field2 toExponential
+        call_method 0
+        drop
+        get_var assert
+        push_const8 37: 1234.125
+        get_var m
+        call2 2
+        get_field2 toExponential
+        push_5 5
+        call_method 1
+        drop
+        get_var assert
+        push_const8 38: 1234.125
+        get_var m
+        call2 2
+        get_field2 toExponential
+        push_5 5
+        push_atom_value down
+        call_method 2
+        drop
+        get_var assert
+        push_const8 39: 1234.125
+        get_var m
+        call2 2
+        get_field2 toPrecision
+        push_6 6
+        call_method 1
+        drop
+        get_var assert
+        push_const8 40: 1234.125
+        get_var m
+        call2 2
+        get_field2 toPrecision
+        push_6 6
+        push_atom_value down
+        call_method 2
+        drop
+        get_var assert
+        push_const8 41: 1234.125
+        neg
+        get_var m
+        call2 2
+        get_field2 toPrecision
+        push_6 6
+        push_atom_value floor
+        call_method 2
+        drop
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bignum.js:1:1: function: <eval>
+  mode: strict
+  locals:
+    0: var <ret>
+    1: catch e [level:3 next:-1]
+  stack_size: 3
+  opcodes:
+        check_define_var assert,64
+        check_define_var assertThrows,64
+        check_define_var bigint_pow,64
+        check_define_var test_less,64
+        check_define_var test_eq,64
+        check_define_var test_bigint1,64
+        check_define_var test_bigint2,64
+        check_define_var test_divrem,64
+        check_define_var test_idiv1,64
+        check_define_var test_bigint_ext,64
+        check_define_var test_bigfloat,64
+        check_define_var test_bigdecimal,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode assertThrows]
+        define_func assertThrows,0
+        fclosure8 2: [bytecode bigint_pow]
+        define_func bigint_pow,0
+        fclosure8 3: [bytecode test_less]
+        define_func test_less,0
+        fclosure8 4: [bytecode test_eq]
+        define_func test_eq,0
+        fclosure8 5: [bytecode test_bigint1]
+        define_func test_bigint1,0
+        fclosure8 6: [bytecode test_bigint2]
+        define_func test_bigint2,0
+        fclosure8 7: [bytecode test_divrem]
+        define_func test_divrem,0
+        fclosure8 8: [bytecode test_idiv1]
+        define_func test_idiv1,0
+        fclosure8 9: [bytecode test_bigint_ext]
+        define_func test_bigint_ext,0
+        fclosure8 10: [bytecode test_bigfloat]
+        define_func test_bigfloat,0
+        fclosure8 11: [bytecode test_bigdecimal]
+        define_func test_bigdecimal,0
+        push_atom_value "use strict"
+        put_loc0 0: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        catch 196
+        get_var __loadScript
+        push_atom_value "test_assert.js"
+        call1 1
+        put_loc0 0: "<ret>"
+        drop
+        goto8 206
+  196:  put_loc1 1: e
+        catch 205
+        drop
+        goto8 206
+  205:  throw
+  206:  get_var test_bigint1
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_bigint2
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_bigint_ext
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_bigfloat
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_bigdecimal
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

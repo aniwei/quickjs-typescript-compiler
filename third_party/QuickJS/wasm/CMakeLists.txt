@@ -52,6 +52,7 @@ set(QTS_TRACE_VARIABLE "" CACHE STRING "Override QTS_TRACE_VARIABLE (empty=defau
 set(QTS_TRACE_CLOSURE "" CACHE STRING "Override QTS_TRACE_CLOSURE (empty=default, else 0/1)")
 set(QTS_TRACE_LABEL "" CACHE STRING "Override QTS_TRACE_LABEL (empty=default, else 0/1)")
 set(QTS_TRACE_STACK "" CACHE STRING "Override QTS_TRACE_STACK (empty=default, else 0/1)")
+set(QTS_TRACE_PC2LINE "" CACHE STRING "Override QTS_TRACE_PC2LINE (empty=default, else 0/1)")
 set(QTS_TRACE_SCOPE "" CACHE STRING "Override QTS_TRACE_SCOPE (empty=default, else 0/1)")
 set(QTS_TRACE_ASSIGN "" CACHE STRING "Override QTS_TRACE_ASSIGN (empty=default, else 0/1)")
 
@@ -60,7 +61,7 @@ set(_QTS_TRACE_DEFS
         QTS_TRACE_LEVEL=${QTS_TRACE_LEVEL}
 )
 
-foreach(_k IN ITEMS EMIT VARIABLE CLOSURE LABEL STACK SCOPE ASSIGN)
+foreach(_k IN ITEMS EMIT VARIABLE CLOSURE LABEL STACK PC2LINE SCOPE ASSIGN)
     if(NOT "${QTS_TRACE_${_k}}" STREQUAL "")
         list(APPEND _QTS_TRACE_DEFS QTS_TRACE_${_k}=${QTS_TRACE_${_k}})
     endif()

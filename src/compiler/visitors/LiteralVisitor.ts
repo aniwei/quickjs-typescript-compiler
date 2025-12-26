@@ -2,6 +2,7 @@ import ts from 'typescript'
 import { VisitorContext } from './VisitorContext'
 import { CompilerContext } from '../CompilerContext'
 import { Opcode, JSAtom } from '../../env'
+import { RawStringConst } from '../RawStringConst'
 
 export class LiteralVisitor extends VisitorContext {
 
@@ -94,5 +95,23 @@ export class LiteralVisitor extends VisitorContext {
     const atom = this.compiler.addAtom(text)
     this.compiler.emitOp(fd, Opcode.OP_push_atom_value)
     this.compiler.emitAtom(fd, atom)
+  }
+
+  /**
+   * 访问正则字面量
+   *
+   * QuickJS 行为：在编译期调用 compile_regexp 生成 regexp bytecode string，
+   * 然后 push_const(pattern) + push_const(bytecode) + OP_regexp。
+   * 参考：third_party/QuickJS/src/core/parser.c:parse_regexp 分支。
+   */
+  visitRegularExpressionLiteral(node: ts.RegularExpressionLiteral) {
+    const fd = this.funcDef
+    if (!fd) return
+
+    const { pattern, bytecode } = this.compiler.getOrCompileRegexpLiteral(node.text)
+
+    this.compiler.emitPushConst(fd, pattern, false)
+    this.compiler.emitPushConst(fd, new RawStringConst(bytecode), false)
+    this.compiler.emitOp(fd, Opcode.OP_regexp)
   }
 }

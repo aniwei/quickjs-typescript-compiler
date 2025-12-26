@@ -4,6 +4,7 @@ import {
   Opcode,
   TempOpcode,
   JSAtom,
+  JS_ATOM_NULL,
   COPY_DATA_PROPERTIES_OPERAND_SPREAD,
   OP_DEFINE_METHOD_METHOD,
   OP_DEFINE_METHOD_GETTER,
@@ -1146,6 +1147,61 @@ export class ExpressionVisitor extends VisitorContext {
       return
     }
 
+    // 数组解构赋值: [a, b] = rhs
+    // QuickJS: js_parse_destructuring_element() (hasval=TRUE) 的 array 分支会基于 iterator 展开。
+    if (ts.isArrayLiteralExpression(node.left)) {
+      if (typeof sourcePos === 'number') {
+        this.compiler.emitSourcePos(fd, sourcePos)
+      }
+
+      // 计算右值
+      this.context.visit(node.right)
+
+      // 解构赋值表达式的值为 RHS
+      if (keepResult) {
+        // 保留 RHS：for_of_start 会消费栈顶 value
+        this.compiler.emitOp(fd, Opcode.OP_dup)
+      }
+
+      // value on stack -> start iterator
+      this.compiler.emitOp(fd, Opcode.OP_for_of_start)
+
+      const elements = node.left.elements
+      for (let i = 0; i < elements.length; i++) {
+        const element = elements[i]
+
+        if (ts.isOmittedExpression(element)) {
+          this.compiler.emitOp(fd, Opcode.OP_for_of_next)
+          this.compiler.emitU8(fd, 0)
+          this.compiler.emitOp(fd, Opcode.OP_drop)
+          this.compiler.emitOp(fd, Opcode.OP_drop)
+          continue
+        }
+
+        if (ts.isSpreadElement(element)) {
+          throw new Error('Array destructuring assignment: spread element is not yet supported')
+        }
+
+        if (!ts.isIdentifier(element)) {
+          throw new Error('Array destructuring assignment currently supports only identifier elements')
+        }
+
+        this.compiler.emitOp(fd, Opcode.OP_for_of_next)
+        this.compiler.emitU8(fd, 0)
+        // drop bool (leave value)
+        this.compiler.emitOp(fd, Opcode.OP_drop)
+
+        const atom = this.compiler.addAtom(element.text)
+        this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var)
+        this.compiler.emitU32(fd, atom)
+        this.compiler.emitU16(fd, fd.scopeLevel)
+      }
+
+      // close iterator
+      this.compiler.emitOp(fd, Opcode.OP_iterator_close)
+      return
+    }
+
     throw new Error('Invalid assignment target')
   }
 
@@ -1614,7 +1670,25 @@ export class ExpressionVisitor extends VisitorContext {
     const fd = this.funcDef!
     // QuickJS: js_parse_call (parser.c:5128-5380)
     // 调用点的 source-pos 更接近 callee 结束处（通常是 '(' 位置）。
-    const callSourcePos = node.expression.getEnd()
+    // TS AST 的 getEnd() 通常停在 callee token 末尾；为对齐 QuickJS，需要尽量指向实际的 '('。
+    const sfForCall = node.getSourceFile()
+    const textForCall = sfForCall.text
+    let callSourcePos = node.arguments.pos - 1
+    if (
+      callSourcePos < 0 ||
+      callSourcePos >= textForCall.length ||
+      textForCall.charCodeAt(callSourcePos) !== 0x28 /* '(' */
+    ) {
+      callSourcePos = node.expression.getEnd()
+      const scanStart = Math.max(0, node.expression.getEnd())
+      const scanEnd = Math.min(textForCall.length, node.end)
+      for (let i = scanStart; i < scanEnd; i++) {
+        if (textForCall.charCodeAt(i) === 0x28 /* '(' */) {
+          callSourcePos = i
+          break
+        }
+      }
+    }
     let isMethodCall = false
     let isSuperCall = false
 
@@ -1630,6 +1704,9 @@ export class ExpressionVisitor extends VisitorContext {
         // Also suppress sourcePos for the implicit undefined to avoid extra pc2line churn.
         fd.suppressSourcePos = true
 
+        const prevValueUsed = this.context.expressionValueUsed
+        this.context.expressionValueUsed = true
+
         const args = node.arguments
         if (args.length >= 1) {
           this.context.visit(args[0])
@@ -1643,6 +1720,8 @@ export class ExpressionVisitor extends VisitorContext {
         } else {
           this.compiler.emitOp(fd, Opcode.OP_undefined)
         }
+
+        this.context.expressionValueUsed = prevValueUsed
 
         this.compiler.emitOp(fd, Opcode.OP_import)
       } finally {
@@ -1772,7 +1851,10 @@ export class ExpressionVisitor extends VisitorContext {
       // 处理参数（复用原有 suppressSourcePos 策略）
       const argCount = node.arguments.length
       const prevSuppressSourcePos = fd.suppressSourcePos
+      const prevValueUsed = this.context.expressionValueUsed
       try {
+        // 参数表达式的值一定会被 call 消费，必须强制保留。
+        this.context.expressionValueUsed = true
         for (const arg of node.arguments) {
           const expr = ts.isSpreadElement(arg) ? arg.expression : arg
           const isSimpleLiteralArg =
@@ -1794,6 +1876,7 @@ export class ExpressionVisitor extends VisitorContext {
         }
       } finally {
         fd.suppressSourcePos = prevSuppressSourcePos
+        this.context.expressionValueUsed = prevValueUsed
       }
 
       if (isMethodCall) {
@@ -1884,7 +1967,20 @@ export class ExpressionVisitor extends VisitorContext {
         } else {
           // 使用 get_field2 获取方法并保留对象
           const methodName = this.compiler.addAtom(node.expression.name.text)
-          this.compiler.emitOp(fd, Opcode.OP_get_field2, node.expression.expression.getEnd())
+          // QuickJS: 对 `obj.prop(...)`，member-access 的 source-pos 锚定到 '.' token。
+          // 这会影响 resolve_labels 中 line_num 的采样，从而影响 pc2line。
+          const sf = node.getSourceFile()
+          const text = sf.text
+          const exprEnd = node.expression.expression.getEnd()
+          const nameStart = node.expression.name.getStart(sf)
+          let dotPos = -1
+          for (let i = nameStart - 1; i >= exprEnd; i--) {
+            if (text.charCodeAt(i) === 0x2e /* '.' */) {
+              dotPos = i
+              break
+            }
+          }
+          this.compiler.emitOp(fd, Opcode.OP_get_field2, dotPos >= 0 ? dotPos : node.expression.expression.getEnd())
           this.compiler.emitAtom(fd, methodName)
           this.compiler.emitIc(fd, methodName)
           isMethodCall = true
@@ -1909,7 +2005,10 @@ export class ExpressionVisitor extends VisitorContext {
     // 对标识符/调用/成员访问等非字面量仍保留 source-pos，以匹配 WASM 输出。
     const argCount = node.arguments.length
     const prevSuppressSourcePos = fd.suppressSourcePos
+    const prevValueUsed = this.context.expressionValueUsed
     try {
+      // 参数表达式的值一定会被 call 消费，必须强制保留。
+      this.context.expressionValueUsed = true
       for (const arg of node.arguments) {
         const expr = ts.isSpreadElement(arg) ? arg.expression : arg
         const isSimpleLiteralArg =
@@ -1932,6 +2031,7 @@ export class ExpressionVisitor extends VisitorContext {
       }
     } finally {
       fd.suppressSourcePos = prevSuppressSourcePos
+      this.context.expressionValueUsed = prevValueUsed
     }
 
     // 发射调用指令
@@ -2916,7 +3016,7 @@ export class ExpressionVisitor extends VisitorContext {
       this.compiler.emitLabelInt(fd, labelThrow2)
 
       this.compiler.emitOp(fd, Opcode.OP_throw_error)
-      this.compiler.emitAtom(fd, JSAtom.JS_ATOM_NULL)
+      this.compiler.emitAtom(fd, JS_ATOM_NULL)
       this.compiler.emitU8(fd, JS_THROW_ERROR_ITERATOR_THROW)
 
       // label_next: keep the value associated with done = true

@@ -1,0 +1,30 @@
+__tests__/fixtures/object-spread.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var a,128
+        check_define_var b,128
+        define_var a,128
+        define_var b,128
+        object
+        push_1 1
+        define_field x
+        put_var_init a
+        object
+        get_var a
+        null
+        copy_data_properties 6
+        drop
+        drop
+        push_2 2
+        define_field y
+        put_var_init b
+        get_var console
+        get_field2 log
+        get_var b
+        get_field x
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

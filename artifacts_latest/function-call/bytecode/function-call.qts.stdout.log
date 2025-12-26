@@ -1,0 +1,31 @@
+__tests__/fixtures/function-call.js:1:1: function: add
+  args: a b
+  stack_size: 2
+  opcodes:
+        get_arg0 0: a
+        get_arg1 1: b
+        add
+        return
+
+__tests__/fixtures/function-call.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var add,64
+        check_define_var result,128
+        fclosure8 0: [bytecode add]
+        define_func add,0
+        define_var result,130
+        get_var add
+        push_1 1
+        push_2 2
+        call2 2
+        put_var_init result
+        get_var console
+        get_field2 log
+        get_var result
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

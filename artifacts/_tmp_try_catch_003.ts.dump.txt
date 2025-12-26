@@ -1,0 +1,189 @@
+Installing/activating latest emsdk ...
+Resolving SDK alias 'latest' to '4.0.17'
+Resolving SDK version '4.0.17' to 'sdk-releases-41d2106c68c28e101e6252a48e22c78b07722508-64bit'
+Installing SDK 'sdk-releases-41d2106c68c28e101e6252a48e22c78b07722508-64bit'..
+Skipped installing node-22.16.0-64bit, already installed.
+Skipped installing python-3.13.3-64bit, already installed.
+Skipped installing releases-41d2106c68c28e101e6252a48e22c78b07722508-64bit, already installed.
+All SDK components already installed: 'sdk-releases-41d2106c68c28e101e6252a48e22c78b07722508-64bit'.
+Resolving SDK alias 'latest' to '4.0.17'
+Resolving SDK version '4.0.17' to 'sdk-releases-41d2106c68c28e101e6252a48e22c78b07722508-64bit'
+Setting the following tools as active:
+   node-22.16.0-64bit
+   python-3.13.3-64bit
+   releases-41d2106c68c28e101e6252a48e22c78b07722508-64bit
+
+Next steps:
+- To conveniently access emsdk tools from the command line,
+  consider adding the following directories to your PATH:
+    /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk
+    /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/upstream/emscripten
+- This can be done for the current shell by running:
+    source "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/emsdk_env.sh"
+- Configure emsdk in your shell startup scripts by running:
+    echo 'source "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/emsdk_env.sh"' >> $HOME/.zprofile
+-- Configuring done (2.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/build
+[  1%] Building C object quickjs-src/CMakeFiles/quickjs.dir/dtoa.c.o
+[  7%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/core/bytecode.cpp.o
+[  7%] Building C object quickjs-src/CMakeFiles/quickjs.dir/cutils.c.o
+[  7%] Building C object quickjs-src/CMakeFiles/quickjs.dir/libregexp.c.o
+[  7%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/function.c.o
+[  9%] Building C object quickjs-src/CMakeFiles/quickjs.dir/libunicode.c.o
+[ 12%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/string-utils.c.o
+[ 12%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/memory.c.o
+[ 14%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/object.c.o
+[ 17%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/parser.c.o
+[ 17%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/exception.c.o
+[ 18%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/malloc.c.o
+[ 20%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/gc.c.o
+[ 21%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/runtime.c.o
+[ 23%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/convertion.c.o
+[ 26%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-async-function.c.o
+[ 28%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/shape.c.o
+[ 28%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-array.c.o
+[ 29%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/module.c.o
+[ 31%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-atomics.c.o
+[ 32%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-async-generator.c.o
+[ 34%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-date.c.o
+[ 35%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-boolean.c.o
+[ 39%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-regexp.c.o
+[ 39%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/taro_js_array.cpp.o
+[ 40%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/taro_js_promise.cpp.o
+[ 42%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-object.c.o
+[ 43%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/taro_js_proxy.cpp.o
+[ 48%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/taro_js_runtime.cpp.o
+[ 48%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-math.c.o
+[ 48%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/taro_js_module.cpp.o
+[ 50%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-reflect.c.o
+[ 51%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/taro_js_error.cpp.o
+[ 53%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-promise.c.o
+[ 54%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-operator.c.o
+[ 56%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-generator.c.o
+[ 59%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/taro_js_class.cpp.o
+[ 59%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/taro_js_json.cpp.o
+[ 60%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-symbol.c.o
+[ 62%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/core/ic.cpp.o
+[ 64%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/taro_js_symbol.cpp.o
+[ 65%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-proxy.c.o
+[ 67%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/taro_js_type.cpp.o
+[ 68%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-big-num.c.o
+[ 71%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-function.c.o
+[ 71%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-map.c.o
+[ 73%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-typed-array.c.o
+[ 75%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/taro_js_string.cpp.o
+[ 76%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-string.c.o
+[ 78%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/taro_js_function.cpp.o
+[ 79%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-weak-ref.c.o
+[ 81%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/common.cpp.o
+[ 82%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/taro_js_bytecode.cpp.o
+[ 84%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-closures.c.o
+[ 85%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-number.c.o
+[ 87%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/taro_js_object.cpp.o
+[ 89%] Building CXX object quickjs-src/CMakeFiles/quickjs.dir/extension/taro_js_big_num.cpp.o
+[ 90%] Building C object quickjs-src/CMakeFiles/quickjs.dir/core/builtins/js-json.c.o
+[ 92%] Linking CXX static library libquickjs.a
+[ 92%] Built target quickjs
+[ 95%] Built target quickjs-libc
+[ 98%] Building CXX object CMakeFiles/quickjs_wasm.dir/QuickJSBinding.cpp.o
+[ 98%] Building CXX object CMakeFiles/quickjs_wasm.dir/Export.cpp.o
+[100%] Linking CXX executable /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/output/quickjs_wasm.js
+[100%] Built target quickjs_wasm
+WASM build outputs ready:
+ - /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/output/quickjs_wasm.js
+ - /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/output/quickjs_wasm.wasm
+ - /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/output/quickjs_wasm.build-config.json
+__tests__/fixtures/try-catch-finally-throw-instanceof-new-003.js:1:0: function: <eval>
+  locals:
+    0: var <ret>
+    1: const x [level:2 next:-1]
+    2: catch e [level:5 next:-1]
+    3: var <ret>
+  stack_size: 4
+  opcodes (194 bytes):
+   0 check_define_var  atom=473 (C3) flags=64
+   6 check_define_var  atom=474 (out) flags=128
+  12 fclosure8
+  14 define_func  atom=473 (C3) flags=0
+  20 define_var  atom=474 (out) flags=130
+  26 push_0
+  27 put_var_init  atom=474 (out)
+  32 undefined
+  33 put_loc0
+  34 catch  offset=72
+  39 set_loc_uninitialized
+  42 get_var  atom=473 (C3)
+  47 dup
+  48 call_constructor
+  51 put_loc1
+  52 undefined
+  53 put_loc0
+  54 get_loc_check
+  57 get_var  atom=473 (C3)
+  62 instanceof
+  63 if_true8  offset=7
+  65 push_atom_value  atom=475 (bad)
+  70 throw
+  71 get_loc_check
+  74 get_field  atom=476 (v)
+  79 dup
+  80 put_var  atom=474 (out)
+  85 put_loc0
+  86 undefined
+  87 put_loc0
+  88 push_3
+  89 push_7
+  90 mod
+  91 push_0
+  92 strict_eq
+  93 if_false8  offset=3
+  95 push_3
+  96 throw
+  97 drop
+  98 undefined
+  99 gosub  offset=52
+ 104 drop
+ 105 goto8  offset=68
+ 107 put_loc2
+ 108 catch  offset=37
+ 113 get_loc2
+ 114 typeof
+ 115 push_atom_value  atom=72 (number)
+ 120 strict_eq
+ 121 if_false8  offset=6
+ 123 get_loc2
+ 124 push_1
+ 125 add
+ 126 goto8  offset=2
+ 128 push_minus1
+ 129 dup
+ 130 put_var  atom=474 (out)
+ 135 put_loc0
+ 136 drop
+ 137 undefined
+ 138 gosub  offset=13
+ 143 drop
+ 144 goto8  offset=29
+ 146 gosub  offset=5
+ 151 throw
+ 152 get_loc0
+ 153 put_loc3
+ 154 undefined
+ 155 put_loc0
+ 156 get_var  atom=474 (out)
+ 161 push_i8  10
+ 163 add
+ 164 dup
+ 165 put_var  atom=474 (out)
+ 170 put_loc0
+ 171 get_loc3
+ 172 put_loc0
+ 173 ret
+ 174 get_var  atom=477 (console)
+ 179 get_field2  atom=478 (log)
+ 184 get_var  atom=474 (out)
+ 189 call_method
+ 192 set_loc0
+ 193 return
+TTT

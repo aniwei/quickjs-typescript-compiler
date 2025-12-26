@@ -166,8 +166,49 @@ export class TypeScriptCompiler implements CompilerContext {
     }
     
     // 5. 遍历源文件的每个语句并发射字节码
-    for (const statement of sourceFile.statements) {
-      this.visitStatement(statement)
+    // QuickJS: script-level directive prologue (e.g. "use strict") is *scanned* first to
+    // enable strict mode, but the directive statements are still compiled as regular
+    // expression statements (i.e. they push a string and then drop it), which also makes
+    // the directive string appear in the atom table.
+    // Also note: our fixtures may contain TypeScript-only declarations (e.g. `declare function ...`)
+    // before the directive; those are erased at runtime and should not block directive scanning.
+    const scriptPrologue = !isModule ? this.scanScriptDirectivePrologue(sourceFile.statements) : null
+    if (process.env.DEBUG_SCRIPT_PROLOGUE) {
+      const firstRuntimeStmtIndex = (() => {
+        for (let i = 0; i < sourceFile.statements.length; i++) {
+          if (!this.isTypeScriptNonEmittingStatement(sourceFile.statements[i])) return i
+        }
+        return -1
+      })()
+
+      const firstStmtKind = firstRuntimeStmtIndex >= 0
+        ? ts.SyntaxKind[sourceFile.statements[firstRuntimeStmtIndex].kind]
+        : '<none>'
+
+      console.log(
+        `[DEBUG_SCRIPT_PROLOGUE] file=${filename} isModule=${isModule} ` +
+          `firstRuntimeStmtIndex=${firstRuntimeStmtIndex} firstRuntimeStmtKind=${firstStmtKind} ` +
+          `useStrict=${scriptPrologue?.useStrict ?? false} directiveIdxs=[${
+            scriptPrologue ? Array.from(scriptPrologue.directiveStatementIndexes).join(',') : ''
+          }] ` +
+          `jsMode(before)=${fd.jsMode}`
+      )
+    }
+
+    if (scriptPrologue?.useStrict) {
+      fd.jsMode |= JS_MODE_STRICT_DEFAULT
+    }
+
+    if (process.env.DEBUG_SCRIPT_PROLOGUE) {
+      console.log(`[DEBUG_SCRIPT_PROLOGUE] file=${filename} jsMode(after)=${fd.jsMode}`)
+    }
+
+    for (let i = 0; i < sourceFile.statements.length; i++) {
+      const stmt = sourceFile.statements[i]
+      if (!isModule && this.isTypeScriptNonEmittingStatement(stmt)) {
+        continue
+      }
+      this.visitStatement(stmt)
     }
 
     // Finalize module: add module globals closure vars and resolve local exports.
@@ -200,6 +241,10 @@ export class TypeScriptCompiler implements CompilerContext {
     const result = fd.module
       ? writer.write(this.buildModuleBytecode(fd.module, funcBytecode))
       : writer.write(funcBytecode)
+
+    if (process.env.DEBUG_SCRIPT_PROLOGUE) {
+      console.log(`[DEBUG_SCRIPT_PROLOGUE] file=${filename} jsMode(final)=${fd.jsMode}`)
+    }
     
     if (process.env.DEBUG_JUMP) {
       console.log(`[TypeScriptCompiler.compile] result.length=${result.length}, result[83]=0x${result[83]?.toString(16) ?? 'undefined'}`)
@@ -275,6 +320,60 @@ export class TypeScriptCompiler implements CompilerContext {
     out.hasTla = m.hasTla
     out.funcObj = funcObj
     return out
+  }
+
+  private scanScriptDirectivePrologue(
+    statements: readonly ts.Statement[] | ts.NodeArray<ts.Statement>
+  ): { useStrict: boolean; directiveStatementIndexes: Set<number> } {
+    let useStrict = false
+    const directiveStatementIndexes = new Set<number>()
+
+    for (let i = 0; i < statements.length; i++) {
+      const stmt = statements[i]
+
+      // Ignore TS-only declarations that do not exist at runtime.
+      if (this.isTypeScriptNonEmittingStatement(stmt)) {
+        continue
+      }
+
+      if (!ts.isExpressionStatement(stmt)) break
+      const expr = stmt.expression
+      const isStringLiteral = ts.isStringLiteral(expr) || ts.isNoSubstitutionTemplateLiteral(expr)
+      if (!isStringLiteral) break
+
+      directiveStatementIndexes.add(i)
+      if (expr.text === 'use strict') {
+        useStrict = true
+      }
+    }
+
+    return { useStrict, directiveStatementIndexes }
+  }
+
+  private isTypeScriptNonEmittingStatement(stmt: ts.Statement): boolean {
+    // Type-only declarations are erased.
+    if (ts.isInterfaceDeclaration(stmt) || ts.isTypeAliasDeclaration(stmt)) return true
+
+    // Ambient declarations are erased.
+    const mods = ts.canHaveModifiers(stmt) ? ts.getModifiers(stmt) : undefined
+    const hasDeclare = (mods ?? []).some((m: ts.Modifier) => m.kind === ts.SyntaxKind.DeclareKeyword)
+    if (!hasDeclare) {
+      // Also treat `declare function foo();` as ambient: it has no body.
+      if (ts.isFunctionDeclaration(stmt) && !stmt.body) return true
+      return false
+    }
+
+    // `declare function foo(...): ...;`
+    if (ts.isFunctionDeclaration(stmt)) return true
+
+    // `declare var x: ...;`
+    if (ts.isVariableStatement(stmt)) return true
+
+    // `declare namespace Foo { ... }` is erased.
+    if (ts.isModuleDeclaration(stmt)) return true
+
+    // Be conservative: other `declare` statements are also non-emitting.
+    return true
   }
   
   /**
@@ -451,6 +550,12 @@ export class TypeScriptCompiler implements CompilerContext {
       case ts.SyntaxKind.MethodDeclaration:
         this.functionVisitor.visitMethodDefinition(node as ts.MethodDeclaration)
         break
+      case ts.SyntaxKind.GetAccessor:
+        this.functionVisitor.visitGetAccessor(node as ts.GetAccessorDeclaration)
+        break
+      case ts.SyntaxKind.SetAccessor:
+        this.functionVisitor.visitSetAccessor(node as ts.SetAccessorDeclaration)
+        break
       case ts.SyntaxKind.Identifier:
         this.identifierVisitor.visitIdentifier(node as ts.Identifier)
         break
@@ -465,6 +570,9 @@ export class TypeScriptCompiler implements CompilerContext {
         break
       case ts.SyntaxKind.StringLiteral:
         this.literalVisitor.visitStringLiteral(node as ts.StringLiteral)
+        break
+      case ts.SyntaxKind.RegularExpressionLiteral:
+        this.literalVisitor.visitRegularExpressionLiteral(node as ts.RegularExpressionLiteral)
         break
       case ts.SyntaxKind.NoSubstitutionTemplateLiteral:
         this.expressionVisitor.visitNoSubstitutionTemplateLiteral(node as ts.NoSubstitutionTemplateLiteral)

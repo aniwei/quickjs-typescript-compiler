@@ -1,0 +1,72 @@
+__tests__/fixtures/optional-chaining-nested.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var o,128
+        define_var o,128
+        object
+        object
+        object
+        push_1 1
+        define_field c
+        define_field b
+        define_field a
+        put_var_init o
+        get_var console
+        get_field2 log
+        get_var o
+        dup
+        is_undefined_or_null
+        if_false8 59
+        drop
+        undefined
+        goto8 90
+   59:  get_field a
+        dup
+        is_undefined_or_null
+        if_false8 72
+        drop
+        undefined
+        goto8 90
+   72:  get_field b
+        dup
+        is_undefined_or_null
+        if_false8 85
+        drop
+        undefined
+        goto8 90
+   85:  get_field c
+   90:  dup
+        is_undefined_or_null
+        if_false8 96
+        drop
+        push_0 0
+   96:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        null
+        dup
+        is_undefined_or_null
+        if_false8 119
+        drop
+        undefined
+        goto8 137
+  119:  get_field a
+        dup
+        is_undefined_or_null
+        if_false8 132
+        drop
+        undefined
+        goto8 137
+  132:  get_field b
+  137:  dup
+        is_undefined_or_null
+        if_false8 147
+        drop
+        push_atom_value x
+  147:  call_method 1
+        set_loc0 0: "<ret>"
+        return
+

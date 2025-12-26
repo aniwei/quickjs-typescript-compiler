@@ -15,6 +15,7 @@ import * as ts from 'typescript'
 import { TypeScriptCompiler } from '../src/index'
 import { createAdvancedDisassembly } from '../src/disasm'
 import { QuickJSLib } from './QuickJSLib'
+import { safeJsonStringify } from './utils/safeJson'
 
 export interface ComparisonOptions {
   inputTs: string
@@ -519,7 +520,7 @@ class BytecodeComparator {
     // Save JSON analysis
     await fs.writeFile(
       path.join(this.artifactsDir, `${baseName}.analysis.json`),
-      JSON.stringify(analysis, null, 2)
+      safeJsonStringify(analysis, { pretty: true })
     )
     
     // Save human-readable report
@@ -662,12 +663,12 @@ class BytecodeComparator {
       '',
       '### TypeScript编译器输出',
       '```json',
-      JSON.stringify(analysis.compilation.typescript.structure, null, 2),
+      safeJsonStringify(analysis.compilation.typescript.structure, { pretty: true }),
       '```',
       '',
       '### WASM编译器输出',
       '```json',
-      JSON.stringify(analysis.compilation.wasm.structure, null, 2),
+      safeJsonStringify(analysis.compilation.wasm.structure, { pretty: true }),
       '```',
       '',
       '## 字节级差异',

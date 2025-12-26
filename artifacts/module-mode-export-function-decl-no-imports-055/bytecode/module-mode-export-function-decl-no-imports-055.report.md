@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/module-mode-export-function-decl-no-imports-055.ts
-**生成时间**: 2025-12-25T17:39:29.251Z
+**生成时间**: 2025-12-26T13:59:19.917Z
 
 ## 大小对比
 

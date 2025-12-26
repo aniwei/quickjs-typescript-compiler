@@ -1,0 +1,135 @@
+__tests__/fixtures/logical-assignment.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 6
+  opcodes:
+        check_define_var a,128
+        check_define_var b,128
+        check_define_var c,128
+        check_define_var d,128
+        check_define_var obj,128
+        define_var a,130
+        define_var b,130
+        define_var c,130
+        define_var d,130
+        define_var obj,128
+        push_0 0
+        put_var_init a
+        push_empty_string
+        put_var_init b
+        null
+        put_var_init c
+        undefined
+        put_var_init d
+        make_var_ref a
+        get_ref_value
+        dup
+        if_true8 99
+        drop
+        push_1 1
+        insert3
+        put_ref_value
+        goto8 101
+   99:  nip
+        nip
+  101:  put_loc0 0: "<ret>"
+        make_var_ref b
+        get_ref_value
+        dup
+        if_false8 121
+        drop
+        push_atom_value fallback
+        insert3
+        put_ref_value
+        goto8 123
+  121:  nip
+        nip
+  123:  put_loc0 0: "<ret>"
+        make_var_ref c
+        get_ref_value
+        dup
+        is_undefined_or_null
+        if_false8 144
+        drop
+        push_atom_value init
+        insert3
+        put_ref_value
+        goto8 146
+  144:  nip
+        nip
+  146:  put_loc0 0: "<ret>"
+        make_var_ref d
+        get_ref_value
+        dup
+        is_undefined_or_null
+        if_false8 163
+        drop
+        push_2 2
+        insert3
+        put_ref_value
+        goto8 165
+  163:  nip
+        nip
+  165:  put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var a
+        get_var b
+        get_var c
+        get_var d
+        call_method 4
+        put_loc0 0: "<ret>"
+        object
+        push_0 0
+        define_field x
+        null
+        define_field y
+        push_false
+        define_field z
+        put_var_init obj
+        get_var obj
+        get_field2 x
+        dup
+        if_false8 247
+        drop
+        push_5 5
+        insert2
+        put_field x
+        goto8 248
+  247:  nip
+  248:  put_loc0 0: "<ret>"
+        get_var obj
+        get_field2 y
+        dup
+        is_undefined_or_null
+        if_false8 274
+        drop
+        push_i8 10
+        insert2
+        put_field y
+        goto8 275
+  274:  nip
+  275:  put_loc0 0: "<ret>"
+        get_var obj
+        get_field2 z
+        dup
+        if_true8 299
+        drop
+        push_true
+        insert2
+        put_field z
+        goto8 300
+  299:  nip
+  300:  put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var obj
+        get_field x
+        get_var obj
+        get_field y
+        get_var obj
+        get_field z
+        call_method 3
+        set_loc0 0: "<ret>"
+        return
+

@@ -27,6 +27,7 @@ extern "C" {
  *   QTS_TRACE_CLOSURE    - 闭包变量处理
  *   QTS_TRACE_LABEL      - 标签/跳转解析
  *   QTS_TRACE_STACK      - 栈深计算
+ *   QTS_TRACE_PC2LINE    - pc2line/debug 槽位与编码
  *   QTS_TRACE_SCOPE      - 作用域管理
  *   QTS_TRACE_ASSIGN     - 赋值/左值处理（get_lvalue/put_lvalue/复合赋值）
  */
@@ -58,6 +59,10 @@ extern "C" {
 
 #ifndef QTS_TRACE_STACK
 #define QTS_TRACE_STACK QTS_TRACE_ENABLED
+#endif
+
+#ifndef QTS_TRACE_PC2LINE
+#define QTS_TRACE_PC2LINE QTS_TRACE_ENABLED
 #endif
 
 #ifndef QTS_TRACE_SCOPE
@@ -123,6 +128,55 @@ extern "C" {
 #define QTS_TRACE_EMIT_ATOM(atom, pos)
 #define QTS_TRACE_EMIT_COPY_DATA_PROPERTIES(kind, operand, pos)
 #define QTS_TRACE_EMIT_FOR_OF_NEXT(operand, pos)
+#endif
+
+/* pc2line tracing */
+#if QTS_TRACE_PC2LINE
+#if QTS_TRACE_LEVEL >= 2
+#define QTS_TRACE_PC2LINE_BEGIN(line_count, source_pos) \
+    fprintf(stderr, "[QTS:PC2LINE] begin: slots=%d source_pos=%u\n", (int)(line_count), (unsigned)(source_pos))
+
+#define QTS_TRACE_PC2LINE_INIT(line_num, col_num) \
+    fprintf(stderr, "[QTS:PC2LINE] init: line=%d col=%d\n", (int)(line_num), (int)(col_num))
+
+#define QTS_TRACE_PC2LINE_END(out_len) \
+    fprintf(stderr, "[QTS:PC2LINE] end: pc2line_len=%d\n", (int)(out_len))
+#else
+#define QTS_TRACE_PC2LINE_BEGIN(line_count, source_pos)
+#define QTS_TRACE_PC2LINE_INIT(line_num, col_num)
+#define QTS_TRACE_PC2LINE_END(out_len)
+#endif
+
+#if QTS_TRACE_LEVEL >= 3
+#define QTS_TRACE_PC2LINE_ADD(pc, source_pos, count) \
+    fprintf(stderr, "[QTS:PC2LINE] add: pc=%u source_pos=%u count=%d\n", (unsigned)(pc), (unsigned)(source_pos), (int)(count))
+
+#define QTS_TRACE_PC2LINE_SLOT(i, pc, source_pos, line_num, col_num, diff_pc, diff_line, diff_col, is_short, op) \
+    fprintf(stderr, "[QTS:PC2LINE] slot[%d]: pc=%u src=%u line=%d col=%d dpc=%d dline=%d dcol=%d %s op=0x%02x\n", \
+            (int)(i), (unsigned)(pc), (unsigned)(source_pos), (int)(line_num), (int)(col_num), (int)(diff_pc), (int)(diff_line), (int)(diff_col), \
+            (is_short) ? "short" : "long", (unsigned)(op))
+#else
+#define QTS_TRACE_PC2LINE_ADD(pc, source_pos, count) \
+        do { (void)(pc); (void)(source_pos); (void)(count); } while (0)
+
+#define QTS_TRACE_PC2LINE_SLOT(i, pc, source_pos, line_num, col_num, diff_pc, diff_line, diff_col, is_short, op) \
+        do { \
+            (void)(i); (void)(pc); (void)(source_pos); (void)(line_num); (void)(col_num); \
+            (void)(diff_pc); (void)(diff_line); (void)(diff_col); (void)(is_short); (void)(op); \
+        } while (0)
+#endif
+#else
+#define QTS_TRACE_PC2LINE_BEGIN(line_count, source_pos)
+#define QTS_TRACE_PC2LINE_INIT(line_num, col_num)
+#define QTS_TRACE_PC2LINE_END(out_len)
+#define QTS_TRACE_PC2LINE_ADD(pc, source_pos, count) \
+        do { (void)(pc); (void)(source_pos); (void)(count); } while (0)
+
+#define QTS_TRACE_PC2LINE_SLOT(i, pc, source_pos, line_num, col_num, diff_pc, diff_line, diff_col, is_short, op) \
+        do { \
+            (void)(i); (void)(pc); (void)(source_pos); (void)(line_num); (void)(col_num); \
+            (void)(diff_pc); (void)(diff_line); (void)(diff_col); (void)(is_short); (void)(op); \
+        } while (0)
 #endif
 
 /* Variable resolution tracing */
@@ -203,7 +257,10 @@ extern "C" {
     fprintf(stderr, "[QTS:LABEL] typeof_test: pos=%d pos_next=%d line_num:%d->%d atom=%d cmp_op=%d\n", \
             (int)(pos), (int)(pos_next), (int)(line_before), (int)(line_after), (int)(atom), (int)(cmp_op))
 #else
-#define QTS_TRACE_LABEL_TYPEOF_TEST_MATCH(pos, pos_next, line_before, line_after, atom, cmp_op)
+#define QTS_TRACE_LABEL_TYPEOF_TEST_MATCH(pos, pos_next, line_before, line_after, atom, cmp_op) \
+        do { \
+            (void)(pos); (void)(pos_next); (void)(line_before); (void)(line_after); (void)(atom); (void)(cmp_op); \
+        } while (0)
 #endif
 #else
 #define QTS_TRACE_LABEL_BEGIN(bc_len, label_count, jump_size, line_number_size, strip_debug)
@@ -212,7 +269,10 @@ extern "C" {
 #define QTS_TRACE_LABEL_EMIT(label, pos)
 #define QTS_TRACE_LABEL_GOTO(opcode, label)
 #define QTS_TRACE_LABEL_RESOLVE(label, addr)
-#define QTS_TRACE_LABEL_TYPEOF_TEST_MATCH(pos, pos_next, line_before, line_after, atom, cmp_op)
+#define QTS_TRACE_LABEL_TYPEOF_TEST_MATCH(pos, pos_next, line_before, line_after, atom, cmp_op) \
+        do { \
+            (void)(pos); (void)(pos_next); (void)(line_before); (void)(line_after); (void)(atom); (void)(cmp_op); \
+        } while (0)
 #endif
 
 /* Stack size tracing */
@@ -292,8 +352,23 @@ extern "C" {
 #define QTS_TRACE_LABEL_EMIT(label, pos)
 #define QTS_TRACE_LABEL_GOTO(opcode, label)
 #define QTS_TRACE_LABEL_RESOLVE(label, addr)
+#define QTS_TRACE_LABEL_TYPEOF_TEST_MATCH(pos, pos_next, line_before, line_after, atom, cmp_op) \
+        do { \
+            (void)(pos); (void)(pos_next); (void)(line_before); (void)(line_after); (void)(atom); (void)(cmp_op); \
+        } while (0)
 #define QTS_TRACE_STACK_OP(op, stack_before, stack_after)
 #define QTS_TRACE_STACK_RESULT(max_stack, var_count)
+#define QTS_TRACE_PC2LINE_BEGIN(line_count, source_pos)
+#define QTS_TRACE_PC2LINE_INIT(line_num, col_num)
+#define QTS_TRACE_PC2LINE_END(out_len)
+#define QTS_TRACE_PC2LINE_ADD(pc, source_pos, count) \
+        do { (void)(pc); (void)(source_pos); (void)(count); } while (0)
+
+#define QTS_TRACE_PC2LINE_SLOT(i, pc, source_pos, line_num, col_num, diff_pc, diff_line, diff_col, is_short, op) \
+        do { \
+            (void)(i); (void)(pc); (void)(source_pos); (void)(line_num); (void)(col_num); \
+            (void)(diff_pc); (void)(diff_line); (void)(diff_col); (void)(is_short); (void)(op); \
+        } while (0)
 #define QTS_TRACE_SCOPE_PUSH(scope_level, first_var)
 #define QTS_TRACE_SCOPE_POP(scope_level)
 #define QTS_TRACE_SCOPE_ENTER(scope_idx, body_scope)

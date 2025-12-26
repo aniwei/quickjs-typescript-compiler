@@ -1,0 +1,1685 @@
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:6:1: function: assert
+  mode: strict
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 0
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_arg0 0: actual
+        get_arg1 1: expected
+        strict_eq
+        if_false8 17
+        return_undef
+   17:  get_arg0 0: actual
+        is_null
+        if_true8 67
+        get_arg1 1: expected
+        is_null
+        if_true8 67
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 67
+        return_undef
+   67:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 117
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 118
+  117:  push_empty_string
+  118:  add
+        call1 1
+        throw
+
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:19:1: function: assertThrows
+  mode: strict
+  args: err func
+  locals:
+    0: var ex
+    1: catch e [level:3 next:-1]
+  stack_size: 4
+  opcodes:
+        push_false
+        put_loc0 0: ex
+        catch 13
+        get_arg1 1: func
+        call0 0
+        drop
+        drop
+        goto8 35
+   13:  put_loc1 1: e
+        catch 34
+        push_true
+        put_loc0 0: ex
+        get_var assert
+        get_loc1 1: e
+        get_arg0 0: err
+        instanceof
+        call1 1
+        drop
+        drop
+        goto8 35
+   34:  throw
+   35:  get_var assert
+        get_loc0 0: ex
+        push_true
+        push_atom_value "exception expected"
+        call3 3
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:37:1: function: pow
+  mode: strict
+  args: a n
+  locals:
+    0: var r
+    1: var i
+  stack_size: 2
+  opcodes:
+        push_1 1
+        put_loc0 0: r
+        push_0 0
+        put_loc1 1: i
+    4:  get_loc1 1: i
+        get_arg1 1: n
+        lt
+        if_false8 17
+        get_loc0 0: r
+        get_arg0 0: a
+        mul
+        put_loc0 0: r
+        inc_loc 1: i
+        goto8 4
+   17:  get_loc0 0: r
+        return
+
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:44:1: function: test_integer
+  mode: strict
+  locals:
+    0: var a
+    1: var r
+  stack_size: 4
+  opcodes:
+        get_var pow
+        push_3 3
+        push_i8 100
+        call2 2
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_1 1
+        sub
+        get_loc0 0: a
+        neq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: a
+        push_const8 0: 5.153775207320113e+47
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: a
+        push_const8 1: 5.153775207320113e+47
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_var Integer
+        get_field2 isInteger
+        push_1 1
+        call_method 1
+        push_true
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_var Integer
+        get_field2 isInteger
+        push_1 1
+        call_method 1
+        push_false
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_var Integer
+        get_field2 floorLog2
+        push_0 0
+        call_method 1
+        push_minus1 -1
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_var Integer
+        get_field2 floorLog2
+        push_7 7
+        call_method 1
+        push_2 2
+        strict_eq
+        call1 1
+        drop
+        push_1 1
+        push_i8 31
+        shl
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_const8 2: 2147483648
+        push_atom_value "1 << 31 === 2147483648"
+        call3 3
+        drop
+        push_1 1
+        push_i8 32
+        shl
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_const8 3: 4294967296
+        push_atom_value "1 << 32 === 4294967296"
+        call3 3
+        drop
+        push_1 1
+        push_i8 31
+        shl
+        push_0 0
+        lt
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_false
+        push_atom_value "(1 << 31) < 0 === false"
+        call3 3
+        drop
+        get_var assert
+        push_1 1
+        typeof
+        push_atom_value number
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        push_const8 4: 9007199254740991
+        typeof
+        push_atom_value number
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        push_const8 5: 9007199254740992
+        typeof
+        push_atom_value bigint
+        strict_eq
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:64:1: function: test_float
+  mode: strict
+  stack_size: 3
+  opcodes:
+        get_var assert
+        push_1 1
+        typeof
+        push_atom_value bigfloat
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        push_1 1
+        push_1 1
+        eq
+        call1 1
+        drop
+        get_var assert
+        push_1 1
+        push_1 1
+        strict_neq
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:70:1: function: test_modulo
+  mode: strict
+  locals:
+    0: var i
+    1: var p
+    2: var a
+    3: var b
+  stack_size: 10
+  opcodes:
+        get_var assert
+        push_i8 -3
+        push_2 2
+        mod
+        push_1 1
+        eq
+        call1 1
+        drop
+        get_var assert
+        push_3 3
+        push_i8 -2
+        mod
+        push_1 1
+        eq
+        call1 1
+        drop
+        push_i8 101
+        put_loc1 1: p
+        push_1 1
+        put_loc0 0: i
+   31:  get_loc0 0: i
+        get_loc1 1: p
+        lt
+        if_false8 87
+        get_var Integer
+        get_field2 invmod
+        get_loc0 0: i
+        get_loc1 1: p
+        call_method 2
+        put_loc2 2: a
+        get_var assert
+        get_loc2 2: a
+        push_0 0
+        gte
+        dup
+        if_false8 67
+        drop
+        get_loc2 2: a
+        get_loc1 1: p
+        lt
+   67:  call1 1
+        drop
+        get_var assert
+        get_loc0 0: i
+        get_loc2 2: a
+        mul
+        get_loc1 1: p
+        mod
+        push_1 1
+        eq
+        call1 1
+        drop
+        inc_loc 0: i
+        goto8 31
+   87:  get_var assert
+        get_var Integer
+        get_field2 isPrime
+        push_2 2
+        push_i8 107
+        push_1 1
+        sub
+        xor
+        call_method 1
+        call1 1
+        drop
+        get_var assert
+        get_var Integer
+        get_field2 isPrime
+        push_2 2
+        push_i8 107
+        push_1 1
+        sub
+        xor
+        push_2 2
+        push_i8 89
+        push_1 1
+        sub
+        xor
+        mul
+        call_method 1
+        lnot
+        call1 1
+        drop
+        get_var Integer
+        get_field2 factor
+        push_2 2
+        push_i8 89
+        push_1 1
+        sub
+        xor
+        push_2 2
+        mul
+        push_3 3
+        push_i8 11
+        mul
+        push_i8 13
+        mul
+        xor
+        push_2 2
+        push_i16 1009
+        mul
+        xor
+        call_method 1
+        put_loc2 2: a
+        get_var assert
+        get_loc2 2: a
+        push_2 2
+        push_2 2
+        push_2 2
+        push_i8 11
+        push_i8 13
+        push_i8 13
+        push_i16 1009
+        push_const8 0: 6.1897001964269014e+26
+        array_from 8
+        eq
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:86:1: function: test_fraction
+  mode: strict
+  stack_size: 4
+  opcodes:
+        get_var assert
+        push_1 1
+        push_3 3
+        div
+        push_1 1
+        add
+        get_field2 toString
+        call_method 0
+        push_atom_value "4/3"
+        call2 2
+        drop
+        get_var assert
+        push_2 2
+        push_3 3
+        div
+        push_i8 30
+        xor
+        push_i32 1073741824
+        push_const8 0: 205891132094649
+        div
+        call2 2
+        drop
+        get_var assert
+        push_1 1
+        push_3 3
+        div
+        push_2 2
+        push_3 3
+        div
+        lt
+        call1 1
+        drop
+        get_var assert
+        push_1 1
+        push_3 3
+        div
+        push_1 1
+        lt
+        call1 1
+        drop
+        get_var assert
+        push_1 1
+        push_3 3
+        div
+        push_1 1
+        push_3 3
+        div
+        eq
+        call1 1
+        drop
+        get_var assert
+        push_1 1
+        push_3 3
+        div
+        push_2 2
+        push_3 3
+        div
+        lt
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:94:1: function: test_mod
+  mode: strict
+  locals:
+    0: var a
+    1: var b
+    2: var p
+  stack_size: 6
+  opcodes:
+        get_var Mod
+        push_3 3
+        push_i8 101
+        call2 2
+        put_loc0 0: a
+        get_var Mod
+        push_minus1 -1
+        push_i8 101
+        call2 2
+        put_loc1 1: b
+        get_var assert
+        get_loc0 0: a
+        get_loc1 1: b
+        add
+        get_var Mod
+        push_2 2
+        push_i8 101
+        call2 2
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: a
+        push_i8 100
+        get_var Mod
+        push_1 1
+        push_i8 101
+        call2 2
+        eq
+        xor
+        call1 1
+        drop
+        push_2 2
+        push_i16 607
+        push_1 1
+        sub
+        xor
+        put_loc2 2: p
+        get_var Mod
+        push_3 3
+        get_loc2 2: p
+        call2 2
+        get_loc2 2: p
+        push_1 1
+        sub
+        xor
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_var Mod
+        push_1 1
+        get_loc2 2: p
+        call2 2
+        eq
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:104:1: function: test_polynomial
+  mode: strict
+  locals:
+    0: var a
+    1: var b
+    2: var q
+    3: var r
+    4: var t
+    5: var i
+  stack_size: 6
+  opcodes:
+        push_1 1
+        get_var X
+        add
+        push_4 4
+        xor
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_var X
+        eq
+        push_4 4
+        push_4 4
+        get_var X
+        mul
+        add
+        xor
+        push_3 3
+        push_6 6
+        get_var X
+        mul
+        add
+        xor
+        push_2 2
+        push_4 4
+        get_var X
+        mul
+        add
+        push_1 1
+        add
+        xor
+        call1 1
+        drop
+        push_1 1
+        get_var X
+        add
+        put_loc3 3: r
+        push_1 1
+        get_var X
+        add
+        get_var X
+        add
+        push_2 2
+        xor
+        put_loc2 2: q
+        push_1 1
+        get_var X
+        sub
+        push_2 2
+        xor
+        put_loc1 1: b
+        get_loc2 2: q
+        get_loc1 1: b
+        mul
+        get_loc3 3: r
+        add
+        put_loc0 0: a
+        get_var Polynomial
+        get_field2 divrem
+        get_loc0 0: a
+        get_loc1 1: b
+        call_method 2
+        put_loc8 4: t
+        get_var assert
+        get_loc8 4: t
+        push_0 0
+        get_array_el
+        get_loc2 2: q
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_loc8 4: t
+        push_1 1
+        get_array_el
+        get_loc3 3: r
+        eq
+        call1 1
+        drop
+        push_1 1
+        push_2 2
+        get_var X
+        mul
+        add
+        push_3 3
+        get_var X
+        mul
+        add
+        push_2 2
+        xor
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_field2 apply
+        push_const8 0: 0.1
+        call_method 1
+        push_const8 1: 1.23
+        eq
+        call1 1
+        drop
+        push_1 1
+        push_2 2
+        get_var X
+        mul
+        sub
+        push_2 2
+        push_2 2
+        get_var X
+        mul
+        add
+        xor
+        push_3 3
+        xor
+        put_loc0 0: a
+        get_var assert
+        get_var deriv
+        get_loc0 0: a
+        call1 1
+        push_6 6
+        get_var X
+        mul
+        push_2 2
+        push_4 4
+        get_var X
+        mul
+        sub
+        xor
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_var deriv
+        get_var integ
+        get_loc0 0: a
+        call1 1
+        call1 1
+        get_loc0 0: a
+        eq
+        call1 1
+        drop
+        get_var X
+        push_1 1
+        sub
+        get_var X
+        push_2 2
+        sub
+        mul
+        get_var X
+        push_3 3
+        sub
+        mul
+        get_var X
+        push_4 4
+        sub
+        mul
+        get_var X
+        push_const8 2: 0.1
+        sub
+        mul
+        put_loc0 0: a
+        get_var polroots
+        get_loc0 0: a
+        call1 1
+        put_loc3 3: r
+        push_0 0
+        put_loc8 5: i
+  308:  get_loc8 5: i
+        get_loc3 3: r
+        get_length
+        lt
+        if_false8 350
+        get_var abs
+        get_loc0 0: a
+        get_field2 apply
+        get_loc3 3: r
+        get_loc8 5: i
+        get_array_el
+        call_method 1
+        call1 1
+        put_loc1 1: b
+        get_var assert
+        get_loc1 1: b
+        push_const8 3: 1e-13
+        lte
+        call1 1
+        drop
+        inc_loc 5: i
+        goto8 308
+  350:  return_undef
+
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:127:1: function: test_poly_mod
+  mode: strict
+  locals:
+    0: var a
+    1: var p
+  stack_size: 7
+  opcodes:
+        get_var X
+        push_2 2
+        get_var X
+        add
+        push_1 1
+        add
+        xor
+        put_loc1 1: p
+        get_var PolyMod
+        push_3 3
+        get_var X
+        add
+        get_loc1 1: p
+        call2 2
+        push_i8 10
+        xor
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_var PolyMod
+        push_i16 -3725
+        get_var X
+        mul
+        push_i16 18357
+        sub
+        get_loc1 1: p
+        call2 2
+        eq
+        call1 1
+        drop
+        get_var PolyMod
+        push_1 1
+        get_var X
+        div
+        push_1 1
+        get_var X
+        add
+        push_2 2
+        xor
+        call2 2
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_var PolyMod
+        get_var X
+        neg
+        get_var X
+        push_2 2
+        push_1 1
+        add
+        xor
+        call2 2
+        eq
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:136:1: function: test_rfunc
+  mode: strict
+  locals:
+    0: var a
+  stack_size: 7
+  opcodes:
+        get_var X
+        push_1 1
+        add
+        get_var X
+        push_1 1
+        add
+        get_var X
+        push_1 1
+        sub
+        mul
+        div
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_1 1
+        get_var X
+        push_1 1
+        sub
+        div
+        eq
+        call1 1
+        drop
+        get_var X
+        push_2 2
+        add
+        get_var X
+        push_2 2
+        sub
+        div
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_field2 apply
+        push_1 1
+        push_3 3
+        div
+        call_method 1
+        push_i8 -7
+        push_5 5
+        div
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_var deriv
+        get_var X
+        push_2 2
+        get_var X
+        sub
+        push_1 1
+        add
+        xor
+        get_var X
+        push_1 1
+        sub
+        div
+        call1 1
+        get_var X
+        push_2 2
+        push_2 2
+        get_var X
+        mul
+        sub
+        xor
+        get_var X
+        push_2 2
+        push_2 2
+        get_var X
+        mul
+        sub
+        push_1 1
+        add
+        xor
+        div
+        eq
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:144:1: function: test_series
+  mode: strict
+  locals:
+    0: var a
+    1: var b
+  stack_size: 7
+  opcodes:
+        push_1 1
+        get_var X
+        add
+        get_var O
+        get_var X
+        push_5 5
+        xor
+        call1 1
+        add
+        set_loc0 0: a
+        get_field2 inverse
+        call_method 0
+        put_loc1 1: b
+        get_var assert
+        get_loc1 1: b
+        push_1 1
+        get_var X
+        sub
+        get_var X
+        add
+        eq
+        push_2 2
+        get_var X
+        sub
+        xor
+        push_3 3
+        get_var X
+        add
+        xor
+        push_4 4
+        get_var O
+        get_var X
+        push_5 5
+        xor
+        call1 1
+        add
+        xor
+        call1 1
+        drop
+        get_var assert
+        get_var deriv
+        get_loc1 1: b
+        call1 1
+        push_minus1 -1
+        push_2 2
+        get_var X
+        mul
+        add
+        push_3 3
+        get_var X
+        mul
+        sub
+        eq
+        push_2 2
+        push_4 4
+        get_var X
+        mul
+        add
+        xor
+        push_3 3
+        get_var O
+        get_var X
+        push_4 4
+        xor
+        call1 1
+        add
+        xor
+        call1 1
+        drop
+        get_var assert
+        get_var deriv
+        get_var integ
+        get_loc1 1: b
+        call1 1
+        call1 1
+        get_loc1 1: b
+        eq
+        call1 1
+        drop
+        get_var Series
+        push_1 1
+        push_1 1
+        get_var X
+        sub
+        div
+        push_5 5
+        call2 2
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_1 1
+        get_var X
+        add
+        get_var X
+        add
+        eq
+        push_2 2
+        get_var X
+        add
+        xor
+        push_3 3
+        get_var X
+        add
+        xor
+        push_4 4
+        get_var O
+        get_var X
+        push_5 5
+        xor
+        call1 1
+        add
+        xor
+        call1 1
+        drop
+        get_loc0 0: a
+        get_field2 apply
+        push_const8 0: 0.1
+        call_method 1
+        put_loc1 1: b
+        get_var assert
+        get_loc1 1: b
+        push_const8 1: 1.1111
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_var exp
+        push_3 3
+        get_var X
+        mul
+        push_2 2
+        get_var O
+        get_var X
+        push_i8 10
+        xor
+        call1 1
+        add
+        xor
+        call1 1
+        push_1 1
+        push_3 3
+        get_var X
+        mul
+        add
+        eq
+        push_2 2
+        push_i8 9
+        push_2 2
+        div
+        get_var X
+        mul
+        add
+        xor
+        push_4 4
+        push_i8 9
+        push_2 2
+        div
+        get_var X
+        mul
+        add
+        xor
+        push_6 6
+        push_i8 27
+        push_i8 8
+        div
+        get_var X
+        mul
+        add
+        xor
+        push_i8 8
+        get_var O
+        get_var X
+        push_i8 10
+        xor
+        call1 1
+        add
+        xor
+        call1 1
+        drop
+        get_var assert
+        get_var sin
+        get_var X
+        get_var O
+        get_var X
+        push_6 6
+        xor
+        call1 1
+        add
+        call1 1
+        get_var X
+        push_1 1
+        push_6 6
+        div
+        get_var X
+        mul
+        sub
+        eq
+        push_3 3
+        push_1 1
+        push_i8 120
+        div
+        get_var X
+        mul
+        add
+        xor
+        push_5 5
+        get_var O
+        get_var X
+        push_6 6
+        xor
+        call1 1
+        add
+        xor
+        call1 1
+        drop
+        get_var assert
+        get_var cos
+        get_var X
+        get_var O
+        get_var X
+        push_6 6
+        xor
+        call1 1
+        add
+        call1 1
+        push_1 1
+        push_1 1
+        push_2 2
+        div
+        get_var X
+        mul
+        sub
+        eq
+        push_2 2
+        push_1 1
+        push_i8 24
+        div
+        get_var X
+        mul
+        add
+        xor
+        push_4 4
+        get_var O
+        get_var X
+        push_6 6
+        xor
+        call1 1
+        add
+        xor
+        call1 1
+        drop
+        get_var assert
+        get_var tan
+        get_var X
+        get_var O
+        get_var X
+        push_i8 8
+        xor
+        call1 1
+        add
+        call1 1
+        get_var X
+        push_1 1
+        push_3 3
+        div
+        get_var X
+        mul
+        add
+        eq
+        push_3 3
+        push_2 2
+        push_i8 15
+        div
+        get_var X
+        mul
+        add
+        xor
+        push_5 5
+        push_i8 17
+        push_i16 315
+        div
+        get_var X
+        mul
+        add
+        xor
+        push_7 7
+        get_var O
+        get_var X
+        push_i8 8
+        xor
+        call1 1
+        add
+        xor
+        call1 1
+        drop
+        get_var assert
+        push_1 1
+        get_var X
+        add
+        get_var O
+        get_var X
+        push_6 6
+        xor
+        call1 1
+        add
+        push_2 2
+        get_var X
+        add
+        push_1 1
+        push_2 2
+        get_var X
+        mul
+        add
+        push_2 2
+        get_var X
+        mul
+        add
+        eq
+        xor
+        push_2 2
+        push_3 3
+        push_2 2
+        div
+        get_var X
+        mul
+        add
+        xor
+        push_3 3
+        push_5 5
+        push_6 6
+        div
+        get_var X
+        mul
+        add
+        xor
+        push_4 4
+        push_5 5
+        push_i8 12
+        div
+        get_var X
+        mul
+        add
+        xor
+        push_5 5
+        get_var O
+        get_var X
+        push_6 6
+        xor
+        call1 1
+        add
+        xor
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:161:1: function: test_matrix
+  mode: strict
+  locals:
+    0: var a
+    1: var b
+    2: var r
+  stack_size: 7
+  opcodes:
+        push_1 1
+        push_2 2
+        array_from 2
+        push_3 3
+        push_4 4
+        array_from 2
+        array_from 2
+        put_loc0 0: a
+        push_3 3
+        push_4 4
+        array_from 2
+        put_loc1 1: b
+        get_loc0 0: a
+        get_loc1 1: b
+        mul
+        put_loc2 2: r
+        get_var assert
+        get_loc2 2: r
+        push_i8 11
+        push_i8 25
+        array_from 2
+        eq
+        call1 1
+        drop
+        get_loc0 0: a
+        push_minus1 -1
+        xor
+        push_2 2
+        mul
+        put_loc2 2: r
+        get_var assert
+        get_loc2 2: r
+        push_i8 -4
+        push_2 2
+        array_from 2
+        push_3 3
+        push_minus1 -1
+        array_from 2
+        array_from 2
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_var norm2
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        call1 1
+        push_i8 14
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_var diag
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        call1 1
+        push_1 1
+        push_0 0
+        push_0 0
+        array_from 3
+        push_0 0
+        push_2 2
+        push_0 0
+        array_from 3
+        push_0 0
+        push_0 0
+        push_3 3
+        array_from 3
+        array_from 3
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_var trans
+        get_loc0 0: a
+        call1 1
+        push_1 1
+        push_3 3
+        array_from 2
+        push_2 2
+        push_4 4
+        array_from 2
+        array_from 2
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_var trans
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        call1 1
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        array_from 1
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_var trace
+        get_loc0 0: a
+        call1 1
+        push_5 5
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_var charpoly
+        get_var Matrix
+        get_field2 hilbert
+        push_4 4
+        call_method 1
+        call1 1
+        get_var X
+        eq
+        push_4 4
+        push_i16 176
+        push_i8 105
+        div
+        get_var X
+        mul
+        sub
+        xor
+        push_3 3
+        push_i16 3341
+        push_i16 12600
+        div
+        get_var X
+        mul
+        add
+        xor
+        push_2 2
+        push_i8 41
+        push_i16 23625
+        div
+        get_var X
+        mul
+        sub
+        push_1 1
+        push_i32 6048000
+        div
+        add
+        xor
+        call1 1
+        drop
+        get_var assert
+        get_var det
+        get_var Matrix
+        get_field2 hilbert
+        push_4 4
+        call_method 1
+        call1 1
+        push_1 1
+        push_i32 6048000
+        div
+        eq
+        call1 1
+        drop
+        push_1 1
+        push_2 2
+        push_1 1
+        array_from 3
+        push_i8 -2
+        push_i8 -3
+        push_1 1
+        array_from 3
+        push_3 3
+        push_5 5
+        push_0 0
+        array_from 3
+        array_from 3
+        put_loc0 0: a
+        get_var assert
+        get_var rank
+        get_loc0 0: a
+        call1 1
+        push_2 2
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_var ker
+        get_loc0 0: a
+        call1 1
+        push_5 5
+        array_from 1
+        push_i8 -3
+        array_from 1
+        push_1 1
+        array_from 1
+        array_from 3
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_var dp
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        push_3 3
+        push_i8 -4
+        push_i8 -7
+        array_from 3
+        call2 2
+        push_i8 -26
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_var cp
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        push_3 3
+        push_i8 -4
+        push_i8 -7
+        array_from 3
+        call2 2
+        push_i8 -2
+        push_i8 16
+        push_i8 -10
+        array_from 3
+        eq
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:182:1: function: assert_eq
+  mode: strict
+  args: a ref
+  stack_size: 4
+  opcodes:
+        get_var assert
+        get_var abs
+        get_arg0 0: a
+        get_arg1 1: ref
+        div
+        push_1 1
+        sub
+        call1 1
+        push_const8 0: 1e-15
+        lte
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:185:1: function: test_trig
+  mode: strict
+  stack_size: 5
+  opcodes:
+        get_var assert_eq
+        get_var sin
+        push_1 1
+        push_2 2
+        div
+        call1 1
+        push_const8 0: 0.479425538604203
+        call2 2
+        drop
+        get_var assert_eq
+        get_var sin
+        push_2 2
+        push_3 3
+        get_var I
+        mul
+        add
+        call1 1
+        push_const8 1: 9.154499146911428
+        push_const8 2: 4.168906959966565
+        get_var I
+        mul
+        sub
+        call2 2
+        drop
+        get_var assert_eq
+        get_var cos
+        push_2 2
+        push_3 3
+        get_var I
+        mul
+        add
+        call1 1
+        push_const8 3: 4.189625690968807
+        neg
+        push_const8 4: 9.109227893755337
+        get_var I
+        mul
+        sub
+        call2 2
+        drop
+        get_var assert_eq
+        push_2 2
+        push_const8 5: 0.5
+        get_var I
+        mul
+        add
+        push_const8 6: 1.1
+        push_const8 7: 0.5
+        get_var I
+        mul
+        sub
+        xor
+        push_const8 8: 2.494363021357619
+        push_const8 9: 0.23076804554558092
+        get_var I
+        mul
+        sub
+        call2 2
+        drop
+        get_var assert_eq
+        get_var sqrt
+        push_2 2
+        get_var I
+        mul
+        call1 1
+        push_1 1
+        get_var I
+        add
+        call2 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_qjscalc.js:1:1: function: <eval>
+  mode: strict
+  locals:
+    0: var <ret>
+    1: catch e [level:3 next:-1]
+  stack_size: 3
+  opcodes:
+        check_define_var assert,64
+        check_define_var assertThrows,64
+        check_define_var pow,64
+        check_define_var test_integer,64
+        check_define_var test_float,64
+        check_define_var test_modulo,64
+        check_define_var test_fraction,64
+        check_define_var test_mod,64
+        check_define_var test_polynomial,64
+        check_define_var test_poly_mod,64
+        check_define_var test_rfunc,64
+        check_define_var test_series,64
+        check_define_var test_matrix,64
+        check_define_var assert_eq,64
+        check_define_var test_trig,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode assertThrows]
+        define_func assertThrows,0
+        fclosure8 2: [bytecode pow]
+        define_func pow,0
+        fclosure8 3: [bytecode test_integer]
+        define_func test_integer,0
+        fclosure8 4: [bytecode test_float]
+        define_func test_float,0
+        fclosure8 5: [bytecode test_modulo]
+        define_func test_modulo,0
+        fclosure8 6: [bytecode test_fraction]
+        define_func test_fraction,0
+        fclosure8 7: [bytecode test_mod]
+        define_func test_mod,0
+        fclosure8 8: [bytecode test_polynomial]
+        define_func test_polynomial,0
+        fclosure8 9: [bytecode test_poly_mod]
+        define_func test_poly_mod,0
+        fclosure8 10: [bytecode test_rfunc]
+        define_func test_rfunc,0
+        fclosure8 11: [bytecode test_series]
+        define_func test_series,0
+        fclosure8 12: [bytecode test_matrix]
+        define_func test_matrix,0
+        fclosure8 13: [bytecode assert_eq]
+        define_func assert_eq,0
+        fclosure8 14: [bytecode test_trig]
+        define_func test_trig,0
+        push_atom_value "use math"
+        put_loc0 0: "<ret>"
+        push_atom_value "use strict"
+        put_loc0 0: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        catch 244
+        get_var __loadScript
+        push_atom_value "test_assert.js"
+        call1 1
+        put_loc0 0: "<ret>"
+        drop
+        goto8 254
+  244:  put_loc1 1: e
+        catch 253
+        drop
+        goto8 254
+  253:  throw
+  254:  get_var test_integer
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_float
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_modulo
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_fraction
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_mod
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_polynomial
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_poly_mod
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_rfunc
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_series
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_matrix
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_trig
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

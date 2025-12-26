@@ -1,0 +1,61 @@
+__tests__/fixtures/for-loop-variants.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var i,128
+        check_define_var j,128
+        define_var i,130
+        define_var j,130
+        push_0 0
+        put_var_init i
+        undefined
+        put_loc0 0: "<ret>"
+   32:  undefined
+        put_loc0 0: "<ret>"
+        get_var i
+        push_2 2
+        gte
+        if_true8 76
+        get_var console
+        get_field2 log
+        get_var i
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var i
+        post_inc
+        put_var i
+        put_loc0 0: "<ret>"
+        goto8 32
+   76:  push_0 0
+        put_var_init j
+        undefined
+        put_loc0 0: "<ret>"
+   84:  get_var j
+        push_3 3
+        lt
+        if_false8 151
+        undefined
+        put_loc0 0: "<ret>"
+        get_var j
+        push_1 1
+        strict_eq
+        if_false8 118
+        get_var j
+        post_inc
+        put_var j
+        put_loc0 0: "<ret>"
+        goto8 84
+  118:  get_var console
+        get_field2 log
+        get_var j
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var j
+        post_inc
+        put_var j
+        put_loc0 0: "<ret>"
+        goto8 84
+  151:  get_loc0 0: "<ret>"
+        return
+

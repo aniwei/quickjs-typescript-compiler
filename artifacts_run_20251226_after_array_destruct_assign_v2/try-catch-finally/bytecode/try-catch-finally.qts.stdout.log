@@ -1,0 +1,41 @@
+__tests__/fixtures/try-catch-finally.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: catch e [level:3 next:-1]
+    2: var <ret>
+  stack_size: 5
+  opcodes:
+        undefined
+        put_loc0 0: "<ret>"
+        catch 9
+        push_1 1
+        throw
+    9:  put_loc1 1: e
+        catch 40
+        get_var console
+        get_field2 log
+        get_loc1 1: e
+        call_method 1
+        put_loc0 0: "<ret>"
+        drop
+        undefined
+        gosub 46
+        drop
+        goto8 72
+   40:  gosub 46
+        throw
+   46:  get_loc0 0: "<ret>"
+        put_loc2 2: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_atom_value f
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_loc2 2: "<ret>"
+        put_loc0 0: "<ret>"
+        ret
+   72:  get_loc0 0: "<ret>"
+        return
+

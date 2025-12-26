@@ -194,6 +194,7 @@ function buildWasm(opts: Options) {
     'QTS_TRACE_CLOSURE',
     'QTS_TRACE_LABEL',
     'QTS_TRACE_STACK',
+    'QTS_TRACE_PC2LINE',
     'QTS_TRACE_SCOPE',
     'QTS_TRACE_ASSIGN',
   ] as const
@@ -241,6 +242,7 @@ function buildWasm(opts: Options) {
         CLOSURE: resolveCategory('QTS_TRACE_CLOSURE'),
         LABEL: resolveCategory('QTS_TRACE_LABEL'),
         STACK: resolveCategory('QTS_TRACE_STACK'),
+        PC2LINE: resolveCategory('QTS_TRACE_PC2LINE'),
         SCOPE: resolveCategory('QTS_TRACE_SCOPE'),
         ASSIGN: resolveCategory('QTS_TRACE_ASSIGN'),
       },

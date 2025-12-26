@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/array-spread-nested-arrays-089.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_run_20251226_after_array_destruct_assign/array-spread-nested-arrays-089",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_run_20251226_after_array_destruct_assign/array-spread-nested-arrays-089/cli/array-spread-nested-arrays-089.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_run_20251226_after_array_destruct_assign/array-spread-nested-arrays-089/cli/array-spread-nested-arrays-089.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_run_20251226_after_array_destruct_assign/array-spread-nested-arrays-089/cli/array-spread-nested-arrays-089.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_run_20251226_after_array_destruct_assign/array-spread-nested-arrays-089/cli/array-spread-nested-arrays-089.pc2line.txt",
+    "bytecodeSize": 278,
+    "pc2lineLength": 24,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": true,
+    "tsSize": 216,
+    "wasmSize": 216,
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}
