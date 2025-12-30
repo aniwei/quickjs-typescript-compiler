@@ -1,0 +1,513 @@
+import { BytecodeTag, FIRST_ATOM_ID, JS_FUNCTION_BYTECODE_FLAG_HAS_DEBUG } from './env'
+
+export interface ParsedBytecodeModule {
+  version: number
+  atoms: string[]
+  func: FunctionBytecode
+  module?: ParsedModuleBytecode
+}
+
+export interface ParsedReqModuleEntry {
+  moduleNameAtom: number
+  moduleName?: string
+  attributes: unknown
+}
+
+export interface ParsedExportEntry {
+  exportType: number
+  localVarIdx?: number
+  reqModuleIdx?: number
+  localNameAtom?: number
+  localName?: string
+  exportNameAtom: number
+  exportName?: string
+}
+
+export interface ParsedStarExportEntry {
+  reqModuleIdx: number
+}
+
+export interface ParsedImportEntry {
+  varIdx: number
+  isStar: boolean
+  importNameAtom: number
+  importName?: string
+  reqModuleIdx: number
+}
+
+export interface ParsedModuleBytecode {
+  tag: BytecodeTag.TC_TAG_MODULE
+  moduleNameAtom: number
+  moduleName?: string
+  reqModuleEntries: ParsedReqModuleEntry[]
+  exportEntries: ParsedExportEntry[]
+  starExportEntries: ParsedStarExportEntry[]
+  importEntries: ParsedImportEntry[]
+  hasTla: boolean
+  funcObj: FunctionBytecode
+}
+
+export interface FunctionDebugInfo {
+  filenameAtom: number
+  filename?: string
+  pc2line: Uint8Array
+  source?: Uint8Array
+}
+
+export interface VarDef {
+  nameAtom: number
+  name?: string
+  scopeLevel: number
+  scopeNextPlus1: number
+  flags: number
+}
+
+export interface ClosureVar {
+  nameAtom: number
+  name?: string
+  varIdx: number
+  flags: number
+}
+
+export interface FunctionBytecode {
+  tag: BytecodeTag.TC_TAG_FUNCTION_BYTECODE
+  flags: number
+  jsMode: number
+  funcNameAtom: number
+  funcName?: string
+  argCount: number
+  varCount: number
+  definedArgCount: number
+  stackSize: number
+  closureVarCount: number
+  cpoolCount: number
+  bytecodeLen: number
+  bytecode: Uint8Array
+  varDefs: VarDef[]
+  closureVars: ClosureVar[]
+  hasDebug: boolean
+  debug?: FunctionDebugInfo
+  cpool?: Array<unknown>
+}
+
+class Reader {
+  ptr = 0
+
+  constructor(private readonly buf: Uint8Array) {}
+
+  private ensureAvailable(n: number): void {
+    if (n < 0) {
+      throw new Error(`Invalid read length: ${n}`)
+    }
+    if (this.ptr + n > this.buf.length) {
+      throw new Error(
+        `Unexpected end of bytecode buffer (need ${n} bytes at ptr=${this.ptr}, len=${this.buf.length})`
+      )
+    }
+  }
+
+  readU8(): number {
+    this.ensureAvailable(1)
+    return this.buf[this.ptr++]
+  }
+
+  readU16LE(): number {
+    this.ensureAvailable(2)
+    const v = this.buf[this.ptr] | (this.buf[this.ptr + 1] << 8)
+    this.ptr += 2
+    return v
+  }
+
+  readU32LE(): number {
+    this.ensureAvailable(4)
+    const v =
+      (this.buf[this.ptr] |
+        (this.buf[this.ptr + 1] << 8) |
+        (this.buf[this.ptr + 2] << 16) |
+        (this.buf[this.ptr + 3] << 24)) >>>
+      0
+    this.ptr += 4
+    return v
+  }
+
+  readF64LE(): number {
+    this.ensureAvailable(8)
+    const view = new DataView(this.buf.buffer, this.buf.byteOffset + this.ptr, 8)
+    const v = view.getFloat64(0, true)
+    this.ptr += 8
+    return v
+  }
+
+  readBytes(len: number): Uint8Array {
+    this.ensureAvailable(len)
+    const out = this.buf.subarray(this.ptr, this.ptr + len)
+    this.ptr += len
+    return out
+  }
+
+  readULEB128(): number {
+    let val = 0
+    let shift = 0
+    while (true) {
+      const b = this.readU8()
+      val |= (b & 0x7f) << shift
+      if ((b & 0x80) === 0) break
+      shift += 7
+
+      // Defensive: ULEB128 for this format should never exceed 32 bits.
+      if (shift > 35) {
+        throw new Error('Invalid ULEB128 encoding (too large)')
+      }
+    }
+    return val >>> 0
+  }
+
+  readString(): string {
+    const lenTag = this.readULEB128()
+    const isWideChar = (lenTag & 1) !== 0
+    const charLen = lenTag >> 1
+
+    const decodeLatin1 = (bytes: Uint8Array): string => {
+      // Avoid applying huge arrays to fromCharCode.
+      const chunkSize = 0x8000
+      let out = ''
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        const chunk = bytes.subarray(i, i + chunkSize)
+        out += String.fromCharCode(...chunk)
+      }
+      return out
+    }
+
+    const decodeU16Codes = (codes: Uint16Array): string => {
+      const chunkSize = 0x4000
+      let out = ''
+      for (let i = 0; i < codes.length; i += chunkSize) {
+        const chunk = codes.subarray(i, i + chunkSize)
+        out += String.fromCharCode(...chunk)
+      }
+      return out
+    }
+
+    const byteLen = isWideChar ? charLen * 2 : charLen
+    if (byteLen > (this.buf.length - this.ptr)) {
+      throw new Error(
+        `Invalid string length (${byteLen}) at ptr=${this.ptr} (remaining=${this.buf.length - this.ptr})`
+      )
+    }
+
+    if (isWideChar) {
+      const codes = new Uint16Array(charLen)
+      for (let i = 0; i < charLen; i++) {
+        codes[i] = this.readU16LE()
+      }
+      return decodeU16Codes(codes)
+    }
+
+    const bytes = this.readBytes(charLen)
+    // QuickJS narrow strings are stored as raw 8-bit bytes (not UTF-8).
+    return decodeLatin1(bytes)
+  }
+}
+
+function decodeAtomName(atom: number, atoms: string[]): string | undefined {
+  if (atom >= FIRST_ATOM_ID) {
+    const idx = atom - FIRST_ATOM_ID
+    return atoms[idx]
+  }
+  return undefined
+}
+
+function readAtom(reader: Reader): number {
+  const v = reader.readULEB128() >>> 0
+  return (v >>> 1) >>> 0
+}
+
+function readFunctionBytecode(reader: Reader, atoms: string[]): FunctionBytecode {
+  const tag = reader.readU8()
+  if (tag !== BytecodeTag.TC_TAG_FUNCTION_BYTECODE) {
+    throw new Error(
+      `Unsupported tag: ${tag} (expected TC_TAG_FUNCTION_BYTECODE=${BytecodeTag.TC_TAG_FUNCTION_BYTECODE})`
+    )
+  }
+
+  const flags = reader.readU16LE()
+  const jsMode = reader.readU8()
+  const funcNameAtom = readAtom(reader)
+
+  const argCount = reader.readULEB128()
+  const varCount = reader.readULEB128()
+  const definedArgCount = reader.readULEB128()
+  const stackSize = reader.readULEB128()
+  const closureVarCount = reader.readULEB128()
+  const cpoolCount = reader.readULEB128()
+  const bytecodeLen = reader.readULEB128()
+
+  const varDefs: VarDef[] = []
+  const vardefCount = reader.readULEB128()
+  for (let i = 0; i < vardefCount; i++) {
+    const nameAtom = readAtom(reader)
+    const scopeLevel = reader.readULEB128()
+    const scopeNextPlus1 = reader.readULEB128()
+    const flags = reader.readU8()
+    varDefs.push({
+      nameAtom,
+      name: decodeAtomName(nameAtom, atoms),
+      scopeLevel,
+      scopeNextPlus1,
+      flags,
+    })
+  }
+
+  const closureVars: ClosureVar[] = []
+  for (let i = 0; i < closureVarCount; i++) {
+    const nameAtom = readAtom(reader)
+    const varIdx = reader.readULEB128()
+    const flags = reader.readU8()
+    closureVars.push({ nameAtom, name: decodeAtomName(nameAtom, atoms), varIdx, flags })
+  }
+
+  const bytecode = reader.readBytes(bytecodeLen)
+
+  const hasDebug = (flags & JS_FUNCTION_BYTECODE_FLAG_HAS_DEBUG) !== 0
+  let debug: FunctionDebugInfo | undefined
+  if (hasDebug) {
+    const filenameAtom = readAtom(reader)
+    const pc2lineLen = reader.readULEB128()
+    const pc2line = reader.readBytes(pc2lineLen)
+    const sourceLen = reader.readULEB128()
+    const source = sourceLen > 0 ? reader.readBytes(sourceLen) : undefined
+
+    debug = {
+      filenameAtom,
+      filename: decodeAtomName(filenameAtom, atoms),
+      pc2line,
+      source,
+    }
+  }
+
+  const cpool: unknown[] = []
+  for (let i = 0; i < cpoolCount; i++) {
+    const readCpoolValue = (): unknown => {
+      const ctag = reader.readU8()
+      switch (ctag) {
+        case BytecodeTag.TC_TAG_NULL:
+          return null
+        case BytecodeTag.TC_TAG_UNDEFINED:
+          return undefined
+        case BytecodeTag.TC_TAG_BOOL_FALSE:
+          return false
+        case BytecodeTag.TC_TAG_BOOL_TRUE:
+          return true
+        case BytecodeTag.TC_TAG_INT32:
+          return (reader.readU32LE() | 0) as number
+        case BytecodeTag.TC_TAG_FLOAT64:
+          return reader.readF64LE()
+        case BytecodeTag.TC_TAG_STRING:
+          return reader.readString()
+        case BytecodeTag.TC_TAG_BIG_INT: {
+          const len = reader.readULEB128()
+          if (len === 0) return 0n
+          const bytes = reader.readBytes(len)
+          // 二进制补码，小端序
+          let x = 0n
+          for (let j = 0; j < bytes.length; j++) {
+            x |= BigInt(bytes[j]) << (BigInt(j) * 8n)
+          }
+          // 若为负数则做符号扩展（sign extend）
+          const signBit = bytes[bytes.length - 1] & 0x80
+          if (signBit !== 0) {
+            const bits = BigInt(bytes.length) * 8n
+            x -= 1n << bits
+          }
+          return x
+        }
+        case BytecodeTag.TC_TAG_TEMPLATE_OBJECT: {
+          const len = reader.readULEB128()
+          const elements: unknown[] = []
+          for (let j = 0; j < len; j++) {
+            elements.push(readCpoolValue())
+          }
+          const raw = readCpoolValue()
+          return { tag: 'template_object', elements, raw }
+        }
+        case BytecodeTag.TC_TAG_FUNCTION_BYTECODE:
+          reader.ptr -= 1
+          return readFunctionBytecode(reader, atoms)
+        default:
+          // 未识别的 tag：尽量不让解析错位（按 null 占位）。
+          return null
+      }
+    }
+
+    cpool.push(readCpoolValue())
+  }
+
+  return {
+    tag: BytecodeTag.TC_TAG_FUNCTION_BYTECODE,
+    flags,
+    jsMode,
+    funcNameAtom,
+    funcName: decodeAtomName(funcNameAtom, atoms),
+    argCount,
+    varCount,
+    definedArgCount,
+    stackSize,
+    closureVarCount,
+    cpoolCount,
+    bytecodeLen,
+    bytecode,
+    varDefs,
+    closureVars,
+    hasDebug,
+    debug,
+    cpool,
+  }
+}
+
+function readAnyObject(reader: Reader, atoms: string[]): unknown {
+  const tag = reader.readU8()
+  switch (tag) {
+    case BytecodeTag.TC_TAG_NULL:
+      return null
+    case BytecodeTag.TC_TAG_UNDEFINED:
+      return undefined
+    case BytecodeTag.TC_TAG_BOOL_FALSE:
+      return false
+    case BytecodeTag.TC_TAG_BOOL_TRUE:
+      return true
+    case BytecodeTag.TC_TAG_INT32:
+      return (reader.readU32LE() | 0) as number
+    case BytecodeTag.TC_TAG_FLOAT64:
+      return reader.readF64LE()
+    case BytecodeTag.TC_TAG_STRING:
+      return reader.readString()
+    case BytecodeTag.TC_TAG_TEMPLATE_OBJECT: {
+      const len = reader.readULEB128()
+      const elements: unknown[] = []
+      for (let i = 0; i < len; i++) elements.push(readAnyObject(reader, atoms))
+      const raw = readAnyObject(reader, atoms)
+      return { tag: 'template_object', elements, raw }
+    }
+    case BytecodeTag.TC_TAG_FUNCTION_BYTECODE:
+      reader.ptr -= 1
+      return readFunctionBytecode(reader, atoms)
+    case BytecodeTag.TC_TAG_MODULE:
+      reader.ptr -= 1
+      return readModuleBytecode(reader, atoms)
+    default:
+      // 未知 tag：返回 null 以避免解析错位。
+      return null
+  }
+}
+
+function readModuleBytecode(reader: Reader, atoms: string[]): ParsedModuleBytecode {
+  const tag = reader.readU8()
+  if (tag !== BytecodeTag.TC_TAG_MODULE) {
+    throw new Error(`Unsupported tag: ${tag} (expected TC_TAG_MODULE=${BytecodeTag.TC_TAG_MODULE})`)
+  }
+
+  const moduleNameAtom = readAtom(reader)
+  const reqCount = reader.readULEB128()
+  const reqModuleEntries: ParsedReqModuleEntry[] = []
+  for (let i = 0; i < reqCount; i++) {
+    const mn = readAtom(reader)
+    const attributes = readAnyObject(reader, atoms)
+    reqModuleEntries.push({ moduleNameAtom: mn, moduleName: decodeAtomName(mn, atoms), attributes })
+  }
+
+  const exportCount = reader.readULEB128()
+  const exportEntries: ParsedExportEntry[] = []
+  for (let i = 0; i < exportCount; i++) {
+    const exportType = reader.readU8()
+    if (exportType === 0) {
+      const localVarIdx = reader.readULEB128()
+      const exportNameAtom = readAtom(reader)
+      exportEntries.push({
+        exportType,
+        localVarIdx,
+        exportNameAtom,
+        exportName: decodeAtomName(exportNameAtom, atoms),
+      })
+    } else {
+      const reqModuleIdx = reader.readULEB128()
+      const localNameAtom = readAtom(reader)
+      const exportNameAtom = readAtom(reader)
+      exportEntries.push({
+        exportType,
+        reqModuleIdx,
+        localNameAtom,
+        localName: decodeAtomName(localNameAtom, atoms),
+        exportNameAtom,
+        exportName: decodeAtomName(exportNameAtom, atoms),
+      })
+    }
+  }
+
+  const starCount = reader.readULEB128()
+  const starExportEntries: ParsedStarExportEntry[] = []
+  for (let i = 0; i < starCount; i++) {
+    starExportEntries.push({ reqModuleIdx: reader.readULEB128() })
+  }
+
+  const importCount = reader.readULEB128()
+  const importEntries: ParsedImportEntry[] = []
+  for (let i = 0; i < importCount; i++) {
+    const varIdx = reader.readULEB128()
+    const isStar = reader.readU8() !== 0
+    const importNameAtom = readAtom(reader)
+    const reqModuleIdx = reader.readULEB128()
+    importEntries.push({
+      varIdx,
+      isStar,
+      importNameAtom,
+      importName: decodeAtomName(importNameAtom, atoms),
+      reqModuleIdx,
+    })
+  }
+
+  const hasTla = reader.readU8() !== 0
+  const funcObj = readAnyObject(reader, atoms) as FunctionBytecode
+  if (!funcObj || (funcObj as any).tag !== BytecodeTag.TC_TAG_FUNCTION_BYTECODE) {
+    throw new Error('Invalid module func_obj: expected function bytecode')
+  }
+
+  return {
+    tag: BytecodeTag.TC_TAG_MODULE,
+    moduleNameAtom,
+    moduleName: decodeAtomName(moduleNameAtom, atoms),
+    reqModuleEntries,
+    exportEntries,
+    starExportEntries,
+    importEntries,
+    hasTla,
+    funcObj,
+  }
+}
+
+export function parseBytecodeModule(input: Uint8Array | ArrayBuffer | Buffer): ParsedBytecodeModule {
+  const buf =
+    input instanceof Uint8Array
+      ? input
+      : input instanceof ArrayBuffer
+        ? new Uint8Array(input)
+        : new Uint8Array(input)
+
+  const reader = new Reader(buf)
+  const version = reader.readU8()
+
+  const atomCount = reader.readULEB128()
+  const atoms: string[] = []
+  for (let i = 0; i < atomCount; i++) {
+    atoms.push(reader.readString())
+  }
+
+  // 根对象可能是 function 或 module。
+  const tag = reader.readU8()
+  reader.ptr -= 1
+  if (tag === BytecodeTag.TC_TAG_MODULE) {
+    const module = readModuleBytecode(reader, atoms)
+    return { version, atoms, func: module.funcObj, module }
+  }
+  const func = readFunctionBytecode(reader, atoms)
+  return { version, atoms, func }
+}

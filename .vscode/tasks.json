@@ -1,0 +1,702 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run CLI quick validation",
+			"type": "shell",
+			"command": "pnpm -s start __tests__/fixtures/compute.ts --disasm --cfg --pc2line --debug",
+			"args": [],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-compute",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compiler/fixtures/compareWithWasm.ts __tests__/compute.ts --input-js __tests__/compute.js --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "compare-compute (manual run)",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/compute.ts --input-js __tests__/fixtures/compute.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"group": "build"
+		},
+		{
+			"label": "compare fixture compute after fixes",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/compute.ts --input-js __tests__/fixtures/compute.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts --show-diff",
+			"group": "build"
+		},
+		{
+			"label": "compare fixture compute after TS-strip fix",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/compute.ts --input-js __tests__/fixtures/compute.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts --show-diff",
+			"group": "build"
+		},
+		{
+			"label": "Generate env and quick-validate CLI",
+			"type": "shell",
+			"command": "pnpm -s gen:env && pnpm -s start __tests__/fixtures/compute.ts --disasm --cfg --pc2line --debug",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "compare console-log",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/console-log.ts --input-js __tests__/fixtures/console-log.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts --show-diff",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-arrow-fn-basic",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/arrow-fn-basic.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Log remaining difference",
+			"type": "shell",
+			"command": "echo \"Remaining difference in compute.ts: 1 byte at start of pc2line table. Likely due to push_1 encoding or similar.\" >> TODO.md",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare primitives",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/primitives.ts --input-js __tests__/fixtures/primitives.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts --show-diff",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare number",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/number.ts --input-js __tests__/fixtures/number.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts --show-diff",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-comparison-ops",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/comparison-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-comparison-ops-2",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/comparison-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-comparison-ops-3",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/comparison-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-comparison-ops-4",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/comparison-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-comparison-ops-5",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/comparison-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-bitwise-ops",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/bitwise-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-bitwise-ops-2",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/bitwise-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-unary-ops",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/unary-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-unary-ops-2",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/unary-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-unary-ops-3",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/unary-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-unary-ops-4",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/unary-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-unary-ops-5",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/unary-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-unary-ops-6",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/unary-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-unary-ops-7",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/unary-ops.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-conditional-operator",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/conditional-operator.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-conditional-operator-2",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/conditional-operator.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-conditional-operator-3",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/conditional-operator.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-conditional-operator-4",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/conditional-operator.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-conditional-operator-fixed",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/conditional-operator.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-conditional-operator-fixed-2",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/conditional-operator.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-conditional-operator-fixed-3",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/conditional-operator.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-postfix-unary",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/postfix-unary.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-postfix-unary-2",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/postfix-unary.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-debug-info-basic",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/debug-info-basic.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-debug-info-basic-2",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/debug-info-basic.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-debug-info-basic-3",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/debug-info-basic.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-debug-info-basic-4",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/debug-info-basic.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-debug-info-basic-5",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/debug-info-basic.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-debug-info-basic-6",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/debug-info-basic.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "debug-loop-break",
+			"type": "shell",
+			"command": "pnpm -s start __tests__/fixtures/loop-break-continue.ts --disasm --debug",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "Log closure-basic progress",
+			"type": "shell",
+			"command": "echo \"closure-basic.ts: Identical bytecode size (192 bytes). Instructions match (tail_call optimization implemented).\" >> TODO.md",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-class-inheritance",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/class-inheritance.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts --show-diff",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-object-literal",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/object-literal.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "compare-array-literal",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/array-literal.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts",
+			"args": [],
+			"group": "build"
+		},
+		{
+			"label": "Inspect optional-chaining qbc sizes",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e 'import { parseBytecodeModule } from \"./src/bytecodeReader\"; import fs from \"fs\"; const ts=parseBytecodeModule(fs.readFileSync(\"artifacts/optional-chaining.ts.qbc\")); const wasm=parseBytecodeModule(fs.readFileSync(\"artifacts/optional-chaining.wasm.qbc\")); const tsDbg=ts.func.debug; const wasmDbg=wasm.func.debug; console.log(\"TS atoms\",ts.atoms.length,\"WASM atoms\",wasm.atoms.length); console.log(\"TS bytecodeLen\",ts.func.bytecodeLen,\"WASM\",wasm.func.bytecodeLen); console.log(\"TS cpoolCount\",ts.func.cpoolCount,\"WASM\",wasm.func.cpoolCount); console.log(\"TS hasDebug\",ts.func.hasDebug,\"WASM\",wasm.func.hasDebug); console.log(\"TS pc2lineLen\",tsDbg?.pc2line?.length||0,\"WASM\",wasmDbg?.pc2line?.length||0); console.log(\"TS sourceLen\",tsDbg?.source?.length||0,\"WASM\",wasmDbg?.source?.length||0);'",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Inspect optional-chaining inner func debug",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e 'import { parseBytecodeModule } from \"./src/bytecodeReader\"; import fs from \"fs\"; function inner(mod:any){ const cp=mod.func.cpool||[]; const f=cp.find((e:any)=>e && typeof e===\"object\" && e.tag===12); return f; } const ts=parseBytecodeModule(fs.readFileSync(\"artifacts/optional-chaining.ts.qbc\")); const wasm=parseBytecodeModule(fs.readFileSync(\"artifacts/optional-chaining.wasm.qbc\")); const tsIn=inner(ts); const wasmIn=inner(wasm); console.log(\"TS inner?\",!!tsIn,\"WASM inner?\",!!wasmIn); if(tsIn&&wasmIn){ console.log(\"TS inner bytecodeLen\",tsIn.bytecodeLen,\"WASM\",wasmIn.bytecodeLen); console.log(\"TS inner hasDebug\",tsIn.hasDebug,\"WASM\",wasmIn.hasDebug); console.log(\"TS inner pc2lineLen\",tsIn.debug?.pc2line?.length||0,\"WASM\",wasmIn.debug?.pc2line?.length||0); console.log(\"TS inner filename\",tsIn.debug?.filename, \"WASM\", wasmIn.debug?.filename); }'",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Decode optional-chaining pc2line (outer+inner)",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e 'import { parseBytecodeModule } from \"./src/bytecodeReader\"; import fs from \"fs\";\nconst PC2LINE_BASE=-1, PC2LINE_RANGE=5, PC2LINE_OP_FIRST=1;\nfunction readULEB(data:Uint8Array, st:{i:number}){let r=0,sh=0; while(st.i<data.length){const b=data[st.i++]; r|=(b&0x7f)<<sh; if((b&0x80)===0) break; sh+=7;} return r>>>0;}\nfunction readSLEB(data:Uint8Array, st:{i:number}){let r=0,sh=0,b=0; do{b=data[st.i++]; r|=(b&0x7f)<<sh; sh+=7;}while((b&0x80)!==0); if(sh<32 && (b&0x40)!==0){r|=(~0<<sh);} return r|0;}\nfunction decode(pc2:Uint8Array){const st={i:0}; const initLine=readULEB(pc2,st); const initCol=readULEB(pc2,st); let pc=0,line=initLine,col=initCol; const out:any[]=[{pc,line,col,kind:\"init\"}]; while(st.i<pc2.length){const op=pc2[st.i++]; if(op===0){ if(st.i>=pc2.length){out.push({kind:\"end\"}); break;} const dpc=readULEB(pc2,st); const dl=readSLEB(pc2,st); const dc=readSLEB(pc2,st); pc+=dpc; line+=dl; col+=dc; out.push({pc,line,col,op:\"long\",dpc,dl,dc}); } else { const opVal=op-PC2LINE_OP_FIRST; const dpc=Math.floor(opVal/PC2LINE_RANGE); const dl=(opVal%PC2LINE_RANGE)+PC2LINE_BASE; const dc=readSLEB(pc2,st); pc+=dpc; line+=dl; col+=dc; out.push({pc,line,col,op:\"short\",dpc,dl,dc,raw:op}); } } return out;}\nfunction inner(mod:any){const cp=mod.func.cpool||[]; return cp.find((e:any)=>e && typeof e===\"object\" && e.tag===12);\n}\nfunction show(name:string, pc2:Uint8Array){console.log(`\\n=== ${name} len=${pc2.length} ===`); console.log(Array.from(pc2).map(b=>b.toString(16).padStart(2,\"0\")).join(\" \")); console.log(decode(pc2));}\nconst ts=parseBytecodeModule(fs.readFileSync(\"artifacts/optional-chaining.ts.qbc\"));\nconst wasm=parseBytecodeModule(fs.readFileSync(\"artifacts/optional-chaining.wasm.qbc\"));\nshow(\"TS outer\", ts.func.debug!.pc2line);\nshow(\"WASM outer\", wasm.func.debug!.pc2line);\nshow(\"TS inner\", inner(ts).debug.pc2line);\nshow(\"WASM inner\", inner(wasm).debug.pc2line);\n'",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "debug: scan OP_line_num in class-methods",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import {readFileSync} from 'node:fs'; import {parseBytecodeModule} from './src/bytecodeReader'; const OP=200; function scan(label,qbc){ const m=parseBytecodeModule(readFileSync(qbc)); const bc=m.func.cpool[1].bytecode; const hits=[]; for(let i=0;i<=bc.length-5;i++){ if(bc[i]===OP){ const v=(bc[i+1]|(bc[i+2]<<8)|(bc[i+3]<<16)|(bc[i+4]<<24))>>>0; hits.push({i,sourcePos:v}); } } console.log(label, hits); } scan('TS','artifacts/class-methods/bytecode/class-methods.ts.qbc'); scan('WASM','artifacts/class-methods/bytecode/class-methods.wasm.qbc');\"",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "debug: inspect transpiled whitespace class-methods",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import ts from 'typescript'; import {readFileSync} from 'node:fs'; const file='__tests__/fixtures/class-methods.ts'; const code=readFileSync(file,'utf8'); const out=ts.transpileModule(code,{fileName:file, compilerOptions:{module: ts.ModuleKind.ESNext,target: ts.ScriptTarget.ESNext}}).outputText; const lines=out.split('\\n'); console.log('lineCount', lines.length); lines.forEach((l,i)=>{ if(i>=4 && i<=8){ const vis=l.replace(/ /g,'.'); console.log(i, vis, 'len', l.length); } }); const targetLine=lines[6]; console.log('line6 raw:', JSON.stringify(targetLine)); console.log('indexOf(\"+=\")', targetLine.indexOf('+='), 'indexOf(\"=\")', targetLine.indexOf('=') );\"",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "debug: inspect qbc embedded source (class-methods add)",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import {readFileSync} from 'node:fs'; import {parseBytecodeModule} from './src/bytecodeReader'; function show(label,qbc){ const m=parseBytecodeModule(readFileSync(qbc)); const src=m.func.cpool[1].debug.source as string; const lines=src.split('\\n'); console.log('\\n',label,'embeddedSource lineCount',lines.length); const idxs=[5,6,7]; for(const i of idxs){ const l=lines[i]??''; console.log('line',i, l.replace(/ /g,'.'),'len',l.length); } } show('TS','artifacts/class-methods/bytecode/class-methods.ts.qbc'); show('WASM','artifacts/class-methods/bytecode/class-methods.wasm.qbc');\"",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "debug: max col on line 6 in transpiled output",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import ts from 'typescript'; import {readFileSync} from 'node:fs'; import { DebugInfoBuilder } from './src/compiler/DebugInfoBuilder'; import { GetLineColCache } from './src/compiler/FunctionDef'; const file='__tests__/fixtures/class-methods.ts'; const code=readFileSync(file,'utf8'); const out=ts.transpileModule(code,{fileName:file, compilerOptions:{module: ts.ModuleKind.ESNext,target: ts.ScriptTarget.ESNext}}).outputText; const cache=new GetLineColCache(); cache.ptr=0; cache.lineNum=1; cache.colNum=0; cache.bufStart=0; let maxCol=-1; let maxPos=-1; for(let pos=0; pos<out.length; pos++){ const c2=new GetLineColCache(); Object.assign(c2, cache); // not use cached; do fresh each time\n const [ln, col]=DebugInfoBuilder.getLineColCached(c2,out,pos);\n if(ln===6 && col>maxCol){ maxCol=col; maxPos=pos; }\n }\n console.log({maxCol, maxPos});\"",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "dumpPc2line class-methods wasm",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/dumpPc2line.ts artifacts/class-methods/bytecode/class-methods.wasm.qbc",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "debug: decode pc2line with QuickJS zigzag (class-methods cpool[1])",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"const PC2LINE_BASE=-1,PC2LINE_RANGE=5,PC2LINE_OP_FIRST=1; const readULEB=(data,o)=>{let r=0,s=0; for(;;){const b=data[o.i++]; r|=(b&0x7f)<<s; if(!(b&0x80)) break; s+=7;} return r>>>0;}; const readZigZag=(data,o)=>{const u=readULEB(data,o); return ((u>>>1) ^ -(u&1))|0;}; function decode(name,data){const o={i:0}; let pc=0; let line=readULEB(data,o); let col=readULEB(data,o); console.log('\\n'+name,'init', {pc,line,col}); while(o.i<data.length){const op=data[o.i++]; let dpc,dline; if(op===0){dpc=readULEB(data,o); dline=readZigZag(data,o);} else {const enc=op-PC2LINE_OP_FIRST; dpc=Math.floor(enc/PC2LINE_RANGE); dline=(enc%PC2LINE_RANGE)+PC2LINE_BASE;} const dcol=readZigZag(data,o); pc+=dpc; line+=dline; col+=dcol; console.log({pc,line,col,dpc,dline,dcol,op:'0x'+op.toString(16)}); } }\nconst ts=[0x05,0x04,0x0d,0x08,0x07,0x18,0x1b,0x04,0x07,0x03,0x26,0x01,0x1b,0x15];\nconst wasm=[0x05,0x04,0x0d,0x08,0x07,0x08,0x1b,0x14,0x07,0x05,0x26,0x00,0x1b,0x15];\ndecode('TS',ts); decode('WASM',wasm);\"",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "debug: decode pc2line try-catch-003",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import fs from 'node:fs'; import { parseBytecodeModule } from './src/bytecodeReader'; const PC2LINE_BASE=-1,PC2LINE_RANGE=5,PC2LINE_OP_FIRST=1; function readULEB(data, st){let r=0,sh=0; while(st.i<data.length){const b=data[st.i++]; r|=(b&0x7f)<<sh; if((b&0x80)===0) break; sh+=7;} return r>>>0;} function readSLEB(data, st){let r=0,sh=0,b=0; do{b=data[st.i++]; r|=(b&0x7f)<<sh; sh+=7;}while((b&0x80)!==0); if(sh<32 && (b&0x40)!==0){r|=(~0<<sh);} return r|0;} function decode(pc2){const st={i:0}; const initLine=readULEB(pc2,st); const initCol=readULEB(pc2,st); let pc=0,line=initLine,col=initCol; const out=[{pc,line,col,kind:'init'}]; while(st.i<pc2.length){const op=pc2[st.i++]; if(op===0){const dpc=readULEB(pc2,st); const dl=readSLEB(pc2,st); const dc=readSLEB(pc2,st); pc+=dpc; line+=dl; col+=dc; out.push({pc,line,col,op:'long',dpc,dl,dc}); } else { const opVal=op-PC2LINE_OP_FIRST; const dpc=Math.floor(opVal/PC2LINE_RANGE); const dl=(opVal%PC2LINE_RANGE)+PC2LINE_BASE; const dc=readSLEB(pc2,st); pc+=dpc; line+=dl; col+=dc; out.push({pc,line,col,op:'short',raw:op,dpc,dl,dc}); } } return out; }\nconst ts=parseBytecodeModule(fs.readFileSync('artifacts/try-catch-finally-throw-instanceof-new-003/bytecode/try-catch-finally-throw-instanceof-new-003.ts.qbc')); const wasm=parseBytecodeModule(fs.readFileSync('artifacts/try-catch-finally-throw-instanceof-new-003/bytecode/try-catch-finally-throw-instanceof-new-003.wasm.qbc')); const td=decode(ts.func.debug.pc2line); const wd=decode(wasm.func.debug.pc2line); console.log('TS entries around 110-130', td.filter(e=>e.pc>=108&&e.pc<=130)); console.log('WASM entries around 110-130', wd.filter(e=>e.pc>=108&&e.pc<=130));\"",
+			"args": [],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "debug: typeof node positions",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import ts from 'typescript'; import { readFileSync } from 'node:fs'; const file='__tests__/fixtures/try-catch-finally-throw-instanceof-new-003.ts'; const code=readFileSync(file,'utf8'); const js=ts.transpileModule(code,{fileName:file,compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ESNext}}).outputText; const sf=ts.createSourceFile(file.replace(/\\.ts$/,'.js'), js, ts.ScriptTarget.ESNext, true, ts.ScriptKind.JS);\nlet found:any=null;\nfunction walk(n:ts.Node){ if(n.kind===ts.SyntaxKind.TypeOfExpression){ found=n; } ts.forEachChild(n,walk); }\nwalk(sf);\nif(!found){ console.log('no TypeOfExpression'); process.exit(0);} const n=found as any; const expr=n.expression as ts.Node; console.log({nodeKind: ts.SyntaxKind[n.kind], pos:n.pos, end:n.end, getStart:n.getStart(sf), exprStart:expr.getStart(sf)});\nconsole.log('slice(node.pos..node.end)=', JSON.stringify(sf.text.slice(n.pos,n.end)));\nconsole.log('slice(getStart..end)=', JSON.stringify(sf.text.slice(n.getStart(sf),n.end)));\n\"",
+			"args": [],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "compare try-catch-003",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/try-catch-finally-throw-instanceof-new-003.ts --input-js __tests__/fixtures/try-catch-finally-throw-instanceof-new-003.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts --show-diff",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "debug: opcode values typeof/line_num",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import { Opcode, TempOpcode } from './src/env'; console.log({OP_typeof: Opcode.OP_typeof, OP_push_atom_value: Opcode.OP_push_atom_value, OP_strict_eq: Opcode.OP_strict_eq, OP_line_num: TempOpcode.OP_line_num});\"",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "compare try-catch-003 (DEBUG_TYPEOF_TESTS)",
+			"type": "shell",
+			"command": "DEBUG_TYPEOF_TESTS=1 pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/try-catch-finally-throw-instanceof-new-003.ts --input-js __tests__/fixtures/try-catch-finally-throw-instanceof-new-003.ts --normalize-short --artifacts-dir artifacts",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "debug: strict_eq operatorToken.getStart",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import ts from 'typescript'; import { readFileSync } from 'node:fs'; const file='__tests__/fixtures/try-catch-finally-throw-instanceof-new-003.ts'; const code=readFileSync(file,'utf8'); const js=ts.transpileModule(code,{fileName:file,compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ESNext}}).outputText; const sf=ts.createSourceFile(file.replace(/\\.ts$/,'.js'), js, ts.ScriptTarget.ESNext, true, ts.ScriptKind.TS);\nlet target: ts.BinaryExpression|null=null;\nfunction walk(n:ts.Node){ if(ts.isBinaryExpression(n) && n.operatorToken.kind===ts.SyntaxKind.EqualsEqualsEqualsToken){ target=n; } ts.forEachChild(n,walk);} walk(sf);\nif(!target){ console.log('no strict-eq binary'); process.exit(0);} const opTok=target.operatorToken; console.log({binStart:target.getStart(sf), opTokStart:opTok.getStart(sf), opTokPos: (opTok as any).pos, opTokEnd:(opTok as any).end});\nconsole.log('line slice:', JSON.stringify(sf.text.slice(target.getStart(sf), target.getEnd())));\n\"",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "debug: opcode size push_atom_value",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import { OPCODE_BY_CODE, TempOpcode, TEMP_OPCODE_BY_CODE } from './src/env'; console.log('push_atom_value', OPCODE_BY_CODE[4]); console.log('line_num', TEMP_OPCODE_BY_CODE[TempOpcode.OP_line_num]);\"",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "tmp: wasm string encoding probe",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import { QuickJSLib } from './scripts/QuickJSLib'; import { parseBytecodeModule } from './src/bytecodeReader'; (async()=>{ const src='\\\"use strict\\\";\\nfunction f(){ return \\\"café\\\"; }\\n'; const inst:any=await QuickJSLib.getWasmInstance(); const rel='<eval>'; const bc1=inst.QuickJSBinding.compileScript(src, rel, new inst.StringArray()); const bc2=inst.QuickJSBinding.compileScript(new TextEncoder().encode(src), rel, new inst.StringArray()); const find=(buf:any)=>{ const m=parseBytecodeModule(Buffer.from(buf)); return m.atoms.filter((a:any)=> typeof a==='string' && a.includes('caf')); }; console.log(JSON.stringify({stringArg:find(bc1), bytesArg:find(bc2)}, null, 2)); })().catch(e=>{ console.error(e); process.exit(1); });\"",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "compare test_builtin (now)",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/quickjs-tests/test_builtin.ts --input-js __tests__/fixtures/quickjs-tests/test_builtin.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts --show-diff",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "compare:fixtures all (log)",
+			"type": "shell",
+			"command": "cd /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler && rm -f /tmp/compare_fixtures_full.log && QTS_WASM_STACK_SIZE=8388608 QTS_WASM_INITIAL_MEMORY=268435456 pnpm -s compare:fixtures --include-quickjs-tests --no-fail > /tmp/compare_fixtures_full.log 2>&1; echo EXIT:$? >> /tmp/compare_fixtures_full.log",
+			"isBackground": true,
+			"group": "build"
+		},
+		{
+			"label": "dump test_loop ts.qbc",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/debug/dumpQbc.ts artifacts_test_loop_short6/test_loop.ts.qbc | sed -n '1,220p'",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "dump test_loop ts.qbc (find test_for_in)",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/debug/dumpQbc.ts artifacts_test_loop_short6/test_loop.ts.qbc | rg -n \"function: test_for_in|atom=.*\\(test_for_in\\)\" | head -n 40",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "dump test_loop ts.qbc to file",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/debug/dumpQbc.ts artifacts_test_loop_short6/test_loop.ts.qbc > /tmp/test_loop.ts.dump.txt",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "grep test_for_in in dump",
+			"type": "shell",
+			"command": "grep -n \"test_for_in\" /tmp/test_loop.ts.dump.txt | head -n 40",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "list functions in dump",
+			"type": "shell",
+			"command": "grep -n \"function:\" /tmp/test_loop.ts.dump.txt | head -n 40",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "tail dump file",
+			"type": "shell",
+			"command": "tail -n 40 /tmp/test_loop.ts.dump.txt",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "inspect test_for_in ops around pc320",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import fs from 'node:fs'; import { parseBytecodeModule } from './src/bytecodeReader'; const opList=JSON.parse(fs.readFileSync('opcodes.json','utf8')); const opMap=new Map(opList.map((o:any)=>[o.code,o])); function decode(buf:Uint8Array){ const out:any[]=[]; for(let pc=0; pc<buf.length;){ const code=buf[pc]; const info=opMap.get(code); const size=info?.size??1; out.push({pc, code, name: info?.name??('unknown_'+code), size, bytes: Array.from(buf.slice(pc,pc+size)).map((b)=>b.toString(16).padStart(2,'0')).join(' ')}); pc+=size; } return out; }\nconst ts=parseBytecodeModule(fs.readFileSync('artifacts_test_loop_short6/test_loop.ts.qbc')); const wasm=parseBytecodeModule(fs.readFileSync('artifacts_test_loop_short6/test_loop.wasm.qbc')); const tbc=(ts.func.cpool[4] as any).bytecode as Uint8Array; const wbc=(wasm.func.cpool[4] as any).bytecode as Uint8Array; const td=decode(tbc); const wd=decode(wbc);\nfunction show(label:string, ops:any[]){ console.log('\\n==='+label+'==='); for(const o of ops){ if(o.pc>=315 && o.pc<=335){ console.log(o.pc.toString().padStart(4), o.name.padEnd(18), 'size',o.size,'bytes',o.bytes); } } }\nshow('TS',td); show('WASM',wd);\"",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "print embedded source around line89 (test_for_in)",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import fs from 'node:fs'; import { parseBytecodeModule } from './src/bytecodeReader'; const dec=new TextDecoder('utf-8'); function show(label:string, file:string){ const m=parseBytecodeModule(fs.readFileSync(file)); const f=(m.func.cpool[4] as any); const srcBytes=f.debug?.source as Uint8Array|undefined; if(!srcBytes){ console.log(label,'no source'); return; } const src=dec.decode(srcBytes); const lines=src.split('\\n'); console.log('\\n===',label,'lines',lines.length,'==='); for(let ln=86; ln<=92; ln++){ const l=lines[ln-1]??''; const vis=l.replace(/\\t/g,'\\\\t').replace(/ /g,'·'); console.log(String(ln).padStart(3), vis); } }\nshow('TS','artifacts_test_loop_short6/test_loop.ts.qbc'); show('WASM','artifacts_test_loop_short6/test_loop.wasm.qbc');\"",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "compare test_loop after dot sourcePos",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/quickjs-tests/test_loop.ts --input-js __tests__/fixtures/quickjs-tests/test_loop.ts --disasm --side-by-side --artifacts-dir artifacts_test_loop_short7 --show-diff",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "wc test_loop.ts",
+			"type": "shell",
+			"command": "wc -l __tests__/fixtures/quickjs-tests/test_loop.ts",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "wc fixtures_quickjs/test_loop.ts",
+			"type": "shell",
+			"command": "wc -l __tests__/fixtures_quickjs/test_loop.ts",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "scan pc2line diffs test_loop short7",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e \"import fs from 'node:fs'; import { parseBytecodeModule } from './src/bytecodeReader';\nconst ts=parseBytecodeModule(fs.readFileSync('artifacts_test_loop_short7/test_loop.ts.qbc')); const wasm=parseBytecodeModule(fs.readFileSync('artifacts_test_loop_short7/test_loop.wasm.qbc'));\nfunction firstDiff(a:Uint8Array,b:Uint8Array){const n=Math.min(a.length,b.length); for(let i=0;i<n;i++){ if(a[i]!==b[i]) return i; } return a.length===b.length?-1:n; }\nfunction cmp(label:string,a?:Uint8Array,b?:Uint8Array){ if(!a||!b){ console.log(label,'missing', {a:!!a,b:!!b}); return; } const di=firstDiff(a,b); if(di!==-1 || a.length!==b.length){ console.log(label,{lenA:a.length,lenB:b.length, firstDiff:di}); } }\ncmp('outer', ts.func.debug?.pc2line, wasm.func.debug?.pc2line);\nconst tfs=(ts.func.cpool||[]).map((e:any,i:number)=>({i,e})).filter(x=>x.e && typeof x.e==='object' && x.e.tag===12);\nconst wfs=(wasm.func.cpool||[]).map((e:any,i:number)=>({i,e})).filter(x=>x.e && typeof x.e==='object' && x.e.tag===12);\nconsole.log('funcCount', tfs.length, wfs.length);\nconst wMap=new Map(wfs.map(x=>[x.i,x.e]));\nfor(const {i,e} of tfs){ const w=wMap.get(i); cmp('cpool['+i+']', e.debug?.pc2line, w?.debug?.pc2line); }\n\"",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "debug: dump test_for_in embedded source (ts+wasm)",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e 'import {readFileSync} from \"node:fs\"; import {parseBytecodeModule} from \"./src/bytecodeReader\";\nfunction dump(label,qbc){ const m=parseBytecodeModule(readFileSync(qbc)); const cp=m.func.cpool||[]; const func=cp.find((e)=>e && typeof e===\"object\" && e.tag===12 && e.debug && typeof e.debug.source===\"string\" && (e.debug.source as string).includes(\"function test_for_in\")); if(!func){ console.log(label, \"no test_for_in func in cpool; funcs:\", cp.filter((e)=>e&&e.tag===12&&e.debug&&e.debug.source).length); return; }\n const src=func.debug.source; const lines=src.split(\"\\n\"); console.log(\"\\n===\",label,\"===\", qbc, \"lines=\", lines.length);\n for(let i=50;i<=62;i++){ const l=lines[i]??\"\"; console.log(String(i+1).padStart(3,\" \")+\": \"+l.replace(/\\t/g,\"\\\\t\")); }\n}\ndump(\"TS\",\"artifacts_test_loop_short2/test_loop.ts.qbc\");\ndump(\"WASM\",\"artifacts_test_loop_short2/test_loop.wasm.qbc\");\n'",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "debug: inspect top-level cpool entry shapes (test_loop)",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e 'import {readFileSync} from \"node:fs\"; import {parseBytecodeModule} from \"./src/bytecodeReader\"; const m=parseBytecodeModule(readFileSync(\"artifacts_test_loop_short2/test_loop.ts.qbc\")); const cp=m.func.cpool||[]; console.log(\"cpool length\", cp.length); for(let i=0;i<cp.length;i++){ const e:any=cp[i]; if(!e) { console.log(i, \"<null>\"); continue;} if(typeof e!==\"object\"){ console.log(i, typeof e, e); continue; } const keys=Object.keys(e); console.log(i, \"tag\", e.tag, \"keys\", keys.slice(0,10)); if(e.debug){ console.log(\"  debug keys\", Object.keys(e.debug)); } }'",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "debug: list top-level functions in test_loop.ts.qbc",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e 'import {readFileSync} from \"node:fs\"; import {parseBytecodeModule} from \"./src/bytecodeReader\"; const m=parseBytecodeModule(readFileSync(\"artifacts_test_loop_short2/test_loop.ts.qbc\")); const cp=m.func.cpool||[]; cp.forEach((e:any,i:number)=>{ console.log(i, e.funcName, \"bytecodeLen\", e.bytecodeLen, \"pc2lineLen\", e.debug?.pc2line?.length); });'",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "compare test_function_length (after fix)",
+			"type": "shell",
+			"command": "cd /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler && pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/test_function_length.ts --input-js __tests__/fixtures/test_function_length.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts_tmp_test_function_length_fix --show-diff",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "deepDiff test_function_length (after fix)",
+			"type": "shell",
+			"command": "cd /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler && pnpm -s exec tsx scripts/debug/deepDiffQbc.ts artifacts_tmp_test_function_length_fix/test_function_length.ts.qbc artifacts_tmp_test_function_length_fix/test_function_length.wasm.qbc",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "inspect test_function_length cpool[3] bytecode",
+			"type": "shell",
+			"command": "cd /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler && pnpm -s exec tsx -e \"import fs from 'node:fs'; import { parseBytecodeModule } from './src/bytecodeReader'; const opList=JSON.parse(fs.readFileSync('opcodes.json','utf8')); const opMap=new Map(opList.map((o:any)=>[o.code,o])); const decode=(bytes:Uint8Array)=>{ const out:any[]=[]; for(let pc=0; pc<bytes.length;){ const code=bytes[pc]; const info=opMap.get(code); const size=info?.size??1; out.push({pc, name:info?.name??('op_'+code), size, bytes:Array.from(bytes.slice(pc,pc+size)).map(b=>b.toString(16).padStart(2,'0')).join(' ')}); pc+=size; } return out; }; const ts=parseBytecodeModule(fs.readFileSync('artifacts_tmp_test_function_length_fix/test_function_length.ts.qbc')); const wasm=parseBytecodeModule(fs.readFileSync('artifacts_tmp_test_function_length_fix/test_function_length.wasm.qbc')); const getMain=(mod:any)=> (mod.func.cpool||[]).find((e:any)=>e && typeof e==='object' && e.tag===12 && e.funcName==='test_function_length'); const a=getMain(ts).cpool[3]; const b=getMain(wasm).cpool[3]; console.log('meta', {ts:{argCount:a.argCount,varCount:a.varCount,stackSize:a.stackSize,bytecodeLen:a.bytecodeLen}, wasm:{argCount:b.argCount,varCount:b.varCount,stackSize:b.stackSize,bytecodeLen:b.bytecodeLen}}); console.log('\\nTS ops\\n'+decode(a.bytecode).map(o=>String(o.pc).padStart(3)+' '+o.name.padEnd(20)+' '+o.bytes).join('\\n')); console.log('\\nWASM ops\\n'+decode(b.bytecode).map(o=>String(o.pc).padStart(3)+' '+o.name.padEnd(20)+' '+o.bytes).join('\\n'));\"",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "inspect test_function_length cpool[3] vardefs",
+			"type": "shell",
+			"command": "cd /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler && pnpm -s exec tsx -e \"import fs from 'node:fs'; import { parseBytecodeModule } from './src/bytecodeReader'; const ts=parseBytecodeModule(fs.readFileSync('artifacts_tmp_test_function_length_fix/test_function_length.ts.qbc')); const wasm=parseBytecodeModule(fs.readFileSync('artifacts_tmp_test_function_length_fix/test_function_length.wasm.qbc')); const main=(m:any)=>(m.func.cpool||[]).find((e:any)=>e&&e.tag===12&&e.funcName==='test_function_length'); const a=main(ts).cpool[3]; const b=main(wasm).cpool[3]; const pick=(f:any)=>({varCount:f.varCount, vardefs:(f.vardefs||f.varDefs||f.vars||[]).map((v:any)=>({name:v.name, varName:v.varName, kind:v.varKind, type:v.type, isArg:v.isArg, scopeLevel:v.scopeLevel, flags:v.flags}))}); console.log('TS', JSON.stringify(pick(a),null,2)); console.log('WASM', JSON.stringify(pick(b),null,2));\"",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "compare test_function_length (after param-scope copy fix)",
+			"type": "shell",
+			"command": "cd /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler && pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/test_function_length.ts --input-js __tests__/fixtures/test_function_length.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts_tmp_test_function_length_fix2 --show-diff",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "compare test_function_length (skip stackcheck)",
+			"type": "shell",
+			"command": "cd /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler && SKIP_STACKCHECK=1 pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/test_function_length.ts --input-js __tests__/fixtures/test_function_length.ts --normalize-short --artifacts-dir artifacts_tmp_test_function_length_skip_stack --no-fail",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "compare test_function_length (after put_loc fix)",
+			"type": "shell",
+			"command": "cd /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler && pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/test_function_length.ts --input-js __tests__/fixtures/test_function_length.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts_tmp_test_function_length_fix3 --show-diff",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "compare test_argument_scope fix25",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/test_argument_scope.ts --input-js __tests__/fixtures/test_argument_scope.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts_test_argument_scope_fix25 --show-diff",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "deepDiff test_argument_scope fix25",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/debug/deepDiffQbc.ts artifacts_test_argument_scope_fix25/test_argument_scope.ts.qbc artifacts_test_argument_scope_fix25/test_argument_scope.wasm.qbc | head -n 60",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "inspect diff func fix25 cpool[1][0]",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e 'import fs from \"node:fs\"; import { parseBytecodeModule } from \"./src/bytecodeReader\"; const opList=JSON.parse(fs.readFileSync(\"opcodes.json\",\"utf8\")); const opMap=new Map(opList.map((o:any)=>[o.code,o])); const decode=(bytes:Uint8Array)=>{ const out:any[]=[]; for(let pc=0; pc<bytes.length;){ const code=bytes[pc]; const info=opMap.get(code); const size=info?.size??1; out.push({pc,name:info?.name??(\"op_\"+code), size, bytes:Array.from(bytes.slice(pc,pc+size)).map(b=>b.toString(16).padStart(2,\"0\")).join(\" \")}); pc+=size; } return out; };\nconst ts=parseBytecodeModule(fs.readFileSync(\"artifacts_test_argument_scope_fix25/test_argument_scope.ts.qbc\")); const wasm=parseBytecodeModule(fs.readFileSync(\"artifacts_test_argument_scope_fix25/test_argument_scope.wasm.qbc\"));\nconst a=(ts.func.cpool[1] as any).cpool[0]; const b=(wasm.func.cpool[1] as any).cpool[0];\nconsole.log(\"TS meta\", {bytecodeLen:a.bytecodeLen, closureVarCount:a.closureVarCount, argCount:a.argCount, varCount:a.varCount});\nconsole.log(\"WASM meta\", {bytecodeLen:b.bytecodeLen, closureVarCount:b.closureVarCount, argCount:b.argCount, varCount:b.varCount});\nconsole.log(\"TS closureVars\", a.closureVars);\nconsole.log(\"WASM closureVars\", b.closureVars);\nconsole.log(\"\\nTS first 40 ops\\n\"+decode(a.bytecode).slice(0,40).map(o=>String(o.pc).padStart(4)+\" \"+o.name.padEnd(18)+\" \"+o.bytes).join(\"\\n\"));\nconsole.log(\"\\nWASM first 40 ops\\n\"+decode(b.bytecode).slice(0,40).map(o=>String(o.pc).padStart(4)+\" \"+o.name.padEnd(18)+\" \"+o.bytes).join(\"\\n\"));\n'",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "debug: map closure3 cpool[5].cpool[1]",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e 'import fs from \"node:fs\"; import { parseBytecodeModule } from \"./src/bytecodeReader\";\nconst tsMod=parseBytecodeModule(fs.readFileSync(\"artifacts_tmp_test_closure3_repro/test_closure3.ts.qbc\")) as any;\nconst wasmMod=parseBytecodeModule(fs.readFileSync(\"artifacts_tmp_test_closure3_repro/test_closure3.wasm.qbc\")) as any;\nfunction summarize(label:string, mod:any){\n  const root=mod.func;\n  const cp=root.cpool||[];\n  console.log(\"\\n===\"+label+\"===\");\n  console.log(\"root.cpool.length\", cp.length);\n  const e5=cp[5];\n  console.log(\"cpool[5]\", {tag: e5?.tag, funcName: e5?.funcName, cpoolLen: e5?.cpool?.length, varCount: e5?.varCount});\n  const e51=e5?.cpool?.[1];\n  console.log(\"cpool[5].cpool[1]\", {tag: e51?.tag, funcName: e51?.funcName, cpoolLen: e51?.cpool?.length, varCount: e51?.varCount});\n  const varDefs=(e51?.varDefs ?? e51?.vardefs ?? e51?.var_defs ?? e51?.vars) as any[]|undefined;\n  if(varDefs==null){\n    console.log(\"no varDefs keys\", e51?Object.keys(e51):null);\n    return;\n  }\n  console.log(\"varDefs.length\", varDefs.length);\n  for(let i=0;i<Math.min(10,varDefs.length);i++){\n    const vd=varDefs[i];\n    console.log(\" varDef[\"+i+\"]\", {name: vd?.name ?? vd?.varName, scopeLevel: vd?.scopeLevel, scopeNextPlus1: vd?.scopeNextPlus1, flags: vd?.flags, kind: vd?.varKind ?? vd?.kind, isArg: vd?.isArg});\n  }\n}\n\nsummarize(\"TS\", tsMod);\nsummarize(\"WASM\", wasmMod);\n'",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "debug: inspect closure3 varDefs patterns",
+			"type": "shell",
+			"command": "pnpm -s exec tsx -e 'import fs from \"node:fs\"; import { parseBytecodeModule } from \"./src/bytecodeReader\";\nconst tsMod=parseBytecodeModule(fs.readFileSync(\"artifacts_tmp_test_closure3_repro/test_closure3.ts.qbc\")) as any;\nconst wasmMod=parseBytecodeModule(fs.readFileSync(\"artifacts_tmp_test_closure3_repro/test_closure3.wasm.qbc\")) as any;\n\nfunction getVarDefs(f:any): any[] { return (f?.varDefs ?? f?.vardefs ?? f?.vars ?? f?.var_defs ?? []) as any[]; }\nfunction dumpFunc(label:string, f:any, prefix:string){\n  if(!f||typeof f!==\"object\") return;\n  const tag=f.tag;\n  if(tag!==12) return;\n  const vds=getVarDefs(f);\n  console.log(prefix+label, {funcName:f.funcName, argCount:f.argCount, varCount:f.varCount, vdsLen:vds.length});\n  for(let i=0;i<vds.length;i++){\n    const vd=vds[i];\n    console.log(prefix+\"  vd[\"+i+\"]\", {name: vd?.name ?? vd?.varName, scopeLevel: vd?.scopeLevel, scopeNextPlus1: vd?.scopeNextPlus1, flags: vd?.flags});\n  }\n}\n\nfunction walk(label:string, mod:any){\n  const root=mod.func;\n  const cp=root.cpool||[];\n  for(let i=0;i<cp.length;i++){\n    const f=cp[i];\n    if(f && typeof f===\"object\" && f.tag===12){\n      dumpFunc(label, f, `root.cpool[${i}] `);\n      const sub=f.cpool||[];\n      for(let j=0;j<sub.length;j++){\n        const sf=sub[j];\n        if(sf && typeof sf===\"object\" && sf.tag===12){\n          dumpFunc(label, sf, `  root.cpool[${i}].cpool[${j}] `);\n        }\n      }\n    }\n  }\n}\n\nconsole.log(\"\\n--- TS ---\");\nwalk(\"TS\", tsMod);\nconsole.log(\"\\n--- WASM ---\");\nwalk(\"WASM\", wasmMod);\n'",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "compare test_closure3 (after scopeNext fix)",
+			"type": "shell",
+			"command": "pnpm -s exec tsx scripts/compareWithWasm.ts __tests__/fixtures/test_closure3.ts --input-js __tests__/fixtures/test_closure3.ts --disasm --normalize-short --side-by-side --artifacts-dir artifacts_tmp_test_closure3_fix --show-diff",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "tail compare_fixtures_full.log",
+			"type": "shell",
+			"command": "tail -n 60 /tmp/compare_fixtures_full.log",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "check compare_fixtures_full.log progress",
+			"type": "shell",
+			"command": "tail -n 5 /tmp/compare_fixtures_full.log && echo '---' && grep -n 'EXIT:' /tmp/compare_fixtures_full.log | tail -n 3",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "check compare_fixtures_full.log for completion",
+			"type": "shell",
+			"command": "grep -n 'Identical' /tmp/compare_fixtures_full.log | tail -n 5 && grep -n 'Mismatched' /tmp/compare_fixtures_full.log | tail -n 5 && grep -n 'EXIT:' /tmp/compare_fixtures_full.log | tail -n 5",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "check compare fixtures totals",
+			"type": "shell",
+			"command": "grep -n '^Totals:' /tmp/compare_fixtures_full.log | tail -n 5 || true; grep -n '^Summary:' /tmp/compare_fixtures_full.log | tail -n 3 || true; grep -n '^EXIT:' /tmp/compare_fixtures_full.log | tail -n 3 || true",
+			"isBackground": false,
+			"group": "build"
+		}
+	]
+}

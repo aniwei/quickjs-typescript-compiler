@@ -1,0 +1,376 @@
+QuickJS Opcodes: [
+  { name: 'invalid', code: 0, nPop: 0, nPush: 0, fmt: 0, size: 1 },
+  { name: 'push_i32', code: 1, nPop: 0, nPush: 1, fmt: 20, size: 5 },
+  { name: 'push_const', code: 2, nPop: 0, nPush: 1, fmt: 21, size: 5 },
+  { name: 'fclosure', code: 3, nPop: 0, nPush: 1, fmt: 21, size: 5 },
+  {
+    name: 'push_atom_value',
+    code: 4,
+    nPop: 0,
+    nPush: 1,
+    fmt: 23,
+    size: 5
+  },
+  {
+    name: 'private_symbol',
+    code: 5,
+    nPop: 0,
+    nPush: 1,
+    fmt: 23,
+    size: 5
+  },
+  { name: 'undefined', code: 6, nPop: 0, nPush: 1, fmt: 0, size: 1 },
+  { name: 'null', code: 7, nPop: 0, nPush: 1, fmt: 0, size: 1 },
+  { name: 'push_this', code: 8, nPop: 0, nPush: 1, fmt: 0, size: 1 },
+  { name: 'push_false', code: 9, nPop: 0, nPush: 1, fmt: 0, size: 1 },
+  { name: 'push_true', code: 10, nPop: 0, nPush: 1, fmt: 0, size: 1 },
+  { name: 'object', code: 11, nPop: 0, nPush: 1, fmt: 0, size: 1 },
+  {
+    name: 'special_object',
+    code: 12,
+    nPop: 0,
+    nPush: 1,
+    fmt: 5,
+    size: 2
+  },
+  { name: 'rest', code: 13, nPop: 0, nPush: 1, fmt: 10, size: 3 },
+  { name: 'drop', code: 14, nPop: 1, nPush: 0, fmt: 0, size: 1 },
+  { name: 'nip', code: 15, nPop: 2, nPush: 1, fmt: 0, size: 1 },
+  { name: 'nip1', code: 16, nPop: 3, nPush: 2, fmt: 0, size: 1 },
+  { name: 'dup', code: 17, nPop: 1, nPush: 2, fmt: 0, size: 1 },
+  { name: 'dup1', code: 18, nPop: 2, nPush: 3, fmt: 0, size: 1 },
+  { name: 'dup2', code: 19, nPop: 2, nPush: 4, fmt: 0, size: 1 },
+  { name: 'dup3', code: 20, nPop: 3, nPush: 6, fmt: 0, size: 1 },
+  { name: 'insert2', code: 21, nPop: 2, nPush: 3, fmt: 0, size: 1 },
+  { name: 'insert3', code: 22, nPop: 3, nPush: 4, fmt: 0, size: 1 },
+  { name: 'insert4', code: 23, nPop: 4, nPush: 5, fmt: 0, size: 1 },
+  { name: 'perm3', code: 24, nPop: 3, nPush: 3, fmt: 0, size: 1 },
+  { name: 'perm4', code: 25, nPop: 4, nPush: 4, fmt: 0, size: 1 },
+  { name: 'perm5', code: 26, nPop: 5, nPush: 5, fmt: 0, size: 1 },
+  { name: 'swap', code: 27, nPop: 2, nPush: 2, fmt: 0, size: 1 },
+  { name: 'swap2', code: 28, nPop: 4, nPush: 4, fmt: 0, size: 1 },
+  { name: 'rot3l', code: 29, nPop: 3, nPush: 3, fmt: 0, size: 1 },
+  { name: 'rot3r', code: 30, nPop: 3, nPush: 3, fmt: 0, size: 1 },
+  { name: 'rot4l', code: 31, nPop: 4, nPush: 4, fmt: 0, size: 1 },
+  { name: 'rot5l', code: 32, nPop: 5, nPush: 5, fmt: 0, size: 1 },
+  {
+    name: 'call_constructor',
+    code: 33,
+    nPop: 2,
+    nPush: 1,
+    fmt: 13,
+    size: 3
+  },
+  { name: 'call', code: 34, nPop: 1, nPush: 1, fmt: 13, size: 3 },
+  { name: 'tail_call', code: 35, nPop: 1, nPush: 0, fmt: 13, size: 3 },
+  {
+    name: 'call_method',
+    code: 36,
+    nPop: 2,
+    nPush: 1,
+    fmt: 13,
+    size: 3
+  },
+  {
+    name: 'tail_call_method',
+    code: 37,
+    nPop: 2,
+    nPush: 0,
+    fmt: 13,
+    size: 3
+  },
+  { name: 'array_from', code: 38, nPop: 0, nPush: 1, fmt: 13, size: 3 },
+  { name: 'apply', code: 39, nPop: 3, nPush: 1, fmt: 10, size: 3 },
+  { name: 'return', code: 40, nPop: 1, nPush: 0, fmt: 0, size: 1 },
+  {
+    name: 'return_undef',
+    code: 41,
+    nPop: 0,
+    nPush: 0,
+    fmt: 0,
+    size: 1
+  },
+  {
+    name: 'check_ctor_return',
+    code: 42,
+    nPop: 1,
+    nPush: 2,
+    fmt: 0,
+    size: 1
+  },
+  { name: 'check_ctor', code: 43, nPop: 0, nPush: 0, fmt: 0, size: 1 },
+  { name: 'init_ctor', code: 44, nPop: 0, nPush: 1, fmt: 0, size: 1 },
+  { name: 'check_brand', code: 45, nPop: 2, nPush: 2, fmt: 0, size: 1 },
+  { name: 'add_brand', code: 46, nPop: 2, nPush: 0, fmt: 0, size: 1 },
+  {
+    name: 'return_async',
+    code: 47,
+    nPop: 1,
+    nPush: 0,
+    fmt: 0,
+    size: 1
+  },
+  { name: 'throw', code: 48, nPop: 1, nPush: 0, fmt: 0, size: 1 },
+  {
+    name: 'throw_error',
+    code: 49,
+    nPop: 0,
+    nPush: 0,
+    fmt: 24,
+    size: 6
+  },
+  { name: 'eval', code: 50, nPop: 1, nPush: 1, fmt: 15, size: 5 },
+  { name: 'apply_eval', code: 51, nPop: 2, nPush: 1, fmt: 10, size: 3 },
+  { name: 'regexp', code: 52, nPop: 2, nPush: 1, fmt: 0, size: 1 },
+  { name: 'get_super', code: 53, nPop: 1, nPush: 1, fmt: 0, size: 1 },
+  { name: 'import', code: 54, nPop: 2, nPush: 1, fmt: 0, size: 1 },
+  { name: 'check_var', code: 55, nPop: 0, nPush: 1, fmt: 23, size: 5 },
+  {
+    name: 'get_var_undef',
+    code: 56,
+    nPop: 0,
+    nPush: 1,
+    fmt: 23,
+    size: 5
+  },
+  { name: 'get_var', code: 57, nPop: 0, nPush: 1, fmt: 23, size: 5 },
+  { name: 'put_var', code: 58, nPop: 1, nPush: 0, fmt: 23, size: 5 },
+  {
+    name: 'put_var_init',
+    code: 59,
+    nPop: 1,
+    nPush: 0,
+    fmt: 23,
+    size: 5
+  },
+  {
+    name: 'put_var_strict',
+    code: 60,
+    nPop: 2,
+    nPush: 0,
+    fmt: 23,
+    size: 5
+  },
+  {
+    name: 'get_ref_value',
+    code: 61,
+    nPop: 2,
+    nPush: 3,
+    fmt: 0,
+    size: 1
+  },
+  {
+    name: 'put_ref_value',
+    code: 62,
+    nPop: 3,
+    nPush: 0,
+    fmt: 0,
+    size: 1
+  },
+  { name: 'define_var', code: 63, nPop: 0, nPush: 0, fmt: 24, size: 6 },
+  {
+    name: 'check_define_var',
+    code: 64,
+    nPop: 0,
+    nPush: 0,
+    fmt: 24,
+    size: 6
+  },
+  {
+    name: 'define_func',
+    code: 65,
+    nPop: 1,
+    nPush: 0,
+    fmt: 24,
+    size: 6
+  },
+  { name: 'get_field', code: 66, nPop: 1, nPush: 1, fmt: 23, size: 5 },
+  { name: 'get_field2', code: 67, nPop: 1, nPush: 2, fmt: 23, size: 5 },
+  { name: 'put_field', code: 68, nPop: 2, nPush: 0, fmt: 23, size: 5 },
+  {
+    name: 'get_private_field',
+    code: 69,
+    nPop: 2,
+    nPush: 1,
+    fmt: 0,
+    size: 1
+  },
+  {
+    name: 'put_private_field',
+    code: 70,
+    nPop: 3,
+    nPush: 0,
+    fmt: 0,
+    size: 1
+  },
+  {
+    name: 'define_private_field',
+    code: 71,
+    nPop: 3,
+    nPush: 1,
+    fmt: 0,
+    size: 1
+  },
+  {
+    name: 'get_array_el',
+    code: 72,
+    nPop: 2,
+    nPush: 1,
+    fmt: 0,
+    size: 1
+  },
+  {
+    name: 'get_array_el2',
+    code: 73,
+    nPop: 2,
+    nPush: 2,
+    fmt: 0,
+    size: 1
+  },
+  {
+    name: 'get_array_el3',
+    code: 74,
+    nPop: 2,
+    nPush: 3,
+    fmt: 0,
+    size: 1
+  },
+  {
+    name: 'put_array_el',
+    code: 75,
+    nPop: 3,
+    nPush: 0,
+    fmt: 0,
+    size: 1
+  },
+  {
+    name: 'get_super_value',
+    code: 76,
+    nPop: 3,
+    nPush: 1,
+    fmt: 0,
+    size: 1
+  },
+  {
+    name: 'put_super_value',
+    code: 77,
+    nPop: 4,
+    nPush: 0,
+    fmt: 0,
+    size: 1
+  },
+  {
+    name: 'define_field',
+    code: 78,
+    nPop: 2,
+    nPush: 1,
+    fmt: 23,
+    size: 5
+  },
+  { name: 'set_name', code: 79, nPop: 1, nPush: 1, fmt: 23, size: 5 },
+  {
+    name: 'set_name_computed',
+    code: 80,
+    nPop: 2,
+    nPush: 2,
+    fmt: 0,
+    size: 1
+  },
+  { name: 'set_proto', code: 81, nPop: 2, nPush: 1, fmt: 0, size: 1 },
+  {
+    name: 'set_home_object',
+    code: 82,
+    nPop: 2,
+    nPush: 2,
+    fmt: 0,
+    size: 1
+  },
+  {
+    name: 'define_array_el',
+    code: 83,
+    nPop: 3,
+    nPush: 2,
+    fmt: 0,
+    size: 1
+  },
+  { name: 'append', code: 84, nPop: 3, nPush: 2, fmt: 0, size: 1 },
+  {
+    name: 'copy_data_properties',
+    code: 85,
+    nPop: 3,
+    nPush: 3,
+    fmt: 5,
+    size: 2
+  },
+  {
+    name: 'define_method',
+    code: 86,
+    nPop: 2,
+    nPush: 1,
+    fmt: 24,
+    size: 6
+  },
+  {
+    name: 'define_method_computed',
+    code: 87,
+    nPop: 3,
+    nPush: 1,
+    fmt: 5,
+    size: 2
+  },
+  {
+    name: 'define_class',
+    code: 88,
+    nPop: 2,
+    nPush: 2,
+    fmt: 24,
+    size: 6
+  },
+  {
+    name: 'define_class_computed',
+    code: 89,
+    nPop: 3,
+    nPush: 3,
+    fmt: 24,
+    size: 6
+  },
+  { name: 'get_loc', code: 90, nPop: 0, nPush: 1, fmt: 16, size: 3 },
+  { name: 'put_loc', code: 91, nPop: 1, nPush: 0, fmt: 16, size: 3 },
+  { name: 'set_loc', code: 92, nPop: 1, nPush: 1, fmt: 16, size: 3 },
+  { name: 'get_arg', code: 93, nPop: 0, nPush: 1, fmt: 17, size: 3 },
+  { name: 'put_arg', code: 94, nPop: 1, nPush: 0, fmt: 17, size: 3 },
+  { name: 'set_arg', code: 95, nPop: 1, nPush: 1, fmt: 17, size: 3 },
+  {
+    name: 'get_var_ref',
+    code: 96,
+    nPop: 0,
+    nPush: 1,
+    fmt: 18,
+    size: 3
+  },
+  {
+    name: 'put_var_ref',
+    code: 97,
+    nPop: 1,
+    nPush: 0,
+    fmt: 18,
+    size: 3
+  },
+  {
+    name: 'set_var_ref',
+    code: 98,
+    nPop: 1,
+    nPush: 1,
+    fmt: 18,
+    size: 3
+  },
+  {
+    name: 'set_loc_uninitialized',
+    code: 99,
+    nPop: 0,
+    nPush: 0,
+    fmt: 16,
+    size: 3
+  },
+  ... 152 more items
+]
