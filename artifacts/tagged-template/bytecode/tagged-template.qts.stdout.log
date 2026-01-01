@@ -1,0 +1,78 @@
+__tests__/fixtures/tagged-template.js:2:1: function: tag
+  args: strings values
+  stack_size: 2
+  opcodes:
+        rest 1
+        put_arg1 1: values
+        get_arg0 0: strings
+        get_arg1 1: values
+        array_from 2
+        return
+
+__tests__/fixtures/tagged-template.js:6:5: function: <null>
+  args: strings values
+  stack_size: 2
+  opcodes:
+        rest 1
+        put_arg1 1: values
+        get_arg0 0: strings
+        get_arg1 1: values
+        array_from 2
+        return
+
+__tests__/fixtures/tagged-template.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var tag,64
+        check_define_var obj,128
+        check_define_var a,128
+        check_define_var r1,128
+        check_define_var r2,128
+        check_define_var r3,128
+        fclosure8 0: [bytecode tag]
+        define_func tag,0
+        define_var obj,128
+        define_var a,128
+        define_var r1,128
+        define_var r2,128
+        define_var r3,128
+        object
+        fclosure8 1: [bytecode <null>]
+        define_method tag,4
+        put_var_init obj
+        push_1 1
+        put_var_init a
+        get_var tag
+        push_const8 2: [ 0: "x", 1: "y" ]
+        get_var a
+        call2 2
+        put_var_init r1
+        get_var obj
+        get_field2 tag
+        push_const8 3: [ 0: "m", 1: "n" ]
+        get_var a
+        call_method 2
+        put_var_init r2
+        get_var obj
+        push_atom_value tag
+        get_array_el2
+        push_const8 4: [ 0: "p", 1: "q" ]
+        get_var a
+        call_method 2
+        put_var_init r3
+        get_var r1
+        drop
+        undefined
+        put_loc0 0: "<ret>"
+        get_var r2
+        drop
+        undefined
+        put_loc0 0: "<ret>"
+        get_var r3
+        drop
+        undefined
+        set_loc0 0: "<ret>"
+        return
+

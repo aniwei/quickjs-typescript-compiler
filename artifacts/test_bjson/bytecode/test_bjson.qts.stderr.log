@@ -1,0 +1,3897 @@
+[QTS:SCOPE] push: level=1 first_var=-1
+[QTS:SCOPE] enter: idx=1 is_body=0
+[QTS:EMIT] pos=0 op=182 @parser.c:1799
+[QTS:EMIT] pos=1 u16=0x0001 (1) @parser.c:1772
+[QTS:SCOPE] push: level=1 first_var=-1
+[QTS:SCOPE] enter: idx=1 is_body=0
+[QTS:EMIT] pos=0 op=182 @parser.c:1799
+[QTS:EMIT] pos=1 u16=0x0001 (1) @parser.c:1772
+[QTS:SCOPE] push: level=2 first_var=-1
+[QTS:SCOPE] enter: idx=2 is_body=0
+[QTS:EMIT] pos=3 op=182 @parser.c:1799
+[QTS:EMIT] pos=4 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=6 op=200 @parser.c:1786
+[QTS:EMIT] pos=7 u32=0x000000f2 (242) @parser.c:1788
+[QTS:EMIT] pos=11 op=186 @parser.c:1799
+[QTS:EMIT] pos=12 u32=0x0000004f (79) @parser.c:1777
+[QTS:EMIT] pos=16 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=18 op=200 @parser.c:1786
+[QTS:EMIT] pos=19 u32=0x000000fb (251) @parser.c:1788
+[QTS:EMIT] pos=23 op=66 @parser.c:1799
+[QTS:EMIT] pos=24 atom=48 @parser.c:1807
+[QTS:EMIT] pos=28 op=1 @parser.c:1799
+[QTS:EMIT] pos=29 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=33 op=200 @parser.c:1786
+[QTS:EMIT] pos=34 u32=0x00000103 (259) @parser.c:1788
+[QTS:EMIT] pos=38 op=171 @parser.c:1799
+[QTS:EMIT] pos=39 op=108 @parser.c:1799
+[QTS:EMIT] pos=40 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=44 op=200 @parser.c:1786
+[QTS:EMIT] pos=45 u32=0x00000111 (273) @parser.c:1788
+[QTS:EMIT] pos=49 op=186 @parser.c:1799
+[QTS:EMIT] pos=50 u32=0x000001dc (476) @parser.c:1777
+[QTS:EMIT] pos=54 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=49 op=189 @parser.c:1799
+[QTS:EMIT] pos=50 atom=476 @parser.c:1807
+[QTS:EMIT] pos=54 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=58 u16=0x0002 (2) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=2 atom=476 label=1
+[QTS:EMIT] pos=60 op=10 @parser.c:1799
+[QTS:EMIT] pos=61 op=184 @parser.c:1799
+[QTS:EMIT] pos=62 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=66 op=22 @parser.c:1799
+[QTS:EMIT] pos=67 op=62 @parser.c:1799
+[QTS:EMIT] pos=68 op=14 @parser.c:1799
+[QTS:EMIT] pos=69 op=184 @parser.c:1799
+[QTS:EMIT] pos=70 u32=0x00000000 (0) @parser.c:1777
+[QTS:SCOPE] leave: idx=2
+[QTS:SCOPE] pop: level=2
+[QTS:EMIT] pos=74 op=183 @parser.c:1799
+[QTS:EMIT] pos=75 u16=0x0002 (2) @parser.c:1772
+[QTS:SCOPE] push: level=3 first_var=-1
+[QTS:SCOPE] enter: idx=3 is_body=0
+[QTS:EMIT] pos=77 op=182 @parser.c:1799
+[QTS:EMIT] pos=78 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=80 op=200 @parser.c:1786
+[QTS:EMIT] pos=81 u32=0x0000012a (298) @parser.c:1788
+[QTS:EMIT] pos=85 op=186 @parser.c:1799
+[QTS:EMIT] pos=86 u32=0x000001db (475) @parser.c:1777
+[QTS:EMIT] pos=90 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=92 op=200 @parser.c:1786
+[QTS:EMIT] pos=93 u32=0x00000135 (309) @parser.c:1788
+[QTS:EMIT] pos=97 op=186 @parser.c:1799
+[QTS:EMIT] pos=98 u32=0x000001dc (476) @parser.c:1777
+[QTS:EMIT] pos=102 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=104 op=200 @parser.c:1786
+[QTS:EMIT] pos=105 u32=0x00000131 (305) @parser.c:1788
+[QTS:EMIT] pos=109 op=173 @parser.c:1799
+[QTS:EMIT] pos=110 op=108 @parser.c:1799
+[QTS:EMIT] pos=111 u32=0x00000002 (2) @parser.c:1777
+[QTS:EMIT] pos=115 op=200 @parser.c:1786
+[QTS:EMIT] pos=116 u32=0x00000147 (327) @parser.c:1788
+[QTS:EMIT] pos=120 op=41 @parser.c:1799
+[QTS:EMIT] pos=121 op=184 @parser.c:1799
+[QTS:EMIT] pos=122 u32=0x00000002 (2) @parser.c:1777
+[QTS:SCOPE] leave: idx=3
+[QTS:SCOPE] pop: level=3
+[QTS:EMIT] pos=126 op=183 @parser.c:1799
+[QTS:EMIT] pos=127 u16=0x0003 (3) @parser.c:1772
+[QTS:SCOPE] push: level=4 first_var=-1
+[QTS:SCOPE] enter: idx=4 is_body=0
+[QTS:EMIT] pos=129 op=182 @parser.c:1799
+[QTS:EMIT] pos=130 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=132 op=200 @parser.c:1786
+[QTS:EMIT] pos=133 u32=0x00000157 (343) @parser.c:1788
+[QTS:EMIT] pos=137 op=186 @parser.c:1799
+[QTS:EMIT] pos=138 u32=0x000001db (475) @parser.c:1777
+[QTS:EMIT] pos=142 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=144 op=7 @parser.c:1799
+[QTS:EMIT] pos=145 op=200 @parser.c:1786
+[QTS:EMIT] pos=146 u32=0x0000015e (350) @parser.c:1788
+[QTS:EMIT] pos=150 op=174 @parser.c:1799
+[QTS:EMIT] pos=151 op=17 @parser.c:1799
+[QTS:EMIT] pos=152 op=108 @parser.c:1799
+[QTS:EMIT] pos=153 u32=0x00000003 (3) @parser.c:1777
+[QTS:EMIT] pos=157 op=14 @parser.c:1799
+[QTS:EMIT] pos=158 op=200 @parser.c:1786
+[QTS:EMIT] pos=159 u32=0x0000016a (362) @parser.c:1788
+[QTS:EMIT] pos=163 op=186 @parser.c:1799
+[QTS:EMIT] pos=164 u32=0x000001dc (476) @parser.c:1777
+[QTS:EMIT] pos=168 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=170 op=7 @parser.c:1799
+[QTS:EMIT] pos=171 op=200 @parser.c:1786
+[QTS:EMIT] pos=172 u32=0x00000173 (371) @parser.c:1788
+[QTS:EMIT] pos=176 op=174 @parser.c:1799
+[QTS:EMIT] pos=177 op=17 @parser.c:1799
+[QTS:EMIT] pos=178 op=108 @parser.c:1799
+[QTS:EMIT] pos=179 u32=0x00000003 (3) @parser.c:1777
+[QTS:EMIT] pos=183 op=14 @parser.c:1799
+[QTS:EMIT] pos=184 op=200 @parser.c:1786
+[QTS:EMIT] pos=185 u32=0x0000018e (398) @parser.c:1788
+[QTS:EMIT] pos=189 op=186 @parser.c:1799
+[QTS:EMIT] pos=190 u32=0x000001db (475) @parser.c:1777
+[QTS:EMIT] pos=194 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=196 op=153 @parser.c:1799
+[QTS:EMIT] pos=197 op=4 @parser.c:1799
+[QTS:EMIT] pos=198 u32=0x0000004b (75) @parser.c:1777
+[QTS:EMIT] pos=202 op=200 @parser.c:1786
+[QTS:EMIT] pos=203 u32=0x00000195 (405) @parser.c:1788
+[QTS:EMIT] pos=207 op=171 @parser.c:1799
+[QTS:EMIT] pos=208 op=17 @parser.c:1799
+[QTS:EMIT] pos=209 op=108 @parser.c:1799
+[QTS:EMIT] pos=210 u32=0x00000003 (3) @parser.c:1777
+[QTS:EMIT] pos=214 op=14 @parser.c:1799
+[QTS:EMIT] pos=215 op=200 @parser.c:1786
+[QTS:EMIT] pos=216 u32=0x000001ab (427) @parser.c:1788
+[QTS:EMIT] pos=220 op=186 @parser.c:1799
+[QTS:EMIT] pos=221 u32=0x000001dc (476) @parser.c:1777
+[QTS:EMIT] pos=225 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=227 op=153 @parser.c:1799
+[QTS:EMIT] pos=228 op=4 @parser.c:1799
+[QTS:EMIT] pos=229 u32=0x0000004b (75) @parser.c:1777
+[QTS:EMIT] pos=233 op=200 @parser.c:1786
+[QTS:EMIT] pos=234 u32=0x000001b4 (436) @parser.c:1788
+[QTS:EMIT] pos=238 op=171 @parser.c:1799
+[QTS:EMIT] pos=239 op=17 @parser.c:1799
+[QTS:EMIT] pos=240 op=108 @parser.c:1799
+[QTS:EMIT] pos=241 u32=0x00000003 (3) @parser.c:1777
+[QTS:EMIT] pos=245 op=14 @parser.c:1799
+[QTS:EMIT] pos=246 op=200 @parser.c:1786
+[QTS:EMIT] pos=247 u32=0x000001cb (459) @parser.c:1788
+[QTS:EMIT] pos=251 op=186 @parser.c:1799
+[QTS:EMIT] pos=252 u32=0x000001db (475) @parser.c:1777
+[QTS:EMIT] pos=256 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=258 op=200 @parser.c:1786
+[QTS:EMIT] pos=259 u32=0x000001d1 (465) @parser.c:1788
+[QTS:EMIT] pos=263 op=66 @parser.c:1799
+[QTS:EMIT] pos=264 atom=57 @parser.c:1807
+[QTS:EMIT] pos=268 op=200 @parser.c:1786
+[QTS:EMIT] pos=269 u32=0x000001da (474) @parser.c:1788
+[QTS:EMIT] pos=273 op=36 @parser.c:1799
+[QTS:EMIT] pos=274 u16=0x0000 (0) @parser.c:1772
+[QTS:EMIT] pos=276 op=200 @parser.c:1786
+[QTS:EMIT] pos=277 u32=0x000001e1 (481) @parser.c:1788
+[QTS:EMIT] pos=281 op=186 @parser.c:1799
+[QTS:EMIT] pos=282 u32=0x000001dc (476) @parser.c:1777
+[QTS:EMIT] pos=286 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=288 op=200 @parser.c:1786
+[QTS:EMIT] pos=289 u32=0x000001e9 (489) @parser.c:1788
+[QTS:EMIT] pos=293 op=66 @parser.c:1799
+[QTS:EMIT] pos=294 atom=57 @parser.c:1807
+[QTS:EMIT] pos=298 op=200 @parser.c:1786
+[QTS:EMIT] pos=299 u32=0x000001f2 (498) @parser.c:1788
+[QTS:EMIT] pos=303 op=36 @parser.c:1799
+[QTS:EMIT] pos=304 u16=0x0000 (0) @parser.c:1772
+[QTS:EMIT] pos=306 op=200 @parser.c:1786
+[QTS:EMIT] pos=307 u32=0x000001dd (477) @parser.c:1788
+[QTS:EMIT] pos=311 op=173 @parser.c:1799
+[QTS:EMIT] pos=312 op=184 @parser.c:1799
+[QTS:EMIT] pos=313 u32=0x00000003 (3) @parser.c:1777
+[QTS:EMIT] pos=317 op=108 @parser.c:1799
+[QTS:EMIT] pos=318 u32=0x00000004 (4) @parser.c:1777
+[QTS:EMIT] pos=322 op=200 @parser.c:1786
+[QTS:EMIT] pos=323 u32=0x000001fe (510) @parser.c:1788
+[QTS:EMIT] pos=327 op=41 @parser.c:1799
+[QTS:EMIT] pos=328 op=184 @parser.c:1799
+[QTS:EMIT] pos=329 u32=0x00000004 (4) @parser.c:1777
+[QTS:SCOPE] leave: idx=4
+[QTS:SCOPE] pop: level=4
+[QTS:EMIT] pos=333 op=183 @parser.c:1799
+[QTS:EMIT] pos=334 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=336 op=200 @parser.c:1786
+[QTS:EMIT] pos=337 u32=0x00000210 (528) @parser.c:1788
+[QTS:EMIT] pos=341 op=186 @parser.c:1799
+[QTS:EMIT] pos=342 u32=0x0000009f (159) @parser.c:1777
+[QTS:EMIT] pos=346 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=348 op=4 @parser.c:1799
+[QTS:EMIT] pos=349 u32=0x000001dd (477) @parser.c:1777
+[QTS:EMIT] pos=353 op=200 @parser.c:1786
+[QTS:EMIT] pos=354 u32=0x00000232 (562) @parser.c:1788
+[QTS:EMIT] pos=358 op=186 @parser.c:1799
+[QTS:EMIT] pos=359 u32=0x000001db (475) @parser.c:1777
+[QTS:EMIT] pos=363 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=365 op=200 @parser.c:1786
+[QTS:EMIT] pos=366 u32=0x00000230 (560) @parser.c:1788
+[QTS:EMIT] pos=370 op=159 @parser.c:1799
+[QTS:EMIT] pos=371 op=4 @parser.c:1799
+[QTS:EMIT] pos=372 u32=0x000001de (478) @parser.c:1777
+[QTS:EMIT] pos=376 op=200 @parser.c:1786
+[QTS:EMIT] pos=377 u32=0x00000239 (569) @parser.c:1788
+[QTS:EMIT] pos=381 op=159 @parser.c:1799
+[QTS:EMIT] pos=382 op=4 @parser.c:1799
+[QTS:EMIT] pos=383 u32=0x000001df (479) @parser.c:1777
+[QTS:EMIT] pos=387 op=200 @parser.c:1786
+[QTS:EMIT] pos=388 u32=0x0000023f (575) @parser.c:1788
+[QTS:EMIT] pos=392 op=159 @parser.c:1799
+[QTS:EMIT] pos=393 op=200 @parser.c:1786
+[QTS:EMIT] pos=394 u32=0x0000025a (602) @parser.c:1788
+[QTS:EMIT] pos=398 op=186 @parser.c:1799
+[QTS:EMIT] pos=399 u32=0x000001dc (476) @parser.c:1777
+[QTS:EMIT] pos=403 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=405 op=200 @parser.c:1786
+[QTS:EMIT] pos=406 u32=0x00000258 (600) @parser.c:1788
+[QTS:EMIT] pos=410 op=159 @parser.c:1799
+[QTS:EMIT] pos=411 op=4 @parser.c:1799
+[QTS:EMIT] pos=412 u32=0x000001de (478) @parser.c:1777
+[QTS:EMIT] pos=416 op=200 @parser.c:1786
+[QTS:EMIT] pos=417 u32=0x00000263 (611) @parser.c:1788
+[QTS:EMIT] pos=421 op=159 @parser.c:1799
+[QTS:EMIT] pos=422 op=200 @parser.c:1786
+[QTS:EMIT] pos=423 u32=0x00000274 (628) @parser.c:1788
+[QTS:EMIT] pos=427 op=186 @parser.c:1799
+[QTS:EMIT] pos=428 u32=0x00000034 (52) @parser.c:1777
+[QTS:EMIT] pos=432 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=434 op=108 @parser.c:1799
+[QTS:EMIT] pos=435 u32=0x00000005 (5) @parser.c:1777
+[QTS:EMIT] pos=439 op=4 @parser.c:1799
+[QTS:EMIT] pos=440 u32=0x000001e0 (480) @parser.c:1777
+[QTS:EMIT] pos=444 op=200 @parser.c:1786
+[QTS:EMIT] pos=445 u32=0x00000285 (645) @parser.c:1788
+[QTS:EMIT] pos=449 op=186 @parser.c:1799
+[QTS:EMIT] pos=450 u32=0x00000034 (52) @parser.c:1777
+[QTS:EMIT] pos=454 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=456 op=200 @parser.c:1786
+[QTS:EMIT] pos=457 u32=0x00000283 (643) @parser.c:1788
+[QTS:EMIT] pos=461 op=159 @parser.c:1799
+[QTS:EMIT] pos=462 op=4 @parser.c:1799
+[QTS:EMIT] pos=463 u32=0x000001e1 (481) @parser.c:1777
+[QTS:EMIT] pos=467 op=200 @parser.c:1786
+[QTS:EMIT] pos=468 u32=0x0000028d (653) @parser.c:1788
+[QTS:EMIT] pos=472 op=159 @parser.c:1799
+[QTS:EMIT] pos=473 op=110 @parser.c:1799
+[QTS:EMIT] pos=474 u32=0x00000006 (6) @parser.c:1777
+[QTS:EMIT] pos=478 op=184 @parser.c:1799
+[QTS:EMIT] pos=479 u32=0x00000005 (5) @parser.c:1777
+[QTS:EMIT] pos=483 op=4 @parser.c:1799
+[QTS:EMIT] pos=484 u32=0x0000002f (47) @parser.c:1777
+[QTS:EMIT] pos=488 op=184 @parser.c:1799
+[QTS:EMIT] pos=489 u32=0x00000006 (6) @parser.c:1777
+[QTS:EMIT] pos=493 op=200 @parser.c:1786
+[QTS:EMIT] pos=494 u32=0x00000269 (617) @parser.c:1788
+[QTS:EMIT] pos=498 op=159 @parser.c:1799
+[QTS:EMIT] pos=499 op=200 @parser.c:1786
+[QTS:EMIT] pos=500 u32=0x00000215 (533) @parser.c:1788
+[QTS:EMIT] pos=504 op=34 @parser.c:1799
+[QTS:EMIT] pos=505 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=507 op=200 @parser.c:1786
+[QTS:EMIT] pos=508 u32=0x0000020a (522) @parser.c:1788
+[QTS:EMIT] pos=512 op=48 @parser.c:1799
+[QTS:SCOPE] push: level=1 first_var=-1
+[QTS:SCOPE] enter: idx=1 is_body=0
+[QTS:EMIT] pos=0 op=182 @parser.c:1799
+[QTS:EMIT] pos=1 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=3 op=4 @parser.c:1799
+[QTS:EMIT] pos=4 u32=0x0000002f (47) @parser.c:1777
+[QTS:EMIT] pos=8 op=187 @parser.c:1799
+[QTS:EMIT] pos=9 atom=485 @parser.c:1807
+[QTS:EMIT] pos=13 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=15 op=200 @parser.c:1786
+[QTS:EMIT] pos=16 u32=0x000002d0 (720) @parser.c:1788
+[QTS:EMIT] pos=20 op=186 @parser.c:1799
+[QTS:EMIT] pos=21 u32=0x000001e6 (486) @parser.c:1777
+[QTS:EMIT] pos=25 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=20 op=189 @parser.c:1799
+[QTS:EMIT] pos=21 atom=486 @parser.c:1807
+[QTS:EMIT] pos=25 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=29 u16=0x0001 (1) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=1 atom=486 label=0
+[QTS:EMIT] pos=31 op=200 @parser.c:1786
+[QTS:EMIT] pos=32 u32=0x000002da (730) @parser.c:1788
+[QTS:EMIT] pos=36 op=186 @parser.c:1799
+[QTS:EMIT] pos=37 u32=0x000000b0 (176) @parser.c:1777
+[QTS:EMIT] pos=41 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=43 op=17 @parser.c:1799
+[QTS:EMIT] pos=44 op=200 @parser.c:1786
+[QTS:EMIT] pos=45 u32=0x000002e5 (741) @parser.c:1788
+[QTS:EMIT] pos=49 op=186 @parser.c:1799
+[QTS:EMIT] pos=50 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=54 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=56 op=200 @parser.c:1786
+[QTS:EMIT] pos=57 u32=0x000002e4 (740) @parser.c:1788
+[QTS:EMIT] pos=61 op=33 @parser.c:1799
+[QTS:EMIT] pos=62 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=64 op=184 @parser.c:1799
+[QTS:EMIT] pos=65 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=69 op=22 @parser.c:1799
+[QTS:EMIT] pos=70 op=62 @parser.c:1799
+[QTS:EMIT] pos=71 op=14 @parser.c:1799
+[QTS:SCOPE] push: level=2 first_var=-1
+[QTS:SCOPE] enter: idx=2 is_body=0
+[QTS:EMIT] pos=72 op=182 @parser.c:1799
+[QTS:EMIT] pos=73 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=75 op=200 @parser.c:1786
+[QTS:EMIT] pos=76 u32=0x000002f2 (754) @parser.c:1788
+[QTS:EMIT] pos=80 op=186 @parser.c:1799
+[QTS:EMIT] pos=81 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=85 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=80 op=189 @parser.c:1799
+[QTS:EMIT] pos=81 atom=484 @parser.c:1807
+[QTS:EMIT] pos=85 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=89 u16=0x0002 (2) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=2 atom=484 label=1
+[QTS:EMIT] pos=91 op=1 @parser.c:1799
+[QTS:EMIT] pos=92 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=96 op=184 @parser.c:1799
+[QTS:EMIT] pos=97 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=101 op=22 @parser.c:1799
+[QTS:EMIT] pos=102 op=62 @parser.c:1799
+[QTS:EMIT] pos=103 op=14 @parser.c:1799
+[QTS:EMIT] pos=104 op=183 @parser.c:1799
+[QTS:EMIT] pos=105 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=107 op=184 @parser.c:1799
+[QTS:EMIT] pos=108 u32=0x00000002 (2) @parser.c:1777
+[QTS:EMIT] pos=112 op=200 @parser.c:1786
+[QTS:EMIT] pos=113 u32=0x000002f9 (761) @parser.c:1788
+[QTS:EMIT] pos=117 op=186 @parser.c:1799
+[QTS:EMIT] pos=118 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=122 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=124 op=200 @parser.c:1786
+[QTS:EMIT] pos=125 u32=0x000002fd (765) @parser.c:1788
+[QTS:EMIT] pos=129 op=186 @parser.c:1799
+[QTS:EMIT] pos=130 u32=0x000001e6 (486) @parser.c:1777
+[QTS:EMIT] pos=134 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=136 op=200 @parser.c:1786
+[QTS:EMIT] pos=137 u32=0x00000300 (768) @parser.c:1788
+[QTS:EMIT] pos=141 op=66 @parser.c:1799
+[QTS:EMIT] pos=142 atom=48 @parser.c:1807
+[QTS:EMIT] pos=146 op=200 @parser.c:1786
+[QTS:EMIT] pos=147 u32=0x000002fb (763) @parser.c:1788
+[QTS:EMIT] pos=151 op=165 @parser.c:1799
+[QTS:EMIT] pos=152 op=108 @parser.c:1799
+[QTS:EMIT] pos=153 u32=0x00000005 (5) @parser.c:1777
+[QTS:EMIT] pos=157 op=110 @parser.c:1799
+[QTS:EMIT] pos=158 u32=0x00000004 (4) @parser.c:1777
+[QTS:EMIT] pos=162 op=184 @parser.c:1799
+[QTS:EMIT] pos=163 u32=0x00000003 (3) @parser.c:1777
+[QTS:EMIT] pos=167 op=200 @parser.c:1786
+[QTS:EMIT] pos=168 u32=0x00000309 (777) @parser.c:1788
+[QTS:EMIT] pos=172 op=186 @parser.c:1799
+[QTS:EMIT] pos=173 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=177 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=172 op=189 @parser.c:1799
+[QTS:EMIT] pos=173 atom=484 @parser.c:1807
+[QTS:EMIT] pos=177 u32=0x00000006 (6) @parser.c:1777
+[QTS:EMIT] pos=181 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=183 op=61 @parser.c:1799
+[QTS:EMIT] pos=184 op=200 @parser.c:1786
+[QTS:EMIT] pos=185 u32=0x0000030a (778) @parser.c:1788
+[QTS:EMIT] pos=189 op=147 @parser.c:1799
+[QTS:EMIT] pos=190 op=184 @parser.c:1799
+[QTS:EMIT] pos=191 u32=0x00000006 (6) @parser.c:1777
+[QTS:EMIT] pos=195 op=25 @parser.c:1799
+[QTS:EMIT] pos=196 op=62 @parser.c:1799
+[QTS:EMIT] pos=197 op=14 @parser.c:1799
+[QTS:EMIT] pos=198 op=110 @parser.c:1799
+[QTS:EMIT] pos=199 u32=0x00000002 (2) @parser.c:1777
+[QTS:EMIT] pos=203 op=184 @parser.c:1799
+[QTS:EMIT] pos=204 u32=0x00000004 (4) @parser.c:1777
+[QTS:SCOPE] push: level=3 first_var=-1
+[QTS:SCOPE] enter: idx=3 is_body=0
+[QTS:EMIT] pos=208 op=182 @parser.c:1799
+[QTS:EMIT] pos=209 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=211 op=200 @parser.c:1786
+[QTS:EMIT] pos=212 u32=0x00000318 (792) @parser.c:1788
+[QTS:EMIT] pos=216 op=186 @parser.c:1799
+[QTS:EMIT] pos=217 u32=0x000001e7 (487) @parser.c:1777
+[QTS:EMIT] pos=221 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=216 op=189 @parser.c:1799
+[QTS:EMIT] pos=217 atom=487 @parser.c:1807
+[QTS:EMIT] pos=221 u32=0x00000007 (7) @parser.c:1777
+[QTS:EMIT] pos=225 u16=0x0003 (3) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=3 atom=487 label=7
+[QTS:EMIT] pos=227 op=200 @parser.c:1786
+[QTS:EMIT] pos=228 u32=0x0000031c (796) @parser.c:1788
+[QTS:EMIT] pos=232 op=186 @parser.c:1799
+[QTS:EMIT] pos=233 u32=0x000001e6 (486) @parser.c:1777
+[QTS:EMIT] pos=237 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=239 op=200 @parser.c:1786
+[QTS:EMIT] pos=240 u32=0x00000320 (800) @parser.c:1788
+[QTS:EMIT] pos=244 op=186 @parser.c:1799
+[QTS:EMIT] pos=245 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=249 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=251 op=200 @parser.c:1786
+[QTS:EMIT] pos=252 u32=0x0000031f (799) @parser.c:1788
+[QTS:EMIT] pos=256 op=72 @parser.c:1799
+[QTS:EMIT] pos=257 op=200 @parser.c:1786
+[QTS:EMIT] pos=258 u32=0x00000322 (802) @parser.c:1788
+[QTS:EMIT] pos=262 op=66 @parser.c:1799
+[QTS:EMIT] pos=263 atom=57 @parser.c:1807
+[QTS:EMIT] pos=267 op=1 @parser.c:1799
+[QTS:EMIT] pos=268 u32=0x00000010 (16) @parser.c:1777
+[QTS:EMIT] pos=272 op=200 @parser.c:1786
+[QTS:EMIT] pos=273 u32=0x0000032b (811) @parser.c:1788
+[QTS:EMIT] pos=277 op=36 @parser.c:1799
+[QTS:EMIT] pos=278 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=280 op=184 @parser.c:1799
+[QTS:EMIT] pos=281 u32=0x00000007 (7) @parser.c:1777
+[QTS:EMIT] pos=285 op=22 @parser.c:1799
+[QTS:EMIT] pos=286 op=62 @parser.c:1799
+[QTS:EMIT] pos=287 op=14 @parser.c:1799
+[QTS:SCOPE] push: level=4 first_var=-1
+[QTS:SCOPE] enter: idx=4 is_body=0
+[QTS:EMIT] pos=288 op=182 @parser.c:1799
+[QTS:EMIT] pos=289 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=291 op=200 @parser.c:1786
+[QTS:EMIT] pos=292 u32=0x0000033d (829) @parser.c:1788
+[QTS:EMIT] pos=296 op=186 @parser.c:1799
+[QTS:EMIT] pos=297 u32=0x000001e7 (487) @parser.c:1777
+[QTS:EMIT] pos=301 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=303 op=200 @parser.c:1786
+[QTS:EMIT] pos=304 u32=0x0000033e (830) @parser.c:1788
+[QTS:EMIT] pos=308 op=66 @parser.c:1799
+[QTS:EMIT] pos=309 atom=48 @parser.c:1807
+[QTS:EMIT] pos=313 op=1 @parser.c:1799
+[QTS:EMIT] pos=314 u32=0x00000002 (2) @parser.c:1777
+[QTS:EMIT] pos=318 op=200 @parser.c:1786
+[QTS:EMIT] pos=319 u32=0x00000346 (838) @parser.c:1788
+[QTS:EMIT] pos=323 op=165 @parser.c:1799
+[QTS:EMIT] pos=324 op=108 @parser.c:1799
+[QTS:EMIT] pos=325 u32=0x00000008 (8) @parser.c:1777
+[QTS:EMIT] pos=329 op=200 @parser.c:1786
+[QTS:EMIT] pos=330 u32=0x00000357 (855) @parser.c:1788
+[QTS:EMIT] pos=334 op=186 @parser.c:1799
+[QTS:EMIT] pos=335 u32=0x000001e7 (487) @parser.c:1777
+[QTS:EMIT] pos=339 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=334 op=189 @parser.c:1799
+[QTS:EMIT] pos=335 atom=487 @parser.c:1807
+[QTS:EMIT] pos=339 u32=0x00000009 (9) @parser.c:1777
+[QTS:EMIT] pos=343 u16=0x0004 (4) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=4 atom=487 label=9
+[QTS:EMIT] pos=345 op=2 @parser.c:1799
+[QTS:EMIT] pos=346 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=350 op=200 @parser.c:1786
+[QTS:EMIT] pos=351 u32=0x00000361 (865) @parser.c:1788
+[QTS:EMIT] pos=355 op=186 @parser.c:1799
+[QTS:EMIT] pos=356 u32=0x000001e7 (487) @parser.c:1777
+[QTS:EMIT] pos=360 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=362 op=200 @parser.c:1786
+[QTS:EMIT] pos=363 u32=0x0000035f (863) @parser.c:1788
+[QTS:EMIT] pos=367 op=159 @parser.c:1799
+[QTS:EMIT] pos=368 op=184 @parser.c:1799
+[QTS:EMIT] pos=369 u32=0x00000009 (9) @parser.c:1777
+[QTS:EMIT] pos=373 op=22 @parser.c:1799
+[QTS:EMIT] pos=374 op=62 @parser.c:1799
+[QTS:EMIT] pos=375 op=14 @parser.c:1799
+[QTS:EMIT] pos=376 op=184 @parser.c:1799
+[QTS:EMIT] pos=377 u32=0x00000008 (8) @parser.c:1777
+[QTS:SCOPE] leave: idx=4
+[QTS:SCOPE] pop: level=4
+[QTS:EMIT] pos=381 op=183 @parser.c:1799
+[QTS:EMIT] pos=382 u16=0x0004 (4) @parser.c:1772
+[QTS:SCOPE] push: level=5 first_var=-1
+[QTS:SCOPE] enter: idx=5 is_body=0
+[QTS:EMIT] pos=384 op=182 @parser.c:1799
+[QTS:EMIT] pos=385 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=387 op=200 @parser.c:1786
+[QTS:EMIT] pos=388 u32=0x00000370 (880) @parser.c:1788
+[QTS:EMIT] pos=392 op=186 @parser.c:1799
+[QTS:EMIT] pos=393 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=397 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=399 op=1 @parser.c:1799
+[QTS:EMIT] pos=400 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=404 op=200 @parser.c:1786
+[QTS:EMIT] pos=405 u32=0x00000372 (882) @parser.c:1788
+[QTS:EMIT] pos=409 op=174 @parser.c:1799
+[QTS:EMIT] pos=410 op=108 @parser.c:1799
+[QTS:EMIT] pos=411 u32=0x0000000a (10) @parser.c:1777
+[QTS:EMIT] pos=415 op=200 @parser.c:1786
+[QTS:EMIT] pos=416 u32=0x00000385 (901) @parser.c:1788
+[QTS:EMIT] pos=420 op=186 @parser.c:1799
+[QTS:EMIT] pos=421 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=425 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=420 op=189 @parser.c:1799
+[QTS:EMIT] pos=421 atom=485 @parser.c:1807
+[QTS:EMIT] pos=425 u32=0x0000000b (11) @parser.c:1777
+[QTS:EMIT] pos=429 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=431 op=61 @parser.c:1799
+[QTS:ASSIGN] lvalue: opcode=61 scope=5 atom=485 label=11
+[QTS:EMIT] pos=432 op=4 @parser.c:1799
+[QTS:EMIT] pos=433 u32=0x000001e8 (488) @parser.c:1777
+[QTS:ASSIGN] compound: tok=59 op=159
+[QTS:EMIT] pos=437 op=200 @parser.c:1786
+[QTS:EMIT] pos=438 u32=0x00000387 (903) @parser.c:1788
+[QTS:EMIT] pos=442 op=159 @parser.c:1799
+[QTS:EMIT] pos=443 op=184 @parser.c:1799
+[QTS:EMIT] pos=444 u32=0x0000000b (11) @parser.c:1777
+[QTS:EMIT] pos=448 op=22 @parser.c:1799
+[QTS:EMIT] pos=449 op=62 @parser.c:1799
+[QTS:EMIT] pos=450 op=14 @parser.c:1799
+[QTS:EMIT] pos=451 op=184 @parser.c:1799
+[QTS:EMIT] pos=452 u32=0x0000000a (10) @parser.c:1777
+[QTS:SCOPE] leave: idx=5
+[QTS:SCOPE] pop: level=5
+[QTS:EMIT] pos=456 op=183 @parser.c:1799
+[QTS:EMIT] pos=457 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=459 op=200 @parser.c:1786
+[QTS:EMIT] pos=460 u32=0x00000397 (919) @parser.c:1788
+[QTS:EMIT] pos=464 op=186 @parser.c:1799
+[QTS:EMIT] pos=465 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=469 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=464 op=189 @parser.c:1799
+[QTS:EMIT] pos=465 atom=485 @parser.c:1807
+[QTS:EMIT] pos=469 u32=0x0000000c (12) @parser.c:1777
+[QTS:EMIT] pos=473 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=475 op=61 @parser.c:1799
+[QTS:ASSIGN] lvalue: opcode=61 scope=3 atom=485 label=12
+[QTS:EMIT] pos=476 op=200 @parser.c:1786
+[QTS:EMIT] pos=477 u32=0x0000039c (924) @parser.c:1788
+[QTS:EMIT] pos=481 op=186 @parser.c:1799
+[QTS:EMIT] pos=482 u32=0x000001e7 (487) @parser.c:1777
+[QTS:EMIT] pos=486 u16=0x0003 (3) @parser.c:1772
+[QTS:ASSIGN] compound: tok=59 op=159
+[QTS:EMIT] pos=488 op=200 @parser.c:1786
+[QTS:EMIT] pos=489 u32=0x00000399 (921) @parser.c:1788
+[QTS:EMIT] pos=493 op=159 @parser.c:1799
+[QTS:EMIT] pos=494 op=184 @parser.c:1799
+[QTS:EMIT] pos=495 u32=0x0000000c (12) @parser.c:1777
+[QTS:EMIT] pos=499 op=22 @parser.c:1799
+[QTS:EMIT] pos=500 op=62 @parser.c:1799
+[QTS:EMIT] pos=501 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=3
+[QTS:SCOPE] pop: level=3
+[QTS:EMIT] pos=502 op=183 @parser.c:1799
+[QTS:EMIT] pos=503 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=505 op=183 @parser.c:1799
+[QTS:EMIT] pos=506 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=549 op=184 @parser.c:1799
+[QTS:EMIT] pos=550 u32=0x00000005 (5) @parser.c:1777
+[QTS:SCOPE] leave: idx=2
+[QTS:SCOPE] pop: level=2
+[QTS:EMIT] pos=554 op=183 @parser.c:1799
+[QTS:EMIT] pos=555 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=557 op=200 @parser.c:1786
+[QTS:EMIT] pos=558 u32=0x000003b0 (944) @parser.c:1788
+[QTS:EMIT] pos=562 op=186 @parser.c:1799
+[QTS:EMIT] pos=563 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=567 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=569 op=200 @parser.c:1786
+[QTS:EMIT] pos=570 u32=0x000003a9 (937) @parser.c:1788
+[QTS:EMIT] pos=574 op=40 @parser.c:1799
+[QTS:SCOPE] push: level=1 first_var=-1
+[QTS:SCOPE] enter: idx=1 is_body=0
+[QTS:EMIT] pos=0 op=182 @parser.c:1799
+[QTS:EMIT] pos=1 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=3 op=200 @parser.c:1786
+[QTS:EMIT] pos=4 u32=0x000003da (986) @parser.c:1788
+[QTS:EMIT] pos=8 op=186 @parser.c:1799
+[QTS:EMIT] pos=9 u32=0x0000009e (158) @parser.c:1777
+[QTS:EMIT] pos=13 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=15 op=200 @parser.c:1786
+[QTS:EMIT] pos=16 u32=0x000003df (991) @parser.c:1788
+[QTS:EMIT] pos=20 op=66 @parser.c:1799
+[QTS:EMIT] pos=21 atom=290 @parser.c:1807
+[QTS:EMIT] pos=25 op=200 @parser.c:1786
+[QTS:EMIT] pos=26 u32=0x000003e8 (1000) @parser.c:1788
+[QTS:EMIT] pos=30 op=186 @parser.c:1799
+[QTS:EMIT] pos=31 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=35 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=37 op=200 @parser.c:1786
+[QTS:EMIT] pos=38 u32=0x000003e7 (999) @parser.c:1788
+[QTS:EMIT] pos=42 op=36 @parser.c:1799
+[QTS:EMIT] pos=43 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=45 op=17 @parser.c:1799
+[QTS:EMIT] pos=46 op=109 @parser.c:1799
+[QTS:EMIT] pos=47 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=51 op=14 @parser.c:1799
+[QTS:EMIT] pos=52 op=200 @parser.c:1786
+[QTS:EMIT] pos=53 u32=0x000003f7 (1015) @parser.c:1788
+[QTS:EMIT] pos=57 op=186 @parser.c:1799
+[QTS:EMIT] pos=58 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=62 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=64 op=200 @parser.c:1786
+[QTS:EMIT] pos=65 u32=0x00000404 (1028) @parser.c:1788
+[QTS:EMIT] pos=69 op=186 @parser.c:1799
+[QTS:EMIT] pos=70 u32=0x000000ae (174) @parser.c:1777
+[QTS:EMIT] pos=74 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=76 op=200 @parser.c:1786
+[QTS:EMIT] pos=77 u32=0x000003f9 (1017) @parser.c:1788
+[QTS:EMIT] pos=81 op=169 @parser.c:1799
+[QTS:EMIT] pos=82 op=17 @parser.c:1799
+[QTS:EMIT] pos=83 op=109 @parser.c:1799
+[QTS:EMIT] pos=84 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=88 op=14 @parser.c:1799
+[QTS:EMIT] pos=89 op=200 @parser.c:1786
+[QTS:EMIT] pos=90 u32=0x00000423 (1059) @parser.c:1788
+[QTS:EMIT] pos=94 op=186 @parser.c:1799
+[QTS:EMIT] pos=95 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=99 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=101 op=200 @parser.c:1786
+[QTS:EMIT] pos=102 u32=0x00000430 (1072) @parser.c:1788
+[QTS:EMIT] pos=106 op=186 @parser.c:1799
+[QTS:EMIT] pos=107 u32=0x000000b0 (176) @parser.c:1777
+[QTS:EMIT] pos=111 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=113 op=200 @parser.c:1786
+[QTS:EMIT] pos=114 u32=0x00000425 (1061) @parser.c:1788
+[QTS:EMIT] pos=118 op=169 @parser.c:1799
+[QTS:EMIT] pos=119 op=17 @parser.c:1799
+[QTS:EMIT] pos=120 op=109 @parser.c:1799
+[QTS:EMIT] pos=121 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=125 op=14 @parser.c:1799
+[QTS:EMIT] pos=126 op=200 @parser.c:1786
+[QTS:EMIT] pos=127 u32=0x00000448 (1096) @parser.c:1788
+[QTS:EMIT] pos=131 op=186 @parser.c:1799
+[QTS:EMIT] pos=132 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=136 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=138 op=200 @parser.c:1786
+[QTS:EMIT] pos=139 u32=0x00000455 (1109) @parser.c:1788
+[QTS:EMIT] pos=143 op=186 @parser.c:1799
+[QTS:EMIT] pos=144 u32=0x000000b2 (178) @parser.c:1777
+[QTS:EMIT] pos=148 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=150 op=200 @parser.c:1786
+[QTS:EMIT] pos=151 u32=0x0000044a (1098) @parser.c:1788
+[QTS:EMIT] pos=155 op=169 @parser.c:1799
+[QTS:EMIT] pos=156 op=17 @parser.c:1799
+[QTS:EMIT] pos=157 op=109 @parser.c:1799
+[QTS:EMIT] pos=158 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=162 op=14 @parser.c:1799
+[QTS:EMIT] pos=163 op=200 @parser.c:1786
+[QTS:EMIT] pos=164 u32=0x0000046e (1134) @parser.c:1788
+[QTS:EMIT] pos=168 op=186 @parser.c:1799
+[QTS:EMIT] pos=169 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=173 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=175 op=200 @parser.c:1786
+[QTS:EMIT] pos=176 u32=0x0000047b (1147) @parser.c:1788
+[QTS:EMIT] pos=180 op=186 @parser.c:1799
+[QTS:EMIT] pos=181 u32=0x000000b4 (180) @parser.c:1777
+[QTS:EMIT] pos=185 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=187 op=200 @parser.c:1786
+[QTS:EMIT] pos=188 u32=0x00000470 (1136) @parser.c:1788
+[QTS:EMIT] pos=192 op=169 @parser.c:1799
+[QTS:EMIT] pos=193 op=17 @parser.c:1799
+[QTS:EMIT] pos=194 op=109 @parser.c:1799
+[QTS:EMIT] pos=195 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=199 op=14 @parser.c:1799
+[QTS:EMIT] pos=200 op=200 @parser.c:1786
+[QTS:EMIT] pos=201 u32=0x00000494 (1172) @parser.c:1788
+[QTS:EMIT] pos=205 op=186 @parser.c:1799
+[QTS:EMIT] pos=206 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=210 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=212 op=200 @parser.c:1786
+[QTS:EMIT] pos=213 u32=0x000004a1 (1185) @parser.c:1788
+[QTS:EMIT] pos=217 op=186 @parser.c:1799
+[QTS:EMIT] pos=218 u32=0x000000af (175) @parser.c:1777
+[QTS:EMIT] pos=222 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=224 op=200 @parser.c:1786
+[QTS:EMIT] pos=225 u32=0x00000496 (1174) @parser.c:1788
+[QTS:EMIT] pos=229 op=169 @parser.c:1799
+[QTS:EMIT] pos=230 op=17 @parser.c:1799
+[QTS:EMIT] pos=231 op=109 @parser.c:1799
+[QTS:EMIT] pos=232 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=236 op=14 @parser.c:1799
+[QTS:EMIT] pos=237 op=200 @parser.c:1786
+[QTS:EMIT] pos=238 u32=0x000004b8 (1208) @parser.c:1788
+[QTS:EMIT] pos=242 op=186 @parser.c:1799
+[QTS:EMIT] pos=243 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=247 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=249 op=200 @parser.c:1786
+[QTS:EMIT] pos=250 u32=0x000004c5 (1221) @parser.c:1788
+[QTS:EMIT] pos=254 op=186 @parser.c:1799
+[QTS:EMIT] pos=255 u32=0x000000b1 (177) @parser.c:1777
+[QTS:EMIT] pos=259 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=261 op=200 @parser.c:1786
+[QTS:EMIT] pos=262 u32=0x000004ba (1210) @parser.c:1788
+[QTS:EMIT] pos=266 op=169 @parser.c:1799
+[QTS:EMIT] pos=267 op=17 @parser.c:1799
+[QTS:EMIT] pos=268 op=109 @parser.c:1799
+[QTS:EMIT] pos=269 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=273 op=14 @parser.c:1799
+[QTS:EMIT] pos=274 op=200 @parser.c:1786
+[QTS:EMIT] pos=275 u32=0x000004dd (1245) @parser.c:1788
+[QTS:EMIT] pos=279 op=186 @parser.c:1799
+[QTS:EMIT] pos=280 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=284 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=286 op=200 @parser.c:1786
+[QTS:EMIT] pos=287 u32=0x000004ea (1258) @parser.c:1788
+[QTS:EMIT] pos=291 op=186 @parser.c:1799
+[QTS:EMIT] pos=292 u32=0x000000b3 (179) @parser.c:1777
+[QTS:EMIT] pos=296 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=298 op=200 @parser.c:1786
+[QTS:EMIT] pos=299 u32=0x000004df (1247) @parser.c:1788
+[QTS:EMIT] pos=303 op=169 @parser.c:1799
+[QTS:EMIT] pos=304 op=17 @parser.c:1799
+[QTS:EMIT] pos=305 op=109 @parser.c:1799
+[QTS:EMIT] pos=306 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=310 op=14 @parser.c:1799
+[QTS:EMIT] pos=311 op=200 @parser.c:1786
+[QTS:EMIT] pos=312 u32=0x00000502 (1282) @parser.c:1788
+[QTS:EMIT] pos=316 op=186 @parser.c:1799
+[QTS:EMIT] pos=317 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=321 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=323 op=200 @parser.c:1786
+[QTS:EMIT] pos=324 u32=0x0000050f (1295) @parser.c:1788
+[QTS:EMIT] pos=328 op=186 @parser.c:1799
+[QTS:EMIT] pos=329 u32=0x000000b5 (181) @parser.c:1777
+[QTS:EMIT] pos=333 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=335 op=200 @parser.c:1786
+[QTS:EMIT] pos=336 u32=0x00000504 (1284) @parser.c:1788
+[QTS:EMIT] pos=340 op=169 @parser.c:1799
+[QTS:EMIT] pos=341 op=17 @parser.c:1799
+[QTS:EMIT] pos=342 op=109 @parser.c:1799
+[QTS:EMIT] pos=343 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=347 op=14 @parser.c:1799
+[QTS:EMIT] pos=348 op=200 @parser.c:1786
+[QTS:EMIT] pos=349 u32=0x00000529 (1321) @parser.c:1788
+[QTS:EMIT] pos=353 op=186 @parser.c:1799
+[QTS:EMIT] pos=354 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=358 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=360 op=200 @parser.c:1786
+[QTS:EMIT] pos=361 u32=0x00000536 (1334) @parser.c:1788
+[QTS:EMIT] pos=365 op=186 @parser.c:1799
+[QTS:EMIT] pos=366 u32=0x000000b6 (182) @parser.c:1777
+[QTS:EMIT] pos=370 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=372 op=200 @parser.c:1786
+[QTS:EMIT] pos=373 u32=0x0000052b (1323) @parser.c:1788
+[QTS:EMIT] pos=377 op=169 @parser.c:1799
+[QTS:EMIT] pos=378 op=17 @parser.c:1799
+[QTS:EMIT] pos=379 op=109 @parser.c:1799
+[QTS:EMIT] pos=380 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=384 op=14 @parser.c:1799
+[QTS:EMIT] pos=385 op=200 @parser.c:1786
+[QTS:EMIT] pos=386 u32=0x00000550 (1360) @parser.c:1788
+[QTS:EMIT] pos=390 op=186 @parser.c:1799
+[QTS:EMIT] pos=391 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=395 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=397 op=200 @parser.c:1786
+[QTS:EMIT] pos=398 u32=0x0000055d (1373) @parser.c:1788
+[QTS:EMIT] pos=402 op=186 @parser.c:1799
+[QTS:EMIT] pos=403 u32=0x000000b7 (183) @parser.c:1777
+[QTS:EMIT] pos=407 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=409 op=200 @parser.c:1786
+[QTS:EMIT] pos=410 u32=0x00000552 (1362) @parser.c:1788
+[QTS:EMIT] pos=414 op=169 @parser.c:1799
+[QTS:EMIT] pos=415 op=184 @parser.c:1799
+[QTS:EMIT] pos=416 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=420 op=200 @parser.c:1786
+[QTS:EMIT] pos=421 u32=0x000003d3 (979) @parser.c:1788
+[QTS:EMIT] pos=425 op=40 @parser.c:1799
+[QTS:SCOPE] push: level=1 first_var=-1
+[QTS:SCOPE] enter: idx=1 is_body=0
+[QTS:EMIT] pos=0 op=182 @parser.c:1799
+[QTS:EMIT] pos=1 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=3 op=200 @parser.c:1786
+[QTS:EMIT] pos=4 u32=0x000005b1 (1457) @parser.c:1788
+[QTS:EMIT] pos=8 op=186 @parser.c:1799
+[QTS:EMIT] pos=9 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=13 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=15 op=153 @parser.c:1799
+[QTS:SCOPE] push: level=2 first_var=-1
+[QTS:SCOPE] enter: idx=2 is_body=0
+[QTS:EMIT] pos=16 op=182 @parser.c:1799
+[QTS:EMIT] pos=17 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=19 op=17 @parser.c:1799
+[QTS:EMIT] pos=20 op=4 @parser.c:1799
+[QTS:EMIT] pos=21 u32=0x0000004b (75) @parser.c:1777
+[QTS:EMIT] pos=25 op=173 @parser.c:1799
+[QTS:EMIT] pos=26 op=108 @parser.c:1799
+[QTS:EMIT] pos=27 u32=0x00000001 (1) @parser.c:1777
+[QTS:SCOPE] push: level=3 first_var=-1
+[QTS:SCOPE] enter: idx=3 is_body=0
+[QTS:EMIT] pos=31 op=182 @parser.c:1799
+[QTS:EMIT] pos=32 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=34 op=200 @parser.c:1786
+[QTS:EMIT] pos=35 u32=0x000005de (1502) @parser.c:1788
+[QTS:EMIT] pos=39 op=186 @parser.c:1799
+[QTS:EMIT] pos=40 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=44 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=46 op=7 @parser.c:1799
+[QTS:EMIT] pos=47 op=200 @parser.c:1786
+[QTS:EMIT] pos=48 u32=0x000005e0 (1504) @parser.c:1788
+[QTS:EMIT] pos=52 op=173 @parser.c:1799
+[QTS:EMIT] pos=53 op=108 @parser.c:1799
+[QTS:EMIT] pos=54 u32=0x00000002 (2) @parser.c:1777
+[QTS:EMIT] pos=58 op=4 @parser.c:1799
+[QTS:EMIT] pos=59 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=63 op=200 @parser.c:1786
+[QTS:EMIT] pos=64 u32=0x000005fa (1530) @parser.c:1788
+[QTS:EMIT] pos=68 op=40 @parser.c:1799
+[QTS:EMIT] pos=69 op=184 @parser.c:1799
+[QTS:EMIT] pos=70 u32=0x00000002 (2) @parser.c:1777
+[QTS:SCOPE] leave: idx=3
+[QTS:SCOPE] pop: level=3
+[QTS:EMIT] pos=74 op=183 @parser.c:1799
+[QTS:EMIT] pos=75 u16=0x0003 (3) @parser.c:1772
+[QTS:SCOPE] push: level=4 first_var=-1
+[QTS:SCOPE] enter: idx=4 is_body=0
+[QTS:EMIT] pos=77 op=182 @parser.c:1799
+[QTS:EMIT] pos=78 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=80 op=200 @parser.c:1786
+[QTS:EMIT] pos=81 u32=0x00000619 (1561) @parser.c:1788
+[QTS:EMIT] pos=85 op=186 @parser.c:1799
+[QTS:EMIT] pos=86 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=90 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=92 op=200 @parser.c:1786
+[QTS:EMIT] pos=93 u32=0x00000626 (1574) @parser.c:1788
+[QTS:EMIT] pos=97 op=186 @parser.c:1799
+[QTS:EMIT] pos=98 u32=0x000000a7 (167) @parser.c:1777
+[QTS:EMIT] pos=102 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=104 op=200 @parser.c:1786
+[QTS:EMIT] pos=105 u32=0x0000061b (1563) @parser.c:1788
+[QTS:EMIT] pos=109 op=169 @parser.c:1799
+[QTS:EMIT] pos=110 op=108 @parser.c:1799
+[QTS:EMIT] pos=111 u32=0x00000003 (3) @parser.c:1777
+[QTS:SCOPE] push: level=5 first_var=-1
+[QTS:SCOPE] enter: idx=5 is_body=0
+[QTS:EMIT] pos=115 op=182 @parser.c:1799
+[QTS:EMIT] pos=116 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=118 op=200 @parser.c:1786
+[QTS:EMIT] pos=119 u32=0x0000063e (1598) @parser.c:1788
+[QTS:EMIT] pos=123 op=186 @parser.c:1799
+[QTS:EMIT] pos=124 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=128 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=123 op=189 @parser.c:1799
+[QTS:EMIT] pos=124 atom=485 @parser.c:1807
+[QTS:EMIT] pos=128 u32=0x00000004 (4) @parser.c:1777
+[QTS:EMIT] pos=132 u16=0x0005 (5) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=5 atom=485 label=4
+[QTS:EMIT] pos=134 op=4 @parser.c:1799
+[QTS:EMIT] pos=135 u32=0x000001ed (493) @parser.c:1777
+[QTS:EMIT] pos=139 op=200 @parser.c:1786
+[QTS:EMIT] pos=140 u32=0x0000064c (1612) @parser.c:1788
+[QTS:EMIT] pos=144 op=186 @parser.c:1799
+[QTS:EMIT] pos=145 u32=0x000001ea (490) @parser.c:1777
+[QTS:EMIT] pos=149 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=151 op=200 @parser.c:1786
+[QTS:EMIT] pos=152 u32=0x00000652 (1618) @parser.c:1788
+[QTS:EMIT] pos=156 op=186 @parser.c:1799
+[QTS:EMIT] pos=157 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=161 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=163 op=200 @parser.c:1786
+[QTS:EMIT] pos=164 u32=0x00000653 (1619) @parser.c:1788
+[QTS:EMIT] pos=168 op=66 @parser.c:1799
+[QTS:EMIT] pos=169 atom=59 @parser.c:1807
+[QTS:EMIT] pos=173 op=200 @parser.c:1786
+[QTS:EMIT] pos=174 u32=0x0000065b (1627) @parser.c:1788
+[QTS:EMIT] pos=178 op=36 @parser.c:1799
+[QTS:EMIT] pos=179 u16=0x0000 (0) @parser.c:1772
+[QTS:EMIT] pos=181 op=200 @parser.c:1786
+[QTS:EMIT] pos=182 u32=0x00000651 (1617) @parser.c:1788
+[QTS:EMIT] pos=186 op=34 @parser.c:1799
+[QTS:EMIT] pos=187 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=189 op=200 @parser.c:1786
+[QTS:EMIT] pos=190 u32=0x0000064a (1610) @parser.c:1788
+[QTS:EMIT] pos=194 op=159 @parser.c:1799
+[QTS:EMIT] pos=195 op=4 @parser.c:1799
+[QTS:EMIT] pos=196 u32=0x000001e1 (481) @parser.c:1777
+[QTS:EMIT] pos=200 op=200 @parser.c:1786
+[QTS:EMIT] pos=201 u32=0x0000065f (1631) @parser.c:1788
+[QTS:EMIT] pos=205 op=159 @parser.c:1799
+[QTS:EMIT] pos=206 op=184 @parser.c:1799
+[QTS:EMIT] pos=207 u32=0x00000004 (4) @parser.c:1777
+[QTS:EMIT] pos=211 op=22 @parser.c:1799
+[QTS:EMIT] pos=212 op=62 @parser.c:1799
+[QTS:EMIT] pos=213 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=5
+[QTS:SCOPE] pop: level=5
+[QTS:EMIT] pos=214 op=183 @parser.c:1799
+[QTS:EMIT] pos=215 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=217 op=110 @parser.c:1799
+[QTS:EMIT] pos=218 u32=0x00000005 (5) @parser.c:1777
+[QTS:EMIT] pos=222 op=184 @parser.c:1799
+[QTS:EMIT] pos=223 u32=0x00000003 (3) @parser.c:1777
+[QTS:SCOPE] push: level=6 first_var=-1
+[QTS:SCOPE] enter: idx=6 is_body=0
+[QTS:EMIT] pos=227 op=182 @parser.c:1799
+[QTS:EMIT] pos=228 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=230 op=200 @parser.c:1786
+[QTS:EMIT] pos=231 u32=0x00000689 (1673) @parser.c:1788
+[QTS:EMIT] pos=235 op=186 @parser.c:1799
+[QTS:EMIT] pos=236 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=240 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=242 op=200 @parser.c:1786
+[QTS:EMIT] pos=243 u32=0x00000696 (1686) @parser.c:1788
+[QTS:EMIT] pos=247 op=186 @parser.c:1799
+[QTS:EMIT] pos=248 u32=0x000000a0 (160) @parser.c:1777
+[QTS:EMIT] pos=252 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=254 op=200 @parser.c:1786
+[QTS:EMIT] pos=255 u32=0x0000068b (1675) @parser.c:1788
+[QTS:EMIT] pos=259 op=169 @parser.c:1799
+[QTS:EMIT] pos=260 op=108 @parser.c:1799
+[QTS:EMIT] pos=261 u32=0x00000006 (6) @parser.c:1777
+[QTS:SCOPE] push: level=7 first_var=-1
+[QTS:SCOPE] enter: idx=7 is_body=0
+[QTS:EMIT] pos=265 op=182 @parser.c:1799
+[QTS:EMIT] pos=266 u16=0x0007 (7) @parser.c:1772
+[QTS:EMIT] pos=268 op=200 @parser.c:1786
+[QTS:EMIT] pos=269 u32=0x000006b0 (1712) @parser.c:1788
+[QTS:EMIT] pos=273 op=186 @parser.c:1799
+[QTS:EMIT] pos=274 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=278 u16=0x0007 (7) @parser.c:1772
+[QTS:EMIT] pos=273 op=189 @parser.c:1799
+[QTS:EMIT] pos=274 atom=485 @parser.c:1807
+[QTS:EMIT] pos=278 u32=0x00000007 (7) @parser.c:1777
+[QTS:EMIT] pos=282 u16=0x0007 (7) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=7 atom=485 label=7
+[QTS:EMIT] pos=284 op=4 @parser.c:1799
+[QTS:EMIT] pos=285 u32=0x000001ee (494) @parser.c:1777
+[QTS:EMIT] pos=289 op=200 @parser.c:1786
+[QTS:EMIT] pos=290 u32=0x000006c0 (1728) @parser.c:1788
+[QTS:EMIT] pos=294 op=186 @parser.c:1799
+[QTS:EMIT] pos=295 u32=0x000001ea (490) @parser.c:1777
+[QTS:EMIT] pos=299 u16=0x0007 (7) @parser.c:1772
+[QTS:EMIT] pos=301 op=200 @parser.c:1786
+[QTS:EMIT] pos=302 u32=0x000006c6 (1734) @parser.c:1788
+[QTS:EMIT] pos=306 op=186 @parser.c:1799
+[QTS:EMIT] pos=307 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=311 u16=0x0007 (7) @parser.c:1772
+[QTS:EMIT] pos=313 op=200 @parser.c:1786
+[QTS:EMIT] pos=314 u32=0x000006c7 (1735) @parser.c:1788
+[QTS:EMIT] pos=318 op=66 @parser.c:1799
+[QTS:EMIT] pos=319 atom=59 @parser.c:1807
+[QTS:EMIT] pos=323 op=200 @parser.c:1786
+[QTS:EMIT] pos=324 u32=0x000006cf (1743) @parser.c:1788
+[QTS:EMIT] pos=328 op=36 @parser.c:1799
+[QTS:EMIT] pos=329 u16=0x0000 (0) @parser.c:1772
+[QTS:EMIT] pos=331 op=200 @parser.c:1786
+[QTS:EMIT] pos=332 u32=0x000006c5 (1733) @parser.c:1788
+[QTS:EMIT] pos=336 op=34 @parser.c:1799
+[QTS:EMIT] pos=337 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=339 op=200 @parser.c:1786
+[QTS:EMIT] pos=340 u32=0x000006be (1726) @parser.c:1788
+[QTS:EMIT] pos=344 op=159 @parser.c:1799
+[QTS:EMIT] pos=345 op=4 @parser.c:1799
+[QTS:EMIT] pos=346 u32=0x000001e1 (481) @parser.c:1777
+[QTS:EMIT] pos=350 op=200 @parser.c:1786
+[QTS:EMIT] pos=351 u32=0x000006d3 (1747) @parser.c:1788
+[QTS:EMIT] pos=355 op=159 @parser.c:1799
+[QTS:EMIT] pos=356 op=184 @parser.c:1799
+[QTS:EMIT] pos=357 u32=0x00000007 (7) @parser.c:1777
+[QTS:EMIT] pos=361 op=22 @parser.c:1799
+[QTS:EMIT] pos=362 op=62 @parser.c:1799
+[QTS:EMIT] pos=363 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=7
+[QTS:SCOPE] pop: level=7
+[QTS:EMIT] pos=364 op=183 @parser.c:1799
+[QTS:EMIT] pos=365 u16=0x0007 (7) @parser.c:1772
+[QTS:EMIT] pos=367 op=110 @parser.c:1799
+[QTS:EMIT] pos=368 u32=0x00000008 (8) @parser.c:1777
+[QTS:EMIT] pos=372 op=184 @parser.c:1799
+[QTS:EMIT] pos=373 u32=0x00000006 (6) @parser.c:1777
+[QTS:SCOPE] push: level=8 first_var=-1
+[QTS:SCOPE] enter: idx=8 is_body=0
+[QTS:EMIT] pos=377 op=182 @parser.c:1799
+[QTS:EMIT] pos=378 u16=0x0008 (8) @parser.c:1772
+[QTS:EMIT] pos=380 op=200 @parser.c:1786
+[QTS:EMIT] pos=381 u32=0x000006fd (1789) @parser.c:1788
+[QTS:EMIT] pos=385 op=186 @parser.c:1799
+[QTS:EMIT] pos=386 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=390 u16=0x0008 (8) @parser.c:1772
+[QTS:EMIT] pos=392 op=200 @parser.c:1786
+[QTS:EMIT] pos=393 u32=0x0000070a (1802) @parser.c:1788
+[QTS:EMIT] pos=397 op=186 @parser.c:1799
+[QTS:EMIT] pos=398 u32=0x000000a1 (161) @parser.c:1777
+[QTS:EMIT] pos=402 u16=0x0008 (8) @parser.c:1772
+[QTS:EMIT] pos=404 op=200 @parser.c:1786
+[QTS:EMIT] pos=405 u32=0x000006ff (1791) @parser.c:1788
+[QTS:EMIT] pos=409 op=169 @parser.c:1799
+[QTS:EMIT] pos=410 op=108 @parser.c:1799
+[QTS:EMIT] pos=411 u32=0x00000009 (9) @parser.c:1777
+[QTS:SCOPE] push: level=9 first_var=-1
+[QTS:SCOPE] enter: idx=9 is_body=0
+[QTS:EMIT] pos=415 op=182 @parser.c:1799
+[QTS:EMIT] pos=416 u16=0x0009 (9) @parser.c:1772
+[QTS:EMIT] pos=418 op=200 @parser.c:1786
+[QTS:EMIT] pos=419 u32=0x00000724 (1828) @parser.c:1788
+[QTS:EMIT] pos=423 op=186 @parser.c:1799
+[QTS:EMIT] pos=424 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=428 u16=0x0009 (9) @parser.c:1772
+[QTS:EMIT] pos=423 op=189 @parser.c:1799
+[QTS:EMIT] pos=424 atom=485 @parser.c:1807
+[QTS:EMIT] pos=428 u32=0x0000000a (10) @parser.c:1777
+[QTS:EMIT] pos=432 u16=0x0009 (9) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=9 atom=485 label=10
+[QTS:EMIT] pos=434 op=4 @parser.c:1799
+[QTS:EMIT] pos=435 u32=0x000001ef (495) @parser.c:1777
+[QTS:EMIT] pos=439 op=200 @parser.c:1786
+[QTS:EMIT] pos=440 u32=0x00000734 (1844) @parser.c:1788
+[QTS:EMIT] pos=444 op=186 @parser.c:1799
+[QTS:EMIT] pos=445 u32=0x000001ea (490) @parser.c:1777
+[QTS:EMIT] pos=449 u16=0x0009 (9) @parser.c:1772
+[QTS:EMIT] pos=451 op=200 @parser.c:1786
+[QTS:EMIT] pos=452 u32=0x0000073a (1850) @parser.c:1788
+[QTS:EMIT] pos=456 op=186 @parser.c:1799
+[QTS:EMIT] pos=457 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=461 u16=0x0009 (9) @parser.c:1772
+[QTS:EMIT] pos=463 op=200 @parser.c:1786
+[QTS:EMIT] pos=464 u32=0x0000073b (1851) @parser.c:1788
+[QTS:EMIT] pos=468 op=66 @parser.c:1799
+[QTS:EMIT] pos=469 atom=59 @parser.c:1807
+[QTS:EMIT] pos=473 op=200 @parser.c:1786
+[QTS:EMIT] pos=474 u32=0x00000743 (1859) @parser.c:1788
+[QTS:EMIT] pos=478 op=36 @parser.c:1799
+[QTS:EMIT] pos=479 u16=0x0000 (0) @parser.c:1772
+[QTS:EMIT] pos=481 op=200 @parser.c:1786
+[QTS:EMIT] pos=482 u32=0x00000739 (1849) @parser.c:1788
+[QTS:EMIT] pos=486 op=34 @parser.c:1799
+[QTS:EMIT] pos=487 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=489 op=200 @parser.c:1786
+[QTS:EMIT] pos=490 u32=0x00000732 (1842) @parser.c:1788
+[QTS:EMIT] pos=494 op=159 @parser.c:1799
+[QTS:EMIT] pos=495 op=4 @parser.c:1799
+[QTS:EMIT] pos=496 u32=0x000001e1 (481) @parser.c:1777
+[QTS:EMIT] pos=500 op=200 @parser.c:1786
+[QTS:EMIT] pos=501 u32=0x00000747 (1863) @parser.c:1788
+[QTS:EMIT] pos=505 op=159 @parser.c:1799
+[QTS:EMIT] pos=506 op=184 @parser.c:1799
+[QTS:EMIT] pos=507 u32=0x0000000a (10) @parser.c:1777
+[QTS:EMIT] pos=511 op=22 @parser.c:1799
+[QTS:EMIT] pos=512 op=62 @parser.c:1799
+[QTS:EMIT] pos=513 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=9
+[QTS:SCOPE] pop: level=9
+[QTS:EMIT] pos=514 op=183 @parser.c:1799
+[QTS:EMIT] pos=515 u16=0x0009 (9) @parser.c:1772
+[QTS:EMIT] pos=517 op=110 @parser.c:1799
+[QTS:EMIT] pos=518 u32=0x0000000b (11) @parser.c:1777
+[QTS:EMIT] pos=522 op=184 @parser.c:1799
+[QTS:EMIT] pos=523 u32=0x00000009 (9) @parser.c:1777
+[QTS:SCOPE] push: level=10 first_var=-1
+[QTS:SCOPE] enter: idx=10 is_body=0
+[QTS:EMIT] pos=527 op=182 @parser.c:1799
+[QTS:EMIT] pos=528 u16=0x000a (10) @parser.c:1772
+[QTS:EMIT] pos=530 op=200 @parser.c:1786
+[QTS:EMIT] pos=531 u32=0x00000771 (1905) @parser.c:1788
+[QTS:EMIT] pos=535 op=186 @parser.c:1799
+[QTS:EMIT] pos=536 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=540 u16=0x000a (10) @parser.c:1772
+[QTS:EMIT] pos=542 op=200 @parser.c:1786
+[QTS:EMIT] pos=543 u32=0x0000077e (1918) @parser.c:1788
+[QTS:EMIT] pos=547 op=186 @parser.c:1799
+[QTS:EMIT] pos=548 u32=0x000000a2 (162) @parser.c:1777
+[QTS:EMIT] pos=552 u16=0x000a (10) @parser.c:1772
+[QTS:EMIT] pos=554 op=200 @parser.c:1786
+[QTS:EMIT] pos=555 u32=0x00000773 (1907) @parser.c:1788
+[QTS:EMIT] pos=559 op=169 @parser.c:1799
+[QTS:EMIT] pos=560 op=108 @parser.c:1799
+[QTS:EMIT] pos=561 u32=0x0000000c (12) @parser.c:1777
+[QTS:SCOPE] push: level=11 first_var=-1
+[QTS:SCOPE] enter: idx=11 is_body=0
+[QTS:EMIT] pos=565 op=182 @parser.c:1799
+[QTS:EMIT] pos=566 u16=0x000b (11) @parser.c:1772
+[QTS:EMIT] pos=568 op=200 @parser.c:1786
+[QTS:EMIT] pos=569 u32=0x00000799 (1945) @parser.c:1788
+[QTS:EMIT] pos=573 op=186 @parser.c:1799
+[QTS:EMIT] pos=574 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=578 u16=0x000b (11) @parser.c:1772
+[QTS:EMIT] pos=573 op=189 @parser.c:1799
+[QTS:EMIT] pos=574 atom=485 @parser.c:1807
+[QTS:EMIT] pos=578 u32=0x0000000d (13) @parser.c:1777
+[QTS:EMIT] pos=582 u16=0x000b (11) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=11 atom=485 label=13
+[QTS:EMIT] pos=584 op=4 @parser.c:1799
+[QTS:EMIT] pos=585 u32=0x000001f0 (496) @parser.c:1777
+[QTS:EMIT] pos=589 op=200 @parser.c:1786
+[QTS:EMIT] pos=590 u32=0x000007aa (1962) @parser.c:1788
+[QTS:EMIT] pos=594 op=186 @parser.c:1799
+[QTS:EMIT] pos=595 u32=0x000001ea (490) @parser.c:1777
+[QTS:EMIT] pos=599 u16=0x000b (11) @parser.c:1772
+[QTS:EMIT] pos=601 op=200 @parser.c:1786
+[QTS:EMIT] pos=602 u32=0x000007b0 (1968) @parser.c:1788
+[QTS:EMIT] pos=606 op=186 @parser.c:1799
+[QTS:EMIT] pos=607 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=611 u16=0x000b (11) @parser.c:1772
+[QTS:EMIT] pos=613 op=200 @parser.c:1786
+[QTS:EMIT] pos=614 u32=0x000007b1 (1969) @parser.c:1788
+[QTS:EMIT] pos=618 op=66 @parser.c:1799
+[QTS:EMIT] pos=619 atom=59 @parser.c:1807
+[QTS:EMIT] pos=623 op=200 @parser.c:1786
+[QTS:EMIT] pos=624 u32=0x000007b9 (1977) @parser.c:1788
+[QTS:EMIT] pos=628 op=36 @parser.c:1799
+[QTS:EMIT] pos=629 u16=0x0000 (0) @parser.c:1772
+[QTS:EMIT] pos=631 op=200 @parser.c:1786
+[QTS:EMIT] pos=632 u32=0x000007af (1967) @parser.c:1788
+[QTS:EMIT] pos=636 op=34 @parser.c:1799
+[QTS:EMIT] pos=637 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=639 op=200 @parser.c:1786
+[QTS:EMIT] pos=640 u32=0x000007a8 (1960) @parser.c:1788
+[QTS:EMIT] pos=644 op=159 @parser.c:1799
+[QTS:EMIT] pos=645 op=4 @parser.c:1799
+[QTS:EMIT] pos=646 u32=0x000001e1 (481) @parser.c:1777
+[QTS:EMIT] pos=650 op=200 @parser.c:1786
+[QTS:EMIT] pos=651 u32=0x000007bd (1981) @parser.c:1788
+[QTS:EMIT] pos=655 op=159 @parser.c:1799
+[QTS:EMIT] pos=656 op=184 @parser.c:1799
+[QTS:EMIT] pos=657 u32=0x0000000d (13) @parser.c:1777
+[QTS:EMIT] pos=661 op=22 @parser.c:1799
+[QTS:EMIT] pos=662 op=62 @parser.c:1799
+[QTS:EMIT] pos=663 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=11
+[QTS:SCOPE] pop: level=11
+[QTS:EMIT] pos=664 op=183 @parser.c:1799
+[QTS:EMIT] pos=665 u16=0x000b (11) @parser.c:1772
+[QTS:EMIT] pos=667 op=110 @parser.c:1799
+[QTS:EMIT] pos=668 u32=0x0000000e (14) @parser.c:1777
+[QTS:EMIT] pos=672 op=184 @parser.c:1799
+[QTS:EMIT] pos=673 u32=0x0000000c (12) @parser.c:1777
+[QTS:SCOPE] push: level=12 first_var=-1
+[QTS:SCOPE] enter: idx=12 is_body=0
+[QTS:EMIT] pos=677 op=182 @parser.c:1799
+[QTS:EMIT] pos=678 u16=0x000c (12) @parser.c:1772
+[QTS:EMIT] pos=680 op=200 @parser.c:1786
+[QTS:EMIT] pos=681 u32=0x000007e7 (2023) @parser.c:1788
+[QTS:EMIT] pos=685 op=186 @parser.c:1799
+[QTS:EMIT] pos=686 u32=0x000001e9 (489) @parser.c:1777
+[QTS:EMIT] pos=690 u16=0x000c (12) @parser.c:1772
+[QTS:EMIT] pos=692 op=200 @parser.c:1786
+[QTS:EMIT] pos=693 u32=0x000007f3 (2035) @parser.c:1788
+[QTS:EMIT] pos=697 op=186 @parser.c:1799
+[QTS:EMIT] pos=698 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=702 u16=0x000c (12) @parser.c:1772
+[QTS:EMIT] pos=704 op=200 @parser.c:1786
+[QTS:EMIT] pos=705 u32=0x000007f2 (2034) @parser.c:1788
+[QTS:EMIT] pos=709 op=34 @parser.c:1799
+[QTS:EMIT] pos=710 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=712 op=108 @parser.c:1799
+[QTS:EMIT] pos=713 u32=0x0000000f (15) @parser.c:1777
+[QTS:SCOPE] push: level=13 first_var=-1
+[QTS:SCOPE] enter: idx=13 is_body=0
+[QTS:EMIT] pos=717 op=182 @parser.c:1799
+[QTS:EMIT] pos=718 u16=0x000d (13) @parser.c:1772
+[QTS:EMIT] pos=720 op=200 @parser.c:1786
+[QTS:EMIT] pos=721 u32=0x00000809 (2057) @parser.c:1788
+[QTS:EMIT] pos=725 op=186 @parser.c:1799
+[QTS:EMIT] pos=726 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=730 u16=0x000d (13) @parser.c:1772
+[QTS:EMIT] pos=725 op=189 @parser.c:1799
+[QTS:EMIT] pos=726 atom=485 @parser.c:1807
+[QTS:EMIT] pos=730 u32=0x00000010 (16) @parser.c:1777
+[QTS:EMIT] pos=734 u16=0x000d (13) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=13 atom=485 label=16
+[QTS:EMIT] pos=736 op=4 @parser.c:1799
+[QTS:EMIT] pos=737 u32=0x000001f1 (497) @parser.c:1777
+[QTS:EMIT] pos=741 op=184 @parser.c:1799
+[QTS:EMIT] pos=742 u32=0x00000010 (16) @parser.c:1777
+[QTS:EMIT] pos=746 op=22 @parser.c:1799
+[QTS:EMIT] pos=747 op=62 @parser.c:1799
+[QTS:EMIT] pos=748 op=14 @parser.c:1799
+[QTS:SCOPE] push: level=14 first_var=-1
+[QTS:SCOPE] enter: idx=14 is_body=0
+[QTS:EMIT] pos=749 op=182 @parser.c:1799
+[QTS:EMIT] pos=750 u16=0x000e (14) @parser.c:1772
+[QTS:EMIT] pos=752 op=200 @parser.c:1786
+[QTS:EMIT] pos=753 u32=0x00000827 (2087) @parser.c:1788
+[QTS:EMIT] pos=757 op=186 @parser.c:1799
+[QTS:EMIT] pos=758 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=762 u16=0x000e (14) @parser.c:1772
+[QTS:EMIT] pos=757 op=189 @parser.c:1799
+[QTS:EMIT] pos=758 atom=484 @parser.c:1807
+[QTS:EMIT] pos=762 u32=0x00000011 (17) @parser.c:1777
+[QTS:EMIT] pos=766 u16=0x000e (14) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=14 atom=484 label=17
+[QTS:EMIT] pos=768 op=1 @parser.c:1799
+[QTS:EMIT] pos=769 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=773 op=184 @parser.c:1799
+[QTS:EMIT] pos=774 u32=0x00000011 (17) @parser.c:1777
+[QTS:EMIT] pos=778 op=22 @parser.c:1799
+[QTS:EMIT] pos=779 op=62 @parser.c:1799
+[QTS:EMIT] pos=780 op=14 @parser.c:1799
+[QTS:EMIT] pos=781 op=183 @parser.c:1799
+[QTS:EMIT] pos=782 u16=0x000e (14) @parser.c:1772
+[QTS:EMIT] pos=784 op=184 @parser.c:1799
+[QTS:EMIT] pos=785 u32=0x00000012 (18) @parser.c:1777
+[QTS:EMIT] pos=789 op=200 @parser.c:1786
+[QTS:EMIT] pos=790 u32=0x0000082e (2094) @parser.c:1788
+[QTS:EMIT] pos=794 op=186 @parser.c:1799
+[QTS:EMIT] pos=795 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=799 u16=0x000e (14) @parser.c:1772
+[QTS:EMIT] pos=801 op=200 @parser.c:1786
+[QTS:EMIT] pos=802 u32=0x00000832 (2098) @parser.c:1788
+[QTS:EMIT] pos=806 op=186 @parser.c:1799
+[QTS:EMIT] pos=807 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=811 u16=0x000e (14) @parser.c:1772
+[QTS:EMIT] pos=813 op=200 @parser.c:1786
+[QTS:EMIT] pos=814 u32=0x00000833 (2099) @parser.c:1788
+[QTS:EMIT] pos=818 op=66 @parser.c:1799
+[QTS:EMIT] pos=819 atom=48 @parser.c:1807
+[QTS:EMIT] pos=823 op=200 @parser.c:1786
+[QTS:EMIT] pos=824 u32=0x00000830 (2096) @parser.c:1788
+[QTS:EMIT] pos=828 op=165 @parser.c:1799
+[QTS:EMIT] pos=829 op=108 @parser.c:1799
+[QTS:EMIT] pos=830 u32=0x00000015 (21) @parser.c:1777
+[QTS:EMIT] pos=834 op=110 @parser.c:1799
+[QTS:EMIT] pos=835 u32=0x00000014 (20) @parser.c:1777
+[QTS:EMIT] pos=839 op=184 @parser.c:1799
+[QTS:EMIT] pos=840 u32=0x00000013 (19) @parser.c:1777
+[QTS:EMIT] pos=844 op=200 @parser.c:1786
+[QTS:EMIT] pos=845 u32=0x0000083c (2108) @parser.c:1788
+[QTS:EMIT] pos=849 op=186 @parser.c:1799
+[QTS:EMIT] pos=850 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=854 u16=0x000e (14) @parser.c:1772
+[QTS:EMIT] pos=849 op=189 @parser.c:1799
+[QTS:EMIT] pos=850 atom=484 @parser.c:1807
+[QTS:EMIT] pos=854 u32=0x00000016 (22) @parser.c:1777
+[QTS:EMIT] pos=858 u16=0x000e (14) @parser.c:1772
+[QTS:EMIT] pos=860 op=61 @parser.c:1799
+[QTS:EMIT] pos=861 op=200 @parser.c:1786
+[QTS:EMIT] pos=862 u32=0x0000083d (2109) @parser.c:1788
+[QTS:EMIT] pos=866 op=147 @parser.c:1799
+[QTS:EMIT] pos=867 op=184 @parser.c:1799
+[QTS:EMIT] pos=868 u32=0x00000016 (22) @parser.c:1777
+[QTS:EMIT] pos=872 op=25 @parser.c:1799
+[QTS:EMIT] pos=873 op=62 @parser.c:1799
+[QTS:EMIT] pos=874 op=14 @parser.c:1799
+[QTS:EMIT] pos=875 op=110 @parser.c:1799
+[QTS:EMIT] pos=876 u32=0x00000012 (18) @parser.c:1777
+[QTS:EMIT] pos=880 op=184 @parser.c:1799
+[QTS:EMIT] pos=881 u32=0x00000014 (20) @parser.c:1777
+[QTS:SCOPE] push: level=15 first_var=-1
+[QTS:SCOPE] enter: idx=15 is_body=0
+[QTS:EMIT] pos=885 op=182 @parser.c:1799
+[QTS:EMIT] pos=886 u16=0x000f (15) @parser.c:1772
+[QTS:SCOPE] push: level=16 first_var=-1
+[QTS:SCOPE] enter: idx=16 is_body=0
+[QTS:EMIT] pos=888 op=182 @parser.c:1799
+[QTS:EMIT] pos=889 u16=0x0010 (16) @parser.c:1772
+[QTS:EMIT] pos=891 op=200 @parser.c:1786
+[QTS:EMIT] pos=892 u32=0x0000085b (2139) @parser.c:1788
+[QTS:EMIT] pos=896 op=186 @parser.c:1799
+[QTS:EMIT] pos=897 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=901 u16=0x0010 (16) @parser.c:1772
+[QTS:EMIT] pos=903 op=1 @parser.c:1799
+[QTS:EMIT] pos=904 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=908 op=200 @parser.c:1786
+[QTS:EMIT] pos=909 u32=0x0000085d (2141) @parser.c:1788
+[QTS:EMIT] pos=913 op=172 @parser.c:1799
+[QTS:EMIT] pos=914 op=108 @parser.c:1799
+[QTS:EMIT] pos=915 u32=0x00000017 (23) @parser.c:1777
+[QTS:EMIT] pos=919 op=200 @parser.c:1786
+[QTS:EMIT] pos=920 u32=0x0000087b (2171) @parser.c:1788
+[QTS:EMIT] pos=924 op=186 @parser.c:1799
+[QTS:EMIT] pos=925 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=929 u16=0x0010 (16) @parser.c:1772
+[QTS:EMIT] pos=924 op=189 @parser.c:1799
+[QTS:EMIT] pos=925 atom=485 @parser.c:1807
+[QTS:EMIT] pos=929 u32=0x00000018 (24) @parser.c:1777
+[QTS:EMIT] pos=933 u16=0x0010 (16) @parser.c:1772
+[QTS:EMIT] pos=935 op=61 @parser.c:1799
+[QTS:ASSIGN] lvalue: opcode=61 scope=16 atom=485 label=24
+[QTS:EMIT] pos=936 op=4 @parser.c:1799
+[QTS:EMIT] pos=937 u32=0x000001f2 (498) @parser.c:1777
+[QTS:ASSIGN] compound: tok=59 op=159
+[QTS:EMIT] pos=941 op=200 @parser.c:1786
+[QTS:EMIT] pos=942 u32=0x0000087d (2173) @parser.c:1788
+[QTS:EMIT] pos=946 op=159 @parser.c:1799
+[QTS:EMIT] pos=947 op=184 @parser.c:1799
+[QTS:EMIT] pos=948 u32=0x00000018 (24) @parser.c:1777
+[QTS:EMIT] pos=952 op=22 @parser.c:1799
+[QTS:EMIT] pos=953 op=62 @parser.c:1799
+[QTS:EMIT] pos=954 op=14 @parser.c:1799
+[QTS:EMIT] pos=955 op=184 @parser.c:1799
+[QTS:EMIT] pos=956 u32=0x00000017 (23) @parser.c:1777
+[QTS:SCOPE] leave: idx=16
+[QTS:SCOPE] pop: level=16
+[QTS:EMIT] pos=960 op=183 @parser.c:1799
+[QTS:EMIT] pos=961 u16=0x0010 (16) @parser.c:1772
+[QTS:EMIT] pos=963 op=200 @parser.c:1786
+[QTS:EMIT] pos=964 u32=0x00000899 (2201) @parser.c:1788
+[QTS:EMIT] pos=968 op=186 @parser.c:1799
+[QTS:EMIT] pos=969 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=973 u16=0x000f (15) @parser.c:1772
+[QTS:EMIT] pos=968 op=189 @parser.c:1799
+[QTS:EMIT] pos=969 atom=485 @parser.c:1807
+[QTS:EMIT] pos=973 u32=0x00000019 (25) @parser.c:1777
+[QTS:EMIT] pos=977 u16=0x000f (15) @parser.c:1772
+[QTS:EMIT] pos=979 op=61 @parser.c:1799
+[QTS:ASSIGN] lvalue: opcode=61 scope=15 atom=485 label=25
+[QTS:EMIT] pos=980 op=200 @parser.c:1786
+[QTS:EMIT] pos=981 u32=0x0000089e (2206) @parser.c:1788
+[QTS:EMIT] pos=985 op=186 @parser.c:1799
+[QTS:EMIT] pos=986 u32=0x000001ea (490) @parser.c:1777
+[QTS:EMIT] pos=990 u16=0x000f (15) @parser.c:1772
+[QTS:EMIT] pos=992 op=200 @parser.c:1786
+[QTS:EMIT] pos=993 u32=0x000008a4 (2212) @parser.c:1788
+[QTS:EMIT] pos=997 op=186 @parser.c:1799
+[QTS:EMIT] pos=998 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=1002 u16=0x000f (15) @parser.c:1772
+[QTS:EMIT] pos=1004 op=200 @parser.c:1786
+[QTS:EMIT] pos=1005 u32=0x000008a6 (2214) @parser.c:1788
+[QTS:EMIT] pos=1009 op=186 @parser.c:1799
+[QTS:EMIT] pos=1010 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=1014 u16=0x000f (15) @parser.c:1772
+[QTS:EMIT] pos=1016 op=200 @parser.c:1786
+[QTS:EMIT] pos=1017 u32=0x000008a5 (2213) @parser.c:1788
+[QTS:EMIT] pos=1021 op=72 @parser.c:1799
+[QTS:EMIT] pos=1022 op=200 @parser.c:1786
+[QTS:EMIT] pos=1023 u32=0x000008a3 (2211) @parser.c:1788
+[QTS:EMIT] pos=1027 op=34 @parser.c:1799
+[QTS:EMIT] pos=1028 u16=0x0001 (1) @parser.c:1772
+[QTS:ASSIGN] compound: tok=59 op=159
+[QTS:EMIT] pos=1030 op=200 @parser.c:1786
+[QTS:EMIT] pos=1031 u32=0x0000089b (2203) @parser.c:1788
+[QTS:EMIT] pos=1035 op=159 @parser.c:1799
+[QTS:EMIT] pos=1036 op=184 @parser.c:1799
+[QTS:EMIT] pos=1037 u32=0x00000019 (25) @parser.c:1777
+[QTS:EMIT] pos=1041 op=22 @parser.c:1799
+[QTS:EMIT] pos=1042 op=62 @parser.c:1799
+[QTS:EMIT] pos=1043 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=15
+[QTS:SCOPE] pop: level=15
+[QTS:EMIT] pos=1044 op=183 @parser.c:1799
+[QTS:EMIT] pos=1045 u16=0x000f (15) @parser.c:1772
+[QTS:EMIT] pos=1047 op=183 @parser.c:1799
+[QTS:EMIT] pos=1048 u16=0x000e (14) @parser.c:1772
+[QTS:EMIT] pos=1091 op=184 @parser.c:1799
+[QTS:EMIT] pos=1092 u32=0x00000015 (21) @parser.c:1777
+[QTS:SCOPE] leave: idx=14
+[QTS:SCOPE] pop: level=14
+[QTS:EMIT] pos=1096 op=183 @parser.c:1799
+[QTS:EMIT] pos=1097 u16=0x000e (14) @parser.c:1772
+[QTS:EMIT] pos=1099 op=200 @parser.c:1786
+[QTS:EMIT] pos=1100 u32=0x000008cd (2253) @parser.c:1788
+[QTS:EMIT] pos=1104 op=186 @parser.c:1799
+[QTS:EMIT] pos=1105 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=1109 u16=0x000d (13) @parser.c:1772
+[QTS:EMIT] pos=1104 op=189 @parser.c:1799
+[QTS:EMIT] pos=1105 atom=485 @parser.c:1807
+[QTS:EMIT] pos=1109 u32=0x0000001a (26) @parser.c:1777
+[QTS:EMIT] pos=1113 u16=0x000d (13) @parser.c:1772
+[QTS:EMIT] pos=1115 op=61 @parser.c:1799
+[QTS:ASSIGN] lvalue: opcode=61 scope=13 atom=485 label=26
+[QTS:EMIT] pos=1116 op=4 @parser.c:1799
+[QTS:EMIT] pos=1117 u32=0x000001f3 (499) @parser.c:1777
+[QTS:ASSIGN] compound: tok=59 op=159
+[QTS:EMIT] pos=1121 op=200 @parser.c:1786
+[QTS:EMIT] pos=1122 u32=0x000008cf (2255) @parser.c:1788
+[QTS:EMIT] pos=1126 op=159 @parser.c:1799
+[QTS:EMIT] pos=1127 op=184 @parser.c:1799
+[QTS:EMIT] pos=1128 u32=0x0000001a (26) @parser.c:1777
+[QTS:EMIT] pos=1132 op=22 @parser.c:1799
+[QTS:EMIT] pos=1133 op=62 @parser.c:1799
+[QTS:EMIT] pos=1134 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=13
+[QTS:SCOPE] pop: level=13
+[QTS:EMIT] pos=1135 op=183 @parser.c:1799
+[QTS:EMIT] pos=1136 u16=0x000d (13) @parser.c:1772
+[QTS:EMIT] pos=1138 op=110 @parser.c:1799
+[QTS:EMIT] pos=1139 u32=0x0000001b (27) @parser.c:1777
+[QTS:EMIT] pos=1143 op=184 @parser.c:1799
+[QTS:EMIT] pos=1144 u32=0x0000000f (15) @parser.c:1777
+[QTS:SCOPE] push: level=17 first_var=-1
+[QTS:SCOPE] enter: idx=17 is_body=0
+[QTS:EMIT] pos=1148 op=182 @parser.c:1799
+[QTS:EMIT] pos=1149 u16=0x0011 (17) @parser.c:1772
+[QTS:EMIT] pos=1151 op=200 @parser.c:1786
+[QTS:EMIT] pos=1152 u32=0x00000908 (2312) @parser.c:1788
+[QTS:EMIT] pos=1156 op=186 @parser.c:1799
+[QTS:EMIT] pos=1157 u32=0x000001eb (491) @parser.c:1777
+[QTS:EMIT] pos=1161 u16=0x0011 (17) @parser.c:1772
+[QTS:EMIT] pos=1156 op=189 @parser.c:1799
+[QTS:EMIT] pos=1157 atom=491 @parser.c:1807
+[QTS:EMIT] pos=1161 u32=0x0000001c (28) @parser.c:1777
+[QTS:EMIT] pos=1165 u16=0x0011 (17) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=17 atom=491 label=28
+[QTS:EMIT] pos=1167 op=200 @parser.c:1786
+[QTS:EMIT] pos=1168 u32=0x00000910 (2320) @parser.c:1788
+[QTS:EMIT] pos=1172 op=186 @parser.c:1799
+[QTS:EMIT] pos=1173 u32=0x0000009d (157) @parser.c:1777
+[QTS:EMIT] pos=1177 u16=0x0011 (17) @parser.c:1772
+[QTS:EMIT] pos=1179 op=200 @parser.c:1786
+[QTS:EMIT] pos=1180 u32=0x00000916 (2326) @parser.c:1788
+[QTS:EMIT] pos=1184 op=66 @parser.c:1799
+[QTS:EMIT] pos=1185 atom=233 @parser.c:1807
+[QTS:EMIT] pos=1189 op=200 @parser.c:1786
+[QTS:EMIT] pos=1190 u32=0x0000091c (2332) @parser.c:1788
+[QTS:EMIT] pos=1194 op=186 @parser.c:1799
+[QTS:EMIT] pos=1195 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=1199 u16=0x0011 (17) @parser.c:1772
+[QTS:EMIT] pos=1201 op=200 @parser.c:1786
+[QTS:EMIT] pos=1202 u32=0x0000091b (2331) @parser.c:1788
+[QTS:EMIT] pos=1206 op=36 @parser.c:1799
+[QTS:EMIT] pos=1207 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=1209 op=184 @parser.c:1799
+[QTS:EMIT] pos=1210 u32=0x0000001c (28) @parser.c:1777
+[QTS:EMIT] pos=1214 op=22 @parser.c:1799
+[QTS:EMIT] pos=1215 op=62 @parser.c:1799
+[QTS:EMIT] pos=1216 op=14 @parser.c:1799
+[QTS:EMIT] pos=1217 op=200 @parser.c:1786
+[QTS:EMIT] pos=1218 u32=0x00000930 (2352) @parser.c:1788
+[QTS:EMIT] pos=1222 op=186 @parser.c:1799
+[QTS:EMIT] pos=1223 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=1227 u16=0x0011 (17) @parser.c:1772
+[QTS:EMIT] pos=1222 op=189 @parser.c:1799
+[QTS:EMIT] pos=1223 atom=485 @parser.c:1807
+[QTS:EMIT] pos=1227 u32=0x0000001d (29) @parser.c:1777
+[QTS:EMIT] pos=1231 u16=0x0011 (17) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=17 atom=485 label=29
+[QTS:EMIT] pos=1233 op=4 @parser.c:1799
+[QTS:EMIT] pos=1234 u32=0x000001f4 (500) @parser.c:1777
+[QTS:EMIT] pos=1238 op=184 @parser.c:1799
+[QTS:EMIT] pos=1239 u32=0x0000001d (29) @parser.c:1777
+[QTS:EMIT] pos=1243 op=22 @parser.c:1799
+[QTS:EMIT] pos=1244 op=62 @parser.c:1799
+[QTS:EMIT] pos=1245 op=14 @parser.c:1799
+[QTS:SCOPE] push: level=18 first_var=-1
+[QTS:SCOPE] enter: idx=18 is_body=0
+[QTS:EMIT] pos=1246 op=182 @parser.c:1799
+[QTS:EMIT] pos=1247 u16=0x0012 (18) @parser.c:1772
+[QTS:EMIT] pos=1249 op=200 @parser.c:1786
+[QTS:EMIT] pos=1250 u32=0x0000094e (2382) @parser.c:1788
+[QTS:EMIT] pos=1254 op=186 @parser.c:1799
+[QTS:EMIT] pos=1255 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=1259 u16=0x0012 (18) @parser.c:1772
+[QTS:EMIT] pos=1254 op=189 @parser.c:1799
+[QTS:EMIT] pos=1255 atom=484 @parser.c:1807
+[QTS:EMIT] pos=1259 u32=0x0000001e (30) @parser.c:1777
+[QTS:EMIT] pos=1263 u16=0x0012 (18) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=18 atom=484 label=30
+[QTS:EMIT] pos=1265 op=1 @parser.c:1799
+[QTS:EMIT] pos=1266 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=1270 op=184 @parser.c:1799
+[QTS:EMIT] pos=1271 u32=0x0000001e (30) @parser.c:1777
+[QTS:EMIT] pos=1275 op=22 @parser.c:1799
+[QTS:EMIT] pos=1276 op=62 @parser.c:1799
+[QTS:EMIT] pos=1277 op=14 @parser.c:1799
+[QTS:EMIT] pos=1278 op=183 @parser.c:1799
+[QTS:EMIT] pos=1279 u16=0x0012 (18) @parser.c:1772
+[QTS:EMIT] pos=1281 op=184 @parser.c:1799
+[QTS:EMIT] pos=1282 u32=0x0000001f (31) @parser.c:1777
+[QTS:EMIT] pos=1286 op=200 @parser.c:1786
+[QTS:EMIT] pos=1287 u32=0x00000955 (2389) @parser.c:1788
+[QTS:EMIT] pos=1291 op=186 @parser.c:1799
+[QTS:EMIT] pos=1292 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=1296 u16=0x0012 (18) @parser.c:1772
+[QTS:EMIT] pos=1298 op=200 @parser.c:1786
+[QTS:EMIT] pos=1299 u32=0x00000959 (2393) @parser.c:1788
+[QTS:EMIT] pos=1303 op=186 @parser.c:1799
+[QTS:EMIT] pos=1304 u32=0x000001eb (491) @parser.c:1777
+[QTS:EMIT] pos=1308 u16=0x0012 (18) @parser.c:1772
+[QTS:EMIT] pos=1310 op=200 @parser.c:1786
+[QTS:EMIT] pos=1311 u32=0x0000095e (2398) @parser.c:1788
+[QTS:EMIT] pos=1315 op=66 @parser.c:1799
+[QTS:EMIT] pos=1316 atom=48 @parser.c:1807
+[QTS:EMIT] pos=1320 op=200 @parser.c:1786
+[QTS:EMIT] pos=1321 u32=0x00000957 (2391) @parser.c:1788
+[QTS:EMIT] pos=1325 op=165 @parser.c:1799
+[QTS:EMIT] pos=1326 op=108 @parser.c:1799
+[QTS:EMIT] pos=1327 u32=0x00000022 (34) @parser.c:1777
+[QTS:EMIT] pos=1331 op=110 @parser.c:1799
+[QTS:EMIT] pos=1332 u32=0x00000021 (33) @parser.c:1777
+[QTS:EMIT] pos=1336 op=184 @parser.c:1799
+[QTS:EMIT] pos=1337 u32=0x00000020 (32) @parser.c:1777
+[QTS:EMIT] pos=1341 op=200 @parser.c:1786
+[QTS:EMIT] pos=1342 u32=0x00000967 (2407) @parser.c:1788
+[QTS:EMIT] pos=1346 op=186 @parser.c:1799
+[QTS:EMIT] pos=1347 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=1351 u16=0x0012 (18) @parser.c:1772
+[QTS:EMIT] pos=1346 op=189 @parser.c:1799
+[QTS:EMIT] pos=1347 atom=484 @parser.c:1807
+[QTS:EMIT] pos=1351 u32=0x00000023 (35) @parser.c:1777
+[QTS:EMIT] pos=1355 u16=0x0012 (18) @parser.c:1772
+[QTS:EMIT] pos=1357 op=61 @parser.c:1799
+[QTS:EMIT] pos=1358 op=200 @parser.c:1786
+[QTS:EMIT] pos=1359 u32=0x00000968 (2408) @parser.c:1788
+[QTS:EMIT] pos=1363 op=147 @parser.c:1799
+[QTS:EMIT] pos=1364 op=184 @parser.c:1799
+[QTS:EMIT] pos=1365 u32=0x00000023 (35) @parser.c:1777
+[QTS:EMIT] pos=1369 op=25 @parser.c:1799
+[QTS:EMIT] pos=1370 op=62 @parser.c:1799
+[QTS:EMIT] pos=1371 op=14 @parser.c:1799
+[QTS:EMIT] pos=1372 op=110 @parser.c:1799
+[QTS:EMIT] pos=1373 u32=0x0000001f (31) @parser.c:1777
+[QTS:EMIT] pos=1377 op=184 @parser.c:1799
+[QTS:EMIT] pos=1378 u32=0x00000021 (33) @parser.c:1777
+[QTS:SCOPE] push: level=19 first_var=-1
+[QTS:SCOPE] enter: idx=19 is_body=0
+[QTS:EMIT] pos=1382 op=182 @parser.c:1799
+[QTS:EMIT] pos=1383 u16=0x0013 (19) @parser.c:1772
+[QTS:SCOPE] push: level=20 first_var=-1
+[QTS:SCOPE] enter: idx=20 is_body=0
+[QTS:EMIT] pos=1385 op=182 @parser.c:1799
+[QTS:EMIT] pos=1386 u16=0x0014 (20) @parser.c:1772
+[QTS:EMIT] pos=1388 op=200 @parser.c:1786
+[QTS:EMIT] pos=1389 u32=0x00000986 (2438) @parser.c:1788
+[QTS:EMIT] pos=1393 op=186 @parser.c:1799
+[QTS:EMIT] pos=1394 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=1398 u16=0x0014 (20) @parser.c:1772
+[QTS:EMIT] pos=1400 op=1 @parser.c:1799
+[QTS:EMIT] pos=1401 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=1405 op=200 @parser.c:1786
+[QTS:EMIT] pos=1406 u32=0x00000988 (2440) @parser.c:1788
+[QTS:EMIT] pos=1410 op=172 @parser.c:1799
+[QTS:EMIT] pos=1411 op=108 @parser.c:1799
+[QTS:EMIT] pos=1412 u32=0x00000024 (36) @parser.c:1777
+[QTS:EMIT] pos=1416 op=200 @parser.c:1786
+[QTS:EMIT] pos=1417 u32=0x000009a6 (2470) @parser.c:1788
+[QTS:EMIT] pos=1421 op=186 @parser.c:1799
+[QTS:EMIT] pos=1422 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=1426 u16=0x0014 (20) @parser.c:1772
+[QTS:EMIT] pos=1421 op=189 @parser.c:1799
+[QTS:EMIT] pos=1422 atom=485 @parser.c:1807
+[QTS:EMIT] pos=1426 u32=0x00000025 (37) @parser.c:1777
+[QTS:EMIT] pos=1430 u16=0x0014 (20) @parser.c:1772
+[QTS:EMIT] pos=1432 op=61 @parser.c:1799
+[QTS:ASSIGN] lvalue: opcode=61 scope=20 atom=485 label=37
+[QTS:EMIT] pos=1433 op=4 @parser.c:1799
+[QTS:EMIT] pos=1434 u32=0x000001f2 (498) @parser.c:1777
+[QTS:ASSIGN] compound: tok=59 op=159
+[QTS:EMIT] pos=1438 op=200 @parser.c:1786
+[QTS:EMIT] pos=1439 u32=0x000009a8 (2472) @parser.c:1788
+[QTS:EMIT] pos=1443 op=159 @parser.c:1799
+[QTS:EMIT] pos=1444 op=184 @parser.c:1799
+[QTS:EMIT] pos=1445 u32=0x00000025 (37) @parser.c:1777
+[QTS:EMIT] pos=1449 op=22 @parser.c:1799
+[QTS:EMIT] pos=1450 op=62 @parser.c:1799
+[QTS:EMIT] pos=1451 op=14 @parser.c:1799
+[QTS:EMIT] pos=1452 op=184 @parser.c:1799
+[QTS:EMIT] pos=1453 u32=0x00000024 (36) @parser.c:1777
+[QTS:SCOPE] leave: idx=20
+[QTS:SCOPE] pop: level=20
+[QTS:EMIT] pos=1457 op=183 @parser.c:1799
+[QTS:EMIT] pos=1458 u16=0x0014 (20) @parser.c:1772
+[QTS:EMIT] pos=1460 op=200 @parser.c:1786
+[QTS:EMIT] pos=1461 u32=0x000009c4 (2500) @parser.c:1788
+[QTS:EMIT] pos=1465 op=186 @parser.c:1799
+[QTS:EMIT] pos=1466 u32=0x000001ec (492) @parser.c:1777
+[QTS:EMIT] pos=1470 u16=0x0013 (19) @parser.c:1772
+[QTS:EMIT] pos=1465 op=189 @parser.c:1799
+[QTS:EMIT] pos=1466 atom=492 @parser.c:1807
+[QTS:EMIT] pos=1470 u32=0x00000026 (38) @parser.c:1777
+[QTS:EMIT] pos=1474 u16=0x0013 (19) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=19 atom=492 label=38
+[QTS:EMIT] pos=1476 op=200 @parser.c:1786
+[QTS:EMIT] pos=1477 u32=0x000009cb (2507) @parser.c:1788
+[QTS:EMIT] pos=1481 op=186 @parser.c:1799
+[QTS:EMIT] pos=1482 u32=0x000001eb (491) @parser.c:1777
+[QTS:EMIT] pos=1486 u16=0x0013 (19) @parser.c:1772
+[QTS:EMIT] pos=1488 op=200 @parser.c:1786
+[QTS:EMIT] pos=1489 u32=0x000009d1 (2513) @parser.c:1788
+[QTS:EMIT] pos=1493 op=186 @parser.c:1799
+[QTS:EMIT] pos=1494 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=1498 u16=0x0013 (19) @parser.c:1772
+[QTS:EMIT] pos=1500 op=200 @parser.c:1786
+[QTS:EMIT] pos=1501 u32=0x000009d0 (2512) @parser.c:1788
+[QTS:EMIT] pos=1505 op=72 @parser.c:1799
+[QTS:EMIT] pos=1506 op=184 @parser.c:1799
+[QTS:EMIT] pos=1507 u32=0x00000026 (38) @parser.c:1777
+[QTS:EMIT] pos=1511 op=22 @parser.c:1799
+[QTS:EMIT] pos=1512 op=62 @parser.c:1799
+[QTS:EMIT] pos=1513 op=14 @parser.c:1799
+[QTS:EMIT] pos=1514 op=200 @parser.c:1786
+[QTS:EMIT] pos=1515 u32=0x000009e9 (2537) @parser.c:1788
+[QTS:EMIT] pos=1519 op=186 @parser.c:1799
+[QTS:EMIT] pos=1520 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=1524 u16=0x0013 (19) @parser.c:1772
+[QTS:EMIT] pos=1519 op=189 @parser.c:1799
+[QTS:EMIT] pos=1520 atom=485 @parser.c:1807
+[QTS:EMIT] pos=1524 u32=0x00000027 (39) @parser.c:1777
+[QTS:EMIT] pos=1528 u16=0x0013 (19) @parser.c:1772
+[QTS:EMIT] pos=1530 op=61 @parser.c:1799
+[QTS:ASSIGN] lvalue: opcode=61 scope=19 atom=485 label=39
+[QTS:EMIT] pos=1531 op=200 @parser.c:1786
+[QTS:EMIT] pos=1532 u32=0x000009ee (2542) @parser.c:1788
+[QTS:EMIT] pos=1536 op=186 @parser.c:1799
+[QTS:EMIT] pos=1537 u32=0x000001ec (492) @parser.c:1777
+[QTS:EMIT] pos=1541 u16=0x0013 (19) @parser.c:1772
+[QTS:EMIT] pos=1543 op=4 @parser.c:1799
+[QTS:EMIT] pos=1544 u32=0x000001f5 (501) @parser.c:1777
+[QTS:EMIT] pos=1548 op=200 @parser.c:1786
+[QTS:EMIT] pos=1549 u32=0x000009f3 (2547) @parser.c:1788
+[QTS:EMIT] pos=1553 op=159 @parser.c:1799
+[QTS:EMIT] pos=1554 op=200 @parser.c:1786
+[QTS:EMIT] pos=1555 u32=0x000009fb (2555) @parser.c:1788
+[QTS:EMIT] pos=1559 op=186 @parser.c:1799
+[QTS:EMIT] pos=1560 u32=0x000001ea (490) @parser.c:1777
+[QTS:EMIT] pos=1564 u16=0x0013 (19) @parser.c:1772
+[QTS:EMIT] pos=1566 op=200 @parser.c:1786
+[QTS:EMIT] pos=1567 u32=0x00000a01 (2561) @parser.c:1788
+[QTS:EMIT] pos=1571 op=186 @parser.c:1799
+[QTS:EMIT] pos=1572 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=1576 u16=0x0013 (19) @parser.c:1772
+[QTS:EMIT] pos=1578 op=200 @parser.c:1786
+[QTS:EMIT] pos=1579 u32=0x00000a03 (2563) @parser.c:1788
+[QTS:EMIT] pos=1583 op=186 @parser.c:1799
+[QTS:EMIT] pos=1584 u32=0x000001ec (492) @parser.c:1777
+[QTS:EMIT] pos=1588 u16=0x0013 (19) @parser.c:1772
+[QTS:EMIT] pos=1590 op=200 @parser.c:1786
+[QTS:EMIT] pos=1591 u32=0x00000a02 (2562) @parser.c:1788
+[QTS:EMIT] pos=1595 op=72 @parser.c:1799
+[QTS:EMIT] pos=1596 op=200 @parser.c:1786
+[QTS:EMIT] pos=1597 u32=0x00000a00 (2560) @parser.c:1788
+[QTS:EMIT] pos=1601 op=34 @parser.c:1799
+[QTS:EMIT] pos=1602 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=1604 op=200 @parser.c:1786
+[QTS:EMIT] pos=1605 u32=0x000009f9 (2553) @parser.c:1788
+[QTS:EMIT] pos=1609 op=159 @parser.c:1799
+[QTS:ASSIGN] compound: tok=59 op=159
+[QTS:EMIT] pos=1610 op=200 @parser.c:1786
+[QTS:EMIT] pos=1611 u32=0x000009eb (2539) @parser.c:1788
+[QTS:EMIT] pos=1615 op=159 @parser.c:1799
+[QTS:EMIT] pos=1616 op=184 @parser.c:1799
+[QTS:EMIT] pos=1617 u32=0x00000027 (39) @parser.c:1777
+[QTS:EMIT] pos=1621 op=22 @parser.c:1799
+[QTS:EMIT] pos=1622 op=62 @parser.c:1799
+[QTS:EMIT] pos=1623 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=19
+[QTS:SCOPE] pop: level=19
+[QTS:EMIT] pos=1624 op=183 @parser.c:1799
+[QTS:EMIT] pos=1625 u16=0x0013 (19) @parser.c:1772
+[QTS:EMIT] pos=1627 op=183 @parser.c:1799
+[QTS:EMIT] pos=1628 u16=0x0012 (18) @parser.c:1772
+[QTS:EMIT] pos=1671 op=184 @parser.c:1799
+[QTS:EMIT] pos=1672 u32=0x00000022 (34) @parser.c:1777
+[QTS:SCOPE] leave: idx=18
+[QTS:SCOPE] pop: level=18
+[QTS:EMIT] pos=1676 op=183 @parser.c:1799
+[QTS:EMIT] pos=1677 u16=0x0012 (18) @parser.c:1772
+[QTS:EMIT] pos=1679 op=200 @parser.c:1786
+[QTS:EMIT] pos=1680 u32=0x00000a2d (2605) @parser.c:1788
+[QTS:EMIT] pos=1684 op=186 @parser.c:1799
+[QTS:EMIT] pos=1685 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=1689 u16=0x0011 (17) @parser.c:1772
+[QTS:EMIT] pos=1684 op=189 @parser.c:1799
+[QTS:EMIT] pos=1685 atom=485 @parser.c:1807
+[QTS:EMIT] pos=1689 u32=0x00000028 (40) @parser.c:1777
+[QTS:EMIT] pos=1693 u16=0x0011 (17) @parser.c:1772
+[QTS:EMIT] pos=1695 op=61 @parser.c:1799
+[QTS:ASSIGN] lvalue: opcode=61 scope=17 atom=485 label=40
+[QTS:EMIT] pos=1696 op=4 @parser.c:1799
+[QTS:EMIT] pos=1697 u32=0x000001f6 (502) @parser.c:1777
+[QTS:ASSIGN] compound: tok=59 op=159
+[QTS:EMIT] pos=1701 op=200 @parser.c:1786
+[QTS:EMIT] pos=1702 u32=0x00000a2f (2607) @parser.c:1788
+[QTS:EMIT] pos=1706 op=159 @parser.c:1799
+[QTS:EMIT] pos=1707 op=184 @parser.c:1799
+[QTS:EMIT] pos=1708 u32=0x00000028 (40) @parser.c:1777
+[QTS:EMIT] pos=1712 op=22 @parser.c:1799
+[QTS:EMIT] pos=1713 op=62 @parser.c:1799
+[QTS:EMIT] pos=1714 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=17
+[QTS:SCOPE] pop: level=17
+[QTS:EMIT] pos=1715 op=183 @parser.c:1799
+[QTS:EMIT] pos=1716 u16=0x0011 (17) @parser.c:1772
+[QTS:EMIT] pos=1718 op=184 @parser.c:1799
+[QTS:EMIT] pos=1719 u32=0x0000001b (27) @parser.c:1777
+[QTS:SCOPE] leave: idx=12
+[QTS:SCOPE] pop: level=12
+[QTS:EMIT] pos=1723 op=183 @parser.c:1799
+[QTS:EMIT] pos=1724 u16=0x000c (12) @parser.c:1772
+[QTS:EMIT] pos=1726 op=184 @parser.c:1799
+[QTS:EMIT] pos=1727 u32=0x0000000e (14) @parser.c:1777
+[QTS:SCOPE] leave: idx=10
+[QTS:SCOPE] pop: level=10
+[QTS:EMIT] pos=1731 op=183 @parser.c:1799
+[QTS:EMIT] pos=1732 u16=0x000a (10) @parser.c:1772
+[QTS:EMIT] pos=1734 op=184 @parser.c:1799
+[QTS:EMIT] pos=1735 u32=0x0000000b (11) @parser.c:1777
+[QTS:SCOPE] leave: idx=8
+[QTS:SCOPE] pop: level=8
+[QTS:EMIT] pos=1739 op=183 @parser.c:1799
+[QTS:EMIT] pos=1740 u16=0x0008 (8) @parser.c:1772
+[QTS:EMIT] pos=1742 op=184 @parser.c:1799
+[QTS:EMIT] pos=1743 u32=0x00000008 (8) @parser.c:1777
+[QTS:SCOPE] leave: idx=6
+[QTS:SCOPE] pop: level=6
+[QTS:EMIT] pos=1747 op=183 @parser.c:1799
+[QTS:EMIT] pos=1748 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1750 op=184 @parser.c:1799
+[QTS:EMIT] pos=1751 u32=0x00000005 (5) @parser.c:1777
+[QTS:SCOPE] leave: idx=4
+[QTS:SCOPE] pop: level=4
+[QTS:EMIT] pos=1755 op=183 @parser.c:1799
+[QTS:EMIT] pos=1756 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=1758 op=200 @parser.c:1786
+[QTS:EMIT] pos=1759 u32=0x00000a58 (2648) @parser.c:1788
+[QTS:EMIT] pos=1763 op=186 @parser.c:1799
+[QTS:EMIT] pos=1764 u32=0x000001e5 (485) @parser.c:1777
+[QTS:EMIT] pos=1768 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=1770 op=200 @parser.c:1786
+[QTS:EMIT] pos=1771 u32=0x00000a51 (2641) @parser.c:1788
+[QTS:EMIT] pos=1775 op=40 @parser.c:1799
+[QTS:EMIT] pos=1776 op=184 @parser.c:1799
+[QTS:EMIT] pos=1777 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=1781 op=17 @parser.c:1799
+[QTS:EMIT] pos=1782 op=4 @parser.c:1799
+[QTS:EMIT] pos=1783 u32=0x00000047 (71) @parser.c:1777
+[QTS:EMIT] pos=1787 op=173 @parser.c:1799
+[QTS:EMIT] pos=1788 op=108 @parser.c:1799
+[QTS:EMIT] pos=1789 u32=0x00000029 (41) @parser.c:1777
+[QTS:EMIT] pos=1793 op=4 @parser.c:1799
+[QTS:EMIT] pos=1794 u32=0x00000047 (71) @parser.c:1777
+[QTS:EMIT] pos=1798 op=200 @parser.c:1786
+[QTS:EMIT] pos=1799 u32=0x00000a81 (2689) @parser.c:1788
+[QTS:EMIT] pos=1803 op=40 @parser.c:1799
+[QTS:EMIT] pos=1804 op=184 @parser.c:1799
+[QTS:EMIT] pos=1805 u32=0x00000029 (41) @parser.c:1777
+[QTS:EMIT] pos=1809 op=17 @parser.c:1799
+[QTS:EMIT] pos=1810 op=4 @parser.c:1799
+[QTS:EMIT] pos=1811 u32=0x0000004a (74) @parser.c:1777
+[QTS:EMIT] pos=1815 op=173 @parser.c:1799
+[QTS:EMIT] pos=1816 op=108 @parser.c:1799
+[QTS:EMIT] pos=1817 u32=0x0000002a (42) @parser.c:1777
+[QTS:EMIT] pos=1821 op=200 @parser.c:1786
+[QTS:EMIT] pos=1822 u32=0x00000abf (2751) @parser.c:1788
+[QTS:EMIT] pos=1826 op=186 @parser.c:1799
+[QTS:EMIT] pos=1827 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=1831 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=1833 op=200 @parser.c:1786
+[QTS:EMIT] pos=1834 u32=0x00000ac0 (2752) @parser.c:1788
+[QTS:EMIT] pos=1838 op=66 @parser.c:1799
+[QTS:EMIT] pos=1839 atom=338 @parser.c:1807
+[QTS:EMIT] pos=1843 op=200 @parser.c:1786
+[QTS:EMIT] pos=1844 u32=0x00000ac8 (2760) @parser.c:1788
+[QTS:EMIT] pos=1848 op=36 @parser.c:1799
+[QTS:EMIT] pos=1849 u16=0x0000 (0) @parser.c:1772
+[QTS:EMIT] pos=1851 op=200 @parser.c:1786
+[QTS:EMIT] pos=1852 u32=0x00000ab8 (2744) @parser.c:1788
+[QTS:EMIT] pos=1856 op=40 @parser.c:1799
+[QTS:EMIT] pos=1857 op=184 @parser.c:1799
+[QTS:EMIT] pos=1858 u32=0x0000002a (42) @parser.c:1777
+[QTS:EMIT] pos=1862 op=17 @parser.c:1799
+[QTS:EMIT] pos=1863 op=4 @parser.c:1799
+[QTS:EMIT] pos=1864 u32=0x00000048 (72) @parser.c:1777
+[QTS:EMIT] pos=1868 op=173 @parser.c:1799
+[QTS:EMIT] pos=1869 op=108 @parser.c:1799
+[QTS:EMIT] pos=1870 u32=0x0000002b (43) @parser.c:1777
+[QTS:SCOPE] push: level=21 first_var=-1
+[QTS:SCOPE] enter: idx=21 is_body=0
+[QTS:EMIT] pos=1874 op=182 @parser.c:1799
+[QTS:EMIT] pos=1875 u16=0x0015 (21) @parser.c:1772
+[QTS:EMIT] pos=1877 op=200 @parser.c:1786
+[QTS:EMIT] pos=1878 u32=0x00000af3 (2803) @parser.c:1788
+[QTS:EMIT] pos=1882 op=186 @parser.c:1799
+[QTS:EMIT] pos=1883 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=1887 u16=0x0015 (21) @parser.c:1772
+[QTS:EMIT] pos=1889 op=1 @parser.c:1799
+[QTS:EMIT] pos=1890 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=1894 op=200 @parser.c:1786
+[QTS:EMIT] pos=1895 u32=0x00000af5 (2805) @parser.c:1788
+[QTS:EMIT] pos=1899 op=171 @parser.c:1799
+[QTS:EMIT] pos=1900 op=17 @parser.c:1799
+[QTS:EMIT] pos=1901 op=108 @parser.c:1799
+[QTS:EMIT] pos=1902 u32=0x0000002c (44) @parser.c:1777
+[QTS:EMIT] pos=1906 op=14 @parser.c:1799
+[QTS:EMIT] pos=1907 op=1 @parser.c:1799
+[QTS:EMIT] pos=1908 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=1912 op=200 @parser.c:1786
+[QTS:EMIT] pos=1913 u32=0x00000b01 (2817) @parser.c:1788
+[QTS:EMIT] pos=1917 op=186 @parser.c:1799
+[QTS:EMIT] pos=1918 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=1922 u16=0x0015 (21) @parser.c:1772
+[QTS:EMIT] pos=1924 op=200 @parser.c:1786
+[QTS:EMIT] pos=1925 u32=0x00000aff (2815) @parser.c:1788
+[QTS:EMIT] pos=1929 op=157 @parser.c:1799
+[QTS:EMIT] pos=1930 op=1 @parser.c:1799
+[QTS:EMIT] pos=1931 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=1935 op=200 @parser.c:1786
+[QTS:EMIT] pos=1936 u32=0x00000b03 (2819) @parser.c:1788
+[QTS:EMIT] pos=1940 op=165 @parser.c:1799
+[QTS:EMIT] pos=1941 op=184 @parser.c:1799
+[QTS:EMIT] pos=1942 u32=0x0000002c (44) @parser.c:1777
+[QTS:EMIT] pos=1946 op=108 @parser.c:1799
+[QTS:EMIT] pos=1947 u32=0x0000002d (45) @parser.c:1777
+[QTS:EMIT] pos=1951 op=4 @parser.c:1799
+[QTS:EMIT] pos=1952 u32=0x0000008f (143) @parser.c:1777
+[QTS:EMIT] pos=1956 op=200 @parser.c:1786
+[QTS:EMIT] pos=1957 u32=0x00000b18 (2840) @parser.c:1788
+[QTS:EMIT] pos=1961 op=40 @parser.c:1799
+[QTS:EMIT] pos=1962 op=184 @parser.c:1799
+[QTS:EMIT] pos=1963 u32=0x0000002d (45) @parser.c:1777
+[QTS:EMIT] pos=1967 op=200 @parser.c:1786
+[QTS:EMIT] pos=1968 u32=0x00000b4d (2893) @parser.c:1788
+[QTS:EMIT] pos=1972 op=186 @parser.c:1799
+[QTS:EMIT] pos=1973 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=1977 u16=0x0015 (21) @parser.c:1772
+[QTS:EMIT] pos=1979 op=200 @parser.c:1786
+[QTS:EMIT] pos=1980 u32=0x00000b4e (2894) @parser.c:1788
+[QTS:EMIT] pos=1984 op=66 @parser.c:1799
+[QTS:EMIT] pos=1985 atom=57 @parser.c:1807
+[QTS:EMIT] pos=1989 op=200 @parser.c:1786
+[QTS:EMIT] pos=1990 u32=0x00000b57 (2903) @parser.c:1788
+[QTS:EMIT] pos=1994 op=36 @parser.c:1799
+[QTS:EMIT] pos=1995 u16=0x0000 (0) @parser.c:1772
+[QTS:EMIT] pos=1997 op=200 @parser.c:1786
+[QTS:EMIT] pos=1998 u32=0x00000b46 (2886) @parser.c:1788
+[QTS:EMIT] pos=2002 op=40 @parser.c:1799
+[QTS:SCOPE] leave: idx=21
+[QTS:SCOPE] pop: level=21
+[QTS:EMIT] pos=2003 op=183 @parser.c:1799
+[QTS:EMIT] pos=2004 u16=0x0015 (21) @parser.c:1772
+[QTS:EMIT] pos=2006 op=110 @parser.c:1799
+[QTS:EMIT] pos=2007 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=2011 op=184 @parser.c:1799
+[QTS:EMIT] pos=2012 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=2016 op=200 @parser.c:1786
+[QTS:EMIT] pos=2017 u32=0x00000b92 (2962) @parser.c:1788
+[QTS:EMIT] pos=2021 op=186 @parser.c:1799
+[QTS:EMIT] pos=2022 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=2026 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=2028 op=200 @parser.c:1786
+[QTS:EMIT] pos=2029 u32=0x00000b93 (2963) @parser.c:1788
+[QTS:EMIT] pos=2033 op=66 @parser.c:1799
+[QTS:EMIT] pos=2034 atom=57 @parser.c:1807
+[QTS:EMIT] pos=2038 op=200 @parser.c:1786
+[QTS:EMIT] pos=2039 u32=0x00000b9c (2972) @parser.c:1788
+[QTS:EMIT] pos=2043 op=36 @parser.c:1799
+[QTS:EMIT] pos=2044 u16=0x0000 (0) @parser.c:1772
+[QTS:EMIT] pos=2046 op=200 @parser.c:1786
+[QTS:EMIT] pos=2047 u32=0x00000b8b (2955) @parser.c:1788
+[QTS:EMIT] pos=2051 op=40 @parser.c:1799
+[QTS:EMIT] pos=2052 op=184 @parser.c:1799
+[QTS:EMIT] pos=2053 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=2057 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=2
+[QTS:SCOPE] pop: level=2
+[QTS:EMIT] pos=2058 op=183 @parser.c:1799
+[QTS:EMIT] pos=2059 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=2061 op=41 @parser.c:1799
+[QTS:SCOPE] push: level=1 first_var=-1
+[QTS:SCOPE] enter: idx=1 is_body=0
+[QTS:EMIT] pos=0 op=182 @parser.c:1799
+[QTS:EMIT] pos=1 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=3 op=200 @parser.c:1786
+[QTS:EMIT] pos=4 u32=0x00000be3 (3043) @parser.c:1788
+[QTS:EMIT] pos=8 op=186 @parser.c:1799
+[QTS:EMIT] pos=9 u32=0x000001fa (506) @parser.c:1777
+[QTS:EMIT] pos=13 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=8 op=189 @parser.c:1799
+[QTS:EMIT] pos=9 atom=506 @parser.c:1807
+[QTS:EMIT] pos=13 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=17 u16=0x0001 (1) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=1 atom=506 label=0
+[QTS:EMIT] pos=19 op=200 @parser.c:1786
+[QTS:EMIT] pos=20 u32=0x00000beb (3051) @parser.c:1788
+[QTS:EMIT] pos=24 op=186 @parser.c:1799
+[QTS:EMIT] pos=25 u32=0x000001ea (490) @parser.c:1777
+[QTS:EMIT] pos=29 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=31 op=200 @parser.c:1786
+[QTS:EMIT] pos=32 u32=0x00000bf1 (3057) @parser.c:1788
+[QTS:EMIT] pos=36 op=186 @parser.c:1799
+[QTS:EMIT] pos=37 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=41 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=43 op=200 @parser.c:1786
+[QTS:EMIT] pos=44 u32=0x00000bf0 (3056) @parser.c:1788
+[QTS:EMIT] pos=48 op=34 @parser.c:1799
+[QTS:EMIT] pos=49 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=51 op=184 @parser.c:1799
+[QTS:EMIT] pos=52 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=56 op=22 @parser.c:1799
+[QTS:EMIT] pos=57 op=62 @parser.c:1799
+[QTS:EMIT] pos=58 op=14 @parser.c:1799
+[QTS:EMIT] pos=59 op=200 @parser.c:1786
+[QTS:EMIT] pos=60 u32=0x00000bf9 (3065) @parser.c:1788
+[QTS:EMIT] pos=64 op=186 @parser.c:1799
+[QTS:EMIT] pos=65 u32=0x000001f8 (504) @parser.c:1777
+[QTS:EMIT] pos=69 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=64 op=189 @parser.c:1799
+[QTS:EMIT] pos=65 atom=504 @parser.c:1807
+[QTS:EMIT] pos=69 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=73 u16=0x0001 (1) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=1 atom=504 label=1
+[QTS:EMIT] pos=75 op=200 @parser.c:1786
+[QTS:EMIT] pos=76 u32=0x00000bff (3071) @parser.c:1788
+[QTS:EMIT] pos=80 op=186 @parser.c:1799
+[QTS:EMIT] pos=81 u32=0x000001d8 (472) @parser.c:1777
+[QTS:EMIT] pos=85 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=87 op=200 @parser.c:1786
+[QTS:EMIT] pos=88 u32=0x00000c04 (3076) @parser.c:1788
+[QTS:EMIT] pos=92 op=66 @parser.c:1799
+[QTS:EMIT] pos=93 atom=508 @parser.c:1807
+[QTS:EMIT] pos=97 op=200 @parser.c:1786
+[QTS:EMIT] pos=98 u32=0x00000c0b (3083) @parser.c:1788
+[QTS:EMIT] pos=102 op=186 @parser.c:1799
+[QTS:EMIT] pos=103 u32=0x000001e3 (483) @parser.c:1777
+[QTS:EMIT] pos=107 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=109 op=200 @parser.c:1786
+[QTS:EMIT] pos=110 u32=0x00000c0a (3082) @parser.c:1788
+[QTS:EMIT] pos=114 op=36 @parser.c:1799
+[QTS:EMIT] pos=115 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=117 op=184 @parser.c:1799
+[QTS:EMIT] pos=118 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=122 op=22 @parser.c:1799
+[QTS:EMIT] pos=123 op=62 @parser.c:1799
+[QTS:EMIT] pos=124 op=14 @parser.c:1799
+[QTS:SCOPE] push: level=2 first_var=-1
+[QTS:SCOPE] enter: idx=2 is_body=0
+[QTS:EMIT] pos=125 op=182 @parser.c:1799
+[QTS:EMIT] pos=126 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=128 op=1 @parser.c:1799
+[QTS:EMIT] pos=129 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=133 op=108 @parser.c:1799
+[QTS:EMIT] pos=134 u32=0x00000002 (2) @parser.c:1777
+[QTS:SCOPE] push: level=3 first_var=-1
+[QTS:SCOPE] enter: idx=3 is_body=0
+[QTS:EMIT] pos=138 op=182 @parser.c:1799
+[QTS:EMIT] pos=139 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=141 op=200 @parser.c:1786
+[QTS:EMIT] pos=142 u32=0x00000c24 (3108) @parser.c:1788
+[QTS:EMIT] pos=146 op=186 @parser.c:1799
+[QTS:EMIT] pos=147 u32=0x000001fd (509) @parser.c:1777
+[QTS:EMIT] pos=151 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=153 op=200 @parser.c:1786
+[QTS:EMIT] pos=154 u32=0x00000c2a (3114) @parser.c:1788
+[QTS:EMIT] pos=158 op=186 @parser.c:1799
+[QTS:EMIT] pos=159 u32=0x000001fa (506) @parser.c:1777
+[QTS:EMIT] pos=163 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=165 op=4 @parser.c:1799
+[QTS:EMIT] pos=166 u32=0x000001fe (510) @parser.c:1777
+[QTS:EMIT] pos=170 op=200 @parser.c:1786
+[QTS:EMIT] pos=171 u32=0x00000c37 (3127) @parser.c:1788
+[QTS:EMIT] pos=175 op=186 @parser.c:1799
+[QTS:EMIT] pos=176 u32=0x000001e2 (482) @parser.c:1777
+[QTS:EMIT] pos=180 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=182 op=200 @parser.c:1786
+[QTS:EMIT] pos=183 u32=0x00000c3d (3133) @parser.c:1788
+[QTS:EMIT] pos=187 op=186 @parser.c:1799
+[QTS:EMIT] pos=188 u32=0x000001f8 (504) @parser.c:1777
+[QTS:EMIT] pos=192 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=194 op=200 @parser.c:1786
+[QTS:EMIT] pos=195 u32=0x00000c3c (3132) @parser.c:1788
+[QTS:EMIT] pos=199 op=34 @parser.c:1799
+[QTS:EMIT] pos=200 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=202 op=200 @parser.c:1786
+[QTS:EMIT] pos=203 u32=0x00000c29 (3113) @parser.c:1788
+[QTS:EMIT] pos=207 op=34 @parser.c:1799
+[QTS:EMIT] pos=208 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=210 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=3
+[QTS:SCOPE] pop: level=3
+[QTS:EMIT] pos=211 op=183 @parser.c:1799
+[QTS:EMIT] pos=212 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=214 op=184 @parser.c:1799
+[QTS:EMIT] pos=215 u32=0x00000002 (2) @parser.c:1777
+[QTS:SCOPE] leave: idx=2
+[QTS:SCOPE] pop: level=2
+[QTS:EMIT] pos=219 op=183 @parser.c:1799
+[QTS:EMIT] pos=220 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=222 op=200 @parser.c:1786
+[QTS:EMIT] pos=223 u32=0x00000c4e (3150) @parser.c:1788
+[QTS:EMIT] pos=227 op=186 @parser.c:1799
+[QTS:EMIT] pos=228 u32=0x000001f9 (505) @parser.c:1777
+[QTS:EMIT] pos=232 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=227 op=189 @parser.c:1799
+[QTS:EMIT] pos=228 atom=505 @parser.c:1807
+[QTS:EMIT] pos=232 u32=0x00000003 (3) @parser.c:1777
+[QTS:EMIT] pos=236 u16=0x0001 (1) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=1 atom=505 label=3
+[QTS:EMIT] pos=238 op=200 @parser.c:1786
+[QTS:EMIT] pos=239 u32=0x00000c52 (3154) @parser.c:1788
+[QTS:EMIT] pos=243 op=186 @parser.c:1799
+[QTS:EMIT] pos=244 u32=0x000001d8 (472) @parser.c:1777
+[QTS:EMIT] pos=248 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=250 op=200 @parser.c:1786
+[QTS:EMIT] pos=251 u32=0x00000c57 (3159) @parser.c:1788
+[QTS:EMIT] pos=255 op=66 @parser.c:1799
+[QTS:EMIT] pos=256 atom=511 @parser.c:1807
+[QTS:EMIT] pos=260 op=200 @parser.c:1786
+[QTS:EMIT] pos=261 u32=0x00000c5d (3165) @parser.c:1788
+[QTS:EMIT] pos=265 op=186 @parser.c:1799
+[QTS:EMIT] pos=266 u32=0x000001f8 (504) @parser.c:1777
+[QTS:EMIT] pos=270 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=272 op=1 @parser.c:1799
+[QTS:EMIT] pos=273 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=277 op=200 @parser.c:1786
+[QTS:EMIT] pos=278 u32=0x00000c65 (3173) @parser.c:1788
+[QTS:EMIT] pos=282 op=186 @parser.c:1799
+[QTS:EMIT] pos=283 u32=0x000001f8 (504) @parser.c:1777
+[QTS:EMIT] pos=287 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=289 op=200 @parser.c:1786
+[QTS:EMIT] pos=290 u32=0x00000c68 (3176) @parser.c:1788
+[QTS:EMIT] pos=294 op=66 @parser.c:1799
+[QTS:EMIT] pos=295 atom=433 @parser.c:1807
+[QTS:EMIT] pos=299 op=200 @parser.c:1786
+[QTS:EMIT] pos=300 u32=0x00000c5c (3164) @parser.c:1788
+[QTS:EMIT] pos=304 op=36 @parser.c:1799
+[QTS:EMIT] pos=305 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=307 op=184 @parser.c:1799
+[QTS:EMIT] pos=308 u32=0x00000003 (3) @parser.c:1777
+[QTS:EMIT] pos=312 op=22 @parser.c:1799
+[QTS:EMIT] pos=313 op=62 @parser.c:1799
+[QTS:EMIT] pos=314 op=14 @parser.c:1799
+[QTS:EMIT] pos=315 op=200 @parser.c:1786
+[QTS:EMIT] pos=316 u32=0x00000c7a (3194) @parser.c:1788
+[QTS:EMIT] pos=320 op=186 @parser.c:1799
+[QTS:EMIT] pos=321 u32=0x000001fb (507) @parser.c:1777
+[QTS:EMIT] pos=325 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=320 op=189 @parser.c:1799
+[QTS:EMIT] pos=321 atom=507 @parser.c:1807
+[QTS:EMIT] pos=325 u32=0x00000004 (4) @parser.c:1777
+[QTS:EMIT] pos=329 u16=0x0001 (1) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=1 atom=507 label=4
+[QTS:EMIT] pos=331 op=200 @parser.c:1786
+[QTS:EMIT] pos=332 u32=0x00000c82 (3202) @parser.c:1788
+[QTS:EMIT] pos=336 op=186 @parser.c:1799
+[QTS:EMIT] pos=337 u32=0x000001ea (490) @parser.c:1777
+[QTS:EMIT] pos=341 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=343 op=200 @parser.c:1786
+[QTS:EMIT] pos=344 u32=0x00000c88 (3208) @parser.c:1788
+[QTS:EMIT] pos=348 op=186 @parser.c:1799
+[QTS:EMIT] pos=349 u32=0x000001f9 (505) @parser.c:1777
+[QTS:EMIT] pos=353 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=355 op=200 @parser.c:1786
+[QTS:EMIT] pos=356 u32=0x00000c87 (3207) @parser.c:1788
+[QTS:EMIT] pos=360 op=34 @parser.c:1799
+[QTS:EMIT] pos=361 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=363 op=184 @parser.c:1799
+[QTS:EMIT] pos=364 u32=0x00000004 (4) @parser.c:1777
+[QTS:EMIT] pos=368 op=22 @parser.c:1799
+[QTS:EMIT] pos=369 op=62 @parser.c:1799
+[QTS:EMIT] pos=370 op=14 @parser.c:1799
+[QTS:SCOPE] push: level=4 first_var=-1
+[QTS:SCOPE] enter: idx=4 is_body=0
+[QTS:EMIT] pos=371 op=182 @parser.c:1799
+[QTS:EMIT] pos=372 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=374 op=200 @parser.c:1786
+[QTS:EMIT] pos=375 u32=0x00000c94 (3220) @parser.c:1788
+[QTS:EMIT] pos=379 op=186 @parser.c:1799
+[QTS:EMIT] pos=380 u32=0x000001fa (506) @parser.c:1777
+[QTS:EMIT] pos=384 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=386 op=200 @parser.c:1786
+[QTS:EMIT] pos=387 u32=0x00000c9d (3229) @parser.c:1788
+[QTS:EMIT] pos=391 op=186 @parser.c:1799
+[QTS:EMIT] pos=392 u32=0x000001fb (507) @parser.c:1777
+[QTS:EMIT] pos=396 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=398 op=200 @parser.c:1786
+[QTS:EMIT] pos=399 u32=0x00000c9a (3226) @parser.c:1788
+[QTS:EMIT] pos=403 op=172 @parser.c:1799
+[QTS:EMIT] pos=404 op=108 @parser.c:1799
+[QTS:EMIT] pos=405 u32=0x00000005 (5) @parser.c:1777
+[QTS:SCOPE] push: level=5 first_var=-1
+[QTS:SCOPE] enter: idx=5 is_body=0
+[QTS:EMIT] pos=409 op=182 @parser.c:1799
+[QTS:EMIT] pos=410 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=412 op=200 @parser.c:1786
+[QTS:EMIT] pos=413 u32=0x00000cae (3246) @parser.c:1788
+[QTS:EMIT] pos=417 op=186 @parser.c:1799
+[QTS:EMIT] pos=418 u32=0x000001fd (509) @parser.c:1777
+[QTS:EMIT] pos=422 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=424 op=200 @parser.c:1786
+[QTS:EMIT] pos=425 u32=0x00000cb4 (3252) @parser.c:1788
+[QTS:EMIT] pos=429 op=186 @parser.c:1799
+[QTS:EMIT] pos=430 u32=0x000001fa (506) @parser.c:1777
+[QTS:EMIT] pos=434 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=436 op=200 @parser.c:1786
+[QTS:EMIT] pos=437 u32=0x00000cb3 (3251) @parser.c:1788
+[QTS:EMIT] pos=441 op=34 @parser.c:1799
+[QTS:EMIT] pos=442 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=444 op=14 @parser.c:1799
+[QTS:EMIT] pos=445 op=200 @parser.c:1786
+[QTS:EMIT] pos=446 u32=0x00000cc4 (3268) @parser.c:1788
+[QTS:EMIT] pos=450 op=186 @parser.c:1799
+[QTS:EMIT] pos=451 u32=0x000001fd (509) @parser.c:1777
+[QTS:EMIT] pos=455 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=457 op=200 @parser.c:1786
+[QTS:EMIT] pos=458 u32=0x00000cca (3274) @parser.c:1788
+[QTS:EMIT] pos=462 op=186 @parser.c:1799
+[QTS:EMIT] pos=463 u32=0x000001fb (507) @parser.c:1777
+[QTS:EMIT] pos=467 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=469 op=200 @parser.c:1786
+[QTS:EMIT] pos=470 u32=0x00000cc9 (3273) @parser.c:1788
+[QTS:EMIT] pos=474 op=34 @parser.c:1799
+[QTS:EMIT] pos=475 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=477 op=14 @parser.c:1799
+[QTS:EMIT] pos=478 op=200 @parser.c:1786
+[QTS:EMIT] pos=479 u32=0x00000cda (3290) @parser.c:1788
+[QTS:EMIT] pos=483 op=186 @parser.c:1799
+[QTS:EMIT] pos=484 u32=0x000001da (474) @parser.c:1777
+[QTS:EMIT] pos=488 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=490 op=9 @parser.c:1799
+[QTS:EMIT] pos=491 op=200 @parser.c:1786
+[QTS:EMIT] pos=492 u32=0x00000ce0 (3296) @parser.c:1788
+[QTS:EMIT] pos=496 op=34 @parser.c:1799
+[QTS:EMIT] pos=497 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=499 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=5
+[QTS:SCOPE] pop: level=5
+[QTS:EMIT] pos=500 op=183 @parser.c:1799
+[QTS:EMIT] pos=501 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=503 op=184 @parser.c:1799
+[QTS:EMIT] pos=504 u32=0x00000005 (5) @parser.c:1777
+[QTS:SCOPE] leave: idx=4
+[QTS:SCOPE] pop: level=4
+[QTS:EMIT] pos=508 op=183 @parser.c:1799
+[QTS:EMIT] pos=509 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=511 op=41 @parser.c:1799
+[QTS:SCOPE] push: level=1 first_var=-1
+[QTS:SCOPE] enter: idx=1 is_body=0
+[QTS:EMIT] pos=0 op=182 @parser.c:1799
+[QTS:EMIT] pos=1 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=3 op=200 @parser.c:1786
+[QTS:EMIT] pos=4 u32=0x00000d8c (3468) @parser.c:1788
+[QTS:EMIT] pos=8 op=186 @parser.c:1799
+[QTS:EMIT] pos=9 u32=0x00000202 (514) @parser.c:1777
+[QTS:EMIT] pos=13 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=8 op=189 @parser.c:1799
+[QTS:EMIT] pos=9 atom=514 @parser.c:1807
+[QTS:EMIT] pos=13 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=17 u16=0x0001 (1) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=1 atom=514 label=0
+[QTS:EMIT] pos=19 op=1 @parser.c:1799
+[QTS:EMIT] pos=20 u32=0x00000010 (16) @parser.c:1777
+[QTS:EMIT] pos=24 op=184 @parser.c:1799
+[QTS:EMIT] pos=25 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=29 op=22 @parser.c:1799
+[QTS:EMIT] pos=30 op=62 @parser.c:1799
+[QTS:EMIT] pos=31 op=14 @parser.c:1799
+[QTS:EMIT] pos=32 op=200 @parser.c:1786
+[QTS:EMIT] pos=33 u32=0x00000d98 (3480) @parser.c:1788
+[QTS:EMIT] pos=37 op=186 @parser.c:1799
+[QTS:EMIT] pos=38 u32=0x00000201 (513) @parser.c:1777
+[QTS:EMIT] pos=42 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=37 op=189 @parser.c:1799
+[QTS:EMIT] pos=38 atom=513 @parser.c:1807
+[QTS:EMIT] pos=42 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=46 u16=0x0001 (1) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=1 atom=513 label=1
+[QTS:EMIT] pos=48 op=38 @parser.c:1799
+[QTS:EMIT] pos=49 u16=0x0000 (0) @parser.c:1772
+[QTS:EMIT] pos=51 op=184 @parser.c:1799
+[QTS:EMIT] pos=52 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=56 op=22 @parser.c:1799
+[QTS:EMIT] pos=57 op=62 @parser.c:1799
+[QTS:EMIT] pos=58 op=14 @parser.c:1799
+[QTS:SCOPE] push: level=2 first_var=-1
+[QTS:SCOPE] enter: idx=2 is_body=0
+[QTS:EMIT] pos=59 op=182 @parser.c:1799
+[QTS:EMIT] pos=60 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=62 op=200 @parser.c:1786
+[QTS:EMIT] pos=63 u32=0x00000dad (3501) @parser.c:1788
+[QTS:EMIT] pos=67 op=186 @parser.c:1799
+[QTS:EMIT] pos=68 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=72 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=67 op=189 @parser.c:1799
+[QTS:EMIT] pos=68 atom=484 @parser.c:1807
+[QTS:EMIT] pos=72 u32=0x00000002 (2) @parser.c:1777
+[QTS:EMIT] pos=76 u16=0x0002 (2) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=2 atom=484 label=2
+[QTS:EMIT] pos=78 op=1 @parser.c:1799
+[QTS:EMIT] pos=79 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=83 op=184 @parser.c:1799
+[QTS:EMIT] pos=84 u32=0x00000002 (2) @parser.c:1777
+[QTS:EMIT] pos=88 op=22 @parser.c:1799
+[QTS:EMIT] pos=89 op=62 @parser.c:1799
+[QTS:EMIT] pos=90 op=14 @parser.c:1799
+[QTS:EMIT] pos=91 op=183 @parser.c:1799
+[QTS:EMIT] pos=92 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=94 op=184 @parser.c:1799
+[QTS:EMIT] pos=95 u32=0x00000003 (3) @parser.c:1777
+[QTS:EMIT] pos=99 op=200 @parser.c:1786
+[QTS:EMIT] pos=100 u32=0x00000db4 (3508) @parser.c:1788
+[QTS:EMIT] pos=104 op=186 @parser.c:1799
+[QTS:EMIT] pos=105 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=109 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=111 op=200 @parser.c:1786
+[QTS:EMIT] pos=112 u32=0x00000db8 (3512) @parser.c:1788
+[QTS:EMIT] pos=116 op=186 @parser.c:1799
+[QTS:EMIT] pos=117 u32=0x00000202 (514) @parser.c:1777
+[QTS:EMIT] pos=121 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=123 op=200 @parser.c:1786
+[QTS:EMIT] pos=124 u32=0x00000db6 (3510) @parser.c:1788
+[QTS:EMIT] pos=128 op=165 @parser.c:1799
+[QTS:EMIT] pos=129 op=108 @parser.c:1799
+[QTS:EMIT] pos=130 u32=0x00000006 (6) @parser.c:1777
+[QTS:EMIT] pos=134 op=110 @parser.c:1799
+[QTS:EMIT] pos=135 u32=0x00000005 (5) @parser.c:1777
+[QTS:EMIT] pos=139 op=184 @parser.c:1799
+[QTS:EMIT] pos=140 u32=0x00000004 (4) @parser.c:1777
+[QTS:EMIT] pos=144 op=200 @parser.c:1786
+[QTS:EMIT] pos=145 u32=0x00000dbb (3515) @parser.c:1788
+[QTS:EMIT] pos=149 op=186 @parser.c:1799
+[QTS:EMIT] pos=150 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=154 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=149 op=189 @parser.c:1799
+[QTS:EMIT] pos=150 atom=484 @parser.c:1807
+[QTS:EMIT] pos=154 u32=0x00000007 (7) @parser.c:1777
+[QTS:EMIT] pos=158 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=160 op=61 @parser.c:1799
+[QTS:EMIT] pos=161 op=200 @parser.c:1786
+[QTS:EMIT] pos=162 u32=0x00000dbc (3516) @parser.c:1788
+[QTS:EMIT] pos=166 op=147 @parser.c:1799
+[QTS:EMIT] pos=167 op=184 @parser.c:1799
+[QTS:EMIT] pos=168 u32=0x00000007 (7) @parser.c:1777
+[QTS:EMIT] pos=172 op=25 @parser.c:1799
+[QTS:EMIT] pos=173 op=62 @parser.c:1799
+[QTS:EMIT] pos=174 op=14 @parser.c:1799
+[QTS:EMIT] pos=175 op=110 @parser.c:1799
+[QTS:EMIT] pos=176 u32=0x00000003 (3) @parser.c:1777
+[QTS:EMIT] pos=180 op=184 @parser.c:1799
+[QTS:EMIT] pos=181 u32=0x00000005 (5) @parser.c:1777
+[QTS:EMIT] pos=185 op=200 @parser.c:1786
+[QTS:EMIT] pos=186 u32=0x00000dc8 (3528) @parser.c:1788
+[QTS:EMIT] pos=190 op=186 @parser.c:1799
+[QTS:EMIT] pos=191 u32=0x00000201 (513) @parser.c:1777
+[QTS:EMIT] pos=195 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=197 op=200 @parser.c:1786
+[QTS:EMIT] pos=198 u32=0x00000dce (3534) @parser.c:1788
+[QTS:EMIT] pos=202 op=186 @parser.c:1799
+[QTS:EMIT] pos=203 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=207 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=209 op=200 @parser.c:1786
+[QTS:EMIT] pos=210 u32=0x00000dcd (3533) @parser.c:1788
+[QTS:EMIT] pos=214 op=72 @parser.c:1799
+[QTS:ASSIGN] lvalue: opcode=72 scope=0 atom=0 label=-1
+[QTS:EMIT] pos=214 op=11 @parser.c:1799
+[QTS:EMIT] pos=215 op=22 @parser.c:1799
+[QTS:EMIT] pos=216 op=75 @parser.c:1799
+[QTS:EMIT] pos=217 op=14 @parser.c:1799
+[QTS:EMIT] pos=218 op=183 @parser.c:1799
+[QTS:EMIT] pos=219 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=262 op=184 @parser.c:1799
+[QTS:EMIT] pos=263 u32=0x00000006 (6) @parser.c:1777
+[QTS:SCOPE] leave: idx=2
+[QTS:SCOPE] pop: level=2
+[QTS:EMIT] pos=267 op=183 @parser.c:1799
+[QTS:EMIT] pos=268 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=270 op=200 @parser.c:1786
+[QTS:EMIT] pos=271 u32=0x00000ddb (3547) @parser.c:1788
+[QTS:EMIT] pos=275 op=186 @parser.c:1799
+[QTS:EMIT] pos=276 u32=0x00000203 (515) @parser.c:1777
+[QTS:EMIT] pos=280 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=275 op=189 @parser.c:1799
+[QTS:EMIT] pos=276 atom=515 @parser.c:1807
+[QTS:EMIT] pos=280 u32=0x00000008 (8) @parser.c:1777
+[QTS:EMIT] pos=284 u16=0x0001 (1) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=1 atom=515 label=8
+[QTS:EMIT] pos=286 op=200 @parser.c:1786
+[QTS:EMIT] pos=287 u32=0x00000dee (3566) @parser.c:1788
+[QTS:EMIT] pos=291 op=186 @parser.c:1799
+[QTS:EMIT] pos=292 u32=0x000000ac (172) @parser.c:1777
+[QTS:EMIT] pos=296 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=298 op=17 @parser.c:1799
+[QTS:EMIT] pos=299 op=200 @parser.c:1786
+[QTS:EMIT] pos=300 u32=0x00000dfa (3578) @parser.c:1788
+[QTS:EMIT] pos=304 op=186 @parser.c:1799
+[QTS:EMIT] pos=305 u32=0x00000202 (514) @parser.c:1777
+[QTS:EMIT] pos=309 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=311 op=200 @parser.c:1786
+[QTS:EMIT] pos=312 u32=0x00000df9 (3577) @parser.c:1788
+[QTS:EMIT] pos=316 op=33 @parser.c:1799
+[QTS:EMIT] pos=317 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=319 op=184 @parser.c:1799
+[QTS:EMIT] pos=320 u32=0x00000008 (8) @parser.c:1777
+[QTS:EMIT] pos=324 op=22 @parser.c:1799
+[QTS:EMIT] pos=325 op=62 @parser.c:1799
+[QTS:EMIT] pos=326 op=14 @parser.c:1799
+[QTS:SCOPE] push: level=3 first_var=-1
+[QTS:SCOPE] enter: idx=3 is_body=0
+[QTS:EMIT] pos=327 op=182 @parser.c:1799
+[QTS:EMIT] pos=328 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=330 op=200 @parser.c:1786
+[QTS:EMIT] pos=331 u32=0x00000e07 (3591) @parser.c:1788
+[QTS:EMIT] pos=335 op=186 @parser.c:1799
+[QTS:EMIT] pos=336 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=340 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=335 op=189 @parser.c:1799
+[QTS:EMIT] pos=336 atom=484 @parser.c:1807
+[QTS:EMIT] pos=340 u32=0x00000009 (9) @parser.c:1777
+[QTS:EMIT] pos=344 u16=0x0003 (3) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=3 atom=484 label=9
+[QTS:EMIT] pos=346 op=1 @parser.c:1799
+[QTS:EMIT] pos=347 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=351 op=184 @parser.c:1799
+[QTS:EMIT] pos=352 u32=0x00000009 (9) @parser.c:1777
+[QTS:EMIT] pos=356 op=22 @parser.c:1799
+[QTS:EMIT] pos=357 op=62 @parser.c:1799
+[QTS:EMIT] pos=358 op=14 @parser.c:1799
+[QTS:EMIT] pos=359 op=183 @parser.c:1799
+[QTS:EMIT] pos=360 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=362 op=184 @parser.c:1799
+[QTS:EMIT] pos=363 u32=0x0000000a (10) @parser.c:1777
+[QTS:EMIT] pos=367 op=200 @parser.c:1786
+[QTS:EMIT] pos=368 u32=0x00000e0e (3598) @parser.c:1788
+[QTS:EMIT] pos=372 op=186 @parser.c:1799
+[QTS:EMIT] pos=373 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=377 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=379 op=200 @parser.c:1786
+[QTS:EMIT] pos=380 u32=0x00000e12 (3602) @parser.c:1788
+[QTS:EMIT] pos=384 op=186 @parser.c:1799
+[QTS:EMIT] pos=385 u32=0x00000202 (514) @parser.c:1777
+[QTS:EMIT] pos=389 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=391 op=200 @parser.c:1786
+[QTS:EMIT] pos=392 u32=0x00000e10 (3600) @parser.c:1788
+[QTS:EMIT] pos=396 op=165 @parser.c:1799
+[QTS:EMIT] pos=397 op=108 @parser.c:1799
+[QTS:EMIT] pos=398 u32=0x0000000d (13) @parser.c:1777
+[QTS:EMIT] pos=402 op=110 @parser.c:1799
+[QTS:EMIT] pos=403 u32=0x0000000c (12) @parser.c:1777
+[QTS:EMIT] pos=407 op=184 @parser.c:1799
+[QTS:EMIT] pos=408 u32=0x0000000b (11) @parser.c:1777
+[QTS:EMIT] pos=412 op=200 @parser.c:1786
+[QTS:EMIT] pos=413 u32=0x00000e15 (3605) @parser.c:1788
+[QTS:EMIT] pos=417 op=186 @parser.c:1799
+[QTS:EMIT] pos=418 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=422 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=417 op=189 @parser.c:1799
+[QTS:EMIT] pos=418 atom=484 @parser.c:1807
+[QTS:EMIT] pos=422 u32=0x0000000e (14) @parser.c:1777
+[QTS:EMIT] pos=426 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=428 op=61 @parser.c:1799
+[QTS:EMIT] pos=429 op=200 @parser.c:1786
+[QTS:EMIT] pos=430 u32=0x00000e16 (3606) @parser.c:1788
+[QTS:EMIT] pos=434 op=147 @parser.c:1799
+[QTS:EMIT] pos=435 op=184 @parser.c:1799
+[QTS:EMIT] pos=436 u32=0x0000000e (14) @parser.c:1777
+[QTS:EMIT] pos=440 op=25 @parser.c:1799
+[QTS:EMIT] pos=441 op=62 @parser.c:1799
+[QTS:EMIT] pos=442 op=14 @parser.c:1799
+[QTS:EMIT] pos=443 op=110 @parser.c:1799
+[QTS:EMIT] pos=444 u32=0x0000000a (10) @parser.c:1777
+[QTS:EMIT] pos=448 op=184 @parser.c:1799
+[QTS:EMIT] pos=449 u32=0x0000000c (12) @parser.c:1777
+[QTS:SCOPE] push: level=4 first_var=-1
+[QTS:SCOPE] enter: idx=4 is_body=0
+[QTS:EMIT] pos=453 op=182 @parser.c:1799
+[QTS:EMIT] pos=454 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=456 op=200 @parser.c:1786
+[QTS:EMIT] pos=457 u32=0x00000e24 (3620) @parser.c:1788
+[QTS:EMIT] pos=461 op=186 @parser.c:1799
+[QTS:EMIT] pos=462 u32=0x00000201 (513) @parser.c:1777
+[QTS:EMIT] pos=466 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=468 op=200 @parser.c:1786
+[QTS:EMIT] pos=469 u32=0x00000e2a (3626) @parser.c:1788
+[QTS:EMIT] pos=473 op=186 @parser.c:1799
+[QTS:EMIT] pos=474 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=478 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=480 op=200 @parser.c:1786
+[QTS:EMIT] pos=481 u32=0x00000e29 (3625) @parser.c:1788
+[QTS:EMIT] pos=485 op=72 @parser.c:1799
+[QTS:EMIT] pos=486 op=200 @parser.c:1786
+[QTS:EMIT] pos=487 u32=0x00000e2c (3628) @parser.c:1788
+[QTS:EMIT] pos=491 op=66 @parser.c:1799
+[QTS:EMIT] pos=492 atom=108 @parser.c:1807
+[QTS:ASSIGN] lvalue: opcode=66 scope=0 atom=108 label=-1
+[QTS:EMIT] pos=491 op=200 @parser.c:1786
+[QTS:EMIT] pos=492 u32=0x00000e34 (3636) @parser.c:1788
+[QTS:EMIT] pos=496 op=186 @parser.c:1799
+[QTS:EMIT] pos=497 u32=0x00000201 (513) @parser.c:1777
+[QTS:EMIT] pos=501 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=503 op=200 @parser.c:1786
+[QTS:EMIT] pos=504 u32=0x00000e3b (3643) @parser.c:1788
+[QTS:EMIT] pos=508 op=186 @parser.c:1799
+[QTS:EMIT] pos=509 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=513 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=515 op=1 @parser.c:1799
+[QTS:EMIT] pos=516 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=520 op=200 @parser.c:1786
+[QTS:EMIT] pos=521 u32=0x00000e3d (3645) @parser.c:1788
+[QTS:EMIT] pos=525 op=159 @parser.c:1799
+[QTS:EMIT] pos=526 op=200 @parser.c:1786
+[QTS:EMIT] pos=527 u32=0x00000e44 (3652) @parser.c:1788
+[QTS:EMIT] pos=531 op=186 @parser.c:1799
+[QTS:EMIT] pos=532 u32=0x00000202 (514) @parser.c:1777
+[QTS:EMIT] pos=536 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=538 op=200 @parser.c:1786
+[QTS:EMIT] pos=539 u32=0x00000e42 (3650) @parser.c:1788
+[QTS:EMIT] pos=543 op=158 @parser.c:1799
+[QTS:EMIT] pos=544 op=200 @parser.c:1786
+[QTS:EMIT] pos=545 u32=0x00000e39 (3641) @parser.c:1788
+[QTS:EMIT] pos=549 op=72 @parser.c:1799
+[QTS:EMIT] pos=550 op=21 @parser.c:1799
+[QTS:EMIT] pos=551 op=68 @parser.c:1799
+[QTS:EMIT] pos=552 u32=0x0000006c (108) @parser.c:1777
+[QTS:EMIT] pos=556 op=14 @parser.c:1799
+[QTS:EMIT] pos=557 op=200 @parser.c:1786
+[QTS:EMIT] pos=558 u32=0x00000e50 (3664) @parser.c:1788
+[QTS:EMIT] pos=562 op=186 @parser.c:1799
+[QTS:EMIT] pos=563 u32=0x00000201 (513) @parser.c:1777
+[QTS:EMIT] pos=567 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=569 op=200 @parser.c:1786
+[QTS:EMIT] pos=570 u32=0x00000e56 (3670) @parser.c:1788
+[QTS:EMIT] pos=574 op=186 @parser.c:1799
+[QTS:EMIT] pos=575 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=579 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=581 op=200 @parser.c:1786
+[QTS:EMIT] pos=582 u32=0x00000e55 (3669) @parser.c:1788
+[QTS:EMIT] pos=586 op=72 @parser.c:1799
+[QTS:EMIT] pos=587 op=200 @parser.c:1786
+[QTS:EMIT] pos=588 u32=0x00000e58 (3672) @parser.c:1788
+[QTS:EMIT] pos=592 op=66 @parser.c:1799
+[QTS:EMIT] pos=593 atom=516 @parser.c:1807
+[QTS:ASSIGN] lvalue: opcode=66 scope=0 atom=516 label=-1
+[QTS:EMIT] pos=592 op=200 @parser.c:1786
+[QTS:EMIT] pos=593 u32=0x00000e5f (3679) @parser.c:1788
+[QTS:EMIT] pos=597 op=186 @parser.c:1799
+[QTS:EMIT] pos=598 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=602 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=604 op=21 @parser.c:1799
+[QTS:EMIT] pos=605 op=68 @parser.c:1799
+[QTS:EMIT] pos=606 u32=0x00000204 (516) @parser.c:1777
+[QTS:EMIT] pos=610 op=14 @parser.c:1799
+[QTS:EMIT] pos=611 op=200 @parser.c:1786
+[QTS:EMIT] pos=612 u32=0x00000e6a (3690) @parser.c:1788
+[QTS:EMIT] pos=616 op=186 @parser.c:1799
+[QTS:EMIT] pos=617 u32=0x00000201 (513) @parser.c:1777
+[QTS:EMIT] pos=621 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=623 op=200 @parser.c:1786
+[QTS:EMIT] pos=624 u32=0x00000e70 (3696) @parser.c:1788
+[QTS:EMIT] pos=628 op=186 @parser.c:1799
+[QTS:EMIT] pos=629 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=633 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=635 op=200 @parser.c:1786
+[QTS:EMIT] pos=636 u32=0x00000e6f (3695) @parser.c:1788
+[QTS:EMIT] pos=640 op=72 @parser.c:1799
+[QTS:EMIT] pos=641 op=200 @parser.c:1786
+[QTS:EMIT] pos=642 u32=0x00000e72 (3698) @parser.c:1788
+[QTS:EMIT] pos=646 op=66 @parser.c:1799
+[QTS:EMIT] pos=647 atom=517 @parser.c:1807
+[QTS:ASSIGN] lvalue: opcode=66 scope=0 atom=517 label=-1
+[QTS:EMIT] pos=646 op=200 @parser.c:1786
+[QTS:EMIT] pos=647 u32=0x00000e85 (3717) @parser.c:1788
+[QTS:EMIT] pos=651 op=186 @parser.c:1799
+[QTS:EMIT] pos=652 u32=0x000000b0 (176) @parser.c:1777
+[QTS:EMIT] pos=656 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=658 op=17 @parser.c:1799
+[QTS:EMIT] pos=659 op=200 @parser.c:1786
+[QTS:EMIT] pos=660 u32=0x00000e90 (3728) @parser.c:1788
+[QTS:EMIT] pos=664 op=186 @parser.c:1799
+[QTS:EMIT] pos=665 u32=0x00000203 (515) @parser.c:1777
+[QTS:EMIT] pos=669 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=671 op=200 @parser.c:1786
+[QTS:EMIT] pos=672 u32=0x00000e9e (3742) @parser.c:1788
+[QTS:EMIT] pos=676 op=186 @parser.c:1799
+[QTS:EMIT] pos=677 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=681 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=683 op=1 @parser.c:1799
+[QTS:EMIT] pos=684 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=688 op=200 @parser.c:1786
+[QTS:EMIT] pos=689 u32=0x00000e8f (3727) @parser.c:1788
+[QTS:EMIT] pos=693 op=33 @parser.c:1799
+[QTS:EMIT] pos=694 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=696 op=21 @parser.c:1799
+[QTS:EMIT] pos=697 op=68 @parser.c:1799
+[QTS:EMIT] pos=698 u32=0x00000205 (517) @parser.c:1777
+[QTS:EMIT] pos=702 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=4
+[QTS:SCOPE] pop: level=4
+[QTS:EMIT] pos=703 op=183 @parser.c:1799
+[QTS:EMIT] pos=704 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=706 op=183 @parser.c:1799
+[QTS:EMIT] pos=707 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=750 op=184 @parser.c:1799
+[QTS:EMIT] pos=751 u32=0x0000000d (13) @parser.c:1777
+[QTS:SCOPE] leave: idx=3
+[QTS:SCOPE] pop: level=3
+[QTS:EMIT] pos=755 op=183 @parser.c:1799
+[QTS:EMIT] pos=756 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=758 op=200 @parser.c:1786
+[QTS:EMIT] pos=759 u32=0x00000eaf (3759) @parser.c:1788
+[QTS:EMIT] pos=763 op=186 @parser.c:1799
+[QTS:EMIT] pos=764 u32=0x000001f8 (504) @parser.c:1777
+[QTS:EMIT] pos=768 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=763 op=189 @parser.c:1799
+[QTS:EMIT] pos=764 atom=504 @parser.c:1807
+[QTS:EMIT] pos=768 u32=0x0000000f (15) @parser.c:1777
+[QTS:EMIT] pos=772 u16=0x0001 (1) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=1 atom=504 label=15
+[QTS:EMIT] pos=774 op=200 @parser.c:1786
+[QTS:EMIT] pos=775 u32=0x00000eb5 (3765) @parser.c:1788
+[QTS:EMIT] pos=779 op=186 @parser.c:1799
+[QTS:EMIT] pos=780 u32=0x000001d8 (472) @parser.c:1777
+[QTS:EMIT] pos=784 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=786 op=200 @parser.c:1786
+[QTS:EMIT] pos=787 u32=0x00000eba (3770) @parser.c:1788
+[QTS:EMIT] pos=791 op=66 @parser.c:1799
+[QTS:EMIT] pos=792 atom=508 @parser.c:1807
+[QTS:EMIT] pos=796 op=200 @parser.c:1786
+[QTS:EMIT] pos=797 u32=0x00000ec1 (3777) @parser.c:1788
+[QTS:EMIT] pos=801 op=186 @parser.c:1799
+[QTS:EMIT] pos=802 u32=0x00000201 (513) @parser.c:1777
+[QTS:EMIT] pos=806 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=808 op=10 @parser.c:1799
+[QTS:EMIT] pos=809 op=200 @parser.c:1786
+[QTS:EMIT] pos=810 u32=0x00000ec0 (3776) @parser.c:1788
+[QTS:EMIT] pos=814 op=36 @parser.c:1799
+[QTS:EMIT] pos=815 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=817 op=184 @parser.c:1799
+[QTS:EMIT] pos=818 u32=0x0000000f (15) @parser.c:1777
+[QTS:EMIT] pos=822 op=22 @parser.c:1799
+[QTS:EMIT] pos=823 op=62 @parser.c:1799
+[QTS:EMIT] pos=824 op=14 @parser.c:1799
+[QTS:EMIT] pos=825 op=200 @parser.c:1786
+[QTS:EMIT] pos=826 u32=0x00000ed3 (3795) @parser.c:1788
+[QTS:EMIT] pos=830 op=186 @parser.c:1799
+[QTS:EMIT] pos=831 u32=0x00000201 (513) @parser.c:1777
+[QTS:EMIT] pos=835 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=830 op=189 @parser.c:1799
+[QTS:EMIT] pos=831 atom=513 @parser.c:1807
+[QTS:EMIT] pos=835 u32=0x00000010 (16) @parser.c:1777
+[QTS:EMIT] pos=839 u16=0x0001 (1) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=1 atom=513 label=16
+[QTS:EMIT] pos=841 op=200 @parser.c:1786
+[QTS:EMIT] pos=842 u32=0x00000edb (3803) @parser.c:1788
+[QTS:EMIT] pos=846 op=186 @parser.c:1799
+[QTS:EMIT] pos=847 u32=0x000001d8 (472) @parser.c:1777
+[QTS:EMIT] pos=851 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=853 op=200 @parser.c:1786
+[QTS:EMIT] pos=854 u32=0x00000ee0 (3808) @parser.c:1788
+[QTS:EMIT] pos=858 op=66 @parser.c:1799
+[QTS:EMIT] pos=859 atom=511 @parser.c:1807
+[QTS:EMIT] pos=863 op=200 @parser.c:1786
+[QTS:EMIT] pos=864 u32=0x00000ee6 (3814) @parser.c:1788
+[QTS:EMIT] pos=868 op=186 @parser.c:1799
+[QTS:EMIT] pos=869 u32=0x000001f8 (504) @parser.c:1777
+[QTS:EMIT] pos=873 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=875 op=1 @parser.c:1799
+[QTS:EMIT] pos=876 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=880 op=200 @parser.c:1786
+[QTS:EMIT] pos=881 u32=0x00000eee (3822) @parser.c:1788
+[QTS:EMIT] pos=885 op=186 @parser.c:1799
+[QTS:EMIT] pos=886 u32=0x000001f8 (504) @parser.c:1777
+[QTS:EMIT] pos=890 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=892 op=200 @parser.c:1786
+[QTS:EMIT] pos=893 u32=0x00000ef1 (3825) @parser.c:1788
+[QTS:EMIT] pos=897 op=66 @parser.c:1799
+[QTS:EMIT] pos=898 atom=433 @parser.c:1807
+[QTS:EMIT] pos=902 op=10 @parser.c:1799
+[QTS:EMIT] pos=903 op=200 @parser.c:1786
+[QTS:EMIT] pos=904 u32=0x00000ee5 (3813) @parser.c:1788
+[QTS:EMIT] pos=908 op=36 @parser.c:1799
+[QTS:EMIT] pos=909 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=911 op=184 @parser.c:1799
+[QTS:EMIT] pos=912 u32=0x00000010 (16) @parser.c:1777
+[QTS:EMIT] pos=916 op=22 @parser.c:1799
+[QTS:EMIT] pos=917 op=62 @parser.c:1799
+[QTS:EMIT] pos=918 op=14 @parser.c:1799
+[QTS:SCOPE] push: level=5 first_var=-1
+[QTS:SCOPE] enter: idx=5 is_body=0
+[QTS:EMIT] pos=919 op=182 @parser.c:1799
+[QTS:EMIT] pos=920 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=922 op=200 @parser.c:1786
+[QTS:EMIT] pos=923 u32=0x00000f29 (3881) @parser.c:1788
+[QTS:EMIT] pos=927 op=186 @parser.c:1799
+[QTS:EMIT] pos=928 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=932 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=927 op=189 @parser.c:1799
+[QTS:EMIT] pos=928 atom=484 @parser.c:1807
+[QTS:EMIT] pos=932 u32=0x00000011 (17) @parser.c:1777
+[QTS:EMIT] pos=936 u16=0x0005 (5) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=5 atom=484 label=17
+[QTS:EMIT] pos=938 op=1 @parser.c:1799
+[QTS:EMIT] pos=939 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=943 op=184 @parser.c:1799
+[QTS:EMIT] pos=944 u32=0x00000011 (17) @parser.c:1777
+[QTS:EMIT] pos=948 op=22 @parser.c:1799
+[QTS:EMIT] pos=949 op=62 @parser.c:1799
+[QTS:EMIT] pos=950 op=14 @parser.c:1799
+[QTS:EMIT] pos=951 op=183 @parser.c:1799
+[QTS:EMIT] pos=952 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=954 op=184 @parser.c:1799
+[QTS:EMIT] pos=955 u32=0x00000012 (18) @parser.c:1777
+[QTS:EMIT] pos=959 op=200 @parser.c:1786
+[QTS:EMIT] pos=960 u32=0x00000f30 (3888) @parser.c:1788
+[QTS:EMIT] pos=964 op=186 @parser.c:1799
+[QTS:EMIT] pos=965 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=969 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=971 op=200 @parser.c:1786
+[QTS:EMIT] pos=972 u32=0x00000f34 (3892) @parser.c:1788
+[QTS:EMIT] pos=976 op=186 @parser.c:1799
+[QTS:EMIT] pos=977 u32=0x00000202 (514) @parser.c:1777
+[QTS:EMIT] pos=981 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=983 op=200 @parser.c:1786
+[QTS:EMIT] pos=984 u32=0x00000f32 (3890) @parser.c:1788
+[QTS:EMIT] pos=988 op=165 @parser.c:1799
+[QTS:EMIT] pos=989 op=108 @parser.c:1799
+[QTS:EMIT] pos=990 u32=0x00000015 (21) @parser.c:1777
+[QTS:EMIT] pos=994 op=110 @parser.c:1799
+[QTS:EMIT] pos=995 u32=0x00000014 (20) @parser.c:1777
+[QTS:EMIT] pos=999 op=184 @parser.c:1799
+[QTS:EMIT] pos=1000 u32=0x00000013 (19) @parser.c:1777
+[QTS:EMIT] pos=1004 op=200 @parser.c:1786
+[QTS:EMIT] pos=1005 u32=0x00000f37 (3895) @parser.c:1788
+[QTS:EMIT] pos=1009 op=186 @parser.c:1799
+[QTS:EMIT] pos=1010 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=1014 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=1009 op=189 @parser.c:1799
+[QTS:EMIT] pos=1010 atom=484 @parser.c:1807
+[QTS:EMIT] pos=1014 u32=0x00000016 (22) @parser.c:1777
+[QTS:EMIT] pos=1018 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=1020 op=61 @parser.c:1799
+[QTS:EMIT] pos=1021 op=200 @parser.c:1786
+[QTS:EMIT] pos=1022 u32=0x00000f38 (3896) @parser.c:1788
+[QTS:EMIT] pos=1026 op=147 @parser.c:1799
+[QTS:EMIT] pos=1027 op=184 @parser.c:1799
+[QTS:EMIT] pos=1028 u32=0x00000016 (22) @parser.c:1777
+[QTS:EMIT] pos=1032 op=25 @parser.c:1799
+[QTS:EMIT] pos=1033 op=62 @parser.c:1799
+[QTS:EMIT] pos=1034 op=14 @parser.c:1799
+[QTS:EMIT] pos=1035 op=110 @parser.c:1799
+[QTS:EMIT] pos=1036 u32=0x00000012 (18) @parser.c:1777
+[QTS:EMIT] pos=1040 op=184 @parser.c:1799
+[QTS:EMIT] pos=1041 u32=0x00000014 (20) @parser.c:1777
+[QTS:SCOPE] push: level=6 first_var=-1
+[QTS:SCOPE] enter: idx=6 is_body=0
+[QTS:EMIT] pos=1045 op=182 @parser.c:1799
+[QTS:EMIT] pos=1046 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1048 op=200 @parser.c:1786
+[QTS:EMIT] pos=1049 u32=0x00000f46 (3910) @parser.c:1788
+[QTS:EMIT] pos=1053 op=186 @parser.c:1799
+[QTS:EMIT] pos=1054 u32=0x000001da (474) @parser.c:1777
+[QTS:EMIT] pos=1058 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1060 op=200 @parser.c:1786
+[QTS:EMIT] pos=1061 u32=0x00000f4d (3917) @parser.c:1788
+[QTS:EMIT] pos=1065 op=186 @parser.c:1799
+[QTS:EMIT] pos=1066 u32=0x00000201 (513) @parser.c:1777
+[QTS:EMIT] pos=1070 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1072 op=200 @parser.c:1786
+[QTS:EMIT] pos=1073 u32=0x00000f53 (3923) @parser.c:1788
+[QTS:EMIT] pos=1077 op=186 @parser.c:1799
+[QTS:EMIT] pos=1078 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=1082 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1084 op=200 @parser.c:1786
+[QTS:EMIT] pos=1085 u32=0x00000f52 (3922) @parser.c:1788
+[QTS:EMIT] pos=1089 op=72 @parser.c:1799
+[QTS:EMIT] pos=1090 op=200 @parser.c:1786
+[QTS:EMIT] pos=1091 u32=0x00000f55 (3925) @parser.c:1788
+[QTS:EMIT] pos=1095 op=66 @parser.c:1799
+[QTS:EMIT] pos=1096 atom=108 @parser.c:1807
+[QTS:EMIT] pos=1100 op=200 @parser.c:1786
+[QTS:EMIT] pos=1101 u32=0x00000f5c (3932) @parser.c:1788
+[QTS:EMIT] pos=1105 op=186 @parser.c:1799
+[QTS:EMIT] pos=1106 u32=0x00000201 (513) @parser.c:1777
+[QTS:EMIT] pos=1110 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1112 op=200 @parser.c:1786
+[QTS:EMIT] pos=1113 u32=0x00000f63 (3939) @parser.c:1788
+[QTS:EMIT] pos=1117 op=186 @parser.c:1799
+[QTS:EMIT] pos=1118 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=1122 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1124 op=1 @parser.c:1799
+[QTS:EMIT] pos=1125 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=1129 op=200 @parser.c:1786
+[QTS:EMIT] pos=1130 u32=0x00000f65 (3941) @parser.c:1788
+[QTS:EMIT] pos=1134 op=159 @parser.c:1799
+[QTS:EMIT] pos=1135 op=200 @parser.c:1786
+[QTS:EMIT] pos=1136 u32=0x00000f6c (3948) @parser.c:1788
+[QTS:EMIT] pos=1140 op=186 @parser.c:1799
+[QTS:EMIT] pos=1141 u32=0x00000202 (514) @parser.c:1777
+[QTS:EMIT] pos=1145 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1147 op=200 @parser.c:1786
+[QTS:EMIT] pos=1148 u32=0x00000f6a (3946) @parser.c:1788
+[QTS:EMIT] pos=1152 op=158 @parser.c:1799
+[QTS:EMIT] pos=1153 op=200 @parser.c:1786
+[QTS:EMIT] pos=1154 u32=0x00000f61 (3937) @parser.c:1788
+[QTS:EMIT] pos=1158 op=72 @parser.c:1799
+[QTS:EMIT] pos=1159 op=200 @parser.c:1786
+[QTS:EMIT] pos=1160 u32=0x00000f4c (3916) @parser.c:1788
+[QTS:EMIT] pos=1164 op=34 @parser.c:1799
+[QTS:EMIT] pos=1165 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=1167 op=14 @parser.c:1799
+[QTS:EMIT] pos=1168 op=200 @parser.c:1786
+[QTS:EMIT] pos=1169 u32=0x00000f79 (3961) @parser.c:1788
+[QTS:EMIT] pos=1173 op=186 @parser.c:1799
+[QTS:EMIT] pos=1174 u32=0x000001da (474) @parser.c:1777
+[QTS:EMIT] pos=1178 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1180 op=200 @parser.c:1786
+[QTS:EMIT] pos=1181 u32=0x00000f80 (3968) @parser.c:1788
+[QTS:EMIT] pos=1185 op=186 @parser.c:1799
+[QTS:EMIT] pos=1186 u32=0x00000201 (513) @parser.c:1777
+[QTS:EMIT] pos=1190 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1192 op=200 @parser.c:1786
+[QTS:EMIT] pos=1193 u32=0x00000f86 (3974) @parser.c:1788
+[QTS:EMIT] pos=1197 op=186 @parser.c:1799
+[QTS:EMIT] pos=1198 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=1202 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1204 op=200 @parser.c:1786
+[QTS:EMIT] pos=1205 u32=0x00000f85 (3973) @parser.c:1788
+[QTS:EMIT] pos=1209 op=72 @parser.c:1799
+[QTS:EMIT] pos=1210 op=200 @parser.c:1786
+[QTS:EMIT] pos=1211 u32=0x00000f88 (3976) @parser.c:1788
+[QTS:EMIT] pos=1215 op=66 @parser.c:1799
+[QTS:EMIT] pos=1216 atom=516 @parser.c:1807
+[QTS:EMIT] pos=1220 op=200 @parser.c:1786
+[QTS:EMIT] pos=1221 u32=0x00000f8e (3982) @parser.c:1788
+[QTS:EMIT] pos=1225 op=186 @parser.c:1799
+[QTS:EMIT] pos=1226 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=1230 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1232 op=200 @parser.c:1786
+[QTS:EMIT] pos=1233 u32=0x00000f7f (3967) @parser.c:1788
+[QTS:EMIT] pos=1237 op=34 @parser.c:1799
+[QTS:EMIT] pos=1238 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=1240 op=14 @parser.c:1799
+[QTS:EMIT] pos=1241 op=200 @parser.c:1786
+[QTS:EMIT] pos=1242 u32=0x00000f9a (3994) @parser.c:1788
+[QTS:EMIT] pos=1246 op=186 @parser.c:1799
+[QTS:EMIT] pos=1247 u32=0x000001da (474) @parser.c:1777
+[QTS:EMIT] pos=1251 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1253 op=200 @parser.c:1786
+[QTS:EMIT] pos=1254 u32=0x00000fa1 (4001) @parser.c:1788
+[QTS:EMIT] pos=1258 op=186 @parser.c:1799
+[QTS:EMIT] pos=1259 u32=0x00000201 (513) @parser.c:1777
+[QTS:EMIT] pos=1263 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1265 op=200 @parser.c:1786
+[QTS:EMIT] pos=1266 u32=0x00000fa7 (4007) @parser.c:1788
+[QTS:EMIT] pos=1270 op=186 @parser.c:1799
+[QTS:EMIT] pos=1271 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=1275 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1277 op=200 @parser.c:1786
+[QTS:EMIT] pos=1278 u32=0x00000fa6 (4006) @parser.c:1788
+[QTS:EMIT] pos=1282 op=72 @parser.c:1799
+[QTS:EMIT] pos=1283 op=200 @parser.c:1786
+[QTS:EMIT] pos=1284 u32=0x00000fa9 (4009) @parser.c:1788
+[QTS:EMIT] pos=1288 op=66 @parser.c:1799
+[QTS:EMIT] pos=1289 atom=517 @parser.c:1807
+[QTS:EMIT] pos=1293 op=200 @parser.c:1786
+[QTS:EMIT] pos=1294 u32=0x00000fb5 (4021) @parser.c:1788
+[QTS:EMIT] pos=1298 op=66 @parser.c:1799
+[QTS:EMIT] pos=1299 atom=437 @parser.c:1807
+[QTS:EMIT] pos=1303 op=200 @parser.c:1786
+[QTS:EMIT] pos=1304 u32=0x00000fbe (4030) @parser.c:1788
+[QTS:EMIT] pos=1308 op=186 @parser.c:1799
+[QTS:EMIT] pos=1309 u32=0x00000203 (515) @parser.c:1777
+[QTS:EMIT] pos=1313 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1315 op=200 @parser.c:1786
+[QTS:EMIT] pos=1316 u32=0x00000fa0 (4000) @parser.c:1788
+[QTS:EMIT] pos=1320 op=34 @parser.c:1799
+[QTS:EMIT] pos=1321 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=1323 op=14 @parser.c:1799
+[QTS:EMIT] pos=1324 op=200 @parser.c:1786
+[QTS:EMIT] pos=1325 u32=0x00000fd5 (4053) @parser.c:1788
+[QTS:EMIT] pos=1329 op=186 @parser.c:1799
+[QTS:EMIT] pos=1330 u32=0x000001da (474) @parser.c:1777
+[QTS:EMIT] pos=1334 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1336 op=200 @parser.c:1786
+[QTS:EMIT] pos=1337 u32=0x00000fdc (4060) @parser.c:1788
+[QTS:EMIT] pos=1341 op=186 @parser.c:1799
+[QTS:EMIT] pos=1342 u32=0x00000201 (513) @parser.c:1777
+[QTS:EMIT] pos=1346 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1348 op=200 @parser.c:1786
+[QTS:EMIT] pos=1349 u32=0x00000fe2 (4066) @parser.c:1788
+[QTS:EMIT] pos=1353 op=186 @parser.c:1799
+[QTS:EMIT] pos=1354 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=1358 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1360 op=200 @parser.c:1786
+[QTS:EMIT] pos=1361 u32=0x00000fe1 (4065) @parser.c:1788
+[QTS:EMIT] pos=1365 op=72 @parser.c:1799
+[QTS:EMIT] pos=1366 op=200 @parser.c:1786
+[QTS:EMIT] pos=1367 u32=0x00000fe4 (4068) @parser.c:1788
+[QTS:EMIT] pos=1371 op=66 @parser.c:1799
+[QTS:EMIT] pos=1372 atom=517 @parser.c:1807
+[QTS:EMIT] pos=1376 op=200 @parser.c:1786
+[QTS:EMIT] pos=1377 u32=0x00000ff0 (4080) @parser.c:1788
+[QTS:EMIT] pos=1381 op=66 @parser.c:1799
+[QTS:EMIT] pos=1382 atom=48 @parser.c:1807
+[QTS:EMIT] pos=1386 op=1 @parser.c:1799
+[QTS:EMIT] pos=1387 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=1391 op=200 @parser.c:1786
+[QTS:EMIT] pos=1392 u32=0x00000fdb (4059) @parser.c:1788
+[QTS:EMIT] pos=1396 op=34 @parser.c:1799
+[QTS:EMIT] pos=1397 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=1399 op=14 @parser.c:1799
+[QTS:EMIT] pos=1400 op=200 @parser.c:1786
+[QTS:EMIT] pos=1401 u32=0x00001005 (4101) @parser.c:1788
+[QTS:EMIT] pos=1405 op=186 @parser.c:1799
+[QTS:EMIT] pos=1406 u32=0x000001da (474) @parser.c:1777
+[QTS:EMIT] pos=1410 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1412 op=200 @parser.c:1786
+[QTS:EMIT] pos=1413 u32=0x0000100c (4108) @parser.c:1788
+[QTS:EMIT] pos=1417 op=186 @parser.c:1799
+[QTS:EMIT] pos=1418 u32=0x00000201 (513) @parser.c:1777
+[QTS:EMIT] pos=1422 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1424 op=200 @parser.c:1786
+[QTS:EMIT] pos=1425 u32=0x00001012 (4114) @parser.c:1788
+[QTS:EMIT] pos=1429 op=186 @parser.c:1799
+[QTS:EMIT] pos=1430 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=1434 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1436 op=200 @parser.c:1786
+[QTS:EMIT] pos=1437 u32=0x00001011 (4113) @parser.c:1788
+[QTS:EMIT] pos=1441 op=72 @parser.c:1799
+[QTS:EMIT] pos=1442 op=200 @parser.c:1786
+[QTS:EMIT] pos=1443 u32=0x00001014 (4116) @parser.c:1788
+[QTS:EMIT] pos=1447 op=66 @parser.c:1799
+[QTS:EMIT] pos=1448 atom=517 @parser.c:1807
+[QTS:EMIT] pos=1452 op=200 @parser.c:1786
+[QTS:EMIT] pos=1453 u32=0x00001020 (4128) @parser.c:1788
+[QTS:EMIT] pos=1457 op=66 @parser.c:1799
+[QTS:EMIT] pos=1458 atom=439 @parser.c:1807
+[QTS:EMIT] pos=1462 op=200 @parser.c:1786
+[QTS:EMIT] pos=1463 u32=0x0000102d (4141) @parser.c:1788
+[QTS:EMIT] pos=1467 op=186 @parser.c:1799
+[QTS:EMIT] pos=1468 u32=0x000001e4 (484) @parser.c:1777
+[QTS:EMIT] pos=1472 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1474 op=200 @parser.c:1786
+[QTS:EMIT] pos=1475 u32=0x0000100b (4107) @parser.c:1788
+[QTS:EMIT] pos=1479 op=34 @parser.c:1799
+[QTS:EMIT] pos=1480 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=1482 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=6
+[QTS:SCOPE] pop: level=6
+[QTS:EMIT] pos=1483 op=183 @parser.c:1799
+[QTS:EMIT] pos=1484 u16=0x0006 (6) @parser.c:1772
+[QTS:EMIT] pos=1486 op=183 @parser.c:1799
+[QTS:EMIT] pos=1487 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=1530 op=184 @parser.c:1799
+[QTS:EMIT] pos=1531 u32=0x00000015 (21) @parser.c:1777
+[QTS:SCOPE] leave: idx=5
+[QTS:SCOPE] pop: level=5
+[QTS:EMIT] pos=1535 op=183 @parser.c:1799
+[QTS:EMIT] pos=1536 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=1538 op=41 @parser.c:1799
+[QTS:SCOPE] push: level=1 first_var=-1
+[QTS:SCOPE] enter: idx=1 is_body=0
+[QTS:EMIT] pos=0 op=182 @parser.c:1799
+[QTS:EMIT] pos=1 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=3 op=200 @parser.c:1786
+[QTS:EMIT] pos=4 u32=0x00001066 (4198) @parser.c:1788
+[QTS:EMIT] pos=8 op=186 @parser.c:1799
+[QTS:EMIT] pos=9 u32=0x000001f7 (503) @parser.c:1777
+[QTS:EMIT] pos=13 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=15 op=11 @parser.c:1799
+[QTS:EMIT] pos=16 op=1 @parser.c:1799
+[QTS:EMIT] pos=17 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=21 op=78 @parser.c:1799
+[QTS:EMIT] pos=22 atom=520 @parser.c:1807
+[QTS:EMIT] pos=26 op=1 @parser.c:1799
+[QTS:EMIT] pos=27 u32=0x00000002 (2) @parser.c:1777
+[QTS:EMIT] pos=31 op=78 @parser.c:1799
+[QTS:EMIT] pos=32 atom=521 @parser.c:1807
+[QTS:EMIT] pos=36 op=1 @parser.c:1799
+[QTS:EMIT] pos=37 u32=0x00000003 (3) @parser.c:1777
+[QTS:EMIT] pos=41 op=78 @parser.c:1799
+[QTS:EMIT] pos=42 atom=4 @parser.c:1807
+[QTS:EMIT] pos=46 op=200 @parser.c:1786
+[QTS:EMIT] pos=47 u32=0x00001070 (4208) @parser.c:1788
+[QTS:EMIT] pos=51 op=34 @parser.c:1799
+[QTS:EMIT] pos=52 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=54 op=14 @parser.c:1799
+[QTS:EMIT] pos=55 op=200 @parser.c:1786
+[QTS:EMIT] pos=56 u32=0x0000108d (4237) @parser.c:1788
+[QTS:EMIT] pos=60 op=186 @parser.c:1799
+[QTS:EMIT] pos=61 u32=0x000001f7 (503) @parser.c:1777
+[QTS:EMIT] pos=65 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=67 op=1 @parser.c:1799
+[QTS:EMIT] pos=68 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=72 op=1 @parser.c:1799
+[QTS:EMIT] pos=73 u32=0x00000002 (2) @parser.c:1777
+[QTS:EMIT] pos=77 op=1 @parser.c:1799
+[QTS:EMIT] pos=78 u32=0x00000003 (3) @parser.c:1777
+[QTS:EMIT] pos=82 op=38 @parser.c:1799
+[QTS:EMIT] pos=83 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=85 op=200 @parser.c:1786
+[QTS:EMIT] pos=86 u32=0x00001097 (4247) @parser.c:1788
+[QTS:EMIT] pos=90 op=34 @parser.c:1799
+[QTS:EMIT] pos=91 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=93 op=14 @parser.c:1799
+[QTS:EMIT] pos=94 op=200 @parser.c:1786
+[QTS:EMIT] pos=95 u32=0x000010a8 (4264) @parser.c:1788
+[QTS:EMIT] pos=99 op=186 @parser.c:1799
+[QTS:EMIT] pos=100 u32=0x000001f7 (503) @parser.c:1777
+[QTS:EMIT] pos=104 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=106 op=1 @parser.c:1799
+[QTS:EMIT] pos=107 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=111 op=4 @parser.c:1799
+[QTS:EMIT] pos=112 u32=0x0000020a (522) @parser.c:1777
+[QTS:EMIT] pos=116 op=10 @parser.c:1799
+[QTS:EMIT] pos=117 op=9 @parser.c:1799
+[QTS:EMIT] pos=118 op=200 @parser.c:1786
+[QTS:EMIT] pos=119 u32=0x000010cc (4300) @parser.c:1788
+[QTS:EMIT] pos=123 op=186 @parser.c:1799
+[QTS:EMIT] pos=124 u32=0x00000047 (71) @parser.c:1777
+[QTS:EMIT] pos=128 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=130 op=7 @parser.c:1799
+[QTS:EMIT] pos=131 op=200 @parser.c:1786
+[QTS:EMIT] pos=132 u32=0x000010dd (4317) @parser.c:1788
+[QTS:EMIT] pos=136 op=186 @parser.c:1799
+[QTS:EMIT] pos=137 u32=0x00000092 (146) @parser.c:1777
+[QTS:EMIT] pos=141 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=143 op=200 @parser.c:1786
+[QTS:EMIT] pos=144 u32=0x000010e3 (4323) @parser.c:1788
+[QTS:EMIT] pos=148 op=186 @parser.c:1799
+[QTS:EMIT] pos=149 u32=0x00000090 (144) @parser.c:1777
+[QTS:EMIT] pos=153 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=155 op=200 @parser.c:1786
+[QTS:EMIT] pos=156 u32=0x000010e2 (4322) @parser.c:1788
+[QTS:EMIT] pos=160 op=142 @parser.c:1799
+[QTS:EMIT] pos=161 op=1 @parser.c:1799
+[QTS:EMIT] pos=162 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=166 op=200 @parser.c:1786
+[QTS:EMIT] pos=167 u32=0x000010ed (4333) @parser.c:1788
+[QTS:EMIT] pos=171 op=142 @parser.c:1799
+[QTS:EMIT] pos=172 op=38 @parser.c:1799
+[QTS:EMIT] pos=173 u16=0x0009 (9) @parser.c:1772
+[QTS:EMIT] pos=175 op=200 @parser.c:1786
+[QTS:EMIT] pos=176 u32=0x000010b2 (4274) @parser.c:1788
+[QTS:EMIT] pos=180 op=34 @parser.c:1799
+[QTS:EMIT] pos=181 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=183 op=14 @parser.c:1799
+[QTS:SCOPE] push: level=2 first_var=-1
+[QTS:SCOPE] enter: idx=2 is_body=0
+[QTS:EMIT] pos=184 op=182 @parser.c:1799
+[QTS:EMIT] pos=185 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=187 op=200 @parser.c:1786
+[QTS:EMIT] pos=188 u32=0x00001104 (4356) @parser.c:1788
+[QTS:EMIT] pos=192 op=186 @parser.c:1799
+[QTS:EMIT] pos=193 u32=0x000000b9 (185) @parser.c:1777
+[QTS:EMIT] pos=197 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=199 op=153 @parser.c:1799
+[QTS:EMIT] pos=200 op=4 @parser.c:1799
+[QTS:EMIT] pos=201 u32=0x00000047 (71) @parser.c:1777
+[QTS:EMIT] pos=205 op=200 @parser.c:1786
+[QTS:EMIT] pos=206 u32=0x0000110b (4363) @parser.c:1788
+[QTS:EMIT] pos=210 op=174 @parser.c:1799
+[QTS:EMIT] pos=211 op=108 @parser.c:1799
+[QTS:EMIT] pos=212 u32=0x00000000 (0) @parser.c:1777
+[QTS:SCOPE] push: level=3 first_var=-1
+[QTS:SCOPE] enter: idx=3 is_body=0
+[QTS:EMIT] pos=216 op=182 @parser.c:1799
+[QTS:EMIT] pos=217 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=219 op=200 @parser.c:1786
+[QTS:EMIT] pos=220 u32=0x00001126 (4390) @parser.c:1788
+[QTS:EMIT] pos=224 op=186 @parser.c:1799
+[QTS:EMIT] pos=225 u32=0x000001f7 (503) @parser.c:1777
+[QTS:EMIT] pos=229 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=231 op=200 @parser.c:1786
+[QTS:EMIT] pos=232 u32=0x00001132 (4402) @parser.c:1788
+[QTS:EMIT] pos=236 op=186 @parser.c:1799
+[QTS:EMIT] pos=237 u32=0x000000b9 (185) @parser.c:1777
+[QTS:EMIT] pos=241 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=243 op=2 @parser.c:1799
+[QTS:EMIT] pos=244 u32=0x00000000 (0) @parser.c:1777
+[QTS:EMIT] pos=248 op=200 @parser.c:1786
+[QTS:EMIT] pos=249 u32=0x00001138 (4408) @parser.c:1788
+[QTS:EMIT] pos=253 op=34 @parser.c:1799
+[QTS:EMIT] pos=254 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=256 op=200 @parser.c:1786
+[QTS:EMIT] pos=257 u32=0x00001140 (4416) @parser.c:1788
+[QTS:EMIT] pos=261 op=186 @parser.c:1799
+[QTS:EMIT] pos=262 u32=0x000000b9 (185) @parser.c:1777
+[QTS:EMIT] pos=266 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=268 op=4 @parser.c:1799
+[QTS:EMIT] pos=269 u32=0x0000020b (523) @parser.c:1777
+[QTS:EMIT] pos=273 op=200 @parser.c:1786
+[QTS:EMIT] pos=274 u32=0x00001146 (4422) @parser.c:1788
+[QTS:EMIT] pos=278 op=34 @parser.c:1799
+[QTS:EMIT] pos=279 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=281 op=200 @parser.c:1786
+[QTS:EMIT] pos=282 u32=0x0000113f (4415) @parser.c:1788
+[QTS:EMIT] pos=286 op=142 @parser.c:1799
+[QTS:EMIT] pos=287 op=200 @parser.c:1786
+[QTS:EMIT] pos=288 u32=0x00001163 (4451) @parser.c:1788
+[QTS:EMIT] pos=292 op=186 @parser.c:1799
+[QTS:EMIT] pos=293 u32=0x000000b9 (185) @parser.c:1777
+[QTS:EMIT] pos=297 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=299 op=4 @parser.c:1799
+[QTS:EMIT] pos=300 u32=0x0000020c (524) @parser.c:1777
+[QTS:EMIT] pos=304 op=200 @parser.c:1786
+[QTS:EMIT] pos=305 u32=0x00001169 (4457) @parser.c:1788
+[QTS:EMIT] pos=309 op=34 @parser.c:1799
+[QTS:EMIT] pos=310 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=312 op=38 @parser.c:1799
+[QTS:EMIT] pos=313 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=315 op=200 @parser.c:1786
+[QTS:EMIT] pos=316 u32=0x00001130 (4400) @parser.c:1788
+[QTS:EMIT] pos=320 op=34 @parser.c:1799
+[QTS:EMIT] pos=321 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=323 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=3
+[QTS:SCOPE] pop: level=3
+[QTS:EMIT] pos=324 op=183 @parser.c:1799
+[QTS:EMIT] pos=325 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=327 op=184 @parser.c:1799
+[QTS:EMIT] pos=328 u32=0x00000000 (0) @parser.c:1777
+[QTS:SCOPE] leave: idx=2
+[QTS:SCOPE] pop: level=2
+[QTS:EMIT] pos=332 op=183 @parser.c:1799
+[QTS:EMIT] pos=333 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=335 op=200 @parser.c:1786
+[QTS:EMIT] pos=336 u32=0x0000119b (4507) @parser.c:1788
+[QTS:EMIT] pos=340 op=186 @parser.c:1799
+[QTS:EMIT] pos=341 u32=0x000001f7 (503) @parser.c:1777
+[QTS:EMIT] pos=345 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=347 op=200 @parser.c:1786
+[QTS:EMIT] pos=348 u32=0x000011ab (4523) @parser.c:1788
+[QTS:EMIT] pos=352 op=186 @parser.c:1799
+[QTS:EMIT] pos=353 u32=0x000000a7 (167) @parser.c:1777
+[QTS:EMIT] pos=357 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=359 op=17 @parser.c:1799
+[QTS:EMIT] pos=360 op=1 @parser.c:1799
+[QTS:EMIT] pos=361 u32=0x000004d2 (1234) @parser.c:1777
+[QTS:EMIT] pos=365 op=200 @parser.c:1786
+[QTS:EMIT] pos=366 u32=0x000011af (4527) @parser.c:1788
+[QTS:EMIT] pos=370 op=33 @parser.c:1799
+[QTS:EMIT] pos=371 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=373 op=200 @parser.c:1786
+[QTS:EMIT] pos=374 u32=0x000011bb (4539) @parser.c:1788
+[QTS:EMIT] pos=378 op=186 @parser.c:1799
+[QTS:EMIT] pos=379 u32=0x000000a1 (161) @parser.c:1777
+[QTS:EMIT] pos=383 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=385 op=17 @parser.c:1799
+[QTS:EMIT] pos=386 op=4 @parser.c:1799
+[QTS:EMIT] pos=387 u32=0x0000020d (525) @parser.c:1777
+[QTS:EMIT] pos=391 op=200 @parser.c:1786
+[QTS:EMIT] pos=392 u32=0x000011c1 (4545) @parser.c:1788
+[QTS:EMIT] pos=396 op=33 @parser.c:1799
+[QTS:EMIT] pos=397 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=399 op=200 @parser.c:1786
+[QTS:EMIT] pos=400 u32=0x000011ce (4558) @parser.c:1788
+[QTS:EMIT] pos=404 op=186 @parser.c:1799
+[QTS:EMIT] pos=405 u32=0x000000a0 (160) @parser.c:1777
+[QTS:EMIT] pos=409 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=411 op=17 @parser.c:1799
+[QTS:EMIT] pos=412 op=2 @parser.c:1799
+[QTS:EMIT] pos=413 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=417 op=200 @parser.c:1786
+[QTS:EMIT] pos=418 u32=0x000011d5 (4565) @parser.c:1788
+[QTS:EMIT] pos=422 op=142 @parser.c:1799
+[QTS:EMIT] pos=423 op=200 @parser.c:1786
+[QTS:EMIT] pos=424 u32=0x000011d4 (4564) @parser.c:1788
+[QTS:EMIT] pos=428 op=33 @parser.c:1799
+[QTS:EMIT] pos=429 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=431 op=200 @parser.c:1786
+[QTS:EMIT] pos=432 u32=0x000011e1 (4577) @parser.c:1788
+[QTS:EMIT] pos=436 op=186 @parser.c:1799
+[QTS:EMIT] pos=437 u32=0x000000a2 (162) @parser.c:1777
+[QTS:EMIT] pos=441 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=443 op=17 @parser.c:1799
+[QTS:EMIT] pos=444 op=10 @parser.c:1799
+[QTS:EMIT] pos=445 op=200 @parser.c:1786
+[QTS:EMIT] pos=446 u32=0x000011e8 (4584) @parser.c:1788
+[QTS:EMIT] pos=450 op=33 @parser.c:1799
+[QTS:EMIT] pos=451 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=453 op=38 @parser.c:1799
+[QTS:EMIT] pos=454 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=456 op=200 @parser.c:1786
+[QTS:EMIT] pos=457 u32=0x000011a5 (4517) @parser.c:1788
+[QTS:EMIT] pos=461 op=34 @parser.c:1799
+[QTS:EMIT] pos=462 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=464 op=14 @parser.c:1799
+[QTS:EMIT] pos=465 op=200 @parser.c:1786
+[QTS:EMIT] pos=466 u32=0x000011f6 (4598) @parser.c:1788
+[QTS:EMIT] pos=470 op=186 @parser.c:1799
+[QTS:EMIT] pos=471 u32=0x000001f7 (503) @parser.c:1777
+[QTS:EMIT] pos=475 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=477 op=200 @parser.c:1786
+[QTS:EMIT] pos=478 u32=0x00001205 (4613) @parser.c:1788
+[QTS:EMIT] pos=482 op=186 @parser.c:1799
+[QTS:EMIT] pos=483 u32=0x000000b3 (179) @parser.c:1777
+[QTS:EMIT] pos=487 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=489 op=17 @parser.c:1799
+[QTS:EMIT] pos=490 op=1 @parser.c:1799
+[QTS:EMIT] pos=491 u32=0x0001e0f3 (123123) @parser.c:1777
+[QTS:EMIT] pos=495 op=1 @parser.c:1799
+[QTS:EMIT] pos=496 u32=0x0003639f (222111) @parser.c:1777
+[QTS:EMIT] pos=500 op=1 @parser.c:1799
+[QTS:EMIT] pos=501 u32=0x00007dde (32222) @parser.c:1777
+[QTS:EMIT] pos=505 op=200 @parser.c:1786
+[QTS:EMIT] pos=506 u32=0x00001221 (4641) @parser.c:1788
+[QTS:EMIT] pos=510 op=142 @parser.c:1799
+[QTS:EMIT] pos=511 op=38 @parser.c:1799
+[QTS:EMIT] pos=512 u16=0x0003 (3) @parser.c:1772
+[QTS:EMIT] pos=514 op=200 @parser.c:1786
+[QTS:EMIT] pos=515 u32=0x0000120f (4623) @parser.c:1788
+[QTS:EMIT] pos=519 op=33 @parser.c:1799
+[QTS:EMIT] pos=520 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=522 op=200 @parser.c:1786
+[QTS:EMIT] pos=523 u32=0x00001200 (4608) @parser.c:1788
+[QTS:EMIT] pos=527 op=34 @parser.c:1799
+[QTS:EMIT] pos=528 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=530 op=14 @parser.c:1799
+[QTS:EMIT] pos=531 op=200 @parser.c:1786
+[QTS:EMIT] pos=532 u32=0x00001230 (4656) @parser.c:1788
+[QTS:EMIT] pos=536 op=186 @parser.c:1799
+[QTS:EMIT] pos=537 u32=0x000001f7 (503) @parser.c:1777
+[QTS:EMIT] pos=541 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=543 op=200 @parser.c:1786
+[QTS:EMIT] pos=544 u32=0x0000123f (4671) @parser.c:1788
+[QTS:EMIT] pos=548 op=186 @parser.c:1799
+[QTS:EMIT] pos=549 u32=0x000000b5 (181) @parser.c:1777
+[QTS:EMIT] pos=553 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=555 op=17 @parser.c:1799
+[QTS:EMIT] pos=556 op=1 @parser.c:1799
+[QTS:EMIT] pos=557 u32=0x00000400 (1024) @parser.c:1777
+[QTS:EMIT] pos=561 op=2 @parser.c:1799
+[QTS:EMIT] pos=562 u32=0x00000002 (2) @parser.c:1777
+[QTS:EMIT] pos=566 op=38 @parser.c:1799
+[QTS:EMIT] pos=567 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=569 op=200 @parser.c:1786
+[QTS:EMIT] pos=570 u32=0x0000124b (4683) @parser.c:1788
+[QTS:EMIT] pos=574 op=33 @parser.c:1799
+[QTS:EMIT] pos=575 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=577 op=200 @parser.c:1786
+[QTS:EMIT] pos=578 u32=0x0000123a (4666) @parser.c:1788
+[QTS:EMIT] pos=582 op=34 @parser.c:1799
+[QTS:EMIT] pos=583 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=585 op=14 @parser.c:1799
+[QTS:EMIT] pos=586 op=200 @parser.c:1786
+[QTS:EMIT] pos=587 u32=0x00001262 (4706) @parser.c:1788
+[QTS:EMIT] pos=591 op=186 @parser.c:1799
+[QTS:EMIT] pos=592 u32=0x000001f7 (503) @parser.c:1777
+[QTS:EMIT] pos=596 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=598 op=200 @parser.c:1786
+[QTS:EMIT] pos=599 u32=0x00001271 (4721) @parser.c:1788
+[QTS:EMIT] pos=603 op=186 @parser.c:1799
+[QTS:EMIT] pos=604 u32=0x000000b7 (183) @parser.c:1777
+[QTS:EMIT] pos=608 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=610 op=17 @parser.c:1799
+[QTS:EMIT] pos=611 op=1 @parser.c:1799
+[QTS:EMIT] pos=612 u32=0x0001e0f3 (123123) @parser.c:1777
+[QTS:EMIT] pos=616 op=2 @parser.c:1799
+[QTS:EMIT] pos=617 u32=0x00000003 (3) @parser.c:1777
+[QTS:EMIT] pos=621 op=38 @parser.c:1799
+[QTS:EMIT] pos=622 u16=0x0002 (2) @parser.c:1772
+[QTS:EMIT] pos=624 op=200 @parser.c:1786
+[QTS:EMIT] pos=625 u32=0x0000127d (4733) @parser.c:1788
+[QTS:EMIT] pos=629 op=33 @parser.c:1799
+[QTS:EMIT] pos=630 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=632 op=200 @parser.c:1786
+[QTS:EMIT] pos=633 u32=0x0000126c (4716) @parser.c:1788
+[QTS:EMIT] pos=637 op=34 @parser.c:1799
+[QTS:EMIT] pos=638 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=640 op=14 @parser.c:1799
+[QTS:EMIT] pos=641 op=200 @parser.c:1786
+[QTS:EMIT] pos=642 u32=0x000012c3 (4803) @parser.c:1788
+[QTS:EMIT] pos=646 op=186 @parser.c:1799
+[QTS:EMIT] pos=647 u32=0x00000207 (519) @parser.c:1777
+[QTS:EMIT] pos=651 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=646 op=189 @parser.c:1799
+[QTS:EMIT] pos=647 atom=519 @parser.c:1807
+[QTS:EMIT] pos=651 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=655 u16=0x0001 (1) @parser.c:1772
+[QTS:ASSIGN] lvalue: opcode=61 scope=1 atom=519 label=1
+[QTS:EMIT] pos=657 op=11 @parser.c:1799
+[QTS:EMIT] pos=658 op=184 @parser.c:1799
+[QTS:EMIT] pos=659 u32=0x00000001 (1) @parser.c:1777
+[QTS:EMIT] pos=663 op=22 @parser.c:1799
+[QTS:EMIT] pos=664 op=62 @parser.c:1799
+[QTS:EMIT] pos=665 op=14 @parser.c:1799
+[QTS:EMIT] pos=666 op=200 @parser.c:1786
+[QTS:EMIT] pos=667 u32=0x000012d1 (4817) @parser.c:1788
+[QTS:EMIT] pos=671 op=186 @parser.c:1799
+[QTS:EMIT] pos=672 u32=0x00000207 (519) @parser.c:1777
+[QTS:EMIT] pos=676 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=678 op=200 @parser.c:1786
+[QTS:EMIT] pos=679 u32=0x000012d4 (4820) @parser.c:1788
+[QTS:EMIT] pos=683 op=66 @parser.c:1799
+[QTS:EMIT] pos=684 atom=520 @parser.c:1807
+[QTS:ASSIGN] lvalue: opcode=66 scope=0 atom=520 label=-1
+[QTS:EMIT] pos=683 op=200 @parser.c:1786
+[QTS:EMIT] pos=684 u32=0x000012d9 (4825) @parser.c:1788
+[QTS:EMIT] pos=688 op=186 @parser.c:1799
+[QTS:EMIT] pos=689 u32=0x00000207 (519) @parser.c:1777
+[QTS:EMIT] pos=693 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=695 op=21 @parser.c:1799
+[QTS:EMIT] pos=696 op=68 @parser.c:1799
+[QTS:EMIT] pos=697 u32=0x00000208 (520) @parser.c:1777
+[QTS:EMIT] pos=701 op=14 @parser.c:1799
+[QTS:EMIT] pos=702 op=111 @parser.c:1799
+[QTS:EMIT] pos=703 u32=0x00000002 (2) @parser.c:1777
+[QTS:SCOPE] push: level=4 first_var=-1
+[QTS:SCOPE] enter: idx=4 is_body=0
+[QTS:EMIT] pos=707 op=182 @parser.c:1799
+[QTS:EMIT] pos=708 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=710 op=200 @parser.c:1786
+[QTS:EMIT] pos=711 u32=0x000012f0 (4848) @parser.c:1788
+[QTS:EMIT] pos=715 op=186 @parser.c:1799
+[QTS:EMIT] pos=716 u32=0x000001d8 (472) @parser.c:1777
+[QTS:EMIT] pos=720 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=722 op=200 @parser.c:1786
+[QTS:EMIT] pos=723 u32=0x000012f5 (4853) @parser.c:1788
+[QTS:EMIT] pos=727 op=66 @parser.c:1799
+[QTS:EMIT] pos=728 atom=508 @parser.c:1807
+[QTS:EMIT] pos=732 op=200 @parser.c:1786
+[QTS:EMIT] pos=733 u32=0x000012fc (4860) @parser.c:1788
+[QTS:EMIT] pos=737 op=186 @parser.c:1799
+[QTS:EMIT] pos=738 u32=0x00000207 (519) @parser.c:1777
+[QTS:EMIT] pos=742 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=744 op=200 @parser.c:1786
+[QTS:EMIT] pos=745 u32=0x000012fb (4859) @parser.c:1788
+[QTS:EMIT] pos=749 op=36 @parser.c:1799
+[QTS:EMIT] pos=750 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=752 op=14 @parser.c:1799
+[QTS:EMIT] pos=753 op=200 @parser.c:1786
+[QTS:EMIT] pos=754 u32=0x0000130a (4874) @parser.c:1788
+[QTS:EMIT] pos=758 op=186 @parser.c:1799
+[QTS:EMIT] pos=759 u32=0x000001da (474) @parser.c:1777
+[QTS:EMIT] pos=763 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=765 op=9 @parser.c:1799
+[QTS:EMIT] pos=766 op=200 @parser.c:1786
+[QTS:EMIT] pos=767 u32=0x00001310 (4880) @parser.c:1788
+[QTS:EMIT] pos=771 op=34 @parser.c:1799
+[QTS:EMIT] pos=772 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=774 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=4
+[QTS:SCOPE] pop: level=4
+[QTS:EMIT] pos=775 op=183 @parser.c:1799
+[QTS:EMIT] pos=776 u16=0x0004 (4) @parser.c:1772
+[QTS:EMIT] pos=778 op=14 @parser.c:1799
+[QTS:EMIT] pos=779 op=6 @parser.c:1799
+[QTS:EMIT] pos=780 op=112 @parser.c:1799
+[QTS:EMIT] pos=781 u32=0x00000004 (4) @parser.c:1777
+[QTS:EMIT] pos=785 op=14 @parser.c:1799
+[QTS:EMIT] pos=786 op=110 @parser.c:1799
+[QTS:EMIT] pos=787 u32=0x00000005 (5) @parser.c:1777
+[QTS:SCOPE] push: level=5 first_var=-1
+[QTS:SCOPE] enter: idx=5 is_body=0
+[QTS:EMIT] pos=791 op=182 @parser.c:1799
+[QTS:EMIT] pos=792 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=794 op=184 @parser.c:1799
+[QTS:EMIT] pos=795 u32=0x00000002 (2) @parser.c:1777
+[QTS:EMIT] pos=799 op=187 @parser.c:1799
+[QTS:EMIT] pos=800 u32=0x0000020e (526) @parser.c:1777
+[QTS:EMIT] pos=804 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=806 op=111 @parser.c:1799
+[QTS:EMIT] pos=807 u32=0x00000003 (3) @parser.c:1777
+[QTS:SCOPE] push: level=6 first_var=1
+[QTS:SCOPE] enter: idx=6 is_body=0
+[QTS:EMIT] pos=811 op=182 @parser.c:1799
+[QTS:EMIT] pos=812 u16=0x0006 (6) @parser.c:1772
+[QTS:SCOPE] push: level=7 first_var=1
+[QTS:SCOPE] enter: idx=7 is_body=0
+[QTS:EMIT] pos=814 op=182 @parser.c:1799
+[QTS:EMIT] pos=815 u16=0x0007 (7) @parser.c:1772
+[QTS:EMIT] pos=817 op=200 @parser.c:1786
+[QTS:EMIT] pos=818 u32=0x00001337 (4919) @parser.c:1788
+[QTS:EMIT] pos=822 op=186 @parser.c:1799
+[QTS:EMIT] pos=823 u32=0x000001da (474) @parser.c:1777
+[QTS:EMIT] pos=827 u16=0x0007 (7) @parser.c:1772
+[QTS:EMIT] pos=829 op=200 @parser.c:1786
+[QTS:EMIT] pos=830 u32=0x0000133e (4926) @parser.c:1788
+[QTS:EMIT] pos=834 op=186 @parser.c:1799
+[QTS:EMIT] pos=835 u32=0x0000020e (526) @parser.c:1777
+[QTS:EMIT] pos=839 u16=0x0007 (7) @parser.c:1772
+[QTS:EMIT] pos=841 op=200 @parser.c:1786
+[QTS:EMIT] pos=842 u32=0x0000134b (4939) @parser.c:1788
+[QTS:EMIT] pos=846 op=186 @parser.c:1799
+[QTS:EMIT] pos=847 u32=0x000000d3 (211) @parser.c:1777
+[QTS:EMIT] pos=851 u16=0x0007 (7) @parser.c:1772
+[QTS:EMIT] pos=853 op=200 @parser.c:1786
+[QTS:EMIT] pos=854 u32=0x00001340 (4928) @parser.c:1788
+[QTS:EMIT] pos=858 op=169 @parser.c:1799
+[QTS:EMIT] pos=859 op=200 @parser.c:1786
+[QTS:EMIT] pos=860 u32=0x0000133d (4925) @parser.c:1788
+[QTS:EMIT] pos=864 op=34 @parser.c:1799
+[QTS:EMIT] pos=865 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=867 op=14 @parser.c:1799
+[QTS:SCOPE] leave: idx=7
+[QTS:SCOPE] pop: level=7
+[QTS:EMIT] pos=868 op=183 @parser.c:1799
+[QTS:EMIT] pos=869 u16=0x0007 (7) @parser.c:1772
+[QTS:SCOPE] leave: idx=6
+[QTS:SCOPE] pop: level=6
+[QTS:EMIT] pos=871 op=183 @parser.c:1799
+[QTS:EMIT] pos=872 u16=0x0006 (6) @parser.c:1772
+[QTS:SCOPE] leave: idx=5
+[QTS:SCOPE] pop: level=5
+[QTS:EMIT] pos=874 op=183 @parser.c:1799
+[QTS:EMIT] pos=875 u16=0x0005 (5) @parser.c:1772
+[QTS:EMIT] pos=877 op=14 @parser.c:1799
+[QTS:EMIT] pos=878 op=6 @parser.c:1799
+[QTS:EMIT] pos=879 op=112 @parser.c:1799
+[QTS:EMIT] pos=880 u32=0x00000004 (4) @parser.c:1777
+[QTS:EMIT] pos=884 op=14 @parser.c:1799
+[QTS:EMIT] pos=885 op=110 @parser.c:1799
+[QTS:EMIT] pos=886 u32=0x00000005 (5) @parser.c:1777
+[QTS:EMIT] pos=890 op=184 @parser.c:1799
+[QTS:EMIT] pos=891 u32=0x00000003 (3) @parser.c:1777
+[QTS:EMIT] pos=895 op=112 @parser.c:1799
+[QTS:EMIT] pos=896 u32=0x00000004 (4) @parser.c:1777
+[QTS:EMIT] pos=900 op=48 @parser.c:1799
+[QTS:EMIT] pos=901 op=184 @parser.c:1799
+[QTS:EMIT] pos=902 u32=0x00000004 (4) @parser.c:1777
+[QTS:EMIT] pos=906 op=113 @parser.c:1799
+[QTS:EMIT] pos=907 op=184 @parser.c:1799
+[QTS:EMIT] pos=908 u32=0x00000005 (5) @parser.c:1777
+[QTS:EMIT] pos=912 op=200 @parser.c:1786
+[QTS:EMIT] pos=913 u32=0x00001361 (4961) @parser.c:1788
+[QTS:EMIT] pos=917 op=186 @parser.c:1799
+[QTS:EMIT] pos=918 u32=0x00000200 (512) @parser.c:1777
+[QTS:EMIT] pos=922 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=924 op=200 @parser.c:1786
+[QTS:EMIT] pos=925 u32=0x00001375 (4981) @parser.c:1788
+[QTS:EMIT] pos=929 op=34 @parser.c:1799
+[QTS:EMIT] pos=930 u16=0x0000 (0) @parser.c:1772
+[QTS:EMIT] pos=932 op=14 @parser.c:1799
+[QTS:EMIT] pos=933 op=41 @parser.c:1799
+[QTS:EMIT] pos=3 op=200 @parser.c:1786
+[QTS:EMIT] pos=4 u32=0x0000137b (4987) @parser.c:1788
+[QTS:EMIT] pos=8 op=186 @parser.c:1799
+[QTS:EMIT] pos=9 u32=0x00000206 (518) @parser.c:1777
+[QTS:EMIT] pos=13 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=15 op=200 @parser.c:1786
+[QTS:EMIT] pos=16 u32=0x00001389 (5001) @parser.c:1788
+[QTS:EMIT] pos=20 op=34 @parser.c:1799
+[QTS:EMIT] pos=21 u16=0x0000 (0) @parser.c:1772
+[QTS:EMIT] pos=23 op=14 @parser.c:1799
+[QTS:EMIT] pos=24 op=6 @parser.c:1799
+[QTS:EMIT] pos=25 op=47 @parser.c:1799
+[QTS:VAR] hoist: eval_type=0 module=0 globals=0 closures=0
+[QTS:VAR] resolve: atom=79 scope=2 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=476 scope=2 op=189
+[QTS:VAR]   emit: op=189 idx=536870913
+[QTS:VAR] resolve: atom=475 scope=3 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=476 scope=3 op=186
+[QTS:VAR]   emit: op=186 idx=536870913
+[QTS:VAR] resolve: atom=475 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=476 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=536870913
+[QTS:VAR] resolve: atom=475 scope=4 op=185
+[QTS:VAR]   emit: op=185 idx=536870912
+[QTS:VAR] resolve: atom=476 scope=4 op=185
+[QTS:VAR]   emit: op=185 idx=536870913
+[QTS:VAR] resolve: atom=475 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=476 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=536870913
+[QTS:VAR] resolve: atom=159 scope=1 op=186
+[QTS:VAR] resolve: atom=475 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=476 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870913
+[QTS:VAR] resolve: atom=52 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870914
+[QTS:VAR] resolve: atom=52 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870914
+[QTS:LABEL] begin: bc_len=416 label_count=7 jump_size=9 line_number_size=39 strip_debug=0
+[QTS:LABEL] goto: opcode=108 label=0
+[QTS:LABEL] emit: label=0 pos=11
+[QTS:LABEL] goto: opcode=108 label=2
+[QTS:LABEL] emit: label=2 pos=17
+[QTS:LABEL] typeof_test: pos=136 pos_next=137 line_num:398->405 atom=75 cmp_op=171
+[QTS:LABEL] goto: opcode=108 label=4
+[QTS:LABEL] typeof_test: pos=161 pos_next=162 line_num:427->436 atom=75 cmp_op=171
+[QTS:LABEL] goto: opcode=108 label=4
+[QTS:LABEL] emit: label=3 pos=70
+[QTS:LABEL] goto: opcode=108 label=4
+[QTS:LABEL] emit: label=4 pos=73
+[QTS:LABEL] goto: opcode=108 label=5
+[QTS:LABEL] goto: opcode=110 label=6
+[QTS:LABEL] emit: label=5 pos=123
+[QTS:LABEL] emit: label=6 pos=124
+[QTS:PC2LINE] begin: slots=39 source_pos=189 @parser.c:10908
+[QTS:PC2LINE] init: line=4 col=0 @parser.c:10915
+[QTS:PC2LINE] end: pc2line_len=80 @parser.c:10960
+[QTS:LABEL] end: out_len=121
+[QTS:STACK] result: max_stack=4 var_count=1
+[QTS:VAR] hoist: eval_type=0 module=0 globals=0 closures=0
+[QTS:VAR] resolve: atom=485 scope=1 op=187
+[QTS:VAR]   emit: op=187 idx=1
+[QTS:VAR] resolve: atom=486 scope=1 op=189
+[QTS:VAR]   emit: op=189 idx=2
+[QTS:VAR] resolve: atom=176 scope=1 op=186
+[QTS:VAR] resolve: atom=483 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=484 scope=2 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=484 scope=2 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=486 scope=2 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=487 scope=3 op=189
+[QTS:VAR]   emit: op=189 idx=3
+[QTS:VAR] resolve: atom=486 scope=3 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=484 scope=3 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=487 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=3
+[QTS:VAR] resolve: atom=487 scope=4 op=189
+[QTS:VAR]   emit: op=189 idx=3
+[QTS:VAR] resolve: atom=487 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=3
+[QTS:VAR] resolve: atom=484 scope=5 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=485 scope=5 op=189
+[QTS:VAR]   emit: op=189 idx=1
+[QTS:VAR] resolve: atom=485 scope=3 op=189
+[QTS:VAR]   emit: op=189 idx=1
+[QTS:VAR] resolve: atom=487 scope=3 op=186
+[QTS:VAR]   emit: op=186 idx=3
+[QTS:VAR] resolve: atom=484 scope=2 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=485 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=1
+[QTS:LABEL] begin: bc_len=362 label_count=13 jump_size=5 line_number_size=32 strip_debug=0
+[QTS:LABEL] emit: label=2 pos=15
+[QTS:LABEL] goto: opcode=108 label=5
+[QTS:LABEL] emit: label=4 pos=24
+[QTS:LABEL] goto: opcode=108 label=8
+[QTS:LABEL] emit: label=8 pos=48
+[QTS:LABEL] goto: opcode=108 label=10
+[QTS:LABEL] emit: label=10 pos=60
+[QTS:LABEL] emit: label=3 pos=63
+[QTS:LABEL] goto: opcode=110 label=2
+[QTS:LABEL] resolve: label=2 addr=15
+[QTS:LABEL] emit: label=5 pos=67
+[QTS:PC2LINE] begin: slots=25 source_pos=669 @parser.c:10908
+[QTS:PC2LINE] init: line=17 col=0 @parser.c:10915
+[QTS:PC2LINE] end: pc2line_len=56 @parser.c:10960
+[QTS:LABEL] end: out_len=66
+[QTS:STACK] result: max_stack=3 var_count=4
+[QTS:VAR] hoist: eval_type=0 module=0 globals=0 closures=0
+[QTS:VAR] resolve: atom=158 scope=1 op=186
+[QTS:VAR] resolve: atom=483 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=483 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=174 scope=1 op=186
+[QTS:VAR] resolve: atom=483 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=176 scope=1 op=186
+[QTS:VAR] resolve: atom=483 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=178 scope=1 op=186
+[QTS:VAR] resolve: atom=483 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=180 scope=1 op=186
+[QTS:VAR] resolve: atom=483 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=175 scope=1 op=186
+[QTS:VAR] resolve: atom=483 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=177 scope=1 op=186
+[QTS:VAR] resolve: atom=483 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=179 scope=1 op=186
+[QTS:VAR] resolve: atom=483 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=181 scope=1 op=186
+[QTS:VAR] resolve: atom=483 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=182 scope=1 op=186
+[QTS:VAR] resolve: atom=483 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=183 scope=1 op=186
+[QTS:LABEL] begin: bc_len=357 label_count=1 jump_size=10 line_number_size=35 strip_debug=0
+[QTS:LABEL] goto: opcode=109 label=0
+[QTS:LABEL] goto: opcode=109 label=0
+[QTS:LABEL] goto: opcode=109 label=0
+[QTS:LABEL] goto: opcode=109 label=0
+[QTS:LABEL] goto: opcode=109 label=0
+[QTS:LABEL] goto: opcode=109 label=0
+[QTS:LABEL] goto: opcode=109 label=0
+[QTS:LABEL] goto: opcode=109 label=0
+[QTS:LABEL] goto: opcode=109 label=0
+[QTS:LABEL] goto: opcode=109 label=0
+[QTS:LABEL] emit: label=0 pos=142
+[QTS:PC2LINE] begin: slots=35 source_pos=949 @parser.c:10908
+[QTS:PC2LINE] init: line=30 col=0 @parser.c:10915
+[QTS:PC2LINE] end: pc2line_len=74 @parser.c:10960
+[QTS:LABEL] end: out_len=125
+[QTS:STACK] result: max_stack=3 var_count=0
+[QTS:VAR] hoist: eval_type=0 module=0 globals=0 closures=0
+[QTS:VAR] resolve: atom=483 scope=1 op=185
+[QTS:VAR]   emit: op=185 idx=536870912
+[QTS:VAR] resolve: atom=483 scope=3 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=483 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=167 scope=4 op=186
+[QTS:VAR] resolve: atom=485 scope=5 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=490 scope=5 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=483 scope=5 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=483 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=160 scope=6 op=186
+[QTS:VAR] resolve: atom=485 scope=7 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=490 scope=7 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=483 scope=7 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=483 scope=8 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=161 scope=8 op=186
+[QTS:VAR] resolve: atom=485 scope=9 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=490 scope=9 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=483 scope=9 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=483 scope=10 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=162 scope=10 op=186
+[QTS:VAR] resolve: atom=485 scope=11 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=490 scope=11 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=483 scope=11 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=489 scope=12 op=186
+[QTS:VAR]   found: idx=1 is_arg=0
+[QTS:VAR] resolve: atom=483 scope=12 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=485 scope=13 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=484 scope=14 op=189
+[QTS:VAR]   emit: op=189 idx=1
+[QTS:VAR] resolve: atom=484 scope=14 op=186
+[QTS:VAR]   emit: op=186 idx=1
+[QTS:VAR] resolve: atom=483 scope=14 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=484 scope=16 op=186
+[QTS:VAR]   emit: op=186 idx=1
+[QTS:VAR] resolve: atom=485 scope=16 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=485 scope=15 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=490 scope=15 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=483 scope=15 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=484 scope=15 op=186
+[QTS:VAR]   emit: op=186 idx=1
+[QTS:VAR] resolve: atom=484 scope=14 op=189
+[QTS:VAR]   emit: op=189 idx=1
+[QTS:VAR] resolve: atom=485 scope=13 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=491 scope=17 op=189
+[QTS:VAR]   emit: op=189 idx=2
+[QTS:VAR] resolve: atom=157 scope=17 op=186
+[QTS:VAR] resolve: atom=483 scope=17 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=485 scope=17 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=484 scope=18 op=189
+[QTS:VAR]   emit: op=189 idx=1
+[QTS:VAR] resolve: atom=484 scope=18 op=186
+[QTS:VAR]   emit: op=186 idx=1
+[QTS:VAR] resolve: atom=491 scope=18 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=484 scope=20 op=186
+[QTS:VAR]   emit: op=186 idx=1
+[QTS:VAR] resolve: atom=485 scope=20 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=492 scope=19 op=189
+[QTS:VAR]   emit: op=189 idx=3
+[QTS:VAR] resolve: atom=491 scope=19 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=484 scope=19 op=186
+[QTS:VAR]   emit: op=186 idx=1
+[QTS:VAR] resolve: atom=485 scope=19 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=492 scope=19 op=186
+[QTS:VAR]   emit: op=186 idx=3
+[QTS:VAR] resolve: atom=490 scope=19 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=483 scope=19 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=492 scope=19 op=186
+[QTS:VAR]   emit: op=186 idx=3
+[QTS:VAR] resolve: atom=484 scope=18 op=189
+[QTS:VAR]   emit: op=189 idx=1
+[QTS:VAR] resolve: atom=485 scope=17 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=485 scope=2 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=483 scope=2 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=483 scope=21 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=483 scope=21 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=483 scope=21 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=483 scope=2 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:LABEL] begin: bc_len=1431 label_count=46 jump_size=25 line_number_size=126 strip_debug=0
+[QTS:LABEL] goto: opcode=108 label=1
+[QTS:LABEL] goto: opcode=108 label=2
+[QTS:LABEL] emit: label=2 pos=24
+[QTS:LABEL] goto: opcode=108 label=3
+[QTS:LABEL] goto: opcode=110 label=5
+[QTS:LABEL] emit: label=3 pos=60
+[QTS:LABEL] goto: opcode=108 label=6
+[QTS:LABEL] goto: opcode=110 label=8
+[QTS:LABEL] emit: label=6 pos=96
+[QTS:LABEL] goto: opcode=108 label=9
+[QTS:LABEL] goto: opcode=110 label=11
+[QTS:LABEL] emit: label=9 pos=132
+[QTS:LABEL] goto: opcode=108 label=12
+[QTS:LABEL] goto: opcode=110 label=14
+[QTS:LABEL] emit: label=12 pos=168
+[QTS:LABEL] goto: opcode=108 label=15
+[QTS:LABEL] emit: label=18 pos=184
+[QTS:LABEL] goto: opcode=108 label=21
+[QTS:LABEL] emit: label=20 pos=193
+[QTS:LABEL] goto: opcode=108 label=23
+[QTS:LABEL] emit: label=23 pos=205
+[QTS:LABEL] emit: label=19 pos=213
+[QTS:LABEL] goto: opcode=110 label=18
+[QTS:LABEL] resolve: label=18 addr=184
+[QTS:LABEL] emit: label=21 pos=217
+[QTS:LABEL] goto: opcode=110 label=27
+[QTS:LABEL] emit: label=15 pos=227
+[QTS:LABEL] emit: label=31 pos=250
+[QTS:LABEL] goto: opcode=108 label=34
+[QTS:LABEL] emit: label=33 pos=259
+[QTS:LABEL] goto: opcode=108 label=36
+[QTS:LABEL] emit: label=36 pos=271
+[QTS:LABEL] emit: label=32 pos=291
+[QTS:LABEL] goto: opcode=110 label=31
+[QTS:LABEL] resolve: label=31 addr=250
+[QTS:LABEL] emit: label=34 pos=295
+[QTS:LABEL] emit: label=27 pos=302
+[QTS:LABEL] emit: label=14 pos=302
+[QTS:LABEL] emit: label=11 pos=302
+[QTS:LABEL] emit: label=8 pos=302
+[QTS:LABEL] emit: label=5 pos=302
+[QTS:LABEL] emit: label=1 pos=304
+[QTS:LABEL] goto: opcode=108 label=41
+[QTS:LABEL] emit: label=41 pos=319
+[QTS:LABEL] goto: opcode=108 label=42
+[QTS:LABEL] emit: label=42 pos=337
+[QTS:LABEL] goto: opcode=108 label=43
+[QTS:LABEL] goto: opcode=108 label=45
+[QTS:LABEL] emit: label=44 pos=356
+[QTS:LABEL] goto: opcode=108 label=45
+[QTS:LABEL] emit: label=45 pos=364
+[QTS:LABEL] emit: label=43 pos=373
+[QTS:PC2LINE] begin: slots=115 source_pos=1390 @parser.c:10908
+[QTS:PC2LINE] init: line=43 col=0 @parser.c:10915
+[QTS:PC2LINE] end: pc2line_len=240 @parser.c:10960
+[QTS:LABEL] end: out_len=372
+[QTS:STACK] result: max_stack=6 var_count=4
+[QTS:VAR] hoist: eval_type=0 module=0 globals=0 closures=0
+[QTS:VAR] resolve: atom=506 scope=1 op=189
+[QTS:VAR]   emit: op=189 idx=2
+[QTS:VAR] resolve: atom=490 scope=1 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=483 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=504 scope=1 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=472 scope=1 op=186
+[QTS:VAR]   found: idx=1 is_arg=0
+[QTS:VAR] resolve: atom=483 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=536870912
+[QTS:VAR] resolve: atom=509 scope=3 op=186
+[QTS:VAR] resolve: atom=506 scope=3 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=482 scope=3 op=186
+[QTS:VAR]   found: idx=2 is_arg=0
+[QTS:VAR] resolve: atom=504 scope=3 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=505 scope=1 op=189
+[QTS:VAR]   emit: op=189 idx=1
+[QTS:VAR] resolve: atom=472 scope=1 op=186
+[QTS:VAR]   found: idx=1 is_arg=0
+[QTS:VAR] resolve: atom=504 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=504 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=507 scope=1 op=189
+[QTS:VAR]   emit: op=189 idx=3
+[QTS:VAR] resolve: atom=490 scope=1 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=505 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=1
+[QTS:VAR] resolve: atom=506 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=507 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=3
+[QTS:VAR] resolve: atom=509 scope=5 op=186
+[QTS:VAR] resolve: atom=506 scope=5 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=509 scope=5 op=186
+[QTS:VAR] resolve: atom=507 scope=5 op=186
+[QTS:VAR]   emit: op=186 idx=3
+[QTS:VAR] resolve: atom=474 scope=5 op=186
+[QTS:VAR]   found: idx=3 is_arg=0
+[QTS:LABEL] begin: bc_len=355 label_count=6 jump_size=2 line_number_size=37 strip_debug=0
+[QTS:LABEL] goto: opcode=110 label=2
+[QTS:LABEL] emit: label=2 pos=19
+[QTS:LABEL] goto: opcode=108 label=5
+[QTS:LABEL] emit: label=5 pos=68
+[QTS:PC2LINE] begin: slots=27 source_pos=2984 @parser.c:10908
+[QTS:PC2LINE] init: line=96 col=0 @parser.c:10915
+[QTS:PC2LINE] end: pc2line_len=58 @parser.c:10960
+[QTS:LABEL] end: out_len=69
+[QTS:STACK] result: max_stack=5 var_count=4
+[QTS:VAR] hoist: eval_type=0 module=0 globals=0 closures=0
+[QTS:VAR] resolve: atom=514 scope=1 op=189
+[QTS:VAR]   emit: op=189 idx=3
+[QTS:VAR] resolve: atom=513 scope=1 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=484 scope=2 op=189
+[QTS:VAR]   emit: op=189 idx=2
+[QTS:VAR] resolve: atom=484 scope=2 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=514 scope=2 op=186
+[QTS:VAR]   emit: op=186 idx=3
+[QTS:VAR] resolve: atom=513 scope=2 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=484 scope=2 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=484 scope=2 op=189
+[QTS:VAR]   emit: op=189 idx=2
+[QTS:VAR] resolve: atom=515 scope=1 op=189
+[QTS:VAR]   emit: op=189 idx=4
+[QTS:VAR] resolve: atom=172 scope=1 op=186
+[QTS:VAR] resolve: atom=514 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=3
+[QTS:VAR] resolve: atom=484 scope=3 op=189
+[QTS:VAR]   emit: op=189 idx=2
+[QTS:VAR] resolve: atom=484 scope=3 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=514 scope=3 op=186
+[QTS:VAR]   emit: op=186 idx=3
+[QTS:VAR] resolve: atom=513 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=484 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=513 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=484 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=514 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=3
+[QTS:VAR] resolve: atom=513 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=484 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=484 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=513 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=484 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=176 scope=4 op=186
+[QTS:VAR] resolve: atom=515 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=4
+[QTS:VAR] resolve: atom=484 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=484 scope=3 op=189
+[QTS:VAR]   emit: op=189 idx=2
+[QTS:VAR] resolve: atom=504 scope=1 op=189
+[QTS:VAR]   emit: op=189 idx=1
+[QTS:VAR] resolve: atom=472 scope=1 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=513 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=513 scope=1 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=472 scope=1 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=504 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=1
+[QTS:VAR] resolve: atom=504 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=1
+[QTS:VAR] resolve: atom=484 scope=5 op=189
+[QTS:VAR]   emit: op=189 idx=2
+[QTS:VAR] resolve: atom=484 scope=5 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=514 scope=5 op=186
+[QTS:VAR]   emit: op=186 idx=3
+[QTS:VAR] resolve: atom=474 scope=6 op=186
+[QTS:VAR]   found: idx=1 is_arg=0
+[QTS:VAR] resolve: atom=513 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=484 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=513 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=484 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=514 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=3
+[QTS:VAR] resolve: atom=474 scope=6 op=186
+[QTS:VAR]   found: idx=1 is_arg=0
+[QTS:VAR] resolve: atom=513 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=484 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=484 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=474 scope=6 op=186
+[QTS:VAR]   found: idx=1 is_arg=0
+[QTS:VAR] resolve: atom=513 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=484 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=515 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=4
+[QTS:VAR] resolve: atom=474 scope=6 op=186
+[QTS:VAR]   found: idx=1 is_arg=0
+[QTS:VAR] resolve: atom=513 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=484 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=474 scope=6 op=186
+[QTS:VAR]   found: idx=1 is_arg=0
+[QTS:VAR] resolve: atom=513 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=484 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=484 scope=6 op=186
+[QTS:VAR]   emit: op=186 idx=2
+[QTS:VAR] resolve: atom=484 scope=5 op=189
+[QTS:VAR]   emit: op=189 idx=2
+[QTS:LABEL] begin: bc_len=1020 label_count=23 jump_size=9 line_number_size=104 strip_debug=0
+[QTS:LABEL] emit: label=3 pos=9
+[QTS:LABEL] goto: opcode=108 label=6
+[QTS:LABEL] emit: label=5 pos=14
+[QTS:LABEL] emit: label=4 pos=18
+[QTS:LABEL] goto: opcode=110 label=3
+[QTS:LABEL] resolve: label=3 addr=9
+[QTS:LABEL] emit: label=6 pos=22
+[QTS:LABEL] emit: label=10 pos=36
+[QTS:LABEL] goto: opcode=108 label=13
+[QTS:LABEL] emit: label=12 pos=44
+[QTS:LABEL] emit: label=11 pos=89
+[QTS:LABEL] goto: opcode=110 label=10
+[QTS:LABEL] resolve: label=10 addr=36
+[QTS:LABEL] emit: label=13 pos=93
+[QTS:LABEL] emit: label=18 pos=130
+[QTS:LABEL] goto: opcode=108 label=21
+[QTS:LABEL] emit: label=20 pos=138
+[QTS:LABEL] emit: label=19 pos=216
+[QTS:LABEL] goto: opcode=110 label=18
+[QTS:LABEL] resolve: label=18 addr=130
+[QTS:LABEL] emit: label=21 pos=220
+[QTS:PC2LINE] begin: slots=95 source_pos=3390 @parser.c:10908
+[QTS:PC2LINE] init: line=113 col=0 @parser.c:10915
+[QTS:PC2LINE] end: pc2line_len=198 @parser.c:10960
+[QTS:LABEL] end: out_len=215
+[QTS:STACK] result: max_stack=6 var_count=5
+[QTS:VAR] hoist: eval_type=0 module=0 globals=0 closures=0
+[QTS:VAR] resolve: atom=503 scope=1 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=503 scope=1 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=503 scope=1 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=71 scope=1 op=186
+[QTS:VAR] resolve: atom=146 scope=1 op=186
+[QTS:VAR] resolve: atom=144 scope=1 op=186
+[QTS:VAR] resolve: atom=185 scope=2 op=185
+[QTS:VAR] resolve: atom=503 scope=3 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=185 scope=3 op=186
+[QTS:VAR] resolve: atom=185 scope=3 op=186
+[QTS:VAR] resolve: atom=185 scope=3 op=186
+[QTS:VAR] resolve: atom=503 scope=1 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=167 scope=1 op=186
+[QTS:VAR] resolve: atom=161 scope=1 op=186
+[QTS:VAR] resolve: atom=160 scope=1 op=186
+[QTS:VAR] resolve: atom=162 scope=1 op=186
+[QTS:VAR] resolve: atom=503 scope=1 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=179 scope=1 op=186
+[QTS:VAR] resolve: atom=503 scope=1 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=181 scope=1 op=186
+[QTS:VAR] resolve: atom=503 scope=1 op=186
+[QTS:VAR]   found: idx=0 is_arg=0
+[QTS:VAR] resolve: atom=183 scope=1 op=186
+[QTS:VAR] resolve: atom=519 scope=1 op=189
+[QTS:VAR]   emit: op=189 idx=0
+[QTS:VAR] resolve: atom=519 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=519 scope=1 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=472 scope=4 op=186
+[QTS:VAR]   found: idx=1 is_arg=0
+[QTS:VAR] resolve: atom=519 scope=4 op=186
+[QTS:VAR]   emit: op=186 idx=0
+[QTS:VAR] resolve: atom=474 scope=4 op=186
+[QTS:VAR]   found: idx=2 is_arg=0
+[QTS:VAR] resolve: atom=526 scope=5 op=187
+[QTS:VAR]   found: idx=1 is_arg=0
+[QTS:VAR]   emit: op=187 idx=1
+[QTS:VAR] resolve: atom=474 scope=7 op=186
+[QTS:VAR]   found: idx=2 is_arg=0
+[QTS:VAR] resolve: atom=526 scope=7 op=186
+[QTS:VAR]   found: idx=1 is_arg=0
+[QTS:VAR]   emit: op=186 idx=1
+[QTS:VAR] resolve: atom=211 scope=7 op=186
+[QTS:VAR] resolve: atom=512 scope=1 op=186
+[QTS:VAR]   found: idx=3 is_arg=0
+[QTS:LABEL] begin: bc_len=762 label_count=6 jump_size=8 line_number_size=63 strip_debug=0
+[QTS:LABEL] typeof_test: pos=173 pos_next=174 line_num:4356->4363 atom=71 cmp_op=174
+[QTS:LABEL] emit: label=0 pos=109
+[QTS:LABEL] goto: opcode=111 label=2
+[QTS:LABEL] goto: opcode=110 label=5
+[QTS:LABEL] emit: label=2 pos=266
+[QTS:LABEL] goto: opcode=111 label=3
+[QTS:LABEL] goto: opcode=110 label=5
+[QTS:LABEL] emit: label=3 pos=285
+[QTS:LABEL] emit: label=5 pos=286
+[QTS:PC2LINE] begin: slots=61 source_pos=4153 @parser.c:10908
+[QTS:PC2LINE] init: line=136 col=0 @parser.c:10915
+[QTS:PC2LINE] end: pc2line_len=126 @parser.c:10960
+[QTS:LABEL] end: out_len=289
+[QTS:STACK] result: max_stack=10 var_count=2
+[QTS:VAR] hoist: eval_type=1 module=1 globals=7 closures=8
+[QTS:VAR] resolve: atom=518 scope=1 op=186
+[QTS:VAR]   found: idx=7 is_arg=0
+[QTS:LABEL] begin: bc_len=87 label_count=1 jump_size=1 line_number_size=2 strip_debug=0
+[QTS:LABEL] goto: opcode=108 label=0
+[QTS:LABEL] emit: label=0 pos=33
+[QTS:PC2LINE] begin: slots=2 source_pos=0 @parser.c:10908
+[QTS:PC2LINE] init: line=0 col=0 @parser.c:10915
+[QTS:PC2LINE] end: pc2line_len=9 @parser.c:10960
+[QTS:LABEL] end: out_len=40
+[QTS:STACK] result: max_stack=1 var_count=0

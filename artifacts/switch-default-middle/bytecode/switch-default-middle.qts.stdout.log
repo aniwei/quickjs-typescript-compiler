@@ -1,0 +1,40 @@
+__tests__/fixtures/switch-default-middle.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var a,128
+        define_var a,130
+        push_0 0
+        put_var_init a
+        undefined
+        put_loc0 0: "<ret>"
+        get_var a
+        dup
+        push_0 0
+        strict_eq
+        if_false8 62
+        get_var console
+        get_field2 log
+        push_0 0
+        call_method 1
+        put_loc0 0: "<ret>"
+   45:  get_var console
+        get_field2 log
+        push_2 2
+        call_method 1
+        put_loc0 0: "<ret>"
+        goto8 67
+   62:  dup
+        push_1 1
+        strict_eq
+        if_false8 45
+   67:  get_var console
+        get_field2 log
+        push_1 1
+        call_method 1
+        put_loc0 0: "<ret>"
+        drop
+        get_loc0 0: "<ret>"
+        return
+

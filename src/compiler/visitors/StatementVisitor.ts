@@ -19,6 +19,21 @@ export class StatementVisitor extends VisitorContext {
     super(context)
   }
 
+  private debugTryLiveness(fd: any, phase: string): void {
+    if (!process.env.DEBUG_TRY_LIVE) return
+    const pos = fd.lastOpcodePos
+    const bcBuf: Uint8Array = fd.byteCode.buffer
+    const op = (pos >= 0 && pos < fd.byteCode.size) ? bcBuf[pos] : -1
+    const hex = (op >= 0) ? `0x${op.toString(16).padStart(2, '0')}` : '<none>'
+    console.log(`[DEBUG_TRY_LIVE] ${phase}`, {
+      funcNameAtom: fd.funcName,
+      bcSize: fd.byteCode.size,
+      lastOpcodePos: pos,
+      lastOp: hex,
+      isLive: this.compiler.isLiveCode(fd),
+    })
+  }
+
   private isImmediateUnlabeledBreak(stmt: ts.Statement): boolean {
     if (ts.isBreakStatement(stmt)) {
       return stmt.label == null
@@ -265,6 +280,11 @@ export class StatementVisitor extends VisitorContext {
       this.context.visit(stmt)
     }
 
+    // QuickJS 的 js_is_live_code 基于 last_opcode_pos，但块退出时的临时 scope 指令
+    // 仅用于后续 resolve_variables 阶段，不应改变外围语句的 live/dead 判定。
+    // 为对齐 try/catch/finally 的布局，这里保留块内最后一条“语义指令”的 lastOpcodePos。
+    const lastOpcodePosBeforePop = fd.lastOpcodePos
+
     // QuickJS: pop_scope() 本身不发射字节码。
     // 我们的实现用 TempOpcode.OP_leave_scope 表示作用域退出，但对于形如 `{ break x; }`
     // 的块，这个 leave_scope 会落在无条件跳转后的死代码区，导致后续 goto->label 的
@@ -278,6 +298,8 @@ export class StatementVisitor extends VisitorContext {
     } else {
       this.compiler.popScope(fd)
     }
+
+    fd.lastOpcodePos = lastOpcodePosBeforePop
   }
 
   // ============================================================================
@@ -2003,21 +2025,26 @@ export class StatementVisitor extends VisitorContext {
     // 编译 try 块
     this.visitBlock(node.tryBlock)
 
+    this.debugTryLiveness(fd, 'after tryBlock')
+
     // 弹出 break 条目
     this.compiler.popBreakEntry(fd)
 
     // try 块正常结束 - 对应 parser.c:7371-7379
-    // 丢弃 catch 偏移
-    this.compiler.emitOp(fd, Opcode.OP_drop)
-    if (hasFinally) {
-      // 推送 undefined 保持栈平衡
-      this.compiler.emitOp(fd, Opcode.OP_undefined)
-      // 调用 finally
-      this.compiler.emitGotoInt(fd, Opcode.OP_gosub, labelFinally)
+    // QuickJS 仅在 live code 时才会生成这段序列 (js_is_live_code)
+    if (this.compiler.isLiveCode(fd)) {
+      // 丢弃 catch 偏移
       this.compiler.emitOp(fd, Opcode.OP_drop)
+      if (hasFinally) {
+        // 推送 undefined 保持栈平衡
+        this.compiler.emitOp(fd, Opcode.OP_undefined)
+        // 调用 finally
+        this.compiler.emitGotoInt(fd, Opcode.OP_gosub, labelFinally)
+        this.compiler.emitOp(fd, Opcode.OP_drop)
+      }
+      // 跳转到结束
+      this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelEnd)
     }
-    // 跳转到结束
-    this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelEnd)
 
     // catch 子句 - 对应 parser.c:7381-7451
     if (node.catchClause) {
@@ -2063,6 +2090,8 @@ export class StatementVisitor extends VisitorContext {
       // 编译 catch 块
       this.visitBlock(node.catchClause.block)
 
+      this.debugTryLiveness(fd, 'after catchBlock')
+
       // 弹出 break 条目
       this.compiler.popBreakEntry(fd)
 
@@ -2073,17 +2102,20 @@ export class StatementVisitor extends VisitorContext {
       this.compiler.popScope(fd)
 
       // catch 块正常结束 - 对应 parser.c:7432-7441
-      // 丢弃 catch2 偏移
-      this.compiler.emitOp(fd, Opcode.OP_drop)
-      if (hasFinally) {
-        // 推送 undefined
-        this.compiler.emitOp(fd, Opcode.OP_undefined)
-        // 调用 finally
-        this.compiler.emitGotoInt(fd, Opcode.OP_gosub, labelFinally)
+      // QuickJS 仅在 live code 时才会生成这段序列 (js_is_live_code)
+      if (this.compiler.isLiveCode(fd)) {
+        // 丢弃 catch2 偏移
         this.compiler.emitOp(fd, Opcode.OP_drop)
+        if (hasFinally) {
+          // 推送 undefined
+          this.compiler.emitOp(fd, Opcode.OP_undefined)
+          // 调用 finally
+          this.compiler.emitGotoInt(fd, Opcode.OP_gosub, labelFinally)
+          this.compiler.emitOp(fd, Opcode.OP_drop)
+        }
+        // 跳转到结束
+        this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelEnd)
       }
-      // 跳转到结束
-      this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelEnd)
 
       // catch2 标签 - catch 块中发生异常
       this.compiler.emitLabelInt(fd, labelCatch2)
@@ -2158,7 +2190,15 @@ export class StatementVisitor extends VisitorContext {
     }
 
     // 发射 end 标签
-    this.compiler.emitLabelInt(fd, labelEnd)
+    // QuickJS: emit_label(label_end)。但当 label_end 完全未被引用时，它只用于结构占位：
+    // - 不应影响外层 live-code 判定（否则会生成多余的 try 正常结束序列）
+    // - 同时也不应破坏 pc2line（被引用的 label_end 仍需更新 lastOpcodePos）
+    const labelEndRefCount = fd.labelSlots?.[labelEnd]?.refCount ?? 0
+    if (labelEndRefCount > 0) {
+      this.compiler.emitLabelInt(fd, labelEnd)
+    } else {
+      this.compiler.emitLabelRaw(fd, labelEnd)
+    }
   }
 
   // ============================================================================

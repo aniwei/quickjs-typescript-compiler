@@ -370,6 +370,7 @@ export class LabelResolver {
         case Opcode.OP_return_async:
         case Opcode.OP_throw:
         case Opcode.OP_throw_error:
+        case Opcode.OP_ret:
           {
             const state = { lineNum }
             posNext = this.skipDeadCode(fd, bcBuf, bcLen, posNext, state)

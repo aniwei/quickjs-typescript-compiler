@@ -1,0 +1,381 @@
+__tests__/fixtures/test_arrow_function.js:1:1: function: assert
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_arg0 0: actual
+        get_arg1 1: expected
+        strict_eq
+        if_false8 17
+        return_undef
+   17:  get_arg0 0: actual
+        is_null
+        if_true8 67
+        get_arg1 1: expected
+        is_null
+        if_true8 67
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 67
+        return_undef
+   67:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 117
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 118
+  117:  push_empty_string
+  118:  add
+        call1 1
+        throw
+
+__tests__/fixtures/test_arrow_function.js:22:17: function: <null>
+  mode: strict
+  closure vars:
+    0: arguments local:loc0 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: arguments
+        return
+
+__tests__/fixtures/test_arrow_function.js:21:5: function: f1
+  mode: strict
+  locals:
+    0: var arguments
+  stack_size: 1
+  opcodes:
+        special_object 0
+        put_loc0 0: arguments
+        fclosure8 0: [bytecode <null>]
+        tail_call 0
+
+__tests__/fixtures/test_arrow_function.js:25:17: function: <null>
+  mode: strict
+  closure vars:
+    0: this local:loc0 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: this
+        return
+
+__tests__/fixtures/test_arrow_function.js:24:5: function: f2
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 1
+  opcodes:
+        push_this
+        put_loc0 0: this
+        fclosure8 0: [bytecode <null>]
+        tail_call 0
+
+__tests__/fixtures/test_arrow_function.js:28:17: function: <null>
+  mode: strict
+  closure vars:
+    0: this local:loc0 var
+    1: new.target local:loc1 var
+    2: arguments local:loc2 var
+    3: f1 parent:loc0 var
+    4: f2 parent:loc1 var
+    5: f3 parent:loc2 var
+    6: f4 parent:loc3 var
+    7: a parent:loc4 var
+    8: o1 parent:loc5 var
+    9: o2 parent:loc6 var
+  stack_size: 2
+  opcodes:
+        get_var eval
+        push_atom_value this
+        eval 1,1
+        return
+
+__tests__/fixtures/test_arrow_function.js:27:5: function: f3
+  mode: strict
+  locals:
+    0: var this
+    1: var new.target
+    2: var arguments
+  closure vars:
+    0: f1 local:loc0 var
+    1: f2 local:loc1 var
+    2: f3 local:loc2 var
+    3: f4 local:loc3 var
+    4: a local:loc4 var
+    5: o1 local:loc5 var
+    6: o2 local:loc6 var
+  stack_size: 1
+  opcodes:
+        special_object 3
+        put_loc1 1: "new.target"
+        push_this
+        put_loc0 0: this
+        special_object 0
+        put_loc2 2: arguments
+        fclosure8 0: [bytecode <null>]
+        tail_call 0
+
+__tests__/fixtures/test_arrow_function.js:31:17: function: <null>
+  mode: strict
+  closure vars:
+    0: this local:loc0 var
+    1: new.target local:loc1 var
+    2: arguments local:loc2 var
+    3: f1 parent:loc0 var
+    4: f2 parent:loc1 var
+    5: f3 parent:loc2 var
+    6: f4 parent:loc3 var
+    7: a parent:loc4 var
+    8: o1 parent:loc5 var
+    9: o2 parent:loc6 var
+  stack_size: 2
+  opcodes:
+        get_var eval
+        push_atom_value "new.target"
+        eval 1,1
+        return
+
+__tests__/fixtures/test_arrow_function.js:30:5: function: f4
+  mode: strict
+  locals:
+    0: var this
+    1: var new.target
+    2: var arguments
+  closure vars:
+    0: f1 local:loc0 var
+    1: f2 local:loc1 var
+    2: f3 local:loc2 var
+    3: f4 local:loc3 var
+    4: a local:loc4 var
+    5: o1 local:loc5 var
+    6: o2 local:loc6 var
+  stack_size: 1
+  opcodes:
+        special_object 3
+        put_loc1 1: "new.target"
+        push_this
+        put_loc0 0: this
+        special_object 0
+        put_loc2 2: arguments
+        fclosure8 0: [bytecode <null>]
+        tail_call 0
+
+__tests__/fixtures/test_arrow_function.js:40:16: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 1
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        return
+
+__tests__/fixtures/test_arrow_function.js:42:21: function: <null>
+  mode: strict
+  closure vars:
+    0: this local:loc0 var
+    1: new.target local:loc1 var
+    2: <home_object> local:loc2 var
+    3: arguments local:loc3 var
+    4: f1 parent:loc0 var
+    5: f2 parent:loc1 var
+    6: f3 parent:loc2 var
+    7: f4 parent:loc3 var
+    8: a parent:loc4 var
+    9: o1 parent:loc5 var
+   10: o2 parent:loc6 var
+  stack_size: 2
+  opcodes:
+        get_var eval
+        push_atom_value "super.f()"
+        eval 1,1
+        return
+
+__tests__/fixtures/test_arrow_function.js:41:16: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var new.target
+    2: var <home_object>
+    3: var arguments
+  closure vars:
+    0: f1 local:loc0 var
+    1: f2 local:loc1 var
+    2: f3 local:loc2 var
+    3: f4 local:loc3 var
+    4: a local:loc4 var
+    5: o1 local:loc5 var
+    6: o2 local:loc6 var
+  stack_size: 1
+  opcodes:
+        special_object 4
+        put_loc2 2: "<home_object>"
+        special_object 3
+        put_loc1 1: "new.target"
+        push_this
+        put_loc0 0: this
+        special_object 0
+        put_loc3 3: arguments
+        fclosure8 0: [bytecode <null>]
+        tail_call 0
+
+__tests__/fixtures/test_arrow_function.js:19:1: function: test_arrow_function
+  mode: strict
+  locals:
+    0: var f1
+    1: var f2
+    2: var f3
+    3: var f4
+    4: var a
+    5: var o1
+    6: var o2
+  stack_size: 4
+  opcodes:
+        fclosure8 0: [bytecode f1]
+        put_loc0 0: f1
+        fclosure8 1: [bytecode f2]
+        put_loc1 1: f2
+        fclosure8 2: [bytecode f3]
+        put_loc2 2: f3
+        fclosure8 3: [bytecode f4]
+        put_loc3 3: f4
+        get_loc0 0: f1
+        push_1 1
+        push_2 2
+        call2 2
+        put_loc8 4: a
+        get_var assert
+        get_loc8 4: a
+        get_length
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        get_loc8 4: a
+        push_0 0
+        get_array_el
+        push_1 1
+        strict_eq
+        dup
+        if_false8 50
+        drop
+        get_loc8 4: a
+        push_1 1
+        get_array_el
+        push_2 2
+        strict_eq
+   50:  call1 1
+        drop
+        get_var assert
+        get_loc1 1: f2
+        get_field2 call
+        push_atom_value this_val
+        call_method 1
+        push_atom_value this_val
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc2 2: f3
+        get_field2 call
+        push_atom_value this_val
+        call_method 1
+        push_atom_value this_val
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc3 3: f4
+        dup
+        call_constructor 0
+        get_loc3 3: f4
+        strict_eq
+        call1 1
+        drop
+        object
+        fclosure8 4: [bytecode <null>]
+        define_method f,4
+        put_loc8 5: o1
+        object
+        fclosure8 5: [bytecode <null>]
+        define_method f,4
+        set_loc8 6: o2
+        get_loc8 5: o1
+        put_field __proto__
+        get_var assert
+        get_loc8 6: o2
+        get_field2 f
+        call_method 0
+        get_loc8 6: o2
+        strict_eq
+        call1 1
+        return_undef
+
+__tests__/fixtures/test_arrow_function.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: catch e [level:3 next:-1]
+  stack_size: 3
+  opcodes:
+        check_define_var assert,64
+        check_define_var test_arrow_function,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode test_arrow_function]
+        define_func test_arrow_function,0
+        undefined
+        put_loc0 0: "<ret>"
+        catch 50
+        get_var __loadScript
+        push_atom_value "test_assert.js"
+        call1 1
+        put_loc0 0: "<ret>"
+        drop
+        goto8 60
+   50:  put_loc1 1: e
+        catch 59
+        drop
+        goto8 60
+   59:  throw
+   60:  get_loc0 0: "<ret>"
+        return
+

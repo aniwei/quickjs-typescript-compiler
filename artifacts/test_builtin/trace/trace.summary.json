@@ -1,0 +1,13 @@
+{
+  "inputTs": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_builtin.ts",
+  "referenceJsPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_builtin.js",
+  "isModule": false,
+  "tsEventCount": 17777,
+  "wasmEventCount": 19119,
+  "differenceCount": 19112,
+  "firstDifferenceIndex": 5,
+  "firstDifferenceWasmLoc": {
+    "file": "parser.c",
+    "line": 1777
+  }
+}

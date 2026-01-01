@@ -1,0 +1,1225 @@
+__tests__/fixtures_quickjs/octane/base.js:29:20: function: <null>
+  mode: strict
+  closure vars:
+    0: performance parent:loc0 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: performance
+        get_field now
+        dup
+        if_true8 60
+        drop
+        get_var_ref0 0: performance
+        get_field mozNow
+        dup
+        if_true8 60
+        drop
+        get_var_ref0 0: performance
+        get_field msNow
+        dup
+        if_true8 60
+        drop
+        get_var_ref0 0: performance
+        get_field oNow
+        dup
+        if_true8 60
+        drop
+        get_var_ref0 0: performance
+        get_field webkitNow
+        dup
+        if_true8 60
+        drop
+        get_var Date
+        get_field now
+   60:  return
+
+__tests__/fixtures_quickjs/octane/base.js:50:34: function: <null>
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/base.js:51:43: function: <null>
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/base.js:44:8: function: Benchmark
+  mode: strict
+  args: name doWarmup doDeterministic deterministicIterations run setup tearDown rmsResult minIterations
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: name
+        put_field name
+        get_loc0 0: this
+        get_arg1 1: doWarmup
+        put_field doWarmup
+        get_loc0 0: this
+        get_arg2 2: doDeterministic
+        put_field doDeterministic
+        get_loc0 0: this
+        get_arg3 3: deterministicIterations
+        put_field deterministicIterations
+        get_loc0 0: this
+        get_arg 4: run
+        put_field run
+        get_loc0 0: this
+        get_arg 5: setup
+        if_false8 50
+        get_arg 5: setup
+        goto8 52
+   50:  fclosure8 0: [bytecode <null>]
+   52:  put_field Setup
+        get_loc0 0: this
+        get_arg 6: tearDown
+        if_false8 68
+        get_arg 6: tearDown
+        goto8 70
+   68:  fclosure8 1: [bytecode <null>]
+   70:  put_field TearDown
+        get_loc0 0: this
+        get_arg 7: rmsResult
+        if_false8 86
+        get_arg 7: rmsResult
+        goto8 87
+   86:  null
+   87:  put_field rmsResult
+        get_loc0 0: this
+        get_arg 8: minIterations
+        if_false8 103
+        get_arg 8: minIterations
+        goto8 105
+  103:  push_i8 32
+  105:  put_field minIterations
+        return_undef
+
+__tests__/fixtures_quickjs/octane/base.js:59:1: function: BenchmarkResult
+  mode: strict
+  args: benchmark time latency
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: benchmark
+        put_field benchmark
+        get_loc0 0: this
+        get_arg1 1: time
+        put_field time
+        get_loc0 0: this
+        get_arg2 2: latency
+        put_field latency
+        return_undef
+
+__tests__/fixtures_quickjs/octane/base.js:66:37: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 1
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field time
+        return
+
+__tests__/fixtures_quickjs/octane/base.js:73:8: function: BenchmarkSuite
+  mode: strict
+  args: name reference benchmarks
+  locals:
+    0: var this
+  closure vars:
+    0: BenchmarkSuite parent:loc3 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: name
+        put_field name
+        get_loc0 0: this
+        get_arg1 1: reference
+        put_field reference
+        get_loc0 0: this
+        get_arg2 2: benchmarks
+        put_field benchmarks
+        get_var_ref0 0: BenchmarkSuite
+        get_field suites
+        get_field2 push
+        get_loc0 0: this
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/base.js:93:13: function: <null>
+  mode: strict
+  args: s
+  stack_size: 2
+  opcodes:
+        push_atom_value "Alert called with argument: "
+        get_arg0 0: s
+        add
+        throw
+
+__tests__/fixtures_quickjs/octane/base.js:101:16: function: <null>
+  mode: strict
+  closure vars:
+    0: seed local:loc0 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: seed
+        push_i32 2127912214
+        add
+        get_var_ref0 0: seed
+        push_i8 12
+        shl
+        add
+        push_const8 0: 4294967295
+        and
+        set_var_ref0 0: seed
+        push_const8 1: 3345072700
+        xor
+        get_var_ref0 0: seed
+        push_i8 19
+        shr
+        xor
+        push_const8 2: 4294967295
+        and
+        set_var_ref0 0: seed
+        push_i32 374761393
+        add
+        get_var_ref0 0: seed
+        push_5 5
+        shl
+        add
+        push_const8 3: 4294967295
+        and
+        set_var_ref0 0: seed
+        push_const8 4: 3550635116
+        add
+        get_var_ref0 0: seed
+        push_i8 9
+        shl
+        xor
+        push_const8 5: 4294967295
+        and
+        set_var_ref0 0: seed
+        push_const8 6: 4251993797
+        add
+        get_var_ref0 0: seed
+        push_3 3
+        shl
+        add
+        push_const8 7: 4294967295
+        and
+        set_var_ref0 0: seed
+        push_const8 8: 3042594569
+        xor
+        get_var_ref0 0: seed
+        push_i8 16
+        shr
+        xor
+        push_const8 9: 4294967295
+        and
+        set_var_ref0 0: seed
+        push_i32 268435455
+        and
+        push_i32 268435456
+        div
+        return
+
+__tests__/fixtures_quickjs/octane/base.js:99:20: function: <null>
+  mode: strict
+  locals:
+    0: var seed
+  stack_size: 1
+  opcodes:
+        push_i32 49734321
+        put_loc0 0: seed
+        fclosure8 0: [bytecode <null>]
+        return
+
+__tests__/fixtures_quickjs/octane/base.js:98:27: function: <null>
+  mode: strict
+  stack_size: 2
+  opcodes:
+        get_var Math
+        fclosure8 0: [bytecode <null>]
+        call0 0
+        put_field random
+        return_undef
+
+__tests__/fixtures_quickjs/octane/base.js:125:5: function: RunStep
+  mode: strict
+  locals:
+    0: var suite
+    1: var score
+    2: var formatted
+  closure vars:
+    0: continuation local:loc0 var
+    1: index local:loc3 var
+    2: length local:loc2 var
+    3: suites local:loc1 var
+    4: runner local:arg0 var
+    5: skipBenchmarks local:arg1 var
+    6: RunStep local:loc4 var
+    7: BenchmarkSuite parent:loc0 var
+  stack_size: 4
+  opcodes:
+    0:  get_var_ref0 0: continuation
+        dup
+        if_true8 8
+        drop
+        get_var_ref1 1: index
+        get_var_ref2 2: length
+        lt
+    8:  if_false 149
+        get_var_ref0 0: continuation
+        if_false8 21
+        get_var_ref0 0: continuation
+        call0 0
+        put_var_ref0 0: continuation
+        goto8 104
+   21:  get_var_ref3 3: suites
+        get_var_ref1 1: index
+        post_inc
+        put_var_ref1 1: index
+        get_array_el
+        put_loc0 0: suite
+        get_var_ref 4: runner
+        get_field NotifyStart
+        if_false8 55
+        get_var_ref 4: runner
+        get_field2 NotifyStart
+        get_loc0 0: suite
+        get_field name
+        call_method 1
+        drop
+   55:  get_var_ref 5: skipBenchmarks
+        get_field2 indexOf
+        get_loc0 0: suite
+        get_field name
+        call_method 1
+        push_minus1 -1
+        gt
+        if_false8 91
+        get_loc0 0: suite
+        get_field2 NotifySkipped
+        get_var_ref 4: runner
+        call_method 1
+        drop
+        goto8 104
+   91:  get_loc0 0: suite
+        get_field2 RunStep
+        get_var_ref 4: runner
+        call_method 1
+        put_var_ref0 0: continuation
+  104:  get_var_ref0 0: continuation
+        if_false8 0
+        get_var_undef window
+        typeof_is_undefined
+        if_true8 146
+        get_var window
+        get_field setTimeout
+        if_false8 0
+        get_var window
+        get_field2 setTimeout
+        get_var_ref 6: RunStep
+        push_i8 25
+        call_method 2
+        return_undef
+  146:  goto16 0
+  149:  get_var_ref 4: runner
+        get_field NotifyScore
+        if_false8 208
+        get_var_ref 7: BenchmarkSuite
+        get_field2 GeometricMean
+        get_var_ref 7: BenchmarkSuite
+        get_field scores
+        call_method 1
+        put_loc1 1: score
+        get_var_ref 7: BenchmarkSuite
+        get_field2 FormatScore
+        push_i8 100
+        get_loc1 1: score
+        mul
+        call_method 1
+        put_loc2 2: formatted
+        get_var_ref 4: runner
+        get_field2 NotifyScore
+        get_loc2 2: formatted
+        call_method 1
+        drop
+  208:  return_undef
+
+__tests__/fixtures_quickjs/octane/base.js:117:28: function: <null>
+  mode: strict
+  args: runner skipBenchmarks
+  locals:
+    0: var continuation
+    1: var suites
+    2: var length
+    3: var index
+    4: var RunStep
+  closure vars:
+    0: BenchmarkSuite parent:loc3 var
+  stack_size: 2
+  opcodes:
+        fclosure8 0: [bytecode RunStep]
+        put_loc8 4: RunStep
+        get_var_ref0 0: BenchmarkSuite
+        array_from 0
+        put_field print
+        get_arg1 1: skipBenchmarks
+        typeof_is_undefined
+        if_false8 22
+        array_from 0
+        goto8 23
+   22:  get_arg1 1: skipBenchmarks
+   23:  put_arg1 1: skipBenchmarks
+        null
+        put_loc0 0: continuation
+        get_var_ref0 0: BenchmarkSuite
+        get_field suites
+        set_loc1 1: suites
+        get_length
+        put_loc2 2: length
+        get_var_ref0 0: BenchmarkSuite
+        array_from 0
+        put_field scores
+        push_0 0
+        put_loc3 3: index
+        get_loc8 4: RunStep
+        call0 0
+        return_undef
+
+__tests__/fixtures_quickjs/octane/base.js:157:34: function: <null>
+  mode: strict
+  locals:
+    0: var result
+    1: var suites
+    2: var i
+  closure vars:
+    0: BenchmarkSuite parent:loc3 var
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc0 0: result
+        get_var_ref0 0: BenchmarkSuite
+        get_field suites
+        put_loc1 1: suites
+        push_0 0
+        put_loc2 2: i
+   11:  get_loc2 2: i
+        get_loc1 1: suites
+        get_length
+        lt
+        if_false8 33
+        get_loc0 0: result
+        get_loc1 1: suites
+        get_loc2 2: i
+        get_array_el
+        get_field benchmarks
+        get_length
+        add
+        put_loc0 0: result
+        inc_loc 2: i
+        goto8 11
+   33:  get_loc0 0: result
+        return
+
+__tests__/fixtures_quickjs/octane/base.js:166:32: function: <null>
+  mode: strict
+  args: numbers
+  locals:
+    0: var log
+    1: var i
+  stack_size: 5
+  opcodes:
+        push_0 0
+        put_loc0 0: log
+        push_0 0
+        put_loc1 1: i
+    4:  get_loc1 1: i
+        get_arg0 0: numbers
+        get_length
+        lt
+        if_false8 33
+        get_loc0 0: log
+        get_var Math
+        get_field2 log
+        get_arg0 0: numbers
+        get_loc1 1: i
+        get_array_el
+        call_method 1
+        add
+        put_loc0 0: log
+        inc_loc 1: i
+        goto8 4
+   33:  get_var Math
+        get_field2 pow
+        get_var Math
+        get_field E
+        get_loc0 0: log
+        get_arg0 0: numbers
+        get_length
+        div
+        tail_call_method 2
+
+__tests__/fixtures_quickjs/octane/base.js:174:36: function: <null>
+  mode: strict
+  args: measurements
+  locals:
+    0: var log
+    1: var i
+  stack_size: 5
+  opcodes:
+        push_0 0
+        put_loc0 0: log
+        push_0 0
+        put_loc1 1: i
+    4:  get_loc1 1: i
+        get_arg0 0: measurements
+        get_length
+        lt
+        if_false8 38
+        get_loc0 0: log
+        get_var Math
+        get_field2 log
+        get_arg0 0: measurements
+        get_loc1 1: i
+        get_array_el
+        get_field time
+        call_method 1
+        add
+        put_loc0 0: log
+        inc_loc 1: i
+        goto8 4
+   38:  get_var Math
+        get_field2 pow
+        get_var Math
+        get_field E
+        get_loc0 0: log
+        get_arg0 0: measurements
+        get_length
+        div
+        tail_call_method 2
+
+__tests__/fixtures_quickjs/octane/base.js:182:39: function: <null>
+  mode: strict
+  args: measurements
+  locals:
+    0: var log
+    1: var hasLatencyResult
+    2: var i
+  stack_size: 5
+  opcodes:
+        push_0 0
+        put_loc0 0: log
+        push_false
+        put_loc1 1: hasLatencyResult
+        push_0 0
+        put_loc2 2: i
+    6:  get_loc2 2: i
+        get_arg0 0: measurements
+        get_length
+        lt
+        if_false8 54
+        get_arg0 0: measurements
+        get_loc2 2: i
+        get_array_el
+        get_field latency
+        push_0 0
+        neq
+        if_false8 50
+        get_loc0 0: log
+        get_var Math
+        get_field2 log
+        get_arg0 0: measurements
+        get_loc2 2: i
+        get_array_el
+        get_field latency
+        call_method 1
+        add
+        put_loc0 0: log
+        push_true
+        put_loc1 1: hasLatencyResult
+   50:  inc_loc 2: i
+        goto8 6
+   54:  get_loc1 1: hasLatencyResult
+        if_false8 84
+        get_var Math
+        get_field2 pow
+        get_var Math
+        get_field E
+        get_loc0 0: log
+        get_arg0 0: measurements
+        get_length
+        div
+        tail_call_method 2
+   84:  push_0 0
+        return
+
+__tests__/fixtures_quickjs/octane/base.js:200:30: function: <null>
+  mode: strict
+  args: value
+  stack_size: 3
+  opcodes:
+        get_arg0 0: value
+        push_i8 100
+        gt
+        if_false8 16
+        get_arg0 0: value
+        get_field2 toFixed
+        push_0 0
+        tail_call_method 1
+   16:  get_arg0 0: value
+        get_field2 toPrecision
+        push_3 3
+        tail_call_method 1
+
+__tests__/fixtures_quickjs/octane/base.js:210:39: function: <null>
+  mode: strict
+  args: result
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field results
+        get_field2 push
+        get_arg0 0: result
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_field runner
+        get_field NotifyStep
+        if_false8 57
+        get_loc0 0: this
+        get_field runner
+        get_field2 NotifyStep
+        get_arg0 0: result
+        get_field benchmark
+        get_field name
+        call_method 1
+        drop
+   57:  return_undef
+
+__tests__/fixtures_quickjs/octane/base.js:217:41: function: <null>
+  mode: strict
+  locals:
+    0: var mean
+    1: var score
+    2: var formatted
+    3: var meanLatency
+    4: var scoreLatency
+    5: var formattedLatency
+    6: var this
+  closure vars:
+    0: BenchmarkSuite parent:loc3 var
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc8 6: this
+        get_var_ref0 0: BenchmarkSuite
+        get_field2 GeometricMeanTime
+        get_loc8 6: this
+        get_field results
+        call_method 1
+        put_loc0 0: mean
+        get_loc8 6: this
+        get_field reference
+        push_0 0
+        get_array_el
+        get_loc0 0: mean
+        div
+        put_loc1 1: score
+        get_var_ref0 0: BenchmarkSuite
+        get_field scores
+        get_field2 push
+        get_loc1 1: score
+        call_method 1
+        drop
+        get_loc8 6: this
+        get_field runner
+        get_field NotifyResult
+        if_false8 100
+        get_var_ref0 0: BenchmarkSuite
+        get_field2 FormatScore
+        push_i8 100
+        get_loc1 1: score
+        mul
+        call_method 1
+        put_loc2 2: formatted
+        get_loc8 6: this
+        get_field runner
+        get_field2 NotifyResult
+        get_loc8 6: this
+        get_field name
+        get_loc2 2: formatted
+        call_method 2
+        drop
+  100:  get_loc8 6: this
+        get_field reference
+        get_length
+        push_2 2
+        eq
+        if_false8 224
+        get_var_ref0 0: BenchmarkSuite
+        get_field2 GeometricMeanLatency
+        get_loc8 6: this
+        get_field results
+        call_method 1
+        set_loc3 3: meanLatency
+        push_0 0
+        neq
+        if_false8 224
+        get_loc8 6: this
+        get_field reference
+        push_1 1
+        get_array_el
+        get_loc3 3: meanLatency
+        div
+        put_loc8 4: scoreLatency
+        get_var_ref0 0: BenchmarkSuite
+        get_field scores
+        get_field2 push
+        get_loc8 4: scoreLatency
+        call_method 1
+        drop
+        get_loc8 6: this
+        get_field runner
+        get_field NotifyResult
+        if_false8 224
+        get_var_ref0 0: BenchmarkSuite
+        get_field2 FormatScore
+        push_i8 100
+        get_loc8 4: scoreLatency
+        mul
+        call_method 1
+        put_loc8 5: formattedLatency
+        get_loc8 6: this
+        get_field runner
+        get_field2 NotifyResult
+        get_loc8 6: this
+        get_field name
+        push_atom_value Latency
+        add
+        get_loc8 5: formattedLatency
+        call_method 2
+        drop
+  224:  return_undef
+
+__tests__/fixtures_quickjs/octane/base.js:237:42: function: <null>
+  mode: strict
+  args: runner
+  locals:
+    0: var this
+  closure vars:
+    0: BenchmarkSuite parent:loc3 var
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_var_ref0 0: BenchmarkSuite
+        get_field scores
+        get_field2 push
+        push_1 1
+        call_method 1
+        drop
+        get_arg0 0: runner
+        get_field NotifyResult
+        if_false8 47
+        get_arg0 0: runner
+        get_field2 NotifyResult
+        get_loc0 0: this
+        get_field name
+        push_atom_value Skipped
+        call_method 2
+        drop
+   47:  return_undef
+
+__tests__/fixtures_quickjs/octane/base.js:244:40: function: <null>
+  mode: strict
+  args: error
+  locals:
+    0: var this
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field runner
+        get_field NotifyError
+        if_false8 37
+        get_loc0 0: this
+        get_field runner
+        get_field2 NotifyError
+        get_loc0 0: this
+        get_field name
+        get_arg0 0: error
+        call_method 2
+        drop
+   37:  get_loc0 0: this
+        get_field runner
+        get_field NotifyStep
+        if_false8 71
+        get_loc0 0: this
+        get_field runner
+        get_field2 NotifyStep
+        get_loc0 0: this
+        get_field name
+        call_method 1
+        drop
+   71:  return_undef
+
+__tests__/fixtures_quickjs/octane/base.js:262:5: function: Measure
+  mode: strict
+  args: data
+  locals:
+    0: var elapsed
+    1: var start
+    2: var i
+  closure vars:
+    0: doDeterministic local:loc2 var
+    1: benchmark local:arg0 var
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc0 0: elapsed
+        get_var Date
+        dup
+        call_constructor 0
+        put_loc1 1: start
+        push_0 0
+        put_loc2 2: i
+   14:  get_var_ref0 0: doDeterministic
+        if_false8 27
+        get_loc2 2: i
+        get_var_ref1 1: benchmark
+        get_field deterministicIterations
+        lt
+        goto8 32
+   27:  get_loc0 0: elapsed
+        push_i16 1000
+        lt
+   32:  if_false8 60
+        get_var_ref1 1: benchmark
+        get_field2 run
+        call_method 0
+        drop
+        get_var Date
+        dup
+        call_constructor 0
+        get_loc1 1: start
+        sub
+        put_loc0 0: elapsed
+        inc_loc 2: i
+        goto8 14
+   60:  get_arg0 0: data
+        null
+        neq
+        if_false8 91
+        get_arg0 0: data
+        get_field2 runs
+        get_loc2 2: i
+        add
+        put_field runs
+        get_arg0 0: data
+        get_field2 elapsed
+        get_loc0 0: elapsed
+        add
+        put_field elapsed
+   91:  return_undef
+
+__tests__/fixtures_quickjs/octane/base.js:254:47: function: <null>
+  mode: strict
+  args: benchmark data
+  locals:
+    0: var config
+    1: var doWarmup
+    2: var doDeterministic
+    3: var Measure
+    4: var usec
+    5: var rms
+    6: var this
+  closure vars:
+    0: BenchmarkSuite parent:loc3 var
+    1: BenchmarkResult parent:loc2 var
+  stack_size: 7
+  opcodes:
+        push_this
+        put_loc8 6: this
+        fclosure8 0: [bytecode Measure]
+        put_loc3 3: Measure
+        get_var_ref0 0: BenchmarkSuite
+        get_field config
+        set_loc0 0: config
+        get_field doWarmup
+        get_var undefined
+        strict_neq
+        if_false8 34
+        get_loc0 0: config
+        get_field doWarmup
+        goto8 40
+   34:  get_arg0 0: benchmark
+        get_field doWarmup
+   40:  put_loc1 1: doWarmup
+        get_loc0 0: config
+        get_field doDeterministic
+        get_var undefined
+        strict_neq
+        if_false8 63
+        get_loc0 0: config
+        get_field doDeterministic
+        goto8 69
+   63:  get_arg0 0: benchmark
+        get_field doDeterministic
+   69:  put_loc2 2: doDeterministic
+        get_loc1 1: doWarmup
+        lnot
+        if_false8 93
+        get_arg1 1: data
+        null
+        eq
+        if_false8 93
+        object
+        push_0 0
+        define_field runs
+        push_0 0
+        define_field elapsed
+        put_arg1 1: data
+   93:  get_arg1 1: data
+        null
+        eq
+        if_false8 116
+        get_loc3 3: Measure
+        null
+        call1 1
+        drop
+        object
+        push_0 0
+        define_field runs
+        push_0 0
+        define_field elapsed
+        return
+  116:  get_loc3 3: Measure
+        get_arg1 1: data
+        call1 1
+        drop
+        get_arg1 1: data
+        get_field runs
+        get_arg0 0: benchmark
+        get_field minIterations
+        lt
+        if_false8 137
+        get_arg1 1: data
+        return
+  137:  get_arg1 1: data
+        get_field elapsed
+        push_i16 1000
+        mul
+        get_arg1 1: data
+        get_field runs
+        div
+        put_loc8 4: usec
+        get_arg0 0: benchmark
+        get_field rmsResult
+        null
+        neq
+        if_false8 177
+        get_arg0 0: benchmark
+        get_field2 rmsResult
+        call_method 0
+        goto8 178
+  177:  push_0 0
+  178:  put_loc8 5: rms
+        get_loc8 6: this
+        get_field2 NotifyStep
+        get_var_ref1 1: BenchmarkResult
+        dup
+        get_arg0 0: benchmark
+        get_loc8 4: usec
+        get_loc8 5: rms
+        call_constructor 3
+        call_method 1
+        drop
+        null
+        return
+
+__tests__/fixtures_quickjs/octane/base.js:311:5: function: RunNextSetup
+  mode: strict
+  locals:
+    0: catch e [level:5 next:-1]
+  closure vars:
+    0: index local:loc1 var
+    1: length local:loc0 var
+    2: suite local:loc2 var
+    3: RunNextBenchmark local:loc5 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: index
+        get_var_ref1 1: length
+        lt
+        if_false8 53
+        catch 30
+        get_var_ref2 2: suite
+        get_field benchmarks
+        get_var_ref0 0: index
+        get_array_el
+        get_field2 Setup
+        call_method 0
+        drop
+        drop
+        goto8 51
+   30:  put_loc0 0: e
+        catch 50
+        get_var_ref2 2: suite
+        get_field2 NotifyError
+        get_loc0 0: e
+        call_method 1
+        drop
+        null
+        nip_catch
+        return
+   50:  throw
+   51:  get_var_ref3 3: RunNextBenchmark
+        return
+   53:  get_var_ref2 2: suite
+        get_field2 NotifyResult
+        call_method 0
+        drop
+        null
+        return
+
+__tests__/fixtures_quickjs/octane/base.js:325:5: function: RunNextBenchmark
+  mode: strict
+  locals:
+    0: catch e [level:3 next:-1]
+  closure vars:
+    0: data local:loc3 var
+    1: suite local:loc2 var
+    2: index local:loc1 var
+    3: RunNextTearDown local:loc6 var
+    4: RunNextBenchmark local:loc5 var
+  stack_size: 5
+  opcodes:
+        catch 27
+        get_var_ref1 1: suite
+        get_field2 RunSingleBenchmark
+        get_var_ref1 1: suite
+        get_field benchmarks
+        get_var_ref2 2: index
+        get_array_el
+        get_var_ref0 0: data
+        call_method 2
+        put_var_ref0 0: data
+        drop
+        goto8 48
+   27:  put_loc0 0: e
+        catch 47
+        get_var_ref1 1: suite
+        get_field2 NotifyError
+        get_loc0 0: e
+        call_method 1
+        drop
+        null
+        nip_catch
+        return
+   47:  throw
+   48:  get_var_ref0 0: data
+        null
+        eq
+        if_false8 55
+        get_var_ref3 3: RunNextTearDown
+        return
+   55:  get_var_ref 4: RunNextBenchmark
+        call0 0
+        return
+
+__tests__/fixtures_quickjs/octane/base.js:336:5: function: RunNextTearDown
+  mode: strict
+  locals:
+    0: catch e [level:3 next:-1]
+  closure vars:
+    0: suite local:loc2 var
+    1: index local:loc1 var
+    2: RunNextSetup local:loc4 var
+  stack_size: 4
+  opcodes:
+        catch 27
+        get_var_ref0 0: suite
+        get_field benchmarks
+        get_var_ref1 1: index
+        post_inc
+        put_var_ref1 1: index
+        get_array_el
+        get_field2 TearDown
+        call_method 0
+        drop
+        drop
+        goto8 48
+   27:  put_loc0 0: e
+        catch 47
+        get_var_ref0 0: suite
+        get_field2 NotifyError
+        get_loc0 0: e
+        call_method 1
+        drop
+        null
+        nip_catch
+        return
+   47:  throw
+   48:  get_var_ref2 2: RunNextSetup
+        return
+
+__tests__/fixtures_quickjs/octane/base.js:300:36: function: <null>
+  mode: strict
+  args: runner
+  locals:
+    0: var length
+    1: var index
+    2: var suite
+    3: var data
+    4: var RunNextSetup
+    5: var RunNextBenchmark
+    6: var RunNextTearDown
+    7: var this
+  closure vars:
+    0: BenchmarkSuite parent:loc3 var
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc8 7: this
+        fclosure8 0: [bytecode RunNextSetup]
+        put_loc8 4: RunNextSetup
+        fclosure8 1: [bytecode RunNextBenchmark]
+        put_loc8 5: RunNextBenchmark
+        fclosure8 2: [bytecode RunNextTearDown]
+        put_loc8 6: RunNextTearDown
+        get_var_ref0 0: BenchmarkSuite
+        get_field2 ResetRNG
+        call_method 0
+        drop
+        get_loc8 7: this
+        array_from 0
+        put_field results
+        get_loc8 7: this
+        get_arg0 0: runner
+        put_field runner
+        get_loc8 7: this
+        get_field benchmarks
+        get_length
+        put_loc0 0: length
+        push_0 0
+        put_loc1 1: index
+        get_loc8 7: this
+        put_loc2 2: suite
+        get_loc8 4: RunNextSetup
+        tail_call 0
+
+__tests__/fixtures_quickjs/octane/base.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: performance local:loc0 var
+    1: Benchmark local:loc1 var
+    2: BenchmarkResult local:loc2 var
+    3: BenchmarkSuite local:loc3 var
+    4: alert local:loc4 var
+  stack_size: 3
+  opcodes:
+        push_this
+        if_false8 13
+        fclosure8 1: [bytecode Benchmark]
+        put_var_ref1 1: Benchmark
+        fclosure8 2: [bytecode BenchmarkResult]
+        put_var_ref2 2: BenchmarkResult
+        fclosure8 4: [bytecode BenchmarkSuite]
+        put_var_ref3 3: BenchmarkSuite
+        return_undef
+   13:  get_var_ref0 0: performance
+        dup
+        if_true8 19
+        drop
+        object
+   19:  set_var_ref0 0: performance
+        fclosure8 0: [bytecode <null>]
+        call0 0
+        put_field now
+        get_var_ref2 2: BenchmarkResult
+        get_field prototype
+        fclosure8 3: [bytecode <null>]
+        put_field valueOf
+        get_var_ref3 3: BenchmarkSuite
+        array_from 0
+        put_field suites
+        get_var_ref3 3: BenchmarkSuite
+        push_const8 5: "9"
+        put_field version
+        get_var_ref3 3: BenchmarkSuite
+        object
+        get_var undefined
+        define_field doWarmup
+        get_var undefined
+        define_field doDeterministic
+        put_field config
+        fclosure8 6: [bytecode <null>]
+        set_name alert
+        put_var_ref 4: alert
+        get_var_ref3 3: BenchmarkSuite
+        fclosure8 7: [bytecode <null>]
+        put_field ResetRNG
+        get_var_ref3 3: BenchmarkSuite
+        fclosure8 8: [bytecode <null>]
+        put_field RunSuites
+        get_var_ref3 3: BenchmarkSuite
+        fclosure8 9: [bytecode <null>]
+        put_field CountBenchmarks
+        get_var_ref3 3: BenchmarkSuite
+        fclosure8 10: [bytecode <null>]
+        put_field GeometricMean
+        get_var_ref3 3: BenchmarkSuite
+        fclosure8 11: [bytecode <null>]
+        put_field GeometricMeanTime
+        get_var_ref3 3: BenchmarkSuite
+        fclosure8 12: [bytecode <null>]
+        put_field GeometricMeanLatency
+        get_var_ref3 3: BenchmarkSuite
+        fclosure8 13: [bytecode <null>]
+        put_field FormatScore
+        get_var_ref3 3: BenchmarkSuite
+        get_field prototype
+        fclosure8 14: [bytecode <null>]
+        put_field NotifyStep
+        get_var_ref3 3: BenchmarkSuite
+        get_field prototype
+        fclosure8 15: [bytecode <null>]
+        put_field NotifyResult
+        get_var_ref3 3: BenchmarkSuite
+        get_field prototype
+        fclosure8 16: [bytecode <null>]
+        put_field NotifySkipped
+        get_var_ref3 3: BenchmarkSuite
+        get_field prototype
+        fclosure8 17: [bytecode <null>]
+        put_field NotifyError
+        get_var_ref3 3: BenchmarkSuite
+        get_field prototype
+        fclosure8 18: [bytecode <null>]
+        put_field RunSingleBenchmark
+        get_var_ref3 3: BenchmarkSuite
+        get_field prototype
+        fclosure8 19: [bytecode <null>]
+        put_field RunStep
+        undefined
+        return_async
+

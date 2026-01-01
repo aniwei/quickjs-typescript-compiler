@@ -1,0 +1,12 @@
+[QTS:EMIT] pos=0 op=182
+[QTS:EMIT] pos=1 u16=0x0001 (1)
+[QTS:EMIT] pos=3 op=4
+[QTS:EMIT] pos=4 u32=0x000000e6 (230)
+[QTS:EMIT] pos=8 op=187
+[QTS:EMIT] pos=9 u32=0x000000e5 (229)
+[QTS:EMIT] pos=13 u16=0x0001 (1)
+[QTS:EMIT] pos=15 op=6
+[QTS:EMIT] pos=16 op=47
+[QTS:PC2LINE] begin: slots=0 source_pos=0
+[QTS:PC2LINE] init: line=0 col=0
+[QTS:PC2LINE] end: pc2line_len=2

@@ -1,0 +1,13 @@
+{
+  "inputTs": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_try_catch7.ts",
+  "referenceJsPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_try_catch7.js",
+  "isModule": false,
+  "tsEventCount": 463,
+  "wasmEventCount": 520,
+  "differenceCount": 496,
+  "firstDifferenceIndex": 24,
+  "firstDifferenceWasmLoc": {
+    "file": "parser.c",
+    "line": 1799
+  }
+}

@@ -1,0 +1,79 @@
+__tests__/fixtures/closure-vars.js:6:5: function: inner
+  closure vars:
+    0: a local:loc0 let
+    1: b local:loc1 let
+    2: c local:loc2 const
+    3: d local:loc3 var
+  stack_size: 3
+  opcodes:
+        get_var console
+        get_field2 log
+        get_var_ref_check 0: a
+        call_method 1
+        drop
+        get_var console
+        get_field2 log
+        get_var_ref_check 1: b
+        call_method 1
+        drop
+        get_var console
+        get_field2 log
+        get_var_ref_check 2: c
+        call_method 1
+        drop
+        get_var console
+        get_field2 log
+        get_var_ref3 3: d
+        call_method 1
+        drop
+        get_var_ref_check 0: a
+        post_inc
+        put_var_ref_check 0: a
+        drop
+        push_i8 10
+        dup
+        put_var_ref_check 1: b
+        drop
+        push_i8 20
+        put_var_ref3 3: d
+        return_undef
+
+__tests__/fixtures/closure-vars.js:1:1: function: testClosure
+  locals:
+    0: let a [level:1 next:-1]
+    1: let b [level:1 next:0]
+    2: const c [level:1 next:1]
+    3: var d
+    4: var inner
+  stack_size: 1
+  opcodes:
+        fclosure8 0: [bytecode inner]
+        put_loc8 4: inner
+        set_loc_uninitialized 2: c
+        set_loc_uninitialized 1: b
+        set_loc_uninitialized 0: a
+        push_1 1
+        put_loc0 0: a
+        push_2 2
+        put_loc1 1: b
+        push_3 3
+        put_loc2 2: c
+        push_4 4
+        put_loc3 3: d
+        get_loc8 4: inner
+        call0 0
+        return_undef
+
+__tests__/fixtures/closure-vars.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var testClosure,64
+        fclosure8 0: [bytecode testClosure]
+        define_func testClosure,0
+        get_var testClosure
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

@@ -1,0 +1,979 @@
+{
+  "generatedAt": "2025-12-31T18:18:20.114Z",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts",
+  "totals": {
+    "guardrailSummaries": 276,
+    "mismatches": 31,
+    "groups": 4
+  },
+  "mismatches": [
+    {
+      "fixtureName": "base",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/base.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/base",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 5388,
+        "wasmSize": 5388,
+        "sizeDiff": 0,
+        "sizeDiffPercent": 0
+      },
+      "trace": {
+        "differenceCount": 4255,
+        "tsEventCount": 3917,
+        "wasmEventCount": 4276,
+        "firstDifferenceIndex": 5,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1777
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=4 u32=0x000006a2 (1698) @parser.c:1788"
+      }
+    },
+    {
+      "fixtureName": "box2d",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/box2d.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/box2d",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 267459,
+        "wasmSize": 267139,
+        "sizeDiff": 320,
+        "sizeDiffPercent": 0.11978782581352777
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "firstDifferenceIndex": null,
+        "firstDifferenceWasmLoc": null,
+        "firstDifferenceCategory": null,
+        "firstDifferenceWasmLine": null
+      }
+    },
+    {
+      "fixtureName": "bundle",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/bundle.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/bundle",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 6661562,
+        "wasmSize": 6661650,
+        "sizeDiff": -88,
+        "sizeDiffPercent": -0.001320994048021136
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "firstDifferenceIndex": null,
+        "firstDifferenceWasmLoc": null,
+        "firstDifferenceCategory": null,
+        "firstDifferenceWasmLine": null
+      }
+    },
+    {
+      "fixtureName": "code-load",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/code-load.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/code-load",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 105740,
+        "wasmSize": 5,
+        "sizeDiff": 105735,
+        "sizeDiffPercent": 2114700
+      },
+      "trace": {
+        "differenceCount": 1131,
+        "tsEventCount": 1098,
+        "wasmEventCount": 1225,
+        "firstDifferenceIndex": 5,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1777
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=9 u32=0x000001d9 (473) @parser.c:1777"
+      }
+    },
+    {
+      "fixtureName": "crypto",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/crypto.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/crypto",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 36816,
+        "wasmSize": 36619,
+        "sizeDiff": 197,
+        "sizeDiffPercent": 0.5379720909910156
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "firstDifferenceIndex": null,
+        "firstDifferenceWasmLoc": null,
+        "firstDifferenceCategory": null,
+        "firstDifferenceWasmLine": null
+      }
+    },
+    {
+      "fixtureName": "deltablue",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/deltablue.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/deltablue",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 11711,
+        "wasmSize": 5,
+        "sizeDiff": 11706,
+        "sizeDiffPercent": 234119.99999999997
+      },
+      "trace": {
+        "differenceCount": 8700,
+        "tsEventCount": 8130,
+        "wasmEventCount": 8768,
+        "firstDifferenceIndex": 5,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1777
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=9 u32=0x000001d9 (473) @parser.c:1777"
+      }
+    },
+    {
+      "fixtureName": "earley-boyer",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/earley-boyer.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/earley-boyer",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 96615,
+        "wasmSize": 96500,
+        "sizeDiff": 115,
+        "sizeDiffPercent": 0.11917098445595854
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "firstDifferenceIndex": null,
+        "firstDifferenceWasmLoc": null,
+        "firstDifferenceCategory": null,
+        "firstDifferenceWasmLine": null
+      }
+    },
+    {
+      "fixtureName": "gbemu-part1",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/gbemu-part1.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/gbemu-part1",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 25079,
+        "wasmSize": 25048,
+        "sizeDiff": 31,
+        "sizeDiffPercent": 0.12376237623762376
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "firstDifferenceIndex": null,
+        "firstDifferenceWasmLoc": null,
+        "firstDifferenceCategory": null,
+        "firstDifferenceWasmLine": null
+      }
+    },
+    {
+      "fixtureName": "gbemu-part2",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/gbemu-part2.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/gbemu-part2",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 271141,
+        "wasmSize": 270799,
+        "sizeDiff": 342,
+        "sizeDiffPercent": 0.12629293313490816
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "firstDifferenceIndex": null,
+        "firstDifferenceWasmLoc": null,
+        "firstDifferenceCategory": null,
+        "firstDifferenceWasmLine": null
+      }
+    },
+    {
+      "fixtureName": "mandreel",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/mandreel.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/mandreel",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 3512980,
+        "wasmSize": 3512848,
+        "sizeDiff": 132,
+        "sizeDiffPercent": 0.003757634830769791
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "firstDifferenceIndex": null,
+        "firstDifferenceWasmLoc": null,
+        "firstDifferenceCategory": null,
+        "firstDifferenceWasmLine": null
+      }
+    },
+    {
+      "fixtureName": "microbench",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/microbench.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/microbench",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 13213,
+        "wasmSize": 5,
+        "sizeDiff": 13208,
+        "sizeDiffPercent": 264160
+      },
+      "trace": {
+        "differenceCount": 14958,
+        "tsEventCount": 12278,
+        "wasmEventCount": 14978,
+        "firstDifferenceIndex": 9,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1799
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=15 op=186 @parser.c:1799"
+      }
+    },
+    {
+      "fixtureName": "navier-stokes",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/navier-stokes.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/navier-stokes",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 7900,
+        "wasmSize": 5,
+        "sizeDiff": 7895,
+        "sizeDiffPercent": 157900
+      },
+      "trace": {
+        "differenceCount": 7888,
+        "tsEventCount": 7352,
+        "wasmEventCount": 7961,
+        "firstDifferenceIndex": 5,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1777
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=9 u32=0x000001d9 (473) @parser.c:1777"
+      }
+    },
+    {
+      "fixtureName": "pdfjs",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/pdfjs.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/pdfjs",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 1198539,
+        "wasmSize": 1196666,
+        "sizeDiff": 1873,
+        "sizeDiffPercent": 0.1565181930463471
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "firstDifferenceIndex": null,
+        "firstDifferenceWasmLoc": null,
+        "firstDifferenceCategory": null,
+        "firstDifferenceWasmLine": null
+      }
+    },
+    {
+      "fixtureName": "raytrace",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/raytrace.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/raytrace",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 16102,
+        "wasmSize": 5,
+        "sizeDiff": 16097,
+        "sizeDiffPercent": 321940
+      },
+      "trace": {
+        "differenceCount": 11864,
+        "tsEventCount": 11105,
+        "wasmEventCount": 11944,
+        "firstDifferenceIndex": 5,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1777
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=9 u32=0x000001d9 (473) @parser.c:1777"
+      }
+    },
+    {
+      "fixtureName": "regexp",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/regexp.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/regexp",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 137179,
+        "wasmSize": 137179,
+        "sizeDiff": 0,
+        "sizeDiffPercent": 0
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "firstDifferenceIndex": null,
+        "firstDifferenceWasmLoc": null,
+        "firstDifferenceCategory": null,
+        "firstDifferenceWasmLine": null
+      }
+    },
+    {
+      "fixtureName": "repl",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/repl.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/repl",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 19510,
+        "wasmSize": 5,
+        "sizeDiff": 19505,
+        "sizeDiffPercent": 390100
+      },
+      "trace": {
+        "differenceCount": 16645,
+        "tsEventCount": 15115,
+        "wasmEventCount": 16657,
+        "firstDifferenceIndex": 9,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1777
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=9 u32=0x000001da (474) @parser.c:1777"
+      }
+    },
+    {
+      "fixtureName": "run",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/run.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/run",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 1307,
+        "wasmSize": 5,
+        "sizeDiff": 1302,
+        "sizeDiffPercent": 26039.999999999996
+      },
+      "trace": {
+        "differenceCount": 467,
+        "tsEventCount": 439,
+        "wasmEventCount": 485,
+        "firstDifferenceIndex": 4,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1807
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=5 atom=490 @parser.c:1807"
+      }
+    },
+    {
+      "fixtureName": "splay",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/splay.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/splay",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 4161,
+        "wasmSize": 5,
+        "sizeDiff": 4156,
+        "sizeDiffPercent": 83120
+      },
+      "trace": {
+        "differenceCount": 3165,
+        "tsEventCount": 3134,
+        "wasmEventCount": 3441,
+        "firstDifferenceIndex": 5,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1777
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=9 u32=0x000001d9 (473) @parser.c:1777"
+      }
+    },
+    {
+      "fixtureName": "test_argument_scope",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_argument_scope.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_argument_scope",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 3661,
+        "wasmSize": 5,
+        "sizeDiff": 3656,
+        "sizeDiffPercent": 73120
+      },
+      "trace": {
+        "differenceCount": 1889,
+        "tsEventCount": 1719,
+        "wasmEventCount": 1913,
+        "firstDifferenceIndex": 24,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1799
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=49 op=186 @parser.c:1799"
+      }
+    },
+    {
+      "fixtureName": "test_bigint",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_bigint.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_bigint",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 7166,
+        "wasmSize": 5,
+        "sizeDiff": 7161,
+        "sizeDiffPercent": 143220
+      },
+      "trace": {
+        "differenceCount": 3744,
+        "tsEventCount": 3461,
+        "wasmEventCount": 3785,
+        "firstDifferenceIndex": 5,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1777
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=9 u32=0x000001d8 (472) @parser.c:1777"
+      }
+    },
+    {
+      "fixtureName": "test_bignum",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_bignum.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_bignum",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 9232,
+        "wasmSize": 5,
+        "sizeDiff": 9227,
+        "sizeDiffPercent": 184540
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "firstDifferenceIndex": null,
+        "firstDifferenceWasmLoc": null,
+        "firstDifferenceCategory": null,
+        "firstDifferenceWasmLine": null
+      }
+    },
+    {
+      "fixtureName": "test_bjson",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_bjson.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_bjson",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 3005,
+        "wasmSize": 5,
+        "sizeDiff": 3000,
+        "sizeDiffPercent": 60000
+      },
+      "trace": {
+        "differenceCount": 3049,
+        "tsEventCount": 2769,
+        "wasmEventCount": 3073,
+        "firstDifferenceIndex": 24,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1799
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=49 op=186 @parser.c:1799"
+      }
+    },
+    {
+      "fixtureName": "test_builtin",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_builtin.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_builtin",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 76944,
+        "wasmSize": 5,
+        "sizeDiff": 76939,
+        "sizeDiffPercent": 1538780
+      },
+      "trace": {
+        "differenceCount": 19112,
+        "tsEventCount": 17777,
+        "wasmEventCount": 19119,
+        "firstDifferenceIndex": 5,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1777
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=9 u32=0x000001d8 (472) @parser.c:1777"
+      }
+    },
+    {
+      "fixtureName": "test_for_in2",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_for_in2.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_for_in2",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 737,
+        "wasmSize": 5,
+        "sizeDiff": 732,
+        "sizeDiffPercent": 14640
+      },
+      "trace": {
+        "differenceCount": 591,
+        "tsEventCount": 535,
+        "wasmEventCount": 615,
+        "firstDifferenceIndex": 24,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1799
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=49 op=186 @parser.c:1799"
+      }
+    },
+    {
+      "fixtureName": "test_ic_atom_free",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_ic_atom_free.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_ic_atom_free",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 123221,
+        "wasmSize": 121925,
+        "sizeDiff": 1296,
+        "sizeDiffPercent": 1.062948533934796
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "firstDifferenceIndex": null,
+        "firstDifferenceWasmLoc": null,
+        "firstDifferenceCategory": null,
+        "firstDifferenceWasmLine": null
+      }
+    },
+    {
+      "fixtureName": "test_language",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_language.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_language",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 13894,
+        "wasmSize": 5,
+        "sizeDiff": 13889,
+        "sizeDiffPercent": 277780
+      },
+      "trace": {
+        "differenceCount": 9614,
+        "tsEventCount": 8514,
+        "wasmEventCount": 9638,
+        "firstDifferenceIndex": 24,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1799
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=49 op=186 @parser.c:1799"
+      }
+    },
+    {
+      "fixtureName": "test_line_column_num",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_line_column_num.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_line_column_num",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 4445,
+        "wasmSize": 5,
+        "sizeDiff": 4440,
+        "sizeDiffPercent": 88800
+      },
+      "trace": {
+        "differenceCount": 2175,
+        "tsEventCount": 1974,
+        "wasmEventCount": 2199,
+        "firstDifferenceIndex": 24,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1799
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=49 op=186 @parser.c:1799"
+      }
+    },
+    {
+      "fixtureName": "test_loop",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_loop.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_loop",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 4659,
+        "wasmSize": 5,
+        "sizeDiff": 4654,
+        "sizeDiffPercent": 93080
+      },
+      "trace": {
+        "differenceCount": 4960,
+        "tsEventCount": 4228,
+        "wasmEventCount": 4984,
+        "firstDifferenceIndex": 24,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1799
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=49 op=186 @parser.c:1799"
+      }
+    },
+    {
+      "fixtureName": "test_try_catch7",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_try_catch7.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_try_catch7",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 654,
+        "wasmSize": 5,
+        "sizeDiff": 649,
+        "sizeDiffPercent": 12980.000000000002
+      },
+      "trace": {
+        "differenceCount": 496,
+        "tsEventCount": 463,
+        "wasmEventCount": 520,
+        "firstDifferenceIndex": 24,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1799
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=49 op=186 @parser.c:1799"
+      }
+    },
+    {
+      "fixtureName": "typescript-compiler",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/typescript-compiler.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/typescript-compiler",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 547656,
+        "wasmSize": 549300,
+        "sizeDiff": -1644,
+        "sizeDiffPercent": -0.2992900054614965
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "firstDifferenceIndex": null,
+        "firstDifferenceWasmLoc": null,
+        "firstDifferenceCategory": null,
+        "firstDifferenceWasmLine": null
+      }
+    },
+    {
+      "fixtureName": "typescript-input",
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/typescript-input.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/typescript-input",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 1243710,
+        "wasmSize": 5,
+        "sizeDiff": 1243705,
+        "sizeDiffPercent": 24874100
+      },
+      "trace": {
+        "differenceCount": 2,
+        "tsEventCount": 12,
+        "wasmEventCount": 12,
+        "firstDifferenceIndex": 3,
+        "firstDifferenceWasmLoc": {
+          "file": "parser.c",
+          "line": 1777
+        },
+        "firstDifferenceCategory": "EMIT",
+        "firstDifferenceWasmLine": "[QTS:EMIT] pos=4 u32=0x000001d9 (473) @parser.c:1777"
+      }
+    }
+  ],
+  "groups": [
+    {
+      "key": "UNKNOWN@unknown",
+      "category": null,
+      "loc": null,
+      "count": 12,
+      "fixtures": [
+        {
+          "fixtureName": "box2d",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/box2d.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/box2d",
+          "sizeDiff": 320,
+          "traceDiff": 0
+        },
+        {
+          "fixtureName": "bundle",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/bundle.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/bundle",
+          "sizeDiff": -88,
+          "traceDiff": 0
+        },
+        {
+          "fixtureName": "crypto",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/crypto.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/crypto",
+          "sizeDiff": 197,
+          "traceDiff": 0
+        },
+        {
+          "fixtureName": "earley-boyer",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/earley-boyer.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/earley-boyer",
+          "sizeDiff": 115,
+          "traceDiff": 0
+        },
+        {
+          "fixtureName": "gbemu-part1",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/gbemu-part1.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/gbemu-part1",
+          "sizeDiff": 31,
+          "traceDiff": 0
+        },
+        {
+          "fixtureName": "gbemu-part2",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/gbemu-part2.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/gbemu-part2",
+          "sizeDiff": 342,
+          "traceDiff": 0
+        },
+        {
+          "fixtureName": "mandreel",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/mandreel.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/mandreel",
+          "sizeDiff": 132,
+          "traceDiff": 0
+        },
+        {
+          "fixtureName": "pdfjs",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/pdfjs.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/pdfjs",
+          "sizeDiff": 1873,
+          "traceDiff": 0
+        },
+        {
+          "fixtureName": "regexp",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/regexp.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/regexp",
+          "sizeDiff": 0,
+          "traceDiff": 0
+        },
+        {
+          "fixtureName": "test_bignum",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_bignum.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_bignum",
+          "sizeDiff": 9227,
+          "traceDiff": 0
+        },
+        {
+          "fixtureName": "test_ic_atom_free",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_ic_atom_free.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_ic_atom_free",
+          "sizeDiff": 1296,
+          "traceDiff": 0
+        },
+        {
+          "fixtureName": "typescript-compiler",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/typescript-compiler.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/typescript-compiler",
+          "sizeDiff": -1644,
+          "traceDiff": 0
+        }
+      ]
+    },
+    {
+      "key": "EMIT@parser.c:1777",
+      "category": "EMIT",
+      "loc": {
+        "file": "parser.c",
+        "line": 1777
+      },
+      "count": 10,
+      "fixtures": [
+        {
+          "fixtureName": "base",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/base.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/base",
+          "sizeDiff": 0,
+          "traceDiff": 4255
+        },
+        {
+          "fixtureName": "code-load",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/code-load.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/code-load",
+          "sizeDiff": 105735,
+          "traceDiff": 1131
+        },
+        {
+          "fixtureName": "deltablue",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/deltablue.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/deltablue",
+          "sizeDiff": 11706,
+          "traceDiff": 8700
+        },
+        {
+          "fixtureName": "navier-stokes",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/navier-stokes.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/navier-stokes",
+          "sizeDiff": 7895,
+          "traceDiff": 7888
+        },
+        {
+          "fixtureName": "raytrace",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/raytrace.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/raytrace",
+          "sizeDiff": 16097,
+          "traceDiff": 11864
+        },
+        {
+          "fixtureName": "repl",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/repl.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/repl",
+          "sizeDiff": 19505,
+          "traceDiff": 16645
+        },
+        {
+          "fixtureName": "splay",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/splay.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/splay",
+          "sizeDiff": 4156,
+          "traceDiff": 3165
+        },
+        {
+          "fixtureName": "test_bigint",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_bigint.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_bigint",
+          "sizeDiff": 7161,
+          "traceDiff": 3744
+        },
+        {
+          "fixtureName": "test_builtin",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_builtin.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_builtin",
+          "sizeDiff": 76939,
+          "traceDiff": 19112
+        },
+        {
+          "fixtureName": "typescript-input",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/typescript-input.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/typescript-input",
+          "sizeDiff": 1243705,
+          "traceDiff": 2
+        }
+      ]
+    },
+    {
+      "key": "EMIT@parser.c:1799",
+      "category": "EMIT",
+      "loc": {
+        "file": "parser.c",
+        "line": 1799
+      },
+      "count": 8,
+      "fixtures": [
+        {
+          "fixtureName": "microbench",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/microbench.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/microbench",
+          "sizeDiff": 13208,
+          "traceDiff": 14958
+        },
+        {
+          "fixtureName": "test_argument_scope",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_argument_scope.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_argument_scope",
+          "sizeDiff": 3656,
+          "traceDiff": 1889
+        },
+        {
+          "fixtureName": "test_bjson",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_bjson.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_bjson",
+          "sizeDiff": 3000,
+          "traceDiff": 3049
+        },
+        {
+          "fixtureName": "test_for_in2",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_for_in2.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_for_in2",
+          "sizeDiff": 732,
+          "traceDiff": 591
+        },
+        {
+          "fixtureName": "test_language",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_language.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_language",
+          "sizeDiff": 13889,
+          "traceDiff": 9614
+        },
+        {
+          "fixtureName": "test_line_column_num",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_line_column_num.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_line_column_num",
+          "sizeDiff": 4440,
+          "traceDiff": 2175
+        },
+        {
+          "fixtureName": "test_loop",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_loop.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_loop",
+          "sizeDiff": 4654,
+          "traceDiff": 4960
+        },
+        {
+          "fixtureName": "test_try_catch7",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_try_catch7.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_try_catch7",
+          "sizeDiff": 649,
+          "traceDiff": 496
+        }
+      ]
+    },
+    {
+      "key": "EMIT@parser.c:1807",
+      "category": "EMIT",
+      "loc": {
+        "file": "parser.c",
+        "line": 1807
+      },
+      "count": 1,
+      "fixtures": [
+        {
+          "fixtureName": "run",
+          "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/run.ts",
+          "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/run",
+          "sizeDiff": 1302,
+          "traceDiff": 467
+        }
+      ]
+    }
+  ]
+}

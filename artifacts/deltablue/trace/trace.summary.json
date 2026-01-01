@@ -1,0 +1,13 @@
+{
+  "inputTs": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/deltablue.ts",
+  "referenceJsPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/deltablue.js",
+  "isModule": true,
+  "tsEventCount": 8130,
+  "wasmEventCount": 8768,
+  "differenceCount": 8700,
+  "firstDifferenceIndex": 5,
+  "firstDifferenceWasmLoc": {
+    "file": "parser.c",
+    "line": 1777
+  }
+}

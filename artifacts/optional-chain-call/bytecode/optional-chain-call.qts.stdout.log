@@ -1,0 +1,97 @@
+__tests__/fixtures/optional-chain-call.js:4:8: function: <null>
+  stack_size: 1
+  opcodes:
+        push_2 2
+        return
+
+__tests__/fixtures/optional-chain-call.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 5
+  opcodes:
+        check_define_var obj,128
+        define_var obj,128
+        object
+        object
+        push_1 1
+        define_field b
+        define_field a
+        fclosure8 0: [bytecode <null>]
+        set_name f
+        define_field f
+        put_var_init obj
+        get_var console
+        get_field2 log
+        get_var obj
+        dup
+        is_undefined_or_null
+        if_false8 65
+        drop
+        undefined
+        goto8 83
+   65:  get_field a
+        dup
+        is_undefined_or_null
+        if_false8 78
+        drop
+        undefined
+        goto8 83
+   78:  get_field b
+   83:  dup
+        is_undefined_or_null
+        if_false8 89
+        drop
+        push_0 0
+   89:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var obj
+        dup
+        is_undefined_or_null
+        if_false8 116
+        drop
+        undefined
+        goto8 134
+  116:  get_field missing
+        dup
+        is_undefined_or_null
+        if_false8 129
+        drop
+        undefined
+        goto8 134
+  129:  get_field b
+  134:  dup
+        is_undefined_or_null
+        if_false8 140
+        drop
+        push_3 3
+  140:  call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var obj
+        dup
+        is_undefined_or_null
+        if_false8 167
+        drop
+        undefined
+        goto8 184
+  167:  get_field2 f
+        dup
+        is_undefined_or_null
+        if_false8 181
+        drop
+        drop
+        undefined
+        goto8 184
+  181:  call_method 0
+  184:  dup
+        is_undefined_or_null
+        if_false8 190
+        drop
+        push_4 4
+  190:  call_method 1
+        set_loc0 0: "<ret>"
+        return
+

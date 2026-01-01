@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/deltablue.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/deltablue",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/deltablue/cli/deltablue.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/deltablue/cli/deltablue.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/deltablue/cli/deltablue.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/deltablue/cli/deltablue.pc2line.txt",
+    "bytecodeSize": 11807,
+    "pc2lineLength": 586,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": false,
+    "tsSize": 11711,
+    "wasmSize": 5,
+    "sizeDiff": 11706,
+    "sizeDiffPercent": 234119.99999999997
+  },
+  "trace": {
+    "differenceCount": 8700,
+    "tsEventCount": 8130,
+    "wasmEventCount": 8768,
+    "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/deltablue/trace/trace.summary.json"
+  }
+}

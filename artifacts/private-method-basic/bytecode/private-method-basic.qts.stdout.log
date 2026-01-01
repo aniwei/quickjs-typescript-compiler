@@ -1,0 +1,143 @@
+__tests__/fixtures/private-method-basic.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  closure vars:
+    0: #count local:loc2 const
+  stack_size: 3
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc1 1: "<home_object>"
+        add_brand
+        get_loc0 0: this
+        get_var_ref_check 0: "#count"
+        push_0 0
+        define_private_field
+        return_undef
+
+__tests__/fixtures/private-method-basic.js:4:5: function: <null>
+  mode: strict
+  args: delta
+  locals:
+    0: var this
+  closure vars:
+    0: #count local:loc2 const
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        dup
+        get_var_ref0 0: "#count"
+        get_private_field
+        get_arg0 0: delta
+        add
+        insert2
+        get_var_ref0 0: "#count"
+        put_private_field
+        drop
+        get_loc0 0: this
+        get_var_ref0 0: "#count"
+        get_private_field
+        return
+
+__tests__/fixtures/private-method-basic.js:8:5: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: #bump local:loc3 const
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_var_ref0 0: "#bump"
+        check_brand
+        push_1 1
+        tail_call_method 1
+
+__tests__/fixtures/private-method-basic.js:11:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc4 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  return_undef
+
+__tests__/fixtures/private-method-basic.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const Counter [level:2 next:-1]
+    2: const #count [level:3 next:1]
+    3: const #bump [level:3 next:2]
+    4: const <class_fields_init> [level:3 next:3]
+  stack_size: 4
+  opcodes:
+        check_define_var Counter,128
+        check_define_var c,128
+        define_var Counter,130
+        define_var c,128
+        set_loc_uninitialized 1: Counter
+        undefined
+        set_loc_uninitialized 4: "<class_fields_init>"
+        set_loc_uninitialized 3: "#bump"
+        set_loc_uninitialized 2: "#count"
+        push_const8 2: [bytecode <null>]
+        define_class Counter,0
+        private_symbol "#count"
+        put_loc2 2: "#count"
+        fclosure8 0: [bytecode <null>]
+        set_home_object
+        set_name "#bump"
+        put_loc3 3: "#bump"
+        fclosure8 1: [bytecode <null>]
+        define_method inc,0
+        dup
+        null
+        swap
+        add_brand
+        fclosure8 3: [bytecode <null>]
+        set_home_object
+        put_loc8 4: "<class_fields_init>"
+        drop
+        set_loc1 1: Counter
+        close_loc 4: "<class_fields_init>"
+        close_loc 2: "#count"
+        put_var_init Counter
+        get_var Counter
+        dup
+        call_constructor 0
+        put_var_init c
+        get_var console
+        get_field2 log
+        get_var c
+        get_field2 inc
+        call_method 0
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var c
+        get_field2 inc
+        call_method 0
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

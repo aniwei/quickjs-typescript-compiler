@@ -1,0 +1,12 @@
+[QTS:EMIT] pos=0 op=182 @parser.c:1799
+[QTS:EMIT] pos=1 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=3 op=4 @parser.c:1799
+[QTS:EMIT] pos=4 u32=0x000001d9 (473) @parser.c:1777
+[QTS:EMIT] pos=8 op=187 @parser.c:1799
+[QTS:EMIT] pos=9 atom=472 @parser.c:1807
+[QTS:EMIT] pos=13 u16=0x0001 (1) @parser.c:1772
+[QTS:EMIT] pos=15 op=6 @parser.c:1799
+[QTS:EMIT] pos=16 op=47 @parser.c:1799
+[QTS:PC2LINE] begin: slots=0 source_pos=0 @parser.c:10908
+[QTS:PC2LINE] init: line=0 col=0 @parser.c:10915
+[QTS:PC2LINE] end: pc2line_len=2 @parser.c:10960

@@ -1,0 +1,5443 @@
+__tests__/fixtures_quickjs/microbench.js:28:1: function: pad
+  args: str n
+  stack_size: 2
+  opcodes:
+        get_arg0 0: str
+        push_empty_string
+        add
+        put_arg0 0: str
+    4:  get_arg0 0: str
+        get_length
+        get_arg1 1: n
+        lt
+        if_false8 20
+        get_arg0 0: str
+        push_atom_value " "
+        add
+        put_arg0 0: str
+        goto8 4
+   20:  get_arg0 0: str
+        return
+
+__tests__/fixtures_quickjs/microbench.js:34:1: function: pad_left
+  args: str n
+  stack_size: 2
+  opcodes:
+        get_arg0 0: str
+        push_empty_string
+        add
+        put_arg0 0: str
+    4:  get_arg0 0: str
+        get_length
+        get_arg1 1: n
+        lt
+        if_false8 20
+        push_atom_value " "
+        get_arg0 0: str
+        add
+        put_arg0 0: str
+        goto8 4
+   20:  get_arg0 0: str
+        return
+
+__tests__/fixtures_quickjs/microbench.js:40:1: function: pad_center
+  args: str n
+  stack_size: 2
+  opcodes:
+        get_arg0 0: str
+        push_empty_string
+        add
+        put_arg0 0: str
+    4:  get_arg0 0: str
+        get_length
+        get_arg1 1: n
+        lt
+        if_false8 38
+        get_arg1 1: n
+        get_arg0 0: str
+        get_length
+        sub
+        push_1 1
+        and
+        if_false8 28
+        get_arg0 0: str
+        push_atom_value " "
+        add
+        put_arg0 0: str
+        goto8 4
+   28:  push_atom_value " "
+        get_arg0 0: str
+        add
+        put_arg0 0: str
+        goto8 4
+   38:  get_arg0 0: str
+        return
+
+__tests__/fixtures_quickjs/microbench.js:58:1: function: log_line
+  locals:
+    0: var i
+    1: var n
+    2: var s
+    3: var a
+    4: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 1
+        put_loc8 4: arguments
+        push_empty_string
+        put_loc2 2: s
+        push_0 0
+        put_loc0 0: i
+        get_loc8 4: arguments
+        get_length
+        put_loc1 1: n
+   12:  get_loc0 0: i
+        get_loc1 1: n
+        lt
+        if_false8 110
+        get_loc0 0: i
+        push_0 0
+        gt
+        if_false8 29
+        push_atom_value " "
+        add_loc 2: s
+   29:  get_loc8 4: arguments
+        get_loc0 0: i
+        get_array_el
+        set_loc3 3: a
+        typeof
+        push_atom_value number
+        strict_eq
+        if_false8 89
+        get_var total
+        get_loc0 0: i
+        get_array_el3
+        get_loc3 3: a
+        add
+        put_array_el
+        get_loc3 3: a
+        get_field2 toFixed
+        get_var precs
+        get_loc0 0: i
+        get_array_el
+        call_method 1
+        put_loc3 3: a
+        get_loc2 2: s
+        get_var pad_left
+        get_loc3 3: a
+        get_var widths
+        get_loc0 0: i
+        get_array_el
+        call2 2
+        add
+        put_loc2 2: s
+        goto8 106
+   89:  get_loc2 2: s
+        get_var pad_left
+        get_loc3 3: a
+        get_var widths
+        get_loc0 0: i
+        get_array_el
+        call2 2
+        add
+        put_loc2 2: s
+  106:  inc_loc 0: i
+        goto8 12
+  110:  get_var console
+        get_field2 log
+        get_loc2 2: s
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/microbench.js:84:17: function: <null>
+  stack_size: 2
+  opcodes:
+        get_var performance
+        get_field2 now
+        tail_call_method 0
+
+__tests__/fixtures_quickjs/microbench.js:92:17: function: <null>
+  locals:
+    0: var t0
+    1: var t
+  stack_size: 2
+  opcodes:
+        get_var Date
+        get_field2 now
+        call_method 0
+        put_loc0 0: t0
+   14:  get_var Date
+        get_field2 now
+        call_method 0
+        set_loc1 1: t
+        get_loc0 0: t0
+        eq
+        if_true8 14
+        get_loc1 1: t
+        return
+
+__tests__/fixtures_quickjs/microbench.js:100:1: function: log_one
+  args: text n ti
+  locals:
+    0: var ref
+  stack_size: 9
+  opcodes:
+        get_var ref_data
+        if_false8 17
+        get_var ref_data
+        get_arg0 0: text
+        get_array_el
+        put_loc0 0: ref
+        goto8 19
+   17:  null
+        put_loc0 0: ref
+   19:  get_var Math
+        get_field2 round
+        get_arg2 2: ti
+        push_i8 100
+        mul
+        call_method 1
+        push_i8 100
+        div
+        put_arg2 2: ti
+        get_var log_data
+        get_arg0 0: text
+        get_arg2 2: ti
+        put_array_el
+        get_loc0 0: ref
+        typeof
+        push_atom_value number
+        strict_eq
+        if_false8 126
+        get_var log_line
+        get_arg0 0: text
+        get_arg1 1: n
+        get_arg2 2: ti
+        get_loc0 0: ref
+        get_var Math
+        get_field2 round
+        get_loc0 0: ref
+        push_i16 1000
+        mul
+        get_arg2 2: ti
+        div
+        call_method 1
+        call 5
+        drop
+        get_var total_score
+        get_arg2 2: ti
+        push_i8 100
+        mul
+        get_loc0 0: ref
+        div
+        add
+        dup
+        put_var total_score
+        drop
+        get_var total_scale
+        push_i8 100
+        add
+        dup
+        put_var total_scale
+        drop
+        return_undef
+  126:  get_var log_line
+        get_arg0 0: text
+        get_arg1 1: n
+        get_arg2 2: ti
+        call3 3
+        drop
+        get_var total_score
+        push_i8 100
+        add
+        dup
+        put_var total_score
+        drop
+        get_var total_scale
+        push_i8 100
+        add
+        dup
+        put_var total_scale
+        drop
+        return_undef
+
+__tests__/fixtures_quickjs/microbench.js:119:1: function: bench
+  args: f text
+  locals:
+    0: var i
+    1: var j
+    2: var n
+    3: var t
+    4: var ti
+    5: var nb_its
+    6: var ref
+    7: var ti_n
+    8: var ti_n1
+  stack_size: 5
+  opcodes:
+        push_1 1
+        set_loc2 2: n
+        put_loc8 5: nb_its
+        get_arg0 0: f
+        get_field bench
+        if_false8 20
+        get_arg0 0: f
+        get_arg1 1: text
+        call1 1
+        put_loc8 7: ti_n
+        goto16 166
+   20:  push_i32 1000000000
+        put_loc8 7: ti_n
+        push_0 0
+        put_loc0 0: i
+   29:  get_loc0 0: i
+        push_i8 30
+        lt
+        if_false 166
+        push_i32 1000000000
+        put_loc8 4: ti
+        push_0 0
+        put_loc1 1: j
+   47:  get_loc1 1: j
+        get_var max_iterations
+        lt
+        if_false8 97
+        get_var get_clock
+        call0 0
+        put_loc3 3: t
+        get_arg0 0: f
+        get_loc2 2: n
+        call1 1
+        put_loc8 5: nb_its
+        get_var get_clock
+        call0 0
+        get_loc3 3: t
+        sub
+        put_loc3 3: t
+        get_loc8 5: nb_its
+        push_0 0
+        lt
+        if_false8 84
+        return_undef
+   84:  get_loc8 4: ti
+        get_loc3 3: t
+        gt
+        if_false8 93
+        get_loc3 3: t
+        put_loc8 4: ti
+   93:  inc_loc 1: j
+        goto8 47
+   97:  get_loc8 4: ti
+        get_var clock_threshold
+        push_i8 10
+        div
+        gte
+        if_false8 128
+        get_loc8 4: ti
+        get_loc8 5: nb_its
+        div
+        put_loc8 8: ti_n1
+        get_loc8 7: ti_n
+        get_loc8 8: ti_n1
+        gt
+        if_false8 128
+        get_loc8 8: ti_n1
+        put_loc8 7: ti_n
+  128:  get_loc8 4: ti
+        get_var clock_threshold
+        gte
+        if_false8 147
+        get_loc2 2: n
+        get_var min_n_argument
+        gte
+        if_true8 166
+  147:  get_loc2 2: n
+        push_2 2
+        push_const8 0: 2.5
+        push_2 2
+        array_from 3
+        get_loc0 0: i
+        push_3 3
+        mod
+        get_array_el
+        mul
+        put_loc2 2: n
+        inc_loc 0: i
+        goto16 29
+  166:  get_var log_one
+        get_arg1 1: text
+        get_loc2 2: n
+        get_loc8 7: ti_n
+        push_i32 1000000000
+        mul
+        get_var clocks_per_sec
+        div
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/microbench.js:156:1: function: empty_loop
+  args: n
+  locals:
+    0: var j
+  stack_size: 2
+  opcodes:
+        push_0 0
+        put_loc0 0: j
+    2:  get_loc0 0: j
+        get_arg0 0: n
+        lt
+        if_false8 11
+        inc_loc 0: j
+        goto8 2
+   11:  get_arg0 0: n
+        return
+
+__tests__/fixtures_quickjs/microbench.js:162:1: function: empty_down_loop
+  args: n
+  locals:
+    0: var j
+  stack_size: 2
+  opcodes:
+        get_arg0 0: n
+        put_loc0 0: j
+    2:  get_loc0 0: j
+        push_0 0
+        gt
+        if_false8 11
+        dec_loc 0: j
+        goto8 2
+   11:  get_arg0 0: n
+        return
+
+__tests__/fixtures_quickjs/microbench.js:168:1: function: empty_down_loop2
+  args: n
+  locals:
+    0: var j
+  stack_size: 2
+  opcodes:
+        get_arg0 0: n
+        put_loc0 0: j
+    2:  get_loc0 0: j
+        post_dec
+        put_loc0 0: j
+        push_0 0
+        gt
+        if_false8 11
+        goto8 2
+   11:  get_arg0 0: n
+        return
+
+__tests__/fixtures_quickjs/microbench.js:174:1: function: empty_do_loop
+  args: n
+  locals:
+    0: var j
+  stack_size: 2
+  opcodes:
+        get_arg0 0: n
+        put_loc0 0: j
+    2:  get_loc0 0: j
+        dec
+        set_loc0 0: j
+        push_0 0
+        gt
+        if_true8 2
+        get_arg0 0: n
+        return
+
+__tests__/fixtures_quickjs/microbench.js:179:1: function: date_now
+  args: n
+  locals:
+    0: var j
+  stack_size: 2
+  opcodes:
+        push_0 0
+        put_loc0 0: j
+    2:  get_loc0 0: j
+        get_arg0 0: n
+        lt
+        if_false8 25
+        get_var Date
+        get_field2 now
+        call_method 0
+        drop
+        inc_loc 0: j
+        goto8 2
+   25:  get_arg0 0: n
+        return
+
+__tests__/fixtures_quickjs/microbench.js:186:1: function: date_parse
+  args: n
+  locals:
+    0: var x0
+    1: var dx
+    2: var j
+    3: var x1
+    4: var x2
+    5: var x3
+    6: var d0
+    7: var d1
+    8: var d2
+    9: var d3
+  stack_size: 4
+  opcodes:
+        push_0 0
+        put_loc0 0: x0
+        push_0 0
+        put_loc1 1: dx
+        push_0 0
+        put_loc2 2: j
+    6:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false 302
+        get_loc0 0: x0
+        get_loc0 0: x0
+        push_i16 1000
+        mod
+        sub
+        put_loc3 3: x1
+        get_loc0 0: x0
+        neg
+        put_loc8 4: x2
+        get_loc3 3: x1
+        neg
+        put_loc8 5: x3
+        get_var Date
+        dup
+        get_loc0 0: x0
+        call_constructor 1
+        put_loc8 6: d0
+        get_var Date
+        dup
+        get_loc3 3: x1
+        call_constructor 1
+        put_loc8 7: d1
+        get_var Date
+        dup
+        get_loc8 4: x2
+        call_constructor 1
+        put_loc8 8: d2
+        get_var Date
+        dup
+        get_loc8 5: x3
+        call_constructor 1
+        put_loc8 9: d3
+        get_var Date
+        get_field2 parse
+        get_loc8 6: d0
+        get_field2 toISOString
+        call_method 0
+        call_method 1
+        get_loc0 0: x0
+        neq
+        dup
+        if_true 256
+        drop
+        get_var Date
+        get_field2 parse
+        get_loc8 7: d1
+        get_field2 toGMTString
+        call_method 0
+        call_method 1
+        get_loc3 3: x1
+        neq
+        dup
+        if_true8 256
+        drop
+        get_var Date
+        get_field2 parse
+        get_loc8 7: d1
+        get_field2 toString
+        call_method 0
+        call_method 1
+        get_loc3 3: x1
+        neq
+        dup
+        if_true8 256
+        drop
+        get_var Date
+        get_field2 parse
+        get_loc8 8: d2
+        get_field2 toISOString
+        call_method 0
+        call_method 1
+        get_loc8 4: x2
+        neq
+        dup
+        if_true8 256
+        drop
+        get_var Date
+        get_field2 parse
+        get_loc8 9: d3
+        get_field2 toGMTString
+        call_method 0
+        call_method 1
+        get_loc8 5: x3
+        neq
+        dup
+        if_true8 256
+        drop
+        get_var Date
+        get_field2 parse
+        get_loc8 9: d3
+        get_field2 toString
+        call_method 0
+        call_method 1
+        get_loc8 5: x3
+        neq
+  256:  if_false8 281
+        get_var console
+        get_field2 log
+        push_atom_value "Date.parse error for "
+        get_loc0 0: x0
+        add
+        call_method 1
+        drop
+        push_minus1 -1
+        return
+  281:  get_loc1 1: dx
+        push_const8 0: 1.1
+        mul
+        push_1 1
+        add
+        push_0 0
+        sar
+        put_loc1 1: dx
+        get_loc0 0: x0
+        get_loc1 1: dx
+        add
+        push_const8 1: 8640000000000000
+        mod
+        put_loc0 0: x0
+        inc_loc 2: j
+        goto16 6
+  302:  get_arg0 0: n
+        push_6 6
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:211:1: function: prop_read
+  args: n
+  locals:
+    0: var obj
+    1: var sum
+    2: var j
+  stack_size: 2
+  opcodes:
+        object
+        push_1 1
+        define_field a
+        push_2 2
+        define_field b
+        push_3 3
+        define_field c
+        push_4 4
+        define_field d
+        put_loc0 0: obj
+        push_0 0
+        put_loc1 1: sum
+        push_0 0
+        put_loc2 2: j
+   30:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 72
+        get_loc1 1: sum
+        get_loc0 0: obj
+        get_field a
+        add
+        set_loc1 1: sum
+        get_loc0 0: obj
+        get_field b
+        add
+        set_loc1 1: sum
+        get_loc0 0: obj
+        get_field c
+        add
+        set_loc1 1: sum
+        get_loc0 0: obj
+        get_field d
+        add
+        put_loc1 1: sum
+        inc_loc 2: j
+        goto8 30
+   72:  get_loc1 1: sum
+        dup
+        put_var global_res
+        drop
+        get_arg0 0: n
+        push_4 4
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:224:1: function: prop_write
+  args: n
+  locals:
+    0: var obj
+    1: var j
+  stack_size: 2
+  opcodes:
+        object
+        push_1 1
+        define_field a
+        push_2 2
+        define_field b
+        push_3 3
+        define_field c
+        push_4 4
+        define_field d
+        put_loc0 0: obj
+        push_0 0
+        put_loc1 1: j
+   28:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 65
+        get_loc0 0: obj
+        get_loc1 1: j
+        put_field a
+        get_loc0 0: obj
+        get_loc1 1: j
+        put_field b
+        get_loc0 0: obj
+        get_loc1 1: j
+        put_field c
+        get_loc0 0: obj
+        get_loc1 1: j
+        put_field d
+        inc_loc 1: j
+        goto8 28
+   65:  get_arg0 0: n
+        push_4 4
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:235:1: function: prop_update
+  args: n
+  locals:
+    0: var obj
+    1: var j
+  stack_size: 3
+  opcodes:
+        object
+        push_1 1
+        define_field a
+        push_2 2
+        define_field b
+        push_3 3
+        define_field c
+        push_4 4
+        define_field d
+        put_loc0 0: obj
+        push_0 0
+        put_loc1 1: j
+   28:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 89
+        get_loc0 0: obj
+        get_field2 a
+        get_loc1 1: j
+        add
+        put_field a
+        get_loc0 0: obj
+        get_field2 b
+        get_loc1 1: j
+        add
+        put_field b
+        get_loc0 0: obj
+        get_field2 c
+        get_loc1 1: j
+        add
+        put_field c
+        get_loc0 0: obj
+        get_field2 d
+        get_loc1 1: j
+        add
+        put_field d
+        inc_loc 1: j
+        goto8 28
+   89:  get_arg0 0: n
+        push_4 4
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:246:1: function: prop_create
+  args: n
+  locals:
+    0: var obj
+    1: var i
+    2: var j
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc2 2: j
+    2:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 101
+        object
+        set_loc0 0: obj
+        push_1 1
+        put_field a
+        get_loc0 0: obj
+        push_2 2
+        put_field b
+        get_loc0 0: obj
+        push_3 3
+        put_field c
+        get_loc0 0: obj
+        push_4 4
+        put_field d
+        get_loc0 0: obj
+        push_5 5
+        put_field e
+        get_loc0 0: obj
+        push_6 6
+        put_field f
+        get_loc0 0: obj
+        push_7 7
+        put_field g
+        get_loc0 0: obj
+        push_i8 8
+        put_field h
+        get_loc0 0: obj
+        push_i8 9
+        put_field i
+        get_loc0 0: obj
+        push_i8 10
+        put_field j
+        push_0 0
+        put_loc1 1: i
+   83:  get_loc1 1: i
+        push_i8 10
+        lt
+        if_false8 97
+        get_loc0 0: obj
+        get_loc1 1: i
+        get_loc1 1: i
+        put_array_el
+        inc_loc 1: i
+        goto8 83
+   97:  inc_loc 2: j
+        goto8 2
+  101:  get_arg0 0: n
+        push_i8 20
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:266:1: function: prop_clone
+  args: n
+  locals:
+    0: var ref
+    1: var obj
+    2: var j
+    3: var k
+  stack_size: 3
+  opcodes:
+        object
+        push_1 1
+        define_field a
+        push_2 2
+        define_field b
+        push_3 3
+        define_field c
+        push_4 4
+        define_field d
+        push_5 5
+        define_field e
+        push_6 6
+        define_field f
+        push_7 7
+        define_field g
+        push_i8 8
+        define_field h
+        push_i8 9
+        define_field i
+        push_i8 10
+        define_field j
+        put_loc0 0: ref
+        push_0 0
+        put_loc3 3: k
+   67:  get_loc3 3: k
+        push_i8 10
+        lt
+        if_false8 81
+        get_loc0 0: ref
+        get_loc3 3: k
+        get_loc3 3: k
+        put_array_el
+        inc_loc 3: k
+        goto8 67
+   81:  push_0 0
+        put_loc2 2: j
+   83:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 106
+        object
+        get_loc0 0: ref
+        null
+        copy_data_properties 6
+        drop
+        drop
+        dup
+        put_var global_res
+        drop
+        inc_loc 2: j
+        goto8 83
+  106:  get_arg0 0: n
+        push_i8 20
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:277:1: function: prop_delete
+  args: n
+  locals:
+    0: var ref
+    1: var obj
+    2: var j
+    3: var k
+  stack_size: 3
+  opcodes:
+        object
+        push_1 1
+        define_field a
+        push_2 2
+        define_field b
+        push_3 3
+        define_field c
+        push_4 4
+        define_field d
+        push_5 5
+        define_field e
+        push_6 6
+        define_field f
+        push_7 7
+        define_field g
+        push_i8 8
+        define_field h
+        push_i8 9
+        define_field i
+        push_i8 10
+        define_field j
+        put_loc0 0: ref
+        push_0 0
+        put_loc3 3: k
+   67:  get_loc3 3: k
+        push_i8 10
+        lt
+        if_false8 81
+        get_loc0 0: ref
+        get_loc3 3: k
+        get_loc3 3: k
+        put_array_el
+        inc_loc 3: k
+        goto8 67
+   81:  push_0 0
+        put_loc2 2: j
+   83:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 195
+        object
+        get_loc0 0: ref
+        null
+        copy_data_properties 6
+        drop
+        drop
+        set_loc1 1: obj
+        push_atom_value a
+        delete
+        drop
+        get_loc1 1: obj
+        push_atom_value b
+        delete
+        drop
+        get_loc1 1: obj
+        push_atom_value c
+        delete
+        drop
+        get_loc1 1: obj
+        push_atom_value d
+        delete
+        drop
+        get_loc1 1: obj
+        push_atom_value e
+        delete
+        drop
+        get_loc1 1: obj
+        push_atom_value f
+        delete
+        drop
+        get_loc1 1: obj
+        push_atom_value g
+        delete
+        drop
+        get_loc1 1: obj
+        push_atom_value h
+        delete
+        drop
+        get_loc1 1: obj
+        push_atom_value i
+        delete
+        drop
+        get_loc1 1: obj
+        push_atom_value j
+        delete
+        drop
+        push_0 0
+        put_loc3 3: k
+  177:  get_loc3 3: k
+        push_i8 10
+        lt
+        if_false8 191
+        get_loc1 1: obj
+        get_loc3 3: k
+        delete
+        drop
+        inc_loc 3: k
+        goto8 177
+  191:  inc_loc 2: j
+        goto8 83
+  195:  get_arg0 0: n
+        push_i8 20
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:301:1: function: array_read
+  args: n
+  locals:
+    0: var tab
+    1: var len
+    2: var sum
+    3: var i
+    4: var j
+  stack_size: 3
+  opcodes:
+        array_from 0
+        put_loc0 0: tab
+        push_i8 10
+        put_loc1 1: len
+        push_0 0
+        put_loc3 3: i
+    9:  get_loc3 3: i
+        get_loc1 1: len
+        lt
+        if_false8 22
+        get_loc0 0: tab
+        get_loc3 3: i
+        get_loc3 3: i
+        put_array_el
+        inc_loc 3: i
+        goto8 9
+   22:  push_0 0
+        put_loc2 2: sum
+        push_0 0
+        put_loc8 4: j
+   27:  get_loc8 4: j
+        get_arg0 0: n
+        lt
+        if_false8 90
+        get_loc2 2: sum
+        get_loc0 0: tab
+        push_0 0
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_1 1
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_2 2
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_3 3
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_4 4
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_5 5
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_6 6
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_7 7
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_i8 8
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_i8 9
+        get_array_el
+        add
+        put_loc2 2: sum
+        inc_loc 4: j
+        goto8 27
+   90:  get_loc2 2: sum
+        dup
+        put_var global_res
+        drop
+        get_loc1 1: len
+        get_arg0 0: n
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:323:1: function: array_write
+  args: n
+  locals:
+    0: var tab
+    1: var len
+    2: var i
+    3: var j
+  stack_size: 3
+  opcodes:
+        array_from 0
+        put_loc0 0: tab
+        push_i8 10
+        put_loc1 1: len
+        push_0 0
+        put_loc2 2: i
+    9:  get_loc2 2: i
+        get_loc1 1: len
+        lt
+        if_false8 22
+        get_loc0 0: tab
+        get_loc2 2: i
+        get_loc2 2: i
+        put_array_el
+        inc_loc 2: i
+        goto8 9
+   22:  push_0 0
+        put_loc3 3: j
+   24:  get_loc3 3: j
+        get_arg0 0: n
+        lt
+        if_false8 75
+        get_loc0 0: tab
+        push_0 0
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_1 1
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_2 2
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_3 3
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_4 4
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_5 5
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_6 6
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_7 7
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_i8 8
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_i8 9
+        get_loc3 3: j
+        put_array_el
+        inc_loc 3: j
+        goto8 24
+   75:  get_loc1 1: len
+        get_arg0 0: n
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:343:1: function: array_prop_create
+  args: n
+  locals:
+    0: var tab
+    1: var i
+    2: var j
+    3: var len
+  stack_size: 3
+  opcodes:
+        push_i16 1000
+        put_loc3 3: len
+        push_0 0
+        put_loc2 2: j
+    6:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 34
+        array_from 0
+        put_loc0 0: tab
+        push_0 0
+        put_loc1 1: i
+   17:  get_loc1 1: i
+        get_loc3 3: len
+        lt
+        if_false8 30
+        get_loc0 0: tab
+        get_loc1 1: i
+        get_loc1 1: i
+        put_array_el
+        inc_loc 1: i
+        goto8 17
+   30:  inc_loc 2: j
+        goto8 6
+   34:  get_loc3 3: len
+        get_arg0 0: n
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:353:1: function: array_slice
+  args: n
+  locals:
+    0: var ref
+    1: var a
+    2: var i
+    3: var j
+    4: var len
+  stack_size: 3
+  opcodes:
+        push_i16 1000
+        put_loc8 4: len
+        array_from 0
+        put_loc0 0: ref
+        push_0 0
+        put_loc2 2: i
+   11:  get_loc2 2: i
+        get_loc8 4: len
+        lt
+        if_false8 25
+        get_loc0 0: ref
+        get_loc2 2: i
+        get_loc2 2: i
+        put_array_el
+        inc_loc 2: i
+        goto8 11
+   25:  push_0 0
+        put_loc3 3: j
+   27:  get_loc3 3: j
+        get_arg0 0: n
+        lt
+        if_false8 61
+        get_loc0 0: ref
+        push_0 0
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: ref
+        get_field2 slice
+        call_method 0
+        set_loc1 1: a
+        push_0 0
+        push_0 0
+        put_array_el
+        get_loc1 1: a
+        dup
+        put_var global_res
+        drop
+        inc_loc 3: j
+        goto8 27
+   61:  get_loc8 4: len
+        get_arg0 0: n
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:367:1: function: array_length_decr
+  args: n
+  locals:
+    0: var tab
+    1: var ref
+    2: var i
+    3: var j
+    4: var len
+  stack_size: 3
+  opcodes:
+        push_i16 1000
+        put_loc8 4: len
+        array_from 0
+        put_loc1 1: ref
+        push_0 0
+        put_loc2 2: i
+   11:  get_loc2 2: i
+        get_loc8 4: len
+        lt
+        if_false8 25
+        get_loc1 1: ref
+        get_loc2 2: i
+        get_loc2 2: i
+        put_array_el
+        inc_loc 2: i
+        goto8 11
+   25:  push_0 0
+        put_loc3 3: j
+   27:  get_loc3 3: j
+        get_arg0 0: n
+        lt
+        if_false8 65
+        get_loc1 1: ref
+        get_field2 slice
+        call_method 0
+        put_loc0 0: tab
+        get_loc8 4: len
+        put_loc2 2: i
+   45:  get_loc2 2: i
+        post_dec
+        put_loc2 2: i
+        push_0 0
+        gt
+        if_false8 61
+        get_loc0 0: tab
+        get_loc2 2: i
+        put_field length
+        goto8 45
+   61:  inc_loc 3: j
+        goto8 27
+   65:  get_loc8 4: len
+        get_arg0 0: n
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:380:1: function: array_hole_length_decr
+  args: n
+  locals:
+    0: var tab
+    1: var ref
+    2: var i
+    3: var j
+    4: var len
+  stack_size: 3
+  opcodes:
+        push_i16 1000
+        put_loc8 4: len
+        array_from 0
+        put_loc1 1: ref
+        push_0 0
+        put_loc2 2: i
+   11:  get_loc2 2: i
+        get_loc8 4: len
+        lt
+        if_false8 34
+        get_loc2 2: i
+        push_i8 10
+        mod
+        push_i8 9
+        eq
+        if_false8 30
+        get_loc1 1: ref
+        get_loc2 2: i
+        get_loc2 2: i
+        put_array_el
+   30:  inc_loc 2: i
+        goto8 11
+   34:  push_0 0
+        put_loc3 3: j
+   36:  get_loc3 3: j
+        get_arg0 0: n
+        lt
+        if_false8 74
+        get_loc1 1: ref
+        get_field2 slice
+        call_method 0
+        put_loc0 0: tab
+        get_loc8 4: len
+        put_loc2 2: i
+   54:  get_loc2 2: i
+        post_dec
+        put_loc2 2: i
+        push_0 0
+        gt
+        if_false8 70
+        get_loc0 0: tab
+        get_loc2 2: i
+        put_field length
+        goto8 54
+   70:  inc_loc 3: j
+        goto8 36
+   74:  get_loc8 4: len
+        get_arg0 0: n
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:395:1: function: array_push
+  args: n
+  locals:
+    0: var tab
+    1: var i
+    2: var j
+    3: var len
+  stack_size: 3
+  opcodes:
+        push_i16 500
+        put_loc3 3: len
+        push_0 0
+        put_loc2 2: j
+    6:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 41
+        array_from 0
+        put_loc0 0: tab
+        push_0 0
+        put_loc1 1: i
+   17:  get_loc1 1: i
+        get_loc3 3: len
+        lt
+        if_false8 37
+        get_loc0 0: tab
+        get_field2 push
+        get_loc1 1: i
+        call_method 1
+        drop
+        inc_loc 1: i
+        goto8 17
+   37:  inc_loc 2: j
+        goto8 6
+   41:  get_loc3 3: len
+        get_arg0 0: n
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:405:1: function: array_pop
+  args: n
+  locals:
+    0: var tab
+    1: var ref
+    2: var i
+    3: var j
+    4: var len
+    5: var sum
+  stack_size: 3
+  opcodes:
+        push_i16 500
+        put_loc8 4: len
+        array_from 0
+        put_loc1 1: ref
+        push_0 0
+        put_loc2 2: i
+   11:  get_loc2 2: i
+        get_loc8 4: len
+        lt
+        if_false8 25
+        get_loc1 1: ref
+        get_loc2 2: i
+        get_loc2 2: i
+        put_array_el
+        inc_loc 2: i
+        goto8 11
+   25:  push_0 0
+        put_loc3 3: j
+   27:  get_loc3 3: j
+        get_arg0 0: n
+        lt
+        if_false8 84
+        get_loc1 1: ref
+        get_field2 slice
+        call_method 0
+        put_loc0 0: tab
+        push_0 0
+        put_loc8 5: sum
+        push_0 0
+        put_loc2 2: i
+   47:  get_loc2 2: i
+        get_loc8 4: len
+        lt
+        if_false8 71
+        get_loc8 5: sum
+        get_loc0 0: tab
+        get_field2 pop
+        call_method 0
+        add
+        put_loc8 5: sum
+        inc_loc 2: i
+        goto8 47
+   71:  get_loc8 5: sum
+        dup
+        put_var global_res
+        drop
+        inc_loc 3: j
+        goto8 27
+   84:  get_loc8 4: len
+        get_arg0 0: n
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:420:1: function: typed_array_read
+  args: n
+  locals:
+    0: var tab
+    1: var len
+    2: var sum
+    3: var i
+    4: var j
+  stack_size: 3
+  opcodes:
+        push_i8 10
+        put_loc1 1: len
+        get_var Int32Array
+        dup
+        get_loc1 1: len
+        call_constructor 1
+        put_loc0 0: tab
+        push_0 0
+        put_loc3 3: i
+   16:  get_loc3 3: i
+        get_loc1 1: len
+        lt
+        if_false8 29
+        get_loc0 0: tab
+        get_loc3 3: i
+        get_loc3 3: i
+        put_array_el
+        inc_loc 3: i
+        goto8 16
+   29:  push_0 0
+        put_loc2 2: sum
+        push_0 0
+        put_loc8 4: j
+   34:  get_loc8 4: j
+        get_arg0 0: n
+        lt
+        if_false8 97
+        get_loc2 2: sum
+        get_loc0 0: tab
+        push_0 0
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_1 1
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_2 2
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_3 3
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_4 4
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_5 5
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_6 6
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_7 7
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_i8 8
+        get_array_el
+        add
+        set_loc2 2: sum
+        get_loc0 0: tab
+        push_i8 9
+        get_array_el
+        add
+        put_loc2 2: sum
+        inc_loc 4: j
+        goto8 34
+   97:  get_loc2 2: sum
+        dup
+        put_var global_res
+        drop
+        get_loc1 1: len
+        get_arg0 0: n
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:442:1: function: typed_array_write
+  args: n
+  locals:
+    0: var tab
+    1: var len
+    2: var i
+    3: var j
+  stack_size: 3
+  opcodes:
+        push_i8 10
+        put_loc1 1: len
+        get_var Int32Array
+        dup
+        get_loc1 1: len
+        call_constructor 1
+        put_loc0 0: tab
+        push_0 0
+        put_loc2 2: i
+   16:  get_loc2 2: i
+        get_loc1 1: len
+        lt
+        if_false8 29
+        get_loc0 0: tab
+        get_loc2 2: i
+        get_loc2 2: i
+        put_array_el
+        inc_loc 2: i
+        goto8 16
+   29:  push_0 0
+        put_loc3 3: j
+   31:  get_loc3 3: j
+        get_arg0 0: n
+        lt
+        if_false8 82
+        get_loc0 0: tab
+        push_0 0
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_1 1
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_2 2
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_3 3
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_4 4
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_5 5
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_6 6
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_7 7
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_i8 8
+        get_loc3 3: j
+        put_array_el
+        get_loc0 0: tab
+        push_i8 9
+        get_loc3 3: j
+        put_array_el
+        inc_loc 3: j
+        goto8 31
+   82:  get_loc1 1: len
+        get_arg0 0: n
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:463:1: function: global_read
+  args: n
+  locals:
+    0: var sum
+    1: var j
+  stack_size: 2
+  opcodes:
+        push_0 0
+        dup
+        put_var global_var0
+        drop
+        push_0 0
+        put_loc0 0: sum
+        push_0 0
+        put_loc1 1: j
+   12:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 50
+        get_loc0 0: sum
+        get_var global_var0
+        add
+        set_loc0 0: sum
+        get_var global_var0
+        add
+        set_loc0 0: sum
+        get_var global_var0
+        add
+        set_loc0 0: sum
+        get_var global_var0
+        add
+        put_loc0 0: sum
+        inc_loc 1: j
+        goto8 12
+   50:  get_loc0 0: sum
+        dup
+        put_var global_res
+        drop
+        get_arg0 0: n
+        push_4 4
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:488:1: function: global_write_strict
+  args: n
+  locals:
+    0: var j
+  stack_size: 2
+  opcodes:
+        push_0 0
+        put_loc0 0: j
+    2:  get_loc0 0: j
+        get_arg0 0: n
+        lt
+        if_false8 43
+        get_loc0 0: j
+        dup
+        put_var global_var0
+        drop
+        get_loc0 0: j
+        dup
+        put_var global_var0
+        drop
+        get_loc0 0: j
+        dup
+        put_var global_var0
+        drop
+        get_loc0 0: j
+        dup
+        put_var global_var0
+        drop
+        inc_loc 0: j
+        goto8 2
+   43:  get_arg0 0: n
+        push_4 4
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:498:1: function: local_destruct
+  args: n
+  locals:
+    0: var j
+    1: var v1
+    2: var v2
+    3: var v3
+    4: var v4
+    5: var array
+    6: var o
+    7: var a
+    8: var b
+    9: var c
+   10: var d
+  stack_size: 10
+  opcodes:
+        push_1 1
+        push_2 2
+        push_3 3
+        push_4 4
+        push_5 5
+        array_from 5
+        put_loc8 5: array
+        object
+        push_1 1
+        define_field a
+        push_2 2
+        define_field b
+        push_3 3
+        define_field c
+        push_4 4
+        define_field d
+        put_loc8 6: o
+        push_0 0
+        put_loc0 0: j
+   39:  get_loc0 0: j
+        get_arg0 0: n
+        lt
+        if_false 267
+        goto8 113
+   49:  dup
+        for_of_start
+        make_loc_ref v1,1
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref v2,2
+        for_of_next 2
+        drop
+        put_ref_value
+        for_of_next 0
+        drop
+        drop
+        make_loc_ref v3,3
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref v4,4
+        array_from 0
+        push_0 0
+   99:  for_of_next 4
+        if_true8 107
+        define_array_el
+        inc
+        goto8 99
+  107:  drop
+        drop
+        put_ref_value
+        iterator_close
+        goto8 117
+  113:  get_loc8 5: array
+        goto8 49
+  117:  drop
+        goto8 185
+  120:  dup
+        to_object
+        dup
+        make_loc_ref a,7
+        rot3l
+        get_field a
+        put_ref_value
+        dup
+        make_loc_ref b,8
+        rot3l
+        get_field b
+        put_ref_value
+        dup
+        make_loc_ref c,9
+        rot3l
+        get_field c
+        put_ref_value
+        dup
+        make_loc_ref d,10
+        rot3l
+        get_field d
+        put_ref_value
+        drop
+        goto8 189
+  185:  get_loc8 6: o
+        goto8 120
+  189:  drop
+        goto8 257
+  192:  dup
+        to_object
+        dup
+        make_loc_ref a,7
+        rot3l
+        get_field a
+        put_ref_value
+        dup
+        make_loc_ref b,8
+        rot3l
+        get_field b
+        put_ref_value
+        dup
+        make_loc_ref c,9
+        rot3l
+        get_field c
+        put_ref_value
+        dup
+        make_loc_ref d,10
+        rot3l
+        get_field d
+        put_ref_value
+        drop
+        goto8 261
+  257:  get_loc8 6: o
+        goto8 192
+  261:  drop
+        inc_loc 0: j
+        goto16 39
+  267:  get_arg0 0: n
+        push_i8 12
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:525:1: function: global_destruct_strict
+  args: n
+  locals:
+    0: var j
+    1: var v1
+    2: var v2
+    3: var v3
+    4: var v4
+    5: var array
+    6: var o
+    7: var a
+    8: var b
+    9: var c
+   10: var d
+  stack_size: 10
+  opcodes:
+        push_1 1
+        push_2 2
+        push_3 3
+        push_4 4
+        push_5 5
+        array_from 5
+        put_loc8 5: array
+        object
+        push_1 1
+        define_field a
+        push_2 2
+        define_field b
+        push_3 3
+        define_field c
+        push_4 4
+        define_field d
+        put_loc8 6: o
+        push_0 0
+        put_loc0 0: j
+   39:  get_loc0 0: j
+        get_arg0 0: n
+        lt
+        if_false 179
+        goto8 105
+   49:  dup
+        for_of_start
+        make_var_ref global_v1
+        for_of_next 2
+        drop
+        put_ref_value
+        make_var_ref global_v2
+        for_of_next 2
+        drop
+        put_ref_value
+        for_of_next 0
+        drop
+        drop
+        make_var_ref global_v3
+        for_of_next 2
+        drop
+        put_ref_value
+        make_var_ref global_v4
+        array_from 0
+        push_0 0
+   91:  for_of_next 4
+        if_true8 99
+        define_array_el
+        inc
+        goto8 91
+   99:  drop
+        drop
+        put_ref_value
+        iterator_close
+        goto8 109
+  105:  get_loc8 5: array
+        goto8 49
+  109:  drop
+        goto8 169
+  112:  dup
+        to_object
+        dup
+        make_var_ref global_a
+        rot3l
+        get_field a
+        put_ref_value
+        dup
+        make_var_ref global_b
+        rot3l
+        get_field b
+        put_ref_value
+        dup
+        make_var_ref global_c
+        rot3l
+        get_field c
+        put_ref_value
+        dup
+        make_var_ref global_d
+        rot3l
+        get_field d
+        put_ref_value
+        drop
+        goto8 173
+  169:  get_loc8 6: o
+        goto8 112
+  173:  drop
+        inc_loc 0: j
+        goto16 39
+  179:  get_arg0 0: n
+        push_i8 8
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:536:1: function: g
+  args: a
+  stack_size: 1
+  opcodes:
+        push_1 1
+        return
+
+__tests__/fixtures_quickjs/microbench.js:539:1: function: global_func_call
+  args: n
+  locals:
+    0: var j
+    1: var sum
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc1 1: sum
+        push_0 0
+        put_loc0 0: j
+    4:  get_loc0 0: j
+        get_arg0 0: n
+        lt
+        if_false8 50
+        get_loc1 1: sum
+        get_var g
+        get_loc0 0: j
+        call1 1
+        add
+        set_loc1 1: sum
+        get_var g
+        get_loc0 0: j
+        call1 1
+        add
+        set_loc1 1: sum
+        get_var g
+        get_loc0 0: j
+        call1 1
+        add
+        set_loc1 1: sum
+        get_var g
+        get_loc0 0: j
+        call1 1
+        add
+        put_loc1 1: sum
+        inc_loc 0: j
+        goto8 4
+   50:  get_loc1 1: sum
+        dup
+        put_var global_res
+        drop
+        get_arg0 0: n
+        push_4 4
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:552:5: function: f
+  args: a
+  stack_size: 1
+  opcodes:
+        push_1 1
+        return
+
+__tests__/fixtures_quickjs/microbench.js:551:1: function: func_call
+  args: n
+  locals:
+    0: var f
+    1: var j
+    2: var sum
+  stack_size: 3
+  opcodes:
+        fclosure8 0: [bytecode f]
+        put_loc0 0: f
+        push_0 0
+        put_loc2 2: sum
+        push_0 0
+        put_loc1 1: j
+    7:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 37
+        get_loc2 2: sum
+        get_loc0 0: f
+        get_loc1 1: j
+        call1 1
+        add
+        set_loc2 2: sum
+        get_loc0 0: f
+        get_loc1 1: j
+        call1 1
+        add
+        set_loc2 2: sum
+        get_loc0 0: f
+        get_loc1 1: j
+        call1 1
+        add
+        set_loc2 2: sum
+        get_loc0 0: f
+        get_loc1 1: j
+        call1 1
+        add
+        put_loc2 2: sum
+        inc_loc 1: j
+        goto8 7
+   37:  get_loc2 2: sum
+        dup
+        put_var global_res
+        drop
+        get_arg0 0: n
+        push_4 4
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:567:5: function: f
+  args: a
+  closure vars:
+    0: sum local:loc2 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: sum
+        inc
+        put_var_ref0 0: sum
+        return_undef
+
+__tests__/fixtures_quickjs/microbench.js:566:1: function: func_closure_call
+  args: n
+  locals:
+    0: var f
+    1: var j
+    2: var sum
+  stack_size: 2
+  opcodes:
+        fclosure8 0: [bytecode f]
+        put_loc0 0: f
+        push_0 0
+        put_loc2 2: sum
+        push_0 0
+        put_loc1 1: j
+    7:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 32
+        get_loc0 0: f
+        get_loc1 1: j
+        call1 1
+        drop
+        get_loc0 0: f
+        get_loc1 1: j
+        call1 1
+        drop
+        get_loc0 0: f
+        get_loc1 1: j
+        call1 1
+        drop
+        get_loc0 0: f
+        get_loc1 1: j
+        call1 1
+        drop
+        inc_loc 1: j
+        goto8 7
+   32:  get_loc2 2: sum
+        dup
+        put_var global_res
+        drop
+        get_arg0 0: n
+        push_4 4
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:581:1: function: int_arith
+  args: n
+  locals:
+    0: var i
+    1: var j
+    2: var sum
+  stack_size: 3
+  opcodes:
+        push_0 0
+        dup
+        put_var global_res
+        drop
+        push_0 0
+        put_loc1 1: j
+   10:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 54
+        push_0 0
+        put_loc2 2: sum
+        push_0 0
+        put_loc0 0: i
+   19:  get_loc0 0: i
+        push_i16 1000
+        lt
+        if_false8 36
+        get_loc2 2: sum
+        get_loc0 0: i
+        get_loc0 0: i
+        mul
+        add
+        put_loc2 2: sum
+        inc_loc 0: i
+        goto8 19
+   36:  get_var global_res
+        get_loc2 2: sum
+        add
+        dup
+        put_var global_res
+        drop
+        inc_loc 1: j
+        goto8 10
+   54:  get_arg0 0: n
+        push_i16 1000
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:593:1: function: float_arith
+  args: n
+  locals:
+    0: var i
+    1: var j
+    2: var sum
+    3: var a
+    4: var incr
+    5: var a0
+  stack_size: 3
+  opcodes:
+        push_0 0
+        dup
+        put_var global_res
+        drop
+        push_const8 0: 0.1
+        put_loc8 5: a0
+        push_const8 1: 1.1
+        put_loc8 4: incr
+        push_0 0
+        put_loc1 1: j
+   18:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 69
+        push_0 0
+        put_loc2 2: sum
+        get_loc8 5: a0
+        put_loc3 3: a
+        push_0 0
+        put_loc0 0: i
+   30:  get_loc0 0: i
+        push_i16 1000
+        lt
+        if_false8 51
+        get_loc2 2: sum
+        get_loc3 3: a
+        get_loc3 3: a
+        mul
+        add
+        put_loc2 2: sum
+        get_loc8 4: incr
+        add_loc 3: a
+        inc_loc 0: i
+        goto8 30
+   51:  get_var global_res
+        get_loc2 2: sum
+        add
+        dup
+        put_var global_res
+        drop
+        inc_loc 1: j
+        goto8 18
+   69:  get_arg0 0: n
+        push_i16 1000
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:609:1: function: bigint_arith
+  args: n bits
+  locals:
+    0: var i
+    1: var j
+    2: var sum
+    3: var a
+    4: var incr
+    5: var a0
+    6: var sum0
+  stack_size: 6
+  opcodes:
+        get_var BigInt
+        push_0 0
+        call1 1
+        dup
+        put_var global_res
+        put_loc8 6: sum0
+        get_var BigInt
+        push_1 1
+        call1 1
+        get_var BigInt
+        get_var Math
+        get_field2 floor
+        get_arg1 1: bits
+        push_i8 10
+        sub
+        push_const8 0: 0.5
+        mul
+        call_method 1
+        call1 1
+        shl
+        put_loc8 5: a0
+        get_var BigInt
+        push_1 1
+        call1 1
+        put_loc8 4: incr
+        push_0 0
+        put_loc1 1: j
+   62:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 114
+        get_loc8 6: sum0
+        put_loc2 2: sum
+        get_loc8 5: a0
+        put_loc3 3: a
+        push_0 0
+        put_loc0 0: i
+   75:  get_loc0 0: i
+        push_i16 1000
+        lt
+        if_false8 96
+        get_loc2 2: sum
+        get_loc3 3: a
+        get_loc3 3: a
+        mul
+        add
+        put_loc2 2: sum
+        get_loc8 4: incr
+        add_loc 3: a
+        inc_loc 0: i
+        goto8 75
+   96:  get_var global_res
+        get_loc2 2: sum
+        add
+        dup
+        put_var global_res
+        drop
+        inc_loc 1: j
+        goto8 62
+  114:  get_arg0 0: n
+        push_i16 1000
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:625:1: function: bigint32_arith
+  args: n
+  stack_size: 3
+  opcodes:
+        get_var bigint_arith
+        get_arg0 0: n
+        push_i8 32
+        tail_call 2
+
+__tests__/fixtures_quickjs/microbench.js:628:1: function: bigint64_arith
+  args: n
+  stack_size: 3
+  opcodes:
+        get_var bigint_arith
+        get_arg0 0: n
+        push_i8 64
+        tail_call 2
+
+__tests__/fixtures_quickjs/microbench.js:631:1: function: bigint256_arith
+  args: n
+  stack_size: 3
+  opcodes:
+        get_var bigint_arith
+        get_arg0 0: n
+        push_i16 256
+        tail_call 2
+
+__tests__/fixtures_quickjs/microbench.js:634:1: function: map_set_string
+  args: n
+  locals:
+    0: var s
+    1: var i
+    2: var j
+    3: var len
+  stack_size: 4
+  opcodes:
+        push_i16 1000
+        put_loc3 3: len
+        push_0 0
+        put_loc2 2: j
+    6:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 96
+        get_var Map
+        dup
+        call_constructor 0
+        put_loc0 0: s
+        push_0 0
+        put_loc1 1: i
+   23:  get_loc1 1: i
+        get_loc3 3: len
+        lt
+        if_false8 50
+        get_loc0 0: s
+        get_field2 set
+        get_var String
+        get_loc1 1: i
+        call1 1
+        get_loc1 1: i
+        call_method 2
+        drop
+        inc_loc 1: i
+        goto8 23
+   50:  push_0 0
+        put_loc1 1: i
+   52:  get_loc1 1: i
+        get_loc3 3: len
+        lt
+        if_false8 92
+        get_loc0 0: s
+        get_field2 has
+        get_var String
+        get_loc1 1: i
+        call1 1
+        call_method 1
+        lnot
+        if_false8 88
+        get_var Error
+        push_atom_value "bug in Map"
+        call1 1
+        throw
+   88:  inc_loc 1: i
+        goto8 52
+   92:  inc_loc 2: j
+        goto8 6
+   96:  get_arg0 0: n
+        get_loc3 3: len
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:648:1: function: map_set_int
+  args: n
+  locals:
+    0: var s
+    1: var i
+    2: var j
+    3: var len
+  stack_size: 4
+  opcodes:
+        push_i16 1000
+        put_loc3 3: len
+        push_0 0
+        put_loc2 2: j
+    6:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 84
+        get_var Map
+        dup
+        call_constructor 0
+        put_loc0 0: s
+        push_0 0
+        put_loc1 1: i
+   23:  get_loc1 1: i
+        get_loc3 3: len
+        lt
+        if_false8 44
+        get_loc0 0: s
+        get_field2 set
+        get_loc1 1: i
+        get_loc1 1: i
+        call_method 2
+        drop
+        inc_loc 1: i
+        goto8 23
+   44:  push_0 0
+        put_loc1 1: i
+   46:  get_loc1 1: i
+        get_loc3 3: len
+        lt
+        if_false8 80
+        get_loc0 0: s
+        get_field2 has
+        get_loc1 1: i
+        call_method 1
+        lnot
+        if_false8 76
+        get_var Error
+        push_atom_value "bug in Map"
+        call1 1
+        throw
+   76:  inc_loc 1: i
+        goto8 46
+   80:  inc_loc 2: j
+        goto8 6
+   84:  get_arg0 0: n
+        get_loc3 3: len
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:662:1: function: map_set_bigint
+  args: n
+  locals:
+    0: var s
+    1: var i
+    2: var j
+    3: var len
+  stack_size: 4
+  opcodes:
+        push_i16 1000
+        put_loc3 3: len
+        push_0 0
+        put_loc2 2: j
+    6:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 96
+        get_var Map
+        dup
+        call_constructor 0
+        put_loc0 0: s
+        push_0 0
+        put_loc1 1: i
+   23:  get_loc1 1: i
+        get_loc3 3: len
+        lt
+        if_false8 50
+        get_loc0 0: s
+        get_field2 set
+        get_var BigInt
+        get_loc1 1: i
+        call1 1
+        get_loc1 1: i
+        call_method 2
+        drop
+        inc_loc 1: i
+        goto8 23
+   50:  push_0 0
+        put_loc1 1: i
+   52:  get_loc1 1: i
+        get_loc3 3: len
+        lt
+        if_false8 92
+        get_loc0 0: s
+        get_field2 has
+        get_var BigInt
+        get_loc1 1: i
+        call1 1
+        call_method 1
+        lnot
+        if_false8 88
+        get_var Error
+        push_atom_value "bug in Map"
+        call1 1
+        throw
+   88:  inc_loc 1: i
+        goto8 52
+   92:  inc_loc 2: j
+        goto8 6
+   96:  get_arg0 0: n
+        get_loc3 3: len
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:676:1: function: map_delete
+  args: n
+  locals:
+    0: var a
+    1: var i
+    2: var j
+  stack_size: 4
+  opcodes:
+        push_i16 1000
+        dup
+        put_var len
+        drop
+        push_0 0
+        put_loc2 2: j
+   12:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 96
+        get_var Map
+        dup
+        call_constructor 0
+        put_loc0 0: a
+        push_0 0
+        put_loc1 1: i
+   29:  get_loc1 1: i
+        get_var len
+        lt
+        if_false8 60
+        get_loc0 0: a
+        get_field2 set
+        get_var String
+        get_loc1 1: i
+        call1 1
+        get_loc1 1: i
+        call_method 2
+        drop
+        inc_loc 1: i
+        goto8 29
+   60:  push_0 0
+        put_loc1 1: i
+   62:  get_loc1 1: i
+        get_var len
+        lt
+        if_false8 92
+        get_loc0 0: a
+        get_field2 delete
+        get_var String
+        get_loc1 1: i
+        call1 1
+        call_method 1
+        drop
+        inc_loc 1: i
+        goto8 62
+   92:  inc_loc 2: j
+        goto8 12
+   96:  get_var len
+        get_arg0 0: n
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:690:1: function: weak_map_set
+  args: n
+  locals:
+    0: var a
+    1: var i
+    2: var j
+    3: var tab
+  stack_size: 4
+  opcodes:
+        push_i16 1000
+        dup
+        put_var len
+        drop
+        array_from 0
+        put_loc3 3: tab
+        push_0 0
+        put_loc1 1: i
+   16:  get_loc1 1: i
+        get_var len
+        lt
+        if_false8 46
+        get_loc3 3: tab
+        get_field2 push
+        object
+        get_loc1 1: i
+        define_field key
+        call_method 1
+        drop
+        inc_loc 1: i
+        goto8 16
+   46:  push_0 0
+        put_loc2 2: j
+   48:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 96
+        get_var WeakMap
+        dup
+        call_constructor 0
+        put_loc0 0: a
+        push_0 0
+        put_loc1 1: i
+   65:  get_loc1 1: i
+        get_var len
+        lt
+        if_false8 92
+        get_loc0 0: a
+        get_field2 set
+        get_loc3 3: tab
+        get_loc1 1: i
+        get_array_el
+        get_loc1 1: i
+        call_method 2
+        drop
+        inc_loc 1: i
+        goto8 65
+   92:  inc_loc 2: j
+        goto8 48
+   96:  get_var len
+        get_arg0 0: n
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:705:1: function: weak_map_delete
+  args: n
+  locals:
+    0: var a
+    1: var i
+    2: var j
+    3: var tab
+  stack_size: 4
+  opcodes:
+        push_i16 1000
+        dup
+        put_var len
+        drop
+        push_0 0
+        put_loc2 2: j
+   12:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 115
+        array_from 0
+        put_loc3 3: tab
+        push_0 0
+        put_loc1 1: i
+   23:  get_loc1 1: i
+        get_var len
+        lt
+        if_false8 53
+        get_loc3 3: tab
+        get_field2 push
+        object
+        get_loc1 1: i
+        define_field key
+        call_method 1
+        drop
+        inc_loc 1: i
+        goto8 23
+   53:  get_var WeakMap
+        dup
+        call_constructor 0
+        put_loc0 0: a
+        push_0 0
+        put_loc1 1: i
+   65:  get_loc1 1: i
+        get_var len
+        lt
+        if_false8 92
+        get_loc0 0: a
+        get_field2 set
+        get_loc3 3: tab
+        get_loc1 1: i
+        get_array_el
+        get_loc1 1: i
+        call_method 2
+        drop
+        inc_loc 1: i
+        goto8 65
+   92:  push_0 0
+        put_loc1 1: i
+   94:  get_loc1 1: i
+        get_var len
+        lt
+        if_false8 111
+        get_loc3 3: tab
+        get_loc1 1: i
+        null
+        put_array_el
+        inc_loc 1: i
+        goto8 94
+  111:  inc_loc 2: j
+        goto8 12
+  115:  get_var len
+        get_arg0 0: n
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:723:1: function: array_for
+  args: n
+  locals:
+    0: var r
+    1: var i
+    2: var j
+    3: var sum
+    4: var len
+  stack_size: 3
+  opcodes:
+        push_i8 100
+        put_loc8 4: len
+        array_from 0
+        put_loc0 0: r
+        push_0 0
+        put_loc1 1: i
+   10:  get_loc1 1: i
+        get_loc8 4: len
+        lt
+        if_false8 24
+        get_loc0 0: r
+        get_loc1 1: i
+        get_loc1 1: i
+        put_array_el
+        inc_loc 1: i
+        goto8 10
+   24:  push_0 0
+        put_loc2 2: j
+   26:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 63
+        push_0 0
+        put_loc3 3: sum
+        push_0 0
+        put_loc1 1: i
+   35:  get_loc1 1: i
+        get_loc8 4: len
+        lt
+        if_false8 51
+        get_loc3 3: sum
+        get_loc0 0: r
+        get_loc1 1: i
+        get_array_el
+        add
+        put_loc3 3: sum
+        inc_loc 1: i
+        goto8 35
+   51:  get_loc3 3: sum
+        dup
+        put_var global_res
+        drop
+        inc_loc 2: j
+        goto8 26
+   63:  get_arg0 0: n
+        get_loc8 4: len
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:737:1: function: array_for_in
+  args: n
+  locals:
+    0: var r
+    1: var i
+    2: var j
+    3: var sum
+    4: var len
+  stack_size: 4
+  opcodes:
+        push_i8 100
+        put_loc8 4: len
+        array_from 0
+        put_loc0 0: r
+        push_0 0
+        put_loc1 1: i
+   10:  get_loc1 1: i
+        get_loc8 4: len
+        lt
+        if_false8 24
+        get_loc0 0: r
+        get_loc1 1: i
+        get_loc1 1: i
+        put_array_el
+        inc_loc 1: i
+        goto8 10
+   24:  push_0 0
+        put_loc2 2: j
+   26:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 61
+        push_0 0
+        put_loc3 3: sum
+        get_loc0 0: r
+        for_in_start
+        goto8 44
+   37:  put_loc1 1: i
+        get_loc3 3: sum
+        get_loc0 0: r
+        get_loc1 1: i
+        get_array_el
+        add
+        put_loc3 3: sum
+   44:  for_in_next
+        if_false8 37
+        drop
+        drop
+        get_loc3 3: sum
+        dup
+        put_var global_res
+        drop
+        inc_loc 2: j
+        goto8 26
+   61:  get_arg0 0: n
+        get_loc8 4: len
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:751:1: function: array_for_of
+  args: n
+  locals:
+    0: var r
+    1: var i
+    2: var j
+    3: var sum
+    4: var len
+  stack_size: 5
+  opcodes:
+        push_i8 100
+        put_loc8 4: len
+        array_from 0
+        put_loc0 0: r
+        push_0 0
+        put_loc1 1: i
+   10:  get_loc1 1: i
+        get_loc8 4: len
+        lt
+        if_false8 24
+        get_loc0 0: r
+        get_loc1 1: i
+        get_loc1 1: i
+        put_array_el
+        inc_loc 1: i
+        goto8 10
+   24:  push_0 0
+        put_loc2 2: j
+   26:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 59
+        push_0 0
+        put_loc3 3: sum
+        get_loc0 0: r
+        for_of_start
+        goto8 41
+   37:  put_loc1 1: i
+        get_loc1 1: i
+        add_loc 3: sum
+   41:  for_of_next 0
+        if_false8 37
+        drop
+        iterator_close
+        get_loc3 3: sum
+        dup
+        put_var global_res
+        drop
+        inc_loc 2: j
+        goto8 26
+   59:  get_arg0 0: n
+        get_loc8 4: len
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:765:1: function: math_min
+  args: n
+  locals:
+    0: var i
+    1: var j
+    2: var r
+  stack_size: 4
+  opcodes:
+        push_0 0
+        put_loc2 2: r
+        push_0 0
+        put_loc1 1: j
+    4:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 52
+        push_0 0
+        put_loc0 0: i
+   11:  get_loc0 0: i
+        push_i16 1000
+        lt
+        if_false8 40
+        get_var Math
+        get_field2 min
+        get_loc0 0: i
+        push_i16 500
+        call_method 2
+        put_loc2 2: r
+        inc_loc 0: i
+        goto8 11
+   40:  get_loc2 2: r
+        dup
+        put_var global_res
+        drop
+        inc_loc 1: j
+        goto8 4
+   52:  get_arg0 0: n
+        push_i16 1000
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:775:1: function: regexp_ascii
+  args: n
+  locals:
+    0: var i
+    1: var j
+    2: var r
+    3: var s
+  stack_size: 3
+  opcodes:
+        push_atom_value "the quick brown fox jumped over the lazy dog"
+        put_loc3 3: s
+        push_0 0
+        put_loc1 1: j
+    8:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 53
+        push_0 0
+        put_loc0 0: i
+   15:  get_loc0 0: i
+        push_i16 1000
+        lt
+        if_false8 41
+        push_const8 0: "the quick brown fox"
+        push_const8 1: "\u0000\u0000\u0001\u0000I\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0001t\u0000\u0001h\u0000\u0001e\u0000\u0001 \u0000\u0001q\u0000\u0001u\u0000\u0001i\u0000\u0001c\u0000\u0001k\u0000\u0001 \u0000\u0001b\u0000\u0001r\u0000\u0001o\u0000\u0001w\u0000\u0001n\u0000\u0001 \u0000\u0001f\u0000\u0001o\u0000\u0001x\u0000\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        get_loc3 3: s
+        call_method 1
+        put_loc2 2: r
+        inc_loc 0: i
+        goto8 15
+   41:  get_loc2 2: r
+        dup
+        put_var global_res
+        drop
+        inc_loc 1: j
+        goto8 8
+   53:  get_arg0 0: n
+        push_i16 1000
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:785:1: function: regexp_utf16
+  args: n
+  locals:
+    0: var i
+    1: var j
+    2: var r
+    3: var s
+  stack_size: 3
+  opcodes:
+        push_atom_value "the quick brown \u1da0\u1d52\u02e3 jumped over the lazy \u1d48\u1d52\u1d4d"
+        put_loc3 3: s
+        push_0 0
+        put_loc1 1: j
+    8:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 53
+        push_0 0
+        put_loc0 0: i
+   15:  get_loc0 0: i
+        push_i16 1000
+        lt
+        if_false8 41
+        push_const8 0: "the quick brown \u1da0\u1d52\u02e3"
+        push_const8 1: "\u0000\u0000\u0001\u0000I\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0001t\u0000\u0001h\u0000\u0001e\u0000\u0001 \u0000\u0001q\u0000\u0001u\u0000\u0001i\u0000\u0001c\u0000\u0001k\u0000\u0001 \u0000\u0001b\u0000\u0001r\u0000\u0001o\u0000\u0001w\u0000\u0001n\u0000\u0001 \u0000\u0001\u00a0\u001d\u0001R\u001d\u0001\u00e3\u0002\u0010\u0000\u000e"
+        regexp
+        get_field2 exec
+        get_loc3 3: s
+        call_method 1
+        put_loc2 2: r
+        inc_loc 0: i
+        goto8 15
+   41:  get_loc2 2: r
+        dup
+        put_var global_res
+        drop
+        inc_loc 1: j
+        goto8 8
+   53:  get_arg0 0: n
+        push_i16 1000
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:796:1: function: string_build1
+  args: n
+  locals:
+    0: var i
+    1: var j
+    2: var r
+  stack_size: 2
+  opcodes:
+        push_0 0
+        put_loc1 1: j
+    2:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 41
+        push_empty_string
+        put_loc2 2: r
+        push_0 0
+        put_loc0 0: i
+   11:  get_loc0 0: i
+        push_i16 1000
+        lt
+        if_false8 29
+        push_atom_value x
+        add_loc 2: r
+        inc_loc 0: i
+        goto8 11
+   29:  get_loc2 2: r
+        dup
+        put_var global_res
+        drop
+        inc_loc 1: j
+        goto8 2
+   41:  get_arg0 0: n
+        push_i16 1000
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:807:1: function: string_build1x
+  args: n
+  locals:
+    0: var i
+    1: var j
+    2: var r
+  stack_size: 2
+  opcodes:
+        push_0 0
+        put_loc1 1: j
+    2:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 41
+        push_empty_string
+        put_loc2 2: r
+        push_0 0
+        put_loc0 0: i
+   11:  get_loc0 0: i
+        push_i16 1000
+        lt
+        if_false8 29
+        push_atom_value x
+        add_loc 2: r
+        inc_loc 0: i
+        goto8 11
+   29:  get_loc2 2: r
+        dup
+        put_var global_res
+        drop
+        inc_loc 1: j
+        goto8 2
+   41:  get_arg0 0: n
+        push_i16 1000
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:818:1: function: string_build2c
+  args: n
+  locals:
+    0: var i
+    1: var j
+    2: var r
+  stack_size: 2
+  opcodes:
+        push_0 0
+        put_loc1 1: j
+    2:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 41
+        push_empty_string
+        put_loc2 2: r
+        push_0 0
+        put_loc0 0: i
+   11:  get_loc0 0: i
+        push_i16 1000
+        lt
+        if_false8 29
+        push_atom_value xy
+        add_loc 2: r
+        inc_loc 0: i
+        goto8 11
+   29:  get_loc2 2: r
+        dup
+        put_var global_res
+        drop
+        inc_loc 1: j
+        goto8 2
+   41:  get_arg0 0: n
+        push_i16 1000
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:829:1: function: string_build2
+  args: n r
+  locals:
+    0: var i
+    1: var j
+  stack_size: 2
+  opcodes:
+        push_0 0
+        put_loc1 1: j
+    2:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 42
+        push_empty_string
+        put_arg1 1: r
+        push_0 0
+        put_loc0 0: i
+   11:  get_loc0 0: i
+        push_i16 1000
+        lt
+        if_false8 30
+        get_arg1 1: r
+        push_atom_value x
+        add
+        put_arg1 1: r
+        inc_loc 0: i
+        goto8 11
+   30:  get_arg1 1: r
+        dup
+        put_var global_res
+        drop
+        inc_loc 1: j
+        goto8 2
+   42:  get_arg0 0: n
+        push_i16 1000
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:840:1: function: string_build3
+  args: n
+  locals:
+    0: var i
+    1: var j
+    2: var r
+  stack_size: 2
+  opcodes:
+        push_0 0
+        put_loc1 1: j
+    2:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 42
+        push_empty_string
+        put_loc2 2: r
+        push_0 0
+        put_loc0 0: i
+   11:  get_loc0 0: i
+        push_i16 1000
+        lt
+        if_false8 30
+        push_atom_value x
+        get_loc2 2: r
+        add
+        put_loc2 2: r
+        inc_loc 0: i
+        goto8 11
+   30:  get_loc2 2: r
+        dup
+        put_var global_res
+        drop
+        inc_loc 1: j
+        goto8 2
+   42:  get_arg0 0: n
+        push_i16 1000
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:851:1: function: string_build4
+  args: n
+  locals:
+    0: var i
+    1: var j
+    2: var r
+    3: var s
+  stack_size: 2
+  opcodes:
+        push_0 0
+        put_loc1 1: j
+    2:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 43
+        push_empty_string
+        put_loc2 2: r
+        push_0 0
+        put_loc0 0: i
+   11:  get_loc0 0: i
+        push_i16 1000
+        lt
+        if_false8 31
+        get_loc2 2: r
+        put_loc3 3: s
+        push_atom_value x
+        add_loc 2: r
+        inc_loc 0: i
+        goto8 11
+   31:  get_loc2 2: r
+        dup
+        put_var global_res
+        drop
+        inc_loc 1: j
+        goto8 2
+   43:  get_arg0 0: n
+        push_i16 1000
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:864:1: function: string_build_large1
+  args: n
+  locals:
+    0: var i
+    1: var j
+    2: var r
+    3: var len
+  stack_size: 2
+  opcodes:
+        push_i16 20000
+        put_loc3 3: len
+        push_0 0
+        put_loc1 1: j
+    6:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 43
+        push_empty_string
+        put_loc2 2: r
+        push_0 0
+        put_loc0 0: i
+   15:  get_loc0 0: i
+        get_loc3 3: len
+        lt
+        if_false8 31
+        push_atom_value abcdef
+        add_loc 2: r
+        inc_loc 0: i
+        goto8 15
+   31:  get_loc2 2: r
+        dup
+        put_var global_res
+        drop
+        inc_loc 1: j
+        goto8 6
+   43:  get_arg0 0: n
+        get_loc3 3: len
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:875:1: function: string_build_large2
+  args: n
+  locals:
+    0: var i
+    1: var j
+    2: var r
+    3: var len
+  stack_size: 2
+  opcodes:
+        push_i16 20000
+        put_loc3 3: len
+        push_0 0
+        put_loc1 1: j
+    6:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 44
+        push_empty_string
+        put_loc2 2: r
+        push_0 0
+        put_loc0 0: i
+   15:  get_loc0 0: i
+        get_loc3 3: len
+        lt
+        if_false8 32
+        push_atom_value abcdef
+        get_loc2 2: r
+        add
+        put_loc2 2: r
+        inc_loc 0: i
+        goto8 15
+   32:  get_loc2 2: r
+        dup
+        put_var global_res
+        drop
+        inc_loc 1: j
+        goto8 6
+   44:  get_arg0 0: n
+        get_loc3 3: len
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:887:5: function: random
+  args: arr n def
+  locals:
+    0: var i
+  stack_size: 5
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        get_arg1 1: n
+        lt
+        if_false8 33
+        get_arg0 0: arr
+        get_loc0 0: i
+        get_arg2 2: def
+        get_var Math
+        get_field2 random
+        call_method 0
+        get_arg1 1: n
+        mul
+        push_0 0
+        sar
+        get_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 2
+   33:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:891:5: function: random8
+  args: arr n def
+  locals:
+    0: var i
+  stack_size: 5
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        get_arg1 1: n
+        lt
+        if_false8 35
+        get_arg0 0: arr
+        get_loc0 0: i
+        get_arg2 2: def
+        get_var Math
+        get_field2 random
+        call_method 0
+        push_i16 256
+        mul
+        push_0 0
+        sar
+        get_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 2
+   35:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:895:5: function: random1
+  args: arr n def
+  locals:
+    0: var i
+  stack_size: 5
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        get_arg1 1: n
+        lt
+        if_false8 33
+        get_arg0 0: arr
+        get_loc0 0: i
+        get_arg2 2: def
+        get_var Math
+        get_field2 random
+        call_method 0
+        push_2 2
+        mul
+        push_0 0
+        sar
+        get_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 2
+   33:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:899:5: function: hill
+  args: arr n def
+  locals:
+    0: var mid
+    1: var i
+  stack_size: 5
+  opcodes:
+        get_arg1 1: n
+        push_1 1
+        sar
+        put_loc0 0: mid
+        push_0 0
+        put_loc1 1: i
+    6:  get_loc1 1: i
+        get_loc0 0: mid
+        lt
+        if_false8 21
+        get_arg0 0: arr
+        get_loc1 1: i
+        get_arg2 2: def
+        get_loc1 1: i
+        get_array_el
+        put_array_el
+        inc_loc 1: i
+        goto8 6
+   21:  get_loc0 0: mid
+        put_loc1 1: i
+   23:  get_loc1 1: i
+        get_arg1 1: n
+        lt
+        if_false8 40
+        get_arg0 0: arr
+        get_loc1 1: i
+        get_arg2 2: def
+        get_arg1 1: n
+        get_loc1 1: i
+        sub
+        get_array_el
+        put_array_el
+        inc_loc 1: i
+        goto8 23
+   40:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:906:5: function: comb
+  args: arr n def
+  locals:
+    0: var i
+  stack_size: 5
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        get_arg1 1: n
+        lt
+        if_false8 21
+        get_arg0 0: arr
+        get_loc0 0: i
+        get_arg2 2: def
+        get_loc0 0: i
+        push_1 1
+        and
+        get_loc0 0: i
+        mul
+        get_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 2
+   21:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:910:5: function: crisscross
+  args: arr n def
+  locals:
+    0: var i
+  stack_size: 5
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        get_arg1 1: n
+        lt
+        if_false8 27
+        get_arg0 0: arr
+        get_loc0 0: i
+        get_arg2 2: def
+        get_loc0 0: i
+        push_1 1
+        and
+        if_false8 20
+        get_arg1 1: n
+        get_loc0 0: i
+        sub
+        goto8 21
+   20:  get_loc0 0: i
+   21:  get_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 2
+   27:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:914:5: function: zero
+  args: arr n def
+  locals:
+    0: var i
+  stack_size: 4
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        get_arg1 1: n
+        lt
+        if_false8 17
+        get_arg0 0: arr
+        get_loc0 0: i
+        get_arg2 2: def
+        push_0 0
+        get_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 2
+   17:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:918:5: function: increasing
+  args: arr n def
+  locals:
+    0: var i
+  stack_size: 4
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        get_arg1 1: n
+        lt
+        if_false8 17
+        get_arg0 0: arr
+        get_loc0 0: i
+        get_arg2 2: def
+        get_loc0 0: i
+        get_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 2
+   17:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:922:5: function: decreasing
+  args: arr n def
+  locals:
+    0: var i
+  stack_size: 5
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        get_arg1 1: n
+        lt
+        if_false8 21
+        get_arg0 0: arr
+        get_loc0 0: i
+        get_arg2 2: def
+        get_arg1 1: n
+        push_1 1
+        sub
+        get_loc0 0: i
+        sub
+        get_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 2
+   21:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:926:5: function: alternate
+  args: arr n def
+  locals:
+    0: var i
+  stack_size: 5
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        get_arg1 1: n
+        lt
+        if_false8 19
+        get_arg0 0: arr
+        get_loc0 0: i
+        get_arg2 2: def
+        get_loc0 0: i
+        push_1 1
+        xor
+        get_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 2
+   19:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:930:5: function: jigsaw
+  args: arr n def
+  locals:
+    0: var i
+  stack_size: 6
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        get_arg1 1: n
+        lt
+        if_false8 21
+        get_arg0 0: arr
+        get_loc0 0: i
+        get_arg2 2: def
+        get_loc0 0: i
+        get_arg1 1: n
+        push_4 4
+        sar
+        mod
+        get_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 2
+   21:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:934:5: function: incbutone
+  args: arr n def
+  locals:
+    0: var i
+  stack_size: 4
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        get_arg1 1: n
+        lt
+        if_false8 17
+        get_arg0 0: arr
+        get_loc0 0: i
+        get_arg2 2: def
+        get_loc0 0: i
+        get_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 2
+   17:  get_arg1 1: n
+        push_0 0
+        gt
+        if_false8 30
+        get_arg0 0: arr
+        get_arg1 1: n
+        push_2 2
+        sar
+        get_arg2 2: def
+        get_arg1 1: n
+        get_array_el
+        put_array_el
+   30:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:940:5: function: incbutfirst
+  args: arr n def
+  locals:
+    0: var i
+  stack_size: 4
+  opcodes:
+        get_arg1 1: n
+        push_0 0
+        gt
+        if_false8 11
+        get_arg0 0: arr
+        push_0 0
+        get_arg2 2: def
+        get_arg1 1: n
+        get_array_el
+        put_array_el
+   11:  push_1 1
+        put_loc0 0: i
+   13:  get_loc0 0: i
+        get_arg1 1: n
+        lt
+        if_false8 28
+        get_arg0 0: arr
+        get_loc0 0: i
+        get_arg2 2: def
+        get_loc0 0: i
+        get_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 13
+   28:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:946:5: function: incbutlast
+  args: arr n def
+  locals:
+    0: var i
+  stack_size: 5
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        get_arg1 1: n
+        push_1 1
+        sub
+        lt
+        if_false8 21
+        get_arg0 0: arr
+        get_loc0 0: i
+        get_arg2 2: def
+        get_loc0 0: i
+        push_1 1
+        add
+        get_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 2
+   21:  get_arg1 1: n
+        push_0 0
+        gt
+        if_false8 34
+        get_arg0 0: arr
+        get_arg1 1: n
+        push_1 1
+        sub
+        get_arg2 2: def
+        push_0 0
+        get_array_el
+        put_array_el
+   34:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:886:1: function: sort_bench
+  args: text
+  locals:
+    0: var random
+    1: var random8
+    2: var random1
+    3: var hill
+    4: var comb
+    5: var crisscross
+    6: var zero
+    7: var increasing
+    8: var decreasing
+    9: var alternate
+   10: var jigsaw
+   11: var incbutone
+   12: var incbutfirst
+   13: var incbutlast
+   14: var sort_cases
+   15: var n
+   16: var array_type
+   17: var def
+   18: var arr
+   19: var i
+   20: var j
+   21: var x
+   22: var y
+   23: var total
+   24: var save_total_score
+   25: var save_total_scale
+   26: var f
+   27: var ti
+   28: var tx
+   29: var t1
+  stack_size: 14
+  opcodes:
+        fclosure8 0: [bytecode random]
+        put_loc0 0: random
+        fclosure8 1: [bytecode random8]
+        put_loc1 1: random8
+        fclosure8 2: [bytecode random1]
+        put_loc2 2: random1
+        fclosure8 3: [bytecode hill]
+        put_loc3 3: hill
+        fclosure8 4: [bytecode comb]
+        put_loc8 4: comb
+        fclosure8 5: [bytecode crisscross]
+        put_loc8 5: crisscross
+        fclosure8 6: [bytecode zero]
+        put_loc8 6: zero
+        fclosure8 7: [bytecode increasing]
+        put_loc8 7: increasing
+        fclosure8 8: [bytecode decreasing]
+        put_loc8 8: decreasing
+        fclosure8 9: [bytecode alternate]
+        put_loc8 9: alternate
+        fclosure8 10: [bytecode jigsaw]
+        put_loc8 10: jigsaw
+        fclosure8 11: [bytecode incbutone]
+        put_loc8 11: incbutone
+        fclosure8 12: [bytecode incbutfirst]
+        put_loc8 12: incbutfirst
+        fclosure8 13: [bytecode incbutlast]
+        put_loc8 13: incbutlast
+        get_loc0 0: random
+        get_loc1 1: random8
+        get_loc2 2: random1
+        get_loc8 10: jigsaw
+        get_loc3 3: hill
+        get_loc8 4: comb
+        get_loc8 5: crisscross
+        get_loc8 6: zero
+        get_loc8 7: increasing
+        get_loc8 8: decreasing
+        get_loc8 9: alternate
+        get_loc8 11: incbutone
+        get_loc8 13: incbutlast
+        get_loc8 12: incbutfirst
+        array_from 14
+        put_loc8 14: sort_cases
+        get_var sort_bench
+        get_field array_size
+        dup
+        if_true8 98
+        drop
+        push_i16 10000
+   98:  put_loc8 15: n
+        get_var sort_bench
+        get_field array_type
+        dup
+        if_true8 119
+        drop
+        get_var Array
+  119:  put_loc8 16: array_type
+        push_0 0
+        put_loc8 23: total
+        get_var total_score
+        put_loc8 24: save_total_score
+        get_var total_scale
+        put_loc8 25: save_total_scale
+        get_loc8 16: array_type
+        dup
+        get_loc8 15: n
+        push_1 1
+        add
+        call_constructor 1
+        put_loc8 17: def
+        get_loc8 16: array_type
+        get_var Array
+        eq
+        if_false8 183
+        push_0 0
+        put_loc8 19: i
+  163:  get_loc8 19: i
+        get_loc8 15: n
+        lte
+        if_false8 204
+        get_loc8 17: def
+        get_loc8 19: i
+        get_loc8 19: i
+        push_empty_string
+        add
+        put_array_el
+        inc_loc 19: i
+        goto8 163
+  183:  push_0 0
+        put_loc8 19: i
+  186:  get_loc8 19: i
+        get_loc8 15: n
+        lte
+        if_false8 204
+        get_loc8 17: def
+        get_loc8 19: i
+        get_loc8 19: i
+        put_array_el
+        inc_loc 19: i
+        goto8 186
+  204:  get_loc8 17: def
+        get_field2 sort
+        call_method 0
+        drop
+        get_loc8 14: sort_cases
+        for_of_start
+        goto16 504
+  221:  put_loc8 26: f
+        push_0 0
+        put_loc8 27: ti
+        push_0 0
+        put_loc8 28: tx
+        push_0 0
+        put_loc8 20: j
+  232:  get_loc8 20: j
+        push_i8 100
+        lt
+        if_false8 325
+        get_loc8 16: array_type
+        dup
+        get_loc8 15: n
+        call_constructor 1
+        put_loc8 18: arr
+        get_loc8 26: f
+        get_loc8 18: arr
+        get_loc8 15: n
+        get_loc8 17: def
+        call3 3
+        drop
+        get_var get_clock
+        call0 0
+        put_loc8 29: t1
+        get_loc8 18: arr
+        get_field2 sort
+        call_method 0
+        drop
+        get_var get_clock
+        call0 0
+        get_loc8 29: t1
+        sub
+        put_loc8 29: t1
+        get_loc8 29: t1
+        add_loc 28: tx
+        get_loc8 27: ti
+        lnot
+        dup
+        if_true8 305
+        drop
+        get_loc8 27: ti
+        get_loc8 29: t1
+        gt
+  305:  if_false8 311
+        get_loc8 29: t1
+        put_loc8 27: ti
+  311:  get_loc8 28: tx
+        get_var clocks_per_sec
+        gte
+        if_true8 325
+        inc_loc 20: j
+        goto8 232
+  325:  get_loc8 27: ti
+        add_loc 23: total
+        push_0 0
+        put_loc8 19: i
+        get_loc8 18: arr
+        push_0 0
+        get_array_el
+        set_loc8 21: x
+        is_undefined
+        if_true8 376
+        push_1 1
+        put_loc8 19: i
+  344:  get_loc8 19: i
+        get_loc8 15: n
+        lt
+        if_false8 376
+        get_loc8 18: arr
+        get_loc8 19: i
+        get_array_el
+        set_loc8 22: y
+        is_undefined
+        if_true8 376
+        get_loc8 21: x
+        get_loc8 22: y
+        gt
+        if_true8 376
+        get_loc8 22: y
+        put_loc8 21: x
+        inc_loc 19: i
+        goto8 344
+  376:  get_loc8 19: i
+        get_loc8 15: n
+        lt
+        if_false8 395
+        get_loc8 18: arr
+        get_loc8 19: i
+        get_array_el
+        is_undefined
+        if_false8 395
+        inc_loc 19: i
+        goto8 376
+  395:  get_loc8 19: i
+        get_loc8 15: n
+        lt
+        if_false8 466
+        get_var console
+        get_field2 log
+        push_atom_value "sort_bench: out of order error for "
+        get_loc8 26: f
+        get_field name
+        add
+        push_atom_value " at offset "
+        add
+        get_loc8 19: i
+        push_1 1
+        sub
+        add
+        push_atom_value ": "
+        add
+        get_loc8 18: arr
+        get_loc8 19: i
+        push_1 1
+        sub
+        get_array_el
+        add
+        push_atom_value " > "
+        add
+        get_loc8 18: arr
+        get_loc8 19: i
+        get_array_el
+        add
+        call_method 1
+        drop
+  466:  get_var sort_bench
+        get_field verbose
+        if_false8 504
+        get_var log_one
+        push_atom_value sort_
+        get_loc8 26: f
+        get_field name
+        add
+        push_1 1
+        get_loc8 27: ti
+        push_i8 100
+        div
+        call3 3
+        drop
+  504:  for_of_next 0
+        if_false 221
+        drop
+        iterator_close
+        get_loc8 24: save_total_score
+        dup
+        put_var total_score
+        drop
+        get_loc8 25: save_total_scale
+        dup
+        put_var total_scale
+        drop
+        get_loc8 23: total
+        get_loc8 15: n
+        div
+        push_i8 100
+        div
+        return
+
+__tests__/fixtures_quickjs/microbench.js:1018:1: function: int_to_string
+  args: n
+  locals:
+    0: var s
+    1: var j
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc1 1: j
+    2:  get_loc1 1: j
+        get_arg0 0: n
+        lt
+        if_false8 45
+        get_loc1 1: j
+        push_i16 1000
+        mod
+        get_field2 toString
+        call_method 0
+        put_loc0 0: s
+        push_i32 1234000
+        get_loc1 1: j
+        push_i16 1000
+        mod
+        add
+        get_field2 toString
+        call_method 0
+        put_loc0 0: s
+        inc_loc 1: j
+        goto8 2
+   45:  get_loc0 0: s
+        dup
+        put_var global_res
+        drop
+        get_arg0 0: n
+        push_2 2
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:1027:1: function: int_to_string
+  args: n
+  locals:
+    0: var s
+    1: var r
+    2: var j
+  stack_size: 2
+  opcodes:
+        push_0 0
+        put_loc1 1: r
+        push_0 0
+        put_loc2 2: j
+    4:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 31
+        get_loc2 2: j
+        push_i8 10
+        mod
+        push_empty_string
+        add
+        put_loc0 0: s
+        get_loc2 2: j
+        push_i8 100
+        mod
+        push_empty_string
+        add
+        put_loc0 0: s
+        get_loc2 2: j
+        push_empty_string
+        add
+        put_loc0 0: s
+        inc_loc 2: j
+        goto8 4
+   31:  get_arg0 0: n
+        push_3 3
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:1037:1: function: int_toString
+  args: n
+  locals:
+    0: var s
+    1: var r
+    2: var j
+  stack_size: 2
+  opcodes:
+        push_0 0
+        put_loc1 1: r
+        push_0 0
+        put_loc2 2: j
+    4:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 49
+        get_loc2 2: j
+        push_i8 10
+        mod
+        get_field2 toString
+        call_method 0
+        put_loc0 0: s
+        get_loc2 2: j
+        push_i8 100
+        mod
+        get_field2 toString
+        call_method 0
+        put_loc0 0: s
+        get_loc2 2: j
+        get_field2 toString
+        call_method 0
+        put_loc0 0: s
+        inc_loc 2: j
+        goto8 4
+   49:  get_arg0 0: n
+        push_3 3
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:1047:1: function: float_to_string
+  args: n
+  locals:
+    0: var s
+    1: var r
+    2: var j
+  stack_size: 2
+  opcodes:
+        push_0 0
+        put_loc1 1: r
+        push_0 0
+        put_loc2 2: j
+    4:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 43
+        get_loc2 2: j
+        push_i8 10
+        mod
+        push_const8 0: 0.1
+        add
+        push_empty_string
+        add
+        put_loc0 0: s
+        get_loc2 2: j
+        push_const8 1: 0.1
+        add
+        push_empty_string
+        add
+        put_loc0 0: s
+        get_loc2 2: j
+        push_i32 12345678
+        mul
+        push_const8 2: 0.1
+        add
+        push_empty_string
+        add
+        put_loc0 0: s
+        inc_loc 2: j
+        goto8 4
+   43:  get_arg0 0: n
+        push_3 3
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:1057:1: function: float_toString
+  args: n
+  locals:
+    0: var s
+    1: var r
+    2: var j
+  stack_size: 2
+  opcodes:
+        push_0 0
+        put_loc1 1: r
+        push_0 0
+        put_loc2 2: j
+    4:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 61
+        get_loc2 2: j
+        push_i8 10
+        mod
+        push_const8 0: 0.1
+        add
+        get_field2 toString
+        call_method 0
+        put_loc0 0: s
+        get_loc2 2: j
+        push_const8 1: 0.1
+        add
+        get_field2 toString
+        call_method 0
+        put_loc0 0: s
+        get_loc2 2: j
+        push_i32 12345678
+        mul
+        push_const8 2: 0.1
+        add
+        get_field2 toString
+        call_method 0
+        put_loc0 0: s
+        inc_loc 2: j
+        goto8 4
+   61:  get_arg0 0: n
+        push_3 3
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:1067:1: function: float_toFixed
+  args: n
+  locals:
+    0: var s
+    1: var r
+    2: var j
+  stack_size: 4
+  opcodes:
+        push_0 0
+        put_loc1 1: r
+        push_0 0
+        put_loc2 2: j
+    4:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 73
+        get_loc2 2: j
+        push_i8 10
+        mod
+        push_const8 0: 0.1
+        add
+        get_field2 toFixed
+        get_loc2 2: j
+        push_i8 16
+        mod
+        call_method 1
+        put_loc0 0: s
+        get_loc2 2: j
+        push_const8 1: 0.1
+        add
+        get_field2 toFixed
+        get_loc2 2: j
+        push_i8 16
+        mod
+        call_method 1
+        put_loc0 0: s
+        get_loc2 2: j
+        push_i32 12345678
+        mul
+        push_const8 2: 0.1
+        add
+        get_field2 toFixed
+        get_loc2 2: j
+        push_i8 16
+        mod
+        call_method 1
+        put_loc0 0: s
+        inc_loc 2: j
+        goto8 4
+   73:  get_arg0 0: n
+        push_3 3
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:1077:1: function: float_toPrecision
+  args: n
+  locals:
+    0: var s
+    1: var r
+    2: var j
+  stack_size: 4
+  opcodes:
+        push_0 0
+        put_loc1 1: r
+        push_0 0
+        put_loc2 2: j
+    4:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 79
+        get_loc2 2: j
+        push_i8 10
+        mod
+        push_const8 0: 0.1
+        add
+        get_field2 toPrecision
+        get_loc2 2: j
+        push_i8 16
+        mod
+        push_1 1
+        add
+        call_method 1
+        put_loc0 0: s
+        get_loc2 2: j
+        push_const8 1: 0.1
+        add
+        get_field2 toPrecision
+        get_loc2 2: j
+        push_i8 16
+        mod
+        push_1 1
+        add
+        call_method 1
+        put_loc0 0: s
+        get_loc2 2: j
+        push_i32 12345678
+        mul
+        push_const8 2: 0.1
+        add
+        get_field2 toPrecision
+        get_loc2 2: j
+        push_i8 16
+        mod
+        push_1 1
+        add
+        call_method 1
+        put_loc0 0: s
+        inc_loc 2: j
+        goto8 4
+   79:  get_arg0 0: n
+        push_3 3
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:1087:1: function: float_toExponential
+  args: n
+  locals:
+    0: var s
+    1: var r
+    2: var j
+  stack_size: 4
+  opcodes:
+        push_0 0
+        put_loc1 1: r
+        push_0 0
+        put_loc2 2: j
+    4:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 73
+        get_loc2 2: j
+        push_i8 10
+        mod
+        push_const8 0: 0.1
+        add
+        get_field2 toExponential
+        get_loc2 2: j
+        push_i8 16
+        mod
+        call_method 1
+        put_loc0 0: s
+        get_loc2 2: j
+        push_const8 1: 0.1
+        add
+        get_field2 toExponential
+        get_loc2 2: j
+        push_i8 16
+        mod
+        call_method 1
+        put_loc0 0: s
+        get_loc2 2: j
+        push_i32 12345678
+        mul
+        push_const8 2: 0.1
+        add
+        get_field2 toExponential
+        get_loc2 2: j
+        push_i8 16
+        mod
+        call_method 1
+        put_loc0 0: s
+        inc_loc 2: j
+        goto8 4
+   73:  get_arg0 0: n
+        push_3 3
+        mul
+        return
+
+__tests__/fixtures_quickjs/microbench.js:1097:1: function: string_to_int
+  args: n
+  locals:
+    0: var s
+    1: var r
+    2: var j
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc1 1: r
+        push_const8 0: "12345"
+        put_loc0 0: s
+        push_0 0
+        put_loc2 2: j
+    7:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 22
+        get_loc1 1: r
+        get_loc0 0: s
+        push_0 0
+        or
+        add
+        put_loc1 1: r
+        inc_loc 2: j
+        goto8 7
+   22:  get_loc1 1: r
+        dup
+        put_var global_res
+        drop
+        get_arg0 0: n
+        return
+
+__tests__/fixtures_quickjs/microbench.js:1107:1: function: string_to_float
+  args: n
+  locals:
+    0: var s
+    1: var r
+    2: var j
+  stack_size: 2
+  opcodes:
+        push_0 0
+        put_loc1 1: r
+        push_atom_value "12345.6"
+        put_loc0 0: s
+        push_0 0
+        put_loc2 2: j
+   10:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false8 23
+        get_loc1 1: r
+        get_loc0 0: s
+        sub
+        put_loc1 1: r
+        inc_loc 2: j
+        goto8 10
+   23:  get_loc1 1: r
+        dup
+        put_var global_res
+        drop
+        get_arg0 0: n
+        return
+
+__tests__/fixtures_quickjs/microbench.js:1117:1: function: load_result
+  args: filename
+  locals:
+    0: var has_filename
+    1: var has_error
+    2: var str
+    3: var res
+    4: var f
+  stack_size: 6
+  opcodes:
+        get_arg0 0: filename
+        put_loc0 0: has_filename
+        push_false
+        put_loc1 1: has_error
+        get_arg0 0: filename
+        lnot
+        if_false8 14
+        push_atom_value "microbench.txt"
+        put_arg0 0: filename
+   14:  get_var_undef fs
+        typeof_is_undefined
+        if_true8 68
+        catch 56
+        get_var fs
+        get_field2 readFileSync
+        get_arg0 0: filename
+        object
+        push_atom_value utf8
+        define_field encoding
+        call_method 2
+        put_loc2 2: str
+        drop
+        goto8 129
+   56:  drop
+        catch 67
+        push_true
+        put_loc1 1: has_error
+        drop
+        goto8 129
+   67:  throw
+   68:  get_var_undef std
+        typeof_is_undefined
+        if_true8 127
+        get_var std
+        get_field2 open
+        get_arg0 0: filename
+        push_atom_value r
+        call_method 2
+        set_loc8 4: f
+        if_false8 123
+        get_loc8 4: f
+        get_field2 readAsString
+        call_method 0
+        put_loc2 2: str
+        get_loc8 4: f
+        get_field2 close
+        call_method 0
+        drop
+        goto8 129
+  123:  push_true
+        put_loc1 1: has_error
+        goto8 129
+  127:  null
+        return
+  129:  get_loc1 1: has_error
+        if_false8 158
+        get_loc0 0: has_filename
+        if_false8 156
+        get_var console
+        get_field2 log
+        push_atom_value "cannot load "
+        get_arg0 0: filename
+        add
+        call_method 1
+        drop
+  156:  null
+        return
+  158:  get_var JSON
+        get_field2 parse
+        get_loc2 2: str
+        call_method 1
+        set_loc3 3: res
+        return
+
+__tests__/fixtures_quickjs/microbench.js:1156:1: function: save_result
+  args: filename obj
+  locals:
+    0: var str
+    1: var has_error
+    2: var f
+  stack_size: 7
+  opcodes:
+        get_var JSON
+        get_field2 stringify
+        get_arg1 1: obj
+        null
+        push_2 2
+        call_method 3
+        push_atom_value "\n"
+        add
+        put_loc0 0: str
+        push_false
+        put_loc1 1: has_error
+        get_var_undef fs
+        typeof_is_undefined
+        if_true8 80
+        catch 68
+        get_var fs
+        get_field2 writeFileSync
+        get_arg0 0: filename
+        get_loc0 0: str
+        object
+        push_atom_value utf8
+        define_field encoding
+        call_method 3
+        put_loc0 0: str
+        drop
+        goto8 142
+   68:  drop
+        catch 79
+        push_true
+        put_loc1 1: has_error
+        drop
+        goto8 142
+   79:  throw
+   80:  get_var_undef std
+        typeof_is_undefined
+        if_true8 141
+        get_var std
+        get_field2 open
+        get_arg0 0: filename
+        push_atom_value w
+        call_method 2
+        set_loc2 2: f
+        if_false8 133
+        get_loc2 2: f
+        get_field2 puts
+        get_loc0 0: str
+        call_method 1
+        drop
+        get_loc2 2: f
+        get_field2 close
+        call_method 0
+        drop
+        goto8 142
+  133:  push_atom_value true
+        put_loc1 1: has_error
+        goto8 142
+  141:  return_undef
+  142:  get_loc1 1: has_error
+        if_false8 166
+        get_var console
+        get_field2 log
+        push_atom_value "cannot save "
+        get_arg0 0: filename
+        add
+        call_method 1
+        drop
+  166:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:1185:1: function: main
+  args: argc argv g
+  locals:
+    0: var test_list
+    1: var tests
+    2: var i
+    3: var j
+    4: var n
+    5: var f
+    6: var name
+    7: var found
+    8: var ref_file
+    9: var new_ref_file
+  stack_size: 32
+  opcodes:
+        get_var empty_loop
+        get_var empty_down_loop
+        get_var empty_down_loop2
+        get_var empty_do_loop
+        get_var date_now
+        get_var date_parse
+        get_var prop_read
+        get_var prop_write
+        get_var prop_update
+        get_var prop_create
+        get_var prop_clone
+        get_var prop_delete
+        get_var array_read
+        get_var array_write
+        get_var array_prop_create
+        get_var array_slice
+        get_var array_length_decr
+        get_var array_hole_length_decr
+        get_var array_push
+        get_var array_pop
+        get_var typed_array_read
+        get_var typed_array_write
+        get_var global_read
+        get_var global_write
+        get_var global_write_strict
+        get_var local_destruct
+        get_var global_destruct
+        get_var global_destruct_strict
+        get_var global_func_call
+        get_var func_call
+        get_var func_closure_call
+        get_var int_arith
+        array_from 32
+        get_var float_arith
+        define_field 32
+        get_var map_set_string
+        define_field 33
+        get_var map_set_int
+        define_field 34
+        get_var map_set_bigint
+        define_field 35
+        get_var map_delete
+        define_field 36
+        get_var weak_map_set
+        define_field 37
+        get_var weak_map_delete
+        define_field 38
+        get_var array_for
+        define_field 39
+        get_var array_for_in
+        define_field 40
+        get_var array_for_of
+        define_field 41
+        get_var math_min
+        define_field 42
+        get_var regexp_ascii
+        define_field 43
+        get_var regexp_utf16
+        define_field 44
+        get_var string_build1
+        define_field 45
+        get_var string_build1x
+        define_field 46
+        get_var string_build2c
+        define_field 47
+        get_var string_build2
+        define_field 48
+        get_var string_build3
+        define_field 49
+        get_var string_build4
+        define_field 50
+        get_var string_build_large1
+        define_field 51
+        get_var string_build_large2
+        define_field 52
+        get_var int_to_string
+        define_field 53
+        get_var int_toString
+        define_field 54
+        get_var float_to_string
+        define_field 55
+        get_var float_toString
+        define_field 56
+        get_var float_toFixed
+        define_field 57
+        get_var float_toPrecision
+        define_field 58
+        get_var float_toExponential
+        define_field 59
+        get_var string_to_int
+        define_field 60
+        get_var string_to_float
+        define_field 61
+        put_loc0 0: test_list
+        array_from 0
+        put_loc1 1: tests
+        push_atom_value "microbench-new.txt"
+        put_loc8 9: new_ref_file
+        get_var_undef BigInt
+        typeof_is_function
+        if_false8 528
+        get_loc0 0: test_list
+        get_field2 push
+        get_var bigint32_arith
+        call_method 1
+        drop
+        get_loc0 0: test_list
+        get_field2 push
+        get_var bigint64_arith
+        call_method 1
+        drop
+        get_loc0 0: test_list
+        get_field2 push
+        get_var bigint256_arith
+        call_method 1
+        drop
+  528:  get_loc0 0: test_list
+        get_field2 push
+        get_var sort_bench
+        call_method 1
+        drop
+        push_1 1
+        put_loc2 2: i
+  545:  get_loc2 2: i
+        get_arg0 0: argc
+        lt
+        if_false 804
+        get_arg1 1: argv
+        get_loc2 2: i
+        post_inc
+        put_loc2 2: i
+        get_array_el
+        set_loc8 6: name
+        push_atom_value "-a"
+        eq
+        if_false8 581
+        get_var sort_bench
+        push_true
+        put_field verbose
+        goto8 545
+  581:  get_loc8 6: name
+        push_atom_value "-t"
+        eq
+        if_false8 651
+        get_arg1 1: argv
+        get_loc2 2: i
+        post_inc
+        put_loc2 2: i
+        get_array_el
+        put_loc8 6: name
+        get_var sort_bench
+        get_arg2 2: g
+        get_loc8 6: name
+        get_array_el
+        put_field array_type
+        get_var sort_bench
+        get_field array_type
+        typeof_is_function
+        if_true8 649
+        get_var console
+        get_field2 log
+        push_atom_value "unknown array type: "
+        get_loc8 6: name
+        add
+        call_method 1
+        drop
+        push_1 1
+        return
+  649:  goto8 545
+  651:  get_loc8 6: name
+        push_atom_value "-n"
+        eq
+        if_false8 680
+        get_var sort_bench
+        get_arg1 1: argv
+        get_loc2 2: i
+        post_inc
+        put_loc2 2: i
+        get_array_el
+        plus
+        put_field array_size
+        goto16 545
+  680:  get_loc8 6: name
+        push_atom_value "-r"
+        eq
+        if_false8 700
+        get_arg1 1: argv
+        get_loc2 2: i
+        post_inc
+        put_loc2 2: i
+        get_array_el
+        put_loc8 8: ref_file
+        goto16 545
+  700:  get_loc8 6: name
+        push_atom_value "-s"
+        eq
+        if_false8 720
+        get_arg1 1: argv
+        get_loc2 2: i
+        post_inc
+        put_loc2 2: i
+        get_array_el
+        put_loc8 9: new_ref_file
+        goto16 545
+  720:  push_0 0
+        put_loc3 3: j
+        push_false
+        put_loc8 7: found
+  725:  get_loc3 3: j
+        get_loc0 0: test_list
+        get_length
+        lt
+        if_false8 772
+        get_loc0 0: test_list
+        get_loc3 3: j
+        get_array_el
+        set_loc8 5: f
+        get_field name
+        get_field2 startsWith
+        get_loc8 6: name
+        call_method 1
+        if_false8 768
+        get_loc1 1: tests
+        get_field2 push
+        get_loc8 5: f
+        call_method 1
+        drop
+        push_true
+        put_loc8 7: found
+  768:  inc_loc 3: j
+        goto8 725
+  772:  get_loc8 7: found
+        lnot
+        if_false 545
+        get_var console
+        get_field2 log
+        push_atom_value "unknown benchmark: "
+        get_loc8 6: name
+        add
+        call_method 1
+        drop
+        push_1 1
+        return
+  804:  get_loc1 1: tests
+        get_length
+        push_0 0
+        eq
+        if_false8 812
+        get_loc0 0: test_list
+        put_loc1 1: tests
+  812:  get_var load_result
+        get_loc8 8: ref_file
+        call1 1
+        dup
+        put_var ref_data
+        drop
+        object
+        dup
+        put_var log_data
+        drop
+        get_var log_line
+        get_field2 apply
+        null
+        get_var heads
+        call_method 2
+        drop
+        push_0 0
+        put_loc8 4: n
+        push_0 0
+        put_loc2 2: i
+  860:  get_loc2 2: i
+        get_loc1 1: tests
+        get_length
+        lt
+        if_false8 927
+        get_loc1 1: tests
+        get_loc2 2: i
+        get_array_el
+        put_loc8 5: f
+        get_var bench
+        get_loc8 5: f
+        get_loc8 5: f
+        get_field name
+        get_var ref_data
+        get_var log_data
+        call 4
+        drop
+        get_var ref_data
+        if_false8 923
+        get_var ref_data
+        get_loc8 5: f
+        get_field name
+        get_array_el
+        if_false8 923
+        inc_loc 4: n
+  923:  inc_loc 2: i
+        goto8 860
+  927:  get_var ref_data
+        if_false8 993
+        get_var log_line
+        push_atom_value total
+        push_empty_string
+        get_var total
+        push_2 2
+        get_array_el
+        get_var total
+        push_3 3
+        get_array_el
+        get_var Math
+        get_field2 round
+        get_var total_scale
+        push_i16 1000
+        mul
+        get_var total_score
+        div
+        call_method 1
+        call 5
+        drop
+        goto8 1013
+  993:  get_var log_line
+        push_atom_value total
+        push_empty_string
+        get_var total
+        push_2 2
+        get_array_el
+        call3 3
+        drop
+ 1013:  get_loc1 1: tests
+        get_loc0 0: test_list
+        eq
+        if_false8 1036
+        get_loc8 9: new_ref_file
+        if_false8 1036
+        get_var save_result
+        get_loc8 9: new_ref_file
+        get_var log_data
+        call2 2
+        drop
+ 1036:  return_undef
+
+__tests__/fixtures_quickjs/microbench.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: var this
+  stack_size: 5
+  opcodes:
+        push_this
+        put_loc1 1: this
+        check_define_var fs,0
+        check_define_var pad,64
+        check_define_var pad_left,64
+        check_define_var pad_center,64
+        check_define_var ref_data,0
+        check_define_var log_data,0
+        check_define_var heads,0
+        check_define_var widths,0
+        check_define_var precs,0
+        check_define_var total,0
+        check_define_var total_score,0
+        check_define_var total_scale,0
+        check_define_var log_line,64
+        check_define_var clocks_per_sec,0
+        check_define_var max_iterations,0
+        check_define_var clock_threshold,0
+        check_define_var min_n_argument,0
+        check_define_var get_clock,0
+        check_define_var log_one,64
+        check_define_var bench,64
+        check_define_var global_res,0
+        check_define_var empty_loop,64
+        check_define_var empty_down_loop,64
+        check_define_var empty_down_loop2,64
+        check_define_var empty_do_loop,64
+        check_define_var date_now,64
+        check_define_var date_parse,64
+        check_define_var prop_read,64
+        check_define_var prop_write,64
+        check_define_var prop_update,64
+        check_define_var prop_create,64
+        check_define_var prop_clone,64
+        check_define_var prop_delete,64
+        check_define_var array_read,64
+        check_define_var array_write,64
+        check_define_var array_prop_create,64
+        check_define_var array_slice,64
+        check_define_var array_length_decr,64
+        check_define_var array_hole_length_decr,64
+        check_define_var array_push,64
+        check_define_var array_pop,64
+        check_define_var typed_array_read,64
+        check_define_var typed_array_write,64
+        check_define_var global_var0,0
+        check_define_var global_read,64
+        check_define_var global_write,0
+        check_define_var global_write_strict,64
+        check_define_var local_destruct,64
+        check_define_var global_v1,0
+        check_define_var global_v2,0
+        check_define_var global_v3,0
+        check_define_var global_v4,0
+        check_define_var global_a,0
+        check_define_var global_b,0
+        check_define_var global_c,0
+        check_define_var global_d,0
+        check_define_var global_destruct,0
+        check_define_var global_destruct_strict,64
+        check_define_var g,64
+        check_define_var global_func_call,64
+        check_define_var func_call,64
+        check_define_var func_closure_call,64
+        check_define_var int_arith,64
+        check_define_var float_arith,64
+        check_define_var bigint_arith,64
+        check_define_var bigint32_arith,64
+        check_define_var bigint64_arith,64
+        check_define_var bigint256_arith,64
+        check_define_var map_set_string,64
+        check_define_var map_set_int,64
+        check_define_var map_set_bigint,64
+        check_define_var map_delete,64
+        check_define_var weak_map_set,64
+        check_define_var weak_map_delete,64
+        check_define_var array_for,64
+        check_define_var array_for_in,64
+        check_define_var array_for_of,64
+        check_define_var math_min,64
+        check_define_var regexp_ascii,64
+        check_define_var regexp_utf16,64
+        check_define_var string_build1,64
+        check_define_var string_build1x,64
+        check_define_var string_build2c,64
+        check_define_var string_build2,64
+        check_define_var string_build3,64
+        check_define_var string_build4,64
+        check_define_var string_build_large1,64
+        check_define_var string_build_large2,64
+        check_define_var sort_bench,64
+        check_define_var int_to_string,64
+        check_define_var int_to_string,64
+        check_define_var int_toString,64
+        check_define_var float_to_string,64
+        check_define_var float_toString,64
+        check_define_var float_toFixed,64
+        check_define_var float_toPrecision,64
+        check_define_var float_toExponential,64
+        check_define_var string_to_int,64
+        check_define_var string_to_float,64
+        check_define_var load_result,64
+        check_define_var save_result,64
+        check_define_var main,64
+        define_var fs,0
+        fclosure8 0: [bytecode pad]
+        define_func pad,0
+        fclosure8 1: [bytecode pad_left]
+        define_func pad_left,0
+        fclosure8 2: [bytecode pad_center]
+        define_func pad_center,0
+        define_var ref_data,0
+        define_var log_data,0
+        define_var heads,0
+        define_var widths,0
+        define_var precs,0
+        define_var total,0
+        define_var total_score,0
+        define_var total_scale,0
+        fclosure8 3: [bytecode log_line]
+        define_func log_line,0
+        define_var clocks_per_sec,0
+        define_var max_iterations,0
+        define_var clock_threshold,0
+        define_var min_n_argument,0
+        define_var get_clock,0
+        fclosure8 6: [bytecode log_one]
+        define_func log_one,0
+        fclosure8 7: [bytecode bench]
+        define_func bench,0
+        define_var global_res,0
+        fclosure8 8: [bytecode empty_loop]
+        define_func empty_loop,0
+        fclosure8 9: [bytecode empty_down_loop]
+        define_func empty_down_loop,0
+        fclosure8 10: [bytecode empty_down_loop2]
+        define_func empty_down_loop2,0
+        fclosure8 11: [bytecode empty_do_loop]
+        define_func empty_do_loop,0
+        fclosure8 12: [bytecode date_now]
+        define_func date_now,0
+        fclosure8 13: [bytecode date_parse]
+        define_func date_parse,0
+        fclosure8 14: [bytecode prop_read]
+        define_func prop_read,0
+        fclosure8 15: [bytecode prop_write]
+        define_func prop_write,0
+        fclosure8 16: [bytecode prop_update]
+        define_func prop_update,0
+        fclosure8 17: [bytecode prop_create]
+        define_func prop_create,0
+        fclosure8 18: [bytecode prop_clone]
+        define_func prop_clone,0
+        fclosure8 19: [bytecode prop_delete]
+        define_func prop_delete,0
+        fclosure8 20: [bytecode array_read]
+        define_func array_read,0
+        fclosure8 21: [bytecode array_write]
+        define_func array_write,0
+        fclosure8 22: [bytecode array_prop_create]
+        define_func array_prop_create,0
+        fclosure8 23: [bytecode array_slice]
+        define_func array_slice,0
+        fclosure8 24: [bytecode array_length_decr]
+        define_func array_length_decr,0
+        fclosure8 25: [bytecode array_hole_length_decr]
+        define_func array_hole_length_decr,0
+        fclosure8 26: [bytecode array_push]
+        define_func array_push,0
+        fclosure8 27: [bytecode array_pop]
+        define_func array_pop,0
+        fclosure8 28: [bytecode typed_array_read]
+        define_func typed_array_read,0
+        fclosure8 29: [bytecode typed_array_write]
+        define_func typed_array_write,0
+        define_var global_var0,0
+        fclosure8 30: [bytecode global_read]
+        define_func global_read,0
+        define_var global_write,0
+        fclosure8 31: [bytecode global_write_strict]
+        define_func global_write_strict,0
+        fclosure8 32: [bytecode local_destruct]
+        define_func local_destruct,0
+        define_var global_v1,0
+        define_var global_v2,0
+        define_var global_v3,0
+        define_var global_v4,0
+        define_var global_a,0
+        define_var global_b,0
+        define_var global_c,0
+        define_var global_d,0
+        define_var global_destruct,0
+        fclosure8 33: [bytecode global_destruct_strict]
+        define_func global_destruct_strict,0
+        fclosure8 34: [bytecode g]
+        define_func g,0
+        fclosure8 35: [bytecode global_func_call]
+        define_func global_func_call,0
+        fclosure8 36: [bytecode func_call]
+        define_func func_call,0
+        fclosure8 37: [bytecode func_closure_call]
+        define_func func_closure_call,0
+        fclosure8 38: [bytecode int_arith]
+        define_func int_arith,0
+        fclosure8 39: [bytecode float_arith]
+        define_func float_arith,0
+        fclosure8 40: [bytecode bigint_arith]
+        define_func bigint_arith,0
+        fclosure8 41: [bytecode bigint32_arith]
+        define_func bigint32_arith,0
+        fclosure8 42: [bytecode bigint64_arith]
+        define_func bigint64_arith,0
+        fclosure8 43: [bytecode bigint256_arith]
+        define_func bigint256_arith,0
+        fclosure8 44: [bytecode map_set_string]
+        define_func map_set_string,0
+        fclosure8 45: [bytecode map_set_int]
+        define_func map_set_int,0
+        fclosure8 46: [bytecode map_set_bigint]
+        define_func map_set_bigint,0
+        fclosure8 47: [bytecode map_delete]
+        define_func map_delete,0
+        fclosure8 48: [bytecode weak_map_set]
+        define_func weak_map_set,0
+        fclosure8 49: [bytecode weak_map_delete]
+        define_func weak_map_delete,0
+        fclosure8 50: [bytecode array_for]
+        define_func array_for,0
+        fclosure8 51: [bytecode array_for_in]
+        define_func array_for_in,0
+        fclosure8 52: [bytecode array_for_of]
+        define_func array_for_of,0
+        fclosure8 53: [bytecode math_min]
+        define_func math_min,0
+        fclosure8 54: [bytecode regexp_ascii]
+        define_func regexp_ascii,0
+        fclosure8 55: [bytecode regexp_utf16]
+        define_func regexp_utf16,0
+        fclosure8 56: [bytecode string_build1]
+        define_func string_build1,0
+        fclosure8 57: [bytecode string_build1x]
+        define_func string_build1x,0
+        fclosure8 58: [bytecode string_build2c]
+        define_func string_build2c,0
+        fclosure8 59: [bytecode string_build2]
+        define_func string_build2,0
+        fclosure8 60: [bytecode string_build3]
+        define_func string_build3,0
+        fclosure8 61: [bytecode string_build4]
+        define_func string_build4,0
+        fclosure8 62: [bytecode string_build_large1]
+        define_func string_build_large1,0
+        fclosure8 63: [bytecode string_build_large2]
+        define_func string_build_large2,0
+        fclosure8 64: [bytecode sort_bench]
+        define_func sort_bench,0
+        fclosure8 65: [bytecode int_to_string]
+        define_func int_to_string,0
+        fclosure8 66: [bytecode int_to_string]
+        define_func int_to_string,0
+        fclosure8 67: [bytecode int_toString]
+        define_func int_toString,0
+        fclosure8 68: [bytecode float_to_string]
+        define_func float_to_string,0
+        fclosure8 69: [bytecode float_toString]
+        define_func float_toString,0
+        fclosure8 70: [bytecode float_toFixed]
+        define_func float_toFixed,0
+        fclosure8 71: [bytecode float_toPrecision]
+        define_func float_toPrecision,0
+        fclosure8 72: [bytecode float_toExponential]
+        define_func float_toExponential,0
+        fclosure8 73: [bytecode string_to_int]
+        define_func string_to_int,0
+        fclosure8 74: [bytecode string_to_float]
+        define_func string_to_float,0
+        fclosure8 75: [bytecode load_result]
+        define_func load_result,0
+        fclosure8 76: [bytecode save_result]
+        define_func save_result,0
+        fclosure8 77: [bytecode main]
+        define_func main,0
+        undefined
+        put_loc0 0: "<ret>"
+        get_var_undef require
+        typeof_is_undefined
+        if_true8 1404
+        get_var require
+        push_atom_value fs
+        call1 1
+        put_var fs
+ 1404:  push_atom_value TEST
+        push_atom_value N
+        push_atom_value "TIME (ns)"
+        push_atom_value "REF (ns)"
+        push_atom_value "SCORE (1000)"
+        array_from 5
+        put_var heads
+        push_i8 22
+        push_i8 10
+        push_i8 9
+        push_i8 9
+        push_i8 9
+        array_from 5
+        put_var widths
+        push_0 0
+        push_0 0
+        push_2 2
+        push_2 2
+        push_0 0
+        array_from 5
+        put_var precs
+        push_0 0
+        push_0 0
+        push_0 0
+        push_0 0
+        push_0 0
+        array_from 5
+        put_var total
+        push_0 0
+        put_var total_score
+        push_0 0
+        put_var total_scale
+        push_i16 1000
+        put_var clocks_per_sec
+        push_i8 100
+        put_var max_iterations
+        push_2 2
+        put_var clock_threshold
+        push_1 1
+        put_var min_n_argument
+        undefined
+        put_loc0 0: "<ret>"
+        get_var_undef performance
+        typeof_is_undefined
+        if_true8 1546
+        fclosure8 4: [bytecode <null>]
+        set_name get_clock
+        dup
+        put_var get_clock
+        put_loc0 0: "<ret>"
+        goto8 1589
+ 1546:  undefined
+        put_loc0 0: "<ret>"
+        get_var_undef os
+        typeof_is_undefined
+        if_true8 1575
+        get_var os
+        get_field now
+        dup
+        put_var get_clock
+        put_loc0 0: "<ret>"
+        goto8 1589
+ 1575:  fclosure8 5: [bytecode <null>]
+        set_name get_clock
+        dup
+        put_var get_clock
+        put_loc0 0: "<ret>"
+ 1589:  get_var eval
+        push_atom_value "(function global_write(n)\n           {\n               var j;\n               for(j = 0; j < n; j++) {\n                   global_var0 = j;\n                   global_var0 = j;\n                   global_var0 = j;\n                   global_var0 = j;\n               }\n               return n * 4;\n           })"
+        call1 1
+        put_var global_write
+        get_var eval
+        push_atom_value "(function global_destruct(n)\n           {\n               var j, v1, v2, v3, v4;\n               var array = [ 1, 2, 3, 4, 5 ];\n               var o = { a:1, b:2, c:3, d:4 };\n               var a, b, c, d;\n               for(j = 0; j < n; j++) {\n                   [ global_v1, global_v2,, global_v3, ...global_v4] = array;\n                   ({ a: global_a, b: global_b, c: global_c, d: global_d } = o);\n               }\n               return n * 8;\n          })"
+        call1 1
+        put_var global_destruct
+        get_var sort_bench
+        push_true
+        insert2
+        put_field bench
+        put_loc0 0: "<ret>"
+        get_var sort_bench
+        push_false
+        insert2
+        put_field verbose
+        put_loc0 0: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        get_var_undef scriptArgs
+        typeof_is_undefined
+        if_false8 1714
+        array_from 0
+        dup
+        put_var scriptArgs
+        put_loc0 0: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        get_var process
+        get_field argv
+        typeof
+        push_atom_value object
+        strict_eq
+        if_false8 1714
+        get_var process
+        get_field argv
+        get_field2 slice
+        push_1 1
+        call_method 1
+        dup
+        put_var scriptArgs
+        put_loc0 0: "<ret>"
+ 1714:  get_var main
+        get_var scriptArgs
+        get_length
+        get_var scriptArgs
+        get_loc1 1: this
+        call3 3
+        set_loc0 0: "<ret>"
+        return
+

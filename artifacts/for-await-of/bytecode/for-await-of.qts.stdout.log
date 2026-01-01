@@ -1,0 +1,84 @@
+__tests__/fixtures/for-await-of.js:1:1: function: numbers
+  stack_size: 2
+  opcodes:
+        initial_yield
+        push_1 1
+        await
+        yield
+        if_false8 9
+        await
+        await
+        return_async
+    9:  drop
+        push_2 2
+        await
+        yield
+        if_false8 18
+        await
+        await
+        return_async
+   18:  drop
+        push_3 3
+        await
+        yield
+        if_false8 27
+        await
+        await
+        return_async
+   27:  drop
+        undefined
+        await
+        return_async
+
+__tests__/fixtures/for-await-of.js:6:1: function: main
+  locals:
+    0: let sum [level:1 next:-1]
+    1: const n [level:2 next:0]
+  stack_size: 5
+  opcodes:
+        set_loc_uninitialized 0: sum
+        push_0 0
+        put_loc0 0: sum
+        set_loc_uninitialized 1: n
+        get_var numbers
+        call0 0
+        for_await_of_start
+        goto8 30
+   17:  put_loc1 1: n
+        get_loc_check 0: sum
+        get_loc_check 1: n
+        add
+        dup
+        put_loc_check 0: sum
+        drop
+   30:  for_await_of_next
+        await
+        iterator_get_value_done
+        if_false8 17
+        drop
+        iterator_close
+        get_var console
+        get_field2 log
+        push_atom_value sum
+        get_loc_check 0: sum
+        call_method 2
+        drop
+        undefined
+        return_async
+
+__tests__/fixtures/for-await-of.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var numbers,64
+        check_define_var main,64
+        fclosure8 0: [bytecode numbers]
+        define_func numbers,0
+        fclosure8 1: [bytecode main]
+        define_func main,0
+        get_var main
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

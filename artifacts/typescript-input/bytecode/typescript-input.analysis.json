@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-12-31T18:10:59.984Z",
+  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/typescript-input.ts",
+  "note": "analysis omitted: bytecode too large (1243710 bytes)",
+  "compilation": {
+    "typescript": {
+      "size": 1243710
+    },
+    "wasm": {
+      "size": 5
+    }
+  },
+  "sizeDifference": {
+    "absolute": 1243705,
+    "percentage": "24874100.00"
+  }
+}
