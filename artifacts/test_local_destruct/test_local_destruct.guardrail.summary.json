@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_local_destruct/cli/test_local_destruct.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_local_destruct/cli/test_local_destruct.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/test_local_destruct/cli/test_local_destruct.pc2line.txt",
-    "bytecodeSize": 517,
+    "bytecodeSize": 599,
     "pc2lineLength": 2,
     "stackMax": 0
   },
   "bytecode": {
-    "identical": false,
-    "tsSize": 455,
+    "identical": true,
+    "tsSize": 537,
     "wasmSize": 537,
-    "sizeDiff": -82,
-    "sizeDiffPercent": -15.27001862197393
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
   },
   "trace": {
     "differenceCount": 0,

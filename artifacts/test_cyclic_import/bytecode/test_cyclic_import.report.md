@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_cyclic_import.ts
-**生成时间**: 2026-01-01T10:02:04.086Z
+**生成时间**: 2026-01-01T11:11:06.360Z
 
 ## 大小对比
 

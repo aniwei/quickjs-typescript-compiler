@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/inc-2.ts
-**生成时间**: 2026-01-01T10:01:38.986Z
+**生成时间**: 2026-01-01T11:10:38.232Z
 
 ## 大小对比
 

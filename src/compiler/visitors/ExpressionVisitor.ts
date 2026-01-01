@@ -1172,7 +1172,16 @@ export class ExpressionVisitor extends VisitorContext {
 
     // 简单赋值 =
     if (op === ts.SyntaxKind.EqualsToken) {
-      this.emitSimpleAssignment(node, node.left.getStart())
+      // QuickJS: for parenthesized object destructuring assignments like `({ a } = obj)`,
+      // the left-hand side token stream includes the leading '(', and pc2line is anchored
+      // to that '(' rather than the inner '{'. TypeScript AST represents the assignment
+      // as a BinaryExpression whose parent is a ParenthesizedExpression, so we must
+      // explicitly use the parent's start position to match QuickJS.
+      let sourcePos = node.left.getStart()
+      if (ts.isObjectLiteralExpression(node.left) && ts.isParenthesizedExpression(node.parent)) {
+        sourcePos = node.parent.getStart(node.getSourceFile())
+      }
+      this.emitSimpleAssignment(node, sourcePos)
       return
     }
 
@@ -1610,14 +1619,40 @@ export class ExpressionVisitor extends VisitorContext {
         this.compiler.emitSourcePos(fd, sourcePos)
       }
 
-      // 计算右值
-      this.context.visit(node.right)
+      // QuickJS emits destructuring assignments in two phases (same as array destructuring):
+      //   1) goto labelParse (jump forward to evaluate RHS)
+      //   2) labelAssign: duplicate RHS (to preserve expression value), to_object, then assign via put_lvalue
+      //   3) labelParse: evaluate RHS, goto labelAssign
+      // This produces the characteristic goto8/goto8-backedge pattern.
+      // third_party/QuickJS/src/core/parser.c: js_parse_destructuring_element(): if (s->token.val == '=' && allow_initializer)
+      const labelParse = this.compiler.newLabelInt(fd)
+      const labelAssign = this.compiler.newLabelInt(fd)
+      const labelDone = this.compiler.newLabelInt(fd)
 
-      // 解构赋值表达式的值为 RHS
-      if (keepResult) {
-        // OP_to_object 会消费栈顶 value
-        this.compiler.emitOp(fd, Opcode.OP_dup)
+      const emitIdentifierLValueRef = (target: ts.Identifier): { atom: number; label: number; enumDepth: number } => {
+        // Same rationale as array destructuring assignment: identifier lvalues are handled via get_lvalue()/put_lvalue()
+        // which becomes a ref pair + OP_put_ref_value.
+        // third_party/QuickJS/src/core/parser.c: get_lvalue(): OP_scope_get_var -> OP_scope_make_ref; depth=2
+        const atom = this.compiler.addAtom(target.text)
+        const label = this.compiler.newLabelInt(fd)
+
+        this.compiler.emitOp(fd, TempOpcode.OP_scope_make_ref)
+        this.compiler.emitU32(fd, atom)
+        this.compiler.emitU32(fd, label)
+        this.compiler.emitU16(fd, fd.scopeLevel)
+        this.compiler.updateLabel(fd, label, 1)
+
+        return { atom, label, enumDepth: 2 }
       }
+
+      // Jump forward to parse RHS
+      this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelParse)
+
+      // Assignment body: expects RHS value on stack.
+      this.compiler.emitLabelInt(fd, labelAssign)
+
+      // Preserve the assignment-expression value (RHS) because OP_to_object consumes one copy.
+      this.compiler.emitOp(fd, Opcode.OP_dup)
 
       // throw an exception if the value cannot be converted to an object
       this.compiler.emitOp(fd, Opcode.OP_to_object)
@@ -1639,7 +1674,6 @@ export class ExpressionVisitor extends VisitorContext {
             throw new Error('Object destructuring assignment currently supports only identifier property names')
           }
           propNameAtomText = prop.name.text
-
           // In destructuring patterns, `initializer` is the assignment target (or target with default).
           targetExpr = prop.initializer
         } else {
@@ -1651,10 +1685,7 @@ export class ExpressionVisitor extends VisitorContext {
         }
 
         // Optional default value: ({ a = init } = rhs) or ({ a: x = init } = rhs)
-        if (
-          ts.isBinaryExpression(targetExpr) &&
-          targetExpr.operatorToken.kind === ts.SyntaxKind.EqualsToken
-        ) {
+        if (ts.isBinaryExpression(targetExpr) && targetExpr.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
           defaultValue = targetExpr.right
           targetExpr = targetExpr.left
         }
@@ -1663,32 +1694,56 @@ export class ExpressionVisitor extends VisitorContext {
           throw new Error('Object destructuring assignment currently supports only identifier elements')
         }
 
-        // source -- source val
+        // Stack shape at this point: [rhs obj]
+        // dup: [rhs obj obj]
         this.compiler.emitOp(fd, Opcode.OP_dup)
+
+        // QuickJS pc2line: for renamed bindings like `{ a: a }`, it records the source position
+        // at the target identifier (the second `a`, after ':'). The PC should align with the
+        // upcoming make_ref/make_loc_ref, which comes *after* the per-property `dup`.
+        if (ts.isPropertyAssignment(prop)) {
+          this.compiler.emitSourcePos(fd, targetExpr.getStart())
+        }
+
+        // Create lvalue ref: [rhs obj obj] -> [rhs obj obj ref_obj ref_prop]
+        const { label } = emitIdentifierLValueRef(targetExpr)
+
+        // rot3l: [rhs obj obj ref_obj ref_prop] -> [rhs obj ref_obj ref_prop obj]
+        this.compiler.emitOp(fd, Opcode.OP_rot3l)
+
+        // get_field: [rhs obj ref_obj ref_prop obj] -> [rhs obj ref_obj ref_prop value]
         const propAtom = this.compiler.addAtom(propNameAtomText)
         this.compiler.emitOp(fd, Opcode.OP_get_field)
         this.compiler.emitU32(fd, propAtom)
         this.compiler.emitIc(fd, propAtom)
 
         if (defaultValue) {
-          const labelHasVal = this.compiler.newLabelInt(fd)
+          // QuickJS: dup; is_undefined; if_false keep; drop; <init>; label keep
+          const labelKeep = this.compiler.newLabelInt(fd)
           this.compiler.emitOp(fd, Opcode.OP_dup)
-          this.compiler.emitOp(fd, Opcode.OP_undefined)
-          this.compiler.emitOp(fd, Opcode.OP_strict_eq)
-          this.compiler.emitGotoInt(fd, Opcode.OP_if_false, labelHasVal)
+          this.compiler.emitOp(fd, Opcode.OP_is_undefined)
+          this.compiler.emitGotoInt(fd, Opcode.OP_if_false, labelKeep)
           this.compiler.emitOp(fd, Opcode.OP_drop)
           this.context.visit(defaultValue)
-          this.compiler.emitLabelInt(fd, labelHasVal)
+          this.compiler.emitLabelInt(fd, labelKeep)
         }
 
-        const targetAtom = this.compiler.addAtom(targetExpr.text)
-        this.compiler.emitOp(fd, TempOpcode.OP_scope_put_var)
-        this.compiler.emitU32(fd, targetAtom)
-        this.compiler.emitU16(fd, fd.scopeLevel)
+        // put_lvalue(opcode=OP_get_ref_value, special=PUT_LVALUE_NOKEEP_DEPTH)
+        // third_party/QuickJS/src/core/parser.c: put_lvalue(): emit_label(label); OP_put_ref_value
+        this.compiler.emitLabelInt(fd, label)
+        this.compiler.emitOp(fd, Opcode.OP_put_ref_value)
       }
 
-      // drop the source object
+      // drop the source object, keep RHS value
       this.compiler.emitOp(fd, Opcode.OP_drop)
+      this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelDone)
+
+      // RHS parsing code: executed first.
+      this.compiler.emitLabelInt(fd, labelParse)
+      this.context.visit(node.right)
+      this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelAssign)
+
+      this.compiler.emitLabelInt(fd, labelDone)
       return
     }
 

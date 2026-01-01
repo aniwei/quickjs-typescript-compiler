@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/es2020_bigint_large.ts
-**生成时间**: 2026-01-01T10:01:38.851Z
+**生成时间**: 2026-01-01T11:10:38.084Z
 
 ## 大小对比
 

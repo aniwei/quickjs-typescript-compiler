@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-01T10:01:39.079Z",
+  "timestamp": "2026-01-01T11:10:38.320Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/nested-functions-arguments-new-target-indirect-019.ts",
   "compilation": {
     "typescript": {
