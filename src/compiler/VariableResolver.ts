@@ -802,8 +802,11 @@ export class VariableResolver {
     }
 
     // 模块顶层：bindings 在 module instantiation 阶段创建。
-    // 对齐 QuickJS：不发射 OP_define_var / OP_define_func；仅在需要时生成一个
-    // `push_this; if_false8 ...` 的受保护块来初始化提升函数（global func decl）。
+    // 对齐 QuickJS：不发射 OP_define_var / OP_define_func；并且始终生成一个
+    // `push_this; if_false <label>; (init...); return_undef; label` 的受保护块。
+    // QuickJS 来源：third_party/QuickJS/src/core/parser.c: instantiate_hoisted_definitions()
+    //   if (s->module) { dbuf_putc(OP_push_this); dbuf_putc(OP_if_false); dbuf_put_u32(label_next); ... }
+    // 即使没有任何需要初始化的 hoisted 定义，也会有该 prologue。
     if (fd.module) {
       const hoistedFuncs: { cpoolIdx: number; varName: number; closureVarIdx: number }[] = []
       for (let i = 0; i < fd.globalVarCount; i++) {
@@ -820,30 +823,28 @@ export class VariableResolver {
         hoistedFuncs.push({ cpoolIdx: hf.cpoolIdx, varName: hf.varName, closureVarIdx })
       }
 
-      if (hoistedFuncs.length) {
-        // Guard: if (this) { init_hoisted_funcs; return_undef }
-        // 重要：这里必须使用带 label 的 OP_if_false，而不是直接输出 OP_if_false8。
-        // 否则 LabelResolver 的 skipDeadCode 会把后续字节码当作不可达，从而无法做
-        // push_i32 -> push_1 等短操作码优化。
-        const labelSkip = this.compiler.newLabelInt(fd)
-        fd.labelSlots[labelSkip].refCount++
-        fd.jumpSize++
+      // Guard: if (this) { init_hoisted_funcs; return_undef }
+      // 重要：这里必须使用带 label 的 OP_if_false，而不是直接输出 OP_if_false8。
+      // 否则 LabelResolver 的 skipDeadCode 会把后续字节码当作不可达，从而影响
+      // 后续短操作码选择与整体 byte-for-byte 对齐。
+      const labelSkip = this.compiler.newLabelInt(fd)
+      fd.labelSlots[labelSkip].refCount++
+      fd.jumpSize++
 
-        bcOut.putU8(Opcode.OP_push_this)
-        bcOut.putU8(Opcode.OP_if_false)
-        bcOut.putU32(labelSkip)
+      bcOut.putU8(Opcode.OP_push_this)
+      bcOut.putU8(Opcode.OP_if_false)
+      bcOut.putU32(labelSkip)
 
-        for (const hf of hoistedFuncs) {
-          bcOut.putU8(Opcode.OP_fclosure)
-          bcOut.putU32(hf.cpoolIdx >>> 0)
-          bcOut.putU8(Opcode.OP_put_var_ref)
-          bcOut.putU16(hf.closureVarIdx)
-        }
-
-        bcOut.putU8(Opcode.OP_return_undef)
-        bcOut.putU8(TempOpcode.OP_label)
-        bcOut.putU32(labelSkip)
+      for (const hf of hoistedFuncs) {
+        bcOut.putU8(Opcode.OP_fclosure)
+        bcOut.putU32(hf.cpoolIdx >>> 0)
+        bcOut.putU8(Opcode.OP_put_var_ref)
+        bcOut.putU16(hf.closureVarIdx)
       }
+
+      bcOut.putU8(Opcode.OP_return_undef)
+      bcOut.putU8(TempOpcode.OP_label)
+      bcOut.putU32(labelSkip)
 
       return
     }

@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/async-await-promise-chain-no-top-level-await-006.ts
-**生成时间**: 2026-01-01T07:22:58.942Z
+**生成时间**: 2026-01-01T10:01:38.483Z
 
 ## 大小对比
 

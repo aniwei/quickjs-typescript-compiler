@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/logical-assignment.ts
-**生成时间**: 2026-01-01T07:22:59.514Z
+**生成时间**: 2026-01-01T10:01:39.036Z
 
 ## 大小对比
 

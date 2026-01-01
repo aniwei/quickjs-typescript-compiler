@@ -1,0 +1,21 @@
+__tests__/fixtures/quickjs-tests/repl.js:1:2: function: <null>
+  mode: strict
+  args: g
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:1:1: function: <eval>
+  mode: strict
+  stack_size: 2
+  opcodes:
+        push_this
+        if_false8 4
+        return_undef
+    4:  fclosure8 0: [bytecode <null>]
+        get_var globalThis
+        call1 1
+        drop
+        undefined
+        return_async
+
