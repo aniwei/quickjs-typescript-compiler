@@ -1,0 +1,1734 @@
+# 字节码分析报告
+
+**输入文件**: __tests__/fixtures/quickjs-tests/test_loop.ts
+**生成时间**: 2026-01-03T04:33:07.083Z
+
+## 大小对比
+
+- TypeScript编译器: 4655 字节
+- WASM编译器: 4652 字节
+- 差异: 3 字节 (0.06%)
+
+## 结构分析
+
+### TypeScript编译器输出
+```json
+{
+  "source": "TypeScript",
+  "bcVersion": "0x5",
+  "userAtomCount": 67,
+  "atoms": [
+    {
+      "index": 0,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "e",
+      "offset": 2
+    },
+    {
+      "index": 1,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "assert",
+      "offset": 4
+    },
+    {
+      "index": 2,
+      "rawLength": 20,
+      "actualLength": 10,
+      "isWideChar": 0,
+      "string": "test_while",
+      "offset": 11
+    },
+    {
+      "index": 3,
+      "rawLength": 32,
+      "actualLength": 16,
+      "isWideChar": 0,
+      "string": "test_while_break",
+      "offset": 22
+    },
+    {
+      "index": 4,
+      "rawLength": 26,
+      "actualLength": 13,
+      "isWideChar": 0,
+      "string": "test_do_while",
+      "offset": 39
+    },
+    {
+      "index": 5,
+      "rawLength": 16,
+      "actualLength": 8,
+      "isWideChar": 0,
+      "string": "test_for",
+      "offset": 53
+    },
+    {
+      "index": 6,
+      "rawLength": 22,
+      "actualLength": 11,
+      "isWideChar": 0,
+      "string": "test_for_in",
+      "offset": 62
+    },
+    {
+      "index": 7,
+      "rawLength": 24,
+      "actualLength": 12,
+      "isWideChar": 0,
+      "string": "test_for_in2",
+      "offset": 74
+    },
+    {
+      "index": 8,
+      "rawLength": 34,
+      "actualLength": 17,
+      "isWideChar": 0,
+      "string": "test_for_in_proxy",
+      "offset": 87
+    },
+    {
+      "index": 9,
+      "rawLength": 28,
+      "actualLength": 14,
+      "isWideChar": 0,
+      "string": "test_for_break",
+      "offset": 105
+    },
+    {
+      "index": 10,
+      "rawLength": 24,
+      "actualLength": 12,
+      "isWideChar": 0,
+      "string": "test_switch1",
+      "offset": 120
+    },
+    {
+      "index": 11,
+      "rawLength": 24,
+      "actualLength": 12,
+      "isWideChar": 0,
+      "string": "test_switch2",
+      "offset": 133
+    },
+    {
+      "index": 12,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch1",
+      "offset": 146
+    },
+    {
+      "index": 13,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch2",
+      "offset": 162
+    },
+    {
+      "index": 14,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch3",
+      "offset": 178
+    },
+    {
+      "index": 15,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch4",
+      "offset": 194
+    },
+    {
+      "index": 16,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch5",
+      "offset": 210
+    },
+    {
+      "index": 17,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch6",
+      "offset": 226
+    },
+    {
+      "index": 18,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch7",
+      "offset": 242
+    },
+    {
+      "index": 19,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch8",
+      "offset": 258
+    },
+    {
+      "index": 20,
+      "rawLength": 36,
+      "actualLength": 18,
+      "isWideChar": 0,
+      "string": "test_cyclic_labels",
+      "offset": 274
+    },
+    {
+      "index": 21,
+      "rawLength": 24,
+      "actualLength": 12,
+      "isWideChar": 0,
+      "string": "__loadScript",
+      "offset": 293
+    },
+    {
+      "index": 22,
+      "rawLength": 28,
+      "actualLength": 14,
+      "isWideChar": 0,
+      "string": "test_assert.js",
+      "offset": 306
+    },
+    {
+      "index": 23,
+      "rawLength": 90,
+      "actualLength": 45,
+      "isWideChar": 0,
+      "string": "__tests__/fixtures/quickjs-tests/test_loop.js",
+      "offset": 321
+    },
+    {
+      "index": 24,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "actual",
+      "offset": 367
+    },
+    {
+      "index": 25,
+      "rawLength": 16,
+      "actualLength": 8,
+      "isWideChar": 0,
+      "string": "expected",
+      "offset": 374
+    },
+    {
+      "index": 26,
+      "rawLength": 46,
+      "actualLength": 23,
+      "isWideChar": 0,
+      "string": "assertion failed: got |",
+      "offset": 383
+    },
+    {
+      "index": 27,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "|",
+      "offset": 407
+    },
+    {
+      "index": 28,
+      "rawLength": 24,
+      "actualLength": 12,
+      "isWideChar": 0,
+      "string": ", expected |",
+      "offset": 409
+    },
+    {
+      "index": 29,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": " (",
+      "offset": 422
+    },
+    {
+      "index": 30,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": ")",
+      "offset": 425
+    },
+    {
+      "index": 31,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "i",
+      "offset": 427
+    },
+    {
+      "index": 32,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "c",
+      "offset": 429
+    },
+    {
+      "index": 33,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "j",
+      "offset": 431
+    },
+    {
+      "index": 34,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "tab",
+      "offset": 433
+    },
+    {
+      "index": 35,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "a",
+      "offset": 437
+    },
+    {
+      "index": 36,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "b",
+      "offset": 439
+    },
+    {
+      "index": 37,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "k",
+      "offset": 441
+    },
+    {
+      "index": 38,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "x",
+      "offset": 443
+    },
+    {
+      "index": 39,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "y",
+      "offset": 445
+    },
+    {
+      "index": 40,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "push",
+      "offset": 447
+    },
+    {
+      "index": 41,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "x,y",
+      "offset": 452
+    },
+    {
+      "index": 42,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "for_in",
+      "offset": 456
+    },
+    {
+      "index": 43,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "1,x,y,4",
+      "offset": 463
+    },
+    {
+      "index": 44,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "1,y",
+      "offset": 471
+    },
+    {
+      "index": 45,
+      "rawLength": 38,
+      "actualLength": 19,
+      "isWideChar": 0,
+      "string": "0,1,2,3,4,5,6,7,8,9",
+      "offset": 475
+    },
+    {
+      "index": 46,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "z",
+      "offset": 495
+    },
+    {
+      "index": 47,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "x,z",
+      "offset": 497
+    },
+    {
+      "index": 48,
+      "rawLength": 22,
+      "actualLength": 11,
+      "isWideChar": 0,
+      "string": "removed_key",
+      "offset": 501
+    },
+    {
+      "index": 49,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "str",
+      "offset": 513
+    },
+    {
+      "index": 50,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "o",
+      "offset": 517
+    },
+    {
+      "index": 51,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": " ",
+      "offset": 519
+    },
+    {
+      "index": 52,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": " a c",
+      "offset": 521
+    },
+    {
+      "index": 53,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "key",
+      "offset": 526
+    },
+    {
+      "index": 54,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "s",
+      "offset": 530
+    },
+    {
+      "index": 55,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "?",
+      "offset": 532
+    },
+    {
+      "index": 56,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "abc",
+      "offset": 534
+    },
+    {
+      "index": 57,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "ab3",
+      "offset": 538
+    },
+    {
+      "index": 58,
+      "rawLength": 10,
+      "actualLength": 5,
+      "isWideChar": 0,
+      "string": "hello",
+      "offset": 542
+    },
+    {
+      "index": 59,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "t",
+      "offset": 548
+    },
+    {
+      "index": 60,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "f",
+      "offset": 550
+    },
+    {
+      "index": 61,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "tf",
+      "offset": 552
+    },
+    {
+      "index": 62,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "tcf",
+      "offset": 555
+    },
+    {
+      "index": 63,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "catch6",
+      "offset": 559
+    },
+    {
+      "index": 64,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "g",
+      "offset": 566
+    },
+    {
+      "index": 65,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "tfag",
+      "offset": 568
+    },
+    {
+      "index": 66,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "xafyaf",
+      "offset": 573
+    }
+  ],
+  "functionHeader": {
+    "offset": 580,
+    "tag": "0xc",
+    "remaining": 4075
+  }
+}
+```
+
+### WASM编译器输出
+```json
+{
+  "source": "WASM",
+  "bcVersion": "0x5",
+  "userAtomCount": 67,
+  "atoms": [
+    {
+      "index": 0,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "e",
+      "offset": 2
+    },
+    {
+      "index": 1,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "assert",
+      "offset": 4
+    },
+    {
+      "index": 2,
+      "rawLength": 20,
+      "actualLength": 10,
+      "isWideChar": 0,
+      "string": "test_while",
+      "offset": 11
+    },
+    {
+      "index": 3,
+      "rawLength": 32,
+      "actualLength": 16,
+      "isWideChar": 0,
+      "string": "test_while_break",
+      "offset": 22
+    },
+    {
+      "index": 4,
+      "rawLength": 26,
+      "actualLength": 13,
+      "isWideChar": 0,
+      "string": "test_do_while",
+      "offset": 39
+    },
+    {
+      "index": 5,
+      "rawLength": 16,
+      "actualLength": 8,
+      "isWideChar": 0,
+      "string": "test_for",
+      "offset": 53
+    },
+    {
+      "index": 6,
+      "rawLength": 22,
+      "actualLength": 11,
+      "isWideChar": 0,
+      "string": "test_for_in",
+      "offset": 62
+    },
+    {
+      "index": 7,
+      "rawLength": 24,
+      "actualLength": 12,
+      "isWideChar": 0,
+      "string": "test_for_in2",
+      "offset": 74
+    },
+    {
+      "index": 8,
+      "rawLength": 34,
+      "actualLength": 17,
+      "isWideChar": 0,
+      "string": "test_for_in_proxy",
+      "offset": 87
+    },
+    {
+      "index": 9,
+      "rawLength": 28,
+      "actualLength": 14,
+      "isWideChar": 0,
+      "string": "test_for_break",
+      "offset": 105
+    },
+    {
+      "index": 10,
+      "rawLength": 24,
+      "actualLength": 12,
+      "isWideChar": 0,
+      "string": "test_switch1",
+      "offset": 120
+    },
+    {
+      "index": 11,
+      "rawLength": 24,
+      "actualLength": 12,
+      "isWideChar": 0,
+      "string": "test_switch2",
+      "offset": 133
+    },
+    {
+      "index": 12,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch1",
+      "offset": 146
+    },
+    {
+      "index": 13,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch2",
+      "offset": 162
+    },
+    {
+      "index": 14,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch3",
+      "offset": 178
+    },
+    {
+      "index": 15,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch4",
+      "offset": 194
+    },
+    {
+      "index": 16,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch5",
+      "offset": 210
+    },
+    {
+      "index": 17,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch6",
+      "offset": 226
+    },
+    {
+      "index": 18,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch7",
+      "offset": 242
+    },
+    {
+      "index": 19,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_try_catch8",
+      "offset": 258
+    },
+    {
+      "index": 20,
+      "rawLength": 36,
+      "actualLength": 18,
+      "isWideChar": 0,
+      "string": "test_cyclic_labels",
+      "offset": 274
+    },
+    {
+      "index": 21,
+      "rawLength": 24,
+      "actualLength": 12,
+      "isWideChar": 0,
+      "string": "__loadScript",
+      "offset": 293
+    },
+    {
+      "index": 22,
+      "rawLength": 28,
+      "actualLength": 14,
+      "isWideChar": 0,
+      "string": "test_assert.js",
+      "offset": 306
+    },
+    {
+      "index": 23,
+      "rawLength": 90,
+      "actualLength": 45,
+      "isWideChar": 0,
+      "string": "__tests__/fixtures/quickjs-tests/test_loop.js",
+      "offset": 321
+    },
+    {
+      "index": 24,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "actual",
+      "offset": 367
+    },
+    {
+      "index": 25,
+      "rawLength": 16,
+      "actualLength": 8,
+      "isWideChar": 0,
+      "string": "expected",
+      "offset": 374
+    },
+    {
+      "index": 26,
+      "rawLength": 46,
+      "actualLength": 23,
+      "isWideChar": 0,
+      "string": "assertion failed: got |",
+      "offset": 383
+    },
+    {
+      "index": 27,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "|",
+      "offset": 407
+    },
+    {
+      "index": 28,
+      "rawLength": 24,
+      "actualLength": 12,
+      "isWideChar": 0,
+      "string": ", expected |",
+      "offset": 409
+    },
+    {
+      "index": 29,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": " (",
+      "offset": 422
+    },
+    {
+      "index": 30,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": ")",
+      "offset": 425
+    },
+    {
+      "index": 31,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "i",
+      "offset": 427
+    },
+    {
+      "index": 32,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "c",
+      "offset": 429
+    },
+    {
+      "index": 33,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "j",
+      "offset": 431
+    },
+    {
+      "index": 34,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "tab",
+      "offset": 433
+    },
+    {
+      "index": 35,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "a",
+      "offset": 437
+    },
+    {
+      "index": 36,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "b",
+      "offset": 439
+    },
+    {
+      "index": 37,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "k",
+      "offset": 441
+    },
+    {
+      "index": 38,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "x",
+      "offset": 443
+    },
+    {
+      "index": 39,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "y",
+      "offset": 445
+    },
+    {
+      "index": 40,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "push",
+      "offset": 447
+    },
+    {
+      "index": 41,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "x,y",
+      "offset": 452
+    },
+    {
+      "index": 42,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "for_in",
+      "offset": 456
+    },
+    {
+      "index": 43,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "1,x,y,4",
+      "offset": 463
+    },
+    {
+      "index": 44,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "1,y",
+      "offset": 471
+    },
+    {
+      "index": 45,
+      "rawLength": 38,
+      "actualLength": 19,
+      "isWideChar": 0,
+      "string": "0,1,2,3,4,5,6,7,8,9",
+      "offset": 475
+    },
+    {
+      "index": 46,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "z",
+      "offset": 495
+    },
+    {
+      "index": 47,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "x,z",
+      "offset": 497
+    },
+    {
+      "index": 48,
+      "rawLength": 22,
+      "actualLength": 11,
+      "isWideChar": 0,
+      "string": "removed_key",
+      "offset": 501
+    },
+    {
+      "index": 49,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "str",
+      "offset": 513
+    },
+    {
+      "index": 50,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "o",
+      "offset": 517
+    },
+    {
+      "index": 51,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": " ",
+      "offset": 519
+    },
+    {
+      "index": 52,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": " a c",
+      "offset": 521
+    },
+    {
+      "index": 53,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "key",
+      "offset": 526
+    },
+    {
+      "index": 54,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "s",
+      "offset": 530
+    },
+    {
+      "index": 55,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "?",
+      "offset": 532
+    },
+    {
+      "index": 56,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "abc",
+      "offset": 534
+    },
+    {
+      "index": 57,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "ab3",
+      "offset": 538
+    },
+    {
+      "index": 58,
+      "rawLength": 10,
+      "actualLength": 5,
+      "isWideChar": 0,
+      "string": "hello",
+      "offset": 542
+    },
+    {
+      "index": 59,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "t",
+      "offset": 548
+    },
+    {
+      "index": 60,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "f",
+      "offset": 550
+    },
+    {
+      "index": 61,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "tf",
+      "offset": 552
+    },
+    {
+      "index": 62,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "tcf",
+      "offset": 555
+    },
+    {
+      "index": 63,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "catch6",
+      "offset": 559
+    },
+    {
+      "index": 64,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "g",
+      "offset": 566
+    },
+    {
+      "index": 65,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "tfag",
+      "offset": 568
+    },
+    {
+      "index": 66,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "xafyaf",
+      "offset": 573
+    }
+  ],
+  "functionHeader": {
+    "offset": 580,
+    "tag": "0xc",
+    "remaining": 4072
+  }
+}
+```
+
+## 字节级差异
+
+共发现 3235 个字节差异:
+
+- 偏移量 0x250: TS=0xb8 vs WASM=0xb7
+- 偏移量 0x412: TS=0xcb vs WASM=0xcf
+- 偏移量 0x413: TS=0xc7 vs WASM=0x28
+- 偏移量 0x414: TS=0x28 vs WASM=0xf6
+- 偏移量 0x415: TS=0xf6 vs WASM=0x03
+- 偏移量 0x416: TS=0x03 vs WASM=0x54
+- 偏移量 0x417: TS=0x54 vs WASM=0x00
+- 偏移量 0x41a: TS=0x00 vs WASM=0x9f
+- 偏移量 0x41b: TS=0x9f vs WASM=0x02
+- 偏移量 0x41c: TS=0x02 vs WASM=0x24
+- 偏移量 0x41d: TS=0x24 vs WASM=0x08
+- 偏移量 0x41e: TS=0x08 vs WASM=0x34
+- 偏移量 0x41f: TS=0x34 vs WASM=0x18
+- 偏移量 0x420: TS=0x18 vs WASM=0x00
+- 偏移量 0x421: TS=0x00 vs WASM=0x0f
+- 偏移量 0x422: TS=0x0f vs WASM=0x92
+- 偏移量 0x423: TS=0x92 vs WASM=0x05
+- 偏移量 0x424: TS=0x05 vs WASM=0x1f
+- 偏移量 0x425: TS=0x1f vs WASM=0x1b
+- 偏移量 0x426: TS=0x1b vs WASM=0x14
+- ... (显示前20个差异，总共3235个)
+
+## 十六进制转储对比
+
+### TypeScript
+```
+00000000: 05 43 02 65 0c 61 73 73 65 72 74 14 74 65 73 74 |.C.e.assert.test|
+00000010: 5f 77 68 69 6c 65 20 74 65 73 74 5f 77 68 69 6c |_while test_whil|
+00000020: 65 5f 62 72 65 61 6b 1a 74 65 73 74 5f 64 6f 5f |e_break.test_do_|
+00000030: 77 68 69 6c 65 10 74 65 73 74 5f 66 6f 72 16 74 |while.test_for.t|
+00000040: 65 73 74 5f 66 6f 72 5f 69 6e 18 74 65 73 74 5f |est_for_in.test_|
+00000050: 66 6f 72 5f 69 6e 32 22 74 65 73 74 5f 66 6f 72 |for_in2"test_for|
+00000060: 5f 69 6e 5f 70 72 6f 78 79 1c 74 65 73 74 5f 66 |_in_proxy.test_f|
+00000070: 6f 72 5f 62 72 65 61 6b 18 74 65 73 74 5f 73 77 |or_break.test_sw|
+00000080: 69 74 63 68 31 18 74 65 73 74 5f 73 77 69 74 63 |itch1.test_switc|
+00000090: 68 32 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h2.test_try_catc|
+000000a0: 68 31 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h1.test_try_catc|
+000000b0: 68 32 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h2.test_try_catc|
+000000c0: 68 33 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h3.test_try_catc|
+000000d0: 68 34 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h4.test_try_catc|
+000000e0: 68 35 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h5.test_try_catc|
+000000f0: 68 36 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h6.test_try_catc|
+00000100: 68 37 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h7.test_try_catc|
+00000110: 68 38 24 74 65 73 74 5f 63 79 63 6c 69 63 5f 6c |h8$test_cyclic_l|
+00000120: 61 62 65 6c 73 18 5f 5f 6c 6f 61 64 53 63 72 69 |abels.__loadScri|
+00000130: 70 74 1c 74 65 73 74 5f 61 73 73 65 72 74 2e 6a |pt.test_assert.j|
+00000140: 73 5a 5f 5f 74 65 73 74 73 5f 5f 2f 66 69 78 74 |sZ__tests__/fixt|
+00000150: 75 72 65 73 2f 71 75 69 63 6b 6a 73 2d 74 65 73 |ures/quickjs-tes|
+00000160: 74 73 2f 74 65 73 74 5f 6c 6f 6f 70 2e 6a 73 0c |ts/test_loop.js.|
+00000170: 61 63 74 75 61 6c 10 65 78 70 65 63 74 65 64 2e |actual.expected.|
+00000180: 61 73 73 65 72 74 69 6f 6e 20 66 61 69 6c 65 64 |assertion failed|
+00000190: 3a 20 67 6f 74 20 7c 02 7c 18 2c 20 65 78 70 65 |: got |.|., expe|
+000001a0: 63 74 65 64 20 7c 04 20 28 02 29 02 69 02 63 02 |cted |. (.).i.c.|
+000001b0: 6a 06 74 61 62 02 61 02 62 02 6b 02 78 02 79 08 |j.tab.a.b.k.x.y.|
+000001c0: 70 75 73 68 06 78 2c 79 0c 66 6f 72 5f 69 6e 0e |push.x,y.for_in.|
+000001d0: 31 2c 78 2c 79 2c 34 06 31 2c 79 26 30 2c 31 2c |1,x,y,4.1,y&0,1,|
+000001e0: 32 2c 33 2c 34 2c 35 2c 36 2c 37 2c 38 2c 39 02 |2,3,4,5,6,7,8,9.|
+000001f0: 7a 06 78 2c 7a 16 72 65 6d 6f 76 65 64 5f 6b 65 |z.x,z.removed_ke|
+00000200: 79 06 73 74 72 02 6f 02 20 08 20 61 20 63 06 6b |y.str.o. . a c.k|
+00000210: 65 79 02 73 02 3f 06 61 62 63 06 61 62 33 0a 68 |ey.s.?.abc.ab3.h|
+00000220: 65 6c 6c 6f 02 74 02 66 04 74 66 06 74 63 66 0c |ello.t.f.tf.tcf.|
+00000230: 63 61 74 63 68 36 02 67 08 74 66 61 67 0c 78 61 |catch6.g.tfag.xa|
+00000240: 66 79 61 66 0c 00 06 00 a4 01 00 02 00 03 00 14 |fyaf............|
+00000250: b8 03 02 a6 01 00 00 00 c8 03 03 00 03 40 e5 00 |.............@..|
+00000260: 00 00 40 40 e6 00 00 00 40 40 e7 00 00 00 40 40 |..@@....@@....@@|
+00000270: e8 00 00 00 40 40 e9 00 00 00 40 40 ea 00 00 00 |....@@....@@....|
+00000280: 40 40 eb 00 00 00 40 40 ec 00 00 00 40 40 ed 00 |@@....@@....@@..|
+00000290: 00 00 40 40 ee 00 00 00 40 40 ef 00 00 00 40 40 |..@@....@@....@@|
+000002a0: f0 00 00 00 40 40 f1 00 00 00 40 40 f2 00 00 00 |....@@....@@....|
+000002b0: 40 40 f3 00 00 00 40 40 f4 00 00 00 40 40 f5 00 |@@....@@....@@..|
+000002c0: 00 00 40 40 f6 00 00 00 40 40 f7 00 00 00 40 40 |..@@....@@....@@|
+000002d0: f8 00 00 00 40 c2 00 41 e5 00 00 00 00 c2 01 41 |....@..A.......A|
+000002e0: e6 00 00 00 00 c2 02 41 e7 00 00 00 00 c2 03 41 |.......A.......A|
+000002f0: e8 00 00 00 00 c2 04 41 e9 00 00 00 00 c2 05 41 |.......A.......A|
+00000300: ea 00 00 00 00 c2 06 41 eb 00 00 00 00 c2 07 41 |.......A.......A|
+00000310: ec 00 00 00 00 c2 08 41 ed 00 00 00 00 c2 09 41 |.......A.......A|
+00000320: ee 00 00 00 00 c2 0a 41 ef 00 00 00 00 c2 0b 41 |.......A.......A|
+00000330: f0 00 00 00 00 c2 0c 41 f1 00 00 00 00 c2 0d 41 |.......A.......A|
+00000340: f2 00 00 00 00 c2 0e 41 f3 00 00 00 00 c2 0f 41 |.......A.......A|
+00000350: f4 00 00 00 00 c2 10 41 f5 00 00 00 00 c2 11 41 |.......A.......A|
+00000360: f6 00 00 00 00 c2 12 41 f7 00 00 00 00 c2 13 41 |.......A.......A|
+00000370: f8 00 00 00 00 06 cb 6f 13 00 00 00 39 f9 00 00 |.......o....9...|
+00000380: 00 04 fa 00 00 00 f1 cb 0e ee 0b cc 6f 07 00 00 |............o...|
+00000390: 00 0e ee 02 30 39 e6 00 00 00 f0 cb 39 e7 00 00 |....09......9...|
+000003a0: 00 f0 cb 39 e8 00 00 00 f0 cb 39 e9 00 00 00 f0 |...9......9.....|
+000003b0: cb 39 ed 00 00 00 f0 cb 39 ee 00 00 00 f0 cb 39 |.9......9......9|
+000003c0: ef 00 00 00 f0 cb 39 ea 00 00 00 f0 cb 39 eb 00 |......9......9..|
+000003d0: 00 00 f0 cb 39 ec 00 00 00 f0 cb 39 f0 00 00 00 |....9......9....|
+000003e0: f0 cb 39 f1 00 00 00 f0 cb 39 f2 00 00 00 f0 cb |..9......9......|
+000003f0: 39 f3 00 00 00 f0 cb 39 f4 00 00 00 f0 cb 39 f5 |9......9......9.|
+00000400: 00 00 00 f0 cb 39 f6 00 00 00 f0 cb 39 f7 00 00 |.....9......9...|
+00000410: 00 f0 cb c7 28 f6 03 54 00 00 00 9f 02 24 08 34 |....(..T.....$.4|
+00000420: 18 00 0f 92 05 1f 1b 14 0d 13 1b 20 0d 1f 1b 1a |........... ....|
+00000430: 0d 19 1b 10 0d 0f 1b 1c 0d 1b 1b 18 0d 17 1b 18 |................|
+00000440: 0d 17 1b 16 0d 15 1b 18 0d 17 1b 22 0d 21 1b 1e |...........".!..|
+00000450: 0d 1d 1b 1e 0d 1d 1b 1e 0d 1d 1b 1e 0d 1d 1b 1e |................|
+00000460: 0d 1d 1b 1e 0d 1d 1b 1e 0d 1d 1b 1e 00 0c 43 06 |..............C.|
+00000470: 00 ca 03 03 01 03 04 00 00 79 04 f8 03 00 01 00 |.........y......|
+00000480: fa 03 00 01 00 68 00 01 00 9e 01 00 01 00 0c 01 |.....h..........|
+00000490: cb c7 eb b8 ab ec 03 0a d8 d3 d4 ad ec 02 29 d3 |..............).|
+000004a0: f5 ed 2f d4 f5 ed 2b d3 99 04 4b 00 00 00 ab ec |../...+...K.....|
+000004b0: 21 d4 99 04 4b 00 00 00 ab ec 17 d3 43 39 00 00 |!...K.......C9..|
+000004c0: 00 24 00 00 d4 43 39 00 00 00 24 00 00 ad ec 02 |.$...C9...$.....|
+000004d0: 29 39 9f 00 00 00 04 fe 00 00 00 d3 9f 04 ff 00 |)9..............|
+000004e0: 00 00 9f 04 00 01 00 00 9f d4 9f 04 ff 00 00 00 |................|
+000004f0: 9f d5 ec 10 04 01 01 00 00 d5 9f 04 02 01 00 00 |................|
+00000500: 9f ee 02 c3 9f f1 30 f6 03 50 03 00 12 10 07 12 |......0..P......|
+00000510: 0c 10 12 21 0d 00 07 16 07 07 12 0d 08 00 07 0e |...!............|
+00000520: 11 18 07 12 12 23 07 0e 2f 2c 07 12 30 59 07 0c |.....#../,..0Y..|
+00000530: 1b 12 11 0e 07 10 1b 12 11 29 12 29 08 04 34 44 |.........).)..4D|
+00000540: 07 03 20 12 20 0c 08 3f 07 03 20 16 08 31 2a 22 |.. . ..?.. ..1*"|
+00000550: 07 03 20 14 15 0c 06 31 07 15 00 0c 43 06 00 cc |.. ....1....C...|
+00000560: 03 00 02 00 03 00 00 19 02 86 04 00 00 00 88 04 |................|
+00000570: 00 01 00 b7 cb b7 cc c7 ba a5 ec 07 95 01 95 00 |................|
+00000580: ee f6 39 e5 00 00 00 c8 ba ad f1 29 f6 03 16 16 |..9........)....|
+00000590: 00 04 08 0d 00 0d 0e 0c 04 12 07 0d 00 18 09 1b |................|
+000005a0: 0e 0c 04 07 05 00 0c 43 06 00 ce 03 00 02 00 03 |.......C........|
+000005b0: 00 00 25 02 86 04 00 00 00 88 04 00 01 00 b7 cb |..%.............|
+000005c0: b7 cc c7 ba a5 ec 0c 95 01 c7 b8 ab ed 05 95 00 |................|
+000005d0: ee f1 39 e5 00 00 00 c8 b9 ad 11 ec 05 0e c7 b8 |..9.............|
+000005e0: ad f1 29 f6 03 1e 20 00 04 08 0d 00 0d 0e 0c 04 |..)... .........|
+000005f0: 12 07 0d 06 0c 04 13 09 18 09 1b 0e 0c 04 1b 12 |................|
+00000600: 0c 04 07 1b 00 0c 43 06 00 d0 03 00 02 00 03 00 |......C.........|
+00000610: 00 1e 02 86 04 00 00 00 88 04 00 01 00 b7 cb b7 |................|
+00000620: cc 95 01 95 00 c7 ba a5 ed f8 39 e5 00 00 00 c8 |..........9.....|
+00000630: ba ad 11 ec 05 0e c7 ba ad f1 29 f6 03 1a 2c 00 |..........)...,.|
+00000640: 04 08 0d 00 0e 0a 0d 00 0d 08 0c 04 12 15 1b 0e |................|
+00000650: 0c 04 1b 12 0c 04 07 1b 00 0c 43 06 00 d2 03 00 |..........C.....|
+00000660: 03 00 03 00 00 40 03 86 04 00 00 00 88 04 00 01 |.....@..........|
+00000670: 00 8a 04 00 02 00 b7 cc b7 cb c7 ba a5 ec 07 95 |................|
+00000680: 01 95 00 ee f6 39 e5 00 00 00 c8 ba ad 11 ec 05 |.....9..........|
+00000690: 0e c7 ba ad f1 0e b7 cc b7 cd c9 ba a5 ec 07 95 |................|
+000006a0: 01 95 02 ee f6 39 e5 00 00 00 c8 ba ad 11 ec 05 |.....9..........|
+000006b0: 0e c9 ba ad f1 29 f6 03 30 36 00 04 08 0d 0a 0c |.....)..06......|
+000006c0: 0e 0c 04 12 11 0b 1e 19 27 1b 0e 0c 04 1b 12 0c |........'.......|
+000006d0: 04 07 1b 0d 0b 17 20 0c 04 12 19 0b 26 19 2f 1b |...... .....&./.|
+000006e0: 0e 0c 04 1b 12 0c 04 07 1b 00 0c 43 06 00 d4 03 |...........C....|
+000006f0: 00 06 00 06 00 00 80 05 06 86 04 00 00 00 8c 04 |................|
+00000700: 00 01 00 8e 04 00 02 00 90 04 00 03 00 8a 04 00 |................|
+00000710: 04 00 92 04 00 05 00 26 00 00 cc 0b b8 4e 0a 01 |.......&.....N..|
+00000720: 00 00 b9 4e 0b 01 00 00 7e ee 0d cb c8 43 0c 01 |...N....~....C..|
+00000730: 00 00 c7 24 01 00 0e 81 ec f2 0e 0e 39 e5 00 00 |...$........9...|
+00000740: 00 c8 43 39 00 00 00 24 00 00 04 0d 01 00 00 04 |..C9...$........|
+00000750: 0e 01 00 00 f3 0e 0b b9 4e 0a 01 00 00 b9 4e 0b |........N.....N.|
+00000760: 01 00 00 ba 4e 01 00 00 80 cd 0b ba 4e 04 00 00 |....N.......N...|
+00000770: 80 ce 39 9d 00 00 00 43 62 00 00 00 c9 ca 24 02 |..9....Cb.....$.|
+00000780: 00 0e 26 00 00 cc c9 7e ee 0d cb c8 43 0c 01 00 |..&....~....C...|
+00000790: 00 c7 24 01 00 0e 81 ec f2 0e 0e 39 e5 00 00 00 |..$........9....|
+000007a0: c8 43 39 00 00 00 24 00 00 04 0f 01 00 00 04 0e |.C9...$.........|
+000007b0: 01 00 00 f3 0e 0b b9 4e 0b 01 00 00 ba 4e 01 00 |.......N.....N..|
+000007c0: 00 80 cd 39 9d 00 00 00 43 67 00 00 00 c9 04 0a |...9....Cg......|
+000007d0: 01 00 00 0b b8 4e 42 00 00 00 24 03 00 0e 0b ba |.....NB...$.....|
+000007e0: 4e 0a 01 00 00 ce 39 9d 00 00 00 43 62 00 00 00 |N.....9....Cb...|
+000007f0: c9 ca 24 02 00 0e 26 00 00 cc c9 7e ee 0d cb c8 |..$...&....~....|
+00000800: 43 0c 01 00 00 c7 24 01 00 0e 81 ec f2 0e 0e 39 |C.....$........9|
+00000810: e5 00 00 00 c8 43 39 00 00 00 24 00 00 04 10 01 |.....C9...$.....|
+00000820: 00 00 04 0e 01 00 00 f3 0e 26 00 00 cd b7 cb c7 |.........&......|
+00000830: bf 0a a5 ec 10 c9 43 0c 01 00 00 c7 24 01 00 0e |......C.....$...|
+00000840: 95 00 ee ec 26 00 00 cc c9 7e ee 0d cb c8 43 0c |....&....~....C.|
+00000850: 01 00 00 c7 24 01 00 0e 81 ec f2 0e 0e 39 e5 00 |....$........9..|
+00000860: 00 00 c8 43 39 00 00 00 24 00 00 04 11 01 00 00 |...C9...$.......|
+00000870: 04 0e 01 00 00 f3 0e 0b b7 4e 0a 01 00 00 cd 26 |.........N.....&|
+00000880: 00 00 cc 0b b8 4e 0a 01 00 00 b9 4e 0b 01 00 00 |.....N.....N....|
+00000890: 7e ee 18 c9 1b 44 0a 01 00 00 c8 43 0c 01 00 00 |~....D.....C....|
+000008a0: c9 42 0a 01 00 00 24 01 00 0e 81 ec e7 0e 0e 39 |.B....$........9|
+000008b0: e5 00 00 00 c8 43 39 00 00 00 24 00 00 04 0d 01 |.....C9...$.....|
+000008c0: 00 00 04 0e 01 00 00 f3 0e b7 26 01 00 cd 26 00 |..........&...&.|
+000008d0: 00 cc 0b b8 4e 0a 01 00 00 b9 4e 0b 01 00 00 7e |....N.....N....~|
+000008e0: ee 12 c9 b7 1d 4b c8 43 0c 01 00 00 c9 b7 48 24 |.....K.C......H$|
+000008f0: 01 00 0e 81 ec ed 0e 0e 39 e5 00 00 00 c8 43 39 |........9.....C9|
+00000900: 00 00 00 24 00 00 04 0d 01 00 00 04 0e 01 00 00 |...$............|
+00000910: f3 0e 26 00 00 cc 0b b8 4e 0a 01 00 00 b9 4e 0b |..&.....N.....N.|
+00000920: 01 00 00 7e ee 0f c5 04 c8 43 0c 01 00 00 c4 04 |...~.....C......|
+00000930: 24 01 00 0e 81 ec f0 0e 0e 39 e5 00 00 00 c8 43 |$........9.....C|
+00000940: 39 00 00 00 24 00 00 04 0d 01 00 00 04 0e 01 00 |9...$...........|
+00000950: 00 f3 0e 26 00 00 cc b9 c5 05 0b b8 4e 0a 01 00 |...&........N...|
+00000960: 00 b9 4e 0b 01 00 00 7e ee 0f c5 05 c8 43 0c 01 |..N....~.....C..|
+00000970: 00 00 c4 05 24 01 00 0e 81 ec f0 0e 0e 39 e5 00 |....$........9..|
+00000980: 00 00 c8 43 39 00 00 00 24 00 00 04 0d 01 00 00 |...C9...$.......|
+00000990: 04 0e 01 00 00 f3 29 f6 03 f6 01 43 00 04 08 67 |......)....C...g|
+000009a0: 0a 08 01 07 06 1b 0c 07 01 31 17 1b 0e 07 06 1b |.........1......|
+000009b0: 12 43 19 0e 0b 67 00 2b 00 1b 0c 1b 20 07 06 07 |.C...g.+.... ...|
+000009c0: 07 17 29 17 14 16 09 08 01 07 06 1b 0c 07 01 31 |..)............1|
+000009d0: 17 1b 0e 07 06 1b 12 43 19 0f 0b 49 00 1b 0c 1b |.......C...I....|
+000009e0: 20 43 01 17 29 2b 00 1b 0c 1b 20 07 06 07 07 17 | C..)+.... .....|
+000009f0: 29 17 14 16 09 08 01 07 06 1b 0c 07 01 31 17 1b |)............1..|
+00000a00: 0e 07 06 1b 12 43 19 0e 0b 17 0a 0c 0e 11 04 12 |.....C..........|
+00000a10: 13 07 02 1b 0c 07 01 15 16 18 29 17 14 16 09 08 |..........).....|
+00000a20: 01 07 06 1b 0c 07 01 31 17 1b 0e 07 06 1b 12 43 |.......1.......C|
+00000a30: 19 0e 0b 2b 00 67 0a 07 02 21 03 07 06 1b 0c 07 |...+.g...!......|
+00000a40: 02 1b 03 31 17 1b 0e 07 06 1b 12 43 19 0e 0b 1c |...1.......C....|
+00000a50: 00 67 0a 0c 02 0d 03 07 06 1b 0c 0c 02 07 03 31 |.g.............1|
+00000a60: 17 1b 0e 07 06 1b 12 43 19 0e 0b 72 08 07 06 1b |.......C...r....|
+00000a70: 0c 0c 01 31 17 1b 0e 07 06 1b 12 43 19 0e 0b 81 |...1.......C....|
+00000a80: 08 07 06 1b 0c 0c 01 31 17 1b 0e 07 06 1b 12 43 |.......1.......C|
+00000a90: 19 00 0c 43 06 00 d6 03 00 02 00 04 00 00 94 01 |...C............|
+00000aa0: 02 86 04 00 00 00 8c 04 00 01 00 26 00 00 cc 0b |...........&....|
+00000ab0: b8 4e 0a 01 00 00 b9 4e 0b 01 00 00 ba 4e 12 01 |.N.....N.....N..|
+00000ac0: 00 00 7e ee 16 cb c7 04 0b 01 00 00 ad ed 0c c8 |..~.............|
+00000ad0: 43 0c 01 00 00 c7 24 01 00 0e 81 ec e9 0e 0e 39 |C.....$........9|
+00000ae0: e5 00 00 00 c8 43 39 00 00 00 24 00 00 04 13 01 |.....C9...$.....|
+00000af0: 00 00 ab f1 0e 26 00 00 cc 0b b8 4e 0a 01 00 00 |.....&.....N....|
+00000b00: b9 4e 0b 01 00 00 ba 4e 12 01 00 00 7e ee 16 cb |.N.....N....~...|
+00000b10: c7 04 12 01 00 00 ad ed 10 c8 43 0c 01 00 00 c7 |..........C.....|
+00000b20: 24 01 00 0e 81 ec e9 0e 0e 39 e5 00 00 00 c8 43 |$........9.....C|
+00000b30: 39 00 00 00 24 00 00 04 0d 01 00 00 ab f1 29 f6 |9...$.........).|
+00000b40: 03 3b 82 01 00 04 08 85 0a 08 06 20 04 13 0b 07 |.;......... ....|
+00000b50: 06 1b 0c 07 01 31 17 1b 0e 07 06 1b 12 2a 06 07 |.....1.......*..|
+00000b60: 1f 0d 0b 85 0a 08 06 20 04 13 0b 07 06 1b 0c 07 |....... ........|
+00000b70: 01 31 17 1b 0e 07 06 1b 12 2a 06 07 1f 00 0c 43 |.1.......*.....C|
+00000b80: 06 00 d8 03 00 05 00 05 00 02 7f 05 a8 04 01 00 |................|
+00000b90: 60 b0 01 01 01 20 8a 02 01 02 20 aa 04 01 03 20 |`.... .... .... |
+00000ba0: ac 04 02 04 20 63 03 00 63 02 00 63 01 00 63 00 |.... c..c..c..c.|
+00000bb0: 00 c3 cb 0b cc 39 c6 00 00 00 11 64 01 00 0b c2 |.....9.....d....|
+00000bc0: 00 4f 69 00 00 00 4e 69 00 00 00 c2 01 4f 68 00 |.Oi...Ni.....Oh.|
+00000bd0: 00 00 4e 68 00 00 00 21 02 00 cd c3 ce 63 04 00 |..Nh...!.....c..|
+00000be0: 64 02 00 7e ee 2a c5 04 64 03 00 04 17 01 00 00 |d..~.*..d.......|
+00000bf0: 64 04 00 9f 9f 11 65 03 00 0e 64 04 00 04 07 01 |d.....e...d.....|
+00000c00: 00 00 ab ec 0b 04 08 01 00 00 11 65 00 00 0e 81 |...........e....|
+00000c10: ec d5 0e 0e 39 e5 00 00 00 64 03 00 04 18 01 00 |....9....d......|
+00000c20: 00 ab f1 29 f6 03 23 93 01 00 55 28 20 0c 8e 01 |...)..#...U( ...|
+00000c30: 00 09 18 0d 2b 13 2a 1a 11 03 07 0d 21 00 2a 04 |....+.*.....!.*.|
+00000c40: 12 03 4f 0f 1b 0e 2a 08 07 09 00 0c 43 06 00 00 |..O...*.....C...|
+00000c50: 00 00 00 03 00 00 13 00 04 07 01 00 00 04 08 01 |................|
+00000c60: 00 00 04 04 01 00 00 26 03 00 28 f6 03 05 97 01 |.......&..(.....|
+00000c70: 11 5d 09 00 0c 43 06 00 00 02 01 02 03 01 00 2c |.]...C.........,|
+00000c80: 03 b0 01 00 01 00 b2 04 00 01 00 10 00 01 00 a8 |................|
+00000c90: 04 00 09 08 cb 68 00 00 c3 ac ec 0e d4 68 00 00 |.....h.......h..|
+00000ca0: ab ec 07 39 47 00 00 00 28 0b 0a 4e 41 00 00 00 |...9G...(..NA...|
+00000cb0: 0a 4e 3f 00 00 00 c7 d4 48 4e 42 00 00 00 28 f6 |.N?.....HNB...(.|
+00000cc0: 03 17 9a 01 22 0d 23 16 18 11 12 07 0e 11 05 12 |....".#.........|
+00000cd0: 23 1b 0d 4f 76 07 01 20 73 00 0c 43 06 00 da 03 |#..Ov.. s..C....|
+00000ce0: 00 02 00 03 00 00 27 02 86 04 00 00 00 88 04 00 |......'.........|
+00000cf0: 01 00 b7 cc b7 cb c7 ba a5 ec 0e 95 01 c7 b7 ab |................|
+00000d00: ed 03 ee 05 95 00 ee ef 39 e5 00 00 00 c8 b9 ad |........9.......|
+00000d10: 11 ec 05 0e c7 b8 ad f1 29 f6 03 23 a9 01 00 04 |........)..#....|
+00000d20: 08 0d 12 0c 0e 0c 04 12 19 0d 06 0c 04 00 05 03 |................|
+00000d30: 1c 00 04 10 2f 1b 0e 0c 04 1b 12 0c 04 07 1b 00 |..../...........|
+00000d40: 0c 43 06 00 dc 03 00 03 00 03 00 00 4d 03 86 04 |.C..........M...|
+00000d50: 00 00 00 8e 04 00 01 00 b4 04 00 02 00 c3 cd b7 |................|
+00000d60: cb c7 ba a5 ec 30 04 1b 01 00 00 cc c7 11 b7 ad |.....0..........|
+00000d70: ec 09 04 07 01 00 00 cc ee 14 11 b8 ad ec 09 04 |................|
+00000d80: 08 01 00 00 cc ee 07 04 04 01 00 00 cc 0e c8 96 |................|
+00000d90: 02 95 00 ee cd 39 e5 00 00 00 c9 04 1c 01 00 00 |.....9..........|
+00000da0: ad 11 ec 05 0e c7 ba ad f1 29 f6 03 29 b6 01 00 |.........)..)...|
+00000db0: 04 08 0d 0a 0c 0e 0c 04 12 13 21 10 22 00 46 00 |..........!.".F.|
+00000dc0: 2d 00 28 0b 00 03 19 1c 00 04 1e 27 1b 0e 20 04 |-.(........'.. .|
+00000dd0: 1b 1a 0c 04 07 23 00 0c 43 06 00 de 03 00 03 00 |.....#..C.......|
+00000de0: 03 00 00 53 03 86 04 00 00 00 8e 04 00 01 00 b4 |...S............|
+00000df0: 04 00 02 00 c3 cd b7 cb c7 bb a5 ec 36 04 1b 01 |............6...|
+00000e00: 00 00 cc c7 11 b7 ad ec 09 04 07 01 00 00 cc ee |................|
+00000e10: 1a 11 b8 ad ec 09 04 08 01 00 00 cc ee 0d 11 b9 |................|
+00000e20: ad ec 04 0e ee 09 c3 c7 9f cc 0e c8 96 02 95 00 |................|
+00000e30: ee c7 39 e5 00 00 00 c9 04 1d 01 00 00 ad 11 ec |..9.............|
+00000e40: 05 0e c7 bb ad f1 29 f6 03 2f ca 01 00 04 08 0d |......)../......|
+00000e50: 0a 0c 0e 0c 04 12 13 21 10 22 00 46 00 00 10 0a |.......!.".F....|
+00000e60: 00 07 12 07 03 14 19 00 03 1d 1c 00 04 22 27 1b |............."'.|
+00000e70: 0e 20 04 1b 1a 0c 04 07 23 00 0c 43 06 00 e0 03 |. ......#..C....|
+00000e80: 00 01 00 05 00 00 27 01 c8 03 03 00 03 6f 0a 00 |......'......o..|
+00000e90: 00 00 04 1e 01 00 00 30 cb 6f 19 00 00 00 39 e5 |.......0.o....9.|
+00000ea0: 00 00 00 c7 04 1e 01 00 00 04 19 00 00 00 f3 0e |................|
+00000eb0: 06 72 28 30 f6 03 0d e0 01 00 36 10 28 00 1b 0e |.r(0......6.(...|
+00000ec0: 39 01 0d 0b 00 0c 43 06 00 e2 03 00 02 00 04 00 |9.....C.........|
+00000ed0: 00 24 02 8e 04 00 00 00 c8 03 03 00 03 6f 09 00 |.$...........o..|
+00000ee0: 00 00 b8 cb 0e ee 0d cc 6f 09 00 00 00 b9 cb 0e |........o.......|
+00000ef0: ee 02 30 39 e5 00 00 00 c7 b8 04 19 00 00 00 f3 |..09............|
+00000f00: 29 f6 03 0d ea 01 00 1e 10 3c 00 22 07 1b 0e 25 |)........<."...%|
+00000f10: 01 00 0c 43 06 00 e4 03 00 02 00 04 00 00 4f 02 |...C..........O.|
+00000f20: b4 04 00 00 00 c8 03 03 00 03 c3 cb 6f 15 00 00 |............o...|
+00000f30: 00 04 1f 01 00 00 96 00 0e 06 70 24 00 00 00 0e |..........p$....|
+00000f40: ee 26 cc 6f 15 00 00 00 04 04 01 00 00 96 00 0e |.&.o............|
+00000f50: 06 70 0d 00 00 00 0e ee 0f 70 05 00 00 00 30 04 |.p.......p....0.|
+00000f60: 20 01 00 00 96 00 71 39 e5 00 00 00 c7 04 21 01 | .....q9......!.|
+00000f70: 00 00 04 19 00 00 00 f3 29 f6 03 11 f4 01 00 04 |........).......|
+00000f80: 08 27 0c 78 00 78 00 2c 0b 1b 0e 39 01 00 0c 43 |.'.x.x.,...9...C|
+00000f90: 06 00 e6 03 00 02 00 04 00 00 47 02 b4 04 00 00 |..........G.....|
+00000fa0: 00 c8 03 03 00 03 c3 cb 6f 11 00 00 00 04 1f 01 |........o.......|
+00000fb0: 00 00 96 00 04 04 01 00 00 30 cc 6f 11 00 00 00 |.........0.o....|
+00000fc0: c8 96 00 0e 06 70 0d 00 00 00 0e ee 0f 70 05 00 |.....p.......p..|
+00000fd0: 00 00 30 04 20 01 00 00 96 00 71 39 e5 00 00 00 |..0. .....q9....|
+00000fe0: c7 04 22 01 00 00 04 19 00 00 00 f3 29 f6 03 13 |..".........)...|
+00000ff0: 82 02 00 04 08 27 0c 3f 03 28 04 64 00 2c 0b 1b |.....'.?.(.d.,..|
+00001000: 0e 39 01 00 0c 43 06 00 e8 03 00 01 00 04 00 00 |.9...C..........|
+00001010: 3a 01 b4 04 00 00 00 c3 cb 6f 15 00 00 00 04 1f |:........o......|
+00001020: 01 00 00 96 00 0e 06 70 0d 00 00 00 0e ee 11 70 |.......p.......p|
+00001030: 05 00 00 00 30 04 20 01 00 00 96 00 71 ee db 39 |....0. .....q..9|
+00001040: e5 00 00 00 c7 04 21 01 00 00 04 19 00 00 00 f3 |......!.........|
+00001050: 29 f6 03 11 91 02 00 04 08 28 14 00 17 0a 00 37 |)........(.....7|
+00001060: 13 1b 0e 39 01 00 0c 43 06 00 ea 03 00 02 00 04 |...9...C........|
+00001070: 00 01 22 02 c0 04 00 00 00 b4 04 00 01 40 c2 00 |.."..........@..|
+00001080: cb c3 cc 39 e5 00 00 00 c7 f0 b8 ad f1 0e 39 e5 |...9..........9.|
+00001090: 00 00 00 c8 04 21 01 00 00 04 23 01 00 00 f3 29 |.....!....#....)|
+000010a0: f6 03 15 a0 02 00 00 05 16 08 1b 0e 07 02 0c 06 |................|
+000010b0: 07 09 0d 0b 1b 0e 39 01 00 0c 43 06 00 c0 04 00 |......9...C.....|
+000010c0: 00 00 04 01 00 24 00 b4 04 01 01 6f 14 00 00 00 |.....$.....o....|
+000010d0: df 04 1f 01 00 00 9f e3 b8 72 70 0b 00 00 00 28 |.........rp....(|
+000010e0: 70 05 00 00 00 30 df 04 20 01 00 00 9f e3 71 f6 |p....0.. .....q.|
+000010f0: 03 0d a1 02 04 1d 10 20 04 12 03 46 00 20 04 00 |....... ...F. ..|
+00001100: 0c 43 06 00 ec 03 00 02 00 04 00 00 5a 02 b4 04 |.C..........Z...|
+00001110: 00 00 00 c8 03 05 00 03 c3 cb 6f 24 00 00 00 6f |..........o$...o|
+00001120: 11 00 00 00 04 1f 01 00 00 96 00 04 07 01 00 00 |................|
+00001130: 30 70 05 00 00 00 30 04 20 01 00 00 96 00 71 cc |0p....0. .....q.|
+00001140: 6f 11 00 00 00 c8 96 00 0e 06 70 0d 00 00 00 0e |o.........p.....|
+00001150: ee 0f 70 05 00 00 00 30 04 24 01 00 00 96 00 71 |..p....0.$.....q|
+00001160: 39 e5 00 00 00 c7 04 25 01 00 00 04 19 00 00 00 |9......%........|
+00001170: f3 29 f6 03 17 ae 02 00 04 08 41 14 3f 03 28 04 |.)........A.?.(.|
+00001180: 00 0e 08 07 64 00 2c 0b 1b 0e 39 01 00 0c 43 06 |....d.,...9...C.|
+00001190: 00 ee 03 00 03 00 04 00 00 55 03 86 04 00 00 00 |.........U......|
+000011a0: b4 04 00 01 00 c8 03 05 00 03 c3 cc 0b b8 4e 0a |..............N.|
+000011b0: 01 00 00 b9 4e 0b 01 00 00 7e ee 31 cb 6f 0d 00 |....N....~.1.o..|
+000011c0: 00 00 c7 96 01 04 07 01 00 00 30 cd 6f 11 00 00 |..........0.o...|
+000011d0: 00 c9 96 01 0e 06 70 0d 00 00 00 0e ee 0f 70 05 |......p.......p.|
+000011e0: 00 00 00 30 04 20 01 00 00 96 01 71 81 ec ce 0e |...0. .....q....|
+000011f0: 0e 39 e5 00 00 00 c8 04 26 01 00 00 ad f1 29 f6 |.9......&.....).|
+00001200: 03 15 c2 02 00 04 08 7d 14 2b 03 28 04 64 00 46 |.......}.+.(.d.F|
+00001210: 13 1b 0e 20 04 07 05 00 0c 43 06 00 f0 03 00 00 |... .....C......|
+00001220: 00 00 00 00 02 00 ee ff f6 03 03 d3 02 00 00    |...............|
+```
+
+### WASM
+```
+00000000: 05 43 02 65 0c 61 73 73 65 72 74 14 74 65 73 74 |.C.e.assert.test|
+00000010: 5f 77 68 69 6c 65 20 74 65 73 74 5f 77 68 69 6c |_while test_whil|
+00000020: 65 5f 62 72 65 61 6b 1a 74 65 73 74 5f 64 6f 5f |e_break.test_do_|
+00000030: 77 68 69 6c 65 10 74 65 73 74 5f 66 6f 72 16 74 |while.test_for.t|
+00000040: 65 73 74 5f 66 6f 72 5f 69 6e 18 74 65 73 74 5f |est_for_in.test_|
+00000050: 66 6f 72 5f 69 6e 32 22 74 65 73 74 5f 66 6f 72 |for_in2"test_for|
+00000060: 5f 69 6e 5f 70 72 6f 78 79 1c 74 65 73 74 5f 66 |_in_proxy.test_f|
+00000070: 6f 72 5f 62 72 65 61 6b 18 74 65 73 74 5f 73 77 |or_break.test_sw|
+00000080: 69 74 63 68 31 18 74 65 73 74 5f 73 77 69 74 63 |itch1.test_switc|
+00000090: 68 32 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h2.test_try_catc|
+000000a0: 68 31 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h1.test_try_catc|
+000000b0: 68 32 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h2.test_try_catc|
+000000c0: 68 33 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h3.test_try_catc|
+000000d0: 68 34 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h4.test_try_catc|
+000000e0: 68 35 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h5.test_try_catc|
+000000f0: 68 36 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h6.test_try_catc|
+00000100: 68 37 1e 74 65 73 74 5f 74 72 79 5f 63 61 74 63 |h7.test_try_catc|
+00000110: 68 38 24 74 65 73 74 5f 63 79 63 6c 69 63 5f 6c |h8$test_cyclic_l|
+00000120: 61 62 65 6c 73 18 5f 5f 6c 6f 61 64 53 63 72 69 |abels.__loadScri|
+00000130: 70 74 1c 74 65 73 74 5f 61 73 73 65 72 74 2e 6a |pt.test_assert.j|
+00000140: 73 5a 5f 5f 74 65 73 74 73 5f 5f 2f 66 69 78 74 |sZ__tests__/fixt|
+00000150: 75 72 65 73 2f 71 75 69 63 6b 6a 73 2d 74 65 73 |ures/quickjs-tes|
+00000160: 74 73 2f 74 65 73 74 5f 6c 6f 6f 70 2e 6a 73 0c |ts/test_loop.js.|
+00000170: 61 63 74 75 61 6c 10 65 78 70 65 63 74 65 64 2e |actual.expected.|
+00000180: 61 73 73 65 72 74 69 6f 6e 20 66 61 69 6c 65 64 |assertion failed|
+00000190: 3a 20 67 6f 74 20 7c 02 7c 18 2c 20 65 78 70 65 |: got |.|., expe|
+000001a0: 63 74 65 64 20 7c 04 20 28 02 29 02 69 02 63 02 |cted |. (.).i.c.|
+000001b0: 6a 06 74 61 62 02 61 02 62 02 6b 02 78 02 79 08 |j.tab.a.b.k.x.y.|
+000001c0: 70 75 73 68 06 78 2c 79 0c 66 6f 72 5f 69 6e 0e |push.x,y.for_in.|
+000001d0: 31 2c 78 2c 79 2c 34 06 31 2c 79 26 30 2c 31 2c |1,x,y,4.1,y&0,1,|
+000001e0: 32 2c 33 2c 34 2c 35 2c 36 2c 37 2c 38 2c 39 02 |2,3,4,5,6,7,8,9.|
+000001f0: 7a 06 78 2c 7a 16 72 65 6d 6f 76 65 64 5f 6b 65 |z.x,z.removed_ke|
+00000200: 79 06 73 74 72 02 6f 02 20 08 20 61 20 63 06 6b |y.str.o. . a c.k|
+00000210: 65 79 02 73 02 3f 06 61 62 63 06 61 62 33 0a 68 |ey.s.?.abc.ab3.h|
+00000220: 65 6c 6c 6f 02 74 02 66 04 74 66 06 74 63 66 0c |ello.t.f.tf.tcf.|
+00000230: 63 61 74 63 68 36 02 67 08 74 66 61 67 0c 78 61 |catch6.g.tfag.xa|
+00000240: 66 79 61 66 0c 00 06 00 a4 01 00 02 00 03 00 14 |fyaf............|
+00000250: b7 03 02 a6 01 00 00 00 c8 03 03 00 03 40 e5 00 |.............@..|
+00000260: 00 00 40 40 e6 00 00 00 40 40 e7 00 00 00 40 40 |..@@....@@....@@|
+00000270: e8 00 00 00 40 40 e9 00 00 00 40 40 ea 00 00 00 |....@@....@@....|
+00000280: 40 40 eb 00 00 00 40 40 ec 00 00 00 40 40 ed 00 |@@....@@....@@..|
+00000290: 00 00 40 40 ee 00 00 00 40 40 ef 00 00 00 40 40 |..@@....@@....@@|
+000002a0: f0 00 00 00 40 40 f1 00 00 00 40 40 f2 00 00 00 |....@@....@@....|
+000002b0: 40 40 f3 00 00 00 40 40 f4 00 00 00 40 40 f5 00 |@@....@@....@@..|
+000002c0: 00 00 40 40 f6 00 00 00 40 40 f7 00 00 00 40 40 |..@@....@@....@@|
+000002d0: f8 00 00 00 40 c2 00 41 e5 00 00 00 00 c2 01 41 |....@..A.......A|
+000002e0: e6 00 00 00 00 c2 02 41 e7 00 00 00 00 c2 03 41 |.......A.......A|
+000002f0: e8 00 00 00 00 c2 04 41 e9 00 00 00 00 c2 05 41 |.......A.......A|
+00000300: ea 00 00 00 00 c2 06 41 eb 00 00 00 00 c2 07 41 |.......A.......A|
+00000310: ec 00 00 00 00 c2 08 41 ed 00 00 00 00 c2 09 41 |.......A.......A|
+00000320: ee 00 00 00 00 c2 0a 41 ef 00 00 00 00 c2 0b 41 |.......A.......A|
+00000330: f0 00 00 00 00 c2 0c 41 f1 00 00 00 00 c2 0d 41 |.......A.......A|
+00000340: f2 00 00 00 00 c2 0e 41 f3 00 00 00 00 c2 0f 41 |.......A.......A|
+00000350: f4 00 00 00 00 c2 10 41 f5 00 00 00 00 c2 11 41 |.......A.......A|
+00000360: f6 00 00 00 00 c2 12 41 f7 00 00 00 00 c2 13 41 |.......A.......A|
+00000370: f8 00 00 00 00 06 cb 6f 13 00 00 00 39 f9 00 00 |.......o....9...|
+00000380: 00 04 fa 00 00 00 f1 cb 0e ee 0b cc 6f 07 00 00 |............o...|
+00000390: 00 0e ee 02 30 39 e6 00 00 00 f0 cb 39 e7 00 00 |....09......9...|
+000003a0: 00 f0 cb 39 e8 00 00 00 f0 cb 39 e9 00 00 00 f0 |...9......9.....|
+000003b0: cb 39 ed 00 00 00 f0 cb 39 ee 00 00 00 f0 cb 39 |.9......9......9|
+000003c0: ef 00 00 00 f0 cb 39 ea 00 00 00 f0 cb 39 eb 00 |......9......9..|
+000003d0: 00 00 f0 cb 39 ec 00 00 00 f0 cb 39 f0 00 00 00 |....9......9....|
+000003e0: f0 cb 39 f1 00 00 00 f0 cb 39 f2 00 00 00 f0 cb |..9......9......|
+000003f0: 39 f3 00 00 00 f0 cb 39 f4 00 00 00 f0 cb 39 f5 |9......9......9.|
+00000400: 00 00 00 f0 cb 39 f6 00 00 00 f0 cb 39 f7 00 00 |.....9......9...|
+00000410: 00 f0 cf 28 f6 03 54 00 00 00 9f 02 24 08 34 18 |...(..T.....$.4.|
+00000420: 00 0f 92 05 1f 1b 14 0d 13 1b 20 0d 1f 1b 1a 0d |.......... .....|
+00000430: 19 1b 10 0d 0f 1b 1c 0d 1b 1b 18 0d 17 1b 18 0d |................|
+00000440: 17 1b 16 0d 15 1b 18 0d 17 1b 22 0d 21 1b 1e 0d |..........".!...|
+00000450: 1d 1b 1e 0d 1d 1b 1e 0d 1d 1b 1e 0d 1d 1b 1e 0d |................|
+00000460: 1d 1b 1e 0d 1d 1b 1e 0d 1d 1b 1e 00 0c 43 06 00 |.............C..|
+00000470: ca 03 03 01 03 04 00 00 79 04 f8 03 00 01 00 fa |........y.......|
+00000480: 03 00 01 00 68 00 01 00 9e 01 00 01 00 0c 01 cb |....h...........|
+00000490: c7 eb b8 ab ec 03 0a d8 d3 d4 ad ec 02 29 d3 f5 |.............)..|
+000004a0: ed 2f d4 f5 ed 2b d3 99 04 4b 00 00 00 ab ec 21 |./...+...K.....!|
+000004b0: d4 99 04 4b 00 00 00 ab ec 17 d3 43 39 00 00 00 |...K.......C9...|
+000004c0: 24 00 00 d4 43 39 00 00 00 24 00 00 ad ec 02 29 |$...C9...$.....)|
+000004d0: 39 9f 00 00 00 04 fe 00 00 00 d3 9f 04 ff 00 00 |9...............|
+000004e0: 00 9f 04 00 01 00 00 9f d4 9f 04 ff 00 00 00 9f |................|
+000004f0: d5 ec 10 04 01 01 00 00 d5 9f 04 02 01 00 00 9f |................|
+00000500: ee 02 c3 9f f1 30 f6 03 50 03 00 12 10 07 12 0c |.....0..P.......|
+00000510: 10 12 21 0d 00 07 16 07 07 12 0d 08 00 07 0e 11 |..!.............|
+00000520: 18 07 12 12 23 07 0e 2f 2c 07 12 30 59 07 0c 1b |....#../,..0Y...|
+00000530: 12 11 0e 07 10 1b 12 11 29 12 29 08 04 34 44 07 |........).)..4D.|
+00000540: 03 20 12 20 0c 08 3f 07 03 20 16 08 31 2a 22 07 |. . ..?.. ..1*".|
+00000550: 03 20 14 15 0c 06 31 07 15 00 0c 43 06 00 cc 03 |. ....1....C....|
+00000560: 00 02 00 03 00 00 19 02 86 04 00 00 00 88 04 00 |................|
+00000570: 01 00 b7 cb b7 cc c7 ba a5 ec 07 95 01 95 00 ee |................|
+00000580: f6 39 e5 00 00 00 c8 ba ad f1 29 f6 03 16 16 00 |.9........).....|
+00000590: 04 08 0d 00 0d 0e 0c 04 12 07 0d 00 18 09 1b 0e |................|
+000005a0: 0c 04 07 05 00 0c 43 06 00 ce 03 00 02 00 03 00 |......C.........|
+000005b0: 00 25 02 86 04 00 00 00 88 04 00 01 00 b7 cb b7 |.%..............|
+000005c0: cc c7 ba a5 ec 0c 95 01 c7 b8 ab ed 05 95 00 ee |................|
+000005d0: f1 39 e5 00 00 00 c8 b9 ad 11 ec 05 0e c7 b8 ad |.9..............|
+000005e0: f1 29 f6 03 1e 20 00 04 08 0d 00 0d 0e 0c 04 12 |.)... ..........|
+000005f0: 07 0d 06 0c 04 13 09 18 09 1b 0e 0c 04 1b 12 0c |................|
+00000600: 04 07 1b 00 0c 43 06 00 d0 03 00 02 00 03 00 00 |.....C..........|
+00000610: 1e 02 86 04 00 00 00 88 04 00 01 00 b7 cb b7 cc |................|
+00000620: 95 01 95 00 c7 ba a5 ed f8 39 e5 00 00 00 c8 ba |.........9......|
+00000630: ad 11 ec 05 0e c7 ba ad f1 29 f6 03 1a 2c 00 04 |.........)...,..|
+00000640: 08 0d 00 0e 0a 0d 00 0d 08 0c 04 12 15 1b 0e 0c |................|
+00000650: 04 1b 12 0c 04 07 1b 00 0c 43 06 00 d2 03 00 03 |.........C......|
+00000660: 00 03 00 00 40 03 86 04 00 00 00 88 04 00 01 00 |....@...........|
+00000670: 8a 04 00 02 00 b7 cc b7 cb c7 ba a5 ec 07 95 01 |................|
+00000680: 95 00 ee f6 39 e5 00 00 00 c8 ba ad 11 ec 05 0e |....9...........|
+00000690: c7 ba ad f1 0e b7 cc b7 cd c9 ba a5 ec 07 95 01 |................|
+000006a0: 95 02 ee f6 39 e5 00 00 00 c8 ba ad 11 ec 05 0e |....9...........|
+000006b0: c9 ba ad f1 29 f6 03 30 36 00 04 08 0d 0a 0c 0e |....)..06.......|
+000006c0: 0c 04 12 11 0b 1e 19 27 1b 0e 0c 04 1b 12 0c 04 |.......'........|
+000006d0: 07 1b 0d 0b 17 20 0c 04 12 19 0b 26 19 2f 1b 0e |..... .....&./..|
+000006e0: 0c 04 1b 12 0c 04 07 1b 00 0c 43 06 00 d4 03 00 |..........C.....|
+000006f0: 06 00 06 00 00 80 05 06 86 04 00 00 00 8c 04 00 |................|
+00000700: 01 00 8e 04 00 02 00 90 04 00 03 00 8a 04 00 04 |................|
+00000710: 00 92 04 00 05 00 26 00 00 cc 0b b8 4e 0a 01 00 |......&.....N...|
+00000720: 00 b9 4e 0b 01 00 00 7e ee 0d cb c8 43 0c 01 00 |..N....~....C...|
+00000730: 00 c7 24 01 00 0e 81 ec f2 0e 0e 39 e5 00 00 00 |..$........9....|
+00000740: c8 43 39 00 00 00 24 00 00 04 0d 01 00 00 04 0e |.C9...$.........|
+00000750: 01 00 00 f3 0e 0b b9 4e 0a 01 00 00 b9 4e 0b 01 |.......N.....N..|
+00000760: 00 00 ba 4e 01 00 00 80 cd 0b ba 4e 04 00 00 80 |...N.......N....|
+00000770: ce 39 9d 00 00 00 43 62 00 00 00 c9 ca 24 02 00 |.9....Cb.....$..|
+00000780: 0e 26 00 00 cc c9 7e ee 0d cb c8 43 0c 01 00 00 |.&....~....C....|
+00000790: c7 24 01 00 0e 81 ec f2 0e 0e 39 e5 00 00 00 c8 |.$........9.....|
+000007a0: 43 39 00 00 00 24 00 00 04 0f 01 00 00 04 0e 01 |C9...$..........|
+000007b0: 00 00 f3 0e 0b b9 4e 0b 01 00 00 ba 4e 01 00 00 |......N.....N...|
+000007c0: 80 cd 39 9d 00 00 00 43 67 00 00 00 c9 04 0a 01 |..9....Cg.......|
+000007d0: 00 00 0b b8 4e 42 00 00 00 24 03 00 0e 0b ba 4e |....NB...$.....N|
+000007e0: 0a 01 00 00 ce 39 9d 00 00 00 43 62 00 00 00 c9 |.....9....Cb....|
+000007f0: ca 24 02 00 0e 26 00 00 cc c9 7e ee 0d cb c8 43 |.$...&....~....C|
+00000800: 0c 01 00 00 c7 24 01 00 0e 81 ec f2 0e 0e 39 e5 |.....$........9.|
+00000810: 00 00 00 c8 43 39 00 00 00 24 00 00 04 10 01 00 |....C9...$......|
+00000820: 00 04 0e 01 00 00 f3 0e 26 00 00 cd b7 cb c7 bf |........&.......|
+00000830: 0a a5 ec 10 c9 43 0c 01 00 00 c7 24 01 00 0e 95 |.....C.....$....|
+00000840: 00 ee ec 26 00 00 cc c9 7e ee 0d cb c8 43 0c 01 |...&....~....C..|
+00000850: 00 00 c7 24 01 00 0e 81 ec f2 0e 0e 39 e5 00 00 |...$........9...|
+00000860: 00 c8 43 39 00 00 00 24 00 00 04 11 01 00 00 04 |..C9...$........|
+00000870: 0e 01 00 00 f3 0e 0b b7 4e 0a 01 00 00 cd 26 00 |........N.....&.|
+00000880: 00 cc 0b b8 4e 0a 01 00 00 b9 4e 0b 01 00 00 7e |....N.....N....~|
+00000890: ee 18 c9 1b 44 0a 01 00 00 c8 43 0c 01 00 00 c9 |....D.....C.....|
+000008a0: 42 0a 01 00 00 24 01 00 0e 81 ec e7 0e 0e 39 e5 |B....$........9.|
+000008b0: 00 00 00 c8 43 39 00 00 00 24 00 00 04 0d 01 00 |....C9...$......|
+000008c0: 00 04 0e 01 00 00 f3 0e b7 26 01 00 cd 26 00 00 |.........&...&..|
+000008d0: cc 0b b8 4e 0a 01 00 00 b9 4e 0b 01 00 00 7e ee |...N.....N....~.|
+000008e0: 12 c9 b7 1d 4b c8 43 0c 01 00 00 c9 b7 48 24 01 |....K.C......H$.|
+000008f0: 00 0e 81 ec ed 0e 0e 39 e5 00 00 00 c8 43 39 00 |.......9.....C9.|
+00000900: 00 00 24 00 00 04 0d 01 00 00 04 0e 01 00 00 f3 |..$.............|
+00000910: 0e 26 00 00 cc 0b b8 4e 0a 01 00 00 b9 4e 0b 01 |.&.....N.....N..|
+00000920: 00 00 7e ee 0f c5 04 c8 43 0c 01 00 00 c4 04 24 |..~.....C......$|
+00000930: 01 00 0e 81 ec f0 0e 0e 39 e5 00 00 00 c8 43 39 |........9.....C9|
+00000940: 00 00 00 24 00 00 04 0d 01 00 00 04 0e 01 00 00 |...$............|
+00000950: f3 0e 26 00 00 cc b9 c5 05 0b b8 4e 0a 01 00 00 |..&........N....|
+00000960: b9 4e 0b 01 00 00 7e ee 0f c5 05 c8 43 0c 01 00 |.N....~.....C...|
+00000970: 00 c4 05 24 01 00 0e 81 ec f0 0e 0e 39 e5 00 00 |...$........9...|
+00000980: 00 c8 43 39 00 00 00 24 00 00 04 0d 01 00 00 04 |..C9...$........|
+00000990: 0e 01 00 00 f3 29 f6 03 f6 01 43 00 04 08 67 0a |.....)....C...g.|
+000009a0: 08 01 07 06 1b 0c 07 01 31 17 1b 0e 07 06 1b 12 |........1.......|
+000009b0: 43 19 0e 0b 67 00 2b 00 1b 0c 1b 20 07 06 07 07 |C...g.+.... ....|
+000009c0: 17 29 17 14 16 09 08 01 07 06 1b 0c 07 01 31 17 |.)............1.|
+000009d0: 1b 0e 07 06 1b 12 43 19 0f 0b 49 00 1b 0c 1b 20 |......C...I.... |
+000009e0: 43 01 17 29 2b 00 1b 0c 1b 20 07 06 07 07 17 29 |C..)+.... .....)|
+000009f0: 17 14 16 09 08 01 07 06 1b 0c 07 01 31 17 1b 0e |............1...|
+00000a00: 07 06 1b 12 43 19 0e 0b 17 0a 0c 0e 11 04 12 13 |....C...........|
+00000a10: 07 02 1b 0c 07 01 15 16 18 29 17 14 16 09 08 01 |.........)......|
+00000a20: 07 06 1b 0c 07 01 31 17 1b 0e 07 06 1b 12 43 19 |......1.......C.|
+00000a30: 0e 0b 2b 00 67 0a 07 02 21 03 07 06 1b 0c 07 02 |..+.g...!.......|
+00000a40: 1b 03 31 17 1b 0e 07 06 1b 12 43 19 0e 0b 1c 00 |..1.......C.....|
+00000a50: 67 0a 0c 02 0d 03 07 06 1b 0c 0c 02 07 03 31 17 |g.............1.|
+00000a60: 1b 0e 07 06 1b 12 43 19 0e 0b 72 08 07 06 1b 0c |......C...r.....|
+00000a70: 0c 01 31 17 1b 0e 07 06 1b 12 43 19 0e 0b 81 08 |..1.......C.....|
+00000a80: 07 06 1b 0c 0c 01 31 17 1b 0e 07 06 1b 12 43 19 |......1.......C.|
+00000a90: 00 0c 43 06 00 d6 03 00 02 00 04 00 00 94 01 02 |..C.............|
+00000aa0: 86 04 00 00 00 8c 04 00 01 00 26 00 00 cc 0b b8 |..........&.....|
+00000ab0: 4e 0a 01 00 00 b9 4e 0b 01 00 00 ba 4e 12 01 00 |N.....N.....N...|
+00000ac0: 00 7e ee 16 cb c7 04 0b 01 00 00 ad ed 0c c8 43 |.~.............C|
+00000ad0: 0c 01 00 00 c7 24 01 00 0e 81 ec e9 0e 0e 39 e5 |.....$........9.|
+00000ae0: 00 00 00 c8 43 39 00 00 00 24 00 00 04 13 01 00 |....C9...$......|
+00000af0: 00 ab f1 0e 26 00 00 cc 0b b8 4e 0a 01 00 00 b9 |....&.....N.....|
+00000b00: 4e 0b 01 00 00 ba 4e 12 01 00 00 7e ee 16 cb c7 |N.....N....~....|
+00000b10: 04 12 01 00 00 ad ed 10 c8 43 0c 01 00 00 c7 24 |.........C.....$|
+00000b20: 01 00 0e 81 ec e9 0e 0e 39 e5 00 00 00 c8 43 39 |........9.....C9|
+00000b30: 00 00 00 24 00 00 04 0d 01 00 00 ab f1 29 f6 03 |...$.........)..|
+00000b40: 3b 82 01 00 04 08 85 0a 08 06 20 04 13 0b 07 06 |;......... .....|
+00000b50: 1b 0c 07 01 31 17 1b 0e 07 06 1b 12 2a 06 07 1f |....1.......*...|
+00000b60: 0d 0b 85 0a 08 06 20 04 13 0b 07 06 1b 0c 07 01 |...... .........|
+00000b70: 31 17 1b 0e 07 06 1b 12 2a 06 07 1f 00 0c 43 06 |1.......*.....C.|
+00000b80: 00 d8 03 00 05 00 05 00 02 7f 05 a8 04 01 00 60 |...............`|
+00000b90: b0 01 01 01 20 8a 02 01 02 20 aa 04 01 03 20 ac |.... .... .... .|
+00000ba0: 04 02 04 20 63 03 00 63 02 00 63 01 00 63 00 00 |... c..c..c..c..|
+00000bb0: c3 cb 0b cc 39 c6 00 00 00 11 64 01 00 0b c2 00 |....9.....d.....|
+00000bc0: 4f 69 00 00 00 4e 69 00 00 00 c2 01 4f 68 00 00 |Oi...Ni.....Oh..|
+00000bd0: 00 4e 68 00 00 00 21 02 00 cd c3 ce 63 04 00 64 |.Nh...!.....c..d|
+00000be0: 02 00 7e ee 2a c5 04 64 03 00 04 17 01 00 00 64 |..~.*..d.......d|
+00000bf0: 04 00 9f 9f 11 65 03 00 0e 64 04 00 04 07 01 00 |.....e...d......|
+00000c00: 00 ab ec 0b 04 08 01 00 00 11 65 00 00 0e 81 ec |..........e.....|
+00000c10: d5 0e 0e 39 e5 00 00 00 64 03 00 04 18 01 00 00 |...9....d.......|
+00000c20: ab f1 29 f6 03 23 93 01 00 55 28 20 0c 8e 01 00 |..)..#...U( ....|
+00000c30: 09 18 0d 2b 13 2a 1a 11 03 07 0d 21 00 2a 04 12 |...+.*.....!.*..|
+00000c40: 03 4f 0f 1b 0e 2a 08 07 09 00 0c 43 06 00 00 00 |.O...*.....C....|
+00000c50: 00 00 03 00 00 13 00 04 07 01 00 00 04 08 01 00 |................|
+00000c60: 00 04 04 01 00 00 26 03 00 28 f6 03 05 97 01 11 |......&..(......|
+00000c70: 5d 09 00 0c 43 06 00 00 02 01 02 03 01 00 2c 03 |]...C.........,.|
+00000c80: b0 01 00 01 00 b2 04 00 01 00 10 00 01 00 a8 04 |................|
+00000c90: 00 09 08 cb 68 00 00 c3 ac ec 0e d4 68 00 00 ab |....h.......h...|
+00000ca0: ec 07 39 47 00 00 00 28 0b 0a 4e 41 00 00 00 0a |..9G...(..NA....|
+00000cb0: 4e 3f 00 00 00 c7 d4 48 4e 42 00 00 00 28 f6 03 |N?.....HNB...(..|
+00000cc0: 17 9a 01 22 0d 23 16 18 11 12 07 0e 11 05 12 23 |...".#.........#|
+00000cd0: 1b 0d 4f 76 07 01 20 73 00 0c 43 06 00 da 03 00 |..Ov.. s..C.....|
+00000ce0: 02 00 03 00 00 27 02 86 04 00 00 00 88 04 00 01 |.....'..........|
+00000cf0: 00 b7 cc b7 cb c7 ba a5 ec 0e 95 01 c7 b7 ab ed |................|
+00000d00: 03 ee 05 95 00 ee ef 39 e5 00 00 00 c8 b9 ad 11 |.......9........|
+00000d10: ec 05 0e c7 b8 ad f1 29 f6 03 23 a9 01 00 04 08 |.......)..#.....|
+00000d20: 0d 12 0c 0e 0c 04 12 19 0d 06 0c 04 00 05 03 1c |................|
+00000d30: 00 04 10 2f 1b 0e 0c 04 1b 12 0c 04 07 1b 00 0c |.../............|
+00000d40: 43 06 00 dc 03 00 03 00 03 00 00 4d 03 86 04 00 |C..........M....|
+00000d50: 00 00 8e 04 00 01 00 b4 04 00 02 00 c3 cd b7 cb |................|
+00000d60: c7 ba a5 ec 30 04 1b 01 00 00 cc c7 11 b7 ad ec |....0...........|
+00000d70: 09 04 07 01 00 00 cc ee 14 11 b8 ad ec 09 04 08 |................|
+00000d80: 01 00 00 cc ee 07 04 04 01 00 00 cc 0e c8 96 02 |................|
+00000d90: 95 00 ee cd 39 e5 00 00 00 c9 04 1c 01 00 00 ad |....9...........|
+00000da0: 11 ec 05 0e c7 ba ad f1 29 f6 03 29 b6 01 00 04 |........)..)....|
+00000db0: 08 0d 0a 0c 0e 0c 04 12 13 21 10 22 00 46 00 2d |.........!.".F.-|
+00000dc0: 00 28 0b 00 03 19 1c 00 04 1e 27 1b 0e 20 04 1b |.(........'.. ..|
+00000dd0: 1a 0c 04 07 23 00 0c 43 06 00 de 03 00 03 00 03 |....#..C........|
+00000de0: 00 00 53 03 86 04 00 00 00 8e 04 00 01 00 b4 04 |..S.............|
+00000df0: 00 02 00 c3 cd b7 cb c7 bb a5 ec 36 04 1b 01 00 |...........6....|
+00000e00: 00 cc c7 11 b7 ad ec 09 04 07 01 00 00 cc ee 1a |................|
+00000e10: 11 b8 ad ec 09 04 08 01 00 00 cc ee 0d 11 b9 ad |................|
+00000e20: ec 04 0e ee 09 c3 c7 9f cc 0e c8 96 02 95 00 ee |................|
+00000e30: c7 39 e5 00 00 00 c9 04 1d 01 00 00 ad 11 ec 05 |.9..............|
+00000e40: 0e c7 bb ad f1 29 f6 03 2f ca 01 00 04 08 0d 0a |.....)../.......|
+00000e50: 0c 0e 0c 04 12 13 21 10 22 00 46 00 00 10 0a 00 |......!.".F.....|
+00000e60: 07 12 07 03 14 19 00 03 1d 1c 00 04 22 27 1b 0e |............"'..|
+00000e70: 20 04 1b 1a 0c 04 07 23 00 0c 43 06 00 e0 03 00 | ......#..C.....|
+00000e80: 01 00 05 00 00 27 01 c8 03 03 00 03 6f 0a 00 00 |.....'......o...|
+00000e90: 00 04 1e 01 00 00 30 cb 6f 19 00 00 00 39 e5 00 |......0.o....9..|
+00000ea0: 00 00 c7 04 1e 01 00 00 04 19 00 00 00 f3 0e 06 |................|
+00000eb0: 72 28 30 f6 03 0d e0 01 00 36 10 28 00 1b 0e 39 |r(0......6.(...9|
+00000ec0: 01 0d 0b 00 0c 43 06 00 e2 03 00 02 00 04 00 00 |.....C..........|
+00000ed0: 24 02 8e 04 00 00 00 c8 03 03 00 03 6f 09 00 00 |$...........o...|
+00000ee0: 00 b8 cb 0e ee 0d cc 6f 09 00 00 00 b9 cb 0e ee |.......o........|
+00000ef0: 02 30 39 e5 00 00 00 c7 b8 04 19 00 00 00 f3 29 |.09............)|
+00000f00: f6 03 0d ea 01 00 1e 10 3c 00 22 07 1b 0e 25 01 |........<."...%.|
+00000f10: 00 0c 43 06 00 e4 03 00 02 00 04 00 00 4f 02 b4 |..C..........O..|
+00000f20: 04 00 00 00 c8 03 03 00 03 c3 cb 6f 15 00 00 00 |...........o....|
+00000f30: 04 1f 01 00 00 96 00 0e 06 70 24 00 00 00 0e ee |.........p$.....|
+00000f40: 26 cc 6f 15 00 00 00 04 04 01 00 00 96 00 0e 06 |&.o.............|
+00000f50: 70 0d 00 00 00 0e ee 0f 70 05 00 00 00 30 04 20 |p.......p....0. |
+00000f60: 01 00 00 96 00 71 39 e5 00 00 00 c7 04 21 01 00 |.....q9......!..|
+00000f70: 00 04 19 00 00 00 f3 29 f6 03 11 f4 01 00 04 08 |.......)........|
+00000f80: 27 0c 78 00 78 00 2c 0b 1b 0e 39 01 00 0c 43 06 |'.x.x.,...9...C.|
+00000f90: 00 e6 03 00 02 00 04 00 00 47 02 b4 04 00 00 00 |.........G......|
+00000fa0: c8 03 03 00 03 c3 cb 6f 11 00 00 00 04 1f 01 00 |.......o........|
+00000fb0: 00 96 00 04 04 01 00 00 30 cc 6f 11 00 00 00 c8 |........0.o.....|
+00000fc0: 96 00 0e 06 70 0d 00 00 00 0e ee 0f 70 05 00 00 |....p.......p...|
+00000fd0: 00 30 04 20 01 00 00 96 00 71 39 e5 00 00 00 c7 |.0. .....q9.....|
+00000fe0: 04 22 01 00 00 04 19 00 00 00 f3 29 f6 03 13 82 |.".........)....|
+00000ff0: 02 00 04 08 27 0c 3f 03 28 04 64 00 2c 0b 1b 0e |....'.?.(.d.,...|
+00001000: 39 01 00 0c 43 06 00 e8 03 00 01 00 04 00 00 38 |9...C..........8|
+00001010: 01 b4 04 00 00 00 c3 cb 6f 15 00 00 00 04 1f 01 |........o.......|
+00001020: 00 00 96 00 0e 06 70 0d 00 00 00 0e ee 0f 70 05 |......p.......p.|
+00001030: 00 00 00 30 04 20 01 00 00 96 00 71 39 e5 00 00 |...0. .....q9...|
+00001040: 00 c7 04 21 01 00 00 04 19 00 00 00 f3 29 f6 03 |...!.........)..|
+00001050: 11 91 02 00 04 08 28 14 59 00 23 00 2d 13 1b 0e |......(.Y.#.-...|
+00001060: 39 01 00 0c 43 06 00 ea 03 00 02 00 04 00 01 22 |9...C.........."|
+00001070: 02 c0 04 00 00 00 b4 04 00 01 40 c2 00 cb c3 cc |..........@.....|
+00001080: 39 e5 00 00 00 c7 f0 b8 ad f1 0e 39 e5 00 00 00 |9..........9....|
+00001090: c8 04 21 01 00 00 04 23 01 00 00 f3 29 f6 03 15 |..!....#....)...|
+000010a0: a0 02 00 00 05 16 08 1b 0e 07 02 0c 06 07 09 0d |................|
+000010b0: 0b 1b 0e 39 01 00 0c 43 06 00 c0 04 00 00 00 04 |...9...C........|
+000010c0: 01 00 24 00 b4 04 01 01 6f 14 00 00 00 df 04 1f |..$.....o.......|
+000010d0: 01 00 00 9f e3 b8 72 70 0b 00 00 00 28 70 05 00 |......rp....(p..|
+000010e0: 00 00 30 df 04 20 01 00 00 9f e3 71 f6 03 0d a1 |..0.. .....q....|
+000010f0: 02 04 1d 10 20 04 12 03 46 00 20 04 00 0c 43 06 |.... ...F. ...C.|
+00001100: 00 ec 03 00 02 00 04 00 00 5a 02 b4 04 00 00 00 |.........Z......|
+00001110: c8 03 05 00 03 c3 cb 6f 24 00 00 00 6f 11 00 00 |.......o$...o...|
+00001120: 00 04 1f 01 00 00 96 00 04 07 01 00 00 30 70 05 |.............0p.|
+00001130: 00 00 00 30 04 20 01 00 00 96 00 71 cc 6f 11 00 |...0. .....q.o..|
+00001140: 00 00 c8 96 00 0e 06 70 0d 00 00 00 0e ee 0f 70 |.......p.......p|
+00001150: 05 00 00 00 30 04 24 01 00 00 96 00 71 39 e5 00 |....0.$.....q9..|
+00001160: 00 00 c7 04 25 01 00 00 04 19 00 00 00 f3 29 f6 |....%.........).|
+00001170: 03 17 ae 02 00 04 08 41 14 3f 03 28 04 00 0e 08 |.......A.?.(....|
+00001180: 07 64 00 2c 0b 1b 0e 39 01 00 0c 43 06 00 ee 03 |.d.,...9...C....|
+00001190: 00 03 00 04 00 00 55 03 86 04 00 00 00 b4 04 00 |......U.........|
+000011a0: 01 00 c8 03 05 00 03 c3 cc 0b b8 4e 0a 01 00 00 |...........N....|
+000011b0: b9 4e 0b 01 00 00 7e ee 31 cb 6f 0d 00 00 00 c7 |.N....~.1.o.....|
+000011c0: 96 01 04 07 01 00 00 30 cd 6f 11 00 00 00 c9 96 |.......0.o......|
+000011d0: 01 0e 06 70 0d 00 00 00 0e ee 0f 70 05 00 00 00 |...p.......p....|
+000011e0: 30 04 20 01 00 00 96 01 71 81 ec ce 0e 0e 39 e5 |0. .....q.....9.|
+000011f0: 00 00 00 c8 04 26 01 00 00 ad f1 29 f6 03 15 c2 |.....&.....)....|
+00001200: 02 00 04 08 7d 14 2b 03 28 04 64 00 46 13 1b 0e |....}.+.(.d.F...|
+00001210: 20 04 07 05 00 0c 43 06 00 f0 03 00 00 00 00 00 | .....C.........|
+00001220: 00 02 00 ee ff f6 03 03 d3 02 00 00             |............|
+```

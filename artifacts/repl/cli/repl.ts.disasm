@@ -1,5 +1,5 @@
 Module bytecode version: 5
-Atom count: 394
+Atom count: 135
 
 === Outer Function ===
 bytecodeLen=15 stackSize=2 varCount=0 argCount=0
@@ -14,7 +14,7 @@ bytecodeLen=15 stackSize=2 varCount=0 argCount=0
     14  return_async                                 pop=1 push=0      2f
 
 === Inner Function #0 ===
-bytecodeLen=1083 stackSize=2 varCount=116 argCount=1
+bytecodeLen=498 stackSize=2 varCount=52 argCount=1
      0  fclosure8                0                   pop=0 push=1      c2 00
      2  put_loc8                 40                  pop=1 push=0      c5 28
      4  fclosure8                1                   pop=0 push=1      c2 01
@@ -39,360 +39,137 @@ bytecodeLen=1083 stackSize=2 varCount=116 argCount=1
     42  put_loc8                 50                  pop=1 push=0      c5 32
     44  fclosure8                11                  pop=0 push=1      c2 0b
     46  put_loc8                 51                  pop=1 push=0      c5 33
-    48  fclosure8                12                  pop=0 push=1      c2 0c
-    50  put_loc8                 52                  pop=1 push=0      c5 34
-    52  fclosure8                13                  pop=0 push=1      c2 0d
-    54  put_loc8                 53                  pop=1 push=0      c5 35
-    56  fclosure8                14                  pop=0 push=1      c2 0e
-    58  put_loc8                 54                  pop=1 push=0      c5 36
-    60  fclosure8                15                  pop=0 push=1      c2 0f
-    62  put_loc8                 55                  pop=1 push=0      c5 37
-    64  fclosure8                16                  pop=0 push=1      c2 10
-    66  put_loc8                 56                  pop=1 push=0      c5 38
-    68  fclosure8                17                  pop=0 push=1      c2 11
-    70  put_loc8                 57                  pop=1 push=0      c5 39
-    72  fclosure8                18                  pop=0 push=1      c2 12
-    74  put_loc8                 58                  pop=1 push=0      c5 3a
-    76  fclosure8                19                  pop=0 push=1      c2 13
-    78  put_loc8                 59                  pop=1 push=0      c5 3b
-    80  fclosure8                20                  pop=0 push=1      c2 14
-    82  put_loc8                 60                  pop=1 push=0      c5 3c
-    84  fclosure8                21                  pop=0 push=1      c2 15
-    86  put_loc8                 61                  pop=1 push=0      c5 3d
-    88  fclosure8                22                  pop=0 push=1      c2 16
-    90  put_loc8                 62                  pop=1 push=0      c5 3e
-    92  fclosure8                23                  pop=0 push=1      c2 17
-    94  put_loc8                 63                  pop=1 push=0      c5 3f
-    96  fclosure8                24                  pop=0 push=1      c2 18
-    98  put_loc8                 64                  pop=1 push=0      c5 40
-   100  fclosure8                25                  pop=0 push=1      c2 19
-   102  put_loc8                 65                  pop=1 push=0      c5 41
-   104  fclosure8                26                  pop=0 push=1      c2 1a
-   106  put_loc8                 66                  pop=1 push=0      c5 42
-   108  fclosure8                27                  pop=0 push=1      c2 1b
-   110  put_loc8                 67                  pop=1 push=0      c5 43
-   112  fclosure8                28                  pop=0 push=1      c2 1c
-   114  put_loc8                 68                  pop=1 push=0      c5 44
-   116  fclosure8                29                  pop=0 push=1      c2 1d
-   118  put_loc8                 69                  pop=1 push=0      c5 45
-   120  fclosure8                30                  pop=0 push=1      c2 1e
-   122  put_loc8                 70                  pop=1 push=0      c5 46
-   124  fclosure8                31                  pop=0 push=1      c2 1f
-   126  put_loc8                 71                  pop=1 push=0      c5 47
-   128  fclosure8                32                  pop=0 push=1      c2 20
-   130  put_loc8                 72                  pop=1 push=0      c5 48
-   132  fclosure8                33                  pop=0 push=1      c2 21
-   134  put_loc8                 73                  pop=1 push=0      c5 49
-   136  fclosure8                34                  pop=0 push=1      c2 22
-   138  put_loc8                 74                  pop=1 push=0      c5 4a
-   140  fclosure8                35                  pop=0 push=1      c2 23
-   142  put_loc8                 75                  pop=1 push=0      c5 4b
-   144  fclosure8                36                  pop=0 push=1      c2 24
-   146  put_loc8                 76                  pop=1 push=0      c5 4c
-   148  fclosure8                37                  pop=0 push=1      c2 25
-   150  put_loc8                 77                  pop=1 push=0      c5 4d
-   152  fclosure8                38                  pop=0 push=1      c2 26
-   154  put_loc8                 78                  pop=1 push=0      c5 4e
-   156  fclosure8                39                  pop=0 push=1      c2 27
-   158  put_loc8                 79                  pop=1 push=0      c5 4f
-   160  fclosure8                40                  pop=0 push=1      c2 28
-   162  put_loc8                 80                  pop=1 push=0      c5 50
-   164  fclosure8                41                  pop=0 push=1      c2 29
-   166  put_loc8                 81                  pop=1 push=0      c5 51
-   168  fclosure8                42                  pop=0 push=1      c2 2a
-   170  put_loc8                 82                  pop=1 push=0      c5 52
-   172  fclosure8                43                  pop=0 push=1      c2 2b
-   174  put_loc8                 83                  pop=1 push=0      c5 53
-   176  fclosure8                44                  pop=0 push=1      c2 2c
-   178  put_loc8                 84                  pop=1 push=0      c5 54
-   180  fclosure8                45                  pop=0 push=1      c2 2d
-   182  put_loc8                 85                  pop=1 push=0      c5 55
-   184  fclosure8                46                  pop=0 push=1      c2 2e
-   186  put_loc8                 86                  pop=1 push=0      c5 56
-   188  fclosure8                47                  pop=0 push=1      c2 2f
-   190  put_loc8                 87                  pop=1 push=0      c5 57
-   192  fclosure8                48                  pop=0 push=1      c2 30
-   194  put_loc8                 88                  pop=1 push=0      c5 58
-   196  fclosure8                49                  pop=0 push=1      c2 31
-   198  put_loc8                 89                  pop=1 push=0      c5 59
-   200  fclosure8                50                  pop=0 push=1      c2 32
-   202  put_loc8                 90                  pop=1 push=0      c5 5a
-   204  fclosure8                51                  pop=0 push=1      c2 33
-   206  put_loc8                 91                  pop=1 push=0      c5 5b
-   208  fclosure8                52                  pop=0 push=1      c2 34
-   210  put_loc8                 92                  pop=1 push=0      c5 5c
-   212  fclosure8                53                  pop=0 push=1      c2 35
-   214  put_loc8                 94                  pop=1 push=0      c5 5e
-   216  fclosure8                54                  pop=0 push=1      c2 36
-   218  put_loc8                 98                  pop=1 push=0      c5 62
-   220  fclosure8                55                  pop=0 push=1      c2 37
-   222  put_loc8                 99                  pop=1 push=0      c5 63
-   224  fclosure8                56                  pop=0 push=1      c2 38
-   226  put_loc8                 100                 pop=1 push=0      c5 64
-   228  fclosure8                57                  pop=0 push=1      c2 39
-   230  put_loc8                 101                 pop=1 push=0      c5 65
-   232  fclosure8                58                  pop=0 push=1      c2 3a
-   234  put_loc8                 103                 pop=1 push=0      c5 67
-   236  fclosure8                59                  pop=0 push=1      c2 3b
-   238  put_loc8                 104                 pop=1 push=0      c5 68
-   240  fclosure8                60                  pop=0 push=1      c2 3c
-   242  put_loc8                 105                 pop=1 push=0      c5 69
-   244  fclosure8                61                  pop=0 push=1      c2 3d
-   246  put_loc8                 106                 pop=1 push=0      c5 6a
-   248  fclosure8                62                  pop=0 push=1      c2 3e
-   250  put_loc8                 107                 pop=1 push=0      c5 6b
-   252  fclosure8                63                  pop=0 push=1      c2 3f
-   254  put_loc8                 108                 pop=1 push=0      c5 6c
-   256  fclosure8                64                  pop=0 push=1      c2 40
-   258  put_loc8                 109                 pop=1 push=0      c5 6d
-   260  fclosure8                65                  pop=0 push=1      c2 41
-   262  put_loc8                 110                 pop=1 push=0      c5 6e
-   264  fclosure8                66                  pop=0 push=1      c2 42
-   266  put_loc8                 111                 pop=1 push=0      c5 6f
-   268  fclosure8                67                  pop=0 push=1      c2 43
-   270  put_loc8                 112                 pop=1 push=0      c5 70
-   272  fclosure8                68                  pop=0 push=1      c2 44
-   274  put_loc8                 113                 pop=1 push=0      c5 71
-   276  fclosure8                69                  pop=0 push=1      c2 45
-   278  put_loc8                 114                 pop=1 push=0      c5 72
-   280  fclosure8                70                  pop=0 push=1      c2 46
-   282  put_loc8                 115                 pop=1 push=0      c5 73
-   284  get_arg0                 arg=0               pop=0 push=1      d3
-   285  get_var_ref_check        1                   pop=0 push=1      68 01 00
-   288  put_field                230                 pop=2 push=0      44 e6 00 00 00
-   293  get_arg0                 arg=0               pop=0 push=1      d3
-   294  get_var_ref_check        0                   pop=0 push=1      68 00 00
-   297  put_field                229                 pop=2 push=0      44 e5 00 00 00
-   302  get_arg0                 arg=0               pop=0 push=1      d3
-   303  get_field                157                 pop=1 push=1      42 9d 00 00 00
-   308  put_loc0                 loc=0               pop=1 push=0      cb
-   309  get_arg0                 arg=0               pop=0 push=1      d3
-   310  get_field                161                 pop=1 push=1      42 a1 00 00 00
-   315  put_loc1                 loc=1               pop=1 push=0      cc
-   316  get_arg0                 arg=0               pop=0 push=1      d3
-   317  get_field                158                 pop=1 push=1      42 9e 00 00 00
-   322  put_loc2                 loc=2               pop=1 push=0      cd
-   323  get_arg0                 arg=0               pop=0 push=1      d3
-   324  get_field                167                 pop=1 push=1      42 a7 00 00 00
-   329  put_loc3                 loc=3               pop=1 push=0      ce
-   330  get_arg0                 arg=0               pop=0 push=1      d3
-   331  get_field                165                 pop=1 push=1      42 a5 00 00 00
-   336  put_loc8                 4                   pop=1 push=0      c5 04
-   338  get_arg0                 arg=0               pop=0 push=1      d3
-   339  get_field                232                 pop=1 push=1      42 e8 00 00 00
-   344  put_loc8                 5                   pop=1 push=0      c5 05
-   346  get_arg0                 arg=0               pop=0 push=1      d3
-   347  get_field                233                 pop=1 push=1      42 e9 00 00 00
-   352  put_loc8                 6                   pop=1 push=0      c5 06
-   354  object                                       pop=0 push=1      0b
-   355  push_atom_value          343                 pop=0 push=1      04 57 01 00 00
-   360  define_field             344                 pop=2 push=1      4e 58 01 00 00
-   365  push_atom_value          345                 pop=0 push=1      04 59 01 00 00
-   370  define_field             346                 pop=2 push=1      4e 5a 01 00 00
-   375  push_atom_value          347                 pop=0 push=1      04 5b 01 00 00
-   380  define_field             348                 pop=2 push=1      4e 5c 01 00 00
-   385  push_atom_value          349                 pop=0 push=1      04 5d 01 00 00
-   390  define_field             350                 pop=2 push=1      4e 5e 01 00 00
-   395  push_atom_value          351                 pop=0 push=1      04 5f 01 00 00
-   400  define_field             352                 pop=2 push=1      4e 60 01 00 00
-   405  push_atom_value          353                 pop=0 push=1      04 61 01 00 00
-   410  define_field             354                 pop=2 push=1      4e 62 01 00 00
-   415  push_atom_value          355                 pop=0 push=1      04 63 01 00 00
-   420  define_field             356                 pop=2 push=1      4e 64 01 00 00
-   425  push_atom_value          357                 pop=0 push=1      04 65 01 00 00
-   430  define_field             358                 pop=2 push=1      4e 66 01 00 00
-   435  push_atom_value          359                 pop=0 push=1      04 67 01 00 00
-   440  define_field             360                 pop=2 push=1      4e 68 01 00 00
-   445  push_atom_value          361                 pop=0 push=1      04 69 01 00 00
-   450  define_field             362                 pop=2 push=1      4e 6a 01 00 00
-   455  push_atom_value          361                 pop=0 push=1      04 69 01 00 00
-   460  define_field             363                 pop=2 push=1      4e 6b 01 00 00
-   465  push_atom_value          364                 pop=0 push=1      04 6c 01 00 00
-   470  define_field             365                 pop=2 push=1      4e 6d 01 00 00
-   475  push_atom_value          366                 pop=0 push=1      04 6e 01 00 00
-   480  define_field             367                 pop=2 push=1      4e 6f 01 00 00
-   485  push_atom_value          368                 pop=0 push=1      04 70 01 00 00
-   490  define_field             369                 pop=2 push=1      4e 71 01 00 00
-   495  push_atom_value          370                 pop=0 push=1      04 72 01 00 00
-   500  define_field             371                 pop=2 push=1      4e 73 01 00 00
-   505  push_atom_value          372                 pop=0 push=1      04 74 01 00 00
-   510  define_field             373                 pop=2 push=1      4e 75 01 00 00
-   515  push_atom_value          374                 pop=0 push=1      04 76 01 00 00
-   520  define_field             375                 pop=2 push=1      4e 77 01 00 00
-   525  push_atom_value          376                 pop=0 push=1      04 78 01 00 00
-   530  define_field             377                 pop=2 push=1      4e 79 01 00 00
-   535  put_loc8                 7                   pop=1 push=0      c5 07
-   537  object                                       pop=0 push=1      0b
-   538  push_atom_value          367                 pop=0 push=1      04 6f 01 00 00
-   543  define_field             22                  pop=2 push=1      4e 16 00 00 00
-   548  push_atom_value          360                 pop=0 push=1      04 68 01 00 00
-   553  define_field             378                 pop=2 push=1      4e 7a 01 00 00
-   558  push_atom_value          375                 pop=0 push=1      04 77 01 00 00
-   563  define_field             74                  pop=2 push=1      4e 4a 00 00 00
-   568  push_atom_value          358                 pop=0 push=1      04 66 01 00 00
-   573  define_field             379                 pop=2 push=1      4e 7b 01 00 00
-   578  push_atom_value          350                 pop=0 push=1      04 5e 01 00 00
-   583  define_field             72                  pop=2 push=1      4e 48 00 00 00
-   588  push_atom_value          377                 pop=0 push=1      04 79 01 00 00
-   593  define_field             380                 pop=2 push=1      4e 7c 01 00 00
-   598  push_atom_value          369                 pop=0 push=1      04 71 01 00 00
-   603  define_field             27                  pop=2 push=1      4e 1b 00 00 00
-   608  push_atom_value          373                 pop=0 push=1      04 75 01 00 00
-   613  define_field             381                 pop=2 push=1      4e 7d 01 00 00
-   618  push_atom_value          367                 pop=0 push=1      04 6f 01 00 00
-   623  define_field             382                 pop=2 push=1      4e 7e 01 00 00
-   628  push_atom_value          348                 pop=0 push=1      04 5c 01 00 00
-   633  define_field             383                 pop=2 push=1      4e 7f 01 00 00
-   638  push_atom_value          377                 pop=0 push=1      04 79 01 00 00
-   643  define_field             384                 pop=2 push=1      4e 80 01 00 00
-   648  push_atom_value          365                 pop=0 push=1      04 6d 01 00 00
-   653  define_field             385                 pop=2 push=1      4e 81 01 00 00
-   658  put_loc8                 8                   pop=1 push=0      c5 08
-   660  array_from               0                   pop=0 push=1      26 00 00
-   663  put_loc8                 9                   pop=1 push=0      c5 09
-   665  push_empty_string                            pop=0 push=1      c3
-   666  put_loc8                 10                  pop=1 push=0      c5 0a
-   668  push_empty_string                            pop=0 push=1      c3
-   669  put_loc8                 14                  pop=1 push=0      c5 0e
-   671  push_empty_string                            pop=0 push=1      c3
-   672  put_loc8                 15                  pop=1 push=0      c5 0f
-   674  push_0                   0                   pop=0 push=1      b7
-   675  put_loc8                 16                  pop=1 push=0      c5 10
-   677  push_atom_value          386                 pop=0 push=1      04 82 01 00 00
-   682  put_loc8                 17                  pop=1 push=0      c5 11
-   684  push_atom_value          387                 pop=0 push=1      04 83 01 00 00
-   689  put_loc8                 18                  pop=1 push=0      c5 12
-   691  push_true                                    pop=0 push=1      0a
-   692  put_loc8                 19                  pop=1 push=0      c5 13
-   694  push_false                                   pop=0 push=1      09
-   695  put_loc8                 20                  pop=1 push=0      c5 14
-   697  push_true                                    pop=0 push=1      0a
-   698  put_loc8                 21                  pop=1 push=0      c5 15
-   700  push_0                   0                   pop=0 push=1      b7
-   701  put_loc8                 23                  pop=1 push=0      c5 17
-   703  push_empty_string                            pop=0 push=1      c3
-   704  put_loc8                 24                  pop=1 push=0      c5 18
-   706  push_0                   0                   pop=0 push=1      b7
-   707  put_loc8                 25                  pop=1 push=0      c5 19
-   709  push_empty_string                            pop=0 push=1      c3
-   710  put_loc8                 26                  pop=1 push=0      c5 1a
-   712  push_0                   0                   pop=0 push=1      b7
-   713  put_loc8                 27                  pop=1 push=0      c5 1b
-   715  push_empty_string                            pop=0 push=1      c3
-   716  put_loc8                 28                  pop=1 push=0      c5 1c
-   718  push_0                   0                   pop=0 push=1      b7
-   719  put_loc8                 29                  pop=1 push=0      c5 1d
-   721  push_false                                   pop=0 push=1      09
-   722  put_loc8                 33                  pop=1 push=0      c5 21
-   724  push_0                   0                   pop=0 push=1      b7
-   725  put_loc8                 34                  pop=1 push=0      c5 22
-   727  push_0                   0                   pop=0 push=1      b7
-   728  put_loc8                 35                  pop=1 push=0      c5 23
-   730  push_0                   0                   pop=0 push=1      b7
-   731  put_loc8                 39                  pop=1 push=0      c5 27
-   733  object                                       pop=0 push=1      0b
-   734  get_loc8                 58                  pop=0 push=1      c4 3a
-   736  define_field             388                 pop=2 push=1      4e 84 01 00 00
-   741  get_loc8                 61                  pop=0 push=1      c4 3d
-   743  define_field             389                 pop=2 push=1      4e 85 01 00 00
-   748  get_loc8                 87                  pop=0 push=1      c4 57
-   750  define_field             390                 pop=2 push=1      4e 86 01 00 00
-   755  get_loc8                 75                  pop=0 push=1      c4 4b
-   757  define_field             391                 pop=2 push=1      4e 87 01 00 00
-   762  get_loc8                 59                  pop=0 push=1      c4 3b
-   764  define_field             392                 pop=2 push=1      4e 88 01 00 00
-   769  get_loc8                 60                  pop=0 push=1      c4 3c
-   771  define_field             393                 pop=2 push=1      4e 89 01 00 00
-   776  get_loc8                 56                  pop=0 push=1      c4 38
-   778  define_field             394                 pop=2 push=1      4e 8a 01 00 00
-   783  get_loc8                 76                  pop=0 push=1      c4 4c
-   785  define_field             395                 pop=2 push=1      4e 8b 01 00 00
-   790  get_loc8                 92                  pop=0 push=1      c4 5c
-   792  define_field             396                 pop=2 push=1      4e 8c 01 00 00
-   797  get_loc8                 66                  pop=0 push=1      c4 42
-   799  define_field             397                 pop=2 push=1      4e 8d 01 00 00
-   804  get_loc8                 82                  pop=0 push=1      c4 52
-   806  define_field             398                 pop=2 push=1      4e 8e 01 00 00
-   811  get_loc8                 66                  pop=0 push=1      c4 42
-   813  define_field             399                 pop=2 push=1      4e 8f 01 00 00
-   818  get_loc8                 69                  pop=0 push=1      c4 45
-   820  define_field             400                 pop=2 push=1      4e 90 01 00 00
-   825  get_loc8                 68                  pop=0 push=1      c4 44
-   827  define_field             401                 pop=2 push=1      4e 91 01 00 00
-   832  get_loc8                 55                  pop=0 push=1      c4 37
-   834  define_field             402                 pop=2 push=1      4e 92 01 00 00
-   839  get_loc8                 57                  pop=0 push=1      c4 39
-   841  define_field             403                 pop=2 push=1      4e 93 01 00 00
-   846  get_loc8                 57                  pop=0 push=1      c4 39
-   848  define_field             404                 pop=2 push=1      4e 94 01 00 00
-   853  get_loc8                 77                  pop=0 push=1      c4 4d
-   855  define_field             405                 pop=2 push=1      4e 95 01 00 00
-   860  get_loc8                 88                  pop=0 push=1      c4 58
-   862  define_field             406                 pop=2 push=1      4e 96 01 00 00
-   867  get_loc8                 86                  pop=0 push=1      c4 56
-   869  define_field             407                 pop=2 push=1      4e 97 01 00 00
-   874  get_loc8                 68                  pop=0 push=1      c4 44
-   876  define_field             408                 pop=2 push=1      4e 98 01 00 00
-   881  get_loc8                 69                  pop=0 push=1      c4 45
-   883  define_field             409                 pop=2 push=1      4e 99 01 00 00
-   888  get_loc8                 60                  pop=0 push=1      c4 3c
-   890  define_field             410                 pop=2 push=1      4e 9a 01 00 00
-   895  get_loc8                 61                  pop=0 push=1      c4 3d
-   897  define_field             411                 pop=2 push=1      4e 9b 01 00 00
-   902  get_loc8                 64                  pop=0 push=1      c4 40
-   904  define_field             412                 pop=2 push=1      4e 9c 01 00 00
-   909  get_loc8                 65                  pop=0 push=1      c4 41
-   911  define_field             413                 pop=2 push=1      4e 9d 01 00 00
-   916  get_loc8                 64                  pop=0 push=1      c4 40
-   918  define_field             414                 pop=2 push=1      4e 9e 01 00 00
-   923  get_loc8                 65                  pop=0 push=1      c4 41
-   925  define_field             415                 pop=2 push=1      4e 9f 01 00 00
-   930  get_loc8                 58                  pop=0 push=1      c4 3a
-   932  define_field             416                 pop=2 push=1      4e a0 01 00 00
-   937  get_loc8                 74                  pop=0 push=1      c4 4a
-   939  define_field             417                 pop=2 push=1      4e a1 01 00 00
-   944  get_loc8                 59                  pop=0 push=1      c4 3b
-   946  define_field             418                 pop=2 push=1      4e a2 01 00 00
-   951  get_loc8                 71                  pop=0 push=1      c4 47
-   953  define_field             419                 pop=2 push=1      4e a3 01 00 00
-   958  get_loc8                 72                  pop=0 push=1      c4 48
-   960  define_field             420                 pop=2 push=1      4e a4 01 00 00
-   965  get_loc8                 68                  pop=0 push=1      c4 44
-   967  define_field             421                 pop=2 push=1      4e a5 01 00 00
-   972  get_loc8                 69                  pop=0 push=1      c4 45
-   974  define_field             422                 pop=2 push=1      4e a6 01 00 00
-   979  get_loc8                 60                  pop=0 push=1      c4 3c
-   981  define_field             423                 pop=2 push=1      4e a7 01 00 00
-   986  get_loc8                 61                  pop=0 push=1      c4 3d
-   988  define_field             424                 pop=2 push=1      4e a8 01 00 00
-   993  get_loc8                 59                  pop=0 push=1      c4 3b
-   995  define_field             425                 pop=2 push=1      4e a9 01 00 00
-  1000  get_loc8                 58                  pop=0 push=1      c4 3a
-  1002  define_field             426                 pop=2 push=1      4e aa 01 00 00
-  1007  get_loc8                 85                  pop=0 push=1      c4 55
-  1009  define_field             427                 pop=2 push=1      4e ab 01 00 00
-  1014  get_loc8                 65                  pop=0 push=1      c4 41
-  1016  define_field             428                 pop=2 push=1      4e ac 01 00 00
-  1021  get_loc8                 84                  pop=0 push=1      c4 54
-  1023  define_field             429                 pop=2 push=1      4e ad 01 00 00
-  1028  get_loc8                 64                  pop=0 push=1      c4 40
-  1030  define_field             430                 pop=2 push=1      4e ae 01 00 00
-  1035  get_loc8                 83                  pop=0 push=1      c4 53
-  1037  define_field             431                 pop=2 push=1      4e af 01 00 00
-  1042  get_loc8                 80                  pop=0 push=1      c4 50
-  1044  define_field             432                 pop=2 push=1      4e b0 01 00 00
-  1049  get_loc8                 78                  pop=0 push=1      c4 4e
-  1051  define_field             433                 pop=2 push=1      4e b1 01 00 00
-  1056  get_loc8                 79                  pop=0 push=1      c4 4f
-  1058  define_field             434                 pop=2 push=1      4e b2 01 00 00
-  1063  get_loc8                 76                  pop=0 push=1      c4 4c
-  1065  define_field             435                 pop=2 push=1      4e b3 01 00 00
-  1070  put_loc8                 93                  pop=1 push=0      c5 5d
-  1072  push_false                                   pop=0 push=1      09
-  1073  put_loc8                 102                 pop=1 push=0      c5 66
-  1075  get_loc8                 40                  pop=0 push=1      c4 28
-  1077  call0                    npop=0              pop=1 push=1      f0
-  1078  drop                                         pop=1 push=0      0e
-  1079  get_loc8                 107                 pop=0 push=1      c4 6b
-  1081  call0                    npop=0              pop=1 push=1      f0
-  1082  return_undef                                 pop=0 push=0      29
+    48  get_arg0                 arg=0               pop=0 push=1      d3
+    49  get_var_ref_check        1                   pop=0 push=1      68 01 00
+    52  put_field                230                 pop=2 push=0      44 e6 00 00 00
+    57  get_arg0                 arg=0               pop=0 push=1      d3
+    58  get_var_ref_check        0                   pop=0 push=1      68 00 00
+    61  put_field                229                 pop=2 push=0      44 e5 00 00 00
+    66  get_arg0                 arg=0               pop=0 push=1      d3
+    67  get_field                157                 pop=1 push=1      42 9d 00 00 00
+    72  put_loc0                 loc=0               pop=1 push=0      cb
+    73  get_arg0                 arg=0               pop=0 push=1      d3
+    74  get_field                161                 pop=1 push=1      42 a1 00 00 00
+    79  put_loc1                 loc=1               pop=1 push=0      cc
+    80  get_arg0                 arg=0               pop=0 push=1      d3
+    81  get_field                158                 pop=1 push=1      42 9e 00 00 00
+    86  put_loc2                 loc=2               pop=1 push=0      cd
+    87  get_arg0                 arg=0               pop=0 push=1      d3
+    88  get_field                167                 pop=1 push=1      42 a7 00 00 00
+    93  put_loc3                 loc=3               pop=1 push=0      ce
+    94  get_arg0                 arg=0               pop=0 push=1      d3
+    95  get_field                165                 pop=1 push=1      42 a5 00 00 00
+   100  put_loc8                 4                   pop=1 push=0      c5 04
+   102  get_arg0                 arg=0               pop=0 push=1      d3
+   103  get_field                232                 pop=1 push=1      42 e8 00 00 00
+   108  put_loc8                 5                   pop=1 push=0      c5 05
+   110  get_arg0                 arg=0               pop=0 push=1      d3
+   111  get_field                233                 pop=1 push=1      42 e9 00 00 00
+   116  put_loc8                 6                   pop=1 push=0      c5 06
+   118  object                                       pop=0 push=1      0b
+   119  push_atom_value          279                 pop=0 push=1      04 17 01 00 00
+   124  define_field             280                 pop=2 push=1      4e 18 01 00 00
+   129  push_atom_value          281                 pop=0 push=1      04 19 01 00 00
+   134  define_field             282                 pop=2 push=1      4e 1a 01 00 00
+   139  push_atom_value          283                 pop=0 push=1      04 1b 01 00 00
+   144  define_field             284                 pop=2 push=1      4e 1c 01 00 00
+   149  push_atom_value          285                 pop=0 push=1      04 1d 01 00 00
+   154  define_field             286                 pop=2 push=1      4e 1e 01 00 00
+   159  push_atom_value          287                 pop=0 push=1      04 1f 01 00 00
+   164  define_field             288                 pop=2 push=1      4e 20 01 00 00
+   169  push_atom_value          289                 pop=0 push=1      04 21 01 00 00
+   174  define_field             290                 pop=2 push=1      4e 22 01 00 00
+   179  push_atom_value          291                 pop=0 push=1      04 23 01 00 00
+   184  define_field             292                 pop=2 push=1      4e 24 01 00 00
+   189  push_atom_value          293                 pop=0 push=1      04 25 01 00 00
+   194  define_field             294                 pop=2 push=1      4e 26 01 00 00
+   199  push_atom_value          295                 pop=0 push=1      04 27 01 00 00
+   204  define_field             296                 pop=2 push=1      4e 28 01 00 00
+   209  push_atom_value          297                 pop=0 push=1      04 29 01 00 00
+   214  define_field             298                 pop=2 push=1      4e 2a 01 00 00
+   219  push_atom_value          297                 pop=0 push=1      04 29 01 00 00
+   224  define_field             299                 pop=2 push=1      4e 2b 01 00 00
+   229  push_atom_value          300                 pop=0 push=1      04 2c 01 00 00
+   234  define_field             301                 pop=2 push=1      4e 2d 01 00 00
+   239  push_atom_value          302                 pop=0 push=1      04 2e 01 00 00
+   244  define_field             303                 pop=2 push=1      4e 2f 01 00 00
+   249  push_atom_value          304                 pop=0 push=1      04 30 01 00 00
+   254  define_field             305                 pop=2 push=1      4e 31 01 00 00
+   259  push_atom_value          306                 pop=0 push=1      04 32 01 00 00
+   264  define_field             307                 pop=2 push=1      4e 33 01 00 00
+   269  push_atom_value          308                 pop=0 push=1      04 34 01 00 00
+   274  define_field             309                 pop=2 push=1      4e 35 01 00 00
+   279  push_atom_value          310                 pop=0 push=1      04 36 01 00 00
+   284  define_field             311                 pop=2 push=1      4e 37 01 00 00
+   289  push_atom_value          312                 pop=0 push=1      04 38 01 00 00
+   294  define_field             313                 pop=2 push=1      4e 39 01 00 00
+   299  put_loc8                 7                   pop=1 push=0      c5 07
+   301  object                                       pop=0 push=1      0b
+   302  push_atom_value          303                 pop=0 push=1      04 2f 01 00 00
+   307  define_field             22                  pop=2 push=1      4e 16 00 00 00
+   312  push_atom_value          296                 pop=0 push=1      04 28 01 00 00
+   317  define_field             314                 pop=2 push=1      4e 3a 01 00 00
+   322  push_atom_value          311                 pop=0 push=1      04 37 01 00 00
+   327  define_field             74                  pop=2 push=1      4e 4a 00 00 00
+   332  push_atom_value          294                 pop=0 push=1      04 26 01 00 00
+   337  define_field             315                 pop=2 push=1      4e 3b 01 00 00
+   342  push_atom_value          286                 pop=0 push=1      04 1e 01 00 00
+   347  define_field             72                  pop=2 push=1      4e 48 00 00 00
+   352  push_atom_value          313                 pop=0 push=1      04 39 01 00 00
+   357  define_field             316                 pop=2 push=1      4e 3c 01 00 00
+   362  push_atom_value          305                 pop=0 push=1      04 31 01 00 00
+   367  define_field             27                  pop=2 push=1      4e 1b 00 00 00
+   372  push_atom_value          309                 pop=0 push=1      04 35 01 00 00
+   377  define_field             317                 pop=2 push=1      4e 3d 01 00 00
+   382  push_atom_value          303                 pop=0 push=1      04 2f 01 00 00
+   387  define_field             318                 pop=2 push=1      4e 3e 01 00 00
+   392  push_atom_value          284                 pop=0 push=1      04 1c 01 00 00
+   397  define_field             319                 pop=2 push=1      4e 3f 01 00 00
+   402  push_atom_value          313                 pop=0 push=1      04 39 01 00 00
+   407  define_field             320                 pop=2 push=1      4e 40 01 00 00
+   412  push_atom_value          301                 pop=0 push=1      04 2d 01 00 00
+   417  define_field             321                 pop=2 push=1      4e 41 01 00 00
+   422  put_loc8                 8                   pop=1 push=0      c5 08
+   424  array_from               0                   pop=0 push=1      26 00 00
+   427  put_loc8                 9                   pop=1 push=0      c5 09
+   429  push_empty_string                            pop=0 push=1      c3
+   430  put_loc8                 10                  pop=1 push=0      c5 0a
+   432  push_empty_string                            pop=0 push=1      c3
+   433  put_loc8                 14                  pop=1 push=0      c5 0e
+   435  push_empty_string                            pop=0 push=1      c3
+   436  put_loc8                 15                  pop=1 push=0      c5 0f
+   438  push_0                   0                   pop=0 push=1      b7
+   439  put_loc8                 16                  pop=1 push=0      c5 10
+   441  push_atom_value          322                 pop=0 push=1      04 42 01 00 00
+   446  put_loc8                 17                  pop=1 push=0      c5 11
+   448  push_atom_value          323                 pop=0 push=1      04 43 01 00 00
+   453  put_loc8                 18                  pop=1 push=0      c5 12
+   455  push_true                                    pop=0 push=1      0a
+   456  put_loc8                 19                  pop=1 push=0      c5 13
+   458  push_false                                   pop=0 push=1      09
+   459  put_loc8                 20                  pop=1 push=0      c5 14
+   461  push_true                                    pop=0 push=1      0a
+   462  put_loc8                 21                  pop=1 push=0      c5 15
+   464  push_0                   0                   pop=0 push=1      b7
+   465  put_loc8                 23                  pop=1 push=0      c5 17
+   467  push_empty_string                            pop=0 push=1      c3
+   468  put_loc8                 24                  pop=1 push=0      c5 18
+   470  push_0                   0                   pop=0 push=1      b7
+   471  put_loc8                 25                  pop=1 push=0      c5 19
+   473  push_empty_string                            pop=0 push=1      c3
+   474  put_loc8                 26                  pop=1 push=0      c5 1a
+   476  push_0                   0                   pop=0 push=1      b7
+   477  put_loc8                 27                  pop=1 push=0      c5 1b
+   479  push_empty_string                            pop=0 push=1      c3
+   480  put_loc8                 28                  pop=1 push=0      c5 1c
+   482  push_0                   0                   pop=0 push=1      b7
+   483  put_loc8                 29                  pop=1 push=0      c5 1d
+   485  push_false                                   pop=0 push=1      09
+   486  put_loc8                 33                  pop=1 push=0      c5 21
+   488  push_0                   0                   pop=0 push=1      b7
+   489  put_loc8                 34                  pop=1 push=0      c5 22
+   491  push_0                   0                   pop=0 push=1      b7
+   492  put_loc8                 35                  pop=1 push=0      c5 23
+   494  push_0                   0                   pop=0 push=1      b7
+   495  put_loc8                 39                  pop=1 push=0      c5 27
+   497  return_undef                                 pop=0 push=0      29

@@ -1,0 +1,218 @@
+Artifacts: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts
+Skipped non-fixture dirs: 1
+Mode: recursive
+Total fixtures: 281
+Identical: 238
+Mismatched: 42
+
+Mismatch tags:
+  - scope: 37
+  - semantics: 35
+  - debug: 28
+  - func-meta: 11
+  - error: 1
+
+- assert: TS=846 WASM=846 Δ+0 tags=scope,semantics
+    * func.cpool[2](func).cpool[0](func).bytecode: bytecode differ (TS 7 bytes: e0 df d4 48 d3 f2 29 vs WASM 7 bytes: df e0 d4 48 d3 f2 29)
+    * func.cpool[2](func).cpool[0](func).closureVars: closureVars differ (TS=2, WASM=2)
+- base: TS=5388 WASM=5388 Δ+0 tags=scope,semantics
+    * func.cpool[19](func).cpool[2](func).bytecode: bytecode differ (TS 50 bytes: 6f 1a 00 00 00 df 42 0d 01 00 00 e1 93 e5 48 43 08 01 00 00 24 00 00 0e … vs WASM 50 bytes: 6f 1a 00 00 00 df 42 0d 01 00 00 e0 93 e4 48 43 08 01 00 00 24 00 00 0e …)
+    * func.cpool[19](func).cpool[2](func).closureVars: closureVars differ (TS=3, WASM=3)
+- box2d: TS=267499 WASM=267139 Δ+360 tags=debug,func-meta,scope,semantics
+    * func.cpool[0](func).cpool[4](func).bytecodeLen: bytecodeLen TS=38 WASM=37
+    * func.cpool[0](func).cpool[4](func).bytecode: bytecode differ (TS 38 bytes: d3 df ad ec 03 b7 d7 39 9e 00 00 00 d3 11 ed 03 0e b7 f1 cb b7 cc c8 d3 … vs WASM 37 bytes: d3 df ad ec 03 b7 d7 39 9e 00 00 00 d3 11 ed 03 0e b7 f1 cb b7 cc c8 d3 …)
+    * func.cpool[0](func).cpool[4](func).debug.pc2line: pc2line differ (TS 38 bytes: 1a 10 02 26 07 0c 07 07 12 39 0c 28 1b 0c 20 01 07 11 11 34 07 08 07 03 … vs WASM 34 bytes: 1a 10 02 26 07 0c 07 07 12 39 0c 28 1b 0c 20 01 16 22 07 08 07 03 12 57 …)
+    * func.cpool[2](func).cpool[16](func).bytecodeLen: bytecodeLen TS=257 WASM=256
+    * … (316 more diffs)
+- bundle: TS=6662106 WASM=6661650 Δ+456 tags=debug,func-meta,scope,semantics
+    * func.cpoolCount: cpoolCount TS=2241 WASM=2240
+    * func.bytecode: bytecode differ (TS 113796 bytes: 40 e5 00 00 00 00 40 e6 00 00 00 40 40 e7 00 00 00 40 40 e8 00 00 00 40 … vs WASM 113796 bytes: 40 e5 00 00 00 00 40 e6 00 00 00 40 40 e7 00 00 00 40 40 e8 00 00 00 40 …)
+    * func.debug.pc2line: pc2line differ (TS 20433 bytes: 00 00 00 90 c4 02 36 24 4e 23 1b 16 00 02 0e 11 00 08 3c 03 1b 1e 1b 14 … vs WASM 20540 bytes: 00 00 00 90 c4 02 36 24 4e 23 1b 16 00 02 0e 11 00 08 3c 03 1b 1e 1b 14 …)
+    * func.cpool[14](func).bytecodeLen: bytecodeLen TS=249 WASM=252
+    * … (17542 more diffs)
+- class-field-initializers: TS=431 WASM=431 Δ+0 tags=scope
+    * func.cpool[2](func).closureVars: closureVars differ (TS=1, WASM=1)
+- class-methods: TS=370 WASM=370 Δ+0 tags=scope
+    * func.cpool[2](func).closureVars: closureVars differ (TS=1, WASM=1)
+- class-private-accessors: TS=588 WASM=582 Δ+6 tags=debug,scope,semantics
+    * func.bytecodeLen: bytecodeLen TS=168 WASM=162
+    * func.bytecode: bytecode differ (TS 168 bytes: 40 e4 00 00 00 80 40 e8 00 00 00 80 3f e4 00 00 00 82 3f e8 00 00 00 80 … vs WASM 162 bytes: 40 e4 00 00 00 80 40 e8 00 00 00 80 3f e4 00 00 00 82 3f e8 00 00 00 80 …)
+    * func.varDefs: varDefs differ (TS=6, WASM=6)
+    * func.debug.pc2line: pc2line differ (TS 32 bytes: 00 00 00 63 1c 1c 20 0e 2b 29 1b 0e 1b 0a 1b 02 1b 08 11 0b 17 15 1b 0e … vs WASM 32 bytes: 00 00 00 5d 1c 1c 20 0e 2b 29 1b 0e 1b 0a 1b 02 1b 08 11 0b 17 15 1b 0e …)
+- class-static-block: TS=645 WASM=642 Δ+3 tags=debug,scope,semantics
+    * func.bytecodeLen: bytecodeLen TS=180 WASM=177
+    * func.bytecode: bytecode differ (TS 180 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 63 01 00 06 63 04 00 63 03 00 63 02 … vs WASM 177 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 63 01 00 06 63 04 00 63 03 00 63 02 …)
+    * func.varDefs: varDefs differ (TS=5, WASM=5)
+    * func.debug.pc2line: pc2line differ (TS 36 bytes: 00 00 00 68 24 00 1b 0e 1b 0a 1b 0e 1b 0f 17 15 1b 0e 1b 0a 1b 0e 1b 08 … vs WASM 36 bytes: 00 00 00 65 24 00 1b 0e 1b 0a 1b 0e 1b 0f 17 15 1b 0e 1b 0a 1b 0e 1b 08 …)
+- class-static-private-accessors: TS=566 WASM=560 Δ+6 tags=debug,scope,semantics
+    * func.bytecodeLen: bytecodeLen TS=155 WASM=149
+    * func.bytecode: bytecode differ (TS 155 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 63 01 00 06 63 05 00 63 04 00 63 03 … vs WASM 149 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 63 01 00 06 63 05 00 63 04 00 63 03 …)
+    * func.varDefs: varDefs differ (TS=6, WASM=6)
+    * func.debug.pc2line: pc2line differ (TS 28 bytes: 00 00 00 64 1c 00 1b 0e 1b 0a 1b 0e 1b 0a 11 19 17 15 1b 0e 1b 0a 1b 0e … vs WASM 28 bytes: 00 00 00 5e 1c 00 1b 0e 1b 0a 1b 0e 1b 0a 11 19 17 15 1b 0e 1b 0a 1b 0e …)
+- closure-vars: TS=365 WASM=365 Δ+0 tags=scope
+    * func.cpool[0](func).cpool[0](func).closureVars: closureVars differ (TS=4, WASM=4)
+- code-load: TS=105740 WASM=105737 Δ+3 tags=debug,semantics
+    * func.cpool[4](func).bytecodeLen: bytecodeLen TS=50 WASM=49
+    * func.cpool[4](func).bytecode: bytecode differ (TS 50 bytes: b7 cb b7 cc c8 d4 a5 ec 17 c7 d3 c8 48 9f cf c7 bf 0a a2 9f cf c7 bd a3 … vs WASM 49 bytes: b7 cb b7 cc c8 d4 a5 ec 16 c7 d3 c8 48 9f cf c7 bf 0a a2 9f cf c7 bd a3 …)
+    * func.cpool[4](func).debug.pc2line: pc2line differ (TS 61 bytes: bb 0b 00 18 28 07 08 07 03 12 1b 07 10 07 08 07 01 07 0b 0d 08 11 0a 07 … vs WASM 59 bytes: bb 0b 00 18 28 07 08 07 03 12 1b 07 10 07 08 07 01 07 0b 0d 08 11 0a 07 …)
+- complex-class-optional: TS=793 WASM=793 Δ+0 tags=scope
+    * func.cpool[3](func).closureVars: closureVars differ (TS=1, WASM=1)
+- crypto: TS=36816 WASM=36619 Δ+197 tags=debug,func-meta,scope,semantics
+    * func.cpool[11](func).bytecodeLen: bytecodeLen TS=66 WASM=65
+    * func.cpool[11](func).bytecode: bytecode differ (TS 66 bytes: 08 ce ca 42 f0 01 00 00 cb d3 42 f0 01 00 00 cc ca 42 6e 01 00 00 b8 a0 … vs WASM 65 bytes: 08 ce ca 42 f0 01 00 00 cb d3 42 f0 01 00 00 cc ca 42 6e 01 00 00 b8 a0 …)
+    * func.cpool[11](func).debug.pc2line: pc2line differ (TS 45 bytes: a2 01 00 12 32 21 0d 07 02 26 04 20 06 07 15 07 20 0c 04 12 2d 07 10 07 … vs WASM 41 bytes: a2 01 00 12 32 21 0d 07 02 26 04 20 06 0c 0a 0c 04 12 2d 07 10 07 0a 07 …)
+    * func.cpool[15](func).bytecodeLen: bytecodeLen TS=59 WASM=57
+    * … (99 more diffs)
+- deltablue: TS=11711 WASM=11707 Δ+4 tags=debug,scope,semantics
+    * func.cpool[34](func).bytecodeLen: bytecodeLen TS=293 WASM=289
+    * func.cpool[34](func).bytecode: bytecode differ (TS 293 bytes: 08 cb c7 42 4b 01 00 00 42 3b 01 00 00 d3 ab ec 42 c7 c7 42 4c 01 00 00 … vs WASM 289 bytes: 08 cb c7 42 4b 01 00 00 42 3b 01 00 00 d3 ab ec 40 c7 c7 42 4c 01 00 00 …)
+    * func.cpool[34](func).debug.pc2line: pc2line differ (TS 141 bytes: b4 02 2a 12 3b 1b 06 1b 12 07 05 12 19 07 08 07 24 1b 06 1b 12 07 05 1b … vs WASM 141 bytes: b4 02 2a 12 3b 1b 06 1b 12 07 05 12 19 07 08 07 24 1b 06 1b 12 07 05 11 …)
+    * func.cpool[69](func).bytecode: bytecode differ (TS 203 bytes: df 11 21 00 00 e4 07 cb 07 cc 07 cd b7 ce ca d3 a6 ec 40 04 42 01 00 00 … vs WASM 203 bytes: e0 11 21 00 00 e3 07 cb 07 cc 07 cd b7 ce ca d3 a6 ec 40 04 42 01 00 00 …)
+    * … (3 more diffs)
+- earley-boyer: TS=96702 WASM=96500 Δ+202 tags=debug,func-meta,scope,semantics
+    * func.debug.pc2line: pc2line differ (TS 8647 bytes: 00 00 00 8a 0d 06 2c 58 1b 52 12 12 11 52 12 00 06 03 26 00 08 5a 27 00 … vs WASM 8647 bytes: 00 00 00 8a 0d 06 2c 58 1b 52 12 12 11 52 12 00 06 03 26 00 08 5a 27 00 …)
+    * func.cpool[38](func).debug.pc2line: pc2line differ (TS 77 bytes: db 02 00 04 10 0c 04 12 0a 07 0d 08 00 0c 04 12 0a 07 0d 08 00 0c 04 12 … vs WASM 79 bytes: db 02 00 04 10 0c 04 12 0a 07 0d 08 00 0c 04 12 0a 07 0d 08 00 0c 04 12 …)
+    * func.cpool[55](func).debug.pc2line: pc2line differ (TS 43 bytes: a6 04 00 12 1c 07 14 07 12 0c 10 07 23 0d 0b 07 12 0c 10 07 29 07 34 0c … vs WASM 41 bytes: a6 04 00 12 1c 07 14 07 12 0c 10 07 23 0d 0b 07 12 0c 10 0c 0a 0c 04 12 …)
+    * func.cpool[90](func).bytecodeLen: bytecodeLen TS=71 WASM=69
+    * … (175 more diffs)
+- gbemu-part1: TS=25079 WASM=25048 Δ+31 tags=debug,scope,semantics
+    * func.cpool[0](func).bytecode: bytecode differ (TS 76 bytes: 38 b0 00 00 00 99 04 47 00 00 00 ac 11 ec 2e 0e 38 af 00 00 00 99 04 47 … vs WASM 76 bytes: 38 b0 00 00 00 99 04 47 00 00 00 ac 11 ec 2e 0e 38 af 00 00 00 99 04 47 …)
+    * func.cpool[0](func).closureVars: closureVars differ (TS=3, WASM=3)
+    * func.cpool[1](func).bytecode: bytecode differ (TS 85 bytes: 68 00 00 68 01 00 11 21 00 00 e2 f2 0e 68 02 00 b7 44 88 01 00 00 68 02 … vs WASM 85 bytes: 68 00 00 68 01 00 11 21 00 00 e1 f2 0e 68 03 00 b7 44 88 01 00 00 68 03 …)
+    * func.cpool[1](func).closureVars: closureVars differ (TS=6, WASM=6)
+    * … (62 more diffs)
+- gbemu-part2: TS=271141 WASM=270799 Δ+342 tags=debug,func-meta,scope,semantics
+    * func.debug.pc2line: pc2line differ (TS 1506 bytes: 00 00 00 e0 01 d2 04 00 11 16 1b 14 2b 29 11 16 1b 14 2c 29 11 16 1b 14 … vs WASM 1503 bytes: 00 00 00 e0 01 d2 04 00 11 16 1b 14 2b 29 11 16 1b 14 2c 29 11 16 1b 14 …)
+    * func.cpool[525](func).bytecodeLen: bytecodeLen TS=1102 WASM=1091
+    * func.cpool[525](func).bytecode: bytecode differ (TS 1102 bytes: 08 cc c0 ff 00 cb c7 b7 a8 6c 94 00 00 00 c7 bf 30 a8 ec 22 c7 bf 40 a5 … vs WASM 1091 bytes: 08 cc c0 ff 00 cb c7 b7 a8 6c 89 00 00 00 c7 bf 30 a8 ec 22 c7 bf 40 a5 …)
+    * func.cpool[525](func).debug.pc2line: pc2line differ (TS 563 bytes: db 24 2a 00 06 08 3d 0c 0c 21 09 11 0c 11 16 11 0c 12 2d 07 08 34 2c 07 … vs WASM 561 bytes: db 24 2a 00 06 08 3d 0c 0c 21 09 11 0c 11 16 11 0c 12 2d 07 08 34 2c 07 …)
+    * … (153 more diffs)
+- inc-3: TS=2144 WASM=2144 Δ+0 tags=scope
+    * func.cpool[1](func).cpool[9](func).closureVars: closureVars differ (TS=1, WASM=1)
+    * func.cpool[1](func).cpool[12](func).closureVars: closureVars differ (TS=1, WASM=1)
+- mandreel: TS=3513143 WASM=3512848 Δ+295 tags=debug,func-meta,scope,semantics
+    * func.cpoolCount: cpoolCount TS=1364 WASM=1363
+    * func.bytecode: bytecode differ (TS 25289 bytes: 08 6c 2f 27 00 00 c2 00 61 07 00 c2 01 61 08 00 c2 02 61 09 00 c2 03 61 … vs WASM 25289 bytes: 08 6c 2f 27 00 00 c2 00 61 07 00 c2 01 61 08 00 c2 02 61 09 00 c2 03 61 …)
+    * func.cpool[0](func).bytecode: bytecode differ (TS 80 bytes: 38 b0 00 00 00 99 04 47 00 00 00 ac 11 ec 28 0e 38 b7 00 00 00 99 04 47 … vs WASM 80 bytes: 38 b0 00 00 00 99 04 47 00 00 00 ac 11 ec 28 0e 38 b7 00 00 00 99 04 47 …)
+    * func.cpool[0](func).closureVars: closureVars differ (TS=6, WASM=6)
+    * … (7907 more diffs)
+- navier-stokes: TS=7922 WASM=7884 Δ+38 tags=debug,scope,semantics
+    * func.cpool[2](func).bytecode: bytecode differ (TS 67 bytes: df 11 07 21 01 00 e8 43 fa 00 00 00 c0 80 00 c0 80 00 24 02 00 0e e0 43 … vs WASM 67 bytes: e0 11 07 21 01 00 e7 43 fa 00 00 00 c0 80 00 c0 80 00 24 02 00 0e df 43 …)
+    * func.cpool[2](func).closureVars: closureVars differ (TS=3, WASM=3)
+    * func.cpool[6](func).cpool[2](func).bytecodeLen: bytecodeLen TS=168 WASM=166
+    * func.cpool[6](func).cpool[2](func).bytecode: bytecode differ (TS 168 bytes: d6 b7 ad ec 33 5d 04 00 b8 ad ec 2c b8 cb c7 e0 a6 ec 1f c7 e1 9c d0 91 … vs WASM 166 bytes: d6 b7 ad ec 32 5d 04 00 b8 ad ec 2b b8 cb c7 df a6 ec 1e c7 e0 9c d0 91 …)
+    * … (23 more diffs)
+- pdfjs: TS=1198574 WASM=1196666 Δ+1908 tags=debug,func-meta,scope,semantics
+    * module.atoms.length: atoms length differ (TS=8433, WASM=8432)
+    * func.cpool[1](func).cpool[0](func).cpool[0](func).bytecodeLen: bytecodeLen TS=51 WASM=53
+    * func.cpool[1](func).cpool[0](func).cpool[0](func).bytecode: bytecode differ (TS 51 bytes: d3 d4 a7 ec 02 29 df 43 57 01 00 00 b7 b7 e0 42 58 01 00 00 e0 42 59 01 … vs WASM 53 bytes: d3 d4 a7 ec 02 29 e2 43 57 01 00 00 b7 b7 e0 42 58 01 00 00 e0 42 59 01 …)
+    * func.cpool[1](func).cpool[0](func).cpool[0](func).closureVars: closureVars differ (TS=5, WASM=5)
+    * … (2763 more diffs)
+- private-method-basic: TS=517 WASM=514 Δ+3 tags=debug,scope,semantics
+    * func.bytecodeLen: bytecodeLen TS=162 WASM=159
+    * func.bytecode: bytecode differ (TS 162 bytes: 40 e4 00 00 00 80 40 e7 00 00 00 80 3f e4 00 00 00 82 3f e7 00 00 00 80 … vs WASM 159 bytes: 40 e4 00 00 00 80 40 e7 00 00 00 80 3f e4 00 00 00 82 3f e7 00 00 00 80 …)
+    * func.varDefs: varDefs differ (TS=5, WASM=5)
+    * func.debug.pc2line: pc2line differ (TS 32 bytes: 00 00 00 5d 16 1c 20 0e 2b 29 1b 0e 1b 0a 1b 02 1b 08 11 0b 17 15 1b 0e … vs WASM 32 bytes: 00 00 00 5a 16 1c 20 0e 2b 29 1b 0e 1b 0a 1b 02 1b 08 11 0b 17 15 1b 0e …)
+- raytrace: TS=16102 WASM=16154 Δ-52 tags=scope,semantics
+    * func.closureVarCount: closureVarCount TS=7 WASM=20
+    * func.bytecode: bytecode differ (TS 2240 bytes: 08 ec 07 c2 3d 61 06 00 29 68 01 00 11 04 e8 00 00 00 01 95 4a 0b 00 26 … vs WASM 2240 bytes: 08 ec 07 c2 3d 61 13 00 29 68 01 00 11 04 e8 00 00 00 01 95 4a 0b 00 26 …)
+    * func.closureVars: closureVars differ (TS=7, WASM=20)
+- regexp: TS=137179 WASM=137179 Δ+0 tags=scope,semantics
+    * func.cpool[0](func).bytecode: bytecode differ (TS 9 bytes: df 11 21 00 00 e4 e1 f0 29 vs WASM 9 bytes: e0 11 21 00 00 e3 e1 f0 29)
+    * func.cpool[0](func).closureVars: closureVars differ (TS=3, WASM=3)
+- run: TS=1307 WASM=1326 Δ-19 tags=debug,func-meta,scope,semantics
+    * func.cpool[0](func).stackSize: stackSize TS=3 WASM=5
+    * func.cpool[0](func).bytecodeLen: bytecodeLen TS=79 WASM=93
+    * func.cpool[0](func).bytecode: bytecode differ (TS 79 bytes: 0d 00 00 d7 39 fc 00 00 00 43 fd 00 00 00 d3 24 01 00 0e 68 00 00 42 f8 … vs WASM 93 bytes: 0d 00 00 d7 39 fc 00 00 00 43 fd 00 00 00 26 00 00 b7 d3 54 0e 18 27 00 …)
+    * func.cpool[0](func).debug.pc2line: pc2line differ (TS 38 bytes: 2f 00 17 08 1b 0e 1b 10 07 07 17 0b 11 1c 2b 1d 11 1c 2c 23 11 1c 1b 0c … vs WASM 38 bytes: 2f 00 17 08 1b 0e 2f 10 11 07 1c 0b 11 1c 2b 1d 11 1c 2c 23 11 1c 1b 0c …)
+    * … (8 more diffs)
+- splay: TS=4163 WASM=4161 Δ+2 tags=debug,scope,semantics
+    * func.cpool[5](func).bytecode: bytecode differ (TS 81 bytes: 68 00 00 42 14 01 00 00 98 ec 07 04 15 01 00 00 30 e0 11 21 00 00 e5 68 … vs WASM 81 bytes: 68 00 00 42 14 01 00 00 98 ec 07 04 15 01 00 00 30 e1 11 21 00 00 e4 68 …)
+    * func.cpool[5](func).closureVars: closureVars differ (TS=7, WASM=7)
+    * func.cpool[7](func).bytecodeLen: bytecodeLen TS=74 WASM=72
+    * func.cpool[7](func).bytecode: bytecode differ (TS 74 bytes: b7 cb c7 e0 a5 ec 34 e1 f0 cc e2 43 00 01 00 00 c8 24 01 00 d1 07 ab ec … vs WASM 72 bytes: b7 cb c7 df a5 ec 34 e0 f0 cc e1 43 00 01 00 00 c8 24 01 00 d1 07 ab ec …)
+    * … (2 more diffs)
+- static-private-method-basic: TS=485 WASM=482 Δ+3 tags=debug,scope,semantics
+    * func.bytecodeLen: bytecodeLen TS=147 WASM=144
+    * func.bytecode: bytecode differ (TS 147 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 63 01 00 06 63 04 00 63 03 00 63 02 … vs WASM 144 bytes: 40 e4 00 00 00 80 3f e4 00 00 00 82 63 01 00 06 63 04 00 63 03 00 63 02 …)
+    * func.varDefs: varDefs differ (TS=5, WASM=5)
+    * func.debug.pc2line: pc2line differ (TS 28 bytes: 00 00 00 5c 16 00 1b 0e 1b 0a 1b 0e 1b 08 11 17 17 15 1b 0e 1b 0a 1b 0e … vs WASM 28 bytes: 00 00 00 59 16 00 1b 0e 1b 0a 1b 0e 1b 08 11 17 17 15 1b 0e 1b 0a 1b 0e …)
+- test_argument_scope: TS=3665 WASM=3663 Δ+2 tags=debug,scope,semantics
+    * func.cpool[1](func).varDefs: varDefs differ (TS=5, WASM=5)
+    * func.cpool[1](func).cpool[1](func).varCount: varCount TS=7 WASM=8
+    * func.cpool[1](func).cpool[1](func).bytecodeLen: bytecodeLen TS=85 WASM=80
+    * func.cpool[1](func).cpool[1](func).bytecode: bytecode differ (TS 85 bytes: 0c 03 c5 05 08 c5 04 0c 00 c5 06 0c 05 cd 0c 05 ce 63 01 00 63 00 00 d3 … vs WASM 80 bytes: 0c 03 c5 05 08 c5 04 0c 00 c6 07 c5 06 0c 05 cd 0c 05 ce 63 01 00 63 00 …)
+    * … (61 more diffs)
+- test_bigint: TS=7166 WASM=7161 Δ+5 tags=debug,scope,semantics
+    * func.cpool[7](func).bytecodeLen: bytecodeLen TS=473 WASM=468
+    * func.cpool[7](func).bytecode: bytecode differ (TS 473 bytes: 39 e5 00 00 00 39 a0 00 00 00 c1 00 f1 c1 01 f2 0e 39 e5 00 00 00 39 a0 … vs WASM 468 bytes: 39 e5 00 00 00 39 a0 00 00 00 c1 00 f1 c1 01 f2 0e 39 e5 00 00 00 39 a0 …)
+    * func.cpool[7](func).debug.pc2line: pc2line differ (TS 190 bytes: 5e 00 03 08 1b 0e 25 0c 11 0d 0d 0b 1b 0e 25 0e 07 01 11 30 07 3d 0d 0b … vs WASM 190 bytes: 5e 00 03 08 1b 0e 25 0c 11 0d 0d 0b 1b 0e 25 0e 07 01 11 30 07 3d 0d 0b …)
+    * func.cpool[11](func).cpool[2](func).closureVars: closureVars differ (TS=4, WASM=4)
+- test_bignum: TS=-1 WASM=-1 Δ+0 tags=error
+    * error: Unexpected end of bytecode buffer (need 1 bytes at ptr=5, len=5)
+- test_bjson: TS=3005 WASM=3006 Δ-1 tags=debug,scope,semantics
+    * func.cpool[3](func).bytecodeLen: bytecodeLen TS=371 WASM=372
+    * func.cpool[3](func).bytecode: bytecode differ (TS 371 bytes: d3 99 11 04 4b 00 00 00 ad 6c 1b 01 00 00 d3 f5 ec 07 04 01 00 00 00 28 … vs WASM 372 bytes: d3 99 11 04 4b 00 00 00 ad 6c 1c 01 00 00 d3 f5 ec 07 04 01 00 00 00 28 …)
+    * func.cpool[3](func).debug.pc2line: pc2line differ (TS 240 bytes: 2b 00 04 28 4a 07 07 04 2b 03 08 00 07 1a 1b 15 12 03 1b 1c 07 0c 07 02 … vs WASM 240 bytes: 2b 00 04 28 4a 07 07 04 2b 03 08 00 07 1a 1b 15 12 03 1b 1c 07 0c 07 02 …)
+    * func.cpool[4](func).bytecode: bytecode differ (TS 69 bytes: e0 d3 f1 cd 68 00 00 43 0e 01 00 00 d3 24 01 00 cb ee 01 68 00 00 43 0f … vs WASM 69 bytes: df d3 f1 cd 68 01 00 43 0e 01 00 00 d3 24 01 00 cb ee 01 68 01 00 43 0f …)
+    * … (3 more diffs)
+- test_builtin: TS=76944 WASM=76965 Δ-21 tags=debug,scope,semantics
+    * func.bytecodeLen: bytecodeLen TS=700 WASM=715
+    * func.bytecode: bytecode differ (TS 700 bytes: 40 8b 00 00 00 00 40 e5 00 00 00 00 40 e6 00 00 00 40 40 e7 00 00 00 40 … vs WASM 715 bytes: 40 8b 00 00 00 00 40 e5 00 00 00 00 40 e6 00 00 00 40 40 e7 00 00 00 40 …)
+    * func.debug.pc2line: pc2line differ (TS 101 bytes: 00 00 00 e4 03 06 00 00 19 86 01 08 34 18 00 21 f4 0d 1f 1b 08 0d 07 1b … vs WASM 101 bytes: 00 00 00 e4 03 06 00 00 23 86 01 08 34 18 00 26 f4 0d 1f 1b 08 0d 07 1b …)
+    * func.cpool[0](func).bytecodeLen: bytecodeLen TS=38 WASM=42
+    * … (8 more diffs)
+- test_for_in2: TS=737 WASM=743 Δ-6 tags=debug,semantics
+    * func.cpool[1](func).bytecodeLen: bytecodeLen TS=146 WASM=148
+    * func.cpool[1](func).bytecode: bytecode differ (TS 146 bytes: 26 00 00 cc 0b b8 4e f3 00 00 00 b9 4e f4 00 00 00 ba 4e f5 00 00 00 7e … vs WASM 148 bytes: 26 00 00 cc 0b b8 4e f3 00 00 00 b9 4e f4 00 00 00 ba 4e f5 00 00 00 7e …)
+    * func.cpool[1](func).debug.pc2line: pc2line differ (TS 54 bytes: 15 00 04 08 86 10 20 04 13 0b 07 06 1b 0c 07 01 31 17 1b 0e 07 06 1b 12 … vs WASM 58 bytes: 15 00 04 08 85 0a 08 06 20 04 13 0b 07 06 1b 0c 07 01 31 17 1b 0e 07 06 …)
+- test_ic_atom_free: TS=124709 WASM=121925 Δ+2784 tags=debug,func-meta,scope,semantics
+    * func.cpool[0](func).bytecodeLen: bytecodeLen TS=398 WASM=384
+    * func.cpool[0](func).bytecode: bytecode differ (TS 398 bytes: c2 00 c5 04 04 47 00 00 00 38 8d 00 00 00 99 ac ec 08 39 8d 00 00 00 ee … vs WASM 384 bytes: c2 00 c5 04 04 47 00 00 00 38 8d 00 00 00 99 ac ec 08 39 8d 00 00 00 ee …)
+    * func.cpool[0](func).debug.pc2line: pc2line differ (TS 164 bytes: 03 01 2f 72 20 13 11 2e 3e 46 20 13 11 22 3e 3a 20 13 11 26 3e 3e 20 13 … vs WASM 164 bytes: 03 01 2f 72 20 13 11 2e 3e 46 20 13 11 22 3e 3a 20 13 11 26 3e 3e 20 13 …)
+    * func.cpool[0](func).cpool[0](func).bytecode: bytecode differ (TS 198 bytes: 08 c5 04 c2 01 ce df d3 48 98 6c b2 00 00 00 e0 d3 48 98 ec 68 04 1b 00 … vs WASM 198 bytes: 08 c5 04 c2 01 ce e1 d3 48 98 6c b2 00 00 00 df d3 48 98 ec 6c 04 1b 00 …)
+    * … (1360 more diffs)
+- test_language: TS=13898 WASM=13957 Δ-59 tags=debug,func-meta,scope,semantics
+    * func.cpool[11](func).cpool[9](func).closureVars: closureVars differ (TS=1, WASM=1)
+    * func.cpool[11](func).cpool[12](func).closureVars: closureVars differ (TS=1, WASM=1)
+    * func.cpool[21](func).varDefs: varDefs differ (TS=5, WASM=5)
+    * func.cpool[21](func).cpool[1](func).varCount: varCount TS=7 WASM=8
+    * … (83 more diffs)
+- test_line_column_num: TS=4445 WASM=4444 Δ+1 tags=debug,semantics
+    * func.cpool[12](func).bytecodeLen: bytecodeLen TS=448 WASM=447
+    * func.cpool[12](func).bytecode: bytecode differ (TS 448 bytes: 0c 03 c5 06 08 c5 05 0c 01 c5 07 0c 05 c5 04 6f 23 00 00 00 c4 04 75 3c … vs WASM 447 bytes: 0c 03 c5 06 08 c5 05 0c 01 c5 07 0c 05 c5 04 6f 23 00 00 00 c4 04 75 3c …)
+    * func.cpool[12](func).debug.pc2line: pc2line differ (TS 97 bytes: a4 01 00 69 10 70 08 00 0f 0e 07 57 0e 07 02 39 03 0d 0b 57 0e 07 02 3e … vs WASM 97 bytes: a4 01 00 69 10 70 08 00 0f 0e 07 57 0e 07 02 39 03 0d 0b 57 0e 07 02 3e …)
+- test_loop: TS=4648 WASM=4652 Δ-4 tags=debug,semantics
+    * func.cpool[6](func).bytecodeLen: bytecodeLen TS=146 WASM=148
+    * func.cpool[6](func).bytecode: bytecode differ (TS 146 bytes: 26 00 00 cc 0b b8 4e 0a 01 00 00 b9 4e 0b 01 00 00 ba 4e 12 01 00 00 7e … vs WASM 148 bytes: 26 00 00 cc 0b b8 4e 0a 01 00 00 b9 4e 0b 01 00 00 ba 4e 12 01 00 00 7e …)
+    * func.cpool[6](func).debug.pc2line: pc2line differ (TS 55 bytes: 82 01 00 04 08 86 10 20 04 13 0b 07 06 1b 0c 07 01 31 17 1b 0e 07 06 1b … vs WASM 59 bytes: 82 01 00 04 08 85 0a 08 06 20 04 13 0b 07 06 1b 0c 07 01 31 17 1b 0e 07 …)
+    * func.cpool[15](func).bytecodeLen: bytecodeLen TS=58 WASM=56
+    * … (2 more diffs)
+- test_op_overloading: TS=3834 WASM=3834 Δ+0 tags=scope
+    * func.cpool[1](func).cpool[1](func).closureVars: closureVars differ (TS=1, WASM=1)
+- test_std: TS=7270 WASM=7270 Δ+0 tags=scope,semantics
+    * func.cpool[1](func).bytecode: bytecode differ (TS 191 bytes: e0 68 00 00 43 fe 00 00 00 04 ff 00 00 00 bf 7b 04 00 01 00 00 24 03 00 … vs WASM 191 bytes: df 68 01 00 43 fe 00 00 00 04 ff 00 00 00 bf 7b 04 00 01 00 00 24 03 00 …)
+    * func.cpool[1](func).closureVars: closureVars differ (TS=2, WASM=2)
+    * func.cpool[5](func).bytecode: bytecode differ (TS 127 bytes: 04 2f 01 00 00 cd 04 27 01 00 00 ce 68 00 00 43 30 01 00 00 c9 04 31 01 … vs WASM 127 bytes: 04 2f 01 00 00 cd 04 27 01 00 00 ce 68 00 00 43 30 01 00 00 c9 04 31 01 …)
+    * func.cpool[5](func).closureVars: closureVars differ (TS=3, WASM=3)
+    * … (8 more diffs)
+- test_worker: TS=927 WASM=927 Δ+0 tags=scope,semantics
+    * func.cpool[1](func).bytecode: bytecode differ (TS 29 bytes: 68 00 00 42 f1 00 00 00 11 04 f2 00 00 00 21 01 00 e5 b7 cb e1 c2 00 44 … vs WASM 29 bytes: 68 02 00 42 f1 00 00 00 11 04 f2 00 00 00 21 01 00 e4 b7 cb e0 c2 00 44 …)
+    * func.cpool[1](func).closureVars: closureVars differ (TS=3, WASM=3)
+    * func.cpool[1](func).cpool[0](func).bytecode: bytecode differ (TS 171 bytes: d3 42 f8 00 00 00 cf 42 f9 00 00 00 11 04 fa 00 00 00 ad ec 53 e0 c7 42 … vs WASM 171 bytes: d3 42 f8 00 00 00 cf 42 f9 00 00 00 11 04 fa 00 00 00 ad ec 53 df c7 42 …)
+    * func.cpool[1](func).cpool[0](func).closureVars: closureVars differ (TS=3, WASM=3)
+- typescript: TS=2219 WASM=2219 Δ+0 tags=scope,semantics
+    * func.cpool[2](func).bytecode: bytecode differ (TS 127 bytes: e1 f0 cf 43 fc 00 00 00 68 00 00 04 fd 00 00 00 24 02 00 0e 26 00 00 e6 … vs WASM 127 bytes: e0 f0 cf 43 fc 00 00 00 68 02 00 04 fd 00 00 00 24 02 00 0e 26 00 00 e6 …)
+    * func.cpool[2](func).closureVars: closureVars differ (TS=4, WASM=4)
+    * func.cpool[2](func).cpool[0](func).closureVars: closureVars differ (TS=1, WASM=1)
+    * func.cpool[11](func).bytecode: bytecode differ (TS 93 bytes: 68 00 00 42 0d 01 00 00 11 21 00 00 cf 68 00 00 42 0e 01 00 00 42 0f 01 … vs WASM 93 bytes: 68 01 00 42 0d 01 00 00 11 21 00 00 cf 68 01 00 42 0e 01 00 00 42 0f 01 …)
+    * … (2 more diffs)
+- typescript-compiler: TS=547948 WASM=549300 Δ-1352 tags=debug,func-meta,scope,semantics
+    * func.closureVarCount: closureVarCount TS=8 WASM=40
+    * func.bytecodeLen: bytecodeLen TS=418 WASM=424
+    * func.bytecode: bytecode differ (TS 418 bytes: 08 ec 02 29 c2 00 df 11 ed 04 0e 0b e7 f1 0e c2 01 df 11 ed 04 0e 0b e7 … vs WASM 424 bytes: 08 ec 02 29 c2 00 df 11 ed 04 0e 0b e7 f1 0e c2 01 df 11 ed 04 0e 0b e7 …)
+    * func.closureVars: closureVars differ (TS=8, WASM=40)
+    * … (989 more diffs)
+
+Wrote artifacts/mismatch-structure-summary.json
+

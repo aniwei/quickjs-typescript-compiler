@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/if-else.ts
-**生成时间**: 2026-01-01T11:10:38.208Z
+**生成时间**: 2026-01-03T04:40:38.583Z
 
 ## 大小对比
 

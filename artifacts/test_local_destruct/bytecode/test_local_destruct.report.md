@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_local_destruct.ts
-**生成时间**: 2026-01-01T11:11:34.559Z
+**生成时间**: 2026-01-03T04:41:29.036Z
 
 ## 大小对比
 

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-01T11:10:37.816Z",
+  "timestamp": "2026-01-03T04:40:38.254Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/class-private-field-method-destructuring-loop-039.ts",
   "compilation": {
     "typescript": {

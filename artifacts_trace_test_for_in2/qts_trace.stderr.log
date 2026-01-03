@@ -1,0 +1,320 @@
+Setting up EMSDK environment (suppress these messages with EMSDK_QUIET=1)
+Adding directories to PATH:
+PATH += /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk
+PATH += /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/upstream/emscripten
+
+Setting environment variables:
+PATH = /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk:/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/upstream/emscripten:/Users/aniwei/.rvm/gems/ruby-2.7.2/bin:/Users/aniwei/.rvm/gems/ruby-2.7.2@global/bin:/Users/aniwei/.rvm/rubies/ruby-2.7.2/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Apple/usr/bin:/opt/homebrew/bin:/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/node_modules/.bin:/Users/aniwei/Desktop/workspaces/node_modules/.bin:/Users/aniwei/Desktop/node_modules/.bin:/Users/aniwei/node_modules/.bin:/Users/node_modules/.bin:/node_modules/.bin:/Users/aniwei/.nvm/versions/node/v20.19.5/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin:./node_modules/.bin:/Users/aniwei/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand:/Users/aniwei/Library/Application Support/Code/User/globalStorage/github.copilot-chat/copilotCli:/Users/aniwei/.nvm/versions/node/v20.19.5/bin:/opt/homebrew/sbin:/Users/aniwei/.rvm/bin
+EMSDK = /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk
+EMSDK_NODE = /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/node/22.16.0_64bit/bin/node
+EMSDK_PYTHON = /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/python/3.13.3_64bit/bin/python3
+SSL_CERT_FILE = /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/python/3.13.3_64bit/lib/python3.13/site-packages/certifi/cacert.pem
+emcmake: cmake -S /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm -B /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/build -DCMAKE_BUILD_TYPE=Release -DQTS_TRACE_ENABLED=1 -DQTS_TRACE_LEVEL=3 -DCMAKE_TOOLCHAIN_FILE=/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake -DCMAKE_CROSSCOMPILING_EMULATOR=/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/node/22.16.0_64bit/bin/node in directory /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler
+Setting up EMSDK environment (suppress these messages with EMSDK_QUIET=1)
+Adding directories to PATH:
+PATH += /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk
+PATH += /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/upstream/emscripten
+
+Setting environment variables:
+PATH = /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk:/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/upstream/emscripten:/Users/aniwei/.rvm/gems/ruby-2.7.2/bin:/Users/aniwei/.rvm/gems/ruby-2.7.2@global/bin:/Users/aniwei/.rvm/rubies/ruby-2.7.2/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Apple/usr/bin:/opt/homebrew/bin:/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/node_modules/.bin:/Users/aniwei/Desktop/workspaces/node_modules/.bin:/Users/aniwei/Desktop/node_modules/.bin:/Users/aniwei/node_modules/.bin:/Users/node_modules/.bin:/node_modules/.bin:/Users/aniwei/.nvm/versions/node/v20.19.5/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin:./node_modules/.bin:/Users/aniwei/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand:/Users/aniwei/Library/Application Support/Code/User/globalStorage/github.copilot-chat/copilotCli:/Users/aniwei/.nvm/versions/node/v20.19.5/bin:/opt/homebrew/sbin:/Users/aniwei/.rvm/bin
+EMSDK = /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk
+EMSDK_NODE = /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/node/22.16.0_64bit/bin/node
+EMSDK_PYTHON = /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/python/3.13.3_64bit/bin/python3
+SSL_CERT_FILE = /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/emsdk/python/3.13.3_64bit/lib/python3.13/site-packages/certifi/cacert.pem
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:353:29: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  353 |     modes.push_back(JSMode{ id: JS_MODE_STRICT, name: "JS_MODE_STRICT" });
+      |                             ^~~
+      |                             .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:353:49: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  353 |     modes.push_back(JSMode{ id: JS_MODE_STRICT, name: "JS_MODE_STRICT" });
+      |                                                 ^~~~~
+      |                                                 .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:354:29: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  354 |     modes.push_back(JSMode{ id: JS_MODE_ASYNC, name: "JS_MODE_ASYNC" });
+      |                             ^~~
+      |                             .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:354:48: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  354 |     modes.push_back(JSMode{ id: JS_MODE_ASYNC, name: "JS_MODE_ASYNC" });
+      |                                                ^~~~~
+      |                                                .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:355:29: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  355 |     modes.push_back(JSMode{ id: JS_MODE_BACKTRACE_BARRIER, name: "JS_MODE_BACKTRACE_BARRIER" });
+      |                             ^~~
+      |                             .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:355:60: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  355 |     modes.push_back(JSMode{ id: JS_MODE_BACKTRACE_BARRIER, name: "JS_MODE_BACKTRACE_BARRIER" });
+      |                                                            ^~~~~
+      |                                                            .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:363:30: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  363 |     codes.push_back(PC2Line{ id: PC2LINE_BASE, name: "PC2LINE_BASE" });
+      |                              ^~~
+      |                              .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:363:48: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  363 |     codes.push_back(PC2Line{ id: PC2LINE_BASE, name: "PC2LINE_BASE" });
+      |                                                ^~~~~
+      |                                                .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:364:30: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  364 |     codes.push_back(PC2Line{ id: PC2LINE_RANGE, name: "PC2LINE_RANGE" });
+      |                              ^~~
+      |                              .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:364:49: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  364 |     codes.push_back(PC2Line{ id: PC2LINE_RANGE, name: "PC2LINE_RANGE" });
+      |                                                 ^~~~~
+      |                                                 .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:365:30: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  365 |     codes.push_back(PC2Line{ id: PC2LINE_OP_FIRST, name: "PC2LINE_OP_FIRST" });
+      |                              ^~~
+      |                              .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:365:52: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  365 |     codes.push_back(PC2Line{ id: PC2LINE_OP_FIRST, name: "PC2LINE_OP_FIRST" });
+      |                                                    ^~~~~
+      |                                                    .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:366:30: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  366 |     codes.push_back(PC2Line{ id: PC2LINE_DIFF_PC_MAX, name: "PC2LINE_DIFF_PC_MAX" });
+      |                              ^~~
+      |                              .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:366:55: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  366 |     codes.push_back(PC2Line{ id: PC2LINE_DIFF_PC_MAX, name: "PC2LINE_DIFF_PC_MAX" });
+      |                                                       ^~~~~
+      |                                                       .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:374:38: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  374 |     objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_ARGUMENTS, name: "OP_SPECIAL_OBJECT_ARGUMENTS" });
+      |                                      ^~~
+      |                                      .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:374:71: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  374 |     objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_ARGUMENTS, name: "OP_SPECIAL_OBJECT_ARGUMENTS" });
+      |                                                                       ^~~~~
+      |                                                                       .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:375:38: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  375 |     objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_MAPPED_ARGUMENTS, name: "OP_SPECIAL_OBJECT_MAPPED_ARGUMENTS" });
+      |                                      ^~~
+      |                                      .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:375:78: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  375 |     objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_MAPPED_ARGUMENTS, name: "OP_SPECIAL_OBJECT_MAPPED_ARGUMENTS" });
+      |                                                                              ^~~~~
+      |                                                                              .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:376:38: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  376 |     objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_THIS_FUNC, name: "OP_SPECIAL_OBJECT_THIS_FUNC" });
+      |                                      ^~~
+      |                                      .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:376:71: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  376 |     objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_THIS_FUNC, name: "OP_SPECIAL_OBJECT_THIS_FUNC" });
+      |                                                                       ^~~~~
+      |                                                                       .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:377:38: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  377 |     objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_NEW_TARGET, name: "OP_SPECIAL_OBJECT_NEW_TARGET" });
+      |                                      ^~~
+      |                                      .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:377:72: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  377 |     objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_NEW_TARGET, name: "OP_SPECIAL_OBJECT_NEW_TARGET" });
+      |                                                                        ^~~~~
+      |                                                                        .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:378:38: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  378 |     objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_HOME_OBJECT, name: "OP_SPECIAL_OBJECT_HOME_OBJECT" });
+      |                                      ^~~
+      |                                      .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:378:73: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  378 |     objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_HOME_OBJECT, name: "OP_SPECIAL_OBJECT_HOME_OBJECT" });
+      |                                                                         ^~~~~
+      |                                                                         .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:379:38: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  379 |     objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_VAR_OBJECT, name: "OP_SPECIAL_OBJECT_VAR_OBJECT" });
+      |                                      ^~~
+      |                                      .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:379:72: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  379 |     objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_VAR_OBJECT, name: "OP_SPECIAL_OBJECT_VAR_OBJECT" });
+      |                                                                        ^~~~~
+      |                                                                        .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:380:38: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  380 |     objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_IMPORT_META, name: "OP_SPECIAL_OBJECT_IMPORT_META" });
+      |                                      ^~~
+      |                                      .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:380:73: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  380 |     objects.push_back(SpecialObject{ id: OP_SPECIAL_OBJECT_IMPORT_META, name: "OP_SPECIAL_OBJECT_IMPORT_META" });
+      |                                                                         ^~~~~
+      |                                                                         .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:388:35: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  388 |     kinds.push_back(FunctionKind{ id: JS_FUNC_NORMAL, name: "JS_FUNC_NORMAL" });
+      |                                   ^~~
+      |                                   .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:388:55: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  388 |     kinds.push_back(FunctionKind{ id: JS_FUNC_NORMAL, name: "JS_FUNC_NORMAL" });
+      |                                                       ^~~~~
+      |                                                       .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:389:35: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  389 |     kinds.push_back(FunctionKind{ id: JS_FUNC_GENERATOR, name: "JS_FUNC_GENERATOR" });
+      |                                   ^~~
+      |                                   .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:389:58: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  389 |     kinds.push_back(FunctionKind{ id: JS_FUNC_GENERATOR, name: "JS_FUNC_GENERATOR" });
+      |                                                          ^~~~~
+      |                                                          .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:390:35: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  390 |     kinds.push_back(FunctionKind{ id: JS_FUNC_ASYNC, name: "JS_FUNC_ASYNC" });
+      |                                   ^~~
+      |                                   .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:390:54: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  390 |     kinds.push_back(FunctionKind{ id: JS_FUNC_ASYNC, name: "JS_FUNC_ASYNC" });
+      |                                                      ^~~~~
+      |                                                      .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:391:35: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  391 |     kinds.push_back(FunctionKind{ id: JS_FUNC_ASYNC_GENERATOR, name: "JS_FUNC_ASYNC_GENERATOR" });
+      |                                   ^~~
+      |                                   .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:391:64: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  391 |     kinds.push_back(FunctionKind{ id: JS_FUNC_ASYNC_GENERATOR, name: "JS_FUNC_ASYNC_GENERATOR" });
+      |                                                                ^~~~~
+      |                                                                .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:399:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  399 |     tags.push_back(BytecodeTag{ id: BC_TAG_NULL, name: "TC_TAG_NULL" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:399:50: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  399 |     tags.push_back(BytecodeTag{ id: BC_TAG_NULL, name: "TC_TAG_NULL" });
+      |                                                  ^~~~~
+      |                                                  .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:400:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  400 |     tags.push_back(BytecodeTag{ id: BC_TAG_UNDEFINED, name: "TC_TAG_UNDEFINED" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:400:55: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  400 |     tags.push_back(BytecodeTag{ id: BC_TAG_UNDEFINED, name: "TC_TAG_UNDEFINED" });
+      |                                                       ^~~~~
+      |                                                       .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:401:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  401 |     tags.push_back(BytecodeTag{ id: BC_TAG_BOOL_FALSE, name: "TC_TAG_BOOL_FALSE" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:401:56: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  401 |     tags.push_back(BytecodeTag{ id: BC_TAG_BOOL_FALSE, name: "TC_TAG_BOOL_FALSE" });
+      |                                                        ^~~~~
+      |                                                        .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:402:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  402 |     tags.push_back(BytecodeTag{ id: BC_TAG_BOOL_TRUE, name: "TC_TAG_BOOL_TRUE" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:402:55: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  402 |     tags.push_back(BytecodeTag{ id: BC_TAG_BOOL_TRUE, name: "TC_TAG_BOOL_TRUE" });
+      |                                                       ^~~~~
+      |                                                       .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:403:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  403 |     tags.push_back(BytecodeTag{ id: BC_TAG_INT32, name: "TC_TAG_INT32" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:403:51: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  403 |     tags.push_back(BytecodeTag{ id: BC_TAG_INT32, name: "TC_TAG_INT32" });
+      |                                                   ^~~~~
+      |                                                   .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:404:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  404 |     tags.push_back(BytecodeTag{ id: BC_TAG_FLOAT64, name: "TC_TAG_FLOAT64" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:404:53: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  404 |     tags.push_back(BytecodeTag{ id: BC_TAG_FLOAT64, name: "TC_TAG_FLOAT64" });
+      |                                                     ^~~~~
+      |                                                     .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:405:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  405 |     tags.push_back(BytecodeTag{ id: BC_TAG_STRING, name: "TC_TAG_STRING" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:405:52: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  405 |     tags.push_back(BytecodeTag{ id: BC_TAG_STRING, name: "TC_TAG_STRING" });
+      |                                                    ^~~~~
+      |                                                    .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:406:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  406 |     tags.push_back(BytecodeTag{ id: BC_TAG_OBJECT, name: "TC_TAG_OBJECT" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:406:52: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  406 |     tags.push_back(BytecodeTag{ id: BC_TAG_OBJECT, name: "TC_TAG_OBJECT" });
+      |                                                    ^~~~~
+      |                                                    .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:407:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  407 |     tags.push_back(BytecodeTag{ id: BC_TAG_ARRAY, name: "TC_TAG_ARRAY" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:407:51: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  407 |     tags.push_back(BytecodeTag{ id: BC_TAG_ARRAY, name: "TC_TAG_ARRAY" });
+      |                                                   ^~~~~
+      |                                                   .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:408:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  408 |     tags.push_back(BytecodeTag{ id: BC_TAG_BIG_INT, name: "TC_TAG_BIG_INT" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:408:53: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  408 |     tags.push_back(BytecodeTag{ id: BC_TAG_BIG_INT, name: "TC_TAG_BIG_INT" });
+      |                                                     ^~~~~
+      |                                                     .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:409:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  409 |     tags.push_back(BytecodeTag{ id: BC_TAG_TEMPLATE_OBJECT, name: "TC_TAG_TEMPLATE_OBJECT" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:409:61: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  409 |     tags.push_back(BytecodeTag{ id: BC_TAG_TEMPLATE_OBJECT, name: "TC_TAG_TEMPLATE_OBJECT" });
+      |                                                             ^~~~~
+      |                                                             .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:410:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  410 |     tags.push_back(BytecodeTag{ id: BC_TAG_FUNCTION_BYTECODE, name: "TC_TAG_FUNCTION_BYTECODE" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:410:63: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  410 |     tags.push_back(BytecodeTag{ id: BC_TAG_FUNCTION_BYTECODE, name: "TC_TAG_FUNCTION_BYTECODE" });
+      |                                                               ^~~~~
+      |                                                               .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:411:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  411 |     tags.push_back(BytecodeTag{ id: BC_TAG_MODULE, name: "TC_TAG_MODULE" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:411:52: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  411 |     tags.push_back(BytecodeTag{ id: BC_TAG_MODULE, name: "TC_TAG_MODULE" });
+      |                                                    ^~~~~
+      |                                                    .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:412:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  412 |     tags.push_back(BytecodeTag{ id: BC_TAG_TYPED_ARRAY, name: "TC_TAG_TYPED_ARRAY" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:412:57: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  412 |     tags.push_back(BytecodeTag{ id: BC_TAG_TYPED_ARRAY, name: "TC_TAG_TYPED_ARRAY" });
+      |                                                         ^~~~~
+      |                                                         .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:413:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  413 |     tags.push_back(BytecodeTag{ id: BC_TAG_ARRAY_BUFFER, name: "TC_TAG_ARRAY_BUFFER" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:413:58: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  413 |     tags.push_back(BytecodeTag{ id: BC_TAG_ARRAY_BUFFER, name: "TC_TAG_ARRAY_BUFFER" });
+      |                                                          ^~~~~
+      |                                                          .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:414:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  414 |     tags.push_back(BytecodeTag{ id: BC_TAG_SHARED_ARRAY_BUFFER, name: "TC_TAG_SHARED_ARRAY_BUFFER" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:414:65: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  414 |     tags.push_back(BytecodeTag{ id: BC_TAG_SHARED_ARRAY_BUFFER, name: "TC_TAG_SHARED_ARRAY_BUFFER" });
+      |                                                                 ^~~~~
+      |                                                                 .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:415:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  415 |     tags.push_back(BytecodeTag{ id: BC_TAG_DATE, name: "TC_TAG_DATE" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:415:50: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  415 |     tags.push_back(BytecodeTag{ id: BC_TAG_DATE, name: "TC_TAG_DATE" });
+      |                                                  ^~~~~
+      |                                                  .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:416:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  416 |     tags.push_back(BytecodeTag{ id: BC_TAG_OBJECT_VALUE, name: "TC_TAG_OBJECT_VALUE" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:416:58: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  416 |     tags.push_back(BytecodeTag{ id: BC_TAG_OBJECT_VALUE, name: "TC_TAG_OBJECT_VALUE" });
+      |                                                          ^~~~~
+      |                                                          .name = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:417:33: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  417 |     tags.push_back(BytecodeTag{ id: BC_TAG_OBJECT_REFERENCE, name: "TC_TAG_OBJECT_REFERENCE" });
+      |                                 ^~~
+      |                                 .id = 
+/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/third_party/QuickJS/wasm/QuickJSBinding.cpp:417:62: warning: use of GNU old-style field designator extension [-Wgnu-designator]
+  417 |     tags.push_back(BytecodeTag{ id: BC_TAG_OBJECT_REFERENCE, name: "TC_TAG_OBJECT_REFERENCE" });
+      |                                                              ^~~~~
+      |                                                              .name = 
+74 warnings generated.

@@ -370,7 +370,6 @@ export class LabelResolver {
         case Opcode.OP_return_async:
         case Opcode.OP_throw:
         case Opcode.OP_throw_error:
-        case Opcode.OP_ret:
           {
             const state = { lineNum }
             posNext = this.skipDeadCode(fd, bcBuf, bcLen, posNext, state)
@@ -898,6 +897,162 @@ export class LabelResolver {
               bcOut.putU8(idx)
               posNext = cc.pos
               break
+            }
+
+            // Align QuickJS output for unused-result `+=` on locals when the RHS is another local load:
+            //   get_loc(n) get_loc(m) add put_loc(n) -> get_loc(m) add_loc(n)
+            //
+            // This sequence is used by QuickJS for string concatenation accumulators in the switch fixtures.
+            // QuickJS reference (resolve_labels peephole emitting OP_add_loc):
+            //   third_party/QuickJS/src/core/parser.c:11839-11871
+            //
+            // We intentionally restrict this to RHS `get_loc*` (pure local reads) to avoid reordering effects.
+            {
+              const sourceLen = fd.source ? fd.source.length : 0
+              const ccRhsShort: CodeContext = { ...cc, pos: 0, lineNum: -1, sourceLen, op: 0, idx: 0, label: 0, val: 0, atom: 0 }
+              const ccRhsLoc8: CodeContext = { ...cc, pos: 0, lineNum: -1, sourceLen, op: 0, idx: 0, label: 0, val: 0, atom: 0 }
+              const ccRhsLoc16: CodeContext = { ...cc, pos: 0, lineNum: -1, sourceLen, op: 0, idx: 0, label: 0, val: 0, atom: 0 }
+
+              // Canonical (QuickJS) unused-result pattern includes dup+drop.
+              const matchedStoreShortDupDrop = (idx < 4) && this.codeMatch(ccRhsShort, posNext, [
+                M4(Opcode.OP_get_loc0, Opcode.OP_get_loc1, Opcode.OP_get_loc2, Opcode.OP_get_loc3),
+                Opcode.OP_add,
+                Opcode.OP_dup,
+                putOpShort,
+                Opcode.OP_drop,
+                -1,
+              ])
+
+              const matchedStoreLoc8DupDrop = this.codeMatch(ccRhsShort, posNext, [
+                M4(Opcode.OP_get_loc0, Opcode.OP_get_loc1, Opcode.OP_get_loc2, Opcode.OP_get_loc3),
+                Opcode.OP_add,
+                Opcode.OP_dup,
+                Opcode.OP_put_loc8,
+                idx,
+                Opcode.OP_drop,
+                -1,
+              ])
+
+              const matchedStoreLoc16DupDrop = this.codeMatch(ccRhsShort, posNext, [
+                M4(Opcode.OP_get_loc0, Opcode.OP_get_loc1, Opcode.OP_get_loc2, Opcode.OP_get_loc3),
+                Opcode.OP_add,
+                Opcode.OP_dup,
+                Opcode.OP_put_loc,
+                idx,
+                Opcode.OP_drop,
+                -1,
+              ])
+
+              // Also accept shorter internal variants without dup/drop.
+              const matchedStoreShortNoDup = (idx < 4) && this.codeMatch(ccRhsShort, posNext, [
+                M4(Opcode.OP_get_loc0, Opcode.OP_get_loc1, Opcode.OP_get_loc2, Opcode.OP_get_loc3),
+                Opcode.OP_add,
+                putOpShort,
+                -1,
+              ])
+
+              const matchedStoreLoc8NoDup = this.codeMatch(ccRhsShort, posNext, [
+                M4(Opcode.OP_get_loc0, Opcode.OP_get_loc1, Opcode.OP_get_loc2, Opcode.OP_get_loc3),
+                Opcode.OP_add,
+                Opcode.OP_put_loc8,
+                idx,
+                -1,
+              ])
+
+              const matchedStoreLoc16NoDup = this.codeMatch(ccRhsShort, posNext, [
+                M4(Opcode.OP_get_loc0, Opcode.OP_get_loc1, Opcode.OP_get_loc2, Opcode.OP_get_loc3),
+                Opcode.OP_add,
+                Opcode.OP_put_loc,
+                idx,
+                -1,
+              ])
+
+              const matchedRhsLoc8DupDrop = this.codeMatch(ccRhsLoc8, posNext, [
+                Opcode.OP_get_loc8,
+                -1,
+                Opcode.OP_add,
+                Opcode.OP_dup,
+                Opcode.OP_put_loc8,
+                idx,
+                Opcode.OP_drop,
+                -1,
+              ])
+
+              const matchedRhsLoc8NoDup = this.codeMatch(ccRhsLoc8, posNext, [
+                Opcode.OP_get_loc8,
+                -1,
+                Opcode.OP_add,
+                Opcode.OP_put_loc8,
+                idx,
+                -1,
+              ])
+
+              const matchedRhsLoc16DupDrop = this.codeMatch(ccRhsLoc16, posNext, [
+                Opcode.OP_get_loc,
+                -1,
+                Opcode.OP_add,
+                Opcode.OP_dup,
+                Opcode.OP_put_loc,
+                idx,
+                Opcode.OP_drop,
+                -1,
+              ])
+
+              const matchedRhsLoc16NoDup = this.codeMatch(ccRhsLoc16, posNext, [
+                Opcode.OP_get_loc,
+                -1,
+                Opcode.OP_add,
+                Opcode.OP_put_loc,
+                idx,
+                -1,
+              ])
+
+              if (
+                matchedStoreShortDupDrop || matchedStoreLoc8DupDrop || matchedStoreLoc16DupDrop ||
+                matchedStoreShortNoDup || matchedStoreLoc8NoDup || matchedStoreLoc16NoDup
+              ) {
+                if (ccRhsShort.lineNum >= 0) lineNum = ccRhsShort.lineNum
+                this.addPc2lineInfo(fd, bcOut.size, lineNum)
+                // ccRhsShort.op is set because we used M4() multi-match.
+                bcOut.putU8(ccRhsShort.op)
+                bcOut.putU8(Opcode.OP_add_loc)
+                bcOut.putU8(idx)
+                posNext = ccRhsShort.pos
+                break
+              }
+
+              if (matchedRhsLoc8DupDrop || matchedRhsLoc8NoDup) {
+                if (ccRhsLoc8.lineNum >= 0) lineNum = ccRhsLoc8.lineNum
+                this.addPc2lineInfo(fd, bcOut.size, lineNum)
+                if (USE_SHORT_OPCODES && OPTIMIZE && ccRhsLoc8.idx < 4) {
+                  bcOut.putU8(Opcode.OP_get_loc0 + ccRhsLoc8.idx)
+                } else {
+                  bcOut.putU8(Opcode.OP_get_loc8)
+                  bcOut.putU8(ccRhsLoc8.idx)
+                }
+                bcOut.putU8(Opcode.OP_add_loc)
+                bcOut.putU8(idx)
+                posNext = ccRhsLoc8.pos
+                break
+              }
+
+              if (matchedRhsLoc16DupDrop || matchedRhsLoc16NoDup) {
+                if (ccRhsLoc16.lineNum >= 0) lineNum = ccRhsLoc16.lineNum
+                this.addPc2lineInfo(fd, bcOut.size, lineNum)
+                if (USE_SHORT_OPCODES && OPTIMIZE && ccRhsLoc16.idx < 4) {
+                  bcOut.putU8(Opcode.OP_get_loc0 + ccRhsLoc16.idx)
+                } else if (ccRhsLoc16.idx < 256) {
+                  bcOut.putU8(Opcode.OP_get_loc8)
+                  bcOut.putU8(ccRhsLoc16.idx)
+                } else {
+                  bcOut.putU8(Opcode.OP_get_loc)
+                  bcOut.putU16(ccRhsLoc16.idx)
+                }
+                bcOut.putU8(Opcode.OP_add_loc)
+                bcOut.putU8(idx)
+                posNext = ccRhsLoc16.pos
+                break
+              }
             }
 
             // QuickJS resolve_labels peephole (parser.c:11793-11833):
@@ -2250,7 +2405,11 @@ export class LabelResolver {
       const len = opDef.size
       
       if (op === TempOpcode.OP_line_num && this.isLikelyLineNum(bcBuf, pos, fd.source ? fd.source.length : 0)) {
-        state.lineNum = this.getU32(bcBuf, pos + 1)
+        // QuickJS skip_dead_code() updates *linep* on OP_line_num (parser.c:10417-10485).
+        // However, in our pipeline we may have emitted extra OP_line_num markers for code that
+        // will later be proven unreachable and skipped here. If we propagate those line updates,
+        // they can incorrectly retarget the next reachable opcode's pc2line (e.g. catch2 rethrow).
+        // For pc2line parity, ignore OP_line_num while skipping dead code.
       } else if (op === TempOpcode.OP_label) {
         const label = this.getU32(bcBuf, pos + 1)
         if (this.updateLabel(fd, label, 0) > 0) {
