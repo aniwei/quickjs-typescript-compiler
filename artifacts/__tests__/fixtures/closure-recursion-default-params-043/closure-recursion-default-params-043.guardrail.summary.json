@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/closure-recursion-default-params-043.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests__/fixtures/closure-recursion-default-params-043",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests__/fixtures/closure-recursion-default-params-043/cli/closure-recursion-default-params-043.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests__/fixtures/closure-recursion-default-params-043/cli/closure-recursion-default-params-043.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests__/fixtures/closure-recursion-default-params-043/cli/closure-recursion-default-params-043.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests__/fixtures/closure-recursion-default-params-043/cli/closure-recursion-default-params-043.pc2line.txt",
+    "bytecodeSize": 404,
+    "pc2lineLength": 18,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": true,
+    "tsSize": 342,
+    "wasmSize": 342,
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}

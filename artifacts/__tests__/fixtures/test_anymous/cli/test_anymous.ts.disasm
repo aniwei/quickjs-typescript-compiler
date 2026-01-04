@@ -1,0 +1,18 @@
+Module bytecode version: 5
+Atom count: 4
+
+=== Outer Function ===
+bytecodeLen=15 stackSize=2 varCount=0 argCount=0
+     0  push_this                                    pop=0 push=1      08
+     1  if_false8                2                   pop=1 push=0      ec 02
+     3  return_undef                                 pop=0 push=0      29
+     4  fclosure8                0                   pop=0 push=1      c2 00
+     6  get_var                  141                 pop=0 push=1      39 8d 00 00 00
+    11  call1                    npop=1              pop=1 push=1      f1
+    12  drop                                         pop=1 push=0      0e
+    13  undefined                                    pop=0 push=1      06
+    14  return_async                                 pop=1 push=0      2f
+
+=== Inner Function #0 ===
+bytecodeLen=1 stackSize=0 varCount=0 argCount=1
+     0  return_undef                                 pop=0 push=0      29

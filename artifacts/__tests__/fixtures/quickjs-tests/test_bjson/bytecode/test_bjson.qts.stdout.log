@@ -1,0 +1,762 @@
+__tests__/fixtures/quickjs-tests/test_bjson.js:5:1: function: assert
+  mode: strict
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 0
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_arg0 0: actual
+        get_arg1 1: expected
+        strict_eq
+        if_false8 17
+        return_undef
+   17:  get_arg0 0: actual
+        is_null
+        if_true8 67
+        get_arg1 1: expected
+        is_null
+        if_true8 67
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 67
+        return_undef
+   67:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 117
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 118
+  117:  push_empty_string
+  118:  add
+        call1 1
+        throw
+
+__tests__/fixtures/quickjs-tests/test_bjson.js:18:1: function: toHex
+  mode: strict
+  args: a
+  locals:
+    0: var i
+    1: var s
+    2: var tab
+    3: var v
+  stack_size: 3
+  opcodes:
+        push_empty_string
+        put_loc1 1: s
+        get_var Uint8Array
+        dup
+        get_arg0 0: a
+        call_constructor 1
+        put_loc2 2: tab
+        push_0 0
+        put_loc0 0: i
+   15:  get_loc0 0: i
+        get_loc2 2: tab
+        get_length
+        lt
+        if_false8 64
+        get_loc2 2: tab
+        get_loc0 0: i
+        get_array_el
+        get_field2 toString
+        push_i8 16
+        call_method 1
+        set_loc3 3: v
+        get_length
+        push_2 2
+        lt
+        if_false8 45
+        push_const8 0: "0"
+        get_loc3 3: v
+        add
+        put_loc3 3: v
+   45:  get_loc0 0: i
+        push_0 0
+        strict_neq
+        if_false8 57
+        push_atom_value " "
+        add_loc 1: s
+   57:  get_loc3 3: v
+        add_loc 1: s
+        inc_loc 0: i
+        goto8 15
+   64:  get_loc1 1: s
+        return
+
+__tests__/fixtures/quickjs-tests/test_bjson.js:31:1: function: isArrayLike
+  mode: strict
+  args: a
+  stack_size: 3
+  opcodes:
+        get_var Array
+        get_field2 isArray
+        get_arg0 0: a
+        call_method 1
+        dup
+        if_true8 124
+        drop
+        get_arg0 0: a
+        get_var Uint8ClampedArray
+        instanceof
+        dup
+        if_true8 124
+        drop
+        get_arg0 0: a
+        get_var Uint8Array
+        instanceof
+        dup
+        if_true8 124
+        drop
+        get_arg0 0: a
+        get_var Uint16Array
+        instanceof
+        dup
+        if_true8 124
+        drop
+        get_arg0 0: a
+        get_var Uint32Array
+        instanceof
+        dup
+        if_true8 124
+        drop
+        get_arg0 0: a
+        get_var Int8Array
+        instanceof
+        dup
+        if_true8 124
+        drop
+        get_arg0 0: a
+        get_var Int16Array
+        instanceof
+        dup
+        if_true8 124
+        drop
+        get_arg0 0: a
+        get_var Int32Array
+        instanceof
+        dup
+        if_true8 124
+        drop
+        get_arg0 0: a
+        get_var Float16Array
+        instanceof
+        dup
+        if_true8 124
+        drop
+        get_arg0 0: a
+        get_var Float32Array
+        instanceof
+        dup
+        if_true8 124
+        drop
+        get_arg0 0: a
+        get_var Float64Array
+        instanceof
+  124:  return
+
+__tests__/fixtures/quickjs-tests/test_bjson.js:44:1: function: toStr
+  mode: strict
+  args: a
+  locals:
+    0: var s
+    1: var i
+    2: var props
+    3: var prop
+  closure vars:
+    0: toStr parent:loc4 var
+    1: isArrayLike parent:loc3 var
+  stack_size: 6
+  opcodes:
+        get_arg0 0: a
+        typeof
+        dup
+        push_atom_value object
+        strict_eq
+        if_false 294
+        get_arg0 0: a
+        is_null
+        if_false8 24
+        push_atom_value null
+        return
+   24:  get_arg0 0: a
+        get_var Date
+        instanceof
+        if_false8 60
+        push_atom_value "Date("
+        get_var_ref0 0: toStr
+        get_arg0 0: a
+        get_field2 valueOf
+        call_method 0
+        call1 1
+        add
+        push_atom_value ")"
+        add
+        put_loc0 0: s
+        goto16 292
+   60:  get_arg0 0: a
+        get_var Number
+        instanceof
+        if_false8 96
+        push_atom_value "Number("
+        get_var_ref0 0: toStr
+        get_arg0 0: a
+        get_field2 valueOf
+        call_method 0
+        call1 1
+        add
+        push_atom_value ")"
+        add
+        put_loc0 0: s
+        goto16 292
+   96:  get_arg0 0: a
+        get_var String
+        instanceof
+        if_false8 132
+        push_atom_value "String("
+        get_var_ref0 0: toStr
+        get_arg0 0: a
+        get_field2 valueOf
+        call_method 0
+        call1 1
+        add
+        push_atom_value ")"
+        add
+        put_loc0 0: s
+        goto16 292
+  132:  get_arg0 0: a
+        get_var Boolean
+        instanceof
+        if_false8 168
+        push_atom_value "Boolean("
+        get_var_ref0 0: toStr
+        get_arg0 0: a
+        get_field2 valueOf
+        call_method 0
+        call1 1
+        add
+        push_atom_value ")"
+        add
+        put_loc0 0: s
+        goto16 292
+  168:  get_var_ref1 1: isArrayLike
+        get_arg0 0: a
+        call1 1
+        if_false8 220
+        push_atom_value "["
+        put_loc0 0: s
+        push_0 0
+        put_loc1 1: i
+  181:  get_loc1 1: i
+        get_arg0 0: a
+        get_length
+        lt
+        if_false8 211
+        get_loc1 1: i
+        push_0 0
+        neq
+        if_false8 199
+        push_atom_value ","
+        add_loc 0: s
+  199:  get_loc0 0: s
+        get_var_ref0 0: toStr
+        get_arg0 0: a
+        get_loc1 1: i
+        get_array_el
+        call1 1
+        add
+        put_loc0 0: s
+        inc_loc 1: i
+        goto8 181
+  211:  push_atom_value "]"
+        add_loc 0: s
+        goto8 292
+  220:  get_var Object
+        get_field2 keys
+        get_arg0 0: a
+        call_method 1
+        put_loc2 2: props
+        push_atom_value "{"
+        put_loc0 0: s
+        push_0 0
+        put_loc1 1: i
+  243:  get_loc1 1: i
+        get_loc2 2: props
+        get_length
+        lt
+        if_false8 285
+        get_loc1 1: i
+        push_0 0
+        neq
+        if_false8 261
+        push_atom_value ","
+        add_loc 0: s
+  261:  get_loc2 2: props
+        get_loc1 1: i
+        get_array_el
+        put_loc3 3: prop
+        get_loc0 0: s
+        get_loc3 3: prop
+        push_atom_value ":"
+        add
+        get_var_ref0 0: toStr
+        get_arg0 0: a
+        get_loc3 3: prop
+        get_array_el
+        call1 1
+        add
+        add
+        put_loc0 0: s
+        inc_loc 1: i
+        goto8 243
+  285:  push_atom_value "}"
+        add_loc 0: s
+  292:  get_loc0 0: s
+        return
+  294:  dup
+        push_atom_value undefined
+        strict_eq
+        if_false8 309
+        push_atom_value undefined
+        return
+  309:  dup
+        push_atom_value string
+        strict_eq
+        if_false8 327
+        get_arg0 0: a
+        get_field2 __quote
+        tail_call_method 0
+  327:  dup
+        push_atom_value number
+        strict_eq
+        if_false8 363
+        get_arg0 0: a
+        push_0 0
+        eq
+        if_false8 354
+        push_1 1
+        get_arg0 0: a
+        div
+        push_0 0
+        lt
+        if_false8 354
+        push_atom_value "-0"
+        return
+  354:  get_arg0 0: a
+        get_field2 toString
+        tail_call_method 0
+  363:  get_arg0 0: a
+        get_field2 toString
+        tail_call_method 0
+
+__tests__/fixtures/quickjs-tests/test_bjson.js:97:1: function: bjson_test
+  mode: strict
+  args: a
+  locals:
+    0: var buf
+    1: var r
+    2: var a_str
+    3: var r_str
+  closure vars:
+    0: toStr parent:loc4 var
+    1: bjson parent:loc0 const
+    2: toHex parent:loc2 var
+    3: assert parent:loc1 var
+  stack_size: 5
+  opcodes:
+        get_var_ref0 0: toStr
+        get_arg0 0: a
+        call1 1
+        put_loc2 2: a_str
+        get_var_ref_check 1: bjson
+        get_field2 write
+        get_arg0 0: a
+        call_method 1
+        put_loc0 0: buf
+        goto8 19
+   19:  get_var_ref_check 1: bjson
+        get_field2 read
+        get_loc0 0: buf
+        push_0 0
+        get_loc0 0: buf
+        get_field byteLength
+        call_method 3
+        put_loc1 1: r
+        get_var_ref0 0: toStr
+        get_loc1 1: r
+        call1 1
+        put_loc3 3: r_str
+        get_loc2 2: a_str
+        get_loc3 3: r_str
+        neq
+        if_false8 68
+        get_var print
+        get_loc2 2: a_str
+        call1 1
+        drop
+        get_var print
+        get_loc3 3: r_str
+        call1 1
+        drop
+        get_var_ref3 3: assert
+        push_false
+        call1 1
+        drop
+   68:  return_undef
+
+__tests__/fixtures/quickjs-tests/test_bjson.js:114:1: function: bjson_test_reference
+  mode: strict
+  locals:
+    0: var array
+    1: var buf
+    2: var i
+    3: var n
+    4: var array_buffer
+  closure vars:
+    0: bjson parent:loc0 const
+    1: assert parent:loc1 var
+  stack_size: 6
+  opcodes:
+        push_i8 16
+        put_loc3 3: n
+        array_from 0
+        put_loc0 0: array
+        push_0 0
+        put_loc2 2: i
+    9:  get_loc2 2: i
+        get_loc3 3: n
+        lt
+        if_false8 22
+        get_loc0 0: array
+        get_loc2 2: i
+        object
+        put_array_el
+        inc_loc 2: i
+        goto8 9
+   22:  get_var ArrayBuffer
+        dup
+        get_loc3 3: n
+        call_constructor 1
+        put_loc8 4: array_buffer
+        push_0 0
+        put_loc2 2: i
+   36:  get_loc2 2: i
+        get_loc3 3: n
+        lt
+        if_false8 90
+        get_loc0 0: array
+        get_loc2 2: i
+        get_array_el
+        get_loc0 0: array
+        get_loc2 2: i
+        push_1 1
+        add
+        get_loc3 3: n
+        mod
+        get_array_el
+        put_field next
+        get_loc0 0: array
+        get_loc2 2: i
+        get_array_el
+        get_loc2 2: i
+        put_field idx
+        get_loc0 0: array
+        get_loc2 2: i
+        get_array_el
+        get_var Uint8Array
+        dup
+        get_loc8 4: array_buffer
+        get_loc2 2: i
+        push_1 1
+        call_constructor 3
+        put_field typed_array
+        inc_loc 2: i
+        goto8 36
+   90:  get_var_ref_check 0: bjson
+        get_field2 write
+        get_loc0 0: array
+        push_true
+        call_method 2
+        put_loc1 1: buf
+        get_var_ref_check 0: bjson
+        get_field2 read
+        get_loc1 1: buf
+        push_0 0
+        get_loc1 1: buf
+        get_field byteLength
+        push_true
+        call_method 4
+        put_loc0 0: array
+        push_0 0
+        put_loc2 2: i
+  127:  get_loc2 2: i
+        get_loc3 3: n
+        lt
+        if_false8 214
+        get_var_ref1 1: assert
+        get_loc0 0: array
+        get_loc2 2: i
+        get_array_el
+        get_field next
+        get_loc0 0: array
+        get_loc2 2: i
+        push_1 1
+        add
+        get_loc3 3: n
+        mod
+        get_array_el
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc0 0: array
+        get_loc2 2: i
+        get_array_el
+        get_field idx
+        get_loc2 2: i
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc0 0: array
+        get_loc2 2: i
+        get_array_el
+        get_field typed_array
+        get_field buffer
+        get_loc8 4: array_buffer
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc0 0: array
+        get_loc2 2: i
+        get_array_el
+        get_field typed_array
+        get_length
+        push_1 1
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc0 0: array
+        get_loc2 2: i
+        get_array_el
+        get_field typed_array
+        get_field byteOffset
+        get_loc2 2: i
+        call2 2
+        drop
+        inc_loc 2: i
+        goto8 127
+  214:  return_undef
+
+__tests__/fixtures/quickjs-tests/test_bjson.js:137:1: function: bjson_test_all
+  mode: strict
+  locals:
+    0: var obj
+    1: catch e [level:5 next:-1]
+  closure vars:
+    0: bjson_test parent:loc5 var
+    1: bjson parent:loc0 const
+    2: assert parent:loc1 var
+    3: bjson_test_reference parent:loc6 var
+  stack_size: 10
+  opcodes:
+        get_var_ref0 0: bjson_test
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field y
+        push_3 3
+        define_field if
+        call1 1
+        drop
+        get_var_ref0 0: bjson_test
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        call1 1
+        drop
+        get_var_ref0 0: bjson_test
+        push_1 1
+        push_atom_value aa
+        push_true
+        push_false
+        get_var undefined
+        null
+        get_var NaN
+        get_var Infinity
+        neg
+        push_0 0
+        neg
+        array_from 9
+        call1 1
+        drop
+        get_var_undef BigInt
+        typeof_is_undefined
+        if_true8 109
+        get_var_ref0 0: bjson_test
+        get_var BigInt
+        push_const8 0: "1"
+        call1 1
+        get_var BigInt
+        push_atom_value "0x123456789"
+        call1 1
+        neg
+        get_var BigInt
+        push_atom_value "0x123456789abcdef123456789abcdef"
+        call1 1
+        array_from 3
+        call1 1
+        drop
+  109:  get_var_ref0 0: bjson_test
+        get_var Date
+        dup
+        push_i16 1234
+        call_constructor 1
+        get_var String
+        dup
+        push_atom_value abc
+        call_constructor 1
+        get_var Number
+        dup
+        push_const8 1: 12.1
+        neg
+        call_constructor 1
+        get_var Boolean
+        dup
+        push_true
+        call_constructor 1
+        array_from 4
+        call1 1
+        drop
+        get_var_ref0 0: bjson_test
+        get_var Int32Array
+        dup
+        push_i32 123123
+        push_i32 222111
+        push_i16 -32222
+        array_from 3
+        call_constructor 1
+        call1 1
+        drop
+        get_var_ref0 0: bjson_test
+        get_var Float16Array
+        dup
+        push_i16 1024
+        push_const8 2: 1024.5
+        array_from 2
+        call_constructor 1
+        call1 1
+        drop
+        get_var_ref0 0: bjson_test
+        get_var Float64Array
+        dup
+        push_i32 123123
+        push_const8 3: 222111.5
+        array_from 2
+        call_constructor 1
+        call1 1
+        drop
+        object
+        set_loc0 0: obj
+        get_loc0 0: obj
+        put_field x
+        catch 266
+        get_var_ref_check 1: bjson
+        get_field2 write
+        get_loc0 0: obj
+        call_method 1
+        drop
+        get_var_ref2 2: assert
+        push_false
+        call1 1
+        drop
+        drop
+        goto8 286
+  266:  put_loc1 1: e
+        catch 285
+        get_var_ref2 2: assert
+        get_loc1 1: e
+        get_var TypeError
+        instanceof
+        call1 1
+        drop
+        drop
+        goto8 286
+  285:  throw
+  286:  get_var_ref3 3: bjson_test_reference
+        call0 0
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_bjson.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: bjson local:loc0 const
+    1: assert local:loc0 var
+    2: toHex local:loc1 var
+    3: isArrayLike local:loc2 var
+    4: toStr local:loc3 var
+    5: bjson_test local:loc4 var
+    6: bjson_test_reference local:loc5 var
+    7: bjson_test_all local:loc6 var
+  stack_size: 1
+  opcodes:
+        push_this
+        if_false8 33
+        fclosure8 0: [bytecode assert]
+        put_var_ref1 1: assert
+        fclosure8 1: [bytecode toHex]
+        put_var_ref2 2: toHex
+        fclosure8 2: [bytecode isArrayLike]
+        put_var_ref3 3: isArrayLike
+        fclosure8 3: [bytecode toStr]
+        put_var_ref 4: toStr
+        fclosure8 4: [bytecode bjson_test]
+        put_var_ref 5: bjson_test
+        fclosure8 5: [bytecode bjson_test_reference]
+        put_var_ref 6: bjson_test_reference
+        fclosure8 6: [bytecode bjson_test_all]
+        put_var_ref 7: bjson_test_all
+        return_undef
+   33:  get_var_ref 7: bjson_test_all
+        call0 0
+        drop
+        undefined
+        return_async
+

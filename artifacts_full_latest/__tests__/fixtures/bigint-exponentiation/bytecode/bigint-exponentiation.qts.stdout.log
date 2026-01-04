@@ -1,0 +1,29 @@
+__tests__/fixtures/bigint-exponentiation.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var y,128
+        define_var y,130
+        get_var console
+        get_field2 log
+        push_bigint_i32 2
+        push_bigint_i32 3
+        pow
+        call_method 1
+        put_loc0 0: "<ret>"
+        push_bigint_i32 2
+        put_var_init y
+        get_var y
+        push_bigint_i32 5
+        pow
+        dup
+        put_var y
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var y
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

@@ -1,0 +1,36 @@
+Module bytecode version: 5
+Atom count: 6
+
+=== Outer Function ===
+bytecodeLen=46 stackSize=4 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 80
+     6  define_var               228                 pop=0 push=0      3f e4 00 00 00 80
+    12  fclosure8                0                   pop=0 push=1      c2 00
+    14  set_name                 228                 pop=1 push=1      4f e4 00 00 00
+    19  put_var_init             228                 pop=1 push=0      3b e4 00 00 00
+    24  get_var                  229                 pop=0 push=1      39 e5 00 00 00
+    29  get_field2               230                 pop=1 push=2      43 e6 00 00 00
+    34  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    39  push_5                   5                   pop=0 push=1      bc
+    40  call1                    npop=1              pop=1 push=1      f1
+    41  call_method              1                   pop=2 push=1      24 01 00
+    44  set_loc0                 loc=0               pop=1 push=1      cf
+    45  return                                       pop=1 push=0      28
+
+=== Inner Function #0 ===
+bytecodeLen=25 stackSize=2 varCount=1 argCount=1
+     0  set_loc_uninitialized    0                   pop=0 push=0      63 00 00
+     3  push_i8                  10                  pop=0 push=1      bf 0a
+     5  put_loc0                 loc=0               pop=1 push=0      cb
+     6  get_arg0                 arg=0               pop=0 push=1      d3
+     7  get_loc_check            0                   pop=0 push=1      64 00 00
+    10  gt                                           pop=2 push=1      a7
+    11  if_false8                7                   pop=1 push=0      ec 07
+    13  get_arg0                 arg=0               pop=0 push=1      d3
+    14  get_loc_check            0                   pop=0 push=1      64 00 00
+    17  sub                                          pop=2 push=1      a0
+    18  return                                       pop=1 push=0      28
+    19  get_loc_check            0                   pop=0 push=1      64 00 00
+    22  get_arg0                 arg=0               pop=0 push=1      d3
+    23  sub                                          pop=2 push=1      a0
+    24  return                                       pop=1 push=0      28

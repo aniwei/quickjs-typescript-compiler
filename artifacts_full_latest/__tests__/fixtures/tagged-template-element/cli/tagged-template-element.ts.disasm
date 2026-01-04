@@ -1,0 +1,38 @@
+Module bytecode version: 5
+Atom count: 6
+
+=== Outer Function ===
+bytecodeLen=91 stackSize=4 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 80
+     6  check_define_var         229                 pop=0 push=0      40 e5 00 00 00 80
+    12  check_define_var         230                 pop=0 push=0      40 e6 00 00 00 80
+    18  define_var               228                 pop=0 push=0      3f e4 00 00 00 80
+    24  define_var               229                 pop=0 push=0      3f e5 00 00 00 80
+    30  define_var               230                 pop=0 push=0      3f e6 00 00 00 80
+    36  object                                       pop=0 push=1      0b
+    37  fclosure8                0                   pop=0 push=1      c2 00
+    39  define_method            231                 pop=2 push=1      56 e7 00 00 00 04
+    45  put_var_init             228                 pop=1 push=0      3b e4 00 00 00
+    50  push_2                   2                   pop=0 push=1      b9
+    51  put_var_init             229                 pop=1 push=0      3b e5 00 00 00
+    56  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    61  push_atom_value          231                 pop=0 push=1      04 e7 00 00 00
+    66  get_array_el2                                pop=2 push=2      49
+    67  push_const8              1                   pop=0 push=1      c1 01
+    69  get_var                  229                 pop=0 push=1      39 e5 00 00 00
+    74  call_method              2                   pop=2 push=1      24 02 00
+    77  put_var_init             230                 pop=1 push=0      3b e6 00 00 00
+    82  get_var                  230                 pop=0 push=1      39 e6 00 00 00
+    87  drop                                         pop=1 push=0      0e
+    88  undefined                                    pop=0 push=1      06
+    89  set_loc0                 loc=0               pop=1 push=1      cf
+    90  return                                       pop=1 push=0      28
+
+=== Inner Function #0 ===
+bytecodeLen=10 stackSize=2 varCount=0 argCount=2
+     0  rest                     1                   pop=0 push=1      0d 01 00
+     3  put_arg1                 arg=1               pop=1 push=0      d8
+     4  get_arg0                 arg=0               pop=0 push=1      d3
+     5  get_arg1                 arg=1               pop=0 push=1      d4
+     6  array_from               2                   pop=0 push=1      26 02 00
+     9  return                                       pop=1 push=0      28

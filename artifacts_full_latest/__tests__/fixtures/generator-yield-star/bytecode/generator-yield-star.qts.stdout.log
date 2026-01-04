@@ -1,0 +1,69 @@
+__tests__/fixtures/generator-yield-star.js:1:1: function: *gen
+  stack_size: 2
+  opcodes:
+        initial_yield
+        push_1 1
+        yield
+        if_false8 6
+        return_async
+    6:  drop
+        push_2 2
+        yield
+        if_false8 12
+        return_async
+   12:  drop
+        push_3 3
+        yield
+        if_false8 18
+        return_async
+   18:  drop
+        push_4 4
+        return_async
+
+__tests__/fixtures/generator-yield-star.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var gen,64
+        check_define_var it,128
+        fclosure8 0: [bytecode gen]
+        define_func gen,0
+        define_var it,128
+        get_var gen
+        call0 0
+        put_var_init it
+        get_var console
+        get_field2 log
+        get_var it
+        get_field2 next
+        call_method 0
+        get_field value
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var it
+        get_field2 next
+        call_method 0
+        get_field value
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var it
+        get_field2 next
+        call_method 0
+        get_field value
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var it
+        get_field2 next
+        call_method 0
+        get_field value
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

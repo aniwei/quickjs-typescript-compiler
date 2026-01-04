@@ -23,6 +23,8 @@
  * THE SOFTWARE.
  */
 
+#define QTS_TRACE_PUT_LOC_PEEPHOLE 1
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -11939,7 +11941,24 @@ static __exception int resolve_labels(JSContext* ctx, JSFunctionDef* s) {
           /* transformation: put_x(n) get_x(n) -> set_x(n) */
           int idx;
           idx = get_u16(bc_buf + pos + 1);
+#ifdef QTS_TRACE_PUT_LOC_PEEPHOLE
+          {
+            int next_op_after_line_num = -1;
+            int temp_pos = pos_next;
+            while (temp_pos < bc_len && bc_buf[temp_pos] == OP_line_num) {
+              temp_pos += 5;
+            }
+            if (temp_pos < bc_len) {
+              next_op_after_line_num = bc_buf[temp_pos];
+            }
+            fprintf(stderr, "[QTS:PUT_LOC_PEEPHOLE] op=%d idx=%d pos=%d pos_next=%d next_op=%d expected_get=%d\n",
+                    op, idx, pos, pos_next, next_op_after_line_num, op - 1);
+          }
+#endif
           if (code_match(&cc, pos_next, op - 1, idx, -1)) {
+#ifdef QTS_TRACE_PUT_LOC_PEEPHOLE
+            fprintf(stderr, "[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x\n");
+#endif
             if (cc.line_num >= 0)
               line_num = cc.line_num;
             add_pc2line_info(s, bc_out.size, line_num);
@@ -11947,6 +11966,9 @@ static __exception int resolve_labels(JSContext* ctx, JSFunctionDef* s) {
             pos_next = cc.pos;
             break;
           }
+#ifdef QTS_TRACE_PUT_LOC_PEEPHOLE
+          fprintf(stderr, "[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x\n");
+#endif
           add_pc2line_info(s, bc_out.size, line_num);
           put_short_code(&bc_out, op, idx);
           break;

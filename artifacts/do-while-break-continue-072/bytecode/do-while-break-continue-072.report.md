@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/do-while-break-continue-072.ts
-**生成时间**: 2026-01-03T04:40:38.455Z
+**生成时间**: 2026-01-03T15:14:56.489Z
 
 ## 大小对比
 

@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/complex-control-flow.ts
-**生成时间**: 2026-01-03T04:40:38.370Z
+**生成时间**: 2026-01-03T15:14:56.375Z
 
 ## 大小对比
 

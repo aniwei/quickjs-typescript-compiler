@@ -1,0 +1,32 @@
+Module bytecode version: 5
+Atom count: 6
+
+=== Outer Function ===
+bytecodeLen=61 stackSize=5 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 80
+     6  define_var               228                 pop=0 push=0      3f e4 00 00 00 80
+    12  object                                       pop=0 push=1      0b
+    13  push_1                   1                   pop=0 push=1      b8
+    14  define_field             229                 pop=2 push=1      4e e5 00 00 00
+    19  fclosure8                0                   pop=0 push=1      c2 00
+    21  define_method            106                 pop=2 push=1      56 6a 00 00 00 04
+    27  put_var_init             228                 pop=1 push=0      3b e4 00 00 00
+    32  get_var                  230                 pop=0 push=1      39 e6 00 00 00
+    37  get_field2               231                 pop=1 push=2      43 e7 00 00 00
+    42  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    47  get_field2               106                 pop=1 push=2      43 6a 00 00 00
+    52  push_2                   2                   pop=0 push=1      b9
+    53  call_method              1                   pop=2 push=1      24 01 00
+    56  call_method              1                   pop=2 push=1      24 01 00
+    59  set_loc0                 loc=0               pop=1 push=1      cf
+    60  return                                       pop=1 push=0      28
+
+=== Inner Function #0 ===
+bytecodeLen=11 stackSize=2 varCount=1 argCount=1
+     0  push_this                                    pop=0 push=1      08
+     1  put_loc0                 loc=0               pop=1 push=0      cb
+     2  get_loc0                 loc=0               pop=0 push=1      c7
+     3  get_field                229                 pop=1 push=1      42 e5 00 00 00
+     8  get_arg0                 arg=0               pop=0 push=1      d3
+     9  add                                          pop=2 push=1      9f
+    10  return                                       pop=1 push=0      28

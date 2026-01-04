@@ -1,0 +1,29 @@
+Module bytecode version: 5
+Atom count: 7
+
+=== Outer Function ===
+bytecodeLen=83 stackSize=3 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 80
+     6  check_define_var         229                 pop=0 push=0      40 e5 00 00 00 80
+    12  define_var               228                 pop=0 push=0      3f e4 00 00 00 80
+    18  define_var               229                 pop=0 push=0      3f e5 00 00 00 80
+    24  object                                       pop=0 push=1      0b
+    25  push_1                   1                   pop=0 push=1      b8
+    26  define_field             230                 pop=2 push=1      4e e6 00 00 00
+    31  put_var_init             228                 pop=1 push=0      3b e4 00 00 00
+    36  object                                       pop=0 push=1      0b
+    37  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    42  null                                         pop=0 push=1      07
+    43  copy_data_properties     6                   pop=3 push=3      55 06
+    45  drop                                         pop=1 push=0      0e
+    46  drop                                         pop=1 push=0      0e
+    47  push_2                   2                   pop=0 push=1      b9
+    48  define_field             231                 pop=2 push=1      4e e7 00 00 00
+    53  put_var_init             229                 pop=1 push=0      3b e5 00 00 00
+    58  get_var                  232                 pop=0 push=1      39 e8 00 00 00
+    63  get_field2               233                 pop=1 push=2      43 e9 00 00 00
+    68  get_var                  229                 pop=0 push=1      39 e5 00 00 00
+    73  get_field                230                 pop=1 push=1      42 e6 00 00 00
+    78  call_method              1                   pop=2 push=1      24 01 00
+    81  set_loc0                 loc=0               pop=1 push=1      cf
+    82  return                                       pop=1 push=0      28

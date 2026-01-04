@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/regexp-literal.ts
-**生成时间**: 2026-01-03T04:41:28.810Z
+**生成时间**: 2026-01-03T15:15:48.255Z
 
 ## 大小对比
 

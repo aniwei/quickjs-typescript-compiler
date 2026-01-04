@@ -1,0 +1,193 @@
+__tests__/fixtures/test_repl1.js:93:5: function: termInit
+  mode: strict
+  locals:
+    0: var tab
+  closure vars:
+    0: term_fd local:loc35 var
+    1: std parent:loc0 const
+  stack_size: 2
+  opcodes:
+        get_var_ref_check 1: std
+        get_field in
+        get_field2 fileno
+        call_method 0
+        put_var_ref0 0: term_fd
+        return_undef
+
+__tests__/fixtures/test_repl1.js:30:2: function: <null>
+  mode: strict
+  args: g
+  locals:
+    0: var Object
+    1: var String
+    2: var Array
+    3: var Date
+    4: var Math
+    5: var isFinite
+    6: var parseFloat
+    7: var colors
+    8: var history
+    9: var clip_board
+   10: var prec
+   11: var expBits
+   12: var log2_10
+   13: var pstate
+   14: var prompt
+   15: var plen
+   16: var ps1
+   17: var ps2
+   18: var utf8
+   19: var show_time
+   20: var show_colors
+   21: var eval_start_time
+   22: var eval_time
+   23: var mexpr
+   24: var level
+   25: var cmd
+   26: var cursor_pos
+   27: var last_cmd
+   28: var last_cursor_pos
+   29: var history_index
+   30: var this_fun
+   31: var last_fun
+   32: var quote_flag
+   33: var utf8_state
+   34: var utf8_val
+   35: var term_fd
+   36: var term_read_buf
+   37: var term_width
+   38: var term_cursor_x
+   39: var termInit
+  closure vars:
+    0: std parent:loc0 const
+    1: os parent:loc1 const
+  stack_size: 2
+  opcodes:
+        fclosure8 0: [bytecode termInit]
+        put_loc8 39: termInit
+        get_arg0 0: g
+        get_var_ref_check 1: os
+        put_field os
+        get_arg0 0: g
+        get_var_ref_check 0: std
+        put_field std
+        get_arg0 0: g
+        get_field Object
+        put_loc0 0: Object
+        get_arg0 0: g
+        get_field String
+        put_loc1 1: String
+        get_arg0 0: g
+        get_field Array
+        put_loc2 2: Array
+        get_arg0 0: g
+        get_field Date
+        put_loc3 3: Date
+        get_arg0 0: g
+        get_field Math
+        put_loc8 4: Math
+        get_arg0 0: g
+        get_field isFinite
+        put_loc8 5: isFinite
+        get_arg0 0: g
+        get_field parseFloat
+        put_loc8 6: parseFloat
+        object
+        push_atom_value "\u001b[0m"
+        define_field none
+        push_atom_value "\u001b[30m"
+        define_field black
+        push_atom_value "\u001b[31m"
+        define_field red
+        push_atom_value "\u001b[32m"
+        define_field green
+        push_atom_value "\u001b[33m"
+        define_field yellow
+        push_atom_value "\u001b[34m"
+        define_field blue
+        push_atom_value "\u001b[35m"
+        define_field magenta
+        push_atom_value "\u001b[36m"
+        define_field cyan
+        push_atom_value "\u001b[37m"
+        define_field white
+        push_atom_value "\u001b[30;1m"
+        define_field gray
+        push_atom_value "\u001b[30;1m"
+        define_field grey
+        push_atom_value "\u001b[31;1m"
+        define_field bright_red
+        push_atom_value "\u001b[32;1m"
+        define_field bright_green
+        push_atom_value "\u001b[33;1m"
+        define_field bright_yellow
+        push_atom_value "\u001b[34;1m"
+        define_field bright_blue
+        push_atom_value "\u001b[35;1m"
+        define_field bright_magenta
+        push_atom_value "\u001b[36;1m"
+        define_field bright_cyan
+        push_atom_value "\u001b[37;1m"
+        define_field bright_white
+        put_loc8 7: colors
+        array_from 0
+        put_loc8 8: history
+        push_empty_string
+        put_loc8 9: clip_board
+        push_empty_string
+        put_loc8 13: pstate
+        push_empty_string
+        put_loc8 14: prompt
+        push_0 0
+        put_loc8 15: plen
+        push_atom_value "qjs > "
+        put_loc8 16: ps1
+        push_atom_value "  ... "
+        put_loc8 17: ps2
+        push_true
+        put_loc8 18: utf8
+        push_false
+        put_loc8 19: show_time
+        push_true
+        put_loc8 20: show_colors
+        push_0 0
+        put_loc8 22: eval_time
+        push_empty_string
+        put_loc8 23: mexpr
+        push_0 0
+        put_loc8 24: level
+        push_empty_string
+        put_loc8 25: cmd
+        push_0 0
+        put_loc8 26: cursor_pos
+        push_empty_string
+        put_loc8 27: last_cmd
+        push_0 0
+        put_loc8 28: last_cursor_pos
+        push_false
+        put_loc8 32: quote_flag
+        push_0 0
+        put_loc8 33: utf8_state
+        push_0 0
+        put_loc8 34: utf8_val
+        push_0 0
+        put_loc8 38: term_cursor_x
+        return_undef
+
+__tests__/fixtures/test_repl1.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: std local:loc0 const
+    1: os local:loc1 const
+  stack_size: 2
+  opcodes:
+        push_this
+        if_false8 4
+        return_undef
+    4:  fclosure8 0: [bytecode <null>]
+        get_var globalThis
+        call1 1
+        drop
+        undefined
+        return_async
+

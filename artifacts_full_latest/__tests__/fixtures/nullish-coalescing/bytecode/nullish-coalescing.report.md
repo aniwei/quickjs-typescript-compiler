@@ -1,0 +1,183 @@
+# 字节码分析报告
+
+**输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/nullish-coalescing.ts
+**生成时间**: 2026-01-03T05:23:09.760Z
+
+## 大小对比
+
+- TypeScript编译器: 216 字节
+- WASM编译器: 216 字节
+- 差异: 0 字节 (0.00%)
+
+## 结构分析
+
+### TypeScript编译器输出
+```json
+{
+  "source": "TypeScript",
+  "bcVersion": "0x5",
+  "userAtomCount": 6,
+  "atoms": [
+    {
+      "index": 0,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "a",
+      "offset": 2
+    },
+    {
+      "index": 1,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "b",
+      "offset": 4
+    },
+    {
+      "index": 2,
+      "rawLength": 16,
+      "actualLength": 8,
+      "isWideChar": 0,
+      "string": "fallback",
+      "offset": 6
+    },
+    {
+      "index": 3,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "console",
+      "offset": 15
+    },
+    {
+      "index": 4,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "log",
+      "offset": 23
+    },
+    {
+      "index": 5,
+      "rawLength": 80,
+      "actualLength": 40,
+      "isWideChar": 0,
+      "string": "__tests__/fixtures/nullish-coalescing.js",
+      "offset": 27
+    }
+  ],
+  "functionHeader": {
+    "offset": 68,
+    "tag": "0xc",
+    "remaining": 148
+  }
+}
+```
+
+### WASM编译器输出
+```json
+{
+  "source": "WASM",
+  "bcVersion": "0x5",
+  "userAtomCount": 6,
+  "atoms": [
+    {
+      "index": 0,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "a",
+      "offset": 2
+    },
+    {
+      "index": 1,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "b",
+      "offset": 4
+    },
+    {
+      "index": 2,
+      "rawLength": 16,
+      "actualLength": 8,
+      "isWideChar": 0,
+      "string": "fallback",
+      "offset": 6
+    },
+    {
+      "index": 3,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "console",
+      "offset": 15
+    },
+    {
+      "index": 4,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "log",
+      "offset": 23
+    },
+    {
+      "index": 5,
+      "rawLength": 80,
+      "actualLength": 40,
+      "isWideChar": 0,
+      "string": "__tests__/fixtures/nullish-coalescing.js",
+      "offset": 27
+    }
+  ],
+  "functionHeader": {
+    "offset": 68,
+    "tag": "0xc",
+    "remaining": 148
+  }
+}
+```
+
+## 字节级差异
+
+共发现 0 个字节差异:
+
+
+## 十六进制转储对比
+
+### TypeScript
+```
+00000000: 05 06 02 61 02 62 10 66 61 6c 6c 62 61 63 6b 0e |...a.b.fallback.|
+00000010: 63 6f 6e 73 6f 6c 65 06 6c 6f 67 50 5f 5f 74 65 |console.logP__te|
+00000020: 73 74 73 5f 5f 2f 66 69 78 74 75 72 65 73 2f 6e |sts__/fixtures/n|
+00000030: 75 6c 6c 69 73 68 2d 63 6f 61 6c 65 73 63 69 6e |ullish-coalescin|
+00000040: 67 2e 6a 73 0c 00 06 00 a4 01 00 01 00 05 00 00 |g.js............|
+00000050: 67 01 a6 01 00 00 00 40 e4 00 00 00 80 40 e5 00 |g......@.....@..|
+00000060: 00 00 80 3f e4 00 00 00 80 3f e5 00 00 00 80 07 |...?.....?......|
+00000070: 3b e4 00 00 00 39 e4 00 00 00 11 b2 ec 07 0e 04 |;....9..........|
+00000080: e6 00 00 00 3b e5 00 00 00 39 e7 00 00 00 43 e8 |....;....9....C.|
+00000090: 00 00 00 39 e5 00 00 00 24 01 00 cb 39 e7 00 00 |...9....$...9...|
+000000a0: 00 43 e8 00 00 00 b7 11 b2 ec 03 0e b8 39 47 00 |.C...........9G.|
+000000b0: 00 00 11 b2 ec 03 0e b9 9f 24 01 00 cf 28 d2 03 |.........$...(..|
+000000c0: 16 00 00 9a 14 67 13 1b 0e 1b 0a 1b 01 17 15 1b |.....g..........|
+000000d0: 0e 3e 22 39 05 07 13 00                         |.>"9....|
+```
+
+### WASM
+```
+00000000: 05 06 02 61 02 62 10 66 61 6c 6c 62 61 63 6b 0e |...a.b.fallback.|
+00000010: 63 6f 6e 73 6f 6c 65 06 6c 6f 67 50 5f 5f 74 65 |console.logP__te|
+00000020: 73 74 73 5f 5f 2f 66 69 78 74 75 72 65 73 2f 6e |sts__/fixtures/n|
+00000030: 75 6c 6c 69 73 68 2d 63 6f 61 6c 65 73 63 69 6e |ullish-coalescin|
+00000040: 67 2e 6a 73 0c 00 06 00 a4 01 00 01 00 05 00 00 |g.js............|
+00000050: 67 01 a6 01 00 00 00 40 e4 00 00 00 80 40 e5 00 |g......@.....@..|
+00000060: 00 00 80 3f e4 00 00 00 80 3f e5 00 00 00 80 07 |...?.....?......|
+00000070: 3b e4 00 00 00 39 e4 00 00 00 11 b2 ec 07 0e 04 |;....9..........|
+00000080: e6 00 00 00 3b e5 00 00 00 39 e7 00 00 00 43 e8 |....;....9....C.|
+00000090: 00 00 00 39 e5 00 00 00 24 01 00 cb 39 e7 00 00 |...9....$...9...|
+000000a0: 00 43 e8 00 00 00 b7 11 b2 ec 03 0e b8 39 47 00 |.C...........9G.|
+000000b0: 00 00 11 b2 ec 03 0e b9 9f 24 01 00 cf 28 d2 03 |.........$...(..|
+000000c0: 16 00 00 9a 14 67 13 1b 0e 1b 0a 1b 01 17 15 1b |.....g..........|
+000000d0: 0e 3e 22 39 05 07 13 00                         |.>"9....|
+```

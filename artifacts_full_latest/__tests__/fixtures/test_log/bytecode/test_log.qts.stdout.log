@@ -1,0 +1,302 @@
+__tests__/fixtures/test_log.js:31:1: function: pad
+  args: str n
+  stack_size: 2
+  opcodes:
+        get_arg0 0: str
+        push_empty_string
+        add
+        put_arg0 0: str
+    4:  get_arg0 0: str
+        get_length
+        get_arg1 1: n
+        lt
+        if_false8 20
+        get_arg0 0: str
+        push_atom_value " "
+        add
+        put_arg0 0: str
+        goto8 4
+   20:  get_arg0 0: str
+        return
+
+__tests__/fixtures/test_log.js:37:1: function: pad_left
+  args: str n
+  stack_size: 2
+  opcodes:
+        get_arg0 0: str
+        push_empty_string
+        add
+        put_arg0 0: str
+    4:  get_arg0 0: str
+        get_length
+        get_arg1 1: n
+        lt
+        if_false8 20
+        push_atom_value " "
+        get_arg0 0: str
+        add
+        put_arg0 0: str
+        goto8 4
+   20:  get_arg0 0: str
+        return
+
+__tests__/fixtures/test_log.js:43:1: function: pad_center
+  args: str n
+  stack_size: 2
+  opcodes:
+        get_arg0 0: str
+        push_empty_string
+        add
+        put_arg0 0: str
+    4:  get_arg0 0: str
+        get_length
+        get_arg1 1: n
+        lt
+        if_false8 38
+        get_arg1 1: n
+        get_arg0 0: str
+        get_length
+        sub
+        push_1 1
+        and
+        if_false8 28
+        get_arg0 0: str
+        push_atom_value " "
+        add
+        put_arg0 0: str
+        goto8 4
+   28:  push_atom_value " "
+        get_arg0 0: str
+        add
+        put_arg0 0: str
+        goto8 4
+   38:  get_arg0 0: str
+        return
+
+__tests__/fixtures/test_log.js:61:1: function: log_line
+  locals:
+    0: var i
+    1: var n
+    2: var s
+    3: var a
+    4: var arguments
+  stack_size: 5
+  opcodes:
+        special_object 1
+        put_loc8 4: arguments
+        push_empty_string
+        put_loc2 2: s
+        push_0 0
+        put_loc0 0: i
+        get_loc8 4: arguments
+        get_length
+        put_loc1 1: n
+   12:  get_loc0 0: i
+        get_loc1 1: n
+        lt
+        if_false8 110
+        get_loc0 0: i
+        push_0 0
+        gt
+        if_false8 29
+        push_atom_value " "
+        add_loc 2: s
+   29:  get_loc8 4: arguments
+        get_loc0 0: i
+        get_array_el
+        set_loc3 3: a
+        typeof
+        push_atom_value number
+        strict_eq
+        if_false8 89
+        get_var total
+        get_loc0 0: i
+        get_array_el3
+        get_loc3 3: a
+        add
+        put_array_el
+        get_loc3 3: a
+        get_field2 toFixed
+        get_var precs
+        get_loc0 0: i
+        get_array_el
+        call_method 1
+        put_loc3 3: a
+        get_loc2 2: s
+        get_var pad_left
+        get_loc3 3: a
+        get_var widths
+        get_loc0 0: i
+        get_array_el
+        call2 2
+        add
+        put_loc2 2: s
+        goto8 106
+   89:  get_loc2 2: s
+        get_var pad_left
+        get_loc3 3: a
+        get_var widths
+        get_loc0 0: i
+        get_array_el
+        call2 2
+        add
+        put_loc2 2: s
+  106:  inc_loc 0: i
+        goto8 12
+  110:  get_var console
+        get_field2 log
+        get_loc2 2: s
+        call_method 1
+        return_undef
+
+__tests__/fixtures/test_log.js:87:17: function: <null>
+  stack_size: 2
+  opcodes:
+        get_var performance
+        get_field2 now
+        tail_call_method 0
+
+__tests__/fixtures/test_log.js:95:17: function: <null>
+  locals:
+    0: var t0
+    1: var t
+  stack_size: 2
+  opcodes:
+        get_var Date
+        get_field2 now
+        call_method 0
+        put_loc0 0: t0
+   14:  get_var Date
+        get_field2 now
+        call_method 0
+        set_loc1 1: t
+        get_loc0 0: t0
+        eq
+        if_true8 14
+        get_loc1 1: t
+        return
+
+__tests__/fixtures/test_log.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 5
+  opcodes:
+        check_define_var fs,0
+        check_define_var pad,64
+        check_define_var pad_left,64
+        check_define_var pad_center,64
+        check_define_var ref_data,0
+        check_define_var log_data,0
+        check_define_var heads,0
+        check_define_var widths,0
+        check_define_var precs,0
+        check_define_var total,0
+        check_define_var total_score,0
+        check_define_var total_scale,0
+        check_define_var log_line,64
+        check_define_var clocks_per_sec,0
+        check_define_var max_iterations,0
+        check_define_var clock_threshold,0
+        check_define_var min_n_argument,0
+        check_define_var get_clock,0
+        define_var fs,0
+        fclosure8 0: [bytecode pad]
+        define_func pad,0
+        fclosure8 1: [bytecode pad_left]
+        define_func pad_left,0
+        fclosure8 2: [bytecode pad_center]
+        define_func pad_center,0
+        define_var ref_data,0
+        define_var log_data,0
+        define_var heads,0
+        define_var widths,0
+        define_var precs,0
+        define_var total,0
+        define_var total_score,0
+        define_var total_scale,0
+        fclosure8 3: [bytecode log_line]
+        define_func log_line,0
+        define_var clocks_per_sec,0
+        define_var max_iterations,0
+        define_var clock_threshold,0
+        define_var min_n_argument,0
+        define_var get_clock,0
+        undefined
+        put_loc0 0: "<ret>"
+        get_var_undef require
+        typeof_is_undefined
+        if_true8 250
+        get_var require
+        push_atom_value fs
+        call1 1
+        put_var fs
+  250:  push_atom_value TEST
+        push_atom_value N
+        push_atom_value "TIME (ns)"
+        push_atom_value "REF (ns)"
+        push_atom_value "SCORE (1000)"
+        array_from 5
+        put_var heads
+        push_i8 22
+        push_i8 10
+        push_i8 9
+        push_i8 9
+        push_i8 9
+        array_from 5
+        put_var widths
+        push_0 0
+        push_0 0
+        push_2 2
+        push_2 2
+        push_0 0
+        array_from 5
+        put_var precs
+        push_0 0
+        push_0 0
+        push_0 0
+        push_0 0
+        push_0 0
+        array_from 5
+        put_var total
+        push_0 0
+        put_var total_score
+        push_0 0
+        put_var total_scale
+        push_i16 1000
+        put_var clocks_per_sec
+        push_i8 100
+        put_var max_iterations
+        push_2 2
+        put_var clock_threshold
+        push_1 1
+        put_var min_n_argument
+        undefined
+        put_loc0 0: "<ret>"
+        get_var_undef performance
+        typeof_is_undefined
+        if_true8 392
+        fclosure8 4: [bytecode <null>]
+        set_name get_clock
+        dup
+        put_var get_clock
+        put_loc0 0: "<ret>"
+        goto8 435
+  392:  undefined
+        put_loc0 0: "<ret>"
+        get_var_undef os
+        typeof_is_undefined
+        if_true8 421
+        get_var os
+        get_field now
+        dup
+        put_var get_clock
+        put_loc0 0: "<ret>"
+        goto8 435
+  421:  fclosure8 5: [bytecode <null>]
+        set_name get_clock
+        dup
+        put_var get_clock
+        put_loc0 0: "<ret>"
+  435:  get_loc0 0: "<ret>"
+        return
+

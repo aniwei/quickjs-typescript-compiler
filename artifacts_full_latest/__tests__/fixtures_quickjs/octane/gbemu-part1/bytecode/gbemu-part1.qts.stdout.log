@@ -1,0 +1,5510 @@
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:16:1: function: setupGameboy
+  mode: strict
+  closure vars:
+    0: decoded_gameboy_rom parent:loc8 var
+    1: base64_decode parent:loc20 var
+    2: gameboy_rom parent:loc2 const
+  stack_size: 2
+  opcodes:
+        get_var_undef Uint8Array
+        typeof
+        push_atom_value undefined
+        neq
+        dup
+        if_false8 60
+        drop
+        get_var_undef Int8Array
+        typeof
+        push_atom_value undefined
+        neq
+        dup
+        if_false8 60
+        drop
+        get_var_undef Float32Array
+        typeof
+        push_atom_value undefined
+        neq
+        dup
+        if_false8 60
+        drop
+        get_var_undef Int32Array
+        typeof
+        push_atom_value undefined
+        neq
+   60:  lnot
+        if_false8 69
+        push_atom_value TypedArrayUnsupported
+        throw
+   69:  get_var_ref1 1: base64_decode
+        get_var_ref_check 2: gameboy_rom
+        call1 1
+        put_var_ref0 0: decoded_gameboy_rom
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:28:1: function: runGameboy
+  mode: strict
+  closure vars:
+    0: start parent:loc3 const
+    1: GameBoyCanvas parent:loc5 const
+    2: decoded_gameboy_rom parent:loc8 var
+    3: gameboy parent:loc6 const
+    4: GameBoyAudioNode parent:loc14 var
+    5: resetGlobalVariables parent:loc16 var
+  stack_size: 3
+  opcodes:
+        get_var_ref_check 0: start
+        get_var_ref_check 1: GameBoyCanvas
+        dup
+        call_constructor 0
+        get_var_ref2 2: decoded_gameboy_rom
+        call2 2
+        drop
+        get_var_ref_check 3: gameboy
+        push_0 0
+        put_field instructions
+        get_var_ref_check 3: gameboy
+        push_i32 250000
+        put_field totalInstructions
+   35:  get_var_ref_check 3: gameboy
+        get_field instructions
+        get_var_ref_check 3: gameboy
+        get_field totalInstructions
+        lte
+        if_false8 80
+        get_var_ref_check 3: gameboy
+        get_field2 run
+        call_method 0
+        drop
+        get_var_ref 4: GameBoyAudioNode
+        get_field2 run
+        call_method 0
+        drop
+        goto8 35
+   80:  get_var_ref 5: resetGlobalVariables
+        call0 0
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:38:1: function: tearDownGameboy
+  mode: strict
+  closure vars:
+    0: decoded_gameboy_rom parent:loc8 var
+    1: expectedGameboyStateStr parent:loc12 var
+  stack_size: 1
+  opcodes:
+        null
+        put_var_ref0 0: decoded_gameboy_rom
+        null
+        put_var_ref1 1: expectedGameboyStateStr
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:46:1: function: clear_terminal
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:51:14: function: <null>
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:52:10: function: <null>
+  mode: strict
+  locals:
+    0: var event
+    1: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc1 1: this
+        object
+        get_loc1 1: this
+        get_field outputBuffer
+        define_field outputBuffer
+        put_loc0 0: event
+        get_loc1 1: this
+        get_field2 onaudioprocess
+        get_loc0 0: event
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:59:26: function: <null>
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:59:52: function: <null>
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:58:31: function: <null>
+  mode: strict
+  stack_size: 2
+  opcodes:
+        object
+        fclosure8 0: [bytecode <null>]
+        set_name noteOn
+        define_field noteOn
+        fclosure8 1: [bytecode <null>]
+        set_name connect
+        define_field connect
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:63:25: function: <null>
+  mode: strict
+  args: channels len sampleRate
+  stack_size: 2
+  opcodes:
+        object
+        push_1 1
+        define_field gain
+        push_1 1
+        define_field numberOfChannels
+        push_1 1
+        define_field length
+        push_const8 0: 0.000020833333110203966
+        define_field duration
+        push_i32 48000
+        define_field sampleRate
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:73:29: function: <null>
+  mode: strict
+  args: i
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field channelData
+        get_arg0 0: i
+        get_array_el
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:70:33: function: <null>
+  mode: strict
+  args: bufferSize inputChannels outputChannels
+  locals:
+    0: var i
+  closure vars:
+    0: GameBoyAudioNode parent:loc0 var
+  stack_size: 5
+  opcodes:
+        get_var_ref0 0: GameBoyAudioNode
+        get_arg0 0: bufferSize
+        put_field bufferSize
+        get_var_ref0 0: GameBoyAudioNode
+        object
+        fclosure8 0: [bytecode <null>]
+        set_name getChannelData
+        define_field getChannelData
+        array_from 0
+        define_field channelData
+        put_field outputBuffer
+        push_0 0
+        put_loc0 0: i
+   36:  get_loc0 0: i
+        get_arg2 2: outputChannels
+        lt
+        if_false8 68
+        get_var_ref0 0: GameBoyAudioNode
+        get_field outputBuffer
+        get_field channelData
+        get_loc0 0: i
+        get_var Float32Array
+        dup
+        get_arg0 0: bufferSize
+        call_constructor 1
+        put_array_el
+        inc_loc 0: i
+        goto8 36
+   68:  get_var_ref0 0: GameBoyAudioNode
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:57:1: function: GameBoyAudioContext
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: GameBoyAudioNode parent:loc14 var
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        fclosure8 0: [bytecode <null>]
+        put_field createBufferSource
+        get_loc0 0: this
+        push_i32 48000
+        put_field sampleRate
+        get_loc0 0: this
+        object
+        put_field destination
+        get_loc0 0: this
+        fclosure8 1: [bytecode <null>]
+        put_field createBuffer
+        get_loc0 0: this
+        fclosure8 2: [bytecode <null>]
+        put_field createJavaScriptNode
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:84:1: function: resetGlobalVariables
+  mode: strict
+  closure vars:
+    0: audioContextHandle parent:loc35 var
+    1: audioNode parent:loc36 var
+    2: audioSource parent:loc37 var
+    3: launchedContext parent:loc38 var
+    4: audioContextSampleBuffer parent:loc39 var
+    5: resampled parent:loc40 var
+    6: webAudioMinBufferSize parent:loc41 var
+    7: webAudioMaxBufferSize parent:loc42 var
+    8: webAudioActualSampleRate parent:loc43 var
+    9: XAudioJSSampleRate parent:loc44 var
+   10: webAudioMono parent:loc45 var
+   11: XAudioJSVolume parent:loc46 var
+   12: resampleControl parent:loc47 var
+   13: audioBufferSize parent:loc48 var
+   14: resampleBufferStart parent:loc49 var
+   15: resampleBufferEnd parent:loc50 var
+   16: resampleBufferSize parent:loc51 var
+  stack_size: 1
+  opcodes:
+        null
+        put_var_ref0 0: audioContextHandle
+        null
+        put_var_ref1 1: audioNode
+        null
+        put_var_ref2 2: audioSource
+        push_false
+        put_var_ref3 3: launchedContext
+        array_from 0
+        put_var_ref 4: audioContextSampleBuffer
+        array_from 0
+        put_var_ref 5: resampled
+        push_i16 15000
+        put_var_ref 6: webAudioMinBufferSize
+        push_i16 25000
+        put_var_ref 7: webAudioMaxBufferSize
+        push_i32 44100
+        put_var_ref 8: webAudioActualSampleRate
+        push_0 0
+        put_var_ref 9: XAudioJSSampleRate
+        push_false
+        put_var_ref 10: webAudioMono
+        push_1 1
+        put_var_ref 11: XAudioJSVolume
+        null
+        put_var_ref 12: resampleControl
+        push_0 0
+        put_var_ref 13: audioBufferSize
+        push_0 0
+        put_var_ref 14: resampleBufferStart
+        push_0 0
+        put_var_ref 15: resampleBufferEnd
+        push_2 2
+        put_var_ref 16: resampleBufferSize
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:114:1: function: base64
+  mode: strict
+  args: data
+  locals:
+    0: var base64
+    1: catch error [level:3 next:-1]
+    2: var dataLength
+    3: var bytes
+    4: var index
+    5: var remainder
+  closure vars:
+    0: GameBoyWindow parent:loc4 const
+    1: toBase64 parent:loc17 var
+  stack_size: 7
+  opcodes:
+        catch 22
+        get_var_ref_check 0: GameBoyWindow
+        get_field2 btoa
+        get_arg0 0: data
+        call_method 1
+        put_loc0 0: base64
+        drop
+        goto16 263
+   22:  put_loc1 1: error
+        catch 262
+        push_empty_string
+        put_loc0 0: base64
+        get_arg0 0: data
+        get_length
+        set_loc2 2: dataLength
+        push_0 0
+        gt
+        if_false 259
+        push_0 0
+        push_0 0
+        push_0 0
+        array_from 3
+        put_loc3 3: bytes
+        push_0 0
+        put_loc8 4: index
+        get_loc2 2: dataLength
+        push_3 3
+        mod
+        put_loc8 5: remainder
+   55:  get_arg0 0: data
+        get_length
+        push_3 3
+        mod
+        push_0 0
+        gt
+        if_false8 74
+        get_arg0 0: data
+        get_arg0 0: data
+        get_length
+        push_atom_value " "
+        put_array_el
+        goto8 55
+   74:  get_loc8 4: index
+        get_loc2 2: dataLength
+        lt
+        if_false8 192
+        get_arg0 0: data
+        get_field2 charCodeAt
+        get_loc8 4: index
+        post_inc
+        put_loc8 4: index
+        call_method 1
+        push_i16 255
+        and
+        get_arg0 0: data
+        get_field2 charCodeAt
+        get_loc8 4: index
+        post_inc
+        put_loc8 4: index
+        call_method 1
+        push_i16 255
+        and
+        get_arg0 0: data
+        get_field2 charCodeAt
+        get_loc8 4: index
+        post_inc
+        put_loc8 4: index
+        call_method 1
+        push_i16 255
+        and
+        array_from 3
+        put_loc3 3: bytes
+        get_loc0 0: base64
+        get_var_ref1 1: toBase64
+        get_loc3 3: bytes
+        push_0 0
+        get_array_el
+        push_2 2
+        sar
+        get_array_el
+        get_var_ref1 1: toBase64
+        get_loc3 3: bytes
+        push_0 0
+        get_array_el
+        push_3 3
+        and
+        push_4 4
+        shl
+        get_loc3 3: bytes
+        push_1 1
+        get_array_el
+        push_4 4
+        sar
+        or
+        get_array_el
+        add
+        get_var_ref1 1: toBase64
+        get_loc3 3: bytes
+        push_1 1
+        get_array_el
+        push_i8 15
+        and
+        push_2 2
+        shl
+        get_loc3 3: bytes
+        push_2 2
+        get_array_el
+        push_6 6
+        sar
+        or
+        get_array_el
+        add
+        get_var_ref1 1: toBase64
+        get_loc3 3: bytes
+        push_2 2
+        get_array_el
+        push_i8 63
+        and
+        get_array_el
+        add
+        add
+        put_loc0 0: base64
+        goto8 74
+  192:  get_loc8 5: remainder
+        push_0 0
+        gt
+        if_false8 259
+        get_loc0 0: base64
+        get_loc0 0: base64
+        get_length
+        push_1 1
+        sub
+        push_atom_value "="
+        put_array_el
+        get_loc8 5: remainder
+        push_2 2
+        eq
+        if_false8 243
+        get_loc0 0: base64
+        get_loc0 0: base64
+        get_length
+        push_2 2
+        sub
+        push_atom_value "="
+        put_array_el
+        get_loc0 0: base64
+        get_loc0 0: base64
+        get_length
+        push_3 3
+        sub
+        get_var_ref1 1: toBase64
+        get_loc3 3: bytes
+        push_0 0
+        get_array_el
+        push_3 3
+        and
+        push_4 4
+        shl
+        get_array_el
+        put_array_el
+        goto8 259
+  243:  get_loc0 0: base64
+        get_loc0 0: base64
+        get_length
+        push_2 2
+        sub
+        get_var_ref1 1: toBase64
+        get_loc3 3: bytes
+        push_1 1
+        get_array_el
+        push_i8 15
+        and
+        push_2 2
+        shl
+        get_array_el
+        put_array_el
+  259:  drop
+        goto8 263
+  262:  throw
+  263:  get_loc0 0: base64
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:151:1: function: base64_decode
+  mode: strict
+  args: data
+  locals:
+    0: var decode64
+    1: catch error [level:3 next:-1]
+    2: var dataLength
+    3: var sixbits
+    4: var index
+  closure vars:
+    0: GameBoyWindow parent:loc4 const
+    1: fromBase64 parent:loc18 var
+  stack_size: 10
+  opcodes:
+        catch 22
+        get_var_ref_check 0: GameBoyWindow
+        get_field2 atob
+        get_arg0 0: data
+        call_method 1
+        put_loc0 0: decode64
+        drop
+        goto16 268
+   22:  put_loc1 1: error
+        catch 267
+        push_empty_string
+        put_loc0 0: decode64
+        get_arg0 0: data
+        get_length
+        set_loc2 2: dataLength
+        push_3 3
+        gt
+        if_false 264
+        get_loc2 2: dataLength
+        push_4 4
+        mod
+        push_0 0
+        eq
+        if_false 264
+        push_0 0
+        push_0 0
+        push_0 0
+        push_0 0
+        array_from 4
+        put_loc3 3: sixbits
+        push_0 0
+        put_loc8 4: index
+   61:  get_loc8 4: index
+        get_loc2 2: dataLength
+        lt
+        if_false 249
+        get_var_ref1 1: fromBase64
+        get_field2 indexOf
+        get_arg0 0: data
+        get_field2 charAt
+        get_loc8 4: index
+        post_inc
+        put_loc8 4: index
+        call_method 1
+        call_method 1
+        get_var_ref1 1: fromBase64
+        get_field2 indexOf
+        get_arg0 0: data
+        get_field2 charAt
+        get_loc8 4: index
+        post_inc
+        put_loc8 4: index
+        call_method 1
+        call_method 1
+        get_var_ref1 1: fromBase64
+        get_field2 indexOf
+        get_arg0 0: data
+        get_field2 charAt
+        get_loc8 4: index
+        post_inc
+        put_loc8 4: index
+        call_method 1
+        call_method 1
+        get_var_ref1 1: fromBase64
+        get_field2 indexOf
+        get_arg0 0: data
+        get_field2 charAt
+        get_loc8 4: index
+        post_inc
+        put_loc8 4: index
+        call_method 1
+        call_method 1
+        array_from 4
+        put_loc3 3: sixbits
+        get_loc0 0: decode64
+        get_var String
+        get_field2 fromCharCode
+        get_loc3 3: sixbits
+        push_0 0
+        get_array_el
+        push_2 2
+        shl
+        get_loc3 3: sixbits
+        push_1 1
+        get_array_el
+        push_4 4
+        sar
+        or
+        call_method 1
+        get_var String
+        get_field2 fromCharCode
+        get_loc3 3: sixbits
+        push_1 1
+        get_array_el
+        push_i8 15
+        and
+        push_4 4
+        shl
+        get_loc3 3: sixbits
+        push_2 2
+        get_array_el
+        push_2 2
+        sar
+        or
+        call_method 1
+        add
+        get_var String
+        get_field2 fromCharCode
+        get_loc3 3: sixbits
+        push_2 2
+        get_array_el
+        push_3 3
+        and
+        push_6 6
+        shl
+        get_loc3 3: sixbits
+        push_3 3
+        get_array_el
+        or
+        call_method 1
+        add
+        add
+        put_loc0 0: decode64
+        goto16 61
+  249:  get_loc3 3: sixbits
+        push_3 3
+        get_array_el
+        push_i8 64
+        gte
+        if_false8 264
+        get_loc3 3: sixbits
+        push_2 2
+        get_array_el
+        push_i8 64
+        gte
+        drop
+  264:  drop
+        goto8 268
+  267:  throw
+  268:  get_loc0 0: decode64
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:179:1: function: to_little_endian_dword
+  mode: strict
+  args: str
+  closure vars:
+    0: to_little_endian_word parent:loc22 var
+  stack_size: 6
+  opcodes:
+        get_var_ref0 0: to_little_endian_word
+        get_arg0 0: str
+        call1 1
+        get_var String
+        get_field2 fromCharCode
+        get_arg0 0: str
+        push_i8 16
+        sar
+        push_i16 255
+        and
+        get_arg0 0: str
+        push_i8 24
+        sar
+        push_i16 255
+        and
+        call_method 2
+        add
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:182:1: function: to_little_endian_word
+  mode: strict
+  args: str
+  closure vars:
+    0: to_byte parent:loc23 var
+  stack_size: 5
+  opcodes:
+        get_var_ref0 0: to_byte
+        get_arg0 0: str
+        call1 1
+        get_var String
+        get_field2 fromCharCode
+        get_arg0 0: str
+        push_i8 8
+        sar
+        push_i16 255
+        and
+        call_method 1
+        add
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:185:1: function: to_byte
+  mode: strict
+  args: str
+  stack_size: 4
+  opcodes:
+        get_var String
+        get_field2 fromCharCode
+        get_arg0 0: str
+        push_i16 255
+        and
+        tail_call_method 1
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:188:1: function: arrayToBase64
+  mode: strict
+  args: arrayIn
+  locals:
+    0: var binString
+    1: var length
+    2: var index
+  closure vars:
+    0: base64 parent:loc19 var
+  stack_size: 5
+  opcodes:
+        push_empty_string
+        put_loc0 0: binString
+        get_arg0 0: arrayIn
+        get_length
+        put_loc1 1: length
+        push_0 0
+        put_loc2 2: index
+    7:  get_loc2 2: index
+        get_loc1 1: length
+        lt
+        if_false8 47
+        get_arg0 0: arrayIn
+        get_loc2 2: index
+        get_array_el
+        typeof
+        push_atom_value number
+        eq
+        if_false8 43
+        get_loc0 0: binString
+        get_var String
+        get_field2 fromCharCode
+        get_arg0 0: arrayIn
+        get_loc2 2: index
+        get_array_el
+        call_method 1
+        add
+        put_loc0 0: binString
+   43:  inc_loc 2: index
+        goto8 7
+   47:  get_var_ref0 0: base64
+        get_loc0 0: binString
+        tail_call 1
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:198:1: function: base64ToArray
+  mode: strict
+  args: b64String
+  locals:
+    0: var binString
+    1: var outArray
+    2: var length
+    3: var index
+  closure vars:
+    0: base64_decode parent:loc20 var
+  stack_size: 6
+  opcodes:
+        get_var_ref0 0: base64_decode
+        get_arg0 0: b64String
+        call1 1
+        put_loc0 0: binString
+        array_from 0
+        put_loc1 1: outArray
+        get_loc0 0: binString
+        get_length
+        put_loc2 2: length
+        push_0 0
+        put_loc3 3: index
+   13:  get_loc3 3: index
+        get_loc2 2: length
+        lt
+        if_false8 46
+        get_loc1 1: outArray
+        get_field2 push
+        get_loc0 0: binString
+        get_field2 charCodeAt
+        get_loc3 3: index
+        post_inc
+        put_loc3 3: index
+        call_method 1
+        push_i16 255
+        and
+        call_method 1
+        drop
+        goto8 13
+   46:  get_loc1 1: outArray
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:210:1: function: Resampler
+  mode: strict
+  args: fromSampleRate toSampleRate channels outputBufferSize noReturn
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: fromSampleRate
+        put_field fromSampleRate
+        get_loc0 0: this
+        get_arg1 1: toSampleRate
+        put_field toSampleRate
+        get_loc0 0: this
+        get_arg2 2: channels
+        push_0 0
+        or
+        put_field channels
+        get_loc0 0: this
+        get_arg3 3: outputBufferSize
+        put_field outputBufferSize
+        get_loc0 0: this
+        get_arg 4: noReturn
+        lnot
+        lnot
+        put_field noReturn
+        get_loc0 0: this
+        get_field2 initialize
+        call_method 0
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:218:34: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field fromSampleRate
+        push_0 0
+        gt
+        if_false 136
+        get_loc0 0: this
+        get_field toSampleRate
+        push_0 0
+        gt
+        if_false8 136
+        get_loc0 0: this
+        get_field channels
+        push_0 0
+        gt
+        if_false8 136
+        get_loc0 0: this
+        get_field fromSampleRate
+        get_loc0 0: this
+        get_field toSampleRate
+        eq
+        if_false8 70
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field bypassResampler
+        put_field resampler
+        get_loc0 0: this
+        push_1 1
+        put_field ratioWeight
+        return_undef
+   70:  get_loc0 0: this
+        get_field2 compileInterpolationFunction
+        call_method 0
+        drop
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field interpolate
+        put_field resampler
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field fromSampleRate
+        get_loc0 0: this
+        get_field toSampleRate
+        div
+        put_field ratioWeight
+        get_loc0 0: this
+        push_false
+        put_field tailExists
+        get_loc0 0: this
+        push_0 0
+        put_field lastWeight
+        get_loc0 0: this
+        get_field2 initializeBuffers
+        call_method 0
+        drop
+        return_undef
+  136:  get_var Error
+        dup
+        push_atom_value "Invalid settings specified for the resampler."
+        call_constructor 1
+        throw
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:240:52: function: <null>
+  mode: strict
+  locals:
+    0: var toCompile
+    1: var channel
+    2: var this
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc2 2: this
+        push_atom_value "var bufferLength = Math.min(buffer.length, this.outputBufferSize);  if ((bufferLength % "
+        get_loc2 2: this
+        get_field channels
+        add
+        push_atom_value ") == 0) {    if (bufferLength > 0) {      var ratioWeight = this.ratioWeight;      var weight = 0;"
+        add
+        put_loc0 0: toCompile
+        push_0 0
+        put_loc1 1: channel
+   23:  get_loc1 1: channel
+        get_loc2 2: this
+        get_field channels
+        lt
+        if_false8 53
+        get_loc0 0: toCompile
+        push_atom_value "var output"
+        get_loc1 1: channel
+        add
+        push_atom_value " = 0;"
+        add
+        add
+        put_loc0 0: toCompile
+        inc_loc 1: channel
+        goto8 23
+   53:  push_atom_value "var actualPosition = 0;      var amountToNext = 0;      var alreadyProcessedTail = !this.tailExists;      this.tailExists = false;      var outputBuffer = this.outputBuffer;      var outputOffset = 0;      var currentPosition = 0;      do {        if (alreadyProcessedTail) {          weight = ratioWeight;"
+        add_loc 0: toCompile
+        push_0 0
+        put_loc1 1: channel
+   62:  get_loc1 1: channel
+        get_loc2 2: this
+        get_field channels
+        lt
+        if_false8 92
+        get_loc0 0: toCompile
+        push_atom_value output
+        get_loc1 1: channel
+        add
+        push_atom_value " = 0;"
+        add
+        add
+        put_loc0 0: toCompile
+        inc_loc 1: channel
+        goto8 62
+   92:  push_atom_value "}        else {          weight = this.lastWeight;"
+        add_loc 0: toCompile
+        push_0 0
+        put_loc1 1: channel
+  101:  get_loc1 1: channel
+        get_loc2 2: this
+        get_field channels
+        lt
+        if_false8 139
+        get_loc0 0: toCompile
+        push_atom_value output
+        get_loc1 1: channel
+        add
+        push_atom_value " = this.lastOutput["
+        add
+        get_loc1 1: channel
+        add
+        push_atom_value "];"
+        add
+        add
+        put_loc0 0: toCompile
+        inc_loc 1: channel
+        goto8 101
+  139:  push_atom_value "alreadyProcessedTail = true;        }        while (weight > 0 && actualPosition < bufferLength) {          amountToNext = 1 + actualPosition - currentPosition;          if (weight >= amountToNext) {"
+        add_loc 0: toCompile
+        push_0 0
+        put_loc1 1: channel
+  148:  get_loc1 1: channel
+        get_loc2 2: this
+        get_field channels
+        lt
+        if_false8 178
+        get_loc0 0: toCompile
+        push_atom_value output
+        get_loc1 1: channel
+        add
+        push_atom_value " += buffer[actualPosition++] * amountToNext;"
+        add
+        add
+        put_loc0 0: toCompile
+        inc_loc 1: channel
+        goto8 148
+  178:  push_atom_value "currentPosition = actualPosition;            weight -= amountToNext;          }          else {"
+        add_loc 0: toCompile
+        push_0 0
+        put_loc1 1: channel
+  187:  get_loc1 1: channel
+        get_loc2 2: this
+        get_field channels
+        lt
+        if_false8 239
+        get_loc0 0: toCompile
+        push_atom_value output
+        get_loc1 1: channel
+        add
+        push_atom_value " += buffer[actualPosition"
+        add
+        get_loc1 1: channel
+        push_0 0
+        gt
+        if_false8 225
+        push_atom_value " + "
+        get_loc1 1: channel
+        add
+        goto8 226
+  225:  push_empty_string
+  226:  add
+        push_atom_value "] * weight;"
+        add
+        add
+        put_loc0 0: toCompile
+        inc_loc 1: channel
+        goto8 187
+  239:  push_atom_value "currentPosition += weight;            weight = 0;            break;          }        }        if (weight == 0) {"
+        add_loc 0: toCompile
+        push_0 0
+        put_loc1 1: channel
+  248:  get_loc1 1: channel
+        get_loc2 2: this
+        get_field channels
+        lt
+        if_false8 278
+        get_loc0 0: toCompile
+        push_atom_value "outputBuffer[outputOffset++] = output"
+        get_loc1 1: channel
+        add
+        push_atom_value " / ratioWeight;"
+        add
+        add
+        put_loc0 0: toCompile
+        inc_loc 1: channel
+        goto8 248
+  278:  push_atom_value "}        else {          this.lastWeight = weight;"
+        add_loc 0: toCompile
+        push_0 0
+        put_loc1 1: channel
+  287:  get_loc1 1: channel
+        get_loc2 2: this
+        get_field channels
+        lt
+        if_false8 325
+        get_loc0 0: toCompile
+        push_atom_value "this.lastOutput["
+        get_loc1 1: channel
+        add
+        push_atom_value "] = output"
+        add
+        get_loc1 1: channel
+        add
+        push_atom_value ";"
+        add
+        add
+        put_loc0 0: toCompile
+        inc_loc 1: channel
+        goto8 287
+  325:  push_atom_value "this.tailExists = true;          break;        }      } while (actualPosition < bufferLength);      return this.bufferSlice(outputOffset);    }    else {      return (this.noReturn) ? 0 : [];    }  }  else {    throw(new Error(\"Buffer was of incorrect sample length.\"));  }"
+        add_loc 0: toCompile
+        get_loc2 2: this
+        get_var Function
+        push_atom_value buffer
+        get_loc0 0: toCompile
+        call2 2
+        put_field interpolate
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:313:39: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field noReturn
+        if_false8 20
+        get_loc0 0: this
+        get_arg0 0: buffer
+        put_field outputBuffer
+        get_arg0 0: buffer
+        get_length
+        return
+   20:  get_arg0 0: buffer
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:324:35: function: <null>
+  mode: strict
+  args: sliceAmount
+  locals:
+    0: catch error [level:6 next:-1]
+    1: catch error [level:10 next:0]
+    2: var this
+  stack_size: 6
+  opcodes:
+        push_this
+        put_loc2 2: this
+        get_loc2 2: this
+        get_field noReturn
+        if_false8 12
+        get_arg0 0: sliceAmount
+        return
+   12:  catch 35
+        get_loc2 2: this
+        get_field outputBuffer
+        get_field2 subarray
+        push_0 0
+        get_arg0 0: sliceAmount
+        call_method 2
+        nip_catch
+        return
+   35:  put_loc0 0: error
+        catch 81
+        catch 55
+        get_loc2 2: this
+        get_field outputBuffer
+        nip_catch
+        nip_catch
+        return
+   55:  put_loc1 1: error
+        catch 80
+        get_loc2 2: this
+        get_field outputBuffer
+        get_field2 slice
+        push_0 0
+        get_arg0 0: sliceAmount
+        call_method 2
+        nip_catch
+        nip_catch
+        return
+   80:  throw
+   81:  throw
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:347:41: function: <null>
+  mode: strict
+  locals:
+    0: catch error [level:3 next:-1]
+    1: var this
+  stack_size: 5
+  opcodes:
+        push_this
+        put_loc1 1: this
+        catch 51
+        get_loc1 1: this
+        get_var Float32Array
+        dup
+        get_loc1 1: this
+        get_field outputBufferSize
+        call_constructor 1
+        put_field outputBuffer
+        get_loc1 1: this
+        get_var Float32Array
+        dup
+        get_loc1 1: this
+        get_field channels
+        call_constructor 1
+        put_field lastOutput
+        drop
+        return_undef
+   51:  put_loc0 0: error
+        catch 77
+        get_loc1 1: this
+        array_from 0
+        put_field outputBuffer
+        get_loc1 1: this
+        array_from 0
+        put_field lastOutput
+        drop
+        return_undef
+   77:  throw
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:376:90: function: <null>
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:370:1: function: XAudioServer
+  mode: strict
+  args: channels sampleRate minBufferSize maxBufferSize underRunCallback volume
+  locals:
+    0: var this
+  closure vars:
+    0: webAudioMono parent:loc45 var
+    1: XAudioJSSampleRate parent:loc44 var
+    2: webAudioMinBufferSize parent:loc41 var
+    3: samplesPerCallback parent:loc30 var
+    4: webAudioMaxBufferSize parent:loc42 var
+    5: XAudioJSVolume parent:loc46 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: channels
+        push_2 2
+        eq
+        if_false8 11
+        push_2 2
+        goto8 12
+   11:  push_1 1
+   12:  put_field audioChannels
+        get_loc0 0: this
+        get_field audioChannels
+        push_1 1
+        eq
+        put_var_ref0 0: webAudioMono
+        get_arg1 1: sampleRate
+        push_0 0
+        gt
+        if_false8 43
+        get_arg1 1: sampleRate
+        push_i32 16777215
+        lte
+        if_false8 43
+        get_arg1 1: sampleRate
+        goto8 48
+   43:  push_i32 44100
+   48:  put_var_ref1 1: XAudioJSSampleRate
+        get_arg2 2: minBufferSize
+        get_var_ref3 3: samplesPerCallback
+        push_1 1
+        shl
+        gte
+        if_false8 74
+        get_arg2 2: minBufferSize
+        get_arg3 3: maxBufferSize
+        lt
+        if_false8 74
+        get_arg2 2: minBufferSize
+        get_var_ref0 0: webAudioMono
+        if_false8 69
+        push_const8 0: 4294967295
+        goto8 71
+   69:  push_const8 1: 4294967294
+   71:  and
+        goto8 77
+   74:  get_var_ref3 3: samplesPerCallback
+        push_1 1
+        shl
+   77:  put_var_ref2 2: webAudioMinBufferSize
+        get_var Math
+        get_field2 floor
+        get_arg3 3: maxBufferSize
+        call_method 1
+        get_var_ref2 2: webAudioMinBufferSize
+        get_loc0 0: this
+        get_field audioChannels
+        add
+        gt
+        if_false8 116
+        get_arg3 3: maxBufferSize
+        get_var_ref0 0: webAudioMono
+        if_false8 111
+        push_const8 2: 4294967295
+        goto8 113
+  111:  push_const8 3: 4294967294
+  113:  and
+        goto8 119
+  116:  get_arg2 2: minBufferSize
+        push_1 1
+        shl
+  119:  put_var_ref 4: webAudioMaxBufferSize
+        get_loc0 0: this
+        get_arg 4: underRunCallback
+        typeof_is_function
+        if_false8 134
+        get_arg 4: underRunCallback
+        goto8 136
+  134:  fclosure8 4: [bytecode <null>]
+  136:  put_field underRunCallback
+        get_arg 5: volume
+        push_0 0
+        gte
+        if_false8 160
+        get_arg 5: volume
+        push_1 1
+        lte
+        if_false8 160
+        get_arg 5: volume
+        goto8 161
+  160:  push_1 1
+  161:  put_var_ref 5: XAudioJSVolume
+        get_loc0 0: this
+        push_minus1 -1
+        put_field audioType
+        get_loc0 0: this
+        array_from 0
+        put_field mozAudioTail
+        get_loc0 0: this
+        null
+        put_field audioHandleMoz
+        get_loc0 0: this
+        null
+        put_field audioHandleFlash
+        get_loc0 0: this
+        push_false
+        put_field flashInitialized
+        get_loc0 0: this
+        push_false
+        put_field mozAudioFound
+        get_loc0 0: this
+        get_field2 initializeAudio
+        call_method 0
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:386:40: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 MOZWriteAudioNoCallback
+        get_arg0 0: buffer
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_field2 MOZExecuteCallback
+        call_method 0
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:391:50: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 writeMozAudio
+        get_arg0 0: buffer
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:395:50: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 callbackBasedWriteAudioNoCallback
+        get_arg0 0: buffer
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_field2 callbackBasedExecuteCallback
+        call_method 0
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:400:60: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var length
+    1: var bufferCounter
+  closure vars:
+    0: audioBufferSize parent:loc48 var
+    1: webAudioMaxBufferSize parent:loc42 var
+    2: audioContextSampleBuffer parent:loc39 var
+  stack_size: 5
+  opcodes:
+        get_arg0 0: buffer
+        get_length
+        put_loc0 0: length
+        push_0 0
+        put_loc1 1: bufferCounter
+    5:  get_loc1 1: bufferCounter
+        get_loc0 0: length
+        lt
+        if_false8 27
+        get_var_ref0 0: audioBufferSize
+        get_var_ref1 1: webAudioMaxBufferSize
+        lt
+        if_false8 27
+        get_var_ref2 2: audioContextSampleBuffer
+        get_var_ref0 0: audioBufferSize
+        post_inc
+        put_var_ref0 0: audioBufferSize
+        get_arg0 0: buffer
+        get_loc1 1: bufferCounter
+        post_inc
+        put_loc1 1: bufferCounter
+        get_array_el
+        put_array_el
+        goto8 5
+   27:  return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:414:37: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var this
+  closure vars:
+    0: launchedContext parent:loc38 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field audioType
+        push_0 0
+        eq
+        if_false8 24
+        get_loc0 0: this
+        get_field2 MOZWriteAudio
+        get_arg0 0: buffer
+        call_method 1
+        drop
+        return_undef
+   24:  get_loc0 0: this
+        get_field audioType
+        push_1 1
+        eq
+        if_false8 46
+        get_loc0 0: this
+        get_field2 callbackBasedWriteAudio
+        get_arg0 0: buffer
+        call_method 1
+        drop
+        return_undef
+   46:  get_loc0 0: this
+        get_field audioType
+        push_2 2
+        eq
+        if_false8 103
+        get_loc0 0: this
+        get_field2 checkFlashInit
+        call_method 0
+        dup
+        if_true8 70
+        drop
+        get_var_ref0 0: launchedContext
+   70:  if_false8 84
+        get_loc0 0: this
+        get_field2 callbackBasedWriteAudio
+        get_arg0 0: buffer
+        call_method 1
+        drop
+        return_undef
+   84:  get_loc0 0: this
+        get_field mozAudioFound
+        if_false8 103
+        get_loc0 0: this
+        get_field2 MOZWriteAudio
+        get_arg0 0: buffer
+        call_method 1
+        drop
+  103:  return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:438:47: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var this
+  closure vars:
+    0: launchedContext parent:loc38 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field audioType
+        push_0 0
+        eq
+        if_false8 24
+        get_loc0 0: this
+        get_field2 MOZWriteAudioNoCallback
+        get_arg0 0: buffer
+        call_method 1
+        drop
+        return_undef
+   24:  get_loc0 0: this
+        get_field audioType
+        push_1 1
+        eq
+        if_false8 46
+        get_loc0 0: this
+        get_field2 callbackBasedWriteAudioNoCallback
+        get_arg0 0: buffer
+        call_method 1
+        drop
+        return_undef
+   46:  get_loc0 0: this
+        get_field audioType
+        push_2 2
+        eq
+        if_false8 103
+        get_loc0 0: this
+        get_field2 checkFlashInit
+        call_method 0
+        dup
+        if_true8 70
+        drop
+        get_var_ref0 0: launchedContext
+   70:  if_false8 84
+        get_loc0 0: this
+        get_field2 callbackBasedWriteAudioNoCallback
+        get_arg0 0: buffer
+        call_method 1
+        drop
+        return_undef
+   84:  get_loc0 0: this
+        get_field mozAudioFound
+        if_false8 103
+        get_loc0 0: this
+        get_field2 MOZWriteAudioNoCallback
+        get_arg0 0: buffer
+        call_method 1
+        drop
+  103:  return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:456:42: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: resampledSamplesLeft parent:loc54 var
+    1: resampleControl parent:loc47 var
+    2: audioBufferSize parent:loc48 var
+    3: launchedContext parent:loc38 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field audioType
+        push_0 0
+        eq
+        if_false8 34
+        get_loc0 0: this
+        get_field samplesAlreadyWritten
+        get_loc0 0: this
+        get_field audioHandleMoz
+        get_field2 mozCurrentSampleOffset
+        call_method 0
+        sub
+        return
+   34:  get_loc0 0: this
+        get_field audioType
+        push_1 1
+        eq
+        if_false8 74
+        get_var_ref0 0: resampledSamplesLeft
+        call0 0
+        get_var_ref1 1: resampleControl
+        get_field ratioWeight
+        mul
+        get_loc0 0: this
+        get_field audioChannels
+        push_1 1
+        sub
+        sar
+        get_loc0 0: this
+        get_field audioChannels
+        push_1 1
+        sub
+        shl
+        get_var_ref2 2: audioBufferSize
+        add
+        return
+   74:  get_loc0 0: this
+        get_field audioType
+        push_2 2
+        eq
+        if_false8 160
+        get_loc0 0: this
+        get_field2 checkFlashInit
+        call_method 0
+        dup
+        if_true8 98
+        drop
+        get_var_ref3 3: launchedContext
+   98:  if_false8 130
+        get_var_ref0 0: resampledSamplesLeft
+        call0 0
+        get_var_ref1 1: resampleControl
+        get_field ratioWeight
+        mul
+        get_loc0 0: this
+        get_field audioChannels
+        push_1 1
+        sub
+        sar
+        get_loc0 0: this
+        get_field audioChannels
+        push_1 1
+        sub
+        shl
+        get_var_ref2 2: audioBufferSize
+        add
+        return
+  130:  get_loc0 0: this
+        get_field mozAudioFound
+        if_false8 160
+        get_loc0 0: this
+        get_field samplesAlreadyWritten
+        get_loc0 0: this
+        get_field audioHandleMoz
+        get_field2 mozCurrentSampleOffset
+        call_method 0
+        sub
+        return
+  160:  push_0 0
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:478:45: function: <null>
+  mode: strict
+  locals:
+    0: var samplesRequested
+    1: var this
+  closure vars:
+    0: webAudioMinBufferSize parent:loc41 var
+  stack_size: 5
+  opcodes:
+        push_this
+        put_loc1 1: this
+        get_var_ref0 0: webAudioMinBufferSize
+        get_loc1 1: this
+        get_field2 remainingBuffer
+        call_method 0
+        sub
+        set_loc0 0: samplesRequested
+        push_0 0
+        gt
+        if_false8 38
+        get_loc1 1: this
+        get_field2 writeMozAudio
+        get_loc1 1: this
+        get_field2 underRunCallback
+        get_loc0 0: samplesRequested
+        call_method 1
+        call_method 1
+        drop
+   38:  return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:485:55: function: <null>
+  mode: strict
+  locals:
+    0: var samplesRequested
+    1: var this
+  closure vars:
+    0: webAudioMinBufferSize parent:loc41 var
+  stack_size: 5
+  opcodes:
+        push_this
+        put_loc1 1: this
+        get_var_ref0 0: webAudioMinBufferSize
+        get_loc1 1: this
+        get_field2 remainingBuffer
+        call_method 0
+        sub
+        set_loc0 0: samplesRequested
+        push_0 0
+        gt
+        if_false8 38
+        get_loc1 1: this
+        get_field2 callbackBasedWriteAudioNoCallback
+        get_loc1 1: this
+        get_field2 underRunCallback
+        get_loc0 0: samplesRequested
+        call_method 1
+        call_method 1
+        drop
+   38:  return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:493:42: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: launchedContext parent:loc38 var
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field audioType
+        push_0 0
+        eq
+        if_false8 23
+        get_loc0 0: this
+        get_field2 MOZExecuteCallback
+        call_method 0
+        drop
+        return_undef
+   23:  get_loc0 0: this
+        get_field audioType
+        push_1 1
+        eq
+        if_false8 44
+        get_loc0 0: this
+        get_field2 callbackBasedExecuteCallback
+        call_method 0
+        drop
+        return_undef
+   44:  get_loc0 0: this
+        get_field audioType
+        push_2 2
+        eq
+        if_false8 99
+        get_loc0 0: this
+        get_field2 checkFlashInit
+        call_method 0
+        dup
+        if_true8 68
+        drop
+        get_var_ref0 0: launchedContext
+   68:  if_false8 81
+        get_loc0 0: this
+        get_field2 callbackBasedExecuteCallback
+        call_method 0
+        drop
+        return_undef
+   81:  get_loc0 0: this
+        get_field mozAudioFound
+        if_false8 99
+        get_loc0 0: this
+        get_field2 MOZExecuteCallback
+        call_method 0
+        drop
+   99:  return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:510:42: function: <null>
+  mode: strict
+  locals:
+    0: catch error [level:5 next:-1]
+    1: catch error [level:9 next:0]
+    2: catch error [level:13 next:1]
+    3: var this
+  stack_size: 6
+  opcodes:
+        push_this
+        put_loc3 3: this
+        catch 22
+        get_var Error
+        dup
+        push_atom_value "Select initializeWebAudio case"
+        call_constructor 1
+        throw
+   22:  put_loc0 0: error
+        catch 98
+        catch 46
+        get_loc3 3: this
+        get_field2 initializeWebAudio
+        call_method 0
+        drop
+        drop
+        goto8 96
+   46:  put_loc1 1: error
+        catch 95
+        catch 70
+        get_loc3 3: this
+        get_field2 initializeFlashAudio
+        call_method 0
+        drop
+        drop
+        goto8 92
+   70:  put_loc2 2: error
+        catch 91
+        get_var Error
+        dup
+        push_atom_value "Browser does not support real time audio output."
+        call_constructor 1
+        throw
+   91:  throw
+   92:  drop
+        goto8 96
+   95:  throw
+   96:  drop
+        return_undef
+   98:  throw
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:534:48: function: <null>
+  mode: strict
+  locals:
+    0: var emptySampleFrame
+    1: var prebufferAmount
+    2: var samplesToDoubleBuffer
+    3: var index
+    4: var this
+  closure vars:
+    0: XAudioJSSampleRate parent:loc44 var
+    1: webAudioMinBufferSize parent:loc41 var
+  stack_size: 5
+  opcodes:
+        push_this
+        put_loc8 4: this
+        get_loc8 4: this
+        get_var Audio
+        dup
+        call_constructor 0
+        put_field audioHandleMoz
+        get_loc8 4: this
+        get_field audioHandleMoz
+        get_field2 mozSetup
+        get_loc8 4: this
+        get_field audioChannels
+        get_var_ref0 0: XAudioJSSampleRate
+        call_method 2
+        drop
+        get_loc8 4: this
+        push_0 0
+        put_field samplesAlreadyWritten
+        get_loc8 4: this
+        get_field audioChannels
+        push_2 2
+        eq
+        if_false8 69
+        push_0 0
+        push_0 0
+        array_from 2
+        goto8 73
+   69:  push_0 0
+        array_from 1
+   73:  put_loc0 0: emptySampleFrame
+        push_0 0
+        put_loc1 1: prebufferAmount
+        get_var navigator
+        get_field platform
+        push_atom_value MacIntel
+        neq
+        if_false8 202
+        get_var navigator
+        get_field platform
+        push_atom_value MacPPC
+        neq
+        if_false8 202
+  112:  get_loc8 4: this
+        get_field audioHandleMoz
+        get_field2 mozCurrentSampleOffset
+        call_method 0
+        push_0 0
+        eq
+        if_false8 152
+        get_loc1 1: prebufferAmount
+        get_loc8 4: this
+        get_field audioHandleMoz
+        get_field2 mozWriteAudio
+        get_loc0 0: emptySampleFrame
+        call_method 1
+        add
+        put_loc1 1: prebufferAmount
+        goto8 112
+  152:  get_loc1 1: prebufferAmount
+        get_loc8 4: this
+        get_field audioChannels
+        div
+        put_loc2 2: samplesToDoubleBuffer
+        push_0 0
+        put_loc3 3: index
+  164:  get_loc3 3: index
+        get_loc2 2: samplesToDoubleBuffer
+        lt
+        if_false8 202
+        get_loc8 4: this
+        get_field2 samplesAlreadyWritten
+        get_loc8 4: this
+        get_field audioHandleMoz
+        get_field2 mozWriteAudio
+        get_loc0 0: emptySampleFrame
+        call_method 1
+        add
+        put_field samplesAlreadyWritten
+        inc_loc 3: index
+        goto8 164
+  202:  get_loc8 4: this
+        get_field2 samplesAlreadyWritten
+        get_loc1 1: prebufferAmount
+        add
+        put_field samplesAlreadyWritten
+        get_var_ref1 1: webAudioMinBufferSize
+        get_loc8 4: this
+        get_field samplesAlreadyWritten
+        add
+        put_var_ref1 1: webAudioMinBufferSize
+        get_loc8 4: this
+        push_true
+        put_field mozAudioFound
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:556:45: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: getFloat32 parent:loc28 var
+    1: webAudioMinBufferSize parent:loc41 var
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 writeMozAudio
+        get_var_ref0 0: getFloat32
+        get_var_ref1 1: webAudioMinBufferSize
+        call1 1
+        call_method 1
+        drop
+        get_loc0 0: this
+        push_0 0
+        put_field audioType
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:561:45: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: launchedContext parent:loc38 var
+    1: resetCallbackAPIAudioBuffer parent:loc56 var
+    2: webAudioActualSampleRate parent:loc43 var
+    3: samplesPerCallback parent:loc30 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_var_ref0 0: launchedContext
+        if_false8 18
+        get_var_ref1 1: resetCallbackAPIAudioBuffer
+        get_var_ref2 2: webAudioActualSampleRate
+        get_var_ref3 3: samplesPerCallback
+        call2 2
+        drop
+        get_loc0 0: this
+        push_1 1
+        put_field audioType
+        return_undef
+   18:  get_var Error
+        dup
+        push_empty_string
+        call_constructor 1
+        throw
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:581:212: function: <null>
+  mode: strict
+  args: event
+  closure vars:
+    0: thisObj local:loc1 var
+  stack_size: 2
+  opcodes:
+        get_arg0 0: event
+        get_field success
+        if_false8 21
+        get_var_ref0 0: thisObj
+        get_arg0 0: event
+        get_field ref
+        put_field audioHandleFlash
+        return_undef
+   21:  get_var_ref0 0: thisObj
+        push_1 1
+        put_field audioType
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:570:47: function: <null>
+  mode: strict
+  locals:
+    0: var existingFlashload
+    1: var thisObj
+    2: var mainContainerNode
+    3: var containerNode
+    4: var this
+  stack_size: 12
+  opcodes:
+        push_this
+        put_loc8 4: this
+        get_var document
+        get_field2 getElementById
+        push_atom_value XAudioJS
+        call_method 1
+        set_loc0 0: existingFlashload
+        null
+        eq
+        if_false 230
+        get_loc8 4: this
+        put_loc1 1: thisObj
+        get_var document
+        get_field2 createElement
+        push_atom_value div
+        call_method 1
+        set_loc2 2: mainContainerNode
+        get_field2 setAttribute
+        push_atom_value style
+        push_atom_value "position: fixed; bottom: 0px; right: 0px; margin: 0px; padding: 0px; border: none; width: 8px; height: 8px; overflow: hidden; z-index: -1000; "
+        call_method 2
+        drop
+        get_var document
+        get_field2 createElement
+        push_atom_value div
+        call_method 1
+        set_loc3 3: containerNode
+        get_field2 setAttribute
+        push_atom_value style
+        push_atom_value "position: static; border: none; width: 0px; height: 0px; visibility: hidden; margin: 8px; padding: 0px;"
+        call_method 2
+        drop
+        get_loc3 3: containerNode
+        get_field2 setAttribute
+        push_atom_value id
+        push_atom_value XAudioJS
+        call_method 2
+        drop
+        get_loc2 2: mainContainerNode
+        get_field2 appendChild
+        get_loc3 3: containerNode
+        call_method 1
+        drop
+        get_var document
+        get_field2 getElementsByTagName
+        push_atom_value body
+        call_method 1
+        push_0 0
+        get_array_el
+        get_field2 appendChild
+        get_loc2 2: mainContainerNode
+        call_method 1
+        drop
+        get_var swfobject
+        get_field2 embedSWF
+        push_atom_value "XAudioJS.swf"
+        push_atom_value XAudioJS
+        push_const8 0: "8"
+        push_const8 1: "8"
+        push_atom_value "9.0.0"
+        push_empty_string
+        object
+        object
+        push_atom_value always
+        define_field allowscriptaccess
+        object
+        push_atom_value "position: static; visibility: hidden; margin: 8px; padding: 0px; border: none"
+        define_field style
+        fclosure8 2: [bytecode <null>]
+        call_method 10
+        drop
+        goto8 238
+  230:  get_loc8 4: this
+        get_loc0 0: existingFlashload
+        put_field audioHandleFlash
+  238:  get_loc8 4: this
+        push_2 2
+        put_field audioType
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:595:39: function: <null>
+  mode: strict
+  args: newVolume
+  locals:
+    0: var this
+  closure vars:
+    0: XAudioJSVolume parent:loc46 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_arg0 0: newVolume
+        push_0 0
+        gte
+        if_false8 61
+        get_arg0 0: newVolume
+        push_1 1
+        lte
+        if_false8 61
+        get_arg0 0: newVolume
+        put_var_ref0 0: XAudioJSVolume
+        get_loc0 0: this
+        get_field2 checkFlashInit
+        call_method 0
+        if_false8 41
+        get_loc0 0: this
+        get_field audioHandleFlash
+        get_field2 changeVolume
+        get_var_ref0 0: XAudioJSVolume
+        call_method 1
+        drop
+   41:  get_loc0 0: this
+        get_field mozAudioFound
+        if_false8 61
+        get_loc0 0: this
+        get_field audioHandleMoz
+        get_var_ref0 0: XAudioJSVolume
+        put_field volume
+   61:  return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:607:40: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var length
+    1: var samplesAccepted
+    2: var index
+    3: var this
+  closure vars:
+    0: webAudioMaxBufferSize parent:loc42 var
+  stack_size: 6
+  opcodes:
+        push_this
+        put_loc3 3: this
+        get_loc3 3: this
+        get_field mozAudioTail
+        get_length
+        set_loc0 0: length
+        push_0 0
+        gt
+        if_false8 65
+        get_loc3 3: this
+        get_field audioHandleMoz
+        get_field2 mozWriteAudio
+        get_loc3 3: this
+        get_field mozAudioTail
+        call_method 1
+        put_loc1 1: samplesAccepted
+        get_loc3 3: this
+        get_field2 samplesAlreadyWritten
+        get_loc1 1: samplesAccepted
+        add
+        put_field samplesAlreadyWritten
+        get_loc3 3: this
+        get_field mozAudioTail
+        get_field2 splice
+        push_0 0
+        get_loc1 1: samplesAccepted
+        call_method 2
+        drop
+   65:  get_var Math
+        get_field2 min
+        get_arg0 0: buffer
+        get_length
+        get_var_ref0 0: webAudioMaxBufferSize
+        get_loc3 3: this
+        get_field samplesAlreadyWritten
+        sub
+        get_loc3 3: this
+        get_field audioHandleMoz
+        get_field2 mozCurrentSampleOffset
+        call_method 0
+        add
+        call_method 2
+        put_loc0 0: length
+        get_loc3 3: this
+        get_field audioHandleMoz
+        get_field2 mozWriteAudio
+        get_arg0 0: buffer
+        call_method 1
+        put_loc1 1: samplesAccepted
+        get_loc3 3: this
+        get_field2 samplesAlreadyWritten
+        get_loc1 1: samplesAccepted
+        add
+        put_field samplesAlreadyWritten
+        push_0 0
+        put_loc2 2: index
+  135:  get_loc0 0: length
+        get_loc1 1: samplesAccepted
+        gt
+        if_false8 164
+        get_loc3 3: this
+        get_field mozAudioTail
+        get_field2 push
+        get_arg0 0: buffer
+        get_loc2 2: index
+        post_inc
+        put_loc2 2: index
+        get_array_el
+        call_method 1
+        drop
+        dec_loc 0: length
+        goto8 135
+  164:  return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:623:41: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: XAudioJSVolume parent:loc46 var
+    1: resetCallbackAPIAudioBuffer parent:loc56 var
+    2: samplesPerCallback parent:loc30 var
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field flashInitialized
+        lnot
+        if_false8 70
+        get_loc0 0: this
+        get_field audioHandleFlash
+        if_false8 70
+        get_loc0 0: this
+        get_field audioHandleFlash
+        get_field initialize
+        if_false8 70
+        get_loc0 0: this
+        push_true
+        put_field flashInitialized
+        get_loc0 0: this
+        get_field audioHandleFlash
+        get_field2 initialize
+        get_loc0 0: this
+        get_field audioChannels
+        get_var_ref0 0: XAudioJSVolume
+        call_method 2
+        drop
+        get_var_ref1 1: resetCallbackAPIAudioBuffer
+        push_i32 44100
+        get_var_ref2 2: samplesPerCallback
+        call2 2
+        drop
+   70:  get_loc0 0: this
+        get_field flashInitialized
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:632:1: function: getFloat32
+  mode: strict
+  args: size
+  locals:
+    0: catch error [level:3 next:-1]
+  stack_size: 4
+  opcodes:
+        catch 17
+        get_var Float32Array
+        dup
+        get_arg0 0: size
+        call_constructor 1
+        nip_catch
+        return
+   17:  put_loc0 0: error
+        catch 35
+        get_var Array
+        dup
+        get_arg0 0: size
+        call_constructor 1
+        nip_catch
+        return
+   35:  throw
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:640:1: function: getFloat32Flat
+  mode: strict
+  args: size
+  locals:
+    0: var newBuffer
+    1: catch error [level:3 next:-1]
+    2: var audioSampleIndice
+  stack_size: 4
+  opcodes:
+        catch 19
+        get_var Float32Array
+        dup
+        get_arg0 0: size
+        call_constructor 1
+        put_loc0 0: newBuffer
+        drop
+        goto8 53
+   19:  put_loc1 1: error
+        catch 52
+        get_var Array
+        dup
+        get_arg0 0: size
+        call_constructor 1
+        put_loc0 0: newBuffer
+        push_0 0
+        put_loc2 2: audioSampleIndice
+   38:  get_loc0 0: newBuffer
+        get_loc2 2: audioSampleIndice
+        push_0 0
+        put_array_el
+        get_loc2 2: audioSampleIndice
+        inc
+        set_loc2 2: audioSampleIndice
+        get_arg0 0: size
+        lt
+        if_true8 38
+        drop
+        goto8 53
+   52:  throw
+   53:  get_loc0 0: newBuffer
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:656:1: function: audioOutputFlashEvent
+  mode: strict
+  closure vars:
+    0: resampleRefill parent:loc53 var
+    1: outputConvert parent:loc31 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: resampleRefill
+        call0 0
+        drop
+        get_var_ref1 1: outputConvert
+        tail_call 0
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:660:1: function: generateFlashStereoString
+  mode: strict
+  locals:
+    0: var copyBinaryStringLeft
+    1: var copyBinaryStringRight
+    2: var index
+  closure vars:
+    0: samplesPerCallback parent:loc30 var
+    1: resampleBufferStart parent:loc49 var
+    2: resampleBufferEnd parent:loc50 var
+    3: resampled parent:loc40 var
+    4: resampleBufferSize parent:loc51 var
+  stack_size: 10
+  opcodes:
+        push_empty_string
+        put_loc0 0: copyBinaryStringLeft
+        push_empty_string
+        put_loc1 1: copyBinaryStringRight
+        push_0 0
+        put_loc2 2: index
+    6:  get_loc2 2: index
+        get_var_ref0 0: samplesPerCallback
+        lt
+        if_false 158
+        get_var_ref1 1: resampleBufferStart
+        get_var_ref2 2: resampleBufferEnd
+        neq
+        if_false 158
+        get_loc0 0: copyBinaryStringLeft
+        get_var String
+        get_field2 fromCharCode
+        get_var Math
+        get_field2 min
+        get_var Math
+        get_field2 max
+        get_var_ref3 3: resampled
+        get_var_ref1 1: resampleBufferStart
+        post_inc
+        put_var_ref1 1: resampleBufferStart
+        get_array_el
+        push_1 1
+        add
+        push_0 0
+        call_method 2
+        push_2 2
+        call_method 2
+        push_i16 16383
+        mul
+        push_0 0
+        or
+        push_i16 12288
+        add
+        call_method 1
+        add
+        put_loc0 0: copyBinaryStringLeft
+        get_loc1 1: copyBinaryStringRight
+        get_var String
+        get_field2 fromCharCode
+        get_var Math
+        get_field2 min
+        get_var Math
+        get_field2 max
+        get_var_ref3 3: resampled
+        get_var_ref1 1: resampleBufferStart
+        post_inc
+        put_var_ref1 1: resampleBufferStart
+        get_array_el
+        push_1 1
+        add
+        push_0 0
+        call_method 2
+        push_2 2
+        call_method 2
+        push_i16 16383
+        mul
+        push_0 0
+        or
+        push_i16 12288
+        add
+        call_method 1
+        add
+        put_loc1 1: copyBinaryStringRight
+        get_var_ref1 1: resampleBufferStart
+        get_var_ref 4: resampleBufferSize
+        eq
+        if_false8 153
+        push_0 0
+        put_var_ref1 1: resampleBufferStart
+  153:  inc_loc 2: index
+        goto16 6
+  158:  get_loc0 0: copyBinaryStringLeft
+        get_loc1 1: copyBinaryStringRight
+        add
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:673:1: function: generateFlashMonoString
+  mode: strict
+  locals:
+    0: var copyBinaryString
+    1: var index
+  closure vars:
+    0: samplesPerCallback parent:loc30 var
+    1: resampleBufferStart parent:loc49 var
+    2: resampleBufferEnd parent:loc50 var
+    3: resampled parent:loc40 var
+    4: resampleBufferSize parent:loc51 var
+  stack_size: 10
+  opcodes:
+        push_empty_string
+        put_loc0 0: copyBinaryString
+        push_0 0
+        put_loc1 1: index
+    4:  get_loc1 1: index
+        get_var_ref0 0: samplesPerCallback
+        lt
+        if_false8 88
+        get_var_ref1 1: resampleBufferStart
+        get_var_ref2 2: resampleBufferEnd
+        neq
+        if_false8 88
+        get_loc0 0: copyBinaryString
+        get_var String
+        get_field2 fromCharCode
+        get_var Math
+        get_field2 min
+        get_var Math
+        get_field2 max
+        get_var_ref3 3: resampled
+        get_var_ref1 1: resampleBufferStart
+        post_inc
+        put_var_ref1 1: resampleBufferStart
+        get_array_el
+        push_1 1
+        add
+        push_0 0
+        call_method 2
+        push_2 2
+        call_method 2
+        push_i16 16383
+        mul
+        push_0 0
+        or
+        push_i16 12288
+        add
+        call_method 1
+        add
+        put_loc0 0: copyBinaryString
+        get_var_ref1 1: resampleBufferStart
+        get_var_ref 4: resampleBufferSize
+        eq
+        if_false8 84
+        push_0 0
+        put_var_ref1 1: resampleBufferStart
+   84:  inc_loc 1: index
+        goto8 4
+   88:  get_loc0 0: copyBinaryString
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:702:1: function: audioOutputEvent
+  mode: strict
+  args: event
+  locals:
+    0: var index
+    1: var buffer1
+    2: var buffer2
+  closure vars:
+    0: resampleRefill parent:loc53 var
+    1: webAudioMono parent:loc45 var
+    2: samplesPerCallback parent:loc30 var
+    3: resampleBufferStart parent:loc49 var
+    4: resampleBufferEnd parent:loc50 var
+    5: resampled parent:loc40 var
+    6: XAudioJSVolume parent:loc46 var
+    7: resampleBufferSize parent:loc51 var
+  stack_size: 7
+  opcodes:
+        push_0 0
+        put_loc0 0: index
+        get_arg0 0: event
+        get_field outputBuffer
+        get_field2 getChannelData
+        push_0 0
+        call_method 1
+        put_loc1 1: buffer1
+        get_arg0 0: event
+        get_field outputBuffer
+        get_field2 getChannelData
+        push_1 1
+        call_method 1
+        put_loc2 2: buffer2
+        get_var_ref0 0: resampleRefill
+        call0 0
+        drop
+        get_var_ref1 1: webAudioMono
+        lnot
+        if_false8 94
+   41:  get_loc0 0: index
+        get_var_ref2 2: samplesPerCallback
+        lt
+        if_false8 137
+        get_var_ref3 3: resampleBufferStart
+        get_var_ref 4: resampleBufferEnd
+        neq
+        if_false8 137
+        get_loc1 1: buffer1
+        get_loc0 0: index
+        get_var_ref 5: resampled
+        get_var_ref3 3: resampleBufferStart
+        post_inc
+        put_var_ref3 3: resampleBufferStart
+        get_array_el
+        get_var_ref 6: XAudioJSVolume
+        mul
+        put_array_el
+        get_loc2 2: buffer2
+        get_loc0 0: index
+        post_inc
+        put_loc0 0: index
+        get_var_ref 5: resampled
+        get_var_ref3 3: resampleBufferStart
+        post_inc
+        put_var_ref3 3: resampleBufferStart
+        get_array_el
+        get_var_ref 6: XAudioJSVolume
+        mul
+        put_array_el
+        get_var_ref3 3: resampleBufferStart
+        get_var_ref 7: resampleBufferSize
+        eq
+        if_false8 41
+        push_0 0
+        put_var_ref3 3: resampleBufferStart
+        goto8 41
+   94:  get_loc0 0: index
+        get_var_ref2 2: samplesPerCallback
+        lt
+        if_false8 137
+        get_var_ref3 3: resampleBufferStart
+        get_var_ref 4: resampleBufferEnd
+        neq
+        if_false8 137
+        get_loc2 2: buffer2
+        get_loc0 0: index
+        get_loc1 1: buffer1
+        get_loc0 0: index
+        get_var_ref 5: resampled
+        get_var_ref3 3: resampleBufferStart
+        post_inc
+        put_var_ref3 3: resampleBufferStart
+        get_array_el
+        get_var_ref 6: XAudioJSVolume
+        mul
+        insert3
+        put_array_el
+        put_array_el
+        inc_loc 0: index
+        get_var_ref3 3: resampleBufferStart
+        get_var_ref 7: resampleBufferSize
+        eq
+        if_false8 94
+        push_0 0
+        put_var_ref3 3: resampleBufferStart
+        goto8 94
+  137:  get_loc0 0: index
+        get_var_ref2 2: samplesPerCallback
+        lt
+        if_false8 154
+        get_loc2 2: buffer2
+        get_loc0 0: index
+        get_loc1 1: buffer1
+        get_loc0 0: index
+        push_0 0
+        insert3
+        put_array_el
+        put_array_el
+        inc_loc 0: index
+        goto8 137
+  154:  return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:733:1: function: resampleRefill
+  mode: strict
+  locals:
+    0: var resampleLength
+    1: var resampledResult
+    2: var index2
+  closure vars:
+    0: audioBufferSize parent:loc48 var
+    1: resampleControl parent:loc47 var
+    2: getBufferSamples parent:loc55 var
+    3: resampled parent:loc40 var
+    4: resampleBufferEnd parent:loc50 var
+    5: resampleBufferSize parent:loc51 var
+    6: resampleBufferStart parent:loc49 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: audioBufferSize
+        push_0 0
+        gt
+        if_false8 88
+        get_var_ref1 1: resampleControl
+        get_field2 resampler
+        get_var_ref2 2: getBufferSamples
+        call0 0
+        call_method 1
+        put_loc0 0: resampleLength
+        get_var_ref1 1: resampleControl
+        get_field outputBuffer
+        put_loc1 1: resampledResult
+        push_0 0
+        put_loc2 2: index2
+   26:  get_loc2 2: index2
+        get_loc0 0: resampleLength
+        lt
+        if_false8 86
+        get_var_ref3 3: resampled
+        get_var_ref 4: resampleBufferEnd
+        post_inc
+        put_var_ref 4: resampleBufferEnd
+        get_loc1 1: resampledResult
+        get_loc2 2: index2
+        get_array_el
+        put_array_el
+        get_var_ref 4: resampleBufferEnd
+        get_var_ref 5: resampleBufferSize
+        eq
+        if_false8 56
+        push_0 0
+        put_var_ref 4: resampleBufferEnd
+   56:  get_var_ref 6: resampleBufferStart
+        get_var_ref 4: resampleBufferEnd
+        eq
+        if_false8 82
+        get_var_ref 6: resampleBufferStart
+        inc
+        set_var_ref 6: resampleBufferStart
+        get_var_ref 5: resampleBufferSize
+        eq
+        if_false8 82
+        push_0 0
+        put_var_ref 6: resampleBufferStart
+   82:  inc_loc 2: index2
+        goto8 26
+   86:  push_0 0
+        put_var_ref0 0: audioBufferSize
+   88:  return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:753:1: function: resampledSamplesLeft
+  mode: strict
+  closure vars:
+    0: resampleBufferStart parent:loc49 var
+    1: resampleBufferEnd parent:loc50 var
+    2: resampleBufferSize parent:loc51 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: resampleBufferStart
+        get_var_ref1 1: resampleBufferEnd
+        lte
+        if_false8 8
+        push_0 0
+        goto8 9
+    8:  get_var_ref2 2: resampleBufferSize
+    9:  get_var_ref1 1: resampleBufferEnd
+        add
+        get_var_ref0 0: resampleBufferStart
+        sub
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:756:1: function: getBufferSamples
+  mode: strict
+  locals:
+    0: catch error [level:3 next:-1]
+    1: catch error [level:7 next:0]
+  closure vars:
+    0: audioContextSampleBuffer parent:loc39 var
+    1: audioBufferSize parent:loc48 var
+  stack_size: 6
+  opcodes:
+        catch 18
+        get_var_ref0 0: audioContextSampleBuffer
+        get_field2 subarray
+        push_0 0
+        get_var_ref1 1: audioBufferSize
+        call_method 2
+        nip_catch
+        return
+   18:  put_loc0 0: error
+        catch 61
+        catch 40
+        get_var_ref0 0: audioContextSampleBuffer
+        get_var_ref1 1: audioBufferSize
+        put_field length
+        get_var_ref0 0: audioContextSampleBuffer
+        nip_catch
+        nip_catch
+        return
+   40:  put_loc1 1: error
+        catch 60
+        get_var_ref0 0: audioContextSampleBuffer
+        get_field2 slice
+        push_0 0
+        get_var_ref1 1: audioBufferSize
+        call_method 2
+        nip_catch
+        nip_catch
+        return
+   60:  throw
+   61:  throw
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:774:1: function: resetCallbackAPIAudioBuffer
+  mode: strict
+  args: APISampleRate bufferAlloc
+  closure vars:
+    0: audioContextSampleBuffer parent:loc39 var
+    1: getFloat32 parent:loc28 var
+    2: webAudioMaxBufferSize parent:loc42 var
+    3: audioBufferSize parent:loc48 var
+    4: resampleBufferStart parent:loc49 var
+    5: resampleBufferEnd parent:loc50 var
+    6: resampleBufferSize parent:loc51 var
+    7: XAudioJSSampleRate parent:loc44 var
+    8: samplesPerCallback parent:loc30 var
+    9: webAudioMono parent:loc45 var
+   10: resampled parent:loc40 var
+   11: getFloat32Flat parent:loc29 var
+   12: resampleControl parent:loc47 var
+   13: Resampler parent:loc26 var
+   14: outputConvert parent:loc31 var
+   15: generateFlashMonoString parent:loc34 var
+   16: generateFlashStereoString parent:loc33 var
+  stack_size: 7
+  opcodes:
+        get_var_ref1 1: getFloat32
+        get_var_ref2 2: webAudioMaxBufferSize
+        call1 1
+        put_var_ref0 0: audioContextSampleBuffer
+        get_var_ref2 2: webAudioMaxBufferSize
+        put_var_ref3 3: audioBufferSize
+        push_0 0
+        put_var_ref 4: resampleBufferStart
+        push_0 0
+        put_var_ref 5: resampleBufferEnd
+        get_var Math
+        get_field2 max
+        get_var_ref2 2: webAudioMaxBufferSize
+        get_var Math
+        get_field2 ceil
+        get_var_ref 7: XAudioJSSampleRate
+        get_arg0 0: APISampleRate
+        div
+        call_method 1
+        mul
+        get_var_ref 8: samplesPerCallback
+        call_method 2
+        push_1 1
+        shl
+        put_var_ref 6: resampleBufferSize
+        get_var_ref 9: webAudioMono
+        if_false8 96
+        get_var_ref 11: getFloat32Flat
+        get_var_ref 6: resampleBufferSize
+        call1 1
+        put_var_ref 10: resampled
+        get_var_ref 13: Resampler
+        dup
+        get_var_ref 7: XAudioJSSampleRate
+        get_arg0 0: APISampleRate
+        push_1 1
+        get_var_ref 6: resampleBufferSize
+        push_true
+        call_constructor 5
+        put_var_ref 12: resampleControl
+        get_var_ref 15: generateFlashMonoString
+        put_var_ref 14: outputConvert
+        return_undef
+   96:  get_var_ref 6: resampleBufferSize
+        push_1 1
+        shl
+        put_var_ref 6: resampleBufferSize
+        get_var_ref 11: getFloat32Flat
+        get_var_ref 6: resampleBufferSize
+        call1 1
+        put_var_ref 10: resampled
+        get_var_ref 13: Resampler
+        dup
+        get_var_ref 7: XAudioJSSampleRate
+        get_arg0 0: APISampleRate
+        push_2 2
+        get_var_ref 6: resampleBufferSize
+        push_true
+        call_constructor 5
+        put_var_ref 12: resampleControl
+        get_var_ref 16: generateFlashStereoString
+        put_var_ref 14: outputConvert
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:795:2: function: <null>
+  mode: strict
+  locals:
+    0: catch error [level:5 next:-1]
+    1: catch error [level:9 next:0]
+    2: catch error [level:13 next:-1]
+  closure vars:
+    0: launchedContext parent:loc38 var
+    1: audioContextHandle parent:loc35 var
+    2: GameBoyAudioContext parent:loc15 var
+    3: audioSource parent:loc37 var
+    4: XAudioJSSampleRate parent:loc44 var
+    5: webAudioActualSampleRate parent:loc43 var
+    6: audioNode parent:loc36 var
+    7: samplesPerCallback parent:loc30 var
+    8: audioOutputEvent parent:loc52 var
+  stack_size: 7
+  opcodes:
+        get_var_ref0 0: launchedContext
+        lnot
+        if_false 195
+        catch 21
+        get_var_ref2 2: GameBoyAudioContext
+        dup
+        call_constructor 0
+        put_var_ref1 1: audioContextHandle
+        drop
+        goto8 60
+   21:  put_loc0 0: error
+        catch 59
+        catch 45
+        get_var AudioContext
+        dup
+        call_constructor 0
+        put_var_ref1 1: audioContextHandle
+        drop
+        goto8 56
+   45:  put_loc1 1: error
+        catch 55
+        undefined
+        nip_catch
+        nip_catch
+        return
+   55:  throw
+   56:  drop
+        goto8 60
+   59:  throw
+   60:  catch 183
+        get_var_ref1 1: audioContextHandle
+        get_field2 createBufferSource
+        call_method 0
+        set_var_ref3 3: audioSource
+        push_false
+        put_field loop
+        get_var_ref1 1: audioContextHandle
+        get_field sampleRate
+        set_var_ref 5: webAudioActualSampleRate
+        put_var_ref 4: XAudioJSSampleRate
+        get_var_ref3 3: audioSource
+        get_var_ref1 1: audioContextHandle
+        get_field2 createBuffer
+        push_1 1
+        push_1 1
+        get_var_ref 5: webAudioActualSampleRate
+        call_method 3
+        put_field buffer
+        get_var_ref1 1: audioContextHandle
+        get_field2 createJavaScriptNode
+        get_var_ref 7: samplesPerCallback
+        push_1 1
+        push_2 2
+        call_method 3
+        set_var_ref 6: audioNode
+        get_var_ref 8: audioOutputEvent
+        put_field onaudioprocess
+        get_var_ref3 3: audioSource
+        get_field2 connect
+        get_var_ref 6: audioNode
+        call_method 1
+        drop
+        get_var_ref 6: audioNode
+        get_field2 connect
+        get_var_ref1 1: audioContextHandle
+        get_field destination
+        call_method 1
+        drop
+        get_var_ref3 3: audioSource
+        get_field2 noteOn
+        push_0 0
+        call_method 1
+        drop
+        drop
+        goto8 193
+  183:  put_loc2 2: error
+        catch 192
+        undefined
+        nip_catch
+        return
+  192:  throw
+  193:  push_true
+        put_var_ref0 0: launchedContext
+  195:  return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:829:1: function: Resize
+  mode: strict
+  args: widthOriginal heightOriginal targetWidth targetHeight blendAlpha interpolationPass
+  locals:
+    0: var this
+  stack_size: 5
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_var Math
+        get_field2 abs
+        get_var parseInt
+        get_arg0 0: widthOriginal
+        call1 1
+        dup
+        if_true8 25
+        drop
+        push_0 0
+   25:  call_method 1
+        put_field widthOriginal
+        get_loc0 0: this
+        get_var Math
+        get_field2 abs
+        get_var parseInt
+        get_arg1 1: heightOriginal
+        call1 1
+        dup
+        if_true8 56
+        drop
+        push_0 0
+   56:  call_method 1
+        put_field heightOriginal
+        get_loc0 0: this
+        get_var Math
+        get_field2 abs
+        get_var parseInt
+        get_arg2 2: targetWidth
+        call1 1
+        dup
+        if_true8 87
+        drop
+        push_0 0
+   87:  call_method 1
+        put_field targetWidth
+        get_loc0 0: this
+        get_var Math
+        get_field2 abs
+        get_var parseInt
+        get_arg3 3: targetHeight
+        call1 1
+        dup
+        if_true8 118
+        drop
+        push_0 0
+  118:  call_method 1
+        put_field targetHeight
+        get_loc0 0: this
+        get_arg 4: blendAlpha
+        lnot
+        lnot
+        if_false8 137
+        push_4 4
+        goto8 138
+  137:  push_3 3
+  138:  put_field colorChannels
+        get_loc0 0: this
+        get_arg 5: interpolationPass
+        lnot
+        lnot
+        put_field interpolationPass
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field targetWidth
+        get_loc0 0: this
+        get_field colorChannels
+        mul
+        put_field targetWidthMultipliedByChannels
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field widthOriginal
+        get_loc0 0: this
+        get_field colorChannels
+        mul
+        put_field originalWidthMultipliedByChannels
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field heightOriginal
+        get_loc0 0: this
+        get_field colorChannels
+        mul
+        put_field originalHeightMultipliedByChannels
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field targetWidthMultipliedByChannels
+        get_loc0 0: this
+        get_field heightOriginal
+        mul
+        put_field widthPassResultSize
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field targetWidthMultipliedByChannels
+        get_loc0 0: this
+        get_field targetHeight
+        mul
+        put_field finalResultSize
+        get_loc0 0: this
+        get_field2 initialize
+        call_method 0
+        return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:843:31: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field widthOriginal
+        push_0 0
+        gt
+        if_false 336
+        get_loc0 0: this
+        get_field heightOriginal
+        push_0 0
+        gt
+        if_false 336
+        get_loc0 0: this
+        get_field targetWidth
+        push_0 0
+        gt
+        if_false 336
+        get_loc0 0: this
+        get_field targetHeight
+        push_0 0
+        gt
+        if_false 336
+        get_loc0 0: this
+        get_field widthOriginal
+        get_loc0 0: this
+        get_field targetWidth
+        eq
+        if_false8 84
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field bypassResizer
+        put_field resizeWidth
+        goto16 205
+   84:  get_loc0 0: this
+        get_loc0 0: this
+        get_field widthOriginal
+        get_loc0 0: this
+        get_field targetWidth
+        div
+        put_field ratioWeightWidthPass
+        get_loc0 0: this
+        get_field ratioWeightWidthPass
+        push_1 1
+        lt
+        if_false8 164
+        get_loc0 0: this
+        get_field interpolationPass
+        if_false8 164
+        get_loc0 0: this
+        get_field2 initializeFirstPassBuffers
+        push_true
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field colorChannels
+        push_4 4
+        eq
+        if_false8 151
+        get_loc0 0: this
+        get_field resizeWidthInterpolatedRGBA
+        goto8 157
+  151:  get_loc0 0: this
+        get_field resizeWidthInterpolatedRGB
+  157:  put_field resizeWidth
+        goto8 205
+  164:  get_loc0 0: this
+        get_field2 initializeFirstPassBuffers
+        push_false
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field colorChannels
+        push_4 4
+        eq
+        if_false8 194
+        get_loc0 0: this
+        get_field resizeWidthRGBA
+        goto8 200
+  194:  get_loc0 0: this
+        get_field resizeWidthRGB
+  200:  put_field resizeWidth
+  205:  get_loc0 0: this
+        get_field heightOriginal
+        get_loc0 0: this
+        get_field targetHeight
+        eq
+        if_false8 233
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field bypassResizer
+        put_field resizeHeight
+        return_undef
+  233:  get_loc0 0: this
+        get_loc0 0: this
+        get_field heightOriginal
+        get_loc0 0: this
+        get_field targetHeight
+        div
+        put_field ratioWeightHeightPass
+        get_loc0 0: this
+        get_field ratioWeightHeightPass
+        push_1 1
+        lt
+        if_false8 294
+        get_loc0 0: this
+        get_field interpolationPass
+        if_false8 294
+        get_loc0 0: this
+        get_field2 initializeSecondPassBuffers
+        push_true
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field resizeHeightInterpolated
+        put_field resizeHeight
+        return_undef
+  294:  get_loc0 0: this
+        get_field2 initializeSecondPassBuffers
+        push_false
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field colorChannels
+        push_4 4
+        eq
+        if_false8 324
+        get_loc0 0: this
+        get_field resizeHeightRGBA
+        goto8 330
+  324:  get_loc0 0: this
+        get_field resizeHeightRGB
+  330:  put_field resizeHeight
+        return_undef
+  336:  get_var Error
+        dup
+        push_atom_value "Invalid settings specified for the resizer."
+        call_constructor 1
+        throw
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:883:35: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var ratioWeight
+    1: var weight
+    2: var amountToNext
+    3: var actualPosition
+    4: var currentPosition
+    5: var line
+    6: var pixelOffset
+    7: var outputOffset
+    8: var nextLineOffsetOriginalWidth
+    9: var nextLineOffsetTargetWidth
+   10: var output
+   11: var outputBuffer
+   12: var this
+  stack_size: 6
+  opcodes:
+        push_this
+        put_loc8 12: this
+        get_loc8 12: this
+        get_field ratioWeightWidthPass
+        put_loc0 0: ratioWeight
+        push_0 0
+        put_loc1 1: weight
+        push_0 0
+        put_loc2 2: amountToNext
+        push_0 0
+        put_loc3 3: actualPosition
+        push_0 0
+        put_loc8 4: currentPosition
+        push_0 0
+        put_loc8 5: line
+        push_0 0
+        put_loc8 6: pixelOffset
+        push_0 0
+        put_loc8 7: outputOffset
+        get_loc8 12: this
+        get_field originalWidthMultipliedByChannels
+        push_2 2
+        sub
+        put_loc8 8: nextLineOffsetOriginalWidth
+        get_loc8 12: this
+        get_field targetWidthMultipliedByChannels
+        push_2 2
+        sub
+        put_loc8 9: nextLineOffsetTargetWidth
+        get_loc8 12: this
+        get_field outputWidthWorkBench
+        put_loc8 10: output
+        get_loc8 12: this
+        get_field widthBuffer
+        put_loc8 11: outputBuffer
+   69:  push_0 0
+        put_loc8 5: line
+   72:  get_loc8 5: line
+        get_loc8 12: this
+        get_field originalHeightMultipliedByChannels
+        lt
+        if_false8 113
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        push_0 0
+        put_array_el
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        push_0 0
+        put_array_el
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        push_0 0
+        put_array_el
+        goto8 72
+  113:  get_loc0 0: ratioWeight
+        put_loc1 1: weight
+  115:  push_1 1
+        get_loc3 3: actualPosition
+        add
+        get_loc8 4: currentPosition
+        sub
+        put_loc2 2: amountToNext
+        get_loc1 1: weight
+        get_loc2 2: amountToNext
+        gte
+        if_false8 217
+        push_0 0
+        put_loc8 5: line
+        get_loc3 3: actualPosition
+        put_loc8 6: pixelOffset
+  133:  get_loc8 5: line
+        get_loc8 12: this
+        get_field originalHeightMultipliedByChannels
+        lt
+        if_false8 205
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc8 6: pixelOffset
+        post_inc
+        put_loc8 6: pixelOffset
+        get_array_el
+        get_loc2 2: amountToNext
+        mul
+        add
+        put_array_el
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc8 6: pixelOffset
+        post_inc
+        put_loc8 6: pixelOffset
+        get_array_el
+        get_loc2 2: amountToNext
+        mul
+        add
+        put_array_el
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc8 6: pixelOffset
+        get_array_el
+        get_loc2 2: amountToNext
+        mul
+        add
+        put_array_el
+        get_loc8 8: nextLineOffsetOriginalWidth
+        add_loc 6: pixelOffset
+        goto8 133
+  205:  get_loc3 3: actualPosition
+        push_3 3
+        add
+        set_loc3 3: actualPosition
+        put_loc8 4: currentPosition
+        get_loc1 1: weight
+        get_loc2 2: amountToNext
+        sub
+        put_loc1 1: weight
+        goto8 300
+  217:  push_0 0
+        put_loc8 5: line
+        get_loc3 3: actualPosition
+        put_loc8 6: pixelOffset
+  223:  get_loc8 5: line
+        get_loc8 12: this
+        get_field originalHeightMultipliedByChannels
+        lt
+        if_false8 295
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc8 6: pixelOffset
+        post_inc
+        put_loc8 6: pixelOffset
+        get_array_el
+        get_loc1 1: weight
+        mul
+        add
+        put_array_el
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc8 6: pixelOffset
+        post_inc
+        put_loc8 6: pixelOffset
+        get_array_el
+        get_loc1 1: weight
+        mul
+        add
+        put_array_el
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc8 6: pixelOffset
+        get_array_el
+        get_loc1 1: weight
+        mul
+        add
+        put_array_el
+        get_loc8 8: nextLineOffsetOriginalWidth
+        add_loc 6: pixelOffset
+        goto8 223
+  295:  get_loc1 1: weight
+        add_loc 4: currentPosition
+        goto8 321
+  300:  get_loc1 1: weight
+        push_0 0
+        gt
+        dup
+        if_false8 316
+        drop
+        get_loc3 3: actualPosition
+        get_loc8 12: this
+        get_field originalWidthMultipliedByChannels
+        lt
+  316:  if_true 115
+  321:  push_0 0
+        put_loc8 5: line
+        get_loc8 7: outputOffset
+        put_loc8 6: pixelOffset
+  328:  get_loc8 5: line
+        get_loc8 12: this
+        get_field originalHeightMultipliedByChannels
+        lt
+        if_false8 397
+        get_loc8 11: outputBuffer
+        get_loc8 6: pixelOffset
+        post_inc
+        put_loc8 6: pixelOffset
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el
+        get_loc0 0: ratioWeight
+        div
+        put_array_el
+        get_loc8 11: outputBuffer
+        get_loc8 6: pixelOffset
+        post_inc
+        put_loc8 6: pixelOffset
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el
+        get_loc0 0: ratioWeight
+        div
+        put_array_el
+        get_loc8 11: outputBuffer
+        get_loc8 6: pixelOffset
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el
+        get_loc0 0: ratioWeight
+        div
+        put_array_el
+        get_loc8 9: nextLineOffsetTargetWidth
+        add_loc 6: pixelOffset
+        goto8 328
+  397:  push_3 3
+        add_loc 7: outputOffset
+        get_loc8 7: outputOffset
+        get_loc8 12: this
+        get_field targetWidthMultipliedByChannels
+        lt
+        if_true 69
+        get_loc8 11: outputBuffer
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:933:47: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var ratioWeight
+    1: var weight
+    2: var finalOffset
+    3: var pixelOffset
+    4: var outputBuffer
+    5: var targetPosition
+    6: var this
+  stack_size: 6
+  opcodes:
+        push_this
+        put_loc8 6: this
+        get_loc8 6: this
+        get_field widthOriginal
+        push_1 1
+        sub
+        get_loc8 6: this
+        get_field targetWidth
+        div
+        put_loc0 0: ratioWeight
+        push_0 0
+        put_loc1 1: weight
+        push_0 0
+        put_loc2 2: finalOffset
+        push_0 0
+        put_loc3 3: pixelOffset
+        get_loc8 6: this
+        get_field widthBuffer
+        put_loc8 4: outputBuffer
+        push_0 0
+        put_loc8 5: targetPosition
+   39:  get_loc8 5: targetPosition
+        get_loc8 6: this
+        get_field targetWidthMultipliedByChannels
+        lt
+        if_false 229
+        check_var secondWeight
+        get_loc1 1: weight
+        push_1 1
+        mod
+        put_var_strict secondWeight
+        check_var firstWeight
+        push_1 1
+        get_var secondWeight
+        sub
+        put_var_strict firstWeight
+        get_loc8 5: targetPosition
+        put_loc2 2: finalOffset
+        get_var Math
+        get_field2 floor
+        get_loc1 1: weight
+        call_method 1
+        push_3 3
+        mul
+        put_loc3 3: pixelOffset
+  104:  get_loc2 2: finalOffset
+        get_loc8 6: this
+        get_field widthPassResultSize
+        lt
+        if_false8 220
+        get_loc8 4: outputBuffer
+        get_loc2 2: finalOffset
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        get_array_el
+        get_var firstWeight
+        mul
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_3 3
+        add
+        get_array_el
+        get_var secondWeight
+        mul
+        add
+        put_array_el
+        get_loc8 4: outputBuffer
+        get_loc2 2: finalOffset
+        push_1 1
+        add
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_1 1
+        add
+        get_array_el
+        get_var firstWeight
+        mul
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_4 4
+        add
+        get_array_el
+        get_var secondWeight
+        mul
+        add
+        put_array_el
+        get_loc8 4: outputBuffer
+        get_loc2 2: finalOffset
+        push_2 2
+        add
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_2 2
+        add
+        get_array_el
+        get_var firstWeight
+        mul
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_5 5
+        add
+        get_array_el
+        get_var secondWeight
+        mul
+        add
+        put_array_el
+        get_loc3 3: pixelOffset
+        get_loc8 6: this
+        get_field originalWidthMultipliedByChannels
+        add
+        put_loc3 3: pixelOffset
+        get_loc2 2: finalOffset
+        get_loc8 6: this
+        get_field targetWidthMultipliedByChannels
+        add
+        put_loc2 2: finalOffset
+        goto8 104
+  220:  push_3 3
+        add_loc 5: targetPosition
+        get_loc0 0: ratioWeight
+        add_loc 1: weight
+        goto16 39
+  229:  get_loc8 4: outputBuffer
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:952:36: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var ratioWeight
+    1: var weight
+    2: var amountToNext
+    3: var actualPosition
+    4: var currentPosition
+    5: var line
+    6: var pixelOffset
+    7: var outputOffset
+    8: var nextLineOffsetOriginalWidth
+    9: var nextLineOffsetTargetWidth
+   10: var output
+   11: var outputBuffer
+   12: var this
+  stack_size: 6
+  opcodes:
+        push_this
+        put_loc8 12: this
+        get_loc8 12: this
+        get_field ratioWeightWidthPass
+        put_loc0 0: ratioWeight
+        push_0 0
+        put_loc1 1: weight
+        push_0 0
+        put_loc2 2: amountToNext
+        push_0 0
+        put_loc3 3: actualPosition
+        push_0 0
+        put_loc8 4: currentPosition
+        push_0 0
+        put_loc8 5: line
+        push_0 0
+        put_loc8 6: pixelOffset
+        push_0 0
+        put_loc8 7: outputOffset
+        get_loc8 12: this
+        get_field originalWidthMultipliedByChannels
+        push_3 3
+        sub
+        put_loc8 8: nextLineOffsetOriginalWidth
+        get_loc8 12: this
+        get_field targetWidthMultipliedByChannels
+        push_3 3
+        sub
+        put_loc8 9: nextLineOffsetTargetWidth
+        get_loc8 12: this
+        get_field outputWidthWorkBench
+        put_loc8 10: output
+        get_loc8 12: this
+        get_field widthBuffer
+        put_loc8 11: outputBuffer
+   69:  push_0 0
+        put_loc8 5: line
+   72:  get_loc8 5: line
+        get_loc8 12: this
+        get_field originalHeightMultipliedByChannels
+        lt
+        if_false8 122
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        push_0 0
+        put_array_el
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        push_0 0
+        put_array_el
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        push_0 0
+        put_array_el
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        push_0 0
+        put_array_el
+        goto8 72
+  122:  get_loc0 0: ratioWeight
+        put_loc1 1: weight
+  124:  push_1 1
+        get_loc3 3: actualPosition
+        add
+        get_loc8 4: currentPosition
+        sub
+        put_loc2 2: amountToNext
+        get_loc1 1: weight
+        get_loc2 2: amountToNext
+        gte
+        if_false8 245
+        push_0 0
+        put_loc8 5: line
+        get_loc3 3: actualPosition
+        put_loc8 6: pixelOffset
+  142:  get_loc8 5: line
+        get_loc8 12: this
+        get_field originalHeightMultipliedByChannels
+        lt
+        if_false8 233
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc8 6: pixelOffset
+        post_inc
+        put_loc8 6: pixelOffset
+        get_array_el
+        get_loc2 2: amountToNext
+        mul
+        add
+        put_array_el
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc8 6: pixelOffset
+        post_inc
+        put_loc8 6: pixelOffset
+        get_array_el
+        get_loc2 2: amountToNext
+        mul
+        add
+        put_array_el
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc8 6: pixelOffset
+        post_inc
+        put_loc8 6: pixelOffset
+        get_array_el
+        get_loc2 2: amountToNext
+        mul
+        add
+        put_array_el
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc8 6: pixelOffset
+        get_array_el
+        get_loc2 2: amountToNext
+        mul
+        add
+        put_array_el
+        get_loc8 8: nextLineOffsetOriginalWidth
+        add_loc 6: pixelOffset
+        goto8 142
+  233:  get_loc3 3: actualPosition
+        push_4 4
+        add
+        set_loc3 3: actualPosition
+        put_loc8 4: currentPosition
+        get_loc1 1: weight
+        get_loc2 2: amountToNext
+        sub
+        put_loc1 1: weight
+        goto8 347
+  245:  push_0 0
+        put_loc8 5: line
+        get_loc3 3: actualPosition
+        put_loc8 6: pixelOffset
+  251:  get_loc8 5: line
+        get_loc8 12: this
+        get_field originalHeightMultipliedByChannels
+        lt
+        if_false8 342
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc8 6: pixelOffset
+        post_inc
+        put_loc8 6: pixelOffset
+        get_array_el
+        get_loc1 1: weight
+        mul
+        add
+        put_array_el
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc8 6: pixelOffset
+        post_inc
+        put_loc8 6: pixelOffset
+        get_array_el
+        get_loc1 1: weight
+        mul
+        add
+        put_array_el
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc8 6: pixelOffset
+        post_inc
+        put_loc8 6: pixelOffset
+        get_array_el
+        get_loc1 1: weight
+        mul
+        add
+        put_array_el
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc8 6: pixelOffset
+        get_array_el
+        get_loc1 1: weight
+        mul
+        add
+        put_array_el
+        get_loc8 8: nextLineOffsetOriginalWidth
+        add_loc 6: pixelOffset
+        goto8 251
+  342:  get_loc1 1: weight
+        add_loc 4: currentPosition
+        goto8 368
+  347:  get_loc1 1: weight
+        push_0 0
+        gt
+        dup
+        if_false8 363
+        drop
+        get_loc3 3: actualPosition
+        get_loc8 12: this
+        get_field originalWidthMultipliedByChannels
+        lt
+  363:  if_true 124
+  368:  push_0 0
+        put_loc8 5: line
+        get_loc8 7: outputOffset
+        put_loc8 6: pixelOffset
+  375:  get_loc8 5: line
+        get_loc8 12: this
+        get_field originalHeightMultipliedByChannels
+        lt
+        if_false8 462
+        get_loc8 11: outputBuffer
+        get_loc8 6: pixelOffset
+        post_inc
+        put_loc8 6: pixelOffset
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el
+        get_loc0 0: ratioWeight
+        div
+        put_array_el
+        get_loc8 11: outputBuffer
+        get_loc8 6: pixelOffset
+        post_inc
+        put_loc8 6: pixelOffset
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el
+        get_loc0 0: ratioWeight
+        div
+        put_array_el
+        get_loc8 11: outputBuffer
+        get_loc8 6: pixelOffset
+        post_inc
+        put_loc8 6: pixelOffset
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el
+        get_loc0 0: ratioWeight
+        div
+        put_array_el
+        get_loc8 11: outputBuffer
+        get_loc8 6: pixelOffset
+        get_loc8 10: output
+        get_loc8 5: line
+        post_inc
+        put_loc8 5: line
+        get_array_el
+        get_loc0 0: ratioWeight
+        div
+        put_array_el
+        get_loc8 9: nextLineOffsetTargetWidth
+        add_loc 6: pixelOffset
+        goto8 375
+  462:  push_4 4
+        add_loc 7: outputOffset
+        get_loc8 7: outputOffset
+        get_loc8 12: this
+        get_field targetWidthMultipliedByChannels
+        lt
+        if_true 69
+        get_loc8 11: outputBuffer
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:1006:48: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var ratioWeight
+    1: var weight
+    2: var finalOffset
+    3: var pixelOffset
+    4: var outputBuffer
+    5: var targetPosition
+    6: var this
+  stack_size: 6
+  opcodes:
+        push_this
+        put_loc8 6: this
+        get_loc8 6: this
+        get_field widthOriginal
+        push_1 1
+        sub
+        get_loc8 6: this
+        get_field targetWidth
+        div
+        put_loc0 0: ratioWeight
+        push_0 0
+        put_loc1 1: weight
+        push_0 0
+        put_loc2 2: finalOffset
+        push_0 0
+        put_loc3 3: pixelOffset
+        get_loc8 6: this
+        get_field widthBuffer
+        put_loc8 4: outputBuffer
+        push_0 0
+        put_loc8 5: targetPosition
+   39:  get_loc8 5: targetPosition
+        get_loc8 6: this
+        get_field targetWidthMultipliedByChannels
+        lt
+        if_false 262
+        check_var secondWeight
+        get_loc1 1: weight
+        push_1 1
+        mod
+        put_var_strict secondWeight
+        check_var firstWeight
+        push_1 1
+        get_var secondWeight
+        sub
+        put_var_strict firstWeight
+        get_loc8 5: targetPosition
+        put_loc2 2: finalOffset
+        get_var Math
+        get_field2 floor
+        get_loc1 1: weight
+        call_method 1
+        push_4 4
+        mul
+        put_loc3 3: pixelOffset
+  104:  get_loc2 2: finalOffset
+        get_loc8 6: this
+        get_field widthPassResultSize
+        lt
+        if_false 253
+        get_loc8 4: outputBuffer
+        get_loc2 2: finalOffset
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        get_array_el
+        get_var firstWeight
+        mul
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_4 4
+        add
+        get_array_el
+        get_var secondWeight
+        mul
+        add
+        put_array_el
+        get_loc8 4: outputBuffer
+        get_loc2 2: finalOffset
+        push_1 1
+        add
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_1 1
+        add
+        get_array_el
+        get_var firstWeight
+        mul
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_5 5
+        add
+        get_array_el
+        get_var secondWeight
+        mul
+        add
+        put_array_el
+        get_loc8 4: outputBuffer
+        get_loc2 2: finalOffset
+        push_2 2
+        add
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_2 2
+        add
+        get_array_el
+        get_var firstWeight
+        mul
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_6 6
+        add
+        get_array_el
+        get_var secondWeight
+        mul
+        add
+        put_array_el
+        get_loc8 4: outputBuffer
+        get_loc2 2: finalOffset
+        push_3 3
+        add
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_3 3
+        add
+        get_array_el
+        get_var firstWeight
+        mul
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_7 7
+        add
+        get_array_el
+        get_var secondWeight
+        mul
+        add
+        put_array_el
+        get_loc3 3: pixelOffset
+        get_loc8 6: this
+        get_field originalWidthMultipliedByChannels
+        add
+        put_loc3 3: pixelOffset
+        get_loc2 2: finalOffset
+        get_loc8 6: this
+        get_field targetWidthMultipliedByChannels
+        add
+        put_loc2 2: finalOffset
+        goto16 104
+  253:  push_4 4
+        add_loc 5: targetPosition
+        get_loc0 0: ratioWeight
+        add_loc 1: weight
+        goto16 39
+  262:  get_loc8 4: outputBuffer
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:1026:36: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var ratioWeight
+    1: var weight
+    2: var amountToNext
+    3: var actualPosition
+    4: var currentPosition
+    5: var pixelOffset
+    6: var outputOffset
+    7: var output
+    8: var outputBuffer
+    9: var this
+  stack_size: 7
+  opcodes:
+        push_this
+        put_loc8 9: this
+        get_loc8 9: this
+        get_field ratioWeightHeightPass
+        put_loc0 0: ratioWeight
+        push_0 0
+        put_loc1 1: weight
+        push_0 0
+        put_loc2 2: amountToNext
+        push_0 0
+        put_loc3 3: actualPosition
+        push_0 0
+        put_loc8 4: currentPosition
+        push_0 0
+        put_loc8 5: pixelOffset
+        push_0 0
+        put_loc8 6: outputOffset
+        get_loc8 9: this
+        get_field outputHeightWorkBench
+        put_loc8 7: output
+        get_loc8 9: this
+        get_field heightBuffer
+        put_loc8 8: outputBuffer
+   44:  push_0 0
+        put_loc8 5: pixelOffset
+   47:  get_loc8 5: pixelOffset
+        get_loc8 9: this
+        get_field targetWidthMultipliedByChannels
+        lt
+        if_false8 88
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        push_0 0
+        put_array_el
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        push_0 0
+        put_array_el
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        push_0 0
+        put_array_el
+        goto8 47
+   88:  get_loc0 0: ratioWeight
+        put_loc1 1: weight
+   90:  push_1 1
+        get_loc3 3: actualPosition
+        add
+        get_loc8 4: currentPosition
+        sub
+        put_loc2 2: amountToNext
+        get_loc1 1: weight
+        get_loc2 2: amountToNext
+        gte
+        if_false8 179
+        push_0 0
+        put_loc8 5: pixelOffset
+  105:  get_loc8 5: pixelOffset
+        get_loc8 9: this
+        get_field targetWidthMultipliedByChannels
+        lt
+        if_false8 170
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc3 3: actualPosition
+        post_inc
+        put_loc3 3: actualPosition
+        get_array_el
+        get_loc2 2: amountToNext
+        mul
+        add
+        put_array_el
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc3 3: actualPosition
+        post_inc
+        put_loc3 3: actualPosition
+        get_array_el
+        get_loc2 2: amountToNext
+        mul
+        add
+        put_array_el
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc3 3: actualPosition
+        post_inc
+        put_loc3 3: actualPosition
+        get_array_el
+        get_loc2 2: amountToNext
+        mul
+        add
+        put_array_el
+        goto8 105
+  170:  get_loc3 3: actualPosition
+        put_loc8 4: currentPosition
+        get_loc1 1: weight
+        get_loc2 2: amountToNext
+        sub
+        put_loc1 1: weight
+        goto8 254
+  179:  push_0 0
+        put_loc8 5: pixelOffset
+        get_loc3 3: actualPosition
+        put_loc2 2: amountToNext
+  184:  get_loc8 5: pixelOffset
+        get_loc8 9: this
+        get_field targetWidthMultipliedByChannels
+        lt
+        if_false8 249
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc2 2: amountToNext
+        post_inc
+        put_loc2 2: amountToNext
+        get_array_el
+        get_loc1 1: weight
+        mul
+        add
+        put_array_el
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc2 2: amountToNext
+        post_inc
+        put_loc2 2: amountToNext
+        get_array_el
+        get_loc1 1: weight
+        mul
+        add
+        put_array_el
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc2 2: amountToNext
+        post_inc
+        put_loc2 2: amountToNext
+        get_array_el
+        get_loc1 1: weight
+        mul
+        add
+        put_array_el
+        goto8 184
+  249:  get_loc1 1: weight
+        add_loc 4: currentPosition
+        goto8 275
+  254:  get_loc1 1: weight
+        push_0 0
+        gt
+        dup
+        if_false8 270
+        drop
+        get_loc3 3: actualPosition
+        get_loc8 9: this
+        get_field widthPassResultSize
+        lt
+  270:  if_true 90
+  275:  push_0 0
+        put_loc8 5: pixelOffset
+  278:  get_loc8 5: pixelOffset
+        get_loc8 9: this
+        get_field targetWidthMultipliedByChannels
+        lt
+        if_false8 385
+        get_loc8 8: outputBuffer
+        get_loc8 6: outputOffset
+        post_inc
+        put_loc8 6: outputOffset
+        get_var Math
+        get_field2 round
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el
+        get_loc0 0: ratioWeight
+        div
+        call_method 1
+        put_array_el
+        get_loc8 8: outputBuffer
+        get_loc8 6: outputOffset
+        post_inc
+        put_loc8 6: outputOffset
+        get_var Math
+        get_field2 round
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el
+        get_loc0 0: ratioWeight
+        div
+        call_method 1
+        put_array_el
+        get_loc8 8: outputBuffer
+        get_loc8 6: outputOffset
+        post_inc
+        put_loc8 6: outputOffset
+        get_var Math
+        get_field2 round
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el
+        get_loc0 0: ratioWeight
+        div
+        call_method 1
+        put_array_el
+        goto8 278
+  385:  get_loc8 6: outputOffset
+        get_loc8 9: this
+        get_field finalResultSize
+        lt
+        if_true 44
+        get_loc8 8: outputBuffer
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:1072:45: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var ratioWeight
+    1: var weight
+    2: var finalOffset
+    3: var pixelOffset
+    4: var pixelOffsetAccumulated
+    5: var pixelOffsetAccumulated2
+    6: var outputBuffer
+    7: var this
+  stack_size: 6
+  opcodes:
+        push_this
+        put_loc8 7: this
+        get_loc8 7: this
+        get_field heightOriginal
+        push_1 1
+        sub
+        get_loc8 7: this
+        get_field targetHeight
+        div
+        put_loc0 0: ratioWeight
+        push_0 0
+        put_loc1 1: weight
+        push_0 0
+        put_loc2 2: finalOffset
+        push_0 0
+        put_loc3 3: pixelOffset
+        push_0 0
+        put_loc8 4: pixelOffsetAccumulated
+        push_0 0
+        put_loc8 5: pixelOffsetAccumulated2
+        get_loc8 7: this
+        get_field heightBuffer
+        put_loc8 6: outputBuffer
+   42:  check_var secondWeight
+        get_loc1 1: weight
+        push_1 1
+        mod
+        put_var_strict secondWeight
+        check_var firstWeight
+        push_1 1
+        get_var secondWeight
+        sub
+        put_var_strict firstWeight
+        get_var Math
+        get_field2 floor
+        get_loc1 1: weight
+        call_method 1
+        get_loc8 7: this
+        get_field targetWidthMultipliedByChannels
+        mul
+        set_loc8 4: pixelOffsetAccumulated
+        get_loc8 7: this
+        get_field targetWidthMultipliedByChannels
+        add
+        put_loc8 5: pixelOffsetAccumulated2
+        push_0 0
+        put_loc3 3: pixelOffset
+  108:  get_loc3 3: pixelOffset
+        get_loc8 7: this
+        get_field targetWidthMultipliedByChannels
+        lt
+        if_false8 154
+        get_loc8 6: outputBuffer
+        get_loc2 2: finalOffset
+        post_inc
+        put_loc2 2: finalOffset
+        get_arg0 0: buffer
+        get_loc8 4: pixelOffsetAccumulated
+        get_loc3 3: pixelOffset
+        add
+        get_array_el
+        get_var firstWeight
+        mul
+        get_arg0 0: buffer
+        get_loc8 5: pixelOffsetAccumulated2
+        get_loc3 3: pixelOffset
+        add
+        get_array_el
+        get_var secondWeight
+        mul
+        add
+        put_array_el
+        inc_loc 3: pixelOffset
+        goto8 108
+  154:  get_loc0 0: ratioWeight
+        add_loc 1: weight
+        get_loc2 2: finalOffset
+        get_loc8 7: this
+        get_field finalResultSize
+        lt
+        if_true8 42
+        get_loc8 6: outputBuffer
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:1094:37: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var ratioWeight
+    1: var weight
+    2: var amountToNext
+    3: var actualPosition
+    4: var currentPosition
+    5: var pixelOffset
+    6: var outputOffset
+    7: var output
+    8: var outputBuffer
+    9: var this
+  stack_size: 7
+  opcodes:
+        push_this
+        put_loc8 9: this
+        get_loc8 9: this
+        get_field ratioWeightHeightPass
+        put_loc0 0: ratioWeight
+        push_0 0
+        put_loc1 1: weight
+        push_0 0
+        put_loc2 2: amountToNext
+        push_0 0
+        put_loc3 3: actualPosition
+        push_0 0
+        put_loc8 4: currentPosition
+        push_0 0
+        put_loc8 5: pixelOffset
+        push_0 0
+        put_loc8 6: outputOffset
+        get_loc8 9: this
+        get_field outputHeightWorkBench
+        put_loc8 7: output
+        get_loc8 9: this
+        get_field heightBuffer
+        put_loc8 8: outputBuffer
+   44:  push_0 0
+        put_loc8 5: pixelOffset
+   47:  get_loc8 5: pixelOffset
+        get_loc8 9: this
+        get_field targetWidthMultipliedByChannels
+        lt
+        if_false8 97
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        push_0 0
+        put_array_el
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        push_0 0
+        put_array_el
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        push_0 0
+        put_array_el
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        push_0 0
+        put_array_el
+        goto8 47
+   97:  get_loc0 0: ratioWeight
+        put_loc1 1: weight
+   99:  push_1 1
+        get_loc3 3: actualPosition
+        add
+        get_loc8 4: currentPosition
+        sub
+        put_loc2 2: amountToNext
+        get_loc1 1: weight
+        get_loc2 2: amountToNext
+        gte
+        if_false8 205
+        push_0 0
+        put_loc8 5: pixelOffset
+  114:  get_loc8 5: pixelOffset
+        get_loc8 9: this
+        get_field targetWidthMultipliedByChannels
+        lt
+        if_false8 196
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc3 3: actualPosition
+        post_inc
+        put_loc3 3: actualPosition
+        get_array_el
+        get_loc2 2: amountToNext
+        mul
+        add
+        put_array_el
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc3 3: actualPosition
+        post_inc
+        put_loc3 3: actualPosition
+        get_array_el
+        get_loc2 2: amountToNext
+        mul
+        add
+        put_array_el
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc3 3: actualPosition
+        post_inc
+        put_loc3 3: actualPosition
+        get_array_el
+        get_loc2 2: amountToNext
+        mul
+        add
+        put_array_el
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc3 3: actualPosition
+        post_inc
+        put_loc3 3: actualPosition
+        get_array_el
+        get_loc2 2: amountToNext
+        mul
+        add
+        put_array_el
+        goto8 114
+  196:  get_loc3 3: actualPosition
+        put_loc8 4: currentPosition
+        get_loc1 1: weight
+        get_loc2 2: amountToNext
+        sub
+        put_loc1 1: weight
+        goto8 297
+  205:  push_0 0
+        put_loc8 5: pixelOffset
+        get_loc3 3: actualPosition
+        put_loc2 2: amountToNext
+  210:  get_loc8 5: pixelOffset
+        get_loc8 9: this
+        get_field targetWidthMultipliedByChannels
+        lt
+        if_false8 292
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc2 2: amountToNext
+        post_inc
+        put_loc2 2: amountToNext
+        get_array_el
+        get_loc1 1: weight
+        mul
+        add
+        put_array_el
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc2 2: amountToNext
+        post_inc
+        put_loc2 2: amountToNext
+        get_array_el
+        get_loc1 1: weight
+        mul
+        add
+        put_array_el
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc2 2: amountToNext
+        post_inc
+        put_loc2 2: amountToNext
+        get_array_el
+        get_loc1 1: weight
+        mul
+        add
+        put_array_el
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el3
+        get_arg0 0: buffer
+        get_loc2 2: amountToNext
+        post_inc
+        put_loc2 2: amountToNext
+        get_array_el
+        get_loc1 1: weight
+        mul
+        add
+        put_array_el
+        goto8 210
+  292:  get_loc1 1: weight
+        add_loc 4: currentPosition
+        goto8 318
+  297:  get_loc1 1: weight
+        push_0 0
+        gt
+        dup
+        if_false8 313
+        drop
+        get_loc3 3: actualPosition
+        get_loc8 9: this
+        get_field widthPassResultSize
+        lt
+  313:  if_true 99
+  318:  push_0 0
+        put_loc8 5: pixelOffset
+  321:  get_loc8 5: pixelOffset
+        get_loc8 9: this
+        get_field targetWidthMultipliedByChannels
+        lt
+        if_false 463
+        get_loc8 8: outputBuffer
+        get_loc8 6: outputOffset
+        post_inc
+        put_loc8 6: outputOffset
+        get_var Math
+        get_field2 round
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el
+        get_loc0 0: ratioWeight
+        div
+        call_method 1
+        put_array_el
+        get_loc8 8: outputBuffer
+        get_loc8 6: outputOffset
+        post_inc
+        put_loc8 6: outputOffset
+        get_var Math
+        get_field2 round
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el
+        get_loc0 0: ratioWeight
+        div
+        call_method 1
+        put_array_el
+        get_loc8 8: outputBuffer
+        get_loc8 6: outputOffset
+        post_inc
+        put_loc8 6: outputOffset
+        get_var Math
+        get_field2 round
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el
+        get_loc0 0: ratioWeight
+        div
+        call_method 1
+        put_array_el
+        get_loc8 8: outputBuffer
+        get_loc8 6: outputOffset
+        post_inc
+        put_loc8 6: outputOffset
+        get_var Math
+        get_field2 round
+        get_loc8 7: output
+        get_loc8 5: pixelOffset
+        post_inc
+        put_loc8 5: pixelOffset
+        get_array_el
+        get_loc0 0: ratioWeight
+        div
+        call_method 1
+        put_array_el
+        goto16 321
+  463:  get_loc8 6: outputOffset
+        get_loc8 9: this
+        get_field finalResultSize
+        lt
+        if_true 44
+        get_loc8 8: outputBuffer
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:1144:49: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var ratioWeight
+    1: var weight
+    2: var finalOffset
+    3: var pixelOffset
+    4: var outputBuffer
+    5: var this
+  stack_size: 6
+  opcodes:
+        push_this
+        put_loc8 5: this
+        get_loc8 5: this
+        get_field heightOriginal
+        push_1 1
+        sub
+        get_loc8 5: this
+        get_field targetHeight
+        div
+        put_loc0 0: ratioWeight
+        push_0 0
+        put_loc1 1: weight
+        push_0 0
+        put_loc2 2: finalOffset
+        push_0 0
+        put_loc3 3: pixelOffset
+        get_loc8 5: this
+        get_field heightBuffer
+        put_loc8 4: outputBuffer
+   36:  get_loc3 3: pixelOffset
+        get_loc8 5: this
+        get_field finalResultSize
+        lt
+        if_false 234
+        check_var secondWeight
+        get_loc1 1: weight
+        push_1 1
+        mod
+        put_var_strict secondWeight
+        check_var firstWeight
+        push_1 1
+        get_var secondWeight
+        sub
+        put_var_strict firstWeight
+        get_var Math
+        get_field2 floor
+        get_loc1 1: weight
+        call_method 1
+        push_4 4
+        mul
+        put_loc3 3: pixelOffset
+   97:  get_loc3 3: pixelOffset
+        get_loc8 5: this
+        get_field targetWidthMultipliedByChannels
+        lt
+        if_false8 228
+        get_loc8 4: outputBuffer
+        get_loc2 2: finalOffset
+        post_inc
+        put_loc2 2: finalOffset
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        get_array_el
+        get_var firstWeight
+        mul
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_4 4
+        add
+        get_array_el
+        get_var secondWeight
+        mul
+        add
+        put_array_el
+        get_loc8 4: outputBuffer
+        get_loc2 2: finalOffset
+        post_inc
+        put_loc2 2: finalOffset
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_1 1
+        add
+        get_array_el
+        get_var firstWeight
+        mul
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_5 5
+        add
+        get_array_el
+        get_var secondWeight
+        mul
+        add
+        put_array_el
+        get_loc8 4: outputBuffer
+        get_loc2 2: finalOffset
+        post_inc
+        put_loc2 2: finalOffset
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_2 2
+        add
+        get_array_el
+        get_var firstWeight
+        mul
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_6 6
+        add
+        get_array_el
+        get_var secondWeight
+        mul
+        add
+        put_array_el
+        get_loc8 4: outputBuffer
+        get_loc2 2: finalOffset
+        post_inc
+        put_loc2 2: finalOffset
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_3 3
+        add
+        get_array_el
+        get_var firstWeight
+        mul
+        get_arg0 0: buffer
+        get_loc3 3: pixelOffset
+        push_7 7
+        add
+        get_array_el
+        get_var secondWeight
+        mul
+        add
+        put_array_el
+        push_4 4
+        add_loc 3: pixelOffset
+        goto16 97
+  228:  get_loc0 0: ratioWeight
+        add_loc 1: weight
+        goto16 36
+  234:  get_loc8 4: outputBuffer
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:1165:27: function: <null>
+  mode: strict
+  args: buffer
+  locals:
+    0: var this
+  stack_size: 5
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 resizeHeight
+        get_loc0 0: this
+        get_field2 resizeWidth
+        get_arg0 0: buffer
+        call_method 1
+        tail_call_method 1
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:1168:34: function: <null>
+  mode: strict
+  args: buffer
+  stack_size: 1
+  opcodes:
+        get_arg0 0: buffer
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:1172:47: function: <null>
+  mode: strict
+  args: BILINEARAlgo
+  locals:
+    0: var this
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field2 generateFloatBuffer
+        get_loc0 0: this
+        get_field widthPassResultSize
+        call_method 1
+        put_field widthBuffer
+        get_arg0 0: BILINEARAlgo
+        lnot
+        if_false8 48
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field2 generateFloatBuffer
+        get_loc0 0: this
+        get_field originalHeightMultipliedByChannels
+        call_method 1
+        put_field outputWidthWorkBench
+   48:  return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:1179:48: function: <null>
+  mode: strict
+  args: BILINEARAlgo
+  locals:
+    0: var this
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field2 generateUint8Buffer
+        get_loc0 0: this
+        get_field finalResultSize
+        call_method 1
+        put_field heightBuffer
+        get_arg0 0: BILINEARAlgo
+        lnot
+        if_false8 48
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field2 generateFloatBuffer
+        get_loc0 0: this
+        get_field targetWidthMultipliedByChannels
+        call_method 1
+        put_field outputHeightWorkBench
+   48:  return_undef
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:1186:40: function: <null>
+  mode: strict
+  args: bufferLength
+  locals:
+    0: catch error [level:3 next:-1]
+  stack_size: 4
+  opcodes:
+        catch 17
+        get_var Float32Array
+        dup
+        get_arg0 0: bufferLength
+        call_constructor 1
+        nip_catch
+        return
+   17:  put_loc0 0: error
+        catch 28
+        array_from 0
+        nip_catch
+        return
+   28:  throw
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:1195:40: function: <null>
+  mode: strict
+  args: bufferLength
+  locals:
+    0: catch error [level:3 next:-1]
+    1: var this
+  stack_size: 6
+  opcodes:
+        push_this
+        put_loc1 1: this
+        catch 28
+        get_loc1 1: this
+        get_field2 checkForOperaMathBug
+        get_var Uint8Array
+        dup
+        get_arg0 0: bufferLength
+        call_constructor 1
+        call_method 1
+        nip_catch
+        return
+   28:  put_loc0 0: error
+        catch 39
+        array_from 0
+        nip_catch
+        return
+   39:  throw
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:1204:41: function: <null>
+  mode: strict
+  args: typedArray
+  stack_size: 4
+  opcodes:
+        get_arg0 0: typedArray
+        push_0 0
+        push_minus1 -1
+        put_array_el
+        get_arg0 0: typedArray
+        push_0 0
+        get_array_el3
+        push_0 0
+        sar
+        put_array_el
+        get_arg0 0: typedArray
+        push_0 0
+        get_array_el
+        push_i16 255
+        neq
+        if_false8 23
+        array_from 0
+        return
+   23:  get_arg0 0: typedArray
+        return
+
+__tests__/fixtures_quickjs/octane/gbemu-part1.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: Benchmark parent:loc0 const
+    1: BenchmarkSuite parent:loc1 const
+    2: gameboy_rom parent:loc2 const
+    3: start parent:loc3 const
+    4: GameBoyWindow parent:loc4 const
+    5: GameBoyCanvas parent:loc5 const
+    6: gameboy parent:loc6 const
+    7: GameboyBenchmark local:loc0 var
+    8: decoded_gameboy_rom local:loc1 var
+    9: setupGameboy local:loc2 var
+   10: runGameboy local:loc3 var
+   11: tearDownGameboy local:loc4 var
+   12: expectedGameboyStateStr local:loc5 var
+   13: clear_terminal local:loc6 var
+   14: GameBoyAudioNode local:loc7 var
+   15: GameBoyAudioContext local:loc8 var
+   16: resetGlobalVariables local:loc9 var
+   17: toBase64 local:loc10 var
+   18: fromBase64 local:loc11 var
+   19: base64 local:loc12 var
+   20: base64_decode local:loc13 var
+   21: to_little_endian_dword local:loc14 var
+   22: to_little_endian_word local:loc15 var
+   23: to_byte local:loc16 var
+   24: arrayToBase64 local:loc17 var
+   25: base64ToArray local:loc18 var
+   26: Resampler local:loc19 var
+   27: XAudioServer local:loc20 var
+   28: getFloat32 local:loc21 var
+   29: getFloat32Flat local:loc22 var
+   30: samplesPerCallback local:loc23 var
+   31: outputConvert local:loc24 var
+   32: audioOutputFlashEvent local:loc25 var
+   33: generateFlashStereoString local:loc26 var
+   34: generateFlashMonoString local:loc27 var
+   35: audioContextHandle local:loc28 var
+   36: audioNode local:loc29 var
+   37: audioSource local:loc30 var
+   38: launchedContext local:loc31 var
+   39: audioContextSampleBuffer local:loc32 var
+   40: resampled local:loc33 var
+   41: webAudioMinBufferSize local:loc34 var
+   42: webAudioMaxBufferSize local:loc35 var
+   43: webAudioActualSampleRate local:loc36 var
+   44: XAudioJSSampleRate local:loc37 var
+   45: webAudioMono local:loc38 var
+   46: XAudioJSVolume local:loc39 var
+   47: resampleControl local:loc40 var
+   48: audioBufferSize local:loc41 var
+   49: resampleBufferStart local:loc42 var
+   50: resampleBufferEnd local:loc43 var
+   51: resampleBufferSize local:loc44 var
+   52: audioOutputEvent local:loc45 var
+   53: resampleRefill local:loc46 var
+   54: resampledSamplesLeft local:loc47 var
+   55: getBufferSamples local:loc48 var
+   56: resetCallbackAPIAudioBuffer local:loc49 var
+   57: Resize local:loc50 var
+  stack_size: 32
+  opcodes:
+        push_this
+        if_false 137
+        fclosure8 0: [bytecode setupGameboy]
+        put_var_ref 9: setupGameboy
+        fclosure8 1: [bytecode runGameboy]
+        put_var_ref 10: runGameboy
+        fclosure8 2: [bytecode tearDownGameboy]
+        put_var_ref 11: tearDownGameboy
+        fclosure8 3: [bytecode clear_terminal]
+        put_var_ref 13: clear_terminal
+        fclosure8 6: [bytecode GameBoyAudioContext]
+        put_var_ref 15: GameBoyAudioContext
+        fclosure8 7: [bytecode resetGlobalVariables]
+        put_var_ref 16: resetGlobalVariables
+        fclosure8 18: [bytecode base64]
+        put_var_ref 19: base64
+        fclosure8 19: [bytecode base64_decode]
+        put_var_ref 20: base64_decode
+        fclosure8 20: [bytecode to_little_endian_dword]
+        put_var_ref 21: to_little_endian_dword
+        fclosure8 21: [bytecode to_little_endian_word]
+        put_var_ref 22: to_little_endian_word
+        fclosure8 22: [bytecode to_byte]
+        put_var_ref 23: to_byte
+        fclosure8 23: [bytecode arrayToBase64]
+        put_var_ref 24: arrayToBase64
+        fclosure8 24: [bytecode base64ToArray]
+        put_var_ref 25: base64ToArray
+        fclosure8 25: [bytecode Resampler]
+        put_var_ref 26: Resampler
+        fclosure8 31: [bytecode XAudioServer]
+        put_var_ref 27: XAudioServer
+        fclosure8 50: [bytecode getFloat32]
+        put_var_ref 28: getFloat32
+        fclosure8 51: [bytecode getFloat32Flat]
+        put_var_ref 29: getFloat32Flat
+        fclosure8 52: [bytecode audioOutputFlashEvent]
+        put_var_ref 32: audioOutputFlashEvent
+        fclosure8 53: [bytecode generateFlashStereoString]
+        put_var_ref 33: generateFlashStereoString
+        fclosure8 54: [bytecode generateFlashMonoString]
+        put_var_ref 34: generateFlashMonoString
+        fclosure8 55: [bytecode audioOutputEvent]
+        put_var_ref 52: audioOutputEvent
+        fclosure8 56: [bytecode resampleRefill]
+        put_var_ref 53: resampleRefill
+        fclosure8 57: [bytecode resampledSamplesLeft]
+        put_var_ref 54: resampledSamplesLeft
+        fclosure8 58: [bytecode getBufferSamples]
+        put_var_ref 55: getBufferSamples
+        fclosure8 59: [bytecode resetCallbackAPIAudioBuffer]
+        put_var_ref 56: resetCallbackAPIAudioBuffer
+        fclosure8 61: [bytecode Resize]
+        put_var_ref 57: Resize
+        return_undef
+  137:  get_var_ref_check 1: BenchmarkSuite
+        dup
+        push_atom_value Gameboy
+        push_i32 26288412
+        array_from 1
+        get_var_ref_check 0: Benchmark
+        dup
+        push_atom_value Gameboy
+        push_false
+        push_false
+        push_i8 20
+        get_var_ref 10: runGameboy
+        get_var_ref 9: setupGameboy
+        get_var_ref 11: tearDownGameboy
+        null
+        push_4 4
+        call_constructor 9
+        array_from 1
+        call_constructor 3
+        put_var_ref 7: GameboyBenchmark
+        null
+        put_var_ref 8: decoded_gameboy_rom
+        push_atom_value "{\"registerA\":160,\"registerB\":255,\"registerC\":255,\"registerE\":11,"
+        push_atom_value "\"registersHL\":51600,\"programCounter\":24309,\"stackPointer\":49706,"
+        add
+        push_atom_value "\"sumROM\":10171578,\"sumMemory\":3435856,\"sumMBCRam\":234598,\"sumVRam\":0}"
+        add
+        put_var_ref 12: expectedGameboyStateStr
+        object
+        push_0 0
+        define_field bufferSize
+        null
+        define_field onaudioprocess
+        fclosure8 4: [bytecode <null>]
+        set_name connect
+        define_field connect
+        fclosure8 5: [bytecode <null>]
+        set_name run
+        define_field run
+        put_var_ref 14: GameBoyAudioNode
+        push_atom_value A
+        push_atom_value B
+        push_atom_value C
+        push_atom_value D
+        push_atom_value E
+        push_atom_value F
+        push_atom_value G
+        push_atom_value H
+        push_atom_value I
+        push_atom_value J
+        push_atom_value K
+        push_atom_value L
+        push_atom_value M
+        push_atom_value N
+        push_atom_value O
+        push_atom_value P
+        push_atom_value Q
+        push_atom_value R
+        push_atom_value S
+        push_atom_value T
+        push_atom_value U
+        push_atom_value V
+        push_atom_value W
+        push_atom_value X
+        push_atom_value Y
+        push_atom_value Z
+        push_atom_value a
+        push_atom_value b
+        push_atom_value c
+        push_atom_value d
+        push_atom_value e
+        push_atom_value f
+        array_from 32
+        push_atom_value g
+        define_field 32
+        push_atom_value h
+        define_field 33
+        push_atom_value i
+        define_field 34
+        push_atom_value j
+        define_field 35
+        push_atom_value k
+        define_field 36
+        push_atom_value l
+        define_field 37
+        push_atom_value m
+        define_field 38
+        push_atom_value n
+        define_field 39
+        push_atom_value o
+        define_field 40
+        push_atom_value p
+        define_field 41
+        push_atom_value q
+        define_field 42
+        push_atom_value r
+        define_field 43
+        push_atom_value s
+        define_field 44
+        push_atom_value t
+        define_field 45
+        push_atom_value u
+        define_field 46
+        push_atom_value v
+        define_field 47
+        push_atom_value w
+        define_field 48
+        push_atom_value x
+        define_field 49
+        push_atom_value y
+        define_field 50
+        push_atom_value z
+        define_field 51
+        push_const8 8: "0"
+        define_field 52
+        push_const8 9: "1"
+        define_field 53
+        push_const8 10: "2"
+        define_field 54
+        push_const8 11: "3"
+        define_field 55
+        push_const8 12: "4"
+        define_field 56
+        push_const8 13: "5"
+        define_field 57
+        push_const8 14: "6"
+        define_field 58
+        push_const8 15: "7"
+        define_field 59
+        push_const8 16: "8"
+        define_field 60
+        push_const8 17: "9"
+        define_field 61
+        push_atom_value "+"
+        define_field 62
+        push_atom_value "/"
+        define_field 63
+        push_atom_value "="
+        define_field 64
+        put_var_ref 17: toBase64
+        push_atom_value "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+        put_var_ref 18: fromBase64
+        get_var_ref 26: Resampler
+        get_field prototype
+        fclosure8 26: [bytecode <null>]
+        put_field initialize
+        get_var_ref 26: Resampler
+        get_field prototype
+        fclosure8 27: [bytecode <null>]
+        put_field compileInterpolationFunction
+        get_var_ref 26: Resampler
+        get_field prototype
+        fclosure8 28: [bytecode <null>]
+        put_field bypassResampler
+        get_var_ref 26: Resampler
+        get_field prototype
+        fclosure8 29: [bytecode <null>]
+        put_field bufferSlice
+        get_var_ref 26: Resampler
+        get_field prototype
+        fclosure8 30: [bytecode <null>]
+        put_field initializeBuffers
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 32: [bytecode <null>]
+        put_field MOZWriteAudio
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 33: [bytecode <null>]
+        put_field MOZWriteAudioNoCallback
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 34: [bytecode <null>]
+        put_field callbackBasedWriteAudio
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 35: [bytecode <null>]
+        put_field callbackBasedWriteAudioNoCallback
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 36: [bytecode <null>]
+        put_field writeAudio
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 37: [bytecode <null>]
+        put_field writeAudioNoCallback
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 38: [bytecode <null>]
+        put_field remainingBuffer
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 39: [bytecode <null>]
+        put_field MOZExecuteCallback
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 40: [bytecode <null>]
+        put_field callbackBasedExecuteCallback
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 41: [bytecode <null>]
+        put_field executeCallback
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 42: [bytecode <null>]
+        put_field initializeAudio
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 43: [bytecode <null>]
+        put_field preInitializeMozAudio
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 44: [bytecode <null>]
+        put_field initializeMozAudio
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 45: [bytecode <null>]
+        put_field initializeWebAudio
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 46: [bytecode <null>]
+        put_field initializeFlashAudio
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 47: [bytecode <null>]
+        put_field changeVolume
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 48: [bytecode <null>]
+        put_field writeMozAudio
+        get_var_ref 27: XAudioServer
+        get_field prototype
+        fclosure8 49: [bytecode <null>]
+        put_field checkFlashInit
+        push_i16 2048
+        put_var_ref 30: samplesPerCallback
+        null
+        put_var_ref 31: outputConvert
+        null
+        put_var_ref 35: audioContextHandle
+        null
+        put_var_ref 36: audioNode
+        null
+        put_var_ref 37: audioSource
+        push_false
+        put_var_ref 38: launchedContext
+        array_from 0
+        put_var_ref 39: audioContextSampleBuffer
+        array_from 0
+        put_var_ref 40: resampled
+        push_i16 15000
+        put_var_ref 41: webAudioMinBufferSize
+        push_i16 25000
+        put_var_ref 42: webAudioMaxBufferSize
+        push_i32 44100
+        put_var_ref 43: webAudioActualSampleRate
+        push_0 0
+        put_var_ref 44: XAudioJSSampleRate
+        push_false
+        put_var_ref 45: webAudioMono
+        push_1 1
+        put_var_ref 46: XAudioJSVolume
+        null
+        put_var_ref 47: resampleControl
+        push_0 0
+        put_var_ref 48: audioBufferSize
+        push_0 0
+        put_var_ref 49: resampleBufferStart
+        push_0 0
+        put_var_ref 50: resampleBufferEnd
+        push_2 2
+        put_var_ref 51: resampleBufferSize
+        fclosure8 60: [bytecode <null>]
+        call0 0
+        drop
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 62: [bytecode <null>]
+        put_field initialize
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 63: [bytecode <null>]
+        put_field resizeWidthRGB
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 64: [bytecode <null>]
+        put_field resizeWidthInterpolatedRGB
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 65: [bytecode <null>]
+        put_field resizeWidthRGBA
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 66: [bytecode <null>]
+        put_field resizeWidthInterpolatedRGBA
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 67: [bytecode <null>]
+        put_field resizeHeightRGB
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 68: [bytecode <null>]
+        put_field resizeHeightInterpolated
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 69: [bytecode <null>]
+        put_field resizeHeightRGBA
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 70: [bytecode <null>]
+        put_field resizeHeightInterpolatedRGBA
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 71: [bytecode <null>]
+        put_field resize
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 72: [bytecode <null>]
+        put_field bypassResizer
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 73: [bytecode <null>]
+        put_field initializeFirstPassBuffers
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 74: [bytecode <null>]
+        put_field initializeSecondPassBuffers
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 75: [bytecode <null>]
+        put_field generateFloatBuffer
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 76: [bytecode <null>]
+        put_field generateUint8Buffer
+        get_var_ref 57: Resize
+        get_field prototype
+        fclosure8 77: [bytecode <null>]
+        put_field checkForOperaMathBug
+        undefined
+        return_async
+

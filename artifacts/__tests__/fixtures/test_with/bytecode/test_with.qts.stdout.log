@@ -1,0 +1,518 @@
+__tests__/fixtures/test_with.js:4:1: function: assert
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_arg0 0: actual
+        get_arg1 1: expected
+        strict_eq
+        if_false8 17
+        return_undef
+   17:  get_arg0 0: actual
+        is_null
+        if_true8 67
+        get_arg1 1: expected
+        is_null
+        if_true8 67
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 67
+        return_undef
+   67:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 117
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 118
+  117:  push_empty_string
+  118:  add
+        call1 1
+        throw
+
+__tests__/fixtures/test_with.js:24:1: function: log
+  args: str
+  stack_size: 3
+  opcodes:
+        get_var log_str
+        get_arg0 0: str
+        push_atom_value ","
+        add
+        add
+        dup
+        put_var log_str
+        return_undef
+
+__tests__/fixtures/test_with.js:31:9: function: h
+  closure vars:
+    0: d local:arg0 var
+    1: x parent:loc0 var
+  stack_size: 3
+  opcodes:
+        get_var log
+        push_atom_value "d="
+        get_var_ref0 0: d
+        add
+        call1 1
+        drop
+        get_var log
+        push_atom_value "x="
+        get_var_ref1 1: x
+        add
+        call1 1
+        return_undef
+
+__tests__/fixtures/test_with.js:30:5: function: g
+  args: d
+  locals:
+    0: var h
+  closure vars:
+    0: x local:loc0 var
+    1: b local:arg1 var
+    2: c local:arg2 var
+  stack_size: 3
+  opcodes:
+        fclosure8 0: [bytecode h]
+        put_loc0 0: h
+        get_var log
+        push_atom_value "b="
+        get_var_ref1 1: b
+        add
+        call1 1
+        drop
+        get_var log
+        push_atom_value "c="
+        get_var_ref2 2: c
+        add
+        call1 1
+        drop
+        get_loc0 0: h
+        call0 0
+        return_undef
+
+__tests__/fixtures/test_with.js:27:1: function: f
+  args: a b c
+  locals:
+    0: var x
+    1: var g
+  stack_size: 3
+  opcodes:
+        fclosure8 0: [bytecode g]
+        put_loc1 1: g
+        push_i8 10
+        put_loc0 0: x
+        get_var log
+        push_atom_value "a="
+        get_arg0 0: a
+        add
+        call1 1
+        drop
+        get_loc1 1: g
+        push_4 4
+        call1 1
+        drop
+        get_loc1 1: g
+        return
+
+__tests__/fixtures/test_with.js:53:17: function: <null>
+  locals:
+    0: var <with> [level:2 next:-1]
+    1: var <var>
+    2: var this
+    3: var new.target
+    4: var arguments
+  closure vars:
+    0: <with> local:loc2 var
+    1: o1 local:loc0 var
+    2: x local:loc1 var
+    3: f local:loc3 var
+    4: <var> local:loc4 var
+    5: this local:loc5 var
+    6: new.target local:loc6 var
+    7: arguments local:loc7 var
+  stack_size: 4
+  opcodes:
+        special_object 3
+        put_loc3 3: "new.target"
+        push_this
+        put_loc2 2: this
+        special_object 1
+        put_loc8 4: arguments
+        special_object 5
+        put_loc1 1: "<var>"
+        get_loc1 1: "<var>"
+        with_make_ref o2,52,0
+        get_var_ref0 0: "<with>"
+        with_make_ref o2,52,1
+        get_var_ref 4: "<var>"
+        with_make_ref o2,52,0
+        make_var_ref o2
+   52:  object
+        push_atom_value o2
+        define_field x
+        put_ref_value
+        get_loc1 1: "<var>"
+        with_get_var o2,104,0
+        get_var_ref0 0: "<with>"
+        with_get_var o2,104,1
+        get_var_ref 4: "<var>"
+        with_get_var o2,104,0
+        get_var o2
+  104:  set_loc_uninitialized 0: "<with>"
+        to_object
+        set_loc0 0: "<with>"
+        with_get_ref assert,160,1
+        get_loc1 1: "<var>"
+        with_get_ref assert,160,0
+        get_var_ref0 0: "<with>"
+        with_get_ref assert,160,1
+        get_var_ref 4: "<var>"
+        with_get_ref assert,160,0
+        undefined
+        get_var assert
+  160:  get_loc0 0: "<with>"
+        with_get_var x,194,1
+        get_loc1 1: "<var>"
+        with_get_var x,194,0
+        get_var_ref0 0: "<with>"
+        with_get_var x,194,1
+        get_var_ref2 2: x
+  194:  push_atom_value o2
+        strict_eq
+        call_method 1
+        drop
+        get_loc0 0: "<with>"
+        with_get_ref assert,256,1
+        get_loc1 1: "<var>"
+        with_get_ref assert,256,0
+        get_var_ref0 0: "<with>"
+        with_get_ref assert,256,1
+        get_var_ref 4: "<var>"
+        with_get_ref assert,256,0
+        undefined
+        get_var assert
+  256:  get_loc0 0: "<with>"
+        with_get_var y,307,1
+        get_loc1 1: "<var>"
+        with_get_var y,307,0
+        get_var_ref0 0: "<with>"
+        with_get_var y,307,1
+        get_var_ref 4: "<var>"
+        with_get_var y,307,0
+        get_var y
+  307:  push_atom_value o1
+        strict_eq
+        call_method 1
+        drop
+        get_loc0 0: "<with>"
+        with_get_ref assert,369,1
+        get_loc1 1: "<var>"
+        with_get_ref assert,369,0
+        get_var_ref0 0: "<with>"
+        with_get_ref assert,369,1
+        get_var_ref 4: "<var>"
+        with_get_ref assert,369,0
+        undefined
+        get_var assert
+  369:  get_loc0 0: "<with>"
+        with_get_var z,420,1
+        get_loc1 1: "<var>"
+        with_get_var z,420,0
+        get_var_ref0 0: "<with>"
+        with_get_var z,420,1
+        get_var_ref 4: "<var>"
+        with_get_var z,420,0
+        get_var z
+  420:  push_atom_value var_obj
+        strict_eq
+        call_method 1
+        drop
+        get_loc0 0: "<with>"
+        with_get_ref assert,482,1
+        get_loc1 1: "<var>"
+        with_get_ref assert,482,0
+        get_var_ref0 0: "<with>"
+        with_get_ref assert,482,1
+        get_var_ref 4: "<var>"
+        with_get_ref assert,482,0
+        undefined
+        get_var assert
+  482:  get_loc0 0: "<with>"
+        with_get_var eval,533,1
+        get_loc1 1: "<var>"
+        with_get_var eval,533,0
+        get_var_ref0 0: "<with>"
+        with_get_var eval,533,1
+        get_var_ref 4: "<var>"
+        with_get_var eval,533,0
+        get_var eval
+  533:  push_atom_value x
+        eval 1,2
+        push_atom_value o2
+        strict_eq
+        call_method 1
+        drop
+        get_loc0 0: "<with>"
+        with_get_ref assert,605,1
+        get_loc1 1: "<var>"
+        with_get_ref assert,605,0
+        get_var_ref0 0: "<with>"
+        with_get_ref assert,605,1
+        get_var_ref 4: "<var>"
+        with_get_ref assert,605,0
+        undefined
+        get_var assert
+  605:  get_loc0 0: "<with>"
+        with_get_var eval,656,1
+        get_loc1 1: "<var>"
+        with_get_var eval,656,0
+        get_var_ref0 0: "<with>"
+        with_get_var eval,656,1
+        get_var_ref 4: "<var>"
+        with_get_var eval,656,0
+        get_var eval
+  656:  push_atom_value y
+        eval 1,2
+        push_atom_value o1
+        strict_eq
+        call_method 1
+        drop
+        get_loc0 0: "<with>"
+        with_get_ref assert,728,1
+        get_loc1 1: "<var>"
+        with_get_ref assert,728,0
+        get_var_ref0 0: "<with>"
+        with_get_ref assert,728,1
+        get_var_ref 4: "<var>"
+        with_get_ref assert,728,0
+        undefined
+        get_var assert
+  728:  get_loc0 0: "<with>"
+        with_get_var eval,779,1
+        get_loc1 1: "<var>"
+        with_get_var eval,779,0
+        get_var_ref0 0: "<with>"
+        with_get_var eval,779,1
+        get_var_ref 4: "<var>"
+        with_get_var eval,779,0
+        get_var eval
+  779:  push_atom_value z
+        eval 1,2
+        push_atom_value var_obj
+        strict_eq
+        call_method 1
+        drop
+        get_loc0 0: "<with>"
+        with_get_ref assert,851,1
+        get_loc1 1: "<var>"
+        with_get_ref assert,851,0
+        get_var_ref0 0: "<with>"
+        with_get_ref assert,851,1
+        get_var_ref 4: "<var>"
+        with_get_ref assert,851,0
+        undefined
+        get_var assert
+  851:  get_loc0 0: "<with>"
+        with_get_var eval,902,1
+        get_loc1 1: "<var>"
+        with_get_var eval,902,0
+        get_var_ref0 0: "<with>"
+        with_get_var eval,902,1
+        get_var_ref 4: "<var>"
+        with_get_var eval,902,0
+        get_var eval
+  902:  push_atom_value "eval(\"x\")"
+        eval 1,2
+        push_atom_value o2
+        strict_eq
+        call_method 1
+        drop
+        close_loc 0: "<with>"
+        return_undef
+
+__tests__/fixtures/test_with.js:45:1: function: test_with
+  locals:
+    0: var o1
+    1: var x
+    2: var <with> [level:2 next:-1]
+    3: var f
+    4: var <var>
+    5: var this
+    6: var new.target
+    7: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 3
+        put_loc8 6: "new.target"
+        push_this
+        put_loc8 5: this
+        special_object 1
+        put_loc8 7: arguments
+        special_object 5
+        put_loc8 4: "<var>"
+        object
+        push_atom_value o1
+        define_field x
+        push_atom_value o1
+        define_field y
+        put_loc0 0: o1
+        push_atom_value local
+        put_loc1 1: x
+        get_loc8 4: "<var>"
+        with_get_var eval,60,0
+        get_var eval
+   60:  push_atom_value "var z=\"var_obj\";"
+        eval 1,1
+        drop
+        get_loc8 4: "<var>"
+        with_get_var assert,88,0
+        get_var assert
+   88:  get_loc8 4: "<var>"
+        with_get_var z,105,0
+        get_var z
+  105:  push_atom_value var_obj
+        strict_eq
+        call1 1
+        drop
+        get_loc0 0: o1
+        set_loc_uninitialized 2: "<with>"
+        to_object
+        set_loc2 2: "<with>"
+        with_get_ref assert,147,1
+        get_loc8 4: "<var>"
+        with_get_ref assert,147,0
+        undefined
+        get_var assert
+  147:  get_loc2 2: "<with>"
+        with_get_var x,159,1
+        get_loc1 1: x
+  159:  push_atom_value o1
+        strict_eq
+        call_method 1
+        drop
+        get_loc2 2: "<with>"
+        with_get_ref assert,198,1
+        get_loc8 4: "<var>"
+        with_get_ref assert,198,0
+        undefined
+        get_var assert
+  198:  get_loc2 2: "<with>"
+        with_get_var eval,226,1
+        get_loc8 4: "<var>"
+        with_get_var eval,226,0
+        get_var eval
+  226:  push_atom_value x
+        eval 1,4
+        push_atom_value o1
+        strict_eq
+        call_method 1
+        drop
+        get_loc2 2: "<with>"
+        with_make_ref f,264,1
+        make_loc_ref f,3
+  264:  fclosure8 0: [bytecode <null>]
+        set_name f
+        put_ref_value
+        get_loc2 2: "<with>"
+        with_get_ref f,285,1
+        undefined
+        get_loc3 3: f
+  285:  call_method 0
+        drop
+        close_loc 2: "<with>"
+        return_undef
+
+__tests__/fixtures/test_with.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: catch e [level:3 next:-1]
+  stack_size: 4
+  opcodes:
+        check_define_var assert,64
+        check_define_var log_str,0
+        check_define_var log,64
+        check_define_var f,64
+        check_define_var g1,0
+        check_define_var test_with,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        define_var log_str,0
+        fclosure8 1: [bytecode log]
+        define_func log,0
+        fclosure8 2: [bytecode f]
+        define_func f,0
+        define_var g1,0
+        fclosure8 3: [bytecode test_with]
+        define_func test_with,0
+        undefined
+        put_loc0 0: "<ret>"
+        catch 102
+        get_var __loadScript
+        push_atom_value "test_assert.js"
+        call1 1
+        put_loc0 0: "<ret>"
+        drop
+        goto8 112
+  102:  put_loc1 1: e
+        catch 111
+        drop
+        goto8 112
+  111:  throw
+  112:  push_empty_string
+        put_var log_str
+        get_var f
+        push_1 1
+        push_2 2
+        push_3 3
+        call3 3
+        put_var g1
+        get_var g1
+        push_5 5
+        call1 1
+        put_loc0 0: "<ret>"
+        get_var assert
+        get_var log_str
+        push_atom_value "a=1,b=2,c=3,d=4,x=10,b=2,c=3,d=5,x=10,"
+        push_atom_value closure1
+        call3 3
+        set_loc0 0: "<ret>"
+        return
+

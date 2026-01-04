@@ -1,0 +1,49 @@
+Module bytecode version: 5
+Atom count: 5
+
+=== Outer Function ===
+bytecodeLen=46 stackSize=3 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 40
+     6  check_define_var         229                 pop=0 push=0      40 e5 00 00 00 40
+    12  fclosure8                0                   pop=0 push=1      c2 00
+    14  define_func              228                 pop=1 push=0      41 e4 00 00 00 00
+    20  fclosure8                1                   pop=0 push=1      c2 01
+    22  define_func              229                 pop=1 push=0      41 e5 00 00 00 00
+    28  get_var                  229                 pop=0 push=1      39 e5 00 00 00
+    33  call0                    npop=0              pop=1 push=1      f0
+    34  get_field2               129                 pop=1 push=2      43 81 00 00 00
+    39  fclosure8                2                   pop=0 push=1      c2 02
+    41  call_method              1                   pop=2 push=1      24 01 00
+    44  set_loc0                 loc=0               pop=1 push=1      cf
+    45  return                                       pop=1 push=0      28
+
+=== Inner Function #0 ===
+bytecodeLen=3 stackSize=1 varCount=0 argCount=0
+     0  push_i8                  42                  pop=0 push=1      bf 2a
+     2  return_async                                 pop=1 push=0      2f
+
+=== Inner Function #1 ===
+bytecodeLen=39 stackSize=4 varCount=1 argCount=0
+     0  set_loc_uninitialized    0                   pop=0 push=0      63 00 00
+     3  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+     8  call0                    npop=0              pop=1 push=1      f0
+     9  await                                        pop=1 push=1      8d
+    10  put_loc0                 loc=0               pop=1 push=0      cb
+    11  get_var                  231                 pop=0 push=1      39 e7 00 00 00
+    16  get_field2               232                 pop=1 push=2      43 e8 00 00 00
+    21  push_atom_value          66                  pop=0 push=1      04 42 00 00 00
+    26  get_loc_check            0                   pop=0 push=1      64 00 00
+    29  call_method              2                   pop=2 push=1      24 02 00
+    32  drop                                         pop=1 push=0      0e
+    33  get_loc_check            0                   pop=0 push=1      64 00 00
+    36  push_1                   1                   pop=0 push=1      b8
+    37  add                                          pop=2 push=1      9f
+    38  return_async                                 pop=1 push=0      2f
+
+=== Inner Function #2 ===
+bytecodeLen=19 stackSize=4 varCount=0 argCount=1
+     0  get_var                  231                 pop=0 push=1      39 e7 00 00 00
+     5  get_field2               232                 pop=1 push=2      43 e8 00 00 00
+    10  push_atom_value          108                 pop=0 push=1      04 6c 00 00 00
+    15  get_arg0                 arg=0               pop=0 push=1      d3
+    16  tail_call_method         2                   pop=2 push=0      25 02 00

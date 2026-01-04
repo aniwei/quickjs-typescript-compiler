@@ -6,21 +6,21 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/base/cli/base.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/base/cli/base.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/base/cli/base.pc2line.txt",
-    "bytecodeSize": 5417,
+    "bytecodeSize": 5454,
     "pc2lineLength": 134,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 5351,
+    "tsSize": 5388,
     "wasmSize": 5388,
-    "sizeDiff": -37,
-    "sizeDiffPercent": -0.6867112100965108
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
   },
   "trace": {
-    "differenceCount": 4252,
-    "tsEventCount": 3917,
-    "wasmEventCount": 4276,
-    "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/base/trace/trace.summary.json"
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
   }
 }

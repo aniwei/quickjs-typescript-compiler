@@ -1,0 +1,56 @@
+__tests__/fixtures/async-await-promise-chain-no-top-level-await-044.js:2:1: function: run44
+  locals:
+    0: const p [level:1 next:-1]
+    1: const a [level:1 next:0]
+    2: const b [level:1 next:1]
+  stack_size: 4
+  opcodes:
+        set_loc_uninitialized 2: b
+        set_loc_uninitialized 1: a
+        set_loc_uninitialized 0: p
+        get_var Promise
+        get_field2 resolve
+        push_i8 44
+        call_method 1
+        put_loc0 0: p
+        get_loc_check 0: p
+        await
+        put_loc1 1: a
+        get_var Promise
+        get_field2 resolve
+        get_loc_check 1: a
+        push_1 1
+        add
+        call_method 1
+        await
+        put_loc2 2: b
+        get_loc_check 2: b
+        push_2 2
+        mul
+        return_async
+
+__tests__/fixtures/async-await-promise-chain-no-top-level-await-044.js:8:14: function: <null>
+  args: v
+  stack_size: 3
+  opcodes:
+        get_var console
+        get_field2 log
+        get_arg0 0: v
+        tail_call_method 1
+
+__tests__/fixtures/async-await-promise-chain-no-top-level-await-044.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var run44,64
+        fclosure8 0: [bytecode run44]
+        define_func run44,0
+        get_var run44
+        call0 0
+        get_field2 then
+        fclosure8 1: [bytecode <null>]
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

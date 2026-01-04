@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/bitwise-unary-typeof-088.ts
-**生成时间**: 2026-01-03T04:40:38.199Z
+**生成时间**: 2026-01-03T15:14:56.162Z
 
 ## 大小对比
 

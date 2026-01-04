@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/box2d.ts
-**生成时间**: 2025-12-31T17:59:13.444Z
+**生成时间**: 2026-01-03T15:19:10.943Z
 
 ## 大小对比
 

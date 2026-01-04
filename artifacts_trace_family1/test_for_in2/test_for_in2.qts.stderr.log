@@ -1,0 +1,57 @@
+[QTS:LABEL] begin: bc_len=416 label_count=7 jump_size=9 line_number_size=39 strip_debug=0
+[QTS:LABEL] goto: opcode=108 label=0
+[QTS:LABEL] emit: label=0 pos=11
+[QTS:LABEL] goto: opcode=108 label=2
+[QTS:LABEL] emit: label=2 pos=17
+[QTS:LABEL] typeof_test: pos=136 pos_next=137 line_num:360->367 atom=75 cmp_op=171
+[QTS:LABEL] goto: opcode=108 label=4
+[QTS:LABEL] typeof_test: pos=161 pos_next=162 line_num:389->398 atom=75 cmp_op=171
+[QTS:LABEL] goto: opcode=108 label=4
+[QTS:LABEL] emit: label=3 pos=70
+[QTS:LABEL] goto: opcode=108 label=4
+[QTS:LABEL] emit: label=4 pos=73
+[QTS:LABEL] goto: opcode=108 label=5
+[QTS:LABEL] goto: opcode=110 label=6
+[QTS:LABEL] emit: label=5 pos=123
+[QTS:LABEL] emit: label=6 pos=124
+[QTS:PC2LINE] begin: slots=39 source_pos=151
+[QTS:PC2LINE] init: line=3 col=0
+[QTS:PC2LINE] end: pc2line_len=80
+[QTS:LABEL] end: out_len=121
+[QTS:LABEL] begin: bc_len=453 label_count=16 jump_size=12 line_number_size=28 strip_debug=0
+[QTS:LABEL] emit: label=5 pos=4
+[QTS:LABEL] goto: opcode=110 label=1
+[QTS:LABEL] emit: label=4 pos=26
+[QTS:LABEL] emit: label=2 pos=27
+[QTS:LABEL] goto: opcode=109 label=1
+[QTS:LABEL] emit: label=7 pos=36
+[QTS:LABEL] emit: label=1 pos=47
+[QTS:LABEL] goto: opcode=108 label=4
+[QTS:LABEL] resolve: label=4 addr=26
+[QTS:LABEL] emit: label=3 pos=51
+[QTS:LABEL] emit: label=13 pos=78
+[QTS:LABEL] goto: opcode=110 label=9
+[QTS:LABEL] emit: label=12 pos=100
+[QTS:LABEL] emit: label=10 pos=101
+[QTS:LABEL] goto: opcode=109 label=11
+[QTS:LABEL] emit: label=15 pos=110
+[QTS:LABEL] emit: label=9 pos=121
+[QTS:LABEL] goto: opcode=108 label=12
+[QTS:LABEL] resolve: label=12 addr=100
+[QTS:LABEL] emit: label=11 pos=125
+[QTS:PC2LINE] begin: slots=28 source_pos=743
+[QTS:PC2LINE] init: line=21 col=0
+[QTS:PC2LINE] end: pc2line_len=58
+[QTS:LABEL] end: out_len=148
+[QTS:LABEL] begin: bc_len=113 label_count=4 jump_size=7 line_number_size=2 strip_debug=0
+[QTS:LABEL] goto: opcode=111 label=0
+[QTS:LABEL] goto: opcode=110 label=3
+[QTS:LABEL] emit: label=0 pos=50
+[QTS:LABEL] goto: opcode=111 label=1
+[QTS:LABEL] goto: opcode=110 label=3
+[QTS:LABEL] emit: label=1 pos=59
+[QTS:LABEL] emit: label=3 pos=60
+[QTS:PC2LINE] begin: slots=2 source_pos=0
+[QTS:PC2LINE] init: line=0 col=0
+[QTS:PC2LINE] end: pc2line_len=8
+[QTS:LABEL] end: out_len=62

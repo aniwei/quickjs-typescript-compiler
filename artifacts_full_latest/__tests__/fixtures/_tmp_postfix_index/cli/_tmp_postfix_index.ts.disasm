@@ -1,0 +1,47 @@
+Module bytecode version: 5
+Atom count: 5
+
+=== Outer Function ===
+bytecodeLen=16 stackSize=1 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 40
+     6  fclosure8                0                   pop=0 push=1      c2 00
+     8  define_func              228                 pop=1 push=0      41 e4 00 00 00 00
+    14  get_loc0                 loc=0               pop=0 push=1      c7
+    15  return                                       pop=1 push=0      28
+
+=== Inner Function #0 ===
+bytecodeLen=84 stackSize=5 varCount=1 argCount=1
+     0  set_loc_uninitialized    0                   pop=0 push=0      63 00 00
+     3  get_arg0                 arg=0               pop=0 push=1      d3
+     4  push_1                   1                   pop=0 push=1      b8
+     5  push_2                   2                   pop=0 push=1      b9
+     6  push_3                   3                   pop=0 push=1      ba
+     7  array_from               3                   pop=0 push=1      26 03 00
+    10  put_field                231                 pop=2 push=0      44 e7 00 00 00
+    15  get_arg0                 arg=0               pop=0 push=1      d3
+    16  push_0                   0                   pop=0 push=1      b7
+    17  put_field                232                 pop=2 push=0      44 e8 00 00 00
+    22  get_arg0                 arg=0               pop=0 push=1      d3
+    23  get_field                232                 pop=1 push=1      42 e8 00 00 00
+    28  get_arg0                 arg=0               pop=0 push=1      d3
+    29  get_field                231                 pop=1 push=1      42 e7 00 00 00
+    34  get_length                                   pop=1 push=1      eb
+    35  gte                                          pop=2 push=1      a8
+    36  put_loc0                 loc=0               pop=1 push=0      cb
+    37  object                                       pop=0 push=1      0b
+    38  get_loc_check            0                   pop=0 push=1      64 00 00
+    41  define_field             107                 pop=2 push=1      4e 6b 00 00 00
+    46  get_loc_check            0                   pop=0 push=1      64 00 00
+    49  if_false8                8                   pop=1 push=0      ec 08
+    51  get_var                  71                  pop=0 push=1      39 47 00 00 00
+    56  goto8                    21                  pop=0 push=0      ee 15
+    58  get_arg0                 arg=0               pop=0 push=1      d3
+    59  get_field                231                 pop=1 push=1      42 e7 00 00 00
+    64  get_arg0                 arg=0               pop=0 push=1      d3
+    65  get_field2               232                 pop=1 push=2      43 e8 00 00 00
+    70  post_inc                                     pop=1 push=2      93
+    71  perm3                                        pop=3 push=3      18
+    72  put_field                232                 pop=2 push=0      44 e8 00 00 00
+    77  get_array_el                                 pop=2 push=1      48
+    78  define_field             66                  pop=2 push=1      4e 42 00 00 00
+    83  return                                       pop=1 push=0      28

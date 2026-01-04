@@ -1,0 +1,35 @@
+__tests__/fixtures/closure-basic.js:3:5: function: inner
+  closure vars:
+    0: x local:loc0 let
+  stack_size: 1
+  opcodes:
+        get_var_ref_check 0: x
+        return
+
+__tests__/fixtures/closure-basic.js:1:1: function: outer
+  locals:
+    0: let x [level:1 next:-1]
+    1: var inner
+  stack_size: 1
+  opcodes:
+        fclosure8 0: [bytecode inner]
+        put_loc1 1: inner
+        set_loc_uninitialized 0: x
+        push_i8 10
+        put_loc0 0: x
+        get_loc1 1: inner
+        tail_call 0
+
+__tests__/fixtures/closure-basic.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var outer,64
+        fclosure8 0: [bytecode outer]
+        define_func outer,0
+        get_var outer
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

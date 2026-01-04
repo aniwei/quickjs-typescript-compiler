@@ -1,0 +1,393 @@
+# 字节码分析报告
+
+**输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/optional-chaining.ts
+**生成时间**: 2026-01-03T14:08:26.508Z
+
+## 大小对比
+
+- TypeScript编译器: 619 字节
+- WASM编译器: 619 字节
+- 差异: 0 字节 (0.00%)
+
+## 结构分析
+
+### TypeScript编译器输出
+```json
+{
+  "source": "TypeScript",
+  "bcVersion": "0x5",
+  "userAtomCount": 16,
+  "atoms": [
+    {
+      "index": 0,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "user",
+      "offset": 2
+    },
+    {
+      "index": 1,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "list",
+      "offset": 7
+    },
+    {
+      "index": 2,
+      "rawLength": 10,
+      "actualLength": 5,
+      "isWideChar": 0,
+      "string": "alice",
+      "offset": 12
+    },
+    {
+      "index": 3,
+      "rawLength": 26,
+      "actualLength": 13,
+      "isWideChar": 0,
+      "string": "a@example.com",
+      "offset": 18
+    },
+    {
+      "index": 4,
+      "rawLength": 10,
+      "actualLength": 5,
+      "isWideChar": 0,
+      "string": "email",
+      "offset": 32
+    },
+    {
+      "index": 5,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "contact",
+      "offset": 38
+    },
+    {
+      "index": 6,
+      "rawLength": 10,
+      "actualLength": 5,
+      "isWideChar": 0,
+      "string": "greet",
+      "offset": 46
+    },
+    {
+      "index": 7,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "profile",
+      "offset": 52
+    },
+    {
+      "index": 8,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "console",
+      "offset": 60
+    },
+    {
+      "index": 9,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "log",
+      "offset": 68
+    },
+    {
+      "index": 10,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "deep",
+      "offset": 72
+    },
+    {
+      "index": 11,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "nested",
+      "offset": 77
+    },
+    {
+      "index": 12,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "missing",
+      "offset": 84
+    },
+    {
+      "index": 13,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "prop",
+      "offset": 92
+    },
+    {
+      "index": 14,
+      "rawLength": 78,
+      "actualLength": 39,
+      "isWideChar": 0,
+      "string": "__tests__/fixtures/optional-chaining.js",
+      "offset": 97
+    },
+    {
+      "index": 15,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "hi",
+      "offset": 137
+    }
+  ],
+  "functionHeader": {
+    "offset": 140,
+    "tag": "0xc",
+    "remaining": 479
+  }
+}
+```
+
+### WASM编译器输出
+```json
+{
+  "source": "WASM",
+  "bcVersion": "0x5",
+  "userAtomCount": 16,
+  "atoms": [
+    {
+      "index": 0,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "user",
+      "offset": 2
+    },
+    {
+      "index": 1,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "list",
+      "offset": 7
+    },
+    {
+      "index": 2,
+      "rawLength": 10,
+      "actualLength": 5,
+      "isWideChar": 0,
+      "string": "alice",
+      "offset": 12
+    },
+    {
+      "index": 3,
+      "rawLength": 26,
+      "actualLength": 13,
+      "isWideChar": 0,
+      "string": "a@example.com",
+      "offset": 18
+    },
+    {
+      "index": 4,
+      "rawLength": 10,
+      "actualLength": 5,
+      "isWideChar": 0,
+      "string": "email",
+      "offset": 32
+    },
+    {
+      "index": 5,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "contact",
+      "offset": 38
+    },
+    {
+      "index": 6,
+      "rawLength": 10,
+      "actualLength": 5,
+      "isWideChar": 0,
+      "string": "greet",
+      "offset": 46
+    },
+    {
+      "index": 7,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "profile",
+      "offset": 52
+    },
+    {
+      "index": 8,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "console",
+      "offset": 60
+    },
+    {
+      "index": 9,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "log",
+      "offset": 68
+    },
+    {
+      "index": 10,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "deep",
+      "offset": 72
+    },
+    {
+      "index": 11,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "nested",
+      "offset": 77
+    },
+    {
+      "index": 12,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "missing",
+      "offset": 84
+    },
+    {
+      "index": 13,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "prop",
+      "offset": 92
+    },
+    {
+      "index": 14,
+      "rawLength": 78,
+      "actualLength": 39,
+      "isWideChar": 0,
+      "string": "__tests__/fixtures/optional-chaining.js",
+      "offset": 97
+    },
+    {
+      "index": 15,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "hi",
+      "offset": 137
+    }
+  ],
+  "functionHeader": {
+    "offset": 140,
+    "tag": "0xc",
+    "remaining": 479
+  }
+}
+```
+
+## 字节级差异
+
+共发现 0 个字节差异:
+
+
+## 十六进制转储对比
+
+### TypeScript
+```
+00000000: 05 10 08 75 73 65 72 08 6c 69 73 74 0a 61 6c 69 |...user.list.ali|
+00000010: 63 65 1a 61 40 65 78 61 6d 70 6c 65 2e 63 6f 6d |ce.a@example.com|
+00000020: 0a 65 6d 61 69 6c 0e 63 6f 6e 74 61 63 74 0a 67 |.email.contact.g|
+00000030: 72 65 65 74 0e 70 72 6f 66 69 6c 65 0e 63 6f 6e |reet.profile.con|
+00000040: 73 6f 6c 65 06 6c 6f 67 08 64 65 65 70 0c 6e 65 |sole.log.deep.ne|
+00000050: 73 74 65 64 0e 6d 69 73 73 69 6e 67 08 70 72 6f |sted.missing.pro|
+00000060: 70 4e 5f 5f 74 65 73 74 73 5f 5f 2f 66 69 78 74 |pN__tests__/fixt|
+00000070: 75 72 65 73 2f 6f 70 74 69 6f 6e 61 6c 2d 63 68 |ures/optional-ch|
+00000080: 61 69 6e 69 6e 67 2e 6a 73 04 68 69 0c 00 06 00 |aining.js.hi....|
+00000090: a4 01 00 01 00 05 00 01 e8 02 01 a6 01 00 00 00 |................|
+000000a0: 40 e4 00 00 00 80 40 e5 00 00 00 80 3f e4 00 00 |@.....@.....?...|
+000000b0: 00 80 3f e5 00 00 00 80 0b 0b 04 e6 00 00 00 4e |..?............N|
+000000c0: 38 00 00 00 0b 04 e7 00 00 00 4e e8 00 00 00 4e |8.........N....N|
+000000d0: e9 00 00 00 c2 00 56 ea 00 00 00 04 4e eb 00 00 |......V.....N...|
+000000e0: 00 3b e4 00 00 00 39 ec 00 00 00 43 ed 00 00 00 |.;....9....C....|
+000000f0: 39 e4 00 00 00 11 b2 ec 05 0e 06 ee 13 42 eb 00 |9............B..|
+00000100: 00 00 11 b2 ec 05 0e 06 ee 06 42 38 00 00 00 24 |..........B8...$|
+00000110: 01 00 cb 39 ec 00 00 00 43 ed 00 00 00 39 e4 00 |...9....C....9..|
+00000120: 00 00 11 b2 ec 05 0e 06 ee 1f 42 eb 00 00 00 11 |..........B.....|
+00000130: b2 ec 05 0e 06 ee 12 43 ea 00 00 00 11 b2 ec 06 |.......C........|
+00000140: 0e 0e 06 ee 04 24 00 00 24 01 00 cb 0b b8 4e 42 |.....$..$.....NB|
+00000150: 00 00 00 07 0b 0b ba 4e ee 00 00 00 4e ef 00 00 |.......N....N...|
+00000160: 00 26 03 00 3b e5 00 00 00 39 ec 00 00 00 43 ed |.&..;....9....C.|
+00000170: 00 00 00 39 e5 00 00 00 11 b2 ec 05 0e 06 ee 10 |...9............|
+00000180: b8 48 11 b2 ec 05 0e 06 ee 06 42 42 00 00 00 11 |.H........BB....|
+00000190: b2 ec 07 0e 04 f0 00 00 00 24 01 00 cb 39 ec 00 |.........$...9..|
+000001a0: 00 00 43 ed 00 00 00 39 e5 00 00 00 11 b2 ec 05 |..C....9........|
+000001b0: 0e 06 ee 1d b9 48 11 b2 ec 05 0e 06 ee 13 42 ef |.....H........B.|
+000001c0: 00 00 00 11 b2 ec 05 0e 06 ee 06 42 ee 00 00 00 |...........B....|
+000001d0: 11 b2 ec 03 0e b7 24 01 00 cb 39 ec 00 00 00 43 |......$...9....C|
+000001e0: ed 00 00 00 39 e4 00 00 00 11 b2 ec 05 0e 06 ee |....9...........|
+000001f0: 13 42 f0 00 00 00 11 b2 ec 05 0e 06 ee 06 42 f1 |.B............B.|
+00000200: 00 00 00 24 01 00 cf 28 e4 03 44 00 00 00 46 12 |...$...(..D...F.|
+00000210: 00 1b 0e 1b 0a 1b 08 43 12 43 1b 17 15 1b 0e 1b |.......C.C......|
+00000220: 0a 1b 08 43 12 70 12 11 2d a9 15 1b 0e 1b 0a 48 |...C.p..-......H|
+00000230: 08 07 0a 75 13 17 15 1b 0e 1b 0a 48 08 07 0a 43 |...u.......H...C|
+00000240: 10 61 23 17 15 1b 0e 1b 0a 1b 08 43 12 43 1b 00 |.a#........C.C..|
+00000250: 0c 42 07 00 00 00 00 00 01 00 00 06 00 04 f3 00 |.B..............|
+00000260: 00 00 28 e4 03 04 04 08 1c 08 00                |..(........|
+```
+
+### WASM
+```
+00000000: 05 10 08 75 73 65 72 08 6c 69 73 74 0a 61 6c 69 |...user.list.ali|
+00000010: 63 65 1a 61 40 65 78 61 6d 70 6c 65 2e 63 6f 6d |ce.a@example.com|
+00000020: 0a 65 6d 61 69 6c 0e 63 6f 6e 74 61 63 74 0a 67 |.email.contact.g|
+00000030: 72 65 65 74 0e 70 72 6f 66 69 6c 65 0e 63 6f 6e |reet.profile.con|
+00000040: 73 6f 6c 65 06 6c 6f 67 08 64 65 65 70 0c 6e 65 |sole.log.deep.ne|
+00000050: 73 74 65 64 0e 6d 69 73 73 69 6e 67 08 70 72 6f |sted.missing.pro|
+00000060: 70 4e 5f 5f 74 65 73 74 73 5f 5f 2f 66 69 78 74 |pN__tests__/fixt|
+00000070: 75 72 65 73 2f 6f 70 74 69 6f 6e 61 6c 2d 63 68 |ures/optional-ch|
+00000080: 61 69 6e 69 6e 67 2e 6a 73 04 68 69 0c 00 06 00 |aining.js.hi....|
+00000090: a4 01 00 01 00 05 00 01 e8 02 01 a6 01 00 00 00 |................|
+000000a0: 40 e4 00 00 00 80 40 e5 00 00 00 80 3f e4 00 00 |@.....@.....?...|
+000000b0: 00 80 3f e5 00 00 00 80 0b 0b 04 e6 00 00 00 4e |..?............N|
+000000c0: 38 00 00 00 0b 04 e7 00 00 00 4e e8 00 00 00 4e |8.........N....N|
+000000d0: e9 00 00 00 c2 00 56 ea 00 00 00 04 4e eb 00 00 |......V.....N...|
+000000e0: 00 3b e4 00 00 00 39 ec 00 00 00 43 ed 00 00 00 |.;....9....C....|
+000000f0: 39 e4 00 00 00 11 b2 ec 05 0e 06 ee 13 42 eb 00 |9............B..|
+00000100: 00 00 11 b2 ec 05 0e 06 ee 06 42 38 00 00 00 24 |..........B8...$|
+00000110: 01 00 cb 39 ec 00 00 00 43 ed 00 00 00 39 e4 00 |...9....C....9..|
+00000120: 00 00 11 b2 ec 05 0e 06 ee 1f 42 eb 00 00 00 11 |..........B.....|
+00000130: b2 ec 05 0e 06 ee 12 43 ea 00 00 00 11 b2 ec 06 |.......C........|
+00000140: 0e 0e 06 ee 04 24 00 00 24 01 00 cb 0b b8 4e 42 |.....$..$.....NB|
+00000150: 00 00 00 07 0b 0b ba 4e ee 00 00 00 4e ef 00 00 |.......N....N...|
+00000160: 00 26 03 00 3b e5 00 00 00 39 ec 00 00 00 43 ed |.&..;....9....C.|
+00000170: 00 00 00 39 e5 00 00 00 11 b2 ec 05 0e 06 ee 10 |...9............|
+00000180: b8 48 11 b2 ec 05 0e 06 ee 06 42 42 00 00 00 11 |.H........BB....|
+00000190: b2 ec 07 0e 04 f0 00 00 00 24 01 00 cb 39 ec 00 |.........$...9..|
+000001a0: 00 00 43 ed 00 00 00 39 e5 00 00 00 11 b2 ec 05 |..C....9........|
+000001b0: 0e 06 ee 1d b9 48 11 b2 ec 05 0e 06 ee 13 42 ef |.....H........B.|
+000001c0: 00 00 00 11 b2 ec 05 0e 06 ee 06 42 ee 00 00 00 |...........B....|
+000001d0: 11 b2 ec 03 0e b7 24 01 00 cb 39 ec 00 00 00 43 |......$...9....C|
+000001e0: ed 00 00 00 39 e4 00 00 00 11 b2 ec 05 0e 06 ee |....9...........|
+000001f0: 13 42 f0 00 00 00 11 b2 ec 05 0e 06 ee 06 42 f1 |.B............B.|
+00000200: 00 00 00 24 01 00 cf 28 e4 03 44 00 00 00 46 12 |...$...(..D...F.|
+00000210: 00 1b 0e 1b 0a 1b 08 43 12 43 1b 17 15 1b 0e 1b |.......C.C......|
+00000220: 0a 1b 08 43 12 70 12 11 2d a9 15 1b 0e 1b 0a 48 |...C.p..-......H|
+00000230: 08 07 0a 75 13 17 15 1b 0e 1b 0a 48 08 07 0a 43 |...u.......H...C|
+00000240: 10 61 23 17 15 1b 0e 1b 0a 1b 08 43 12 43 1b 00 |.a#........C.C..|
+00000250: 0c 42 07 00 00 00 00 00 01 00 00 06 00 04 f3 00 |.B..............|
+00000260: 00 00 28 e4 03 04 04 08 1c 08 00                |..(........|
+```

@@ -1542,8 +1542,13 @@ export class StatementVisitor extends VisitorContext {
 
     const labelCont = this.compiler.newLabelInt(fd)
     const labelBreak = this.compiler.newLabelInt(fd)
-    // QuickJS: labelNext 是 loop body entry（每次迭代把 key 赋给目标，然后 fallthrough 执行 body）
+    // QuickJS: labelNext 是迭代赋值点（每次迭代把 key 赋给目标，然后 goto labelBody）
+    // 对齐 parser.c:6706 label_next = new_label(s);
     const labelNext = this.compiler.newLabelInt(fd)
+    // QuickJS: labelBody 是循环体入口（赋值后跳转到这里执行循环体）
+    // 对齐 parser.c:6705 label_body = new_label(s);
+    // 这样 put_loc(i) 后面紧跟 goto labelBody，而不是 get_loc(i)，避免 peephole 错误触发
+    const labelBody = this.compiler.newLabelInt(fd)
 
     // create scope
     this.compiler.pushScope(fd)
@@ -1691,7 +1696,8 @@ export class StatementVisitor extends VisitorContext {
     this.compiler.emitOp(fd, Opcode.OP_for_in_start)
     this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelCont)
 
-    // label_next: assign iteration key to target, then fallthrough to body
+    // label_next: assign iteration key to target, then goto label_body
+    // QuickJS 对齐: parser.c:6722-6806 在 label_next 处发射赋值代码，然后 parser.c:6806 emit_goto(s, OP_goto, label_body)
     this.compiler.emitLabelInt(fd, labelNext)
     // Align with QuickJS: the implicit per-iteration assignment should carry the
     // source position of the for-in head lvalue (e.g. `i` in `for (i in obj)`).
@@ -1699,6 +1705,12 @@ export class StatementVisitor extends VisitorContext {
       this.compiler.emitSourcePos(fd, assignTargetSourcePos)
     }
     assignTarget()
+    // QuickJS: emit_goto(s, OP_goto, label_body) - parser.c:6806
+    // 这样 put_loc(i) 后面紧跟 goto，而不是 get_loc(i)，避免 LabelResolver 的 peephole 错误触发
+    this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelBody)
+
+    // label_body: loop body entry - 对齐 parser.c:6892 emit_label(s, label_body)
+    this.compiler.emitLabelInt(fd, labelBody)
 
     // loop body
     this.context.visit(node.statement)

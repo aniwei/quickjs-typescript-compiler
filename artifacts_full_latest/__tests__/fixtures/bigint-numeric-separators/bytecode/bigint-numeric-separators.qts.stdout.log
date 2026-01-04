@@ -1,0 +1,27 @@
+__tests__/fixtures/bigint-numeric-separators.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var a,128
+        check_define_var b,128
+        define_var a,128
+        define_var b,128
+        push_bigint_i32 1000
+        put_var_init a
+        push_bigint_i32 2
+        put_var_init b
+        get_var console
+        get_field2 log
+        get_var a
+        get_var b
+        add
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_const8 0: 1234567890123456789n
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

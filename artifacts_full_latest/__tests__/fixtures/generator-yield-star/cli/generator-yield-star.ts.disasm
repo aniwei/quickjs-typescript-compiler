@@ -1,0 +1,67 @@
+Module bytecode version: 5
+Atom count: 5
+
+=== Outer Function ===
+bytecodeLen=166 stackSize=4 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 40
+     6  check_define_var         229                 pop=0 push=0      40 e5 00 00 00 80
+    12  fclosure8                0                   pop=0 push=1      c2 00
+    14  define_func              228                 pop=1 push=0      41 e4 00 00 00 00
+    20  define_var               229                 pop=0 push=0      3f e5 00 00 00 80
+    26  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    31  call0                    npop=0              pop=1 push=1      f0
+    32  put_var_init             229                 pop=1 push=0      3b e5 00 00 00
+    37  get_var                  230                 pop=0 push=1      39 e6 00 00 00
+    42  get_field2               231                 pop=1 push=2      43 e7 00 00 00
+    47  get_var                  229                 pop=0 push=1      39 e5 00 00 00
+    52  get_field2               108                 pop=1 push=2      43 6c 00 00 00
+    57  call_method              0                   pop=2 push=1      24 00 00
+    60  get_field                66                  pop=1 push=1      42 42 00 00 00
+    65  call_method              1                   pop=2 push=1      24 01 00
+    68  put_loc0                 loc=0               pop=1 push=0      cb
+    69  get_var                  230                 pop=0 push=1      39 e6 00 00 00
+    74  get_field2               231                 pop=1 push=2      43 e7 00 00 00
+    79  get_var                  229                 pop=0 push=1      39 e5 00 00 00
+    84  get_field2               108                 pop=1 push=2      43 6c 00 00 00
+    89  call_method              0                   pop=2 push=1      24 00 00
+    92  get_field                66                  pop=1 push=1      42 42 00 00 00
+    97  call_method              1                   pop=2 push=1      24 01 00
+   100  put_loc0                 loc=0               pop=1 push=0      cb
+   101  get_var                  230                 pop=0 push=1      39 e6 00 00 00
+   106  get_field2               231                 pop=1 push=2      43 e7 00 00 00
+   111  get_var                  229                 pop=0 push=1      39 e5 00 00 00
+   116  get_field2               108                 pop=1 push=2      43 6c 00 00 00
+   121  call_method              0                   pop=2 push=1      24 00 00
+   124  get_field                66                  pop=1 push=1      42 42 00 00 00
+   129  call_method              1                   pop=2 push=1      24 01 00
+   132  put_loc0                 loc=0               pop=1 push=0      cb
+   133  get_var                  230                 pop=0 push=1      39 e6 00 00 00
+   138  get_field2               231                 pop=1 push=2      43 e7 00 00 00
+   143  get_var                  229                 pop=0 push=1      39 e5 00 00 00
+   148  get_field2               108                 pop=1 push=2      43 6c 00 00 00
+   153  call_method              0                   pop=2 push=1      24 00 00
+   156  get_field                66                  pop=1 push=1      42 42 00 00 00
+   161  call_method              1                   pop=2 push=1      24 01 00
+   164  set_loc0                 loc=0               pop=1 push=1      cf
+   165  return                                       pop=1 push=0      28
+
+=== Inner Function #0 ===
+bytecodeLen=21 stackSize=2 varCount=0 argCount=0
+     0  initial_yield                                pop=0 push=0      89
+     1  push_1                   1                   pop=0 push=1      b8
+     2  yield                                        pop=1 push=2      8a
+     3  if_false8                2                   pop=1 push=0      ec 02
+     5  return_async                                 pop=1 push=0      2f
+     6  drop                                         pop=1 push=0      0e
+     7  push_2                   2                   pop=0 push=1      b9
+     8  yield                                        pop=1 push=2      8a
+     9  if_false8                2                   pop=1 push=0      ec 02
+    11  return_async                                 pop=1 push=0      2f
+    12  drop                                         pop=1 push=0      0e
+    13  push_3                   3                   pop=0 push=1      ba
+    14  yield                                        pop=1 push=2      8a
+    15  if_false8                2                   pop=1 push=0      ec 02
+    17  return_async                                 pop=1 push=0      2f
+    18  drop                                         pop=1 push=0      0e
+    19  push_4                   4                   pop=0 push=1      bb
+    20  return_async                                 pop=1 push=0      2f

@@ -1,0 +1,54 @@
+__tests__/fixtures/_tmp_postfix_index.js:2:1: function: f
+  locals:
+    0: const t [level:1 next:-1]
+    1: var this
+  stack_size: 5
+  opcodes:
+        push_this
+        put_loc1 1: this
+        set_loc_uninitialized 0: t
+        get_loc1 1: this
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 3
+        put_field __values__
+        get_loc1 1: this
+        push_0 0
+        put_field __index__
+        get_loc1 1: this
+        get_field __index__
+        get_loc1 1: this
+        get_field __values__
+        get_length
+        gte
+        put_loc0 0: t
+        object
+        get_loc_check 0: t
+        define_field done
+        get_loc_check 0: t
+        if_false8 60
+        get_var undefined
+        goto8 80
+   60:  get_loc1 1: this
+        get_field __values__
+        get_loc1 1: this
+        get_field2 __index__
+        post_inc
+        perm3
+        put_field __index__
+        get_array_el
+   80:  define_field value
+        return
+
+__tests__/fixtures/_tmp_postfix_index.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var f,64
+        fclosure8 0: [bytecode f]
+        define_func f,0
+        get_loc0 0: "<ret>"
+        return
+
