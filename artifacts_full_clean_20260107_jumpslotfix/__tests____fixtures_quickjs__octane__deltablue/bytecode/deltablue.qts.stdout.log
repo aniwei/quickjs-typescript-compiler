@@ -1,0 +1,2767 @@
+__tests__/fixtures_quickjs/octane/deltablue.js:42:9: function: Inheriter
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:41:12: function: <null>
+  mode: strict
+  args: shuper
+  locals:
+    0: var Inheriter
+    1: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc1 1: this
+        fclosure8 0: [bytecode Inheriter]
+        set_loc0 0: Inheriter
+        get_arg0 0: shuper
+        get_field prototype
+        put_field prototype
+        get_loc1 1: this
+        get_loc0 0: Inheriter
+        dup
+        call_constructor 0
+        put_field prototype
+        get_loc1 1: this
+        get_arg0 0: shuper
+        put_field superConstructor
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:48:1: function: OrderedCollection
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_var Array
+        dup
+        call_constructor 0
+        put_field elms
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:51:35: function: <null>
+  mode: strict
+  args: elm
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field elms
+        get_field2 push
+        get_arg0 0: elm
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:54:34: function: <null>
+  mode: strict
+  args: index
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field elms
+        get_arg0 0: index
+        get_array_el
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:57:36: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 1
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field elms
+        get_length
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:60:43: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field elms
+        get_field2 pop
+        tail_call_method 0
+
+__tests__/fixtures_quickjs/octane/deltablue.js:63:38: function: <null>
+  mode: strict
+  args: elm
+  locals:
+    0: var index
+    1: var skipped
+    2: var i
+    3: var value
+    4: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc8 4: this
+        push_0 0
+        put_loc0 0: index
+        push_0 0
+        put_loc1 1: skipped
+        push_0 0
+        put_loc2 2: i
+    9:  get_loc2 2: i
+        get_loc8 4: this
+        get_field elms
+        get_length
+        lt
+        if_false8 55
+        get_loc8 4: this
+        get_field elms
+        get_loc2 2: i
+        get_array_el
+        set_loc3 3: value
+        get_arg0 0: elm
+        neq
+        if_false8 49
+        get_loc8 4: this
+        get_field elms
+        get_loc0 0: index
+        get_loc3 3: value
+        put_array_el
+        inc_loc 0: index
+        goto8 51
+   49:  inc_loc 1: skipped
+   51:  inc_loc 2: i
+        goto8 9
+   55:  push_0 0
+        put_loc2 2: i
+   57:  get_loc2 2: i
+        get_loc1 1: skipped
+        lt
+        if_false8 82
+        get_loc8 4: this
+        get_field elms
+        get_field2 pop
+        call_method 0
+        drop
+        inc_loc 2: i
+        goto8 57
+   82:  return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:87:1: function: Strength
+  mode: strict
+  args: strengthValue name
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: strengthValue
+        put_field strengthValue
+        get_loc0 0: this
+        get_arg1 1: name
+        put_field name
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:91:21: function: <null>
+  mode: strict
+  args: s1 s2
+  stack_size: 2
+  opcodes:
+        get_arg0 0: s1
+        get_field strengthValue
+        get_arg1 1: s2
+        get_field strengthValue
+        lt
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:94:19: function: <null>
+  mode: strict
+  args: s1 s2
+  stack_size: 2
+  opcodes:
+        get_arg0 0: s1
+        get_field strengthValue
+        get_arg1 1: s2
+        get_field strengthValue
+        gt
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:97:22: function: <null>
+  mode: strict
+  args: s1 s2
+  locals:
+    0: var this
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 weaker
+        get_arg0 0: s1
+        get_arg1 1: s2
+        call_method 2
+        if_false8 17
+        get_arg0 0: s1
+        return
+   17:  get_arg1 1: s2
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:100:22: function: <null>
+  mode: strict
+  args: s1 s2
+  locals:
+    0: var this
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 stronger
+        get_arg0 0: s1
+        get_arg1 1: s2
+        call_method 2
+        if_false8 17
+        get_arg0 0: s1
+        return
+   17:  get_arg1 1: s2
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:103:33: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: Strength parent:loc4 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field strengthValue
+        dup
+        push_0 0
+        strict_eq
+        if_false8 20
+        get_var_ref0 0: Strength
+        get_field WEAKEST
+        return
+   20:  dup
+        push_1 1
+        strict_eq
+        if_false8 32
+        get_var_ref0 0: Strength
+        get_field WEAK_DEFAULT
+        return
+   32:  dup
+        push_2 2
+        strict_eq
+        if_false8 44
+        get_var_ref0 0: Strength
+        get_field NORMAL
+        return
+   44:  dup
+        push_3 3
+        strict_eq
+        if_false8 56
+        get_var_ref0 0: Strength
+        get_field STRONG_DEFAULT
+        return
+   56:  dup
+        push_4 4
+        strict_eq
+        if_false8 68
+        get_var_ref0 0: Strength
+        get_field PREFERRED
+        return
+   68:  dup
+        push_5 5
+        strict_eq
+        if_false8 80
+        get_var_ref0 0: Strength
+        get_field REQUIRED
+        return
+   80:  return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:131:1: function: Constraint
+  mode: strict
+  args: strength
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: strength
+        put_field strength
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:137:38: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: planner parent:loc19 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 addToGraph
+        call_method 0
+        drop
+        get_var_ref0 0: planner
+        get_field2 incrementalAdd
+        get_loc0 0: this
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:148:32: function: <null>
+  mode: strict
+  args: mark
+  locals:
+    0: var out
+    1: var overridden
+    2: var this
+  closure vars:
+    0: Strength parent:loc4 var
+    1: planner parent:loc19 var
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc2 2: this
+        get_loc2 2: this
+        get_field2 chooseMethod
+        get_arg0 0: mark
+        call_method 1
+        drop
+        get_loc2 2: this
+        get_field2 isSatisfied
+        call_method 0
+        lnot
+        if_false8 54
+        get_loc2 2: this
+        get_field strength
+        get_var_ref0 0: Strength
+        get_field REQUIRED
+        eq
+        if_false8 52
+        get_var alert
+        push_atom_value "Could not satisfy a required constraint!"
+        call1 1
+        drop
+   52:  null
+        return
+   54:  get_loc2 2: this
+        get_field2 markInputs
+        get_arg0 0: mark
+        call_method 1
+        drop
+        get_loc2 2: this
+        get_field2 output
+        call_method 0
+        set_loc0 0: out
+        get_field determinedBy
+        set_loc1 1: overridden
+        null
+        neq
+        if_false8 95
+        get_loc1 1: overridden
+        get_field2 markUnsatisfied
+        call_method 0
+        drop
+   95:  get_loc0 0: out
+        get_loc2 2: this
+        put_field determinedBy
+        get_var_ref1 1: planner
+        get_field2 addPropagate
+        get_loc2 2: this
+        get_arg0 0: mark
+        call_method 2
+        lnot
+        if_false8 128
+        get_var alert
+        push_atom_value "Cycle encountered"
+        call1 1
+        drop
+  128:  get_loc0 0: out
+        get_arg0 0: mark
+        put_field mark
+        get_loc1 1: overridden
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:166:42: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: planner parent:loc19 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 isSatisfied
+        call_method 0
+        if_false8 25
+        get_var_ref0 0: planner
+        get_field2 incrementalRemove
+        get_loc0 0: this
+        call_method 1
+        drop
+        return_undef
+   25:  get_loc0 0: this
+        get_field2 removeFromGraph
+        call_method 0
+        drop
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:177:32: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_false
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:187:1: function: UnaryConstraint
+  mode: strict
+  args: v strength
+  locals:
+    0: var this
+  closure vars:
+    0: UnaryConstraint parent:loc6 var
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_var_ref0 0: UnaryConstraint
+        get_field superConstructor
+        get_field2 call
+        get_loc0 0: this
+        get_arg1 1: strength
+        call_method 2
+        drop
+        get_loc0 0: this
+        get_arg0 0: v
+        put_field myOutput
+        get_loc0 0: this
+        push_false
+        put_field satisfied
+        get_loc0 0: this
+        get_field2 addConstraint
+        call_method 0
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:197:40: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field myOutput
+        get_field2 addConstraint
+        get_loc0 0: this
+        call_method 1
+        drop
+        get_loc0 0: this
+        push_false
+        put_field satisfied
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:205:42: function: <null>
+  mode: strict
+  args: mark
+  locals:
+    0: var this
+  closure vars:
+    0: Strength parent:loc4 var
+  stack_size: 5
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field myOutput
+        get_field mark
+        get_arg0 0: mark
+        neq
+        dup
+        if_false8 46
+        drop
+        get_var_ref0 0: Strength
+        get_field2 stronger
+        get_loc0 0: this
+        get_field strength
+        get_loc0 0: this
+        get_field myOutput
+        get_field walkStrength
+        call_method 2
+   46:  put_field satisfied
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:212:41: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 1
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field satisfied
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:215:40: function: <null>
+  mode: strict
+  args: mark
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:221:36: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 1
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field myOutput
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:229:41: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field myOutput
+        get_loc0 0: this
+        get_field strength
+        put_field walkStrength
+        get_loc0 0: this
+        get_field myOutput
+        get_loc0 0: this
+        get_field2 isInput
+        call_method 0
+        lnot
+        put_field stay
+        get_loc0 0: this
+        get_field myOutput
+        get_field stay
+        if_false8 63
+        get_loc0 0: this
+        get_field2 execute
+        call_method 0
+        drop
+   63:  return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:238:45: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        push_false
+        put_field satisfied
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:241:41: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_true
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:244:45: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field myOutput
+        null
+        neq
+        if_false8 28
+        get_loc0 0: this
+        get_field myOutput
+        get_field2 removeConstraint
+        get_loc0 0: this
+        call_method 1
+        drop
+   28:  get_loc0 0: this
+        push_false
+        put_field satisfied
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:258:1: function: StayConstraint
+  mode: strict
+  args: v str
+  locals:
+    0: var this
+  closure vars:
+    0: StayConstraint parent:loc7 var
+  stack_size: 5
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_var_ref0 0: StayConstraint
+        get_field superConstructor
+        get_field2 call
+        get_loc0 0: this
+        get_arg0 0: v
+        get_arg1 1: str
+        call_method 3
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:262:36: function: <null>
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:272:1: function: EditConstraint
+  mode: strict
+  args: v str
+  locals:
+    0: var this
+  closure vars:
+    0: EditConstraint parent:loc8 var
+  stack_size: 5
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_var_ref0 0: EditConstraint
+        get_field superConstructor
+        get_field2 call
+        get_loc0 0: this
+        get_arg0 0: v
+        get_arg1 1: str
+        call_method 3
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:279:36: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_true
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:282:36: function: <null>
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:296:1: function: BinaryConstraint
+  mode: strict
+  args: var1 var2 strength
+  locals:
+    0: var this
+  closure vars:
+    0: BinaryConstraint parent:loc10 var
+    1: Direction parent:loc9 var
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_var_ref0 0: BinaryConstraint
+        get_field superConstructor
+        get_field2 call
+        get_loc0 0: this
+        get_arg2 2: strength
+        call_method 2
+        drop
+        get_loc0 0: this
+        get_arg0 0: var1
+        put_field v1
+        get_loc0 0: this
+        get_arg1 1: var2
+        put_field v2
+        get_loc0 0: this
+        get_var_ref1 1: Direction
+        get_field NONE
+        put_field direction
+        get_loc0 0: this
+        get_field2 addConstraint
+        call_method 0
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:309:43: function: <null>
+  mode: strict
+  args: mark
+  locals:
+    0: var this
+  closure vars:
+    0: Strength parent:loc4 var
+    1: Direction parent:loc9 var
+  stack_size: 5
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field v1
+        get_field mark
+        get_arg0 0: mark
+        eq
+        if_false8 80
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field v2
+        get_field mark
+        get_arg0 0: mark
+        neq
+        if_false8 69
+        get_var_ref0 0: Strength
+        get_field2 stronger
+        get_loc0 0: this
+        get_field strength
+        get_loc0 0: this
+        get_field v2
+        get_field walkStrength
+        call_method 2
+        if_false8 69
+        get_var_ref1 1: Direction
+        get_field FORWARD
+        goto8 75
+   69:  get_var_ref1 1: Direction
+        get_field NONE
+   75:  put_field direction
+   80:  get_loc0 0: this
+        get_field v2
+        get_field mark
+        get_arg0 0: mark
+        eq
+        if_false8 158
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field v1
+        get_field mark
+        get_arg0 0: mark
+        neq
+        if_false8 147
+        get_var_ref0 0: Strength
+        get_field2 stronger
+        get_loc0 0: this
+        get_field strength
+        get_loc0 0: this
+        get_field v1
+        get_field walkStrength
+        call_method 2
+        if_false8 147
+        get_var_ref1 1: Direction
+        get_field BACKWARD
+        goto8 153
+  147:  get_var_ref1 1: Direction
+        get_field NONE
+  153:  put_field direction
+  158:  get_var_ref0 0: Strength
+        get_field2 weaker
+        get_loc0 0: this
+        get_field v1
+        get_field walkStrength
+        get_loc0 0: this
+        get_field v2
+        get_field walkStrength
+        call_method 2
+        if_false8 240
+        get_loc0 0: this
+        get_var_ref0 0: Strength
+        get_field2 stronger
+        get_loc0 0: this
+        get_field strength
+        get_loc0 0: this
+        get_field v1
+        get_field walkStrength
+        call_method 2
+        if_false8 228
+        get_var_ref1 1: Direction
+        get_field BACKWARD
+        goto8 234
+  228:  get_var_ref1 1: Direction
+        get_field NONE
+  234:  put_field direction
+        return_undef
+  240:  get_loc0 0: this
+        get_var_ref0 0: Strength
+        get_field2 stronger
+        get_loc0 0: this
+        get_field strength
+        get_loc0 0: this
+        get_field v2
+        get_field walkStrength
+        call_method 2
+        if_false8 277
+        get_var_ref1 1: Direction
+        get_field FORWARD
+        goto8 283
+  277:  get_var_ref1 1: Direction
+        get_field BACKWARD
+  283:  put_field direction
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:334:41: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: Direction parent:loc9 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field v1
+        get_field2 addConstraint
+        get_loc0 0: this
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_field v2
+        get_field2 addConstraint
+        get_loc0 0: this
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_var_ref0 0: Direction
+        get_field NONE
+        put_field direction
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:342:42: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: Direction parent:loc9 var
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field direction
+        get_var_ref0 0: Direction
+        get_field NONE
+        neq
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:348:41: function: <null>
+  mode: strict
+  args: mark
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 input
+        call_method 0
+        get_arg0 0: mark
+        put_field mark
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:354:36: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: Direction parent:loc9 var
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field direction
+        get_var_ref0 0: Direction
+        get_field FORWARD
+        eq
+        if_false8 24
+        get_loc0 0: this
+        get_field v1
+        return
+   24:  get_loc0 0: this
+        get_field v2
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:360:37: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: Direction parent:loc9 var
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field direction
+        get_var_ref0 0: Direction
+        get_field FORWARD
+        eq
+        if_false8 24
+        get_loc0 0: this
+        get_field v2
+        return
+   24:  get_loc0 0: this
+        get_field v1
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:368:42: function: <null>
+  mode: strict
+  locals:
+    0: var ihn
+    1: var out
+    2: var this
+  closure vars:
+    0: Strength parent:loc4 var
+  stack_size: 5
+  opcodes:
+        push_this
+        put_loc2 2: this
+        get_loc2 2: this
+        get_field2 input
+        call_method 0
+        put_loc0 0: ihn
+        get_loc2 2: this
+        get_field2 output
+        call_method 0
+        set_loc1 1: out
+        get_var_ref0 0: Strength
+        get_field2 weakestOf
+        get_loc2 2: this
+        get_field strength
+        get_loc0 0: ihn
+        get_field walkStrength
+        call_method 2
+        put_field walkStrength
+        get_loc1 1: out
+        get_loc0 0: ihn
+        get_field stay
+        put_field stay
+        get_loc1 1: out
+        get_field stay
+        if_false8 78
+        get_loc2 2: this
+        get_field2 execute
+        call_method 0
+        drop
+   78:  return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:378:46: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: Direction parent:loc9 var
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_var_ref0 0: Direction
+        get_field NONE
+        put_field direction
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:381:42: function: <null>
+  mode: strict
+  args: mark
+  locals:
+    0: var i
+    1: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc1 1: this
+        get_loc1 1: this
+        get_field2 input
+        call_method 0
+        set_loc0 0: i
+        get_field mark
+        get_arg0 0: mark
+        eq
+        dup
+        if_true8 41
+        drop
+        get_loc0 0: i
+        get_field stay
+        dup
+        if_true8 41
+        drop
+        get_loc0 0: i
+        get_field determinedBy
+        null
+        eq
+   41:  return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:385:46: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: Direction parent:loc9 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field v1
+        null
+        neq
+        if_false8 28
+        get_loc0 0: this
+        get_field v1
+        get_field2 removeConstraint
+        get_loc0 0: this
+        call_method 1
+        drop
+   28:  get_loc0 0: this
+        get_field v2
+        null
+        neq
+        if_false8 54
+        get_loc0 0: this
+        get_field v2
+        get_field2 removeConstraint
+        get_loc0 0: this
+        call_method 1
+        drop
+   54:  get_loc0 0: this
+        get_var_ref0 0: Direction
+        get_field NONE
+        put_field direction
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:401:1: function: ScaleConstraint
+  mode: strict
+  args: src scale offset dest strength
+  locals:
+    0: var this
+  closure vars:
+    0: Direction parent:loc9 var
+    1: ScaleConstraint parent:loc11 var
+  stack_size: 6
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_var_ref0 0: Direction
+        get_field NONE
+        put_field direction
+        get_loc0 0: this
+        get_arg1 1: scale
+        put_field scale
+        get_loc0 0: this
+        get_arg2 2: offset
+        put_field offset
+        get_var_ref1 1: ScaleConstraint
+        get_field superConstructor
+        get_field2 call
+        get_loc0 0: this
+        get_arg0 0: src
+        get_arg3 3: dest
+        get_arg 4: strength
+        call_method 4
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:411:40: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: ScaleConstraint parent:loc11 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_var_ref0 0: ScaleConstraint
+        get_field superConstructor
+        get_field prototype
+        get_field addToGraph
+        get_field2 call
+        get_loc0 0: this
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_field scale
+        get_field2 addConstraint
+        get_loc0 0: this
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_field offset
+        get_field2 addConstraint
+        get_loc0 0: this
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:416:45: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: ScaleConstraint parent:loc11 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_var_ref0 0: ScaleConstraint
+        get_field superConstructor
+        get_field prototype
+        get_field removeFromGraph
+        get_field2 call
+        get_loc0 0: this
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_field scale
+        null
+        neq
+        if_false8 54
+        get_loc0 0: this
+        get_field scale
+        get_field2 removeConstraint
+        get_loc0 0: this
+        call_method 1
+        drop
+   54:  get_loc0 0: this
+        get_field offset
+        null
+        neq
+        if_false8 80
+        get_loc0 0: this
+        get_field offset
+        get_field2 removeConstraint
+        get_loc0 0: this
+        call_method 1
+        drop
+   80:  return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:423:40: function: <null>
+  mode: strict
+  args: mark
+  locals:
+    0: var this
+  closure vars:
+    0: ScaleConstraint parent:loc11 var
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_var_ref0 0: ScaleConstraint
+        get_field superConstructor
+        get_field prototype
+        get_field markInputs
+        get_field2 call
+        get_loc0 0: this
+        get_arg0 0: mark
+        call_method 2
+        drop
+        get_loc0 0: this
+        get_field scale
+        get_loc0 0: this
+        get_field offset
+        get_arg0 0: mark
+        insert2
+        put_field mark
+        put_field mark
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:430:37: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: Direction parent:loc9 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field direction
+        get_var_ref0 0: Direction
+        get_field FORWARD
+        eq
+        if_false8 64
+        get_loc0 0: this
+        get_field v2
+        get_loc0 0: this
+        get_field v1
+        get_field value
+        get_loc0 0: this
+        get_field scale
+        get_field value
+        mul
+        get_loc0 0: this
+        get_field offset
+        get_field value
+        add
+        put_field value
+        return_undef
+   64:  get_loc0 0: this
+        get_field v1
+        get_loc0 0: this
+        get_field v2
+        get_field value
+        get_loc0 0: this
+        get_field offset
+        get_field value
+        sub
+        get_loc0 0: this
+        get_field scale
+        get_field value
+        div
+        put_field value
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:443:41: function: <null>
+  mode: strict
+  locals:
+    0: var ihn
+    1: var out
+    2: var this
+  closure vars:
+    0: Strength parent:loc4 var
+  stack_size: 5
+  opcodes:
+        push_this
+        put_loc2 2: this
+        get_loc2 2: this
+        get_field2 input
+        call_method 0
+        put_loc0 0: ihn
+        get_loc2 2: this
+        get_field2 output
+        call_method 0
+        set_loc1 1: out
+        get_var_ref0 0: Strength
+        get_field2 weakestOf
+        get_loc2 2: this
+        get_field strength
+        get_loc0 0: ihn
+        get_field walkStrength
+        call_method 2
+        put_field walkStrength
+        get_loc1 1: out
+        get_loc0 0: ihn
+        get_field stay
+        dup
+        if_false8 85
+        drop
+        get_loc2 2: this
+        get_field scale
+        get_field stay
+        dup
+        if_false8 85
+        drop
+        get_loc2 2: this
+        get_field offset
+        get_field stay
+   85:  put_field stay
+        get_loc1 1: out
+        get_field stay
+        if_false8 108
+        get_loc2 2: this
+        get_field2 execute
+        call_method 0
+        drop
+  108:  return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:456:1: function: EqualityConstraint
+  mode: strict
+  args: var1 var2 strength
+  locals:
+    0: var this
+  closure vars:
+    0: EqualityConstraint parent:loc12 var
+  stack_size: 6
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_var_ref0 0: EqualityConstraint
+        get_field superConstructor
+        get_field2 call
+        get_loc0 0: this
+        get_arg0 0: var1
+        get_arg1 1: var2
+        get_arg2 2: strength
+        call_method 4
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:463:40: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 output
+        call_method 0
+        get_loc0 0: this
+        get_field2 input
+        call_method 0
+        get_field value
+        put_field value
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:475:1: function: Variable
+  mode: strict
+  args: name initialValue
+  locals:
+    0: var this
+  closure vars:
+    0: OrderedCollection parent:loc3 var
+    1: Strength parent:loc4 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg1 1: initialValue
+        dup
+        if_true8 9
+        drop
+        push_0 0
+    9:  put_field value
+        get_loc0 0: this
+        get_var_ref0 0: OrderedCollection
+        dup
+        call_constructor 0
+        put_field constraints
+        get_loc0 0: this
+        null
+        put_field determinedBy
+        get_loc0 0: this
+        push_0 0
+        put_field mark
+        get_loc0 0: this
+        get_var_ref1 1: Strength
+        get_field WEAKEST
+        put_field walkStrength
+        get_loc0 0: this
+        push_true
+        put_field stay
+        get_loc0 0: this
+        get_arg0 0: name
+        put_field name
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:488:36: function: <null>
+  mode: strict
+  args: c
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field constraints
+        get_field2 add
+        get_arg0 0: c
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:494:39: function: <null>
+  mode: strict
+  args: c
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field constraints
+        get_field2 remove
+        get_arg0 0: c
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_field determinedBy
+        get_arg0 0: c
+        eq
+        if_false8 35
+        get_loc0 0: this
+        null
+        put_field determinedBy
+   35:  return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:505:1: function: Planner
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        push_0 0
+        put_field currentMark
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:522:36: function: <null>
+  mode: strict
+  args: c
+  locals:
+    0: var mark
+    1: var overridden
+    2: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc2 2: this
+        get_loc2 2: this
+        get_field2 newMark
+        call_method 0
+        put_loc0 0: mark
+        get_arg0 0: c
+        get_field2 satisfy
+        get_loc0 0: mark
+        call_method 1
+        put_loc1 1: overridden
+   23:  get_loc1 1: overridden
+        null
+        neq
+        if_false8 41
+        get_loc1 1: overridden
+        get_field2 satisfy
+        get_loc0 0: mark
+        call_method 1
+        put_loc1 1: overridden
+        goto8 23
+   41:  return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:539:39: function: <null>
+  mode: strict
+  args: c
+  locals:
+    0: var out
+    1: var unsatisfied
+    2: var strength
+    3: var i
+    4: var u
+    5: var this
+  closure vars:
+    0: Strength parent:loc4 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc8 5: this
+        get_arg0 0: c
+        get_field2 output
+        call_method 0
+        put_loc0 0: out
+        get_arg0 0: c
+        get_field2 markUnsatisfied
+        call_method 0
+        drop
+        get_arg0 0: c
+        get_field2 removeFromGraph
+        call_method 0
+        drop
+        get_loc8 5: this
+        get_field2 removePropagateFrom
+        get_loc0 0: out
+        call_method 1
+        put_loc1 1: unsatisfied
+        get_var_ref0 0: Strength
+        get_field REQUIRED
+        put_loc2 2: strength
+   52:  push_0 0
+        put_loc3 3: i
+   54:  get_loc3 3: i
+        get_loc1 1: unsatisfied
+        get_field2 size
+        call_method 0
+        lt
+        if_false8 105
+        get_loc1 1: unsatisfied
+        get_field2 at
+        get_loc3 3: i
+        call_method 1
+        set_loc8 4: u
+        get_field strength
+        get_loc2 2: strength
+        eq
+        if_false8 101
+        get_loc8 5: this
+        get_field2 incrementalAdd
+        get_loc8 4: u
+        call_method 1
+        drop
+  101:  inc_loc 3: i
+        goto8 54
+  105:  get_loc2 2: strength
+        get_field2 nextWeaker
+        call_method 0
+        put_loc2 2: strength
+        get_loc2 2: strength
+        get_var_ref0 0: Strength
+        get_field WEAKEST
+        neq
+        if_true8 52
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:557:29: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 currentMark
+        inc
+        insert2
+        put_field currentMark
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:579:30: function: <null>
+  mode: strict
+  args: sources
+  locals:
+    0: var mark
+    1: var plan
+    2: var todo
+    3: var c
+    4: var this
+  closure vars:
+    0: Plan parent:loc15 var
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc8 4: this
+        get_loc8 4: this
+        get_field2 newMark
+        call_method 0
+        put_loc0 0: mark
+        get_var_ref0 0: Plan
+        dup
+        call_constructor 0
+        put_loc1 1: plan
+        get_arg0 0: sources
+        put_loc2 2: todo
+   22:  get_loc2 2: todo
+        get_field2 size
+        call_method 0
+        push_0 0
+        gt
+        if_false8 123
+        get_loc2 2: todo
+        get_field2 removeFirst
+        call_method 0
+        set_loc3 3: c
+        get_field2 output
+        call_method 0
+        get_field mark
+        get_loc0 0: mark
+        neq
+        if_false8 22
+        get_loc3 3: c
+        get_field2 inputsKnown
+        get_loc0 0: mark
+        call_method 1
+        if_false8 22
+        get_loc1 1: plan
+        get_field2 addConstraint
+        get_loc3 3: c
+        call_method 1
+        drop
+        get_loc3 3: c
+        get_field2 output
+        call_method 0
+        get_loc0 0: mark
+        put_field mark
+        get_loc8 4: this
+        get_field2 addConstraintsConsumingTo
+        get_loc3 3: c
+        get_field2 output
+        call_method 0
+        get_loc2 2: todo
+        call_method 2
+        drop
+        goto8 22
+  123:  get_loc1 1: plan
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:597:48: function: <null>
+  mode: strict
+  args: constraints
+  locals:
+    0: var sources
+    1: var i
+    2: var c
+    3: var this
+  closure vars:
+    0: OrderedCollection parent:loc3 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc3 3: this
+        get_var_ref0 0: OrderedCollection
+        dup
+        call_constructor 0
+        put_loc0 0: sources
+        push_0 0
+        put_loc1 1: i
+   10:  get_loc1 1: i
+        get_arg0 0: constraints
+        get_field2 size
+        call_method 0
+        lt
+        if_false8 70
+        get_arg0 0: constraints
+        get_field2 at
+        get_loc1 1: i
+        call_method 1
+        set_loc2 2: c
+        get_field2 isInput
+        call_method 0
+        if_false8 66
+        get_loc2 2: c
+        get_field2 isSatisfied
+        call_method 0
+        if_false8 66
+        get_loc0 0: sources
+        get_field2 add
+        get_loc2 2: c
+        call_method 1
+        drop
+   66:  inc_loc 1: i
+        goto8 10
+   70:  get_loc3 3: this
+        get_field2 makePlan
+        get_loc0 0: sources
+        tail_call_method 1
+
+__tests__/fixtures_quickjs/octane/deltablue.js:620:34: function: <null>
+  mode: strict
+  args: c mark
+  locals:
+    0: var todo
+    1: var d
+    2: var this
+  closure vars:
+    0: OrderedCollection parent:loc3 var
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc2 2: this
+        get_var_ref0 0: OrderedCollection
+        dup
+        call_constructor 0
+        set_loc0 0: todo
+        get_field2 add
+        get_arg0 0: c
+        call_method 1
+        drop
+   18:  get_loc0 0: todo
+        get_field2 size
+        call_method 0
+        push_0 0
+        gt
+        if_false8 103
+        get_loc0 0: todo
+        get_field2 removeFirst
+        call_method 0
+        set_loc1 1: d
+        get_field2 output
+        call_method 0
+        get_field mark
+        get_arg1 1: mark
+        eq
+        if_false8 71
+        get_loc2 2: this
+        get_field2 incrementalRemove
+        get_arg0 0: c
+        call_method 1
+        drop
+        push_false
+        return
+   71:  get_loc1 1: d
+        get_field2 recalculate
+        call_method 0
+        drop
+        get_loc2 2: this
+        get_field2 addConstraintsConsumingTo
+        get_loc1 1: d
+        get_field2 output
+        call_method 0
+        get_loc0 0: todo
+        call_method 2
+        drop
+        goto8 18
+  103:  push_true
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:639:41: function: <null>
+  mode: strict
+  args: out
+  locals:
+    0: var unsatisfied
+    1: var todo
+    2: var v
+    3: var i
+    4: var c
+    5: var determining
+    6: var next
+  closure vars:
+    0: Strength parent:loc4 var
+    1: OrderedCollection parent:loc3 var
+  stack_size: 4
+  opcodes:
+        get_arg0 0: out
+        null
+        put_field determinedBy
+        get_arg0 0: out
+        get_var_ref0 0: Strength
+        get_field WEAKEST
+        put_field walkStrength
+        get_arg0 0: out
+        push_true
+        put_field stay
+        get_var_ref1 1: OrderedCollection
+        dup
+        call_constructor 0
+        put_loc0 0: unsatisfied
+        get_var_ref1 1: OrderedCollection
+        dup
+        call_constructor 0
+        set_loc1 1: todo
+        get_field2 add
+        get_arg0 0: out
+        call_method 1
+        drop
+   48:  get_loc1 1: todo
+        get_field2 size
+        call_method 0
+        push_0 0
+        gt
+        if_false 235
+        get_loc1 1: todo
+        get_field2 removeFirst
+        call_method 0
+        put_loc2 2: v
+        push_0 0
+        put_loc3 3: i
+   76:  get_loc3 3: i
+        get_loc2 2: v
+        get_field constraints
+        get_field2 size
+        call_method 0
+        lt
+        if_false8 138
+        get_loc2 2: v
+        get_field constraints
+        get_field2 at
+        get_loc3 3: i
+        call_method 1
+        set_loc8 4: c
+        get_field2 isSatisfied
+        call_method 0
+        lnot
+        if_false8 134
+        get_loc0 0: unsatisfied
+        get_field2 add
+        get_loc8 4: c
+        call_method 1
+        drop
+  134:  inc_loc 3: i
+        goto8 76
+  138:  get_loc2 2: v
+        get_field determinedBy
+        put_loc8 5: determining
+        push_0 0
+        put_loc3 3: i
+  148:  get_loc3 3: i
+        get_loc2 2: v
+        get_field constraints
+        get_field2 size
+        call_method 0
+        lt
+        if_false8 48
+        get_loc2 2: v
+        get_field constraints
+        get_field2 at
+        get_loc3 3: i
+        call_method 1
+        set_loc8 6: next
+        get_loc8 5: determining
+        neq
+        if_false8 231
+        get_loc8 6: next
+        get_field2 isSatisfied
+        call_method 0
+        if_false8 231
+        get_loc8 6: next
+        get_field2 recalculate
+        call_method 0
+        drop
+        get_loc1 1: todo
+        get_field2 add
+        get_loc8 6: next
+        get_field2 output
+        call_method 0
+        call_method 1
+        drop
+  231:  inc_loc 3: i
+        goto8 148
+  235:  get_loc0 0: unsatisfied
+        return
+
+__tests__/fixtures_quickjs/octane/deltablue.js:664:47: function: <null>
+  mode: strict
+  args: v coll
+  locals:
+    0: var determining
+    1: var cc
+    2: var i
+    3: var c
+  stack_size: 3
+  opcodes:
+        get_arg0 0: v
+        get_field determinedBy
+        put_loc0 0: determining
+        get_arg0 0: v
+        get_field constraints
+        put_loc1 1: cc
+        push_0 0
+        put_loc2 2: i
+   16:  get_loc2 2: i
+        get_loc1 1: cc
+        get_field2 size
+        call_method 0
+        lt
+        if_false8 70
+        get_loc1 1: cc
+        get_field2 at
+        get_loc2 2: i
+        call_method 1
+        set_loc3 3: c
+        get_loc0 0: determining
+        neq
+        if_false8 66
+        get_loc3 3: c
+        get_field2 isSatisfied
+        call_method 0
+        if_false8 66
+        get_arg1 1: coll
+        get_field2 add
+        get_loc3 3: c
+        call_method 1
+        drop
+   66:  inc_loc 2: i
+        goto8 16
+   70:  return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:681:1: function: Plan
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: OrderedCollection parent:loc3 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_var_ref0 0: OrderedCollection
+        dup
+        call_constructor 0
+        put_field v
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:684:32: function: <null>
+  mode: strict
+  args: c
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field v
+        get_field2 add
+        get_arg0 0: c
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:687:23: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field v
+        get_field2 size
+        tail_call_method 0
+
+__tests__/fixtures_quickjs/octane/deltablue.js:690:31: function: <null>
+  mode: strict
+  args: index
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field v
+        get_field2 at
+        get_arg0 0: index
+        tail_call_method 1
+
+__tests__/fixtures_quickjs/octane/deltablue.js:693:26: function: <null>
+  mode: strict
+  locals:
+    0: var i
+    1: var c
+    2: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc2 2: this
+        push_0 0
+        put_loc0 0: i
+    4:  get_loc0 0: i
+        get_loc2 2: this
+        get_field2 size
+        call_method 0
+        lt
+        if_false8 41
+        get_loc2 2: this
+        get_field2 constraintAt
+        get_loc0 0: i
+        call_method 1
+        set_loc1 1: c
+        get_field2 execute
+        call_method 0
+        drop
+        inc_loc 0: i
+        goto8 4
+   41:  return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:715:1: function: chainTest
+  mode: strict
+  args: n
+  locals:
+    0: var prev
+    1: var first
+    2: var last
+    3: var i
+    4: var name
+    5: var v
+    6: var edit
+    7: var edits
+    8: var plan
+  closure vars:
+    0: planner parent:loc19 var
+    1: Planner parent:loc14 var
+    2: Variable parent:loc13 var
+    3: EqualityConstraint parent:loc12 var
+    4: Strength parent:loc4 var
+    5: StayConstraint parent:loc7 var
+    6: EditConstraint parent:loc8 var
+    7: OrderedCollection parent:loc3 var
+  stack_size: 5
+  opcodes:
+        get_var_ref1 1: Planner
+        dup
+        call_constructor 0
+        put_var_ref0 0: planner
+        null
+        put_loc0 0: prev
+        null
+        put_loc1 1: first
+        null
+        put_loc2 2: last
+        push_0 0
+        put_loc3 3: i
+   14:  get_loc3 3: i
+        get_arg0 0: n
+        lte
+        if_false8 82
+        push_atom_value v
+        get_loc3 3: i
+        add
+        put_loc8 4: name
+        get_var_ref2 2: Variable
+        dup
+        get_loc8 4: name
+        call_constructor 1
+        put_loc8 5: v
+        get_loc0 0: prev
+        null
+        neq
+        if_false8 59
+        get_var_ref3 3: EqualityConstraint
+        dup
+        get_loc0 0: prev
+        get_loc8 5: v
+        get_var_ref 4: Strength
+        get_field REQUIRED
+        call_constructor 3
+        drop
+   59:  get_loc3 3: i
+        push_0 0
+        eq
+        if_false8 67
+        get_loc8 5: v
+        put_loc1 1: first
+   67:  get_loc3 3: i
+        get_arg0 0: n
+        eq
+        if_false8 75
+        get_loc8 5: v
+        put_loc2 2: last
+   75:  get_loc8 5: v
+        put_loc0 0: prev
+        inc_loc 3: i
+        goto8 14
+   82:  get_var_ref 5: StayConstraint
+        dup
+        get_loc2 2: last
+        get_var_ref 4: Strength
+        get_field STRONG_DEFAULT
+        call_constructor 2
+        drop
+        get_var_ref 6: EditConstraint
+        dup
+        get_loc1 1: first
+        get_var_ref 4: Strength
+        get_field PREFERRED
+        call_constructor 2
+        put_loc8 6: edit
+        get_var_ref 7: OrderedCollection
+        dup
+        call_constructor 0
+        set_loc8 7: edits
+        get_field2 add
+        get_loc8 6: edit
+        call_method 1
+        drop
+        get_var_ref0 0: planner
+        get_field2 extractPlanFromConstraints
+        get_loc8 7: edits
+        call_method 1
+        put_loc8 8: plan
+        push_0 0
+        put_loc3 3: i
+  152:  get_loc3 3: i
+        push_i8 100
+        lt
+        if_false8 202
+        get_loc1 1: first
+        get_loc3 3: i
+        put_field value
+        get_loc8 8: plan
+        get_field2 execute
+        call_method 0
+        drop
+        get_loc2 2: last
+        get_field value
+        get_loc3 3: i
+        neq
+        if_false8 198
+        get_var alert
+        push_atom_value "Chain test failed."
+        call1 1
+        drop
+  198:  inc_loc 3: i
+        goto8 152
+  202:  return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:748:1: function: projectionTest
+  mode: strict
+  args: n
+  locals:
+    0: var scale
+    1: var offset
+    2: var src
+    3: var dst
+    4: var dests
+    5: var i
+  closure vars:
+    0: planner parent:loc19 var
+    1: Planner parent:loc14 var
+    2: Variable parent:loc13 var
+    3: OrderedCollection parent:loc3 var
+    4: StayConstraint parent:loc7 var
+    5: Strength parent:loc4 var
+    6: ScaleConstraint parent:loc11 var
+    7: change parent:loc18 var
+  stack_size: 7
+  opcodes:
+        get_var_ref1 1: Planner
+        dup
+        call_constructor 0
+        put_var_ref0 0: planner
+        get_var_ref2 2: Variable
+        dup
+        push_atom_value scale
+        push_i8 10
+        call_constructor 2
+        put_loc0 0: scale
+        get_var_ref2 2: Variable
+        dup
+        push_atom_value offset
+        push_i16 1000
+        call_constructor 2
+        put_loc1 1: offset
+        null
+        put_loc2 2: src
+        null
+        put_loc3 3: dst
+        get_var_ref3 3: OrderedCollection
+        dup
+        call_constructor 0
+        put_loc8 4: dests
+        push_0 0
+        put_loc8 5: i
+   47:  get_loc8 5: i
+        get_arg0 0: n
+        lt
+        if_false8 138
+        get_var_ref2 2: Variable
+        dup
+        push_atom_value src
+        get_loc8 5: i
+        add
+        get_loc8 5: i
+        call_constructor 2
+        put_loc2 2: src
+        get_var_ref2 2: Variable
+        dup
+        push_atom_value dst
+        get_loc8 5: i
+        add
+        get_loc8 5: i
+        call_constructor 2
+        put_loc3 3: dst
+        get_loc8 4: dests
+        get_field2 add
+        get_loc3 3: dst
+        call_method 1
+        drop
+        get_var_ref 4: StayConstraint
+        dup
+        get_loc2 2: src
+        get_var_ref 5: Strength
+        get_field NORMAL
+        call_constructor 2
+        drop
+        get_var_ref 6: ScaleConstraint
+        dup
+        get_loc2 2: src
+        get_loc0 0: scale
+        get_loc1 1: offset
+        get_loc3 3: dst
+        get_var_ref 5: Strength
+        get_field REQUIRED
+        call_constructor 5
+        drop
+        inc_loc 5: i
+        goto8 47
+  138:  get_var_ref 7: change
+        get_loc2 2: src
+        push_i8 17
+        call2 2
+        drop
+        get_loc3 3: dst
+        get_field value
+        push_i16 1170
+        neq
+        if_false8 170
+        get_var alert
+        push_atom_value "Projection 1 failed"
+        call1 1
+        drop
+  170:  get_var_ref 7: change
+        get_loc3 3: dst
+        push_i16 1050
+        call2 2
+        drop
+        get_loc2 2: src
+        get_field value
+        push_5 5
+        neq
+        if_false8 201
+        get_var alert
+        push_atom_value "Projection 2 failed"
+        call1 1
+        drop
+  201:  get_var_ref 7: change
+        get_loc0 0: scale
+        push_5 5
+        call2 2
+        drop
+        push_0 0
+        put_loc8 5: i
+  211:  get_loc8 5: i
+        get_arg0 0: n
+        push_1 1
+        sub
+        lt
+        if_false8 263
+        get_loc8 4: dests
+        get_field2 at
+        get_loc8 5: i
+        call_method 1
+        get_field value
+        get_loc8 5: i
+        push_5 5
+        mul
+        push_i16 1000
+        add
+        neq
+        if_false8 259
+        get_var alert
+        push_atom_value "Projection 3 failed"
+        call1 1
+        drop
+  259:  inc_loc 5: i
+        goto8 211
+  263:  get_var_ref 7: change
+        get_loc1 1: offset
+        push_i16 2000
+        call2 2
+        drop
+        push_0 0
+        put_loc8 5: i
+  275:  get_loc8 5: i
+        get_arg0 0: n
+        push_1 1
+        sub
+        lt
+        if_false8 327
+        get_loc8 4: dests
+        get_field2 at
+        get_loc8 5: i
+        call_method 1
+        get_field value
+        get_loc8 5: i
+        push_5 5
+        mul
+        push_i16 2000
+        add
+        neq
+        if_false8 323
+        get_var alert
+        push_atom_value "Projection 4 failed"
+        call1 1
+        drop
+  323:  inc_loc 5: i
+        goto8 275
+  327:  return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:778:1: function: change
+  mode: strict
+  args: v newValue
+  locals:
+    0: var edit
+    1: var edits
+    2: var plan
+    3: var i
+  closure vars:
+    0: EditConstraint parent:loc8 var
+    1: Strength parent:loc4 var
+    2: OrderedCollection parent:loc3 var
+    3: planner parent:loc19 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: EditConstraint
+        dup
+        get_arg0 0: v
+        get_var_ref1 1: Strength
+        get_field PREFERRED
+        call_constructor 2
+        put_loc0 0: edit
+        get_var_ref2 2: OrderedCollection
+        dup
+        call_constructor 0
+        set_loc1 1: edits
+        get_field2 add
+        get_loc0 0: edit
+        call_method 1
+        drop
+        get_var_ref3 3: planner
+        get_field2 extractPlanFromConstraints
+        get_loc1 1: edits
+        call_method 1
+        put_loc2 2: plan
+        push_0 0
+        put_loc3 3: i
+   42:  get_loc3 3: i
+        push_i8 10
+        lt
+        if_false8 69
+        get_arg0 0: v
+        get_arg1 1: newValue
+        put_field value
+        get_loc2 2: plan
+        get_field2 execute
+        call_method 0
+        drop
+        inc_loc 3: i
+        goto8 42
+   69:  get_loc0 0: edit
+        get_field2 destroyConstraint
+        call_method 0
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:791:1: function: deltaBlue
+  mode: strict
+  closure vars:
+    0: chainTest parent:loc16 var
+    1: projectionTest parent:loc17 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: chainTest
+        push_i8 100
+        call1 1
+        drop
+        get_var_ref1 1: projectionTest
+        push_i8 100
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/deltablue.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: Benchmark parent:loc0 const
+    1: BenchmarkSuite parent:loc1 const
+    2: DeltaBlue local:loc0 var
+    3: OrderedCollection local:loc1 var
+    4: Strength local:loc2 var
+    5: Constraint local:loc3 var
+    6: UnaryConstraint local:loc4 var
+    7: StayConstraint local:loc5 var
+    8: EditConstraint local:loc6 var
+    9: Direction local:loc7 var
+   10: BinaryConstraint local:loc8 var
+   11: ScaleConstraint local:loc9 var
+   12: EqualityConstraint local:loc10 var
+   13: Variable local:loc11 var
+   14: Planner local:loc12 var
+   15: Plan local:loc13 var
+   16: chainTest local:loc14 var
+   17: projectionTest local:loc15 var
+   18: change local:loc16 var
+   19: planner local:loc17 var
+   20: deltaBlue local:loc18 var
+  stack_size: 11
+  opcodes:
+        push_this
+        if_false8 82
+        fclosure8 1: [bytecode OrderedCollection]
+        put_var_ref3 3: OrderedCollection
+        fclosure8 7: [bytecode Strength]
+        put_var_ref 4: Strength
+        fclosure8 13: [bytecode Constraint]
+        put_var_ref 5: Constraint
+        fclosure8 18: [bytecode UnaryConstraint]
+        put_var_ref 6: UnaryConstraint
+        fclosure8 28: [bytecode StayConstraint]
+        put_var_ref 7: StayConstraint
+        fclosure8 30: [bytecode EditConstraint]
+        put_var_ref 8: EditConstraint
+        fclosure8 33: [bytecode BinaryConstraint]
+        put_var_ref 10: BinaryConstraint
+        fclosure8 44: [bytecode ScaleConstraint]
+        put_var_ref 11: ScaleConstraint
+        fclosure8 50: [bytecode EqualityConstraint]
+        put_var_ref 12: EqualityConstraint
+        fclosure8 52: [bytecode Variable]
+        put_var_ref 13: Variable
+        fclosure8 55: [bytecode Planner]
+        put_var_ref 14: Planner
+        fclosure8 64: [bytecode Plan]
+        put_var_ref 15: Plan
+        fclosure8 69: [bytecode chainTest]
+        put_var_ref 16: chainTest
+        fclosure8 70: [bytecode projectionTest]
+        put_var_ref 17: projectionTest
+        fclosure8 71: [bytecode change]
+        put_var_ref 18: change
+        fclosure8 72: [bytecode deltaBlue]
+        put_var_ref 20: deltaBlue
+        return_undef
+   82:  get_var_ref_check 1: BenchmarkSuite
+        dup
+        push_atom_value DeltaBlue
+        push_i32 66118
+        array_from 1
+        get_var_ref_check 0: Benchmark
+        dup
+        push_atom_value DeltaBlue
+        push_true
+        push_false
+        push_i16 4400
+        get_var_ref 20: deltaBlue
+        call_constructor 5
+        array_from 1
+        call_constructor 3
+        put_var_ref2 2: DeltaBlue
+        get_var Object
+        get_field2 defineProperty
+        get_var Object
+        get_field prototype
+        push_atom_value inheritsFrom
+        object
+        fclosure8 0: [bytecode <null>]
+        set_name value
+        define_field value
+        call_method 3
+        drop
+        get_var_ref3 3: OrderedCollection
+        get_field prototype
+        fclosure8 2: [bytecode <null>]
+        put_field add
+        get_var_ref3 3: OrderedCollection
+        get_field prototype
+        fclosure8 3: [bytecode <null>]
+        put_field at
+        get_var_ref3 3: OrderedCollection
+        get_field prototype
+        fclosure8 4: [bytecode <null>]
+        put_field size
+        get_var_ref3 3: OrderedCollection
+        get_field prototype
+        fclosure8 5: [bytecode <null>]
+        put_field removeFirst
+        get_var_ref3 3: OrderedCollection
+        get_field prototype
+        fclosure8 6: [bytecode <null>]
+        put_field remove
+        get_var_ref 4: Strength
+        fclosure8 8: [bytecode <null>]
+        put_field stronger
+        get_var_ref 4: Strength
+        fclosure8 9: [bytecode <null>]
+        put_field weaker
+        get_var_ref 4: Strength
+        fclosure8 10: [bytecode <null>]
+        put_field weakestOf
+        get_var_ref 4: Strength
+        fclosure8 11: [bytecode <null>]
+        put_field strongest
+        get_var_ref 4: Strength
+        get_field prototype
+        fclosure8 12: [bytecode <null>]
+        put_field nextWeaker
+        get_var_ref 4: Strength
+        get_var_ref 4: Strength
+        dup
+        push_0 0
+        push_atom_value required
+        call_constructor 2
+        put_field REQUIRED
+        get_var_ref 4: Strength
+        get_var_ref 4: Strength
+        dup
+        push_1 1
+        push_atom_value strongPreferred
+        call_constructor 2
+        put_field STONG_PREFERRED
+        get_var_ref 4: Strength
+        get_var_ref 4: Strength
+        dup
+        push_2 2
+        push_atom_value preferred
+        call_constructor 2
+        put_field PREFERRED
+        get_var_ref 4: Strength
+        get_var_ref 4: Strength
+        dup
+        push_3 3
+        push_atom_value strongDefault
+        call_constructor 2
+        put_field STRONG_DEFAULT
+        get_var_ref 4: Strength
+        get_var_ref 4: Strength
+        dup
+        push_4 4
+        push_atom_value normal
+        call_constructor 2
+        put_field NORMAL
+        get_var_ref 4: Strength
+        get_var_ref 4: Strength
+        dup
+        push_5 5
+        push_atom_value weakDefault
+        call_constructor 2
+        put_field WEAK_DEFAULT
+        get_var_ref 4: Strength
+        get_var_ref 4: Strength
+        dup
+        push_6 6
+        push_atom_value weakest
+        call_constructor 2
+        put_field WEAKEST
+        get_var_ref 5: Constraint
+        get_field prototype
+        fclosure8 14: [bytecode <null>]
+        put_field addConstraint
+        get_var_ref 5: Constraint
+        get_field prototype
+        fclosure8 15: [bytecode <null>]
+        put_field satisfy
+        get_var_ref 5: Constraint
+        get_field prototype
+        fclosure8 16: [bytecode <null>]
+        put_field destroyConstraint
+        get_var_ref 5: Constraint
+        get_field prototype
+        fclosure8 17: [bytecode <null>]
+        put_field isInput
+        get_var_ref 6: UnaryConstraint
+        get_field2 inheritsFrom
+        get_var_ref 5: Constraint
+        call_method 1
+        drop
+        get_var_ref 6: UnaryConstraint
+        get_field prototype
+        fclosure8 19: [bytecode <null>]
+        put_field addToGraph
+        get_var_ref 6: UnaryConstraint
+        get_field prototype
+        fclosure8 20: [bytecode <null>]
+        put_field chooseMethod
+        get_var_ref 6: UnaryConstraint
+        get_field prototype
+        fclosure8 21: [bytecode <null>]
+        put_field isSatisfied
+        get_var_ref 6: UnaryConstraint
+        get_field prototype
+        fclosure8 22: [bytecode <null>]
+        put_field markInputs
+        get_var_ref 6: UnaryConstraint
+        get_field prototype
+        fclosure8 23: [bytecode <null>]
+        put_field output
+        get_var_ref 6: UnaryConstraint
+        get_field prototype
+        fclosure8 24: [bytecode <null>]
+        put_field recalculate
+        get_var_ref 6: UnaryConstraint
+        get_field prototype
+        fclosure8 25: [bytecode <null>]
+        put_field markUnsatisfied
+        get_var_ref 6: UnaryConstraint
+        get_field prototype
+        fclosure8 26: [bytecode <null>]
+        put_field inputsKnown
+        get_var_ref 6: UnaryConstraint
+        get_field prototype
+        fclosure8 27: [bytecode <null>]
+        put_field removeFromGraph
+        get_var_ref 7: StayConstraint
+        get_field2 inheritsFrom
+        get_var_ref 6: UnaryConstraint
+        call_method 1
+        drop
+        get_var_ref 7: StayConstraint
+        get_field prototype
+        fclosure8 29: [bytecode <null>]
+        put_field execute
+        get_var_ref 8: EditConstraint
+        get_field2 inheritsFrom
+        get_var_ref 6: UnaryConstraint
+        call_method 1
+        drop
+        get_var_ref 8: EditConstraint
+        get_field prototype
+        fclosure8 31: [bytecode <null>]
+        put_field isInput
+        get_var_ref 8: EditConstraint
+        get_field prototype
+        fclosure8 32: [bytecode <null>]
+        put_field execute
+        get_var Object
+        dup
+        call_constructor 0
+        set_var_ref 9: Direction
+        push_0 0
+        put_field NONE
+        get_var_ref 9: Direction
+        push_1 1
+        put_field FORWARD
+        get_var_ref 9: Direction
+        push_minus1 -1
+        put_field BACKWARD
+        get_var_ref 10: BinaryConstraint
+        get_field2 inheritsFrom
+        get_var_ref 5: Constraint
+        call_method 1
+        drop
+        get_var_ref 10: BinaryConstraint
+        get_field prototype
+        fclosure8 34: [bytecode <null>]
+        put_field chooseMethod
+        get_var_ref 10: BinaryConstraint
+        get_field prototype
+        fclosure8 35: [bytecode <null>]
+        put_field addToGraph
+        get_var_ref 10: BinaryConstraint
+        get_field prototype
+        fclosure8 36: [bytecode <null>]
+        put_field isSatisfied
+        get_var_ref 10: BinaryConstraint
+        get_field prototype
+        fclosure8 37: [bytecode <null>]
+        put_field markInputs
+        get_var_ref 10: BinaryConstraint
+        get_field prototype
+        fclosure8 38: [bytecode <null>]
+        put_field input
+        get_var_ref 10: BinaryConstraint
+        get_field prototype
+        fclosure8 39: [bytecode <null>]
+        put_field output
+        get_var_ref 10: BinaryConstraint
+        get_field prototype
+        fclosure8 40: [bytecode <null>]
+        put_field recalculate
+        get_var_ref 10: BinaryConstraint
+        get_field prototype
+        fclosure8 41: [bytecode <null>]
+        put_field markUnsatisfied
+        get_var_ref 10: BinaryConstraint
+        get_field prototype
+        fclosure8 42: [bytecode <null>]
+        put_field inputsKnown
+        get_var_ref 10: BinaryConstraint
+        get_field prototype
+        fclosure8 43: [bytecode <null>]
+        put_field removeFromGraph
+        get_var_ref 11: ScaleConstraint
+        get_field2 inheritsFrom
+        get_var_ref 10: BinaryConstraint
+        call_method 1
+        drop
+        get_var_ref 11: ScaleConstraint
+        get_field prototype
+        fclosure8 45: [bytecode <null>]
+        put_field addToGraph
+        get_var_ref 11: ScaleConstraint
+        get_field prototype
+        fclosure8 46: [bytecode <null>]
+        put_field removeFromGraph
+        get_var_ref 11: ScaleConstraint
+        get_field prototype
+        fclosure8 47: [bytecode <null>]
+        put_field markInputs
+        get_var_ref 11: ScaleConstraint
+        get_field prototype
+        fclosure8 48: [bytecode <null>]
+        put_field execute
+        get_var_ref 11: ScaleConstraint
+        get_field prototype
+        fclosure8 49: [bytecode <null>]
+        put_field recalculate
+        get_var_ref 12: EqualityConstraint
+        get_field2 inheritsFrom
+        get_var_ref 10: BinaryConstraint
+        call_method 1
+        drop
+        get_var_ref 12: EqualityConstraint
+        get_field prototype
+        fclosure8 51: [bytecode <null>]
+        put_field execute
+        get_var_ref 13: Variable
+        get_field prototype
+        fclosure8 53: [bytecode <null>]
+        put_field addConstraint
+        get_var_ref 13: Variable
+        get_field prototype
+        fclosure8 54: [bytecode <null>]
+        put_field removeConstraint
+        get_var_ref 14: Planner
+        get_field prototype
+        fclosure8 56: [bytecode <null>]
+        put_field incrementalAdd
+        get_var_ref 14: Planner
+        get_field prototype
+        fclosure8 57: [bytecode <null>]
+        put_field incrementalRemove
+        get_var_ref 14: Planner
+        get_field prototype
+        fclosure8 58: [bytecode <null>]
+        put_field newMark
+        get_var_ref 14: Planner
+        get_field prototype
+        fclosure8 59: [bytecode <null>]
+        put_field makePlan
+        get_var_ref 14: Planner
+        get_field prototype
+        fclosure8 60: [bytecode <null>]
+        put_field extractPlanFromConstraints
+        get_var_ref 14: Planner
+        get_field prototype
+        fclosure8 61: [bytecode <null>]
+        put_field addPropagate
+        get_var_ref 14: Planner
+        get_field prototype
+        fclosure8 62: [bytecode <null>]
+        put_field removePropagateFrom
+        get_var_ref 14: Planner
+        get_field prototype
+        fclosure8 63: [bytecode <null>]
+        put_field addConstraintsConsumingTo
+        get_var_ref 15: Plan
+        get_field prototype
+        fclosure8 65: [bytecode <null>]
+        put_field addConstraint
+        get_var_ref 15: Plan
+        get_field prototype
+        fclosure8 66: [bytecode <null>]
+        put_field size
+        get_var_ref 15: Plan
+        get_field prototype
+        fclosure8 67: [bytecode <null>]
+        put_field constraintAt
+        get_var_ref 15: Plan
+        get_field prototype
+        fclosure8 68: [bytecode <null>]
+        put_field execute
+        null
+        put_var_ref 19: planner
+        undefined
+        return_async
+

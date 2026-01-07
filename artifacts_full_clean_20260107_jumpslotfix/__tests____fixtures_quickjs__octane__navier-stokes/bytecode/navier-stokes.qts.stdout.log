@@ -1,0 +1,2148 @@
+__tests__/fixtures_quickjs/octane/navier-stokes.js:32:1: function: runNavierStokes
+  mode: strict
+  closure vars:
+    0: solver parent:loc3 var
+    1: nsFrameCounter parent:loc4 var
+    2: checkResult parent:loc6 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: solver
+        get_field2 update
+        call_method 0
+        drop
+        get_var_ref1 1: nsFrameCounter
+        inc
+        set_var_ref1 1: nsFrameCounter
+        push_i8 15
+        eq
+        if_false8 30
+        get_var_ref2 2: checkResult
+        get_var_ref0 0: solver
+        get_field2 getDens
+        call_method 0
+        call1 1
+        drop
+   30:  return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:38:1: function: checkResult
+  mode: strict
+  args: dens
+  locals:
+    0: var result
+    1: var i
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc0 0: result
+        push_i16 7000
+        put_loc1 1: i
+    6:  get_loc1 1: i
+        push_i16 7100
+        lt
+        if_false8 28
+        get_loc0 0: result
+        get_arg0 0: dens
+        get_loc1 1: i
+        get_array_el
+        push_i8 10
+        mul
+        not
+        not
+        add
+        put_loc0 0: result
+        inc_loc 1: i
+        goto8 6
+   28:  get_loc0 0: result
+        push_i8 77
+        neq
+        if_false8 49
+        get_var Error
+        dup
+        push_atom_value "checksum failed"
+        call_constructor 1
+        throw
+   49:  return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:51:31: function: <null>
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:47:1: function: setupNavierStokes
+  mode: strict
+  closure vars:
+    0: solver parent:loc3 var
+    1: FluidField parent:loc13 var
+    2: prepareFrame parent:loc12 var
+  stack_size: 4
+  opcodes:
+        get_var_ref1 1: FluidField
+        dup
+        null
+        call_constructor 1
+        set_var_ref0 0: solver
+        get_field2 setResolution
+        push_i16 128
+        push_i16 128
+        call_method 2
+        drop
+        get_var_ref0 0: solver
+        get_field2 setIterations
+        push_i8 20
+        call_method 1
+        drop
+        get_var_ref0 0: solver
+        get_field2 setDisplayFunction
+        fclosure8 0: [bytecode <null>]
+        call_method 1
+        drop
+        get_var_ref0 0: solver
+        get_field2 setUICallback
+        get_var_ref2 2: prepareFrame
+        call_method 1
+        drop
+        get_var_ref0 0: solver
+        get_field2 reset
+        call_method 0
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:55:1: function: tearDownNavierStokes
+  mode: strict
+  closure vars:
+    0: solver parent:loc3 var
+  stack_size: 1
+  opcodes:
+        null
+        put_var_ref0 0: solver
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:58:1: function: addPoints
+  mode: strict
+  args: field
+  locals:
+    0: var n
+    1: var i
+  stack_size: 6
+  opcodes:
+        push_i8 64
+        put_loc0 0: n
+        push_1 1
+        put_loc1 1: i
+    5:  get_loc1 1: i
+        get_loc0 0: n
+        lte
+        if_false8 117
+        get_arg0 0: field
+        get_field2 setVelocity
+        get_loc1 1: i
+        get_loc1 1: i
+        get_loc0 0: n
+        get_loc0 0: n
+        call_method 4
+        drop
+        get_arg0 0: field
+        get_field2 setDensity
+        get_loc1 1: i
+        get_loc1 1: i
+        push_5 5
+        call_method 3
+        drop
+        get_arg0 0: field
+        get_field2 setVelocity
+        get_loc1 1: i
+        get_loc0 0: n
+        get_loc1 1: i
+        sub
+        get_loc0 0: n
+        neg
+        get_loc0 0: n
+        neg
+        call_method 4
+        drop
+        get_arg0 0: field
+        get_field2 setDensity
+        get_loc1 1: i
+        get_loc0 0: n
+        get_loc1 1: i
+        sub
+        push_i8 20
+        call_method 3
+        drop
+        get_arg0 0: field
+        get_field2 setVelocity
+        push_i16 128
+        get_loc1 1: i
+        sub
+        get_loc0 0: n
+        get_loc1 1: i
+        add
+        get_loc0 0: n
+        neg
+        get_loc0 0: n
+        neg
+        call_method 4
+        drop
+        get_arg0 0: field
+        get_field2 setDensity
+        push_i16 128
+        get_loc1 1: i
+        sub
+        get_loc0 0: n
+        get_loc1 1: i
+        add
+        push_i8 30
+        call_method 3
+        drop
+        inc_loc 1: i
+        goto8 5
+  117:  return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:71:1: function: prepareFrame
+  mode: strict
+  args: field
+  closure vars:
+    0: framesTillAddingPoints parent:loc10 var
+    1: addPoints parent:loc9 var
+    2: framesBetweenAddingPoints parent:loc11 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: framesTillAddingPoints
+        push_0 0
+        eq
+        if_false8 15
+        get_var_ref1 1: addPoints
+        get_arg0 0: field
+        call1 1
+        drop
+        get_var_ref2 2: framesBetweenAddingPoints
+        put_var_ref0 0: framesTillAddingPoints
+        get_var_ref2 2: framesBetweenAddingPoints
+        inc
+        put_var_ref2 2: framesBetweenAddingPoints
+        return_undef
+   15:  get_var_ref0 0: framesTillAddingPoints
+        dec
+        put_var_ref0 0: framesTillAddingPoints
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:83:5: function: addFields
+  mode: strict
+  args: x s dt
+  locals:
+    0: var i
+  closure vars:
+    0: size local:loc25 var
+  stack_size: 6
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        get_var_ref0 0: size
+        lt
+        if_false8 21
+        get_arg0 0: x
+        get_loc0 0: i
+        get_array_el3
+        get_arg2 2: dt
+        get_arg1 1: s
+        get_loc0 0: i
+        get_array_el
+        mul
+        add
+        put_array_el
+        inc_loc 0: i
+        goto8 2
+   21:  return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:87:5: function: set_bnd
+  mode: strict
+  args: b x
+  locals:
+    0: var i
+    1: var j
+    2: var maxEdge
+  closure vars:
+    0: width local:loc22 var
+    1: rowSize local:loc24 var
+    2: height local:loc23 var
+  stack_size: 8
+  opcodes:
+        get_arg0 0: b
+        push_1 1
+        strict_eq
+        if_false8 84
+        push_1 1
+        put_loc0 0: i
+    7:  get_loc0 0: i
+        get_var_ref0 0: width
+        lte
+        if_false8 40
+        get_arg1 1: x
+        get_loc0 0: i
+        get_arg1 1: x
+        get_loc0 0: i
+        get_var_ref1 1: rowSize
+        add
+        get_array_el
+        put_array_el
+        get_arg1 1: x
+        get_loc0 0: i
+        get_var_ref2 2: height
+        push_1 1
+        add
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_arg1 1: x
+        get_loc0 0: i
+        get_var_ref2 2: height
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 7
+   40:  push_1 1
+        put_loc1 1: j
+   42:  get_loc1 1: j
+        get_var_ref2 2: height
+        lte
+        if_false 239
+        get_arg1 1: x
+        get_loc1 1: j
+        get_var_ref1 1: rowSize
+        mul
+        get_arg1 1: x
+        push_1 1
+        get_loc1 1: j
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_array_el
+        neg
+        put_array_el
+        get_arg1 1: x
+        get_var_ref0 0: width
+        push_1 1
+        add
+        get_loc1 1: j
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_arg1 1: x
+        get_var_ref0 0: width
+        get_loc1 1: j
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_array_el
+        neg
+        put_array_el
+        inc_loc 1: j
+        goto8 42
+   84:  get_arg0 0: b
+        push_2 2
+        strict_eq
+        if_false8 165
+        push_1 1
+        put_loc0 0: i
+   91:  get_loc0 0: i
+        get_var_ref0 0: width
+        lte
+        if_false8 126
+        get_arg1 1: x
+        get_loc0 0: i
+        get_arg1 1: x
+        get_loc0 0: i
+        get_var_ref1 1: rowSize
+        add
+        get_array_el
+        neg
+        put_array_el
+        get_arg1 1: x
+        get_loc0 0: i
+        get_var_ref2 2: height
+        push_1 1
+        add
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_arg1 1: x
+        get_loc0 0: i
+        get_var_ref2 2: height
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_array_el
+        neg
+        put_array_el
+        inc_loc 0: i
+        goto8 91
+  126:  push_1 1
+        put_loc1 1: j
+  128:  get_loc1 1: j
+        get_var_ref2 2: height
+        lte
+        if_false8 239
+        get_arg1 1: x
+        get_loc1 1: j
+        get_var_ref1 1: rowSize
+        mul
+        get_arg1 1: x
+        push_1 1
+        get_loc1 1: j
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_array_el
+        put_array_el
+        get_arg1 1: x
+        get_var_ref0 0: width
+        push_1 1
+        add
+        get_loc1 1: j
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_arg1 1: x
+        get_var_ref0 0: width
+        get_loc1 1: j
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_array_el
+        put_array_el
+        inc_loc 1: j
+        goto8 128
+  165:  push_1 1
+        put_loc0 0: i
+  167:  get_loc0 0: i
+        get_var_ref0 0: width
+        lte
+        if_false8 200
+        get_arg1 1: x
+        get_loc0 0: i
+        get_arg1 1: x
+        get_loc0 0: i
+        get_var_ref1 1: rowSize
+        add
+        get_array_el
+        put_array_el
+        get_arg1 1: x
+        get_loc0 0: i
+        get_var_ref2 2: height
+        push_1 1
+        add
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_arg1 1: x
+        get_loc0 0: i
+        get_var_ref2 2: height
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 167
+  200:  push_1 1
+        put_loc1 1: j
+  202:  get_loc1 1: j
+        get_var_ref2 2: height
+        lte
+        if_false8 239
+        get_arg1 1: x
+        get_loc1 1: j
+        get_var_ref1 1: rowSize
+        mul
+        get_arg1 1: x
+        push_1 1
+        get_loc1 1: j
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_array_el
+        put_array_el
+        get_arg1 1: x
+        get_var_ref0 0: width
+        push_1 1
+        add
+        get_loc1 1: j
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_arg1 1: x
+        get_var_ref0 0: width
+        get_loc1 1: j
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_array_el
+        put_array_el
+        inc_loc 1: j
+        goto8 202
+  239:  get_var_ref2 2: height
+        push_1 1
+        add
+        get_var_ref1 1: rowSize
+        mul
+        put_loc2 2: maxEdge
+        get_arg1 1: x
+        push_0 0
+        push_const8 0: 0.5
+        get_arg1 1: x
+        push_1 1
+        get_array_el
+        get_arg1 1: x
+        get_var_ref1 1: rowSize
+        get_array_el
+        add
+        mul
+        put_array_el
+        get_arg1 1: x
+        get_loc2 2: maxEdge
+        push_const8 1: 0.5
+        get_arg1 1: x
+        push_1 1
+        get_loc2 2: maxEdge
+        add
+        get_array_el
+        get_arg1 1: x
+        get_var_ref2 2: height
+        get_var_ref1 1: rowSize
+        mul
+        get_array_el
+        add
+        mul
+        put_array_el
+        get_arg1 1: x
+        get_var_ref0 0: width
+        push_1 1
+        add
+        push_const8 2: 0.5
+        get_arg1 1: x
+        get_var_ref0 0: width
+        get_array_el
+        get_arg1 1: x
+        get_var_ref0 0: width
+        push_1 1
+        add
+        get_var_ref1 1: rowSize
+        add
+        get_array_el
+        add
+        mul
+        put_array_el
+        get_arg1 1: x
+        get_var_ref0 0: width
+        push_1 1
+        add
+        get_loc2 2: maxEdge
+        add
+        push_const8 3: 0.5
+        get_arg1 1: x
+        get_var_ref0 0: width
+        get_loc2 2: maxEdge
+        add
+        get_array_el
+        get_arg1 1: x
+        get_var_ref0 0: width
+        push_1 1
+        add
+        get_var_ref2 2: height
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_array_el
+        add
+        mul
+        put_array_el
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:124:5: function: lin_solve
+  mode: strict
+  args: b x x0 a c
+  locals:
+    0: var j
+    1: var currentRow
+    2: var i
+    3: var invC
+    4: var k
+    5: var lastRow
+    6: var nextRow
+    7: var lastX
+  closure vars:
+    0: height local:loc23 var
+    1: rowSize local:loc24 var
+    2: width local:loc22 var
+    3: set_bnd local:loc1 var
+    4: iterations local:loc13 var
+  stack_size: 7
+  opcodes:
+        get_arg3 3: a
+        push_0 0
+        strict_eq
+        if_false8 54
+        get_arg 4: c
+        push_1 1
+        strict_eq
+        if_false8 54
+        push_1 1
+        put_loc0 0: j
+   14:  get_loc0 0: j
+        get_var_ref0 0: height
+        lte
+        if_false8 48
+        get_loc0 0: j
+        get_var_ref1 1: rowSize
+        mul
+        set_loc1 1: currentRow
+        inc
+        put_loc1 1: currentRow
+        push_0 0
+        put_loc2 2: i
+   27:  get_loc2 2: i
+        get_var_ref2 2: width
+        lt
+        if_false8 44
+        get_arg1 1: x
+        get_loc1 1: currentRow
+        get_arg2 2: x0
+        get_loc1 1: currentRow
+        get_array_el
+        put_array_el
+        inc_loc 1: currentRow
+        inc_loc 2: i
+        goto8 27
+   44:  inc_loc 0: j
+        goto8 14
+   48:  get_var_ref3 3: set_bnd
+        get_arg0 0: b
+        get_arg1 1: x
+        call2 2
+        drop
+        return_undef
+   54:  push_1 1
+        get_arg 4: c
+        div
+        put_loc3 3: invC
+        push_0 0
+        put_loc8 4: k
+   63:  get_loc8 4: k
+        get_var_ref 4: iterations
+        lt
+        if_false8 165
+        push_1 1
+        put_loc0 0: j
+   73:  get_loc0 0: j
+        get_var_ref0 0: height
+        lte
+        if_false8 156
+        get_loc0 0: j
+        push_1 1
+        sub
+        get_var_ref1 1: rowSize
+        mul
+        put_loc8 5: lastRow
+        get_loc0 0: j
+        get_var_ref1 1: rowSize
+        mul
+        put_loc1 1: currentRow
+        get_loc0 0: j
+        push_1 1
+        add
+        get_var_ref1 1: rowSize
+        mul
+        put_loc8 6: nextRow
+        get_arg1 1: x
+        get_loc1 1: currentRow
+        get_array_el
+        put_loc8 7: lastX
+        inc_loc 1: currentRow
+        push_1 1
+        put_loc2 2: i
+  105:  get_loc2 2: i
+        get_var_ref2 2: width
+        lte
+        if_false8 152
+        get_arg1 1: x
+        get_loc1 1: currentRow
+        get_arg2 2: x0
+        get_loc1 1: currentRow
+        get_array_el
+        get_arg3 3: a
+        get_loc8 7: lastX
+        get_arg1 1: x
+        get_loc1 1: currentRow
+        inc
+        set_loc1 1: currentRow
+        get_array_el
+        add
+        get_arg1 1: x
+        get_loc8 5: lastRow
+        inc
+        set_loc8 5: lastRow
+        get_array_el
+        add
+        get_arg1 1: x
+        get_loc8 6: nextRow
+        inc
+        set_loc8 6: nextRow
+        get_array_el
+        add
+        mul
+        add
+        get_loc3 3: invC
+        mul
+        insert3
+        put_array_el
+        put_loc8 7: lastX
+        inc_loc 2: i
+        goto8 105
+  152:  inc_loc 0: j
+        goto8 73
+  156:  get_var_ref3 3: set_bnd
+        get_arg0 0: b
+        get_arg1 1: x
+        call2 2
+        drop
+        inc_loc 4: k
+        goto8 63
+  165:  return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:152:5: function: diffuse
+  mode: strict
+  args: b x x0 dt
+  locals:
+    0: var a
+  closure vars:
+    0: lin_solve local:loc2 var
+  stack_size: 8
+  opcodes:
+        push_0 0
+        put_loc0 0: a
+        get_var_ref0 0: lin_solve
+        get_arg0 0: b
+        get_arg1 1: x
+        get_arg2 2: x0
+        get_loc0 0: a
+        push_1 1
+        push_4 4
+        get_loc0 0: a
+        mul
+        add
+        call 5
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:156:5: function: lin_solve2
+  mode: strict
+  args: x x0 y y0 a c
+  locals:
+    0: var j
+    1: var currentRow
+    2: var i
+    3: var invC
+    4: var k
+    5: var lastRow
+    6: var nextRow
+    7: var lastX
+    8: var lastY
+  closure vars:
+    0: height local:loc23 var
+    1: rowSize local:loc24 var
+    2: width local:loc22 var
+    3: set_bnd local:loc1 var
+    4: iterations local:loc13 var
+  stack_size: 7
+  opcodes:
+        get_arg 4: a
+        push_0 0
+        strict_eq
+        if_false8 67
+        get_arg 5: c
+        push_1 1
+        strict_eq
+        if_false8 67
+        push_1 1
+        put_loc0 0: j
+   16:  get_loc0 0: j
+        get_var_ref0 0: height
+        lte
+        if_false8 56
+        get_loc0 0: j
+        get_var_ref1 1: rowSize
+        mul
+        set_loc1 1: currentRow
+        inc
+        put_loc1 1: currentRow
+        push_0 0
+        put_loc2 2: i
+   29:  get_loc2 2: i
+        get_var_ref2 2: width
+        lt
+        if_false8 52
+        get_arg0 0: x
+        get_loc1 1: currentRow
+        get_arg1 1: x0
+        get_loc1 1: currentRow
+        get_array_el
+        put_array_el
+        get_arg2 2: y
+        get_loc1 1: currentRow
+        get_arg3 3: y0
+        get_loc1 1: currentRow
+        get_array_el
+        put_array_el
+        inc_loc 1: currentRow
+        inc_loc 2: i
+        goto8 29
+   52:  inc_loc 0: j
+        goto8 16
+   56:  get_var_ref3 3: set_bnd
+        push_1 1
+        get_arg0 0: x
+        call2 2
+        drop
+        get_var_ref3 3: set_bnd
+        push_2 2
+        get_arg2 2: y
+        call2 2
+        drop
+        return_undef
+   67:  push_1 1
+        get_arg 5: c
+        div
+        put_loc3 3: invC
+        push_0 0
+        put_loc8 4: k
+   76:  get_loc8 4: k
+        get_var_ref 4: iterations
+        lt
+        if_false 226
+        push_1 1
+        put_loc0 0: j
+   89:  get_loc0 0: j
+        get_var_ref0 0: height
+        lte
+        if_false8 211
+        get_loc0 0: j
+        push_1 1
+        sub
+        get_var_ref1 1: rowSize
+        mul
+        put_loc8 5: lastRow
+        get_loc0 0: j
+        get_var_ref1 1: rowSize
+        mul
+        put_loc1 1: currentRow
+        get_loc0 0: j
+        push_1 1
+        add
+        get_var_ref1 1: rowSize
+        mul
+        put_loc8 6: nextRow
+        get_arg0 0: x
+        get_loc1 1: currentRow
+        get_array_el
+        put_loc8 7: lastX
+        get_arg2 2: y
+        get_loc1 1: currentRow
+        get_array_el
+        put_loc8 8: lastY
+        inc_loc 1: currentRow
+        push_1 1
+        put_loc2 2: i
+  126:  get_loc2 2: i
+        get_var_ref2 2: width
+        lte
+        if_false8 207
+        get_arg0 0: x
+        get_loc1 1: currentRow
+        get_arg1 1: x0
+        get_loc1 1: currentRow
+        get_array_el
+        get_arg 4: a
+        get_loc8 7: lastX
+        get_arg0 0: x
+        get_loc1 1: currentRow
+        get_array_el
+        add
+        get_arg0 0: x
+        get_loc8 5: lastRow
+        get_array_el
+        add
+        get_arg0 0: x
+        get_loc8 6: nextRow
+        get_array_el
+        add
+        mul
+        add
+        get_loc3 3: invC
+        mul
+        insert3
+        put_array_el
+        put_loc8 7: lastX
+        get_arg2 2: y
+        get_loc1 1: currentRow
+        get_arg3 3: y0
+        get_loc1 1: currentRow
+        get_array_el
+        get_arg 4: a
+        get_loc8 8: lastY
+        get_arg2 2: y
+        get_loc1 1: currentRow
+        inc
+        set_loc1 1: currentRow
+        get_array_el
+        add
+        get_arg2 2: y
+        get_loc8 5: lastRow
+        inc
+        set_loc8 5: lastRow
+        get_array_el
+        add
+        get_arg2 2: y
+        get_loc8 6: nextRow
+        inc
+        set_loc8 6: nextRow
+        get_array_el
+        add
+        mul
+        add
+        get_loc3 3: invC
+        mul
+        insert3
+        put_array_el
+        put_loc8 8: lastY
+        inc_loc 2: i
+        goto8 126
+  207:  inc_loc 0: j
+        goto8 89
+  211:  get_var_ref3 3: set_bnd
+        push_1 1
+        get_arg0 0: x
+        call2 2
+        drop
+        get_var_ref3 3: set_bnd
+        push_2 2
+        get_arg2 2: y
+        call2 2
+        drop
+        inc_loc 4: k
+        goto16 76
+  226:  return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:190:5: function: diffuse2
+  mode: strict
+  args: x x0 y y0 dt
+  locals:
+    0: var a
+  closure vars:
+    0: lin_solve2 local:loc4 var
+  stack_size: 9
+  opcodes:
+        push_0 0
+        put_loc0 0: a
+        get_var_ref0 0: lin_solve2
+        get_arg0 0: x
+        get_arg1 1: x0
+        get_arg2 2: y
+        get_arg3 3: y0
+        get_loc0 0: a
+        push_1 1
+        push_4 4
+        get_loc0 0: a
+        mul
+        add
+        call 6
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:194:5: function: advect
+  mode: strict
+  args: b d d0 u v dt
+  locals:
+    0: var Wdt0
+    1: var Hdt0
+    2: var Wp5
+    3: var Hp5
+    4: var j
+    5: var pos
+    6: var i
+    7: var x
+    8: var y
+    9: var i0
+   10: var i1
+   11: var j0
+   12: var j1
+   13: var s1
+   14: var s0
+   15: var t1
+   16: var t0
+   17: var row1
+   18: var row2
+  closure vars:
+    0: width local:loc22 var
+    1: height local:loc23 var
+    2: rowSize local:loc24 var
+    3: set_bnd local:loc1 var
+  stack_size: 9
+  opcodes:
+        get_arg 5: dt
+        get_var_ref0 0: width
+        mul
+        put_loc0 0: Wdt0
+        get_arg 5: dt
+        get_var_ref1 1: height
+        mul
+        put_loc1 1: Hdt0
+        get_var_ref0 0: width
+        push_const8 0: 0.5
+        add
+        put_loc2 2: Wp5
+        get_var_ref1 1: height
+        push_const8 1: 0.5
+        add
+        put_loc3 3: Hp5
+        push_1 1
+        put_loc8 4: j
+   25:  get_loc8 4: j
+        get_var_ref1 1: height
+        lte
+        if_false 244
+        get_loc8 4: j
+        get_var_ref2 2: rowSize
+        mul
+        put_loc8 5: pos
+        push_1 1
+        put_loc8 6: i
+   43:  get_loc8 6: i
+        get_var_ref0 0: width
+        lte
+        if_false 239
+        get_loc8 6: i
+        get_loc0 0: Wdt0
+        get_arg3 3: u
+        get_loc8 5: pos
+        inc
+        set_loc8 5: pos
+        get_array_el
+        mul
+        sub
+        put_loc8 7: x
+        get_loc8 4: j
+        get_loc1 1: Hdt0
+        get_arg 4: v
+        get_loc8 5: pos
+        get_array_el
+        mul
+        sub
+        put_loc8 8: y
+        get_loc8 7: x
+        push_const8 2: 0.5
+        lt
+        if_false8 92
+        push_const8 3: 0.5
+        put_loc8 7: x
+        goto8 101
+   92:  get_loc8 7: x
+        get_loc2 2: Wp5
+        gt
+        if_false8 101
+        get_loc2 2: Wp5
+        put_loc8 7: x
+  101:  get_loc8 7: x
+        push_0 0
+        or
+        set_loc8 9: i0
+        push_1 1
+        add
+        put_loc8 10: i1
+        get_loc8 8: y
+        push_const8 4: 0.5
+        lt
+        if_false8 124
+        push_const8 5: 0.5
+        put_loc8 8: y
+        goto8 133
+  124:  get_loc8 8: y
+        get_loc3 3: Hp5
+        gt
+        if_false8 133
+        get_loc3 3: Hp5
+        put_loc8 8: y
+  133:  get_loc8 8: y
+        push_0 0
+        or
+        set_loc8 11: j0
+        push_1 1
+        add
+        put_loc8 12: j1
+        get_loc8 7: x
+        get_loc8 9: i0
+        sub
+        put_loc8 13: s1
+        push_1 1
+        get_loc8 13: s1
+        sub
+        put_loc8 14: s0
+        get_loc8 8: y
+        get_loc8 11: j0
+        sub
+        put_loc8 15: t1
+        push_1 1
+        get_loc8 15: t1
+        sub
+        put_loc8 16: t0
+        get_loc8 11: j0
+        get_var_ref2 2: rowSize
+        mul
+        put_loc8 17: row1
+        get_loc8 12: j1
+        get_var_ref2 2: rowSize
+        mul
+        put_loc8 18: row2
+        get_arg1 1: d
+        get_loc8 5: pos
+        get_loc8 14: s0
+        get_loc8 16: t0
+        get_arg2 2: d0
+        get_loc8 9: i0
+        get_loc8 17: row1
+        add
+        get_array_el
+        mul
+        get_loc8 15: t1
+        get_arg2 2: d0
+        get_loc8 9: i0
+        get_loc8 18: row2
+        add
+        get_array_el
+        mul
+        add
+        mul
+        get_loc8 13: s1
+        get_loc8 16: t0
+        get_arg2 2: d0
+        get_loc8 10: i1
+        get_loc8 17: row1
+        add
+        get_array_el
+        mul
+        get_loc8 15: t1
+        get_arg2 2: d0
+        get_loc8 10: i1
+        get_loc8 18: row2
+        add
+        get_array_el
+        mul
+        add
+        mul
+        add
+        put_array_el
+        inc_loc 6: i
+        goto16 43
+  239:  inc_loc 4: j
+        goto16 25
+  244:  get_var_ref3 3: set_bnd
+        get_arg0 0: b
+        get_arg1 1: d
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:227:5: function: project
+  mode: strict
+  args: u v p div
+  locals:
+    0: var h
+    1: var j
+    2: var row
+    3: var previousRow
+    4: var prevValue
+    5: var currentRow
+    6: var nextValue
+    7: var nextRow
+    8: var i
+    9: var wScale
+   10: var hScale
+   11: var prevPos
+   12: var currentPos
+   13: var nextPos
+   14: var prevRow
+  closure vars:
+    0: width local:loc22 var
+    1: height local:loc23 var
+    2: rowSize local:loc24 var
+    3: set_bnd local:loc1 var
+    4: lin_solve local:loc2 var
+  stack_size: 7
+  opcodes:
+        push_const8 0: 0.5
+        neg
+        get_var Math
+        get_field2 sqrt
+        get_var_ref0 0: width
+        get_var_ref1 1: height
+        mul
+        call_method 1
+        div
+        put_loc0 0: h
+        push_1 1
+        put_loc1 1: j
+   23:  get_loc1 1: j
+        get_var_ref1 1: height
+        lte
+        if_false8 118
+        get_loc1 1: j
+        get_var_ref2 2: rowSize
+        mul
+        put_loc2 2: row
+        get_loc1 1: j
+        push_1 1
+        sub
+        get_var_ref2 2: rowSize
+        mul
+        put_loc3 3: previousRow
+        get_loc2 2: row
+        push_1 1
+        sub
+        put_loc8 4: prevValue
+        get_loc2 2: row
+        put_loc8 5: currentRow
+        get_loc2 2: row
+        push_1 1
+        add
+        put_loc8 6: nextValue
+        get_loc1 1: j
+        push_1 1
+        add
+        get_var_ref2 2: rowSize
+        mul
+        put_loc8 7: nextRow
+        push_1 1
+        put_loc8 8: i
+   61:  get_loc8 8: i
+        get_var_ref0 0: width
+        lte
+        if_false8 114
+        get_arg3 3: div
+        get_loc8 5: currentRow
+        inc
+        set_loc8 5: currentRow
+        get_loc0 0: h
+        get_arg0 0: u
+        get_loc8 6: nextValue
+        inc
+        set_loc8 6: nextValue
+        get_array_el
+        get_arg0 0: u
+        get_loc8 4: prevValue
+        inc
+        set_loc8 4: prevValue
+        get_array_el
+        sub
+        get_arg1 1: v
+        get_loc8 7: nextRow
+        inc
+        set_loc8 7: nextRow
+        get_array_el
+        add
+        get_arg1 1: v
+        get_loc3 3: previousRow
+        inc
+        set_loc3 3: previousRow
+        get_array_el
+        sub
+        mul
+        put_array_el
+        get_arg2 2: p
+        get_loc8 5: currentRow
+        push_0 0
+        put_array_el
+        inc_loc 8: i
+        goto8 61
+  114:  inc_loc 1: j
+        goto8 23
+  118:  get_var_ref3 3: set_bnd
+        push_0 0
+        get_arg3 3: div
+        call2 2
+        drop
+        get_var_ref3 3: set_bnd
+        push_0 0
+        get_arg2 2: p
+        call2 2
+        drop
+        get_var_ref 4: lin_solve
+        push_0 0
+        get_arg2 2: p
+        get_arg3 3: div
+        push_1 1
+        push_4 4
+        call 5
+        drop
+        push_const8 1: 0.5
+        get_var_ref0 0: width
+        mul
+        put_loc8 9: wScale
+        push_const8 2: 0.5
+        get_var_ref1 1: height
+        mul
+        put_loc8 10: hScale
+        push_1 1
+        put_loc1 1: j
+  154:  get_loc1 1: j
+        get_var_ref1 1: height
+        lte
+        if_false8 265
+        get_loc1 1: j
+        get_var_ref2 2: rowSize
+        mul
+        push_1 1
+        sub
+        put_loc8 11: prevPos
+        get_loc1 1: j
+        get_var_ref2 2: rowSize
+        mul
+        put_loc8 12: currentPos
+        get_loc1 1: j
+        get_var_ref2 2: rowSize
+        mul
+        push_1 1
+        add
+        put_loc8 13: nextPos
+        get_loc1 1: j
+        push_1 1
+        sub
+        get_var_ref2 2: rowSize
+        mul
+        put_loc8 14: prevRow
+        get_loc1 1: j
+        get_var_ref2 2: rowSize
+        mul
+        put_loc8 5: currentRow
+        get_loc1 1: j
+        push_1 1
+        add
+        get_var_ref2 2: rowSize
+        mul
+        put_loc8 7: nextRow
+        push_1 1
+        put_loc8 8: i
+  200:  get_loc8 8: i
+        get_var_ref0 0: width
+        lte
+        if_false8 261
+        get_arg0 0: u
+        get_loc8 12: currentPos
+        inc
+        set_loc8 12: currentPos
+        get_array_el3
+        get_loc8 9: wScale
+        get_arg2 2: p
+        get_loc8 13: nextPos
+        inc
+        set_loc8 13: nextPos
+        get_array_el
+        get_arg2 2: p
+        get_loc8 11: prevPos
+        inc
+        set_loc8 11: prevPos
+        get_array_el
+        sub
+        mul
+        sub
+        put_array_el
+        get_arg1 1: v
+        get_loc8 12: currentPos
+        get_array_el3
+        get_loc8 10: hScale
+        get_arg2 2: p
+        get_loc8 7: nextRow
+        inc
+        set_loc8 7: nextRow
+        get_array_el
+        get_arg2 2: p
+        get_loc8 14: prevRow
+        inc
+        set_loc8 14: prevRow
+        get_array_el
+        sub
+        mul
+        sub
+        put_array_el
+        inc_loc 8: i
+        goto8 200
+  261:  inc_loc 1: j
+        goto8 154
+  265:  get_var_ref3 3: set_bnd
+        push_1 1
+        get_arg0 0: u
+        call2 2
+        drop
+        get_var_ref3 3: set_bnd
+        push_2 2
+        get_arg1 1: v
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:261:5: function: dens_step
+  mode: strict
+  args: x x0 u v dt
+  closure vars:
+    0: addFields local:loc0 var
+    1: diffuse local:loc3 var
+    2: advect local:loc6 var
+  stack_size: 7
+  opcodes:
+        get_var_ref0 0: addFields
+        get_arg0 0: x
+        get_arg1 1: x0
+        get_arg 4: dt
+        call3 3
+        drop
+        get_var_ref1 1: diffuse
+        push_0 0
+        get_arg1 1: x0
+        get_arg0 0: x
+        get_arg 4: dt
+        call 4
+        drop
+        get_var_ref2 2: advect
+        push_0 0
+        get_arg0 0: x
+        get_arg1 1: x0
+        get_arg2 2: u
+        get_arg3 3: v
+        get_arg 4: dt
+        call 6
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:266:5: function: vel_step
+  mode: strict
+  args: u v u0 v0 dt
+  locals:
+    0: var temp
+  closure vars:
+    0: addFields local:loc0 var
+    1: diffuse2 local:loc5 var
+    2: project local:loc7 var
+    3: advect local:loc6 var
+  stack_size: 7
+  opcodes:
+        get_var_ref0 0: addFields
+        get_arg0 0: u
+        get_arg2 2: u0
+        get_arg 4: dt
+        call3 3
+        drop
+        get_var_ref0 0: addFields
+        get_arg1 1: v
+        get_arg3 3: v0
+        get_arg 4: dt
+        call3 3
+        drop
+        get_arg2 2: u0
+        put_loc0 0: temp
+        get_arg0 0: u
+        put_arg2 2: u0
+        get_loc0 0: temp
+        put_arg0 0: u
+        get_arg3 3: v0
+        put_loc0 0: temp
+        get_arg1 1: v
+        put_arg3 3: v0
+        get_loc0 0: temp
+        put_arg1 1: v
+        get_var_ref1 1: diffuse2
+        get_arg0 0: u
+        get_arg2 2: u0
+        get_arg1 1: v
+        get_arg3 3: v0
+        get_arg 4: dt
+        call 5
+        drop
+        get_var_ref2 2: project
+        get_arg0 0: u
+        get_arg1 1: v
+        get_arg2 2: u0
+        get_arg3 3: v0
+        call 4
+        drop
+        get_arg2 2: u0
+        put_loc0 0: temp
+        get_arg0 0: u
+        put_arg2 2: u0
+        get_loc0 0: temp
+        put_arg0 0: u
+        get_arg3 3: v0
+        put_loc0 0: temp
+        get_arg1 1: v
+        put_arg3 3: v0
+        get_loc0 0: temp
+        put_arg1 1: v
+        get_var_ref3 3: advect
+        push_1 1
+        get_arg0 0: u
+        get_arg2 2: u0
+        get_arg2 2: u0
+        get_arg3 3: v0
+        get_arg 4: dt
+        call 6
+        drop
+        get_var_ref3 3: advect
+        push_2 2
+        get_arg1 1: v
+        get_arg3 3: v0
+        get_arg2 2: u0
+        get_arg3 3: v0
+        get_arg 4: dt
+        call 6
+        drop
+        get_var_ref2 2: project
+        get_arg0 0: u
+        get_arg1 1: v
+        get_arg2 2: u0
+        get_arg3 3: v0
+        call 4
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:287:22: function: <null>
+  mode: strict
+  args: d u v
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:291:27: function: <null>
+  mode: strict
+  args: x y d
+  closure vars:
+    0: dens local:arg0 var
+    1: rowSize parent:loc0 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: dens
+        get_arg0 0: x
+        push_1 1
+        add
+        get_arg1 1: y
+        push_1 1
+        add
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_arg2 2: d
+        put_array_el
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:294:27: function: <null>
+  mode: strict
+  args: x y
+  closure vars:
+    0: dens local:arg0 var
+    1: rowSize parent:loc0 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: dens
+        get_arg0 0: x
+        push_1 1
+        add
+        get_arg1 1: y
+        push_1 1
+        add
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_array_el
+        return
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:297:28: function: <null>
+  mode: strict
+  args: x y xv yv
+  closure vars:
+    0: u local:arg1 var
+    1: rowSize parent:loc0 var
+    2: v local:arg2 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: u
+        get_arg0 0: x
+        push_1 1
+        add
+        get_arg1 1: y
+        push_1 1
+        add
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_arg2 2: xv
+        put_array_el
+        get_var_ref2 2: v
+        get_arg0 0: x
+        push_1 1
+        add
+        get_arg1 1: y
+        push_1 1
+        add
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_arg3 3: yv
+        put_array_el
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:301:29: function: <null>
+  mode: strict
+  args: x y
+  closure vars:
+    0: u local:arg1 var
+    1: rowSize parent:loc0 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: u
+        get_arg0 0: x
+        push_1 1
+        add
+        get_arg1 1: y
+        push_1 1
+        add
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_array_el
+        return
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:304:29: function: <null>
+  mode: strict
+  args: x y
+  closure vars:
+    0: v local:arg2 var
+    1: rowSize parent:loc0 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: v
+        get_arg0 0: x
+        push_1 1
+        add
+        get_arg1 1: y
+        push_1 1
+        add
+        get_var_ref1 1: rowSize
+        mul
+        add
+        get_array_el
+        return
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:307:22: function: <null>
+  mode: strict
+  closure vars:
+    0: width parent:loc1 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: width
+        return
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:308:23: function: <null>
+  mode: strict
+  closure vars:
+    0: height parent:loc2 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: height
+        return
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:288:5: function: Field
+  mode: strict
+  args: dens u v
+  locals:
+    0: var this
+  closure vars:
+    0: rowSize local:loc24 var
+    1: width local:loc22 var
+    2: height local:loc23 var
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        fclosure8 0: [bytecode <null>]
+        put_field setDensity
+        get_loc0 0: this
+        fclosure8 1: [bytecode <null>]
+        put_field getDensity
+        get_loc0 0: this
+        fclosure8 2: [bytecode <null>]
+        put_field setVelocity
+        get_loc0 0: this
+        fclosure8 3: [bytecode <null>]
+        put_field getXVelocity
+        get_loc0 0: this
+        fclosure8 4: [bytecode <null>]
+        put_field getYVelocity
+        get_loc0 0: this
+        fclosure8 5: [bytecode <null>]
+        put_field width
+        get_loc0 0: this
+        fclosure8 6: [bytecode <null>]
+        put_field height
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:310:5: function: queryUI
+  mode: strict
+  args: d u v
+  locals:
+    0: var i
+  closure vars:
+    0: size local:loc25 var
+    1: uiCallback local:loc10 var
+    2: Field local:loc11 var
+  stack_size: 8
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        get_var_ref0 0: size
+        lt
+        if_false8 23
+        get_arg1 1: u
+        get_loc0 0: i
+        get_arg2 2: v
+        get_loc0 0: i
+        get_arg0 0: d
+        get_loc0 0: i
+        push_0 0
+        insert3
+        put_array_el
+        insert3
+        put_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 2
+   23:  get_var_ref1 1: uiCallback
+        get_var_ref2 2: Field
+        dup
+        get_arg0 0: d
+        get_arg1 1: u
+        get_arg2 2: v
+        call_constructor 3
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:315:19: function: <null>
+  mode: strict
+  closure vars:
+    0: queryUI local:loc12 var
+    1: dens_prev local:loc17 var
+    2: u_prev local:loc19 var
+    3: v_prev local:loc21 var
+    4: vel_step local:loc9 var
+    5: u local:loc18 var
+    6: v local:loc20 var
+    7: dt local:loc15 var
+    8: dens_step local:loc8 var
+    9: dens local:loc16 var
+   10: displayFunc local:loc26 var
+   11: Field local:loc11 var
+  stack_size: 6
+  opcodes:
+        get_var_ref0 0: queryUI
+        get_var_ref1 1: dens_prev
+        get_var_ref2 2: u_prev
+        get_var_ref3 3: v_prev
+        call3 3
+        drop
+        get_var_ref 4: vel_step
+        get_var_ref 5: u
+        get_var_ref 6: v
+        get_var_ref2 2: u_prev
+        get_var_ref3 3: v_prev
+        get_var_ref 7: dt
+        call 5
+        drop
+        get_var_ref 8: dens_step
+        get_var_ref 9: dens
+        get_var_ref1 1: dens_prev
+        get_var_ref 5: u
+        get_var_ref 6: v
+        get_var_ref 7: dt
+        call 5
+        drop
+        get_var_ref 10: displayFunc
+        get_var_ref 11: Field
+        dup
+        get_var_ref 9: dens
+        get_var_ref 5: u
+        get_var_ref 6: v
+        call_constructor 3
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:321:31: function: <null>
+  mode: strict
+  args: func
+  closure vars:
+    0: displayFunc local:loc26 var
+  stack_size: 1
+  opcodes:
+        get_arg0 0: func
+        put_var_ref0 0: displayFunc
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:324:23: function: <null>
+  mode: strict
+  closure vars:
+    0: iterations local:loc13 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: iterations
+        return
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:325:26: function: <null>
+  mode: strict
+  args: iters
+  closure vars:
+    0: iterations local:loc13 var
+  stack_size: 2
+  opcodes:
+        get_arg0 0: iters
+        push_0 0
+        gt
+        if_false8 13
+        get_arg0 0: iters
+        push_i8 100
+        lte
+        if_false8 13
+        get_arg0 0: iters
+        put_var_ref0 0: iterations
+   13:  return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:329:26: function: <null>
+  mode: strict
+  args: callback
+  closure vars:
+    0: uiCallback local:loc10 var
+  stack_size: 1
+  opcodes:
+        get_arg0 0: callback
+        put_var_ref0 0: uiCallback
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:346:5: function: reset
+  mode: strict
+  locals:
+    0: var i
+  closure vars:
+    0: rowSize local:loc24 var
+    1: width local:loc22 var
+    2: size local:loc25 var
+    3: height local:loc23 var
+    4: dens local:loc16 var
+    5: dens_prev local:loc17 var
+    6: u local:loc18 var
+    7: u_prev local:loc19 var
+    8: v local:loc20 var
+    9: v_prev local:loc21 var
+  stack_size: 14
+  opcodes:
+        get_var_ref1 1: width
+        push_2 2
+        add
+        put_var_ref0 0: rowSize
+        get_var_ref1 1: width
+        push_2 2
+        add
+        get_var_ref3 3: height
+        push_2 2
+        add
+        mul
+        put_var_ref2 2: size
+        get_var Array
+        dup
+        get_var_ref2 2: size
+        call_constructor 1
+        put_var_ref 4: dens
+        get_var Array
+        dup
+        get_var_ref2 2: size
+        call_constructor 1
+        put_var_ref 5: dens_prev
+        get_var Array
+        dup
+        get_var_ref2 2: size
+        call_constructor 1
+        put_var_ref 6: u
+        get_var Array
+        dup
+        get_var_ref2 2: size
+        call_constructor 1
+        put_var_ref 7: u_prev
+        get_var Array
+        dup
+        get_var_ref2 2: size
+        call_constructor 1
+        put_var_ref 8: v
+        get_var Array
+        dup
+        get_var_ref2 2: size
+        call_constructor 1
+        put_var_ref 9: v_prev
+        push_0 0
+        put_loc0 0: i
+   92:  get_loc0 0: i
+        get_var_ref2 2: size
+        lt
+        if_false8 137
+        get_var_ref 5: dens_prev
+        get_loc0 0: i
+        get_var_ref 7: u_prev
+        get_loc0 0: i
+        get_var_ref 9: v_prev
+        get_loc0 0: i
+        get_var_ref 4: dens
+        get_loc0 0: i
+        get_var_ref 6: u
+        get_loc0 0: i
+        get_var_ref 8: v
+        get_loc0 0: i
+        push_0 0
+        insert3
+        put_array_el
+        insert3
+        put_array_el
+        insert3
+        put_array_el
+        insert3
+        put_array_el
+        insert3
+        put_array_el
+        put_array_el
+        inc_loc 0: i
+        goto8 92
+  137:  return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:359:20: function: <null>
+  mode: strict
+  closure vars:
+    0: dens local:loc16 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: dens
+        return
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:362:26: function: <null>
+  mode: strict
+  args: hRes wRes
+  locals:
+    0: var res
+  closure vars:
+    0: width local:loc22 var
+    1: height local:loc23 var
+    2: reset local:loc27 var
+  stack_size: 2
+  opcodes:
+        get_arg1 1: wRes
+        get_arg0 0: hRes
+        mul
+        set_loc0 0: res
+        push_0 0
+        gt
+        if_false8 38
+        get_loc0 0: res
+        push_i32 1000000
+        lt
+        if_false8 38
+        get_arg1 1: wRes
+        get_var_ref0 0: width
+        neq
+        dup
+        if_true8 27
+        drop
+        get_arg0 0: hRes
+        get_var_ref1 1: height
+        neq
+   27:  if_false8 38
+        get_arg1 1: wRes
+        put_var_ref0 0: width
+        get_arg0 0: hRes
+        put_var_ref1 1: height
+        get_var_ref2 2: reset
+        call0 0
+        drop
+        push_true
+        return
+   38:  push_false
+        return
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:82:1: function: FluidField
+  mode: strict
+  args: canvas
+  locals:
+    0: var addFields
+    1: var set_bnd
+    2: var lin_solve
+    3: var diffuse
+    4: var lin_solve2
+    5: var diffuse2
+    6: var advect
+    7: var project
+    8: var dens_step
+    9: var vel_step
+   10: var uiCallback
+   11: var Field
+   12: var queryUI
+   13: var iterations
+   14: var visc
+   15: var dt
+   16: var dens
+   17: var dens_prev
+   18: var u
+   19: var u_prev
+   20: var v
+   21: var v_prev
+   22: var width
+   23: var height
+   24: var rowSize
+   25: var size
+   26: var displayFunc
+   27: var reset
+   28: var this
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc8 28: this
+        fclosure8 0: [bytecode addFields]
+        put_loc0 0: addFields
+        fclosure8 1: [bytecode set_bnd]
+        put_loc1 1: set_bnd
+        fclosure8 2: [bytecode lin_solve]
+        put_loc2 2: lin_solve
+        fclosure8 3: [bytecode diffuse]
+        put_loc3 3: diffuse
+        fclosure8 4: [bytecode lin_solve2]
+        put_loc8 4: lin_solve2
+        fclosure8 5: [bytecode diffuse2]
+        put_loc8 5: diffuse2
+        fclosure8 6: [bytecode advect]
+        put_loc8 6: advect
+        fclosure8 7: [bytecode project]
+        put_loc8 7: project
+        fclosure8 8: [bytecode dens_step]
+        put_loc8 8: dens_step
+        fclosure8 9: [bytecode vel_step]
+        put_loc8 9: vel_step
+        fclosure8 11: [bytecode Field]
+        put_loc8 11: Field
+        fclosure8 12: [bytecode queryUI]
+        put_loc8 12: queryUI
+        fclosure8 20: [bytecode reset]
+        put_loc8 27: reset
+        fclosure8 10: [bytecode <null>]
+        set_name uiCallback
+        put_loc8 10: uiCallback
+        get_loc8 28: this
+        fclosure8 13: [bytecode <null>]
+        put_field update
+        get_loc8 28: this
+        fclosure8 14: [bytecode <null>]
+        put_field setDisplayFunction
+        get_loc8 28: this
+        fclosure8 15: [bytecode <null>]
+        put_field iterations
+        get_loc8 28: this
+        fclosure8 16: [bytecode <null>]
+        put_field setIterations
+        get_loc8 28: this
+        fclosure8 17: [bytecode <null>]
+        put_field setUICallback
+        push_i8 10
+        put_loc8 13: iterations
+        push_const8 18: 0.5
+        put_loc8 14: visc
+        push_const8 19: 0.1
+        put_loc8 15: dt
+        get_loc8 28: this
+        get_loc8 27: reset
+        put_field reset
+        get_loc8 28: this
+        fclosure8 21: [bytecode <null>]
+        put_field getDens
+        get_loc8 28: this
+        fclosure8 22: [bytecode <null>]
+        put_field setResolution
+        get_loc8 28: this
+        get_field2 setResolution
+        push_i8 64
+        push_i8 64
+        call_method 2
+        return_undef
+
+__tests__/fixtures_quickjs/octane/navier-stokes.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: Benchmark parent:loc0 const
+    1: BenchmarkSuite parent:loc1 const
+    2: NavierStokes local:loc0 var
+    3: solver local:loc1 var
+    4: nsFrameCounter local:loc2 var
+    5: runNavierStokes local:loc3 var
+    6: checkResult local:loc4 var
+    7: setupNavierStokes local:loc5 var
+    8: tearDownNavierStokes local:loc6 var
+    9: addPoints local:loc7 var
+   10: framesTillAddingPoints local:loc8 var
+   11: framesBetweenAddingPoints local:loc9 var
+   12: prepareFrame local:loc10 var
+   13: FluidField local:loc11 var
+  stack_size: 15
+  opcodes:
+        push_this
+        if_false8 39
+        fclosure8 0: [bytecode runNavierStokes]
+        put_var_ref 5: runNavierStokes
+        fclosure8 1: [bytecode checkResult]
+        put_var_ref 6: checkResult
+        fclosure8 2: [bytecode setupNavierStokes]
+        put_var_ref 7: setupNavierStokes
+        fclosure8 3: [bytecode tearDownNavierStokes]
+        put_var_ref 8: tearDownNavierStokes
+        fclosure8 4: [bytecode addPoints]
+        put_var_ref 9: addPoints
+        fclosure8 5: [bytecode prepareFrame]
+        put_var_ref 12: prepareFrame
+        fclosure8 6: [bytecode FluidField]
+        put_var_ref 13: FluidField
+        return_undef
+   39:  get_var_ref_check 1: BenchmarkSuite
+        dup
+        push_atom_value NavierStokes
+        push_i32 1484000
+        array_from 1
+        get_var_ref_check 0: Benchmark
+        dup
+        push_atom_value NavierStokes
+        push_true
+        push_false
+        push_i16 180
+        get_var_ref 5: runNavierStokes
+        get_var_ref 7: setupNavierStokes
+        get_var_ref 8: tearDownNavierStokes
+        null
+        push_i8 16
+        call_constructor 9
+        array_from 1
+        call_constructor 3
+        put_var_ref2 2: NavierStokes
+        null
+        put_var_ref3 3: solver
+        push_0 0
+        put_var_ref 4: nsFrameCounter
+        push_0 0
+        put_var_ref 10: framesTillAddingPoints
+        push_5 5
+        put_var_ref 11: framesBetweenAddingPoints
+        undefined
+        return_async
+
