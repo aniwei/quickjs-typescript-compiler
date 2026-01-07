@@ -1,0 +1,1605 @@
+{
+  "generatedAt": "2026-01-07T15:37:34.863Z",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix",
+  "totalSummaries": 300,
+  "mismatchCount": 37,
+  "errors": [],
+  "families": [
+    {
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "count": 15,
+      "title": "字节码指令流差异",
+      "anchors": [
+        {
+          "file": "third_party/QuickJS/src/core/parser.c",
+          "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+        }
+      ],
+      "examples": [
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_bigint.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_bjson.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_ic_atom_free.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/code-load.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/crypto.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/deltablue.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/gbemu-part1.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/gbemu-part2.ts"
+      ]
+    },
+    {
+      "normalizedPath": "root.func.cpool[*].cpool[*].bytecode",
+      "count": 9,
+      "title": "字节码指令流差异",
+      "anchors": [
+        {
+          "file": "third_party/QuickJS/src/core/parser.c",
+          "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+        }
+      ],
+      "examples": [
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/repl.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_language.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_argument_scope.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_repl1.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_repl2.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/base.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/box2d.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/repl.ts"
+      ]
+    },
+    {
+      "normalizedPath": "root.func.bytecode",
+      "count": 5,
+      "title": "字节码指令流差异",
+      "anchors": [
+        {
+          "file": "third_party/QuickJS/src/core/parser.c",
+          "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+        }
+      ],
+      "examples": [
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_builtin.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/bundle.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/raytrace.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/typescript-compiler.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/test_builtin.ts"
+      ]
+    },
+    {
+      "normalizedPath": "root.func.cpool[*].debug.pc2line",
+      "count": 2,
+      "title": "pc2line/debug 映射差异",
+      "anchors": [
+        {
+          "file": "third_party/QuickJS/src/core/parser.c",
+          "hint": "emit_source_pos() 写入 OP_line_num；以及 pc2line 生成/编码逻辑（debug info 相关段落）"
+        }
+      ],
+      "examples": [
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/complex-async-flow.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/earley-boyer.ts"
+      ]
+    },
+    {
+      "normalizedPath": "unknown",
+      "count": 2,
+      "title": "unknown",
+      "anchors": [],
+      "examples": [
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_bignum.ts",
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/test_bignum.ts"
+      ]
+    },
+    {
+      "normalizedPath": "root.func.debug.pc2line",
+      "count": 1,
+      "title": "pc2line/debug 映射差异",
+      "anchors": [
+        {
+          "file": "third_party/QuickJS/src/core/parser.c",
+          "hint": "emit_source_pos() 写入 OP_line_num；以及 pc2line 生成/编码逻辑（debug info 相关段落）"
+        }
+      ],
+      "examples": [
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/try-finally-basic.ts"
+      ]
+    },
+    {
+      "normalizedPath": "root.func.cpool[*].cpool[*].debug.pc2line",
+      "count": 1,
+      "title": "pc2line/debug 映射差异",
+      "anchors": [
+        {
+          "file": "third_party/QuickJS/src/core/parser.c",
+          "hint": "emit_source_pos() 写入 OP_line_num；以及 pc2line 生成/编码逻辑（debug info 相关段落）"
+        }
+      ],
+      "examples": [
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/microbench.ts"
+      ]
+    },
+    {
+      "normalizedPath": "root.atoms[*]",
+      "count": 1,
+      "title": "其他结构差异",
+      "anchors": [
+        {
+          "file": "third_party/QuickJS/src/core/parser.c",
+          "hint": "根据代表样本再精确定位"
+        }
+      ],
+      "examples": [
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/mandreel.ts"
+      ]
+    },
+    {
+      "normalizedPath": "root.atoms.length",
+      "count": 1,
+      "title": "其他结构差异",
+      "anchors": [
+        {
+          "file": "third_party/QuickJS/src/core/parser.c",
+          "hint": "根据代表样本再精确定位"
+        }
+      ],
+      "examples": [
+        "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/pdfjs.ts"
+      ]
+    }
+  ],
+  "mismatches": [
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/complex-async-flow.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures__complex-async-flow",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 324,
+        "wasmSize": 320,
+        "sizeDiff": 4,
+        "sizeDiffPercent": 1.25
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[1].debug.pc2line",
+        "a": {
+          "len": 34,
+          "firstDiff": 21,
+          "bytes": "00 16 04 13 0b 1b 08 00 17 07 0f 00 06 10 00 1b 08 27 01 11 0d"
+        },
+        "b": {
+          "len": 30,
+          "firstDiff": 21,
+          "bytes": "00 16 04 13 0b 1b 08 00 1d 08 0f 1b 08 27 01 11 0d"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].debug.pc2line",
+      "family": {
+        "title": "pc2line/debug 映射差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "emit_source_pos() 写入 OP_line_num；以及 pc2line 生成/编码逻辑（debug info 相关段落）"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/repl.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures__quickjs-tests__repl",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 3555,
+        "wasmSize": 3551,
+        "sizeDiff": 4,
+        "sizeDiffPercent": 0.11264432554210081
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[0].cpool[0].bytecode",
+        "a": {
+          "len": 139,
+          "firstDiff": 1,
+          "bytes": "68 00 00 42 0d 00 00 00 43 45 01 00 00 24 00 00 e4 bf 50 e5 68 03 00 43 46 01 00 00 e0 24 01 00"
+        },
+        "b": {
+          "len": 139,
+          "firstDiff": 1,
+          "bytes": "68 01 00 42 0d 00 00 00 43 45 01 00 00 24 00 00 e3 bf 50 e5 68 03 00 43 46 01 00 00 df 24 01 00"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_bigint.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures__quickjs-tests__test_bigint",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 7166,
+        "wasmSize": 7161,
+        "sizeDiff": 5,
+        "sizeDiffPercent": 0.06982265046781176
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[7].bytecode",
+        "a": {
+          "len": 473,
+          "firstDiff": 101,
+          "bytes": "f2 0e 39 e5 00 00 00 b4 01 00 00 00 8e b4 64 00 00 00 a2 43 39 00 00 00 bf 24 24 01 00 04 11 01"
+        },
+        "b": {
+          "len": 468,
+          "firstDiff": 101,
+          "bytes": "f2 0e 39 e5 00 00 00 b4 ff ff ff ff b4 64 00 00 00 a2 43 39 00 00 00 bf 24 24 01 00 04 11 01 00"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_bignum.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures__quickjs-tests__test_bignum",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 9211,
+        "wasmSize": 5,
+        "sizeDiff": 9206,
+        "sizeDiffPercent": 184120
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diffError": "Error: Unexpected end of bytecode buffer (need 1 bytes at ptr=5, len=5)"
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_bjson.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures__quickjs-tests__test_bjson",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 3005,
+        "wasmSize": 3006,
+        "sizeDiff": -1,
+        "sizeDiffPercent": -0.0332667997338656
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[3].bytecode",
+        "a": {
+          "len": 371,
+          "firstDiff": 10,
+          "bytes": "11 04 4b 00 00 00 ad 6c 1b 01 00 00 d3 f5 ec 07 04 01 00 00 00 28 d3 39 a7 00 00 00 a9 ec 1c 04"
+        },
+        "b": {
+          "len": 372,
+          "firstDiff": 10,
+          "bytes": "11 04 4b 00 00 00 ad 6c 1c 01 00 00 d3 f5 ec 07 04 01 00 00 00 28 d3 39 a7 00 00 00 a9 ec 1c 04"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_builtin.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures__quickjs-tests__test_builtin",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 76964,
+        "wasmSize": 76965,
+        "sizeDiff": -1,
+        "sizeDiffPercent": -0.0012992918859221724
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.bytecode",
+        "a": {
+          "len": 715,
+          "firstDiff": 490,
+          "bytes": "00 00 04 07 01 00 00 cb b7 37 8b 00 00 00 3c 8b 00 00 00 0a 37 e5 00 00 00 3c e5 00 00 00 06 cb"
+        },
+        "b": {
+          "len": 715,
+          "firstDiff": 490,
+          "bytes": "00 00 04 07 01 00 00 cb 37 8b 00 00 00 b7 3c 8b 00 00 00 37 e5 00 00 00 0a 3c e5 00 00 00 06 cb"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_ic_atom_free.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures__quickjs-tests__test_ic_atom_free",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 123221,
+        "wasmSize": 121925,
+        "sizeDiff": 1296,
+        "sizeDiffPercent": 1.062948533934796
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[0].bytecode",
+        "a": {
+          "len": 398,
+          "firstDiff": 193,
+          "bytes": "08 01 00 00 c4 04 c2 01 15 44 80 00 00 00 0e c4 04 d3 15 44 09 01 00 00 0e c4 04 c9 15 44 04 01"
+        },
+        "b": {
+          "len": 384,
+          "firstDiff": 193,
+          "bytes": "08 01 00 00 c4 04 c2 01 44 80 00 00 00 c4 04 d3 44 09 01 00 00 c4 04 c9 44 04 01 00 00 c4 04 c8"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_language.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures__quickjs-tests__test_language",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 13894,
+        "wasmSize": 13957,
+        "sizeDiff": -63,
+        "sizeDiffPercent": -0.45138640108905925
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[21].cpool[1].bytecode",
+        "a": {
+          "len": 85,
+          "firstDiff": 9,
+          "bytes": "03 c5 05 08 c5 04 0c 00 c5 06 0c 05 cd 0c 05 ce 63 01 00 63 00 00 d3 11 f4 ec 25 0e c9 75 3c 00"
+        },
+        "b": {
+          "len": 80,
+          "firstDiff": 9,
+          "bytes": "03 c5 05 08 c5 04 0c 00 c6 07 c5 06 0c 05 cd 0c 05 ce 63 01 00 63 00 00 d3 11 f4 ec 1a 0e ca 75"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_argument_scope.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures__test_argument_scope",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 3661,
+        "wasmSize": 3663,
+        "sizeDiff": -2,
+        "sizeDiffPercent": -0.054600054600054605
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[1].cpool[1].bytecode",
+        "a": {
+          "len": 85,
+          "firstDiff": 9,
+          "bytes": "03 c5 05 08 c5 04 0c 00 c5 06 0c 05 cd 0c 05 ce 63 01 00 63 00 00 d3 11 f4 ec 25 0e c9 75 3c 00"
+        },
+        "b": {
+          "len": 80,
+          "firstDiff": 9,
+          "bytes": "03 c5 05 08 c5 04 0c 00 c6 07 c5 06 0c 05 cd 0c 05 ce 63 01 00 63 00 00 d3 11 f4 ec 1a 0e ca 75"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_repl1.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures__test_repl1",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 1393,
+        "wasmSize": 1393,
+        "sizeDiff": 0,
+        "sizeDiffPercent": 0
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[0].cpool[0].bytecode",
+        "a": {
+          "len": 18,
+          "firstDiff": 1,
+          "bytes": "68 00 00 42 0d 00 00 00 43 31 01 00 00 24 00 00 e4 29"
+        },
+        "b": {
+          "len": 18,
+          "firstDiff": 1,
+          "bytes": "68 01 00 42 0d 00 00 00 43 31 01 00 00 24 00 00 e3 29"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_repl2.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures__test_repl2",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 1402,
+        "wasmSize": 1402,
+        "sizeDiff": 0,
+        "sizeDiffPercent": 0
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[0].cpool[0].bytecode",
+        "a": {
+          "len": 21,
+          "firstDiff": 1,
+          "bytes": "68 00 00 42 0d 00 00 00 43 31 01 00 00 24 00 00 e4 bf 50 e5 29"
+        },
+        "b": {
+          "len": 21,
+          "firstDiff": 1,
+          "bytes": "68 01 00 42 0d 00 00 00 43 31 01 00 00 24 00 00 e3 bf 50 e5 29"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/try-finally-basic.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures__try-finally-basic",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 160,
+        "wasmSize": 158,
+        "sizeDiff": 2,
+        "sizeDiffPercent": 1.2658227848101267
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.debug.pc2line",
+        "a": {
+          "len": 16,
+          "firstDiff": 8,
+          "bytes": "00 00 27 08 1b 0e 20 08 48 15 37 00 1b 0e 20 08"
+        },
+        "b": {
+          "len": 14,
+          "firstDiff": 8,
+          "bytes": "00 00 27 08 1b 0e 20 08 7d 15 1b 0e 20 08"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.debug.pc2line",
+      "family": {
+        "title": "pc2line/debug 映射差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "emit_source_pos() 写入 OP_line_num；以及 pc2line 生成/编码逻辑（debug info 相关段落）"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/microbench.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__microbench",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 22483,
+        "wasmSize": 22481,
+        "sizeDiff": 2,
+        "sizeDiffPercent": 0.00889640140563142
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[64].cpool[3].debug.pc2line",
+        "a": {
+          "len": 51,
+          "firstDiff": 27,
+          "bytes": "07 08 07 01 0b 14 18 19 07 07 07 12 07 08 07 03 12 1f 07 08 07 0a 07 08 07 08 07 03 07 05 0b 14"
+        },
+        "b": {
+          "len": 49,
+          "firstDiff": 27,
+          "bytes": "07 08 07 01 0b 14 18 19 0c 0a 07 08 07 03 12 1f 07 08 07 0a 07 08 07 08 07 03 07 05 0b 14"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].cpool[*].debug.pc2line",
+      "family": {
+        "title": "pc2line/debug 映射差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "emit_source_pos() 写入 OP_line_num；以及 pc2line 生成/编码逻辑（debug info 相关段落）"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/base.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__base",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 5388,
+        "wasmSize": 5388,
+        "sizeDiff": 0,
+        "sizeDiffPercent": 0
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[19].cpool[1].bytecode",
+        "a": {
+          "len": 60,
+          "firstDiff": 5,
+          "bytes": "6f 1a 00 00 00 df 43 fb 00 00 00 df 42 0d 01 00 00 e0 48 e1 24 02 00 e5 0e ee 16 cb 6f 12 00 00"
+        },
+        "b": {
+          "len": 60,
+          "firstDiff": 5,
+          "bytes": "6f 1a 00 00 00 e0 43 fb 00 00 00 e0 42 0d 01 00 00 e1 48 df 24 02 00 e3 0e ee 16 cb 6f 12 00 00"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/box2d.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__box2d",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 267461,
+        "wasmSize": 267139,
+        "sizeDiff": 322,
+        "sizeDiffPercent": 0.12053649972486233
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[0].cpool[4].bytecode",
+        "a": {
+          "len": 38,
+          "firstDiff": 26,
+          "bytes": "f1 cb b7 cc c8 d3 a5 ec 0a c7 c8 b7 4b c8 91 cc ee f3 c7 28"
+        },
+        "b": {
+          "len": 37,
+          "firstDiff": 26,
+          "bytes": "f1 cb b7 cc c8 d3 a5 ec 09 c7 c8 b7 4b 95 01 ee f4 c7 28"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/bundle.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__bundle",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 6661697,
+        "wasmSize": 6661650,
+        "sizeDiff": 47,
+        "sizeDiffPercent": 0.0007055309120112885
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.bytecode",
+        "a": {
+          "len": 113796,
+          "firstDiff": 22252,
+          "bytes": "00 3f ef 02 00 00 00 03 3c 02 00 00 41 f0 02 00 00 00 03 3d 02 00 00 41 f1 02 00 00 00 03 3e 02"
+        },
+        "b": {
+          "len": 113796,
+          "firstDiff": 22252,
+          "bytes": "00 3f ef 02 00 00 00 03 3b 02 00 00 41 f0 02 00 00 00 03 3c 02 00 00 41 f1 02 00 00 00 03 3d 02"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/code-load.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__code-load",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 105740,
+        "wasmSize": 105737,
+        "sizeDiff": 3,
+        "sizeDiffPercent": 0.0028372282171803625
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[4].bytecode",
+        "a": {
+          "len": 50,
+          "firstDiff": 8,
+          "bytes": "b7 cb b7 cc c8 d4 a5 ec 17 c7 d3 c8 48 9f cf c7 bf 0a a2 9f cf c7 bd a3 b0 cb c8 91 cc ee e6 c7"
+        },
+        "b": {
+          "len": 49,
+          "firstDiff": 8,
+          "bytes": "b7 cb b7 cc c8 d4 a5 ec 16 c7 d3 c8 48 9f cf c7 bf 0a a2 9f cf c7 bd a3 b0 cb 95 01 ee e7 c7 c7"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/crypto.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__crypto",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 36816,
+        "wasmSize": 36619,
+        "sizeDiff": 197,
+        "sizeDiffPercent": 0.5379720909910156
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[11].bytecode",
+        "a": {
+          "len": 66,
+          "firstDiff": 29,
+          "bytes": "00 b8 a0 cd c9 b7 a8 ec 0c c8 c9 c7 c9 48 4b c9 90 cd ee f1 d3 ca 42 6e 01 00 00 44 6e 01 00 00"
+        },
+        "b": {
+          "len": 65,
+          "firstDiff": 29,
+          "bytes": "00 b8 a0 cd c9 b7 a8 ec 0b c8 c9 c7 c9 48 4b 94 02 ee f2 d3 ca 42 6e 01 00 00 44 6e 01 00 00 d3"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/deltablue.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__deltablue",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 11711,
+        "wasmSize": 11707,
+        "sizeDiff": 4,
+        "sizeDiffPercent": 0.034167592038951054
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[34].bytecode",
+        "a": {
+          "len": 293,
+          "firstDiff": 16,
+          "bytes": "42 3b 01 00 00 d3 ab ec 42 c7 c7 42 4c 01 00 00 42 3b 01 00 00 d3 ac 11 ec 1c 0e df 43 00 01 00"
+        },
+        "b": {
+          "len": 289,
+          "firstDiff": 16,
+          "bytes": "42 3b 01 00 00 d3 ab ec 40 c7 c7 42 4c 01 00 00 42 3b 01 00 00 d3 ac ec 25 df 43 00 01 00 00 c7"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/earley-boyer.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__earley-boyer",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 96690,
+        "wasmSize": 96500,
+        "sizeDiff": 190,
+        "sizeDiffPercent": 0.19689119170984457
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[38].debug.pc2line",
+        "a": {
+          "len": 77,
+          "firstDiff": 75,
+          "bytes": "07 05 0d 04 07 04 12 0a 07 0d"
+        },
+        "b": {
+          "len": 79,
+          "firstDiff": 75,
+          "bytes": "07 05 0d 04 07 04 12 0a 00 01 0a 1d"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].debug.pc2line",
+      "family": {
+        "title": "pc2line/debug 映射差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "emit_source_pos() 写入 OP_line_num；以及 pc2line 生成/编码逻辑（debug info 相关段落）"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/gbemu-part1.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__gbemu-part1",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 25122,
+        "wasmSize": 25048,
+        "sizeDiff": 74,
+        "sizeDiffPercent": 0.29543276908335997
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[0].bytecode",
+        "a": {
+          "len": 76,
+          "firstDiff": 69,
+          "bytes": "ec 07 04 87 01 00 00 30 df 68 01 00 f1 e5 29"
+        },
+        "b": {
+          "len": 76,
+          "firstDiff": 69,
+          "bytes": "ec 07 04 87 01 00 00 30 e0 68 02 00 f1 e3 29"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/gbemu-part2.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__gbemu-part2",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 271141,
+        "wasmSize": 270799,
+        "sizeDiff": 342,
+        "sizeDiffPercent": 0.12629293313490816
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[525].bytecode",
+        "a": {
+          "len": 1102,
+          "firstDiff": 10,
+          "bytes": "c0 ff 00 cb c7 b7 a8 6c 94 00 00 00 c7 bf 30 a8 ec 22 c7 bf 40 a5 ec 1c c8 43 9c 01 00 00 01 00"
+        },
+        "b": {
+          "len": 1091,
+          "firstDiff": 10,
+          "bytes": "c0 ff 00 cb c7 b7 a8 6c 89 00 00 00 c7 bf 30 a8 ec 22 c7 bf 40 a5 ec 1c c8 43 9c 01 00 00 01 00"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/mandreel.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__mandreel",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 3513152,
+        "wasmSize": 3512848,
+        "sizeDiff": 304,
+        "sizeDiffPercent": 0.008653946882984974
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.atoms[4094]",
+        "a": "data:audio/",
+        "b": "audiotagAudioSprite"
+      },
+      "normalizedPath": "root.atoms[*]",
+      "family": {
+        "title": "其他结构差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "根据代表样本再精确定位"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/navier-stokes.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__navier-stokes",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 7900,
+        "wasmSize": 7884,
+        "sizeDiff": 16,
+        "sizeDiffPercent": 0.20294266869609334
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[2].bytecode",
+        "a": {
+          "len": 67,
+          "firstDiff": 0,
+          "bytes": "df 11 07 21 01 00 e8 43 fa 00 00 00 c0 80 00 c0 80 00 24 02 00 0e e0 43 fb 00 00 00 bf 14 24 01"
+        },
+        "b": {
+          "len": 67,
+          "firstDiff": 0,
+          "bytes": "e0 11 07 21 01 00 e7 43 fa 00 00 00 c0 80 00 c0 80 00 24 02 00 0e df 43 fb 00 00 00 bf 14 24 01"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/pdfjs.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__pdfjs",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 1198543,
+        "wasmSize": 1196666,
+        "sizeDiff": 1877,
+        "sizeDiffPercent": 0.15685245507100562
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.atoms.length",
+        "a": 8433,
+        "b": 8432
+      },
+      "normalizedPath": "root.atoms.length",
+      "family": {
+        "title": "其他结构差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "根据代表样本再精确定位"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/raytrace.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__raytrace",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 16102,
+        "wasmSize": 16154,
+        "sizeDiff": -52,
+        "sizeDiffPercent": -0.3219016961743221
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.bytecode",
+        "a": {
+          "len": 2240,
+          "firstDiff": 6,
+          "bytes": "08 ec 07 c2 3d 61 06 00 29 68 01 00 11 04 e8 00 00 00 01 95 4a 0b 00 26 01 00 68 00 00 11 04 e8"
+        },
+        "b": {
+          "len": 2240,
+          "firstDiff": 6,
+          "bytes": "08 ec 07 c2 3d 61 13 00 29 68 01 00 11 04 e8 00 00 00 01 95 4a 0b 00 26 01 00 68 00 00 11 04 e8"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/regexp.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__regexp",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 137179,
+        "wasmSize": 137179,
+        "sizeDiff": 0,
+        "sizeDiffPercent": 0
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[0].bytecode",
+        "a": {
+          "len": 9,
+          "firstDiff": 0,
+          "bytes": "df 11 21 00 00 e4 e1 f0 29"
+        },
+        "b": {
+          "len": 9,
+          "firstDiff": 0,
+          "bytes": "e0 11 21 00 00 e3 e1 f0 29"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/run.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__run",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 1307,
+        "wasmSize": 1326,
+        "sizeDiff": -19,
+        "sizeDiffPercent": -1.4328808446455505
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[0].bytecode",
+        "a": {
+          "len": 79,
+          "firstDiff": 14,
+          "bytes": "00 00 00 43 fd 00 00 00 d3 24 01 00 0e 68 00 00 42 f8 00 00 00 98 ec 0c 68 00 00 26 00 00 44 f8"
+        },
+        "b": {
+          "len": 93,
+          "firstDiff": 14,
+          "bytes": "00 00 00 43 fd 00 00 00 26 00 00 b7 d3 54 0e 18 27 00 00 0e 68 00 00 42 f8 00 00 00 98 ec 0c 68"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/splay.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__splay",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 4161,
+        "wasmSize": 4161,
+        "sizeDiff": 0,
+        "sizeDiffPercent": 0
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[5].bytecode",
+        "a": {
+          "len": 81,
+          "firstDiff": 17,
+          "bytes": "ec 07 04 15 01 00 00 30 e0 11 21 00 00 e5 68 00 00 43 14 01 00 00 24 00 00 e6 b7 cb c7 60 04 00"
+        },
+        "b": {
+          "len": 81,
+          "firstDiff": 17,
+          "bytes": "ec 07 04 15 01 00 00 30 e1 11 21 00 00 e4 68 00 00 43 14 01 00 00 24 00 00 e6 b7 cb c7 60 04 00"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/typescript-compiler.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__octane__typescript-compiler",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 547667,
+        "wasmSize": 549300,
+        "sizeDiff": -1633,
+        "sizeDiffPercent": -0.2972874567631531
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.bytecode",
+        "a": {
+          "len": 418,
+          "firstDiff": 44,
+          "bytes": "0e c2 03 4f e6 00 00 00 e4 c2 04 df 11 ed 04 0e 0b e7 f1 0e c2 05 df 11 ed 04 0e 0b e7 f1 0e c2"
+        },
+        "b": {
+          "len": 424,
+          "firstDiff": 44,
+          "bytes": "0e c2 03 4f e6 00 00 00 e6 c2 04 df 11 ed 04 0e 0b e7 f1 0e c2 05 df 11 ed 04 0e 0b e7 f1 0e c2"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/repl.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__repl",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 19507,
+        "wasmSize": 19473,
+        "sizeDiff": 34,
+        "sizeDiffPercent": 0.17460072921481026
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[0].cpool[0].bytecode",
+        "a": {
+          "len": 139,
+          "firstDiff": 1,
+          "bytes": "68 00 00 42 0d 00 00 00 43 b5 01 00 00 24 00 00 e4 bf 50 e5 68 03 00 43 b6 01 00 00 e0 24 01 00"
+        },
+        "b": {
+          "len": 139,
+          "firstDiff": 1,
+          "bytes": "68 01 00 42 0d 00 00 00 43 b5 01 00 00 24 00 00 e3 bf 50 e5 68 03 00 43 b6 01 00 00 df 24 01 00"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/test_bigint.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__test_bigint",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 7156,
+        "wasmSize": 7151,
+        "sizeDiff": 5,
+        "sizeDiffPercent": 0.06992029086841
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[7].bytecode",
+        "a": {
+          "len": 473,
+          "firstDiff": 101,
+          "bytes": "f2 0e 39 e5 00 00 00 b4 01 00 00 00 8e b4 64 00 00 00 a2 43 39 00 00 00 bf 24 24 01 00 04 11 01"
+        },
+        "b": {
+          "len": 468,
+          "firstDiff": 101,
+          "bytes": "f2 0e 39 e5 00 00 00 b4 ff ff ff ff b4 64 00 00 00 a2 43 39 00 00 00 bf 24 24 01 00 04 11 01 00"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/test_bignum.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__test_bignum",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 9222,
+        "wasmSize": 5,
+        "sizeDiff": 9217,
+        "sizeDiffPercent": 184340
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diffError": "Error: Unexpected end of bytecode buffer (need 1 bytes at ptr=5, len=5)"
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/test_bjson.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__test_bjson",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 2999,
+        "wasmSize": 3000,
+        "sizeDiff": -1,
+        "sizeDiffPercent": -0.03333333333333333
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[3].bytecode",
+        "a": {
+          "len": 371,
+          "firstDiff": 10,
+          "bytes": "11 04 4b 00 00 00 ad 6c 1b 01 00 00 d3 f5 ec 07 04 01 00 00 00 28 d3 39 a7 00 00 00 a9 ec 1c 04"
+        },
+        "b": {
+          "len": 372,
+          "firstDiff": 10,
+          "bytes": "11 04 4b 00 00 00 ad 6c 1c 01 00 00 d3 f5 ec 07 04 01 00 00 00 28 d3 39 a7 00 00 00 a9 ec 1c 04"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/test_builtin.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__test_builtin",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 76954,
+        "wasmSize": 76955,
+        "sizeDiff": -1,
+        "sizeDiffPercent": -0.001299460723799623
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.bytecode",
+        "a": {
+          "len": 715,
+          "firstDiff": 490,
+          "bytes": "00 00 04 07 01 00 00 cb b7 37 8b 00 00 00 3c 8b 00 00 00 0a 37 e5 00 00 00 3c e5 00 00 00 06 cb"
+        },
+        "b": {
+          "len": 715,
+          "firstDiff": 490,
+          "bytes": "00 00 04 07 01 00 00 cb 37 8b 00 00 00 b7 3c 8b 00 00 00 37 e5 00 00 00 0a 3c e5 00 00 00 06 cb"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/test_ic_atom_free.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__test_ic_atom_free",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 123213,
+        "wasmSize": 121917,
+        "sizeDiff": 1296,
+        "sizeDiffPercent": 1.0630182829301902
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[0].bytecode",
+        "a": {
+          "len": 398,
+          "firstDiff": 193,
+          "bytes": "08 01 00 00 c4 04 c2 01 15 44 80 00 00 00 0e c4 04 d3 15 44 09 01 00 00 0e c4 04 c9 15 44 04 01"
+        },
+        "b": {
+          "len": 384,
+          "firstDiff": 193,
+          "bytes": "08 01 00 00 c4 04 c2 01 44 80 00 00 00 c4 04 d3 44 09 01 00 00 c4 04 c9 44 04 01 00 00 c4 04 c8"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    },
+    {
+      "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/test_language.ts",
+      "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_jumpslotfix/__tests____fixtures_quickjs__test_language",
+      "bytecode": {
+        "identical": false,
+        "tsSize": 13888,
+        "wasmSize": 13951,
+        "sizeDiff": -63,
+        "sizeDiffPercent": -0.45158053186151526
+      },
+      "trace": {
+        "differenceCount": 0,
+        "tsEventCount": 0,
+        "wasmEventCount": 0,
+        "summaryPath": ""
+      },
+      "diff": {
+        "path": "root.func.cpool[21].cpool[1].bytecode",
+        "a": {
+          "len": 85,
+          "firstDiff": 9,
+          "bytes": "03 c5 05 08 c5 04 0c 00 c5 06 0c 05 cd 0c 05 ce 63 01 00 63 00 00 d3 11 f4 ec 25 0e c9 75 3c 00"
+        },
+        "b": {
+          "len": 80,
+          "firstDiff": 9,
+          "bytes": "03 c5 05 08 c5 04 0c 00 c6 07 c5 06 0c 05 cd 0c 05 ce 63 01 00 63 00 00 d3 11 f4 ec 1a 0e ca 75"
+        },
+        "note": "Uint8Array differs"
+      },
+      "normalizedPath": "root.func.cpool[*].cpool[*].bytecode",
+      "family": {
+        "title": "字节码指令流差异",
+        "anchors": [
+          {
+            "file": "third_party/QuickJS/src/core/parser.c",
+            "hint": "语句/表达式 lowering（js_parse_statement_or_decl/js_parse_expr 等），以及 emit_op 系列"
+          }
+        ]
+      }
+    }
+  ]
+}

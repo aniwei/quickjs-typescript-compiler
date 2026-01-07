@@ -1,0 +1,52 @@
+Module bytecode version: 5
+Atom count: 10
+
+=== Outer Function ===
+bytecodeLen=65 stackSize=15 varCount=0 argCount=0
+     0  push_this                                    pop=0 push=1      08
+     1  if_false8                10                  pop=1 push=0      ec 0a
+     3  fclosure8                0                   pop=0 push=1      c2 00
+     5  put_var_ref3             var_ref=3           pop=1 push=0      e6
+     6  fclosure8                1                   pop=0 push=1      c2 01
+     8  put_var_ref              4                   pop=1 push=0      61 04 00
+    11  return_undef                                 pop=0 push=0      29
+    12  get_var_ref_check        1                   pop=0 push=1      68 01 00
+    15  dup                                          pop=1 push=2      11
+    16  push_atom_value          236                 pop=0 push=1      04 ec 00 00 00
+    21  push_i32                 152815148           pop=0 push=1      01 2c c6 1b 09
+    26  array_from               1                   pop=0 push=1      26 01 00
+    29  get_var_ref_check        0                   pop=0 push=1      68 00 00
+    32  dup                                          pop=1 push=2      11
+    33  push_atom_value          236                 pop=0 push=1      04 ec 00 00 00
+    38  push_false                                   pop=0 push=1      09
+    39  push_true                                    pop=0 push=1      0a
+    40  push_i8                  10                  pop=0 push=1      bf 0a
+    42  get_var_ref3             var_ref=3           pop=0 push=1      e2
+    43  get_var                  71                  pop=0 push=1      39 47 00 00 00
+    48  get_var_ref              4                   pop=0 push=1      60 04 00
+    51  null                                         pop=0 push=1      07
+    52  push_3                   3                   pop=0 push=1      ba
+    53  call_constructor         9                   pop=2 push=1      21 09 00
+    56  array_from               1                   pop=0 push=1      26 01 00
+    59  call_constructor         3                   pop=2 push=1      21 03 00
+    62  drop                                         pop=1 push=0      0e
+    63  undefined                                    pop=0 push=1      06
+    64  return_async                                 pop=1 push=0      2f
+
+=== Inner Function #0 ===
+bytecodeLen=25 stackSize=2 varCount=0 argCount=0
+     0  get_var_undef            237                 pop=0 push=1      38 ed 00 00 00
+     5  typeof_is_function                           pop=1 push=1      f7
+     6  if_true8                 6                   pop=1 push=0      ed 06
+     8  get_var_ref_check        0                   pop=0 push=1      68 00 00
+    11  call0                    npop=0              pop=1 push=1      f0
+    12  drop                                         pop=1 push=0      0e
+    13  get_var                  237                 pop=0 push=1      39 ed 00 00 00
+    18  push_const8              0                   pop=0 push=1      c1 00
+    20  array_from               1                   pop=0 push=1      26 01 00
+    23  call1                    npop=1              pop=1 push=1      f1
+    24  return_undef                                 pop=0 push=0      29
+
+=== Inner Function #1 ===
+bytecodeLen=1 stackSize=0 varCount=0 argCount=0
+     0  return_undef                                 pop=0 push=0      29

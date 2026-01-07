@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/class-private-field-method-destructuring-loop-058.ts
-**生成时间**: 2026-01-07T15:26:01.259Z
+**生成时间**: 2026-01-07T17:32:02.973Z
 
 ## 大小对比
 

@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/class-private-accessors.ts
-**生成时间**: 2026-01-07T15:26:01.232Z
+**生成时间**: 2026-01-07T17:32:02.940Z
 
 ## 大小对比
 

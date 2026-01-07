@@ -2676,101 +2676,76 @@ export class LabelResolver {
    */
   private optimizeShortJumps(fd: FunctionDef, bcOut: BytecodeBuilder): void {
     if (!fd.jumpSlots || fd.jumpCount === 0) return
-    
-    // 迭代优化，直到没有更多可以收缩的跳转
-    let patchOffsets = 1
-    while (patchOffsets > 0) {
-      patchOffsets = 0
-      
+
+    // Match QuickJS parser.c:12090-12190: single-pass shrink, then (if any shrink)
+    // one final pass to patch offsets. Do NOT iterate shrinking to a fixed point,
+    // otherwise we can over-shrink vs QuickJS (e.g. goto16->goto8).
+    let patchOffsets = 0
+
+    if (process.env.DEBUG_JUMP) {
+      console.log(`[optimizeShortJumps] jumpCount=${fd.jumpCount}`)
+    }
+
+    for (let i = 0; i < fd.jumpCount; i++) {
+      const jp = fd.jumpSlots[i]
+      const pos = jp.pos
+      const op = jp.op
+      const diff = fd.labelSlots[jp.label].addr - pos
+
       if (process.env.DEBUG_JUMP) {
-        console.log(`[optimizeShortJumps] jumpCount=${fd.jumpCount}`)
+        console.log(`  [${i}] op=0x${op.toString(16)}, pos=${pos}, label=${jp.label}, addr=${fd.labelSlots[jp.label].addr}, diff=${diff}, size=${jp.size}`)
       }
-      
-      for (let i = 0; i < fd.jumpCount; i++) {
-        const jp = fd.jumpSlots[i]
-        const ls = fd.labelSlots[jp.label]
-        const pos = jp.pos
-        const op = jp.op
-        const diff = ls.addr - pos
-        
-        if (process.env.DEBUG_JUMP) {
-          console.log(`  [${i}] op=0x${op.toString(16)}, pos=${pos}, label=${jp.label}, addr=${ls.addr}, diff=${diff}, size=${jp.size}`)
+
+      let delta = 3
+      switch (op) {
+        case Opcode.OP_goto16:
+          delta = 1
+        // fallthrough
+        case Opcode.OP_if_false:
+        case Opcode.OP_if_true:
+        case Opcode.OP_goto: {
+          if (diff >= -128 && diff <= 127 + delta) {
+            const newSize = 1
+            const newOp = op === Opcode.OP_goto16
+              ? Opcode.OP_goto8
+              : (Opcode.OP_if_false8 + (op - Opcode.OP_if_false))
+
+            if (jp.size > newSize) {
+              this.shrinkJump(fd, bcOut, jp, newOp, newSize, delta, i)
+              patchOffsets++
+              continue
+            }
+          } else if ((diff === (diff << 16 >> 16)) && op === Opcode.OP_goto && jp.size === 4) {
+            const newSize = 2
+            const newOp = Opcode.OP_goto16
+            delta = 2
+            this.shrinkJump(fd, bcOut, jp, newOp, newSize, delta, i)
+            patchOffsets++
+            continue
+          }
+          break
         }
-        
-        let delta = 3  // 默认 delta: 4字节 -> 1字节 = 3字节差
-        let newSize = 1
-        let newOp = op
-        
-        switch (op) {
-          case Opcode.OP_goto16:
-            delta = 1  // 2字节 -> 1字节 = 1字节差
-            // fall through
-          case Opcode.OP_if_false:
-          case Opcode.OP_if_true:
-          case Opcode.OP_goto:
-            // 检查是否可以收缩为短跳转 (1字节偏移)
-            // C 源码: diff >= -128 && diff <= 127 + delta
-            // 需要考虑收缩后 diff 会改变（如果目标在当前位置之后）
-            if (diff >= -128 && diff <= 127 + delta) {
-              newSize = 1
-              if (op === Opcode.OP_goto16) {
-                newOp = Opcode.OP_goto8
-              } else if (op === Opcode.OP_if_false || op === Opcode.OP_if_true || op === Opcode.OP_goto) {
-                newOp = Opcode.OP_if_false8 + (op - Opcode.OP_if_false)
-              } else {
-                continue  // 已经是短跳转
-              }
-              
-              // 检查是否真的需要收缩
-              if (jp.size <= newSize) continue
-              
-              // 执行收缩
-              this.shrinkJump(fd, bcOut, jp, newOp, newSize, delta, i)
-              patchOffsets++
-            } else if ((diff === (diff << 16 >> 16)) && op === Opcode.OP_goto && jp.size === 4) {
-              // 检查是否可以收缩为中等跳转 (2字节偏移)
-              newSize = 2
-              delta = 2
-              newOp = Opcode.OP_goto16
-              
-              this.shrinkJump(fd, bcOut, jp, newOp, newSize, delta, i)
-              patchOffsets++
-            } else {
-              // 无法收缩：仍然必须回填偏移。
-              // QuickJS: 即使没有发生收缩，也要在每一轮根据最新的 pos/addr 重新计算 diff。
-              // 否则当其它跳转收缩导致字节码整体移动时，这里的 diff 会变成“陈旧值”。
-              const buf = bcOut.buffer
-              if (jp.size === 1) {
-                buf[pos] = diff & 0xff
-              } else if (jp.size === 2) {
-                buf[pos] = diff & 0xff
-                buf[pos + 1] = (diff >> 8) & 0xff
-              } else if (jp.size === 4) {
-                buf[pos] = diff & 0xff
-                buf[pos + 1] = (diff >> 8) & 0xff
-                buf[pos + 2] = (diff >> 16) & 0xff
-                buf[pos + 3] = (diff >> 24) & 0xff
-              }
-            }
+      }
+    }
+
+    if (patchOffsets > 0) {
+      const buf = bcOut.buffer
+      for (let j = 0; j < fd.jumpCount; j++) {
+        const jp = fd.jumpSlots[j]
+        const diff1 = fd.labelSlots[jp.label].addr - jp.pos
+        switch (jp.size) {
+          case 1:
+            buf[jp.pos] = diff1 & 0xff
             break
-            
-          default:
-            // 其他跳转类型（catch, gosub 等）只填充偏移，不收缩
-            // 同时也处理已经是短跳转的情况 (更新偏移量)
-            if (jp.size === 1) {
-              const buf = bcOut.buffer
-              buf[pos] = diff & 0xff
-            } else if (jp.size === 2) {
-              const buf = bcOut.buffer
-              buf[pos] = diff & 0xff
-              buf[pos + 1] = (diff >> 8) & 0xff
-            } else if (jp.size === 4) {
-              const buf = bcOut.buffer
-              buf[pos] = diff & 0xff
-              buf[pos + 1] = (diff >> 8) & 0xff
-              buf[pos + 2] = (diff >> 16) & 0xff
-              buf[pos + 3] = (diff >> 24) & 0xff
-            }
+          case 2:
+            buf[jp.pos] = diff1 & 0xff
+            buf[jp.pos + 1] = (diff1 >> 8) & 0xff
+            break
+          case 4:
+            buf[jp.pos] = diff1 & 0xff
+            buf[jp.pos + 1] = (diff1 >> 8) & 0xff
+            buf[jp.pos + 2] = (diff1 >> 16) & 0xff
+            buf[jp.pos + 3] = (diff1 >> 24) & 0xff
             break
         }
       }

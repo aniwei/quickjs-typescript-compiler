@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/optional-chaining-nullish-coalescing-array-object-nested-078.ts
-**生成时间**: 2026-01-07T15:26:01.868Z
+**生成时间**: 2026-01-07T17:32:03.782Z
 
 ## 大小对比
 

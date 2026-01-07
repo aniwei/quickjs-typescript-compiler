@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/run.ts
-**生成时间**: 2026-01-07T14:09:59.781Z
+**生成时间**: 2026-01-07T15:55:38.042Z
 
 ## 大小对比
 

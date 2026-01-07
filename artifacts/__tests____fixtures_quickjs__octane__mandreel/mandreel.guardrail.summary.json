@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__octane__mandreel/cli/mandreel.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__octane__mandreel/cli/mandreel.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__octane__mandreel/cli/mandreel.pc2line.txt",
-    "bytecodeSize": 3513584,
+    "bytecodeSize": 3513675,
     "pc2lineLength": 7589,
     "stackMax": 0
   },
   "bytecode": {
     "identical": false,
-    "tsSize": 3513152,
+    "tsSize": 3513243,
     "wasmSize": 3512848,
-    "sizeDiff": 304,
-    "sizeDiffPercent": 0.008653946882984974
+    "sizeDiff": 395,
+    "sizeDiffPercent": 0.011244437561773239
   },
   "trace": {
     "differenceCount": 0,

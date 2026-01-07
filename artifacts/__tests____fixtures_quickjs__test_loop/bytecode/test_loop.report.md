@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/test_loop.ts
-**生成时间**: 2026-01-07T14:11:14.972Z
+**生成时间**: 2026-01-07T15:57:02.746Z
 
 ## 大小对比
 

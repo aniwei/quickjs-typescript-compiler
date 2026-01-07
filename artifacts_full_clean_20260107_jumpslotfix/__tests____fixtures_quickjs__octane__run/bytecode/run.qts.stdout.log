@@ -1,0 +1,207 @@
+__tests__/fixtures_quickjs/octane/run.js:48:1: function: print
+  mode: strict
+  args: args
+  closure vars:
+    0: BenchmarkSuite parent:loc0 const
+  stack_size: 5
+  opcodes:
+        rest 0
+        put_arg0 0: args
+        get_var console
+        get_field2 log
+        array_from 0
+        push_0 0
+        get_arg0 0: args
+        append
+        drop
+        perm3
+        apply 0
+        drop
+        get_var_ref_check 0: BenchmarkSuite
+        get_field print
+        lnot
+        if_false8 48
+        get_var_ref_check 0: BenchmarkSuite
+        array_from 0
+        put_field print
+   48:  get_var_ref_check 0: BenchmarkSuite
+        get_field print
+        get_field2 push
+        array_from 0
+        push_0 0
+        get_arg0 0: args
+        append
+        drop
+        perm3
+        apply 0
+        drop
+        get_var_ref_check 0: BenchmarkSuite
+        get_field2 notify
+        get_var_ref_check 0: BenchmarkSuite
+        get_field print
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/run.js:56:1: function: PrintResult
+  mode: strict
+  args: name result
+  closure vars:
+    0: print parent:loc2 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: print
+        get_arg0 0: name
+        push_atom_value ": "
+        add
+        get_arg1 1: result
+        add
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/run.js:59:23: function: <null>
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/run.js:65:22: function: <null>
+  mode: strict
+  args: name error
+  closure vars:
+    0: PrintResult parent:loc0 var
+    1: success parent:loc1 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: PrintResult
+        get_arg0 0: name
+        get_arg1 1: error
+        call2 2
+        drop
+        push_false
+        put_var_ref1 1: success
+        return_undef
+
+__tests__/fixtures_quickjs/octane/run.js:69:22: function: <null>
+  mode: strict
+  args: score
+  closure vars:
+    0: print parent:loc2 var
+    1: BenchmarkSuite parent:loc3 const
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: print
+        push_atom_value "----"
+        call1 1
+        drop
+        get_var_ref0 0: print
+        push_atom_value "Score (version "
+        get_var_ref_check 1: BenchmarkSuite
+        get_field version
+        add
+        push_atom_value "): "
+        add
+        get_arg0 0: score
+        add
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/run.js:75:21: function: <null>
+  mode: strict
+  args: name time
+  closure vars:
+    0: print parent:loc2 var
+  stack_size: 7
+  opcodes:
+        get_arg1 1: time
+        if_false8 37
+        get_var_ref0 0: print
+        push_atom_value "----"
+        get_field2 concat
+        get_arg0 0: name
+        push_atom_value ": "
+        get_var parseInt
+        get_arg1 1: time
+        call1 1
+        push_atom_value ms
+        call_method 4
+        call1 1
+        drop
+   37:  return_undef
+
+__tests__/fixtures_quickjs/octane/run.js:59:1: function: run
+  mode: strict
+  args: notify
+  locals:
+    0: let notify [level:1 next:-2]
+  closure vars:
+    0: PrintResult parent:loc3 var
+    1: success parent:loc1 var
+    2: print parent:loc2 var
+    3: BenchmarkSuite parent:loc0 const
+  stack_size: 4
+  opcodes:
+        set_loc_uninitialized 0: notify
+        get_arg0 0: notify
+        dup
+        is_undefined
+        if_false8 17
+        drop
+        fclosure8 0: [bytecode <null>]
+        set_name notify
+        set_arg0 0: notify
+   17:  put_loc0 0: notify
+        get_var_ref_check 3: BenchmarkSuite
+        get_arg0 0: notify
+        put_field notify
+        get_var_ref_check 3: BenchmarkSuite
+        get_field config
+        get_var undefined
+        put_field doWarmup
+        get_var_ref_check 3: BenchmarkSuite
+        get_field config
+        get_var undefined
+        put_field doDeterministic
+        get_var_ref_check 3: BenchmarkSuite
+        get_field2 RunSuites
+        object
+        get_var_ref0 0: PrintResult
+        define_field NotifyResult
+        fclosure8 1: [bytecode <null>]
+        set_name NotifyError
+        define_field NotifyError
+        fclosure8 2: [bytecode <null>]
+        set_name NotifyScore
+        define_field NotifyScore
+        fclosure8 3: [bytecode <null>]
+        set_name NotifyStep
+        define_field NotifyStep
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/run.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: BenchmarkSuite parent:loc0 const
+    1: success local:loc0 var
+    2: print local:loc1 var
+    3: PrintResult local:loc2 var
+    4: run local:loc3 var
+  stack_size: 1
+  opcodes:
+        push_this
+        if_false8 15
+        fclosure8 0: [bytecode print]
+        put_var_ref2 2: print
+        fclosure8 1: [bytecode PrintResult]
+        put_var_ref3 3: PrintResult
+        fclosure8 2: [bytecode run]
+        put_var_ref 4: run
+        return_undef
+   15:  push_true
+        put_var_ref1 1: success
+        get_var_ref 4: run
+        call0 0
+        drop
+        undefined
+        return_async
+

@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_bignum.ts
-**生成时间**: 2026-01-07T15:26:02.101Z
+**生成时间**: 2026-01-07T17:32:04.039Z
 
 ## 大小对比
 

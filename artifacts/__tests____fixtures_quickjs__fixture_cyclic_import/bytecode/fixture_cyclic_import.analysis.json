@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-07T14:02:03.577Z",
+  "timestamp": "2026-01-07T15:47:23.128Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/fixture_cyclic_import.ts",
   "compilation": {
     "typescript": {

@@ -1,0 +1,53 @@
+Module bytecode version: 5
+Atom count: 8
+
+=== Outer Function ===
+bytecodeLen=36 stackSize=1 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 40
+     6  check_define_var         229                 pop=0 push=0      40 e5 00 00 00 40
+    12  fclosure8                0                   pop=0 push=1      c2 00
+    14  define_func              228                 pop=1 push=0      41 e4 00 00 00 00
+    20  fclosure8                1                   pop=0 push=1      c2 01
+    22  define_func              229                 pop=1 push=0      41 e5 00 00 00 00
+    28  get_var                  229                 pop=0 push=1      39 e5 00 00 00
+    33  call0                    npop=0              pop=1 push=1      f0
+    34  set_loc0                 loc=0               pop=1 push=1      cf
+    35  return                                       pop=1 push=0      28
+
+=== Inner Function #0 ===
+bytecodeLen=24 stackSize=3 varCount=0 argCount=0
+     0  get_var                  199                 pop=0 push=1      39 c7 00 00 00
+     5  get_field2               130                 pop=1 push=2      43 82 00 00 00
+    10  call_method              0                   pop=2 push=1      24 00 00
+    13  get_field2               129                 pop=1 push=2      43 81 00 00 00
+    18  fclosure8                0                   pop=0 push=1      c2 00
+    20  call_method              1                   pop=2 push=1      24 01 00
+    23  return_async                                 pop=1 push=0      2f
+
+=== Inner Function #1 ===
+bytecodeLen=62 stackSize=3 varCount=3 argCount=0
+     0  set_loc_uninitialized    2                   pop=0 push=0      63 02 00
+     3  set_loc_uninitialized    1                   pop=0 push=0      63 01 00
+     6  set_loc_uninitialized    0                   pop=0 push=0      63 00 00
+     9  fclosure8                0                   pop=0 push=1      c2 00
+    11  set_name                 231                 pop=1 push=1      4f e7 00 00 00
+    16  put_loc0                 loc=0               pop=1 push=0      cb
+    17  fclosure8                1                   pop=0 push=1      c2 01
+    19  set_name                 107                 pop=1 push=1      4f 6b 00 00 00
+    24  put_loc1                 loc=1               pop=1 push=0      cc
+    25  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    30  call0                    npop=0              pop=1 push=1      f0
+    31  get_field2               129                 pop=1 push=2      43 81 00 00 00
+    36  get_loc_check            1                   pop=0 push=1      64 01 00
+    39  call_method              1                   pop=2 push=1      24 01 00
+    42  drop                                         pop=1 push=0      0e
+    43  get_var                  199                 pop=0 push=1      39 c7 00 00 00
+    48  dup                                          pop=1 push=2      11
+    49  fclosure8                2                   pop=0 push=1      c2 02
+    51  call_constructor         1                   pop=2 push=1      21 01 00
+    54  put_loc2                 loc=2               pop=1 push=0      cd
+    55  get_loc_check            2                   pop=0 push=1      64 02 00
+    58  await                                        pop=1 push=1      8d
+    59  drop                                         pop=1 push=0      0e
+    60  undefined                                    pop=0 push=1      06
+    61  return_async                                 pop=1 push=0      2f

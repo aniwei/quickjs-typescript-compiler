@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-07T14:10:20.295Z",
+  "timestamp": "2026-01-07T15:55:58.984Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/typescript-input.ts",
   "note": "analysis omitted: bytecode too large (1243714 bytes)",
   "compilation": {

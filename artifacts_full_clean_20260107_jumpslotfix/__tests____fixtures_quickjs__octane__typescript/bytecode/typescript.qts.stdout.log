@@ -1,0 +1,443 @@
+__tests__/fixtures_quickjs/octane/typescript.js:33:1: function: setupTypescript
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/typescript.js:35:1: function: tearDownTypescript
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/typescript.js:45:21: function: <null>
+  mode: strict
+  args: fileName
+  closure vars:
+    0: outfile parent:loc0 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: outfile
+        return
+
+__tests__/fixtures_quickjs/octane/typescript.js:46:21: function: <null>
+  mode: strict
+  args: path
+  stack_size: 1
+  opcodes:
+        push_false
+        return
+
+__tests__/fixtures_quickjs/octane/typescript.js:47:26: function: <null>
+  mode: strict
+  args: path
+  stack_size: 1
+  opcodes:
+        push_false
+        return
+
+__tests__/fixtures_quickjs/octane/typescript.js:48:22: function: <null>
+  mode: strict
+  args: path
+  stack_size: 1
+  opcodes:
+        get_arg0 0: path
+        return
+
+__tests__/fixtures_quickjs/octane/typescript.js:39:1: function: runTypescript
+  mode: strict
+  locals:
+    0: var compiler
+  closure vars:
+    0: outfile parent:loc9 var
+    1: createCompiler parent:loc11 var
+    2: compiler_input parent:loc3 const
+    3: parseErrors parent:loc7 var
+  stack_size: 4
+  opcodes:
+        get_var_ref1 1: createCompiler
+        call0 0
+        set_loc0 0: compiler
+        get_field2 addUnit
+        get_var_ref_check 2: compiler_input
+        push_atom_value "compiler_input.ts"
+        call_method 2
+        drop
+        array_from 0
+        put_var_ref3 3: parseErrors
+        get_loc0 0: compiler
+        get_field2 reTypeCheck
+        call_method 0
+        drop
+        get_loc0 0: compiler
+        get_field2 emit
+        object
+        fclosure8 0: [bytecode <null>]
+        set_name createFile
+        define_field createFile
+        fclosure8 1: [bytecode <null>]
+        set_name fileExists
+        define_field fileExists
+        fclosure8 2: [bytecode <null>]
+        set_name directoryExists
+        define_field directoryExists
+        fclosure8 3: [bytecode <null>]
+        set_name resolvePath
+        define_field resolvePath
+        call_method 1
+        drop
+        get_var_ref3 3: parseErrors
+        get_length
+        push_i16 192
+        neq
+        if_false8 124
+        get_var_ref3 3: parseErrors
+        get_length
+        push_i16 193
+        neq
+        if_false8 124
+        get_var Error
+        dup
+        push_atom_value "Parse errors."
+        call_constructor 1
+        throw
+  124:  null
+        put_loc0 0: compiler
+        return_undef
+
+__tests__/fixtures_quickjs/octane/typescript.js:58:12: function: <null>
+  mode: strict
+  args: s
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 Verify
+        get_arg0 0: s
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/typescript.js:59:16: function: <null>
+  mode: strict
+  args: s
+  locals:
+    0: var this
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 Verify
+        get_arg0 0: s
+        push_atom_value "\n"
+        add
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/typescript.js:60:12: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field checksum
+        get_loc0 0: this
+        get_field cumulative_checksum
+        neq
+        if_false8 32
+        get_var Error
+        dup
+        push_atom_value "Wrong checksum."
+        call_constructor 1
+        throw
+   32:  get_loc0 0: this
+        push_0 0
+        put_field cumulative_checksum
+        return_undef
+
+__tests__/fixtures_quickjs/octane/typescript.js:66:13: function: <null>
+  mode: strict
+  args: s
+  locals:
+    0: var i
+    1: var c
+    2: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc2 2: this
+        push_0 0
+        put_loc0 0: i
+    4:  get_loc0 0: i
+        get_arg0 0: s
+        get_length
+        lt
+        if_false8 41
+        get_arg0 0: s
+        get_field2 charCodeAt
+        get_loc0 0: i
+        call_method 1
+        put_loc1 1: c
+        get_loc2 2: this
+        get_loc2 2: this
+        get_field cumulative_checksum
+        push_1 1
+        shl
+        get_loc1 1: c
+        xor
+        put_field cumulative_checksum
+        inc_loc 0: i
+        goto8 4
+   41:  return_undef
+
+__tests__/fixtures_quickjs/octane/typescript.js:76:12: function: <null>
+  mode: strict
+  args: s
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 Verify
+        get_arg0 0: s
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/typescript.js:77:16: function: <null>
+  mode: strict
+  args: s
+  locals:
+    0: var this
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 Verify
+        get_arg0 0: s
+        push_atom_value "\n"
+        add
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/typescript.js:78:12: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field checksum
+        get_loc0 0: this
+        get_field cumulative_checksum
+        neq
+        if_false8 32
+        get_var Error
+        dup
+        push_atom_value "Wrong checksum."
+        call_constructor 1
+        throw
+   32:  get_loc0 0: this
+        push_0 0
+        put_field cumulative_checksum
+        return_undef
+
+__tests__/fixtures_quickjs/octane/typescript.js:84:13: function: <null>
+  mode: strict
+  args: s
+  locals:
+    0: var i
+    1: var c
+    2: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc2 2: this
+        push_0 0
+        put_loc0 0: i
+    4:  get_loc0 0: i
+        get_arg0 0: s
+        get_length
+        lt
+        if_false8 41
+        get_arg0 0: s
+        get_field2 charCodeAt
+        get_loc0 0: i
+        call_method 1
+        put_loc1 1: c
+        get_loc2 2: this
+        get_loc2 2: this
+        get_field cumulative_checksum
+        push_1 1
+        shl
+        get_loc1 1: c
+        xor
+        put_field cumulative_checksum
+        inc_loc 0: i
+        goto8 4
+   41:  return_undef
+
+__tests__/fixtures_quickjs/octane/typescript.js:95:31: function: <null>
+  mode: strict
+  args: start len message
+  closure vars:
+    0: parseErrors parent:loc0 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: parseErrors
+        get_field2 push
+        object
+        get_arg0 0: start
+        define_field start
+        get_arg1 1: len
+        define_field len
+        get_arg2 2: message
+        define_field message
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/typescript.js:91:1: function: createCompiler
+  mode: strict
+  locals:
+    0: var settings
+    1: var compiler
+  closure vars:
+    0: parseErrors parent:loc7 var
+    1: TypeScript parent:loc2 const
+    2: outerr parent:loc10 var
+  stack_size: 5
+  opcodes:
+        get_var_ref_check 1: TypeScript
+        get_field CompilationSettings
+        dup
+        call_constructor 0
+        set_loc0 0: settings
+        get_var_ref_check 1: TypeScript
+        get_field CodeGenTarget
+        get_field ES5
+        put_field codeGenTarget
+        get_var_ref_check 1: TypeScript
+        get_field TypeScriptCompiler
+        dup
+        get_var_ref2 2: outerr
+        get_var_ref_check 1: TypeScript
+        get_field NullLogger
+        dup
+        call_constructor 0
+        get_loc0 0: settings
+        call_constructor 3
+        set_loc1 1: compiler
+        get_field2 setErrorCallback
+        fclosure8 0: [bytecode <null>]
+        call_method 1
+        drop
+        get_loc1 1: compiler
+        get_field parser
+        push_true
+        put_field errorRecovery
+        get_loc1 1: compiler
+        get_field2 typeCheck
+        call_method 0
+        drop
+        get_loc1 1: compiler
+        return
+
+__tests__/fixtures_quickjs/octane/typescript.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: Benchmark parent:loc0 const
+    1: BenchmarkSuite parent:loc1 const
+    2: TypeScript parent:loc2 const
+    3: compiler_input parent:loc3 const
+    4: typescript local:loc0 var
+    5: setupTypescript local:loc1 var
+    6: tearDownTypescript local:loc2 var
+    7: parseErrors local:loc3 var
+    8: runTypescript local:loc4 var
+    9: outfile local:loc5 var
+   10: outerr local:loc6 var
+   11: createCompiler local:loc7 var
+  stack_size: 15
+  opcodes:
+        push_this
+        if_false8 24
+        fclosure8 0: [bytecode setupTypescript]
+        put_var_ref 5: setupTypescript
+        fclosure8 1: [bytecode tearDownTypescript]
+        put_var_ref 6: tearDownTypescript
+        fclosure8 2: [bytecode runTypescript]
+        put_var_ref 8: runTypescript
+        fclosure8 11: [bytecode createCompiler]
+        put_var_ref 11: createCompiler
+        return_undef
+   24:  get_var_ref_check 1: BenchmarkSuite
+        dup
+        push_atom_value Typescript
+        push_i32 255011322
+        array_from 1
+        get_var_ref_check 0: Benchmark
+        dup
+        push_atom_value Typescript
+        push_false
+        push_true
+        push_5 5
+        get_var_ref 8: runTypescript
+        get_var_ref 5: setupTypescript
+        get_var_ref 6: tearDownTypescript
+        null
+        push_1 1
+        call_constructor 9
+        array_from 1
+        call_constructor 3
+        put_var_ref 4: typescript
+        array_from 0
+        put_var_ref 7: parseErrors
+        object
+        push_i32 -412589664
+        define_field checksum
+        push_0 0
+        define_field cumulative_checksum
+        fclosure8 3: [bytecode <null>]
+        set_name Write
+        define_field Write
+        fclosure8 4: [bytecode <null>]
+        set_name WriteLine
+        define_field WriteLine
+        fclosure8 5: [bytecode <null>]
+        set_name Close
+        define_field Close
+        fclosure8 6: [bytecode <null>]
+        set_name Verify
+        define_field Verify
+        put_var_ref 9: outfile
+        object
+        push_0 0
+        define_field checksum
+        push_0 0
+        define_field cumulative_checksum
+        fclosure8 7: [bytecode <null>]
+        set_name Write
+        define_field Write
+        fclosure8 8: [bytecode <null>]
+        set_name WriteLine
+        define_field WriteLine
+        fclosure8 9: [bytecode <null>]
+        set_name Close
+        define_field Close
+        fclosure8 10: [bytecode <null>]
+        set_name Verify
+        define_field Verify
+        put_var_ref 10: outerr
+        undefined
+        return_async
+

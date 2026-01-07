@@ -1,17 +1,17 @@
 {
-  "timestamp": "2026-01-07T14:07:16.573Z",
+  "timestamp": "2026-01-07T15:52:39.762Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/pdfjs.ts",
-  "note": "analysis omitted: bytecode too large (1198543 bytes)",
+  "note": "analysis omitted: bytecode too large (1198566 bytes)",
   "compilation": {
     "typescript": {
-      "size": 1198543
+      "size": 1198566
     },
     "wasm": {
       "size": 1196666
     }
   },
   "sizeDifference": {
-    "absolute": 1877,
+    "absolute": 1900,
     "percentage": "0.16"
   }
 }

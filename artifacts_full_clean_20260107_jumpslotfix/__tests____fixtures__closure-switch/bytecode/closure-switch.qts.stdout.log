@@ -1,0 +1,57 @@
+__tests__/fixtures/closure-switch.js:1:1: function: handle_msg
+  args: e
+  locals:
+    0: var ev
+  stack_size: 5
+  opcodes:
+        get_arg0 0: e
+        get_field data
+        set_loc0 0: ev
+        get_field type
+        dup
+        push_atom_value abort
+        strict_eq
+        if_false8 58
+        get_var parent
+        get_field2 postMessage
+        object
+        push_atom_value done
+        define_field type
+        call_method 1
+        drop
+        get_var parent
+        null
+        put_field onmessage
+        return_undef
+   58:  dup
+        push_atom_value sab
+        strict_eq
+        if_false8 113
+        get_loc0 0: ev
+        get_field buf
+        push_2 2
+        push_i8 10
+        put_array_el
+        get_var parent
+        get_field2 postMessage
+        object
+        push_atom_value sab_done
+        define_field type
+        get_loc0 0: ev
+        get_field buf
+        define_field buf
+        call_method 1
+        drop
+  113:  return_undef
+
+__tests__/fixtures/closure-switch.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var handle_msg,64
+        fclosure8 0: [bytecode handle_msg]
+        define_func handle_msg,0
+        get_loc0 0: "<ret>"
+        return
+

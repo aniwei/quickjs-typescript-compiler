@@ -20174,7 +20174,7 @@ bytecodeLen=80 stackSize=6 varCount=3 argCount=0
     79  return                                       pop=1 push=0      28
 
 === Inner Function #529 ===
-bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
+bytecodeLen=1601 stackSize=5 varCount=5 argCount=0
      0  push_this                                    pop=0 push=1      08
      1  put_loc8                 4                   pop=1 push=0      c5 04
      3  push_i16                 308                 pop=0 push=1      c0 34 01
@@ -20284,7 +20284,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    243  if_false8                15                  pop=1 push=0      ec 0f
    245  push_atom_value          517                 pop=0 push=1      04 05 02 00 00
    250  put_loc1                 loc=1               pop=1 push=0      cc
-   251  goto16                   803                 pop=0 push=0      ef 23 03
+   251  goto16                   804                 pop=0 push=0      ef 24 03
    254  dup                                          pop=1 push=2      11
    255  push_1                   1                   pop=0 push=1      b8
    256  strict_eq                                    pop=2 push=1      ad
@@ -20294,7 +20294,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    262  put_field                628                 pop=2 push=0      44 74 02 00 00
    267  push_atom_value          804                 pop=0 push=1      04 24 03 00 00
    272  put_loc1                 loc=1               pop=1 push=0      cc
-   273  goto16                   781                 pop=0 push=0      ef 0d 03
+   273  goto16                   782                 pop=0 push=0      ef 0e 03
    276  dup                                          pop=1 push=2      11
    277  push_2                   2                   pop=0 push=1      b9
    278  strict_eq                                    pop=2 push=1      ad
@@ -20307,7 +20307,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    292  put_field                633                 pop=2 push=0      44 79 02 00 00
    297  push_atom_value          805                 pop=0 push=1      04 25 03 00 00
    302  put_loc1                 loc=1               pop=1 push=0      cc
-   303  goto16                   751                 pop=0 push=0      ef ef 02
+   303  goto16                   752                 pop=0 push=0      ef f0 02
    306  dup                                          pop=1 push=2      11
    307  push_3                   3                   pop=0 push=1      ba
    308  strict_eq                                    pop=2 push=1      ad
@@ -20323,7 +20323,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    330  put_field                718                 pop=2 push=0      44 ce 02 00 00
    335  push_atom_value          806                 pop=0 push=1      04 26 03 00 00
    340  put_loc1                 loc=1               pop=1 push=0      cc
-   341  goto16                   713                 pop=0 push=0      ef c9 02
+   341  goto16                   714                 pop=0 push=0      ef ca 02
    344  dup                                          pop=1 push=2      11
    345  push_5                   5                   pop=0 push=1      bc
    346  strict_eq                                    pop=2 push=1      ad
@@ -20333,7 +20333,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    352  put_field                629                 pop=2 push=0      44 75 02 00 00
    357  push_atom_value          807                 pop=0 push=1      04 27 03 00 00
    362  put_loc1                 loc=1               pop=1 push=0      cc
-   363  goto16                   691                 pop=0 push=0      ef b3 02
+   363  goto16                   692                 pop=0 push=0      ef b4 02
    366  dup                                          pop=1 push=2      11
    367  push_6                   6                   pop=0 push=1      bd
    368  strict_eq                                    pop=2 push=1      ad
@@ -20346,7 +20346,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    382  put_field                718                 pop=2 push=0      44 ce 02 00 00
    387  push_atom_value          808                 pop=0 push=1      04 28 03 00 00
    392  put_loc1                 loc=1               pop=1 push=0      cc
-   393  goto16                   661                 pop=0 push=0      ef 95 02
+   393  goto16                   662                 pop=0 push=0      ef 96 02
    396  dup                                          pop=1 push=2      11
    397  push_i8                  8                   pop=0 push=1      bf 08
    399  strict_eq                                    pop=2 push=1      ad
@@ -20356,7 +20356,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    405  put_field                633                 pop=2 push=0      44 79 02 00 00
    410  push_atom_value          809                 pop=0 push=1      04 29 03 00 00
    415  put_loc1                 loc=1               pop=1 push=0      cc
-   416  goto16                   638                 pop=0 push=0      ef 7e 02
+   416  goto16                   639                 pop=0 push=0      ef 7f 02
    419  dup                                          pop=1 push=2      11
    420  push_i8                  9                   pop=0 push=1      bf 09
    422  strict_eq                                    pop=2 push=1      ad
@@ -20369,7 +20369,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    436  put_field                718                 pop=2 push=0      44 ce 02 00 00
    441  push_atom_value          810                 pop=0 push=1      04 2a 03 00 00
    446  put_loc1                 loc=1               pop=1 push=0      cc
-   447  goto16                   607                 pop=0 push=0      ef 5f 02
+   447  goto16                   608                 pop=0 push=0      ef 60 02
    450  dup                                          pop=1 push=2      11
    451  push_i8                  11                  pop=0 push=1      bf 0b
    453  strict_eq                                    pop=2 push=1      ad
@@ -20379,7 +20379,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    459  put_field                634                 pop=2 push=0      44 7a 02 00 00
    464  push_atom_value          811                 pop=0 push=1      04 2b 03 00 00
    469  put_loc1                 loc=1               pop=1 push=0      cc
-   470  goto16                   584                 pop=0 push=0      ef 48 02
+   470  goto16                   585                 pop=0 push=0      ef 49 02
    473  dup                                          pop=1 push=2      11
    474  push_i8                  12                  pop=0 push=1      bf 0c
    476  strict_eq                                    pop=2 push=1      ad
@@ -20392,7 +20392,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    490  put_field                633                 pop=2 push=0      44 79 02 00 00
    495  push_atom_value          812                 pop=0 push=1      04 2c 03 00 00
    500  put_loc1                 loc=1               pop=1 push=0      cc
-   501  goto16                   553                 pop=0 push=0      ef 29 02
+   501  goto16                   554                 pop=0 push=0      ef 2a 02
    504  dup                                          pop=1 push=2      11
    505  push_i8                  13                  pop=0 push=1      bf 0d
    507  strict_eq                                    pop=2 push=1      ad
@@ -20408,7 +20408,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    529  put_field                718                 pop=2 push=0      44 ce 02 00 00
    534  push_atom_value          813                 pop=0 push=1      04 2d 03 00 00
    539  put_loc1                 loc=1               pop=1 push=0      cc
-   540  goto16                   514                 pop=0 push=0      ef 02 02
+   540  goto16                   515                 pop=0 push=0      ef 03 02
    543  dup                                          pop=1 push=2      11
    544  push_i8                  15                  pop=0 push=1      bf 0f
    546  strict_eq                                    pop=2 push=1      ad
@@ -20424,7 +20424,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    568  put_field                718                 pop=2 push=0      44 ce 02 00 00
    573  push_atom_value          814                 pop=0 push=1      04 2e 03 00 00
    578  put_loc1                 loc=1               pop=1 push=0      cc
-   579  goto16                   475                 pop=0 push=0      ef db 01
+   579  goto16                   476                 pop=0 push=0      ef dc 01
    582  dup                                          pop=1 push=2      11
    583  push_i8                  16                  pop=0 push=1      bf 10
    585  strict_eq                                    pop=2 push=1      ad
@@ -20443,7 +20443,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    615  put_field                633                 pop=2 push=0      44 79 02 00 00
    620  push_atom_value          815                 pop=0 push=1      04 2f 03 00 00
    625  put_loc1                 loc=1               pop=1 push=0      cc
-   626  goto16                   428                 pop=0 push=0      ef ac 01
+   626  goto16                   429                 pop=0 push=0      ef ad 01
    629  dup                                          pop=1 push=2      11
    630  push_i8                  17                  pop=0 push=1      bf 11
    632  strict_eq                                    pop=2 push=1      ad
@@ -20453,7 +20453,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    638  put_field                630                 pop=2 push=0      44 76 02 00 00
    643  push_atom_value          816                 pop=0 push=1      04 30 03 00 00
    648  put_loc1                 loc=1               pop=1 push=0      cc
-   649  goto16                   405                 pop=0 push=0      ef 95 01
+   649  goto16                   406                 pop=0 push=0      ef 96 01
    652  dup                                          pop=1 push=2      11
    653  push_i8                  18                  pop=0 push=1      bf 12
    655  strict_eq                                    pop=2 push=1      ad
@@ -20466,7 +20466,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    669  put_field                633                 pop=2 push=0      44 79 02 00 00
    674  push_atom_value          817                 pop=0 push=1      04 31 03 00 00
    679  put_loc1                 loc=1               pop=1 push=0      cc
-   680  goto16                   374                 pop=0 push=0      ef 76 01
+   680  goto16                   375                 pop=0 push=0      ef 77 01
    683  dup                                          pop=1 push=2      11
    684  push_i8                  19                  pop=0 push=1      bf 13
    686  strict_eq                                    pop=2 push=1      ad
@@ -20482,7 +20482,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    708  put_field                718                 pop=2 push=0      44 ce 02 00 00
    713  push_atom_value          818                 pop=0 push=1      04 32 03 00 00
    718  put_loc1                 loc=1               pop=1 push=0      cc
-   719  goto16                   335                 pop=0 push=0      ef 4f 01
+   719  goto16                   336                 pop=0 push=0      ef 50 01
    722  dup                                          pop=1 push=2      11
    723  push_i8                  25                  pop=0 push=1      bf 19
    725  strict_eq                                    pop=2 push=1      ad
@@ -20492,7 +20492,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    731  put_field                631                 pop=2 push=0      44 77 02 00 00
    736  push_atom_value          819                 pop=0 push=1      04 33 03 00 00
    741  put_loc1                 loc=1               pop=1 push=0      cc
-   742  goto16                   312                 pop=0 push=0      ef 38 01
+   742  goto16                   313                 pop=0 push=0      ef 39 01
    745  dup                                          pop=1 push=2      11
    746  push_i8                  26                  pop=0 push=1      bf 1a
    748  strict_eq                                    pop=2 push=1      ad
@@ -20505,7 +20505,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    762  put_field                633                 pop=2 push=0      44 79 02 00 00
    767  push_atom_value          820                 pop=0 push=1      04 34 03 00 00
    772  put_loc1                 loc=1               pop=1 push=0      cc
-   773  goto16                   281                 pop=0 push=0      ef 19 01
+   773  goto16                   282                 pop=0 push=0      ef 1a 01
    776  dup                                          pop=1 push=2      11
    777  push_i8                  27                  pop=0 push=1      bf 1b
    779  strict_eq                                    pop=2 push=1      ad
@@ -20521,7 +20521,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    801  put_field                718                 pop=2 push=0      44 ce 02 00 00
    806  push_atom_value          821                 pop=0 push=1      04 35 03 00 00
    811  put_loc1                 loc=1               pop=1 push=0      cc
-   812  goto16                   242                 pop=0 push=0      ef f2 00
+   812  goto16                   243                 pop=0 push=0      ef f3 00
    815  dup                                          pop=1 push=2      11
    816  push_i8                  28                  pop=0 push=1      bf 1c
    818  strict_eq                                    pop=2 push=1      ad
@@ -20531,7 +20531,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    824  put_field                635                 pop=2 push=0      44 7b 02 00 00
    829  push_atom_value          822                 pop=0 push=1      04 36 03 00 00
    834  put_loc1                 loc=1               pop=1 push=0      cc
-   835  goto16                   219                 pop=0 push=0      ef db 00
+   835  goto16                   220                 pop=0 push=0      ef dc 00
    838  dup                                          pop=1 push=2      11
    839  push_i8                  29                  pop=0 push=1      bf 1d
    841  strict_eq                                    pop=2 push=1      ad
@@ -20544,7 +20544,7 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    855  put_field                633                 pop=2 push=0      44 79 02 00 00
    860  push_atom_value          823                 pop=0 push=1      04 37 03 00 00
    865  put_loc1                 loc=1               pop=1 push=0      cc
-   866  goto16                   188                 pop=0 push=0      ef bc 00
+   866  goto16                   189                 pop=0 push=0      ef bd 00
    869  dup                                          pop=1 push=2      11
    870  push_i8                  30                  pop=0 push=1      bf 1e
    872  strict_eq                                    pop=2 push=1      ad
@@ -20560,328 +20560,328 @@ bytecodeLen=1600 stackSize=5 varCount=5 argCount=0
    894  put_field                718                 pop=2 push=0      44 ce 02 00 00
    899  push_atom_value          824                 pop=0 push=1      04 38 03 00 00
    904  put_loc1                 loc=1               pop=1 push=0      cc
-   905  goto16                   149                 pop=0 push=0      ef 95 00
+   905  goto16                   150                 pop=0 push=0      ef 96 00
    908  dup                                          pop=1 push=2      11
    909  push_i8                  31                  pop=0 push=1      bf 1f
    911  strict_eq                                    pop=2 push=1      ad
-   912  if_false8                17                  pop=1 push=0      ec 11
+   912  if_false8                18                  pop=1 push=0      ec 12
    914  get_loc8                 4                   pop=0 push=1      c4 04
    916  push_true                                    pop=0 push=1      0a
    917  put_field                636                 pop=2 push=0      44 7c 02 00 00
    922  push_atom_value          825                 pop=0 push=1      04 39 03 00 00
    927  put_loc1                 loc=1               pop=1 push=0      cc
-   928  goto8                    126                 pop=0 push=0      ee 7e
-   930  dup                                          pop=1 push=2      11
-   931  push_i8                  34                  pop=0 push=1      bf 22
-   933  strict_eq                                    pop=2 push=1      ad
-   934  if_false8                33                  pop=1 push=0      ec 21
-   936  get_loc8                 4                   pop=0 push=1      c4 04
-   938  push_true                                    pop=0 push=1      0a
-   939  put_field                632                 pop=2 push=0      44 78 02 00 00
-   944  get_loc8                 4                   pop=0 push=1      c4 04
-   946  push_true                                    pop=0 push=1      0a
-   947  put_field                633                 pop=2 push=0      44 79 02 00 00
-   952  get_loc8                 4                   pop=0 push=1      c4 04
-   954  push_true                                    pop=0 push=1      0a
-   955  put_field                718                 pop=2 push=0      44 ce 02 00 00
-   960  push_atom_value          826                 pop=0 push=1      04 3a 03 00 00
-   965  put_loc1                 loc=1               pop=1 push=0      cc
-   966  goto8                    88                  pop=0 push=0      ee 58
-   968  dup                                          pop=1 push=2      11
-   969  push_i16                 253                 pop=0 push=1      c0 fd 00
-   972  strict_eq                                    pop=2 push=1      ad
-   973  if_false8                17                  pop=1 push=0      ec 11
-   975  get_loc8                 4                   pop=0 push=1      c4 04
-   977  push_true                                    pop=0 push=1      0a
-   978  put_field                637                 pop=2 push=0      44 7d 02 00 00
-   983  push_atom_value          827                 pop=0 push=1      04 3b 03 00 00
-   988  put_loc1                 loc=1               pop=1 push=0      cc
-   989  goto8                    65                  pop=0 push=0      ee 41
-   991  dup                                          pop=1 push=2      11
-   992  push_i16                 254                 pop=0 push=1      c0 fe 00
-   995  strict_eq                                    pop=2 push=1      ad
-   996  if_false8                17                  pop=1 push=0      ec 11
-   998  get_loc8                 4                   pop=0 push=1      c4 04
-  1000  push_true                                    pop=0 push=1      0a
-  1001  put_field                638                 pop=2 push=0      44 7e 02 00 00
-  1006  push_atom_value          828                 pop=0 push=1      04 3c 03 00 00
-  1011  put_loc1                 loc=1               pop=1 push=0      cc
-  1012  goto8                    42                  pop=0 push=0      ee 2a
-  1014  dup                                          pop=1 push=2      11
-  1015  push_i16                 255                 pop=0 push=1      c0 ff 00
-  1018  strict_eq                                    pop=2 push=1      ad
-  1019  if_false8                17                  pop=1 push=0      ec 11
-  1021  get_loc8                 4                   pop=0 push=1      c4 04
-  1023  push_true                                    pop=0 push=1      0a
-  1024  put_field                639                 pop=2 push=0      44 7f 02 00 00
-  1029  push_atom_value          829                 pop=0 push=1      04 3d 03 00 00
-  1034  put_loc1                 loc=1               pop=1 push=0      cc
-  1035  goto8                    19                  pop=0 push=0      ee 13
-  1037  push_atom_value          830                 pop=0 push=1      04 3e 03 00 00
-  1042  put_loc1                 loc=1               pop=1 push=0      cc
-  1043  get_var_ref0             var_ref=0           pop=0 push=1      df
-  1044  push_atom_value          831                 pop=0 push=1      04 3f 03 00 00
-  1049  push_2                   2                   pop=0 push=1      b9
-  1050  call2                    npop=2              pop=1 push=1      f2
-  1051  drop                                         pop=1 push=0      0e
-  1052  get_var_ref2             var_ref=2           pop=0 push=1      e1
-  1053  call0                    npop=0              pop=1 push=1      f0
-  1054  drop                                         pop=1 push=0      0e
+   928  goto16                   127                 pop=0 push=0      ef 7f 00
+   931  dup                                          pop=1 push=2      11
+   932  push_i8                  34                  pop=0 push=1      bf 22
+   934  strict_eq                                    pop=2 push=1      ad
+   935  if_false8                33                  pop=1 push=0      ec 21
+   937  get_loc8                 4                   pop=0 push=1      c4 04
+   939  push_true                                    pop=0 push=1      0a
+   940  put_field                632                 pop=2 push=0      44 78 02 00 00
+   945  get_loc8                 4                   pop=0 push=1      c4 04
+   947  push_true                                    pop=0 push=1      0a
+   948  put_field                633                 pop=2 push=0      44 79 02 00 00
+   953  get_loc8                 4                   pop=0 push=1      c4 04
+   955  push_true                                    pop=0 push=1      0a
+   956  put_field                718                 pop=2 push=0      44 ce 02 00 00
+   961  push_atom_value          826                 pop=0 push=1      04 3a 03 00 00
+   966  put_loc1                 loc=1               pop=1 push=0      cc
+   967  goto8                    88                  pop=0 push=0      ee 58
+   969  dup                                          pop=1 push=2      11
+   970  push_i16                 253                 pop=0 push=1      c0 fd 00
+   973  strict_eq                                    pop=2 push=1      ad
+   974  if_false8                17                  pop=1 push=0      ec 11
+   976  get_loc8                 4                   pop=0 push=1      c4 04
+   978  push_true                                    pop=0 push=1      0a
+   979  put_field                637                 pop=2 push=0      44 7d 02 00 00
+   984  push_atom_value          827                 pop=0 push=1      04 3b 03 00 00
+   989  put_loc1                 loc=1               pop=1 push=0      cc
+   990  goto8                    65                  pop=0 push=0      ee 41
+   992  dup                                          pop=1 push=2      11
+   993  push_i16                 254                 pop=0 push=1      c0 fe 00
+   996  strict_eq                                    pop=2 push=1      ad
+   997  if_false8                17                  pop=1 push=0      ec 11
+   999  get_loc8                 4                   pop=0 push=1      c4 04
+  1001  push_true                                    pop=0 push=1      0a
+  1002  put_field                638                 pop=2 push=0      44 7e 02 00 00
+  1007  push_atom_value          828                 pop=0 push=1      04 3c 03 00 00
+  1012  put_loc1                 loc=1               pop=1 push=0      cc
+  1013  goto8                    42                  pop=0 push=0      ee 2a
+  1015  dup                                          pop=1 push=2      11
+  1016  push_i16                 255                 pop=0 push=1      c0 ff 00
+  1019  strict_eq                                    pop=2 push=1      ad
+  1020  if_false8                17                  pop=1 push=0      ec 11
+  1022  get_loc8                 4                   pop=0 push=1      c4 04
+  1024  push_true                                    pop=0 push=1      0a
+  1025  put_field                639                 pop=2 push=0      44 7f 02 00 00
+  1030  push_atom_value          829                 pop=0 push=1      04 3d 03 00 00
+  1035  put_loc1                 loc=1               pop=1 push=0      cc
+  1036  goto8                    19                  pop=0 push=0      ee 13
+  1038  push_atom_value          830                 pop=0 push=1      04 3e 03 00 00
+  1043  put_loc1                 loc=1               pop=1 push=0      cc
+  1044  get_var_ref0             var_ref=0           pop=0 push=1      df
+  1045  push_atom_value          831                 pop=0 push=1      04 3f 03 00 00
+  1050  push_2                   2                   pop=0 push=1      b9
+  1051  call2                    npop=2              pop=1 push=1      f2
+  1052  drop                                         pop=1 push=0      0e
+  1053  get_var_ref2             var_ref=2           pop=0 push=1      e1
+  1054  call0                    npop=0              pop=1 push=1      f0
   1055  drop                                         pop=1 push=0      0e
-  1056  get_var_ref0             var_ref=0           pop=0 push=1      df
-  1057  push_atom_value          832                 pop=0 push=1      04 40 03 00 00
-  1062  get_loc1                 loc=1               pop=0 push=1      c8
-  1063  add                                          pop=2 push=1      9f
-  1064  push_atom_value          833                 pop=0 push=1      04 41 03 00 00
-  1069  add                                          pop=2 push=1      9f
-  1070  push_0                   0                   pop=0 push=1      b7
-  1071  call2                    npop=2              pop=1 push=1      f2
-  1072  drop                                         pop=1 push=0      0e
-  1073  get_loc8                 4                   pop=0 push=1      c4 04
-  1075  get_loc8                 4                   pop=0 push=1      c4 04
-  1077  get_field                641                 pop=1 push=1      42 81 02 00 00
-  1082  get_loc8                 4                   pop=0 push=1      c4 04
-  1084  get_field                517                 pop=1 push=1      42 05 02 00 00
-  1089  push_i16                 328                 pop=0 push=1      c0 48 01
-  1092  get_array_el                                 pop=2 push=1      48
+  1056  drop                                         pop=1 push=0      0e
+  1057  get_var_ref0             var_ref=0           pop=0 push=1      df
+  1058  push_atom_value          832                 pop=0 push=1      04 40 03 00 00
+  1063  get_loc1                 loc=1               pop=0 push=1      c8
+  1064  add                                          pop=2 push=1      9f
+  1065  push_atom_value          833                 pop=0 push=1      04 41 03 00 00
+  1070  add                                          pop=2 push=1      9f
+  1071  push_0                   0                   pop=0 push=1      b7
+  1072  call2                    npop=2              pop=1 push=1      f2
+  1073  drop                                         pop=1 push=0      0e
+  1074  get_loc8                 4                   pop=0 push=1      c4 04
+  1076  get_loc8                 4                   pop=0 push=1      c4 04
+  1078  get_field                641                 pop=1 push=1      42 81 02 00 00
+  1083  get_loc8                 4                   pop=0 push=1      c4 04
+  1085  get_field                517                 pop=1 push=1      42 05 02 00 00
+  1090  push_i16                 328                 pop=0 push=1      c0 48 01
   1093  get_array_el                                 pop=2 push=1      48
-  1094  put_field                834                 pop=2 push=0      44 42 03 00 00
-  1099  get_var_ref0             var_ref=0           pop=0 push=1      df
-  1100  get_loc8                 4                   pop=0 push=1      c4 04
-  1102  get_field                834                 pop=1 push=1      42 42 03 00 00
-  1107  push_atom_value          835                 pop=0 push=1      04 43 03 00 00
-  1112  add                                          pop=2 push=1      9f
-  1113  push_0                   0                   pop=0 push=1      b7
-  1114  call2                    npop=2              pop=1 push=1      f2
-  1115  drop                                         pop=1 push=0      0e
-  1116  get_loc8                 4                   pop=0 push=1      c4 04
-  1118  get_field                530                 pop=1 push=1      42 12 02 00 00
-  1123  get_loc8                 4                   pop=0 push=1      c4 04
-  1125  get_field                517                 pop=1 push=1      42 05 02 00 00
-  1130  push_i16                 329                 pop=0 push=1      c0 49 01
-  1133  get_array_el                                 pop=2 push=1      48
+  1094  get_array_el                                 pop=2 push=1      48
+  1095  put_field                834                 pop=2 push=0      44 42 03 00 00
+  1100  get_var_ref0             var_ref=0           pop=0 push=1      df
+  1101  get_loc8                 4                   pop=0 push=1      c4 04
+  1103  get_field                834                 pop=1 push=1      42 42 03 00 00
+  1108  push_atom_value          835                 pop=0 push=1      04 43 03 00 00
+  1113  add                                          pop=2 push=1      9f
+  1114  push_0                   0                   pop=0 push=1      b7
+  1115  call2                    npop=2              pop=1 push=1      f2
+  1116  drop                                         pop=1 push=0      0e
+  1117  get_loc8                 4                   pop=0 push=1      c4 04
+  1119  get_field                530                 pop=1 push=1      42 12 02 00 00
+  1124  get_loc8                 4                   pop=0 push=1      c4 04
+  1126  get_field                517                 pop=1 push=1      42 05 02 00 00
+  1131  push_i16                 329                 pop=0 push=1      c0 49 01
   1134  get_array_el                                 pop=2 push=1      48
-  1135  dup                                          pop=1 push=2      11
-  1136  push_0                   0                   pop=0 push=1      b7
-  1137  strict_eq                                    pop=2 push=1      ad
-  1138  if_false8                12                  pop=1 push=0      ec 0c
-  1140  get_var_ref0             var_ref=0           pop=0 push=1      df
-  1141  push_atom_value          836                 pop=0 push=1      04 44 03 00 00
-  1146  push_0                   0                   pop=0 push=1      b7
-  1147  call2                    npop=2              pop=1 push=1      f2
-  1148  drop                                         pop=1 push=0      0e
-  1149  goto8                    58                  pop=0 push=0      ee 3a
-  1151  dup                                          pop=1 push=2      11
-  1152  push_2                   2                   pop=0 push=1      b9
-  1153  strict_eq                                    pop=2 push=1      ad
-  1154  if_false8                12                  pop=1 push=0      ec 0c
-  1156  get_var_ref0             var_ref=0           pop=0 push=1      df
-  1157  push_atom_value          837                 pop=0 push=1      04 45 03 00 00
-  1162  push_0                   0                   pop=0 push=1      b7
-  1163  call2                    npop=2              pop=1 push=1      f2
-  1164  drop                                         pop=1 push=0      0e
-  1165  goto8                    42                  pop=0 push=0      ee 2a
-  1167  dup                                          pop=1 push=2      11
-  1168  push_3                   3                   pop=0 push=1      ba
-  1169  strict_eq                                    pop=2 push=1      ad
-  1170  if_false8                12                  pop=1 push=0      ec 0c
-  1172  get_var_ref0             var_ref=0           pop=0 push=1      df
-  1173  push_atom_value          838                 pop=0 push=1      04 46 03 00 00
-  1178  push_0                   0                   pop=0 push=1      b7
-  1179  call2                    npop=2              pop=1 push=1      f2
-  1180  drop                                         pop=1 push=0      0e
-  1181  goto8                    26                  pop=0 push=0      ee 1a
-  1183  dup                                          pop=1 push=2      11
-  1184  push_4                   4                   pop=0 push=1      bb
-  1185  strict_eq                                    pop=2 push=1      ad
-  1186  if_false8                12                  pop=1 push=0      ec 0c
-  1188  get_var_ref0             var_ref=0           pop=0 push=1      df
-  1189  push_atom_value          839                 pop=0 push=1      04 47 03 00 00
-  1194  push_0                   0                   pop=0 push=1      b7
-  1195  call2                    npop=2              pop=1 push=1      f2
-  1196  drop                                         pop=1 push=0      0e
-  1197  goto8                    10                  pop=0 push=0      ee 0a
-  1199  get_var_ref0             var_ref=0           pop=0 push=1      df
-  1200  push_atom_value          840                 pop=0 push=1      04 48 03 00 00
-  1205  push_0                   0                   pop=0 push=1      b7
-  1206  call2                    npop=2              pop=1 push=1      f2
-  1207  drop                                         pop=1 push=0      0e
+  1135  get_array_el                                 pop=2 push=1      48
+  1136  dup                                          pop=1 push=2      11
+  1137  push_0                   0                   pop=0 push=1      b7
+  1138  strict_eq                                    pop=2 push=1      ad
+  1139  if_false8                12                  pop=1 push=0      ec 0c
+  1141  get_var_ref0             var_ref=0           pop=0 push=1      df
+  1142  push_atom_value          836                 pop=0 push=1      04 44 03 00 00
+  1147  push_0                   0                   pop=0 push=1      b7
+  1148  call2                    npop=2              pop=1 push=1      f2
+  1149  drop                                         pop=1 push=0      0e
+  1150  goto8                    58                  pop=0 push=0      ee 3a
+  1152  dup                                          pop=1 push=2      11
+  1153  push_2                   2                   pop=0 push=1      b9
+  1154  strict_eq                                    pop=2 push=1      ad
+  1155  if_false8                12                  pop=1 push=0      ec 0c
+  1157  get_var_ref0             var_ref=0           pop=0 push=1      df
+  1158  push_atom_value          837                 pop=0 push=1      04 45 03 00 00
+  1163  push_0                   0                   pop=0 push=1      b7
+  1164  call2                    npop=2              pop=1 push=1      f2
+  1165  drop                                         pop=1 push=0      0e
+  1166  goto8                    42                  pop=0 push=0      ee 2a
+  1168  dup                                          pop=1 push=2      11
+  1169  push_3                   3                   pop=0 push=1      ba
+  1170  strict_eq                                    pop=2 push=1      ad
+  1171  if_false8                12                  pop=1 push=0      ec 0c
+  1173  get_var_ref0             var_ref=0           pop=0 push=1      df
+  1174  push_atom_value          838                 pop=0 push=1      04 46 03 00 00
+  1179  push_0                   0                   pop=0 push=1      b7
+  1180  call2                    npop=2              pop=1 push=1      f2
+  1181  drop                                         pop=1 push=0      0e
+  1182  goto8                    26                  pop=0 push=0      ee 1a
+  1184  dup                                          pop=1 push=2      11
+  1185  push_4                   4                   pop=0 push=1      bb
+  1186  strict_eq                                    pop=2 push=1      ad
+  1187  if_false8                12                  pop=1 push=0      ec 0c
+  1189  get_var_ref0             var_ref=0           pop=0 push=1      df
+  1190  push_atom_value          839                 pop=0 push=1      04 47 03 00 00
+  1195  push_0                   0                   pop=0 push=1      b7
+  1196  call2                    npop=2              pop=1 push=1      f2
+  1197  drop                                         pop=1 push=0      0e
+  1198  goto8                    10                  pop=0 push=0      ee 0a
+  1200  get_var_ref0             var_ref=0           pop=0 push=1      df
+  1201  push_atom_value          840                 pop=0 push=1      04 48 03 00 00
+  1206  push_0                   0                   pop=0 push=1      b7
+  1207  call2                    npop=2              pop=1 push=1      f2
   1208  drop                                         pop=1 push=0      0e
-  1209  get_loc8                 4                   pop=0 push=1      c4 04
-  1211  get_field                499                 pop=1 push=1      42 f3 01 00 00
-  1216  lnot                                         pop=1 push=1      98
-  1217  if_false                 250                 pop=1 push=0      6c fa 00 00 00
-  1222  get_loc8                 4                   pop=0 push=1      c4 04
-  1224  get_field                517                 pop=1 push=1      42 05 02 00 00
-  1229  push_i16                 323                 pop=0 push=1      c0 43 01
-  1232  get_array_el                                 pop=2 push=1      48
-  1233  dup                                          pop=1 push=2      11
-  1234  push_0                   0                   pop=0 push=1      b7
-  1235  strict_eq                                    pop=2 push=1      ad
-  1236  if_false8                21                  pop=1 push=0      ec 15
-  1238  get_loc8                 4                   pop=0 push=1      c4 04
-  1240  push_false                                   pop=0 push=1      09
-  1241  put_field                526                 pop=2 push=0      44 0e 02 00 00
-  1246  get_var_ref0             var_ref=0           pop=0 push=1      df
-  1247  push_atom_value          841                 pop=0 push=1      04 49 03 00 00
-  1252  push_0                   0                   pop=0 push=1      b7
-  1253  call2                    npop=2              pop=1 push=1      f2
-  1254  drop                                         pop=1 push=0      0e
-  1255  goto16                   168                 pop=0 push=0      ef a8 00
-  1258  dup                                          pop=1 push=2      11
-  1259  push_i8                  50                  pop=0 push=1      bf 32
-  1261  strict_eq                                    pop=2 push=1      ad
-  1262  if_false8                71                  pop=1 push=0      ec 47
-  1264  get_var_ref1             var_ref=1           pop=0 push=1      e0
-  1265  push_2                   2                   pop=0 push=1      b9
-  1266  get_array_el                                 pop=2 push=1      48
-  1267  lnot                                         pop=1 push=1      98
-  1268  if_false8                55                  pop=1 push=0      ec 37
-  1270  get_loc8                 4                   pop=0 push=1      c4 04
-  1272  get_field                56                  pop=1 push=1      42 38 00 00 00
-  1277  get_loc8                 4                   pop=0 push=1      c4 04
-  1279  get_field                534                 pop=1 push=1      42 16 02 00 00
-  1284  add                                          pop=2 push=1      9f
-  1285  get_loc8                 4                   pop=0 push=1      c4 04
-  1287  get_field                517                 pop=1 push=1      42 05 02 00 00
-  1292  push_i16                 323                 pop=0 push=1      c0 43 01
-  1295  get_array_el                                 pop=2 push=1      48
-  1296  add                                          pop=2 push=1      9f
-  1297  push_atom_value          842                 pop=0 push=1      04 4a 03 00 00
-  1302  eq                                           pop=2 push=1      ab
-  1303  if_false8                20                  pop=1 push=0      ec 14
-  1305  get_loc8                 4                   pop=0 push=1      c4 04
-  1307  push_true                                    pop=0 push=1      0a
-  1308  put_field                526                 pop=2 push=0      44 0e 02 00 00
-  1313  get_var_ref0             var_ref=0           pop=0 push=1      df
-  1314  push_atom_value          843                 pop=0 push=1      04 4b 03 00 00
-  1319  push_1                   1                   pop=0 push=1      b8
-  1320  call2                    npop=2              pop=1 push=1      f2
-  1321  drop                                         pop=1 push=0      0e
-  1322  goto8                    101                 pop=0 push=0      ee 65
-  1324  get_loc8                 4                   pop=0 push=1      c4 04
-  1326  push_false                                   pop=0 push=1      09
-  1327  put_field                526                 pop=2 push=0      44 0e 02 00 00
-  1332  goto8                    91                  pop=0 push=0      ee 5b
-  1334  dup                                          pop=1 push=2      11
-  1335  push_i16                 128                 pop=0 push=1      c0 80 00
-  1338  strict_eq                                    pop=2 push=1      ad
-  1339  if_false8                23                  pop=1 push=0      ec 17
-  1341  get_loc8                 4                   pop=0 push=1      c4 04
-  1343  get_var_ref1             var_ref=1           pop=0 push=1      e0
-  1344  push_2                   2                   pop=0 push=1      b9
-  1345  get_array_el                                 pop=2 push=1      48
-  1346  lnot                                         pop=1 push=1      98
-  1347  put_field                526                 pop=2 push=0      44 0e 02 00 00
-  1352  get_var_ref0             var_ref=0           pop=0 push=1      df
-  1353  push_atom_value          844                 pop=0 push=1      04 4c 03 00 00
-  1358  push_0                   0                   pop=0 push=1      b7
-  1359  call2                    npop=2              pop=1 push=1      f2
-  1360  drop                                         pop=1 push=0      0e
-  1361  goto8                    62                  pop=0 push=0      ee 3e
-  1363  dup                                          pop=1 push=2      11
-  1364  push_i16                 192                 pop=0 push=1      c0 c0 00
-  1367  strict_eq                                    pop=2 push=1      ad
-  1368  if_false8                20                  pop=1 push=0      ec 14
-  1370  get_loc8                 4                   pop=0 push=1      c4 04
-  1372  push_true                                    pop=0 push=1      0a
-  1373  put_field                526                 pop=2 push=0      44 0e 02 00 00
-  1378  get_var_ref0             var_ref=0           pop=0 push=1      df
-  1379  push_atom_value          845                 pop=0 push=1      04 4d 03 00 00
-  1384  push_0                   0                   pop=0 push=1      b7
-  1385  call2                    npop=2              pop=1 push=1      f2
-  1386  drop                                         pop=1 push=0      0e
-  1387  goto8                    36                  pop=0 push=0      ee 24
-  1389  get_loc8                 4                   pop=0 push=1      c4 04
-  1391  push_false                                   pop=0 push=1      09
-  1392  put_field                526                 pop=2 push=0      44 0e 02 00 00
-  1397  get_var_ref0             var_ref=0           pop=0 push=1      df
-  1398  push_atom_value          846                 pop=0 push=1      04 4e 03 00 00
-  1403  get_loc8                 4                   pop=0 push=1      c4 04
-  1405  get_field                517                 pop=1 push=1      42 05 02 00 00
-  1410  push_i16                 323                 pop=0 push=1      c0 43 01
-  1413  get_array_el                                 pop=2 push=1      48
-  1414  add                                          pop=2 push=1      9f
-  1415  push_atom_value          847                 pop=0 push=1      04 4f 03 00 00
-  1420  add                                          pop=2 push=1      9f
-  1421  push_1                   1                   pop=0 push=1      b8
-  1422  call2                    npop=2              pop=1 push=1      f2
-  1423  drop                                         pop=1 push=0      0e
+  1209  drop                                         pop=1 push=0      0e
+  1210  get_loc8                 4                   pop=0 push=1      c4 04
+  1212  get_field                499                 pop=1 push=1      42 f3 01 00 00
+  1217  lnot                                         pop=1 push=1      98
+  1218  if_false                 250                 pop=1 push=0      6c fa 00 00 00
+  1223  get_loc8                 4                   pop=0 push=1      c4 04
+  1225  get_field                517                 pop=1 push=1      42 05 02 00 00
+  1230  push_i16                 323                 pop=0 push=1      c0 43 01
+  1233  get_array_el                                 pop=2 push=1      48
+  1234  dup                                          pop=1 push=2      11
+  1235  push_0                   0                   pop=0 push=1      b7
+  1236  strict_eq                                    pop=2 push=1      ad
+  1237  if_false8                21                  pop=1 push=0      ec 15
+  1239  get_loc8                 4                   pop=0 push=1      c4 04
+  1241  push_false                                   pop=0 push=1      09
+  1242  put_field                526                 pop=2 push=0      44 0e 02 00 00
+  1247  get_var_ref0             var_ref=0           pop=0 push=1      df
+  1248  push_atom_value          841                 pop=0 push=1      04 49 03 00 00
+  1253  push_0                   0                   pop=0 push=1      b7
+  1254  call2                    npop=2              pop=1 push=1      f2
+  1255  drop                                         pop=1 push=0      0e
+  1256  goto16                   168                 pop=0 push=0      ef a8 00
+  1259  dup                                          pop=1 push=2      11
+  1260  push_i8                  50                  pop=0 push=1      bf 32
+  1262  strict_eq                                    pop=2 push=1      ad
+  1263  if_false8                71                  pop=1 push=0      ec 47
+  1265  get_var_ref1             var_ref=1           pop=0 push=1      e0
+  1266  push_2                   2                   pop=0 push=1      b9
+  1267  get_array_el                                 pop=2 push=1      48
+  1268  lnot                                         pop=1 push=1      98
+  1269  if_false8                55                  pop=1 push=0      ec 37
+  1271  get_loc8                 4                   pop=0 push=1      c4 04
+  1273  get_field                56                  pop=1 push=1      42 38 00 00 00
+  1278  get_loc8                 4                   pop=0 push=1      c4 04
+  1280  get_field                534                 pop=1 push=1      42 16 02 00 00
+  1285  add                                          pop=2 push=1      9f
+  1286  get_loc8                 4                   pop=0 push=1      c4 04
+  1288  get_field                517                 pop=1 push=1      42 05 02 00 00
+  1293  push_i16                 323                 pop=0 push=1      c0 43 01
+  1296  get_array_el                                 pop=2 push=1      48
+  1297  add                                          pop=2 push=1      9f
+  1298  push_atom_value          842                 pop=0 push=1      04 4a 03 00 00
+  1303  eq                                           pop=2 push=1      ab
+  1304  if_false8                20                  pop=1 push=0      ec 14
+  1306  get_loc8                 4                   pop=0 push=1      c4 04
+  1308  push_true                                    pop=0 push=1      0a
+  1309  put_field                526                 pop=2 push=0      44 0e 02 00 00
+  1314  get_var_ref0             var_ref=0           pop=0 push=1      df
+  1315  push_atom_value          843                 pop=0 push=1      04 4b 03 00 00
+  1320  push_1                   1                   pop=0 push=1      b8
+  1321  call2                    npop=2              pop=1 push=1      f2
+  1322  drop                                         pop=1 push=0      0e
+  1323  goto8                    101                 pop=0 push=0      ee 65
+  1325  get_loc8                 4                   pop=0 push=1      c4 04
+  1327  push_false                                   pop=0 push=1      09
+  1328  put_field                526                 pop=2 push=0      44 0e 02 00 00
+  1333  goto8                    91                  pop=0 push=0      ee 5b
+  1335  dup                                          pop=1 push=2      11
+  1336  push_i16                 128                 pop=0 push=1      c0 80 00
+  1339  strict_eq                                    pop=2 push=1      ad
+  1340  if_false8                23                  pop=1 push=0      ec 17
+  1342  get_loc8                 4                   pop=0 push=1      c4 04
+  1344  get_var_ref1             var_ref=1           pop=0 push=1      e0
+  1345  push_2                   2                   pop=0 push=1      b9
+  1346  get_array_el                                 pop=2 push=1      48
+  1347  lnot                                         pop=1 push=1      98
+  1348  put_field                526                 pop=2 push=0      44 0e 02 00 00
+  1353  get_var_ref0             var_ref=0           pop=0 push=1      df
+  1354  push_atom_value          844                 pop=0 push=1      04 4c 03 00 00
+  1359  push_0                   0                   pop=0 push=1      b7
+  1360  call2                    npop=2              pop=1 push=1      f2
+  1361  drop                                         pop=1 push=0      0e
+  1362  goto8                    62                  pop=0 push=0      ee 3e
+  1364  dup                                          pop=1 push=2      11
+  1365  push_i16                 192                 pop=0 push=1      c0 c0 00
+  1368  strict_eq                                    pop=2 push=1      ad
+  1369  if_false8                20                  pop=1 push=0      ec 14
+  1371  get_loc8                 4                   pop=0 push=1      c4 04
+  1373  push_true                                    pop=0 push=1      0a
+  1374  put_field                526                 pop=2 push=0      44 0e 02 00 00
+  1379  get_var_ref0             var_ref=0           pop=0 push=1      df
+  1380  push_atom_value          845                 pop=0 push=1      04 4d 03 00 00
+  1385  push_0                   0                   pop=0 push=1      b7
+  1386  call2                    npop=2              pop=1 push=1      f2
+  1387  drop                                         pop=1 push=0      0e
+  1388  goto8                    36                  pop=0 push=0      ee 24
+  1390  get_loc8                 4                   pop=0 push=1      c4 04
+  1392  push_false                                   pop=0 push=1      09
+  1393  put_field                526                 pop=2 push=0      44 0e 02 00 00
+  1398  get_var_ref0             var_ref=0           pop=0 push=1      df
+  1399  push_atom_value          846                 pop=0 push=1      04 4e 03 00 00
+  1404  get_loc8                 4                   pop=0 push=1      c4 04
+  1406  get_field                517                 pop=1 push=1      42 05 02 00 00
+  1411  push_i16                 323                 pop=0 push=1      c0 43 01
+  1414  get_array_el                                 pop=2 push=1      48
+  1415  add                                          pop=2 push=1      9f
+  1416  push_atom_value          847                 pop=0 push=1      04 4f 03 00 00
+  1421  add                                          pop=2 push=1      9f
+  1422  push_1                   1                   pop=0 push=1      b8
+  1423  call2                    npop=2              pop=1 push=1      f2
   1424  drop                                         pop=1 push=0      0e
-  1425  get_loc8                 4                   pop=0 push=1      c4 04
-  1427  push_false                                   pop=0 push=1      09
-  1428  put_field                498                 pop=2 push=0      44 f2 01 00 00
-  1433  get_loc8                 4                   pop=0 push=1      c4 04
-  1435  get_field2               288                 pop=1 push=2      43 20 01 00 00
-  1440  call_method              0                   pop=2 push=1      24 00 00
-  1443  drop                                         pop=1 push=0      0e
-  1444  get_loc8                 4                   pop=0 push=1      c4 04
-  1446  get_field2               281                 pop=1 push=2      43 19 01 00 00
-  1451  call_method              0                   pop=2 push=1      24 00 00
-  1454  drop                                         pop=1 push=0      0e
-  1455  get_loc8                 4                   pop=0 push=1      c4 04
-  1457  get_field2               300                 pop=1 push=2      43 2c 01 00 00
-  1462  call_method              0                   pop=2 push=1      24 00 00
-  1465  drop                                         pop=1 push=0      0e
-  1466  goto8                    37                  pop=0 push=0      ee 25
-  1468  get_loc8                 4                   pop=0 push=1      c4 04
-  1470  get_loc8                 4                   pop=0 push=1      c4 04
-  1472  get_field                500                 pop=1 push=1      42 f4 01 00 00
-  1477  put_field                526                 pop=2 push=0      44 0e 02 00 00
-  1482  get_loc8                 4                   pop=0 push=1      c4 04
-  1484  get_field2               288                 pop=1 push=2      43 20 01 00 00
-  1489  call_method              0                   pop=2 push=1      24 00 00
-  1492  drop                                         pop=1 push=0      0e
-  1493  get_loc8                 4                   pop=0 push=1      c4 04
-  1495  get_field2               282                 pop=1 push=2      43 1a 01 00 00
-  1500  call_method              0                   pop=2 push=1      24 00 00
-  1503  drop                                         pop=1 push=0      0e
-  1504  get_loc8                 4                   pop=0 push=1      c4 04
-  1506  get_field2               358                 pop=1 push=2      43 66 01 00 00
-  1511  call_method              0                   pop=2 push=1      24 00 00
-  1514  drop                                         pop=1 push=0      0e
-  1515  get_loc8                 4                   pop=0 push=1      c4 04
-  1517  get_field                517                 pop=1 push=1      42 05 02 00 00
-  1522  push_i16                 331                 pop=0 push=1      c0 4b 01
-  1525  get_array_el                                 pop=2 push=1      48
-  1526  put_loc2                 loc=2               pop=1 push=0      cd
-  1527  get_loc8                 4                   pop=0 push=1      c4 04
-  1529  get_field                517                 pop=1 push=1      42 05 02 00 00
-  1534  push_i16                 324                 pop=0 push=1      c0 44 01
-  1537  get_array_el                                 pop=2 push=1      48
-  1538  push_i32                 65280               pop=0 push=1      01 00 ff 00 00
-  1543  and                                          pop=2 push=1      af
-  1544  get_loc8                 4                   pop=0 push=1      c4 04
-  1546  get_field                517                 pop=1 push=1      42 05 02 00 00
-  1551  push_i16                 325                 pop=0 push=1      c0 45 01
-  1554  get_array_el                                 pop=2 push=1      48
-  1555  push_i16                 255                 pop=0 push=1      c0 ff 00
-  1558  and                                          pop=2 push=1      af
-  1559  or                                           pop=2 push=1      b1
-  1560  put_loc3                 loc=3               pop=1 push=0      ce
-  1561  get_loc2                 loc=2               pop=0 push=1      c9
-  1562  push_i8                  51                  pop=0 push=1      bf 33
-  1564  neq                                          pop=2 push=1      ac
-  1565  if_false8                14                  pop=1 push=0      ec 0e
-  1567  get_var_ref0             var_ref=0           pop=0 push=1      df
-  1568  push_atom_value          848                 pop=0 push=1      04 50 03 00 00
-  1573  get_loc2                 loc=2               pop=0 push=1      c9
-  1574  add                                          pop=2 push=1      9f
-  1575  push_0                   0                   pop=0 push=1      b7
-  1576  call2                    npop=2              pop=1 push=1      f2
-  1577  drop                                         pop=1 push=0      0e
-  1578  goto8                    12                  pop=0 push=0      ee 0c
-  1580  get_var_ref0             var_ref=0           pop=0 push=1      df
-  1581  push_atom_value          849                 pop=0 push=1      04 51 03 00 00
-  1586  get_loc3                 loc=3               pop=0 push=1      ca
-  1587  add                                          pop=2 push=1      9f
-  1588  push_0                   0                   pop=0 push=1      b7
-  1589  call2                    npop=2              pop=1 push=1      f2
-  1590  drop                                         pop=1 push=0      0e
-  1591  get_loc8                 4                   pop=0 push=1      c4 04
-  1593  push_empty_string                            pop=0 push=1      c3
-  1594  put_field                477                 pop=2 push=0      44 dd 01 00 00
-  1599  return_undef                                 pop=0 push=0      29
+  1425  drop                                         pop=1 push=0      0e
+  1426  get_loc8                 4                   pop=0 push=1      c4 04
+  1428  push_false                                   pop=0 push=1      09
+  1429  put_field                498                 pop=2 push=0      44 f2 01 00 00
+  1434  get_loc8                 4                   pop=0 push=1      c4 04
+  1436  get_field2               288                 pop=1 push=2      43 20 01 00 00
+  1441  call_method              0                   pop=2 push=1      24 00 00
+  1444  drop                                         pop=1 push=0      0e
+  1445  get_loc8                 4                   pop=0 push=1      c4 04
+  1447  get_field2               281                 pop=1 push=2      43 19 01 00 00
+  1452  call_method              0                   pop=2 push=1      24 00 00
+  1455  drop                                         pop=1 push=0      0e
+  1456  get_loc8                 4                   pop=0 push=1      c4 04
+  1458  get_field2               300                 pop=1 push=2      43 2c 01 00 00
+  1463  call_method              0                   pop=2 push=1      24 00 00
+  1466  drop                                         pop=1 push=0      0e
+  1467  goto8                    37                  pop=0 push=0      ee 25
+  1469  get_loc8                 4                   pop=0 push=1      c4 04
+  1471  get_loc8                 4                   pop=0 push=1      c4 04
+  1473  get_field                500                 pop=1 push=1      42 f4 01 00 00
+  1478  put_field                526                 pop=2 push=0      44 0e 02 00 00
+  1483  get_loc8                 4                   pop=0 push=1      c4 04
+  1485  get_field2               288                 pop=1 push=2      43 20 01 00 00
+  1490  call_method              0                   pop=2 push=1      24 00 00
+  1493  drop                                         pop=1 push=0      0e
+  1494  get_loc8                 4                   pop=0 push=1      c4 04
+  1496  get_field2               282                 pop=1 push=2      43 1a 01 00 00
+  1501  call_method              0                   pop=2 push=1      24 00 00
+  1504  drop                                         pop=1 push=0      0e
+  1505  get_loc8                 4                   pop=0 push=1      c4 04
+  1507  get_field2               358                 pop=1 push=2      43 66 01 00 00
+  1512  call_method              0                   pop=2 push=1      24 00 00
+  1515  drop                                         pop=1 push=0      0e
+  1516  get_loc8                 4                   pop=0 push=1      c4 04
+  1518  get_field                517                 pop=1 push=1      42 05 02 00 00
+  1523  push_i16                 331                 pop=0 push=1      c0 4b 01
+  1526  get_array_el                                 pop=2 push=1      48
+  1527  put_loc2                 loc=2               pop=1 push=0      cd
+  1528  get_loc8                 4                   pop=0 push=1      c4 04
+  1530  get_field                517                 pop=1 push=1      42 05 02 00 00
+  1535  push_i16                 324                 pop=0 push=1      c0 44 01
+  1538  get_array_el                                 pop=2 push=1      48
+  1539  push_i32                 65280               pop=0 push=1      01 00 ff 00 00
+  1544  and                                          pop=2 push=1      af
+  1545  get_loc8                 4                   pop=0 push=1      c4 04
+  1547  get_field                517                 pop=1 push=1      42 05 02 00 00
+  1552  push_i16                 325                 pop=0 push=1      c0 45 01
+  1555  get_array_el                                 pop=2 push=1      48
+  1556  push_i16                 255                 pop=0 push=1      c0 ff 00
+  1559  and                                          pop=2 push=1      af
+  1560  or                                           pop=2 push=1      b1
+  1561  put_loc3                 loc=3               pop=1 push=0      ce
+  1562  get_loc2                 loc=2               pop=0 push=1      c9
+  1563  push_i8                  51                  pop=0 push=1      bf 33
+  1565  neq                                          pop=2 push=1      ac
+  1566  if_false8                14                  pop=1 push=0      ec 0e
+  1568  get_var_ref0             var_ref=0           pop=0 push=1      df
+  1569  push_atom_value          848                 pop=0 push=1      04 50 03 00 00
+  1574  get_loc2                 loc=2               pop=0 push=1      c9
+  1575  add                                          pop=2 push=1      9f
+  1576  push_0                   0                   pop=0 push=1      b7
+  1577  call2                    npop=2              pop=1 push=1      f2
+  1578  drop                                         pop=1 push=0      0e
+  1579  goto8                    12                  pop=0 push=0      ee 0c
+  1581  get_var_ref0             var_ref=0           pop=0 push=1      df
+  1582  push_atom_value          849                 pop=0 push=1      04 51 03 00 00
+  1587  get_loc3                 loc=3               pop=0 push=1      ca
+  1588  add                                          pop=2 push=1      9f
+  1589  push_0                   0                   pop=0 push=1      b7
+  1590  call2                    npop=2              pop=1 push=1      f2
+  1591  drop                                         pop=1 push=0      0e
+  1592  get_loc8                 4                   pop=0 push=1      c4 04
+  1594  push_empty_string                            pop=0 push=1      c3
+  1595  put_field                477                 pop=2 push=0      44 dd 01 00 00
+  1600  return_undef                                 pop=0 push=0      29
 
 === Inner Function #530 ===
 bytecodeLen=114 stackSize=4 varCount=2 argCount=0
@@ -23089,222 +23089,222 @@ bytecodeLen=334 stackSize=4 varCount=1 argCount=0
    333  return_undef                                 pop=0 push=0      29
 
 === Inner Function #553 ===
-bytecodeLen=506 stackSize=4 varCount=1 argCount=0
+bytecodeLen=508 stackSize=4 varCount=1 argCount=0
      0  push_this                                    pop=0 push=1      08
      1  put_loc0                 loc=0               pop=1 push=0      cb
      2  get_loc0                 loc=0               pop=0 push=1      c7
      3  get_field                725                 pop=1 push=1      42 d5 02 00 00
      8  push_minus1              1                   pop=0 push=1      b6
      9  gt                                           pop=2 push=1      a7
-    10  if_false                 152                 pop=1 push=0      6c 98 00 00 00
+    10  if_false                 153                 pop=1 push=0      6c 99 00 00 00
     15  get_loc0                 loc=0               pop=0 push=1      c7
     16  get_field                724                 pop=1 push=1      42 d4 02 00 00
     21  push_0                   0                   pop=0 push=1      b7
     22  gt                                           pop=2 push=1      a7
-    23  if_false8                17                  pop=1 push=0      ec 11
+    23  if_false8                18                  pop=1 push=0      ec 12
     25  get_loc0                 loc=0               pop=0 push=1      c7
     26  get_field2               724                 pop=1 push=2      43 d4 02 00 00
     31  dec                                          pop=1 push=1      90
     32  insert2                                      pop=2 push=3      15
     33  put_field                724                 pop=2 push=0      44 d4 02 00 00
     38  drop                                         pop=1 push=0      0e
-    39  goto8                    123                 pop=0 push=0      ee 7b
-    41  get_loc0                 loc=0               pop=0 push=1      c7
-    42  get_field                723                 pop=1 push=1      42 d3 02 00 00
-    47  lnot                                         pop=1 push=1      98
-    48  if_false8                58                  pop=1 push=0      ec 3a
-    50  get_loc0                 loc=0               pop=0 push=1      c7
-    51  get_field                722                 pop=1 push=1      42 d2 02 00 00
-    56  push_0                   0                   pop=0 push=1      b7
-    57  gt                                           pop=2 push=1      a7
-    58  if_false8                39                  pop=1 push=0      ec 27
-    60  get_loc0                 loc=0               pop=0 push=1      c7
-    61  get_field2               722                 pop=1 push=2      43 d2 02 00 00
-    66  dec                                          pop=1 push=1      90
-    67  insert2                                      pop=2 push=3      15
-    68  put_field                722                 pop=2 push=0      44 d2 02 00 00
-    73  drop                                         pop=1 push=0      0e
-    74  get_loc0                 loc=0               pop=0 push=1      c7
+    39  goto16                   124                 pop=0 push=0      ef 7c 00
+    42  get_loc0                 loc=0               pop=0 push=1      c7
+    43  get_field                723                 pop=1 push=1      42 d3 02 00 00
+    48  lnot                                         pop=1 push=1      98
+    49  if_false8                58                  pop=1 push=0      ec 3a
+    51  get_loc0                 loc=0               pop=0 push=1      c7
+    52  get_field                722                 pop=1 push=1      42 d2 02 00 00
+    57  push_0                   0                   pop=0 push=1      b7
+    58  gt                                           pop=2 push=1      a7
+    59  if_false8                39                  pop=1 push=0      ec 27
+    61  get_loc0                 loc=0               pop=0 push=1      c7
+    62  get_field2               722                 pop=1 push=2      43 d2 02 00 00
+    67  dec                                          pop=1 push=1      90
+    68  insert2                                      pop=2 push=3      15
+    69  put_field                722                 pop=2 push=0      44 d2 02 00 00
+    74  drop                                         pop=1 push=0      0e
     75  get_loc0                 loc=0               pop=0 push=1      c7
-    76  get_field                725                 pop=1 push=1      42 d5 02 00 00
-    81  put_field                724                 pop=2 push=0      44 d4 02 00 00
-    86  get_loc0                 loc=0               pop=0 push=1      c7
-    87  get_field2               313                 pop=1 push=2      43 39 01 00 00
-    92  call_method              0                   pop=2 push=1      24 00 00
-    95  drop                                         pop=1 push=0      0e
-    96  goto8                    66                  pop=0 push=0      ee 42
-    98  get_loc0                 loc=0               pop=0 push=1      c7
-    99  push_minus1              1                   pop=0 push=1      b6
-   100  put_field                725                 pop=2 push=0      44 d5 02 00 00
-   105  goto8                    57                  pop=0 push=0      ee 39
-   107  get_loc0                 loc=0               pop=0 push=1      c7
-   108  get_field                722                 pop=1 push=1      42 d2 02 00 00
-   113  push_i8                  15                  pop=0 push=1      bf 0f
-   115  lt                                           pop=2 push=1      a5
-   116  if_false8                39                  pop=1 push=0      ec 27
-   118  get_loc0                 loc=0               pop=0 push=1      c7
-   119  get_field2               722                 pop=1 push=2      43 d2 02 00 00
-   124  inc                                          pop=1 push=1      91
-   125  insert2                                      pop=2 push=3      15
-   126  put_field                722                 pop=2 push=0      44 d2 02 00 00
-   131  drop                                         pop=1 push=0      0e
-   132  get_loc0                 loc=0               pop=0 push=1      c7
+    76  get_loc0                 loc=0               pop=0 push=1      c7
+    77  get_field                725                 pop=1 push=1      42 d5 02 00 00
+    82  put_field                724                 pop=2 push=0      44 d4 02 00 00
+    87  get_loc0                 loc=0               pop=0 push=1      c7
+    88  get_field2               313                 pop=1 push=2      43 39 01 00 00
+    93  call_method              0                   pop=2 push=1      24 00 00
+    96  drop                                         pop=1 push=0      0e
+    97  goto8                    66                  pop=0 push=0      ee 42
+    99  get_loc0                 loc=0               pop=0 push=1      c7
+   100  push_minus1              1                   pop=0 push=1      b6
+   101  put_field                725                 pop=2 push=0      44 d5 02 00 00
+   106  goto8                    57                  pop=0 push=0      ee 39
+   108  get_loc0                 loc=0               pop=0 push=1      c7
+   109  get_field                722                 pop=1 push=1      42 d2 02 00 00
+   114  push_i8                  15                  pop=0 push=1      bf 0f
+   116  lt                                           pop=2 push=1      a5
+   117  if_false8                39                  pop=1 push=0      ec 27
+   119  get_loc0                 loc=0               pop=0 push=1      c7
+   120  get_field2               722                 pop=1 push=2      43 d2 02 00 00
+   125  inc                                          pop=1 push=1      91
+   126  insert2                                      pop=2 push=3      15
+   127  put_field                722                 pop=2 push=0      44 d2 02 00 00
+   132  drop                                         pop=1 push=0      0e
    133  get_loc0                 loc=0               pop=0 push=1      c7
-   134  get_field                725                 pop=1 push=1      42 d5 02 00 00
-   139  put_field                724                 pop=2 push=0      44 d4 02 00 00
-   144  get_loc0                 loc=0               pop=0 push=1      c7
-   145  get_field2               313                 pop=1 push=2      43 39 01 00 00
-   150  call_method              0                   pop=2 push=1      24 00 00
-   153  drop                                         pop=1 push=0      0e
-   154  goto8                    8                   pop=0 push=0      ee 08
-   156  get_loc0                 loc=0               pop=0 push=1      c7
-   157  push_minus1              1                   pop=0 push=1      b6
-   158  put_field                725                 pop=2 push=0      44 d5 02 00 00
-   163  get_loc0                 loc=0               pop=0 push=1      c7
-   164  get_field                741                 pop=1 push=1      42 e5 02 00 00
-   169  push_minus1              1                   pop=0 push=1      b6
-   170  gt                                           pop=2 push=1      a7
-   171  if_false                 152                 pop=1 push=0      6c 98 00 00 00
-   176  get_loc0                 loc=0               pop=0 push=1      c7
-   177  get_field                740                 pop=1 push=1      42 e4 02 00 00
-   182  push_0                   0                   pop=0 push=1      b7
-   183  gt                                           pop=2 push=1      a7
-   184  if_false8                17                  pop=1 push=0      ec 11
-   186  get_loc0                 loc=0               pop=0 push=1      c7
-   187  get_field2               740                 pop=1 push=2      43 e4 02 00 00
-   192  dec                                          pop=1 push=1      90
-   193  insert2                                      pop=2 push=3      15
-   194  put_field                740                 pop=2 push=0      44 e4 02 00 00
-   199  drop                                         pop=1 push=0      0e
-   200  goto8                    123                 pop=0 push=0      ee 7b
-   202  get_loc0                 loc=0               pop=0 push=1      c7
-   203  get_field                739                 pop=1 push=1      42 e3 02 00 00
-   208  lnot                                         pop=1 push=1      98
-   209  if_false8                58                  pop=1 push=0      ec 3a
-   211  get_loc0                 loc=0               pop=0 push=1      c7
-   212  get_field                738                 pop=1 push=1      42 e2 02 00 00
-   217  push_0                   0                   pop=0 push=1      b7
-   218  gt                                           pop=2 push=1      a7
-   219  if_false8                39                  pop=1 push=0      ec 27
-   221  get_loc0                 loc=0               pop=0 push=1      c7
-   222  get_field2               738                 pop=1 push=2      43 e2 02 00 00
-   227  dec                                          pop=1 push=1      90
-   228  insert2                                      pop=2 push=3      15
-   229  put_field                738                 pop=2 push=0      44 e2 02 00 00
-   234  drop                                         pop=1 push=0      0e
-   235  get_loc0                 loc=0               pop=0 push=1      c7
-   236  get_loc0                 loc=0               pop=0 push=1      c7
-   237  get_field                741                 pop=1 push=1      42 e5 02 00 00
-   242  put_field                740                 pop=2 push=0      44 e4 02 00 00
-   247  get_loc0                 loc=0               pop=0 push=1      c7
-   248  get_field2               318                 pop=1 push=2      43 3e 01 00 00
-   253  call_method              0                   pop=2 push=1      24 00 00
-   256  drop                                         pop=1 push=0      0e
-   257  goto8                    66                  pop=0 push=0      ee 42
-   259  get_loc0                 loc=0               pop=0 push=1      c7
-   260  push_minus1              1                   pop=0 push=1      b6
-   261  put_field                741                 pop=2 push=0      44 e5 02 00 00
-   266  goto8                    57                  pop=0 push=0      ee 39
-   268  get_loc0                 loc=0               pop=0 push=1      c7
-   269  get_field                738                 pop=1 push=1      42 e2 02 00 00
-   274  push_i8                  15                  pop=0 push=1      bf 0f
-   276  lt                                           pop=2 push=1      a5
-   277  if_false8                39                  pop=1 push=0      ec 27
-   279  get_loc0                 loc=0               pop=0 push=1      c7
-   280  get_field2               738                 pop=1 push=2      43 e2 02 00 00
-   285  inc                                          pop=1 push=1      91
-   286  insert2                                      pop=2 push=3      15
-   287  put_field                738                 pop=2 push=0      44 e2 02 00 00
-   292  drop                                         pop=1 push=0      0e
-   293  get_loc0                 loc=0               pop=0 push=1      c7
-   294  get_loc0                 loc=0               pop=0 push=1      c7
-   295  get_field                741                 pop=1 push=1      42 e5 02 00 00
-   300  put_field                740                 pop=2 push=0      44 e4 02 00 00
-   305  get_loc0                 loc=0               pop=0 push=1      c7
-   306  get_field2               318                 pop=1 push=2      43 3e 01 00 00
-   311  call_method              0                   pop=2 push=1      24 00 00
-   314  drop                                         pop=1 push=0      0e
-   315  goto8                    8                   pop=0 push=0      ee 08
-   317  get_loc0                 loc=0               pop=0 push=1      c7
-   318  push_minus1              1                   pop=0 push=1      b6
-   319  put_field                741                 pop=2 push=0      44 e5 02 00 00
-   324  get_loc0                 loc=0               pop=0 push=1      c7
-   325  get_field                756                 pop=1 push=1      42 f4 02 00 00
-   330  push_minus1              1                   pop=0 push=1      b6
-   331  gt                                           pop=2 push=1      a7
-   332  if_false                 172                 pop=1 push=0      6c ac 00 00 00
-   337  get_loc0                 loc=0               pop=0 push=1      c7
-   338  get_field                755                 pop=1 push=1      42 f3 02 00 00
-   343  push_0                   0                   pop=0 push=1      b7
-   344  gt                                           pop=2 push=1      a7
-   345  if_false8                16                  pop=1 push=0      ec 10
-   347  get_loc0                 loc=0               pop=0 push=1      c7
-   348  get_field2               755                 pop=1 push=2      43 f3 02 00 00
-   353  dec                                          pop=1 push=1      90
-   354  insert2                                      pop=2 push=3      15
-   355  put_field                755                 pop=2 push=0      44 f3 02 00 00
-   360  drop                                         pop=1 push=0      0e
-   361  return_undef                                 pop=0 push=0      29
-   362  get_loc0                 loc=0               pop=0 push=1      c7
-   363  get_field                754                 pop=1 push=1      42 f2 02 00 00
-   368  lnot                                         pop=1 push=1      98
-   369  if_false8                68                  pop=1 push=0      ec 44
-   371  get_loc0                 loc=0               pop=0 push=1      c7
-   372  get_field                752                 pop=1 push=1      42 f0 02 00 00
-   377  push_0                   0                   pop=0 push=1      b7
-   378  gt                                           pop=2 push=1      a7
-   379  if_false8                50                  pop=1 push=0      ec 32
-   381  get_loc0                 loc=0               pop=0 push=1      c7
-   382  get_loc0                 loc=0               pop=0 push=1      c7
-   383  get_field2               752                 pop=1 push=2      43 f0 02 00 00
-   388  dec                                          pop=1 push=1      90
-   389  insert2                                      pop=2 push=3      15
-   390  put_field                752                 pop=2 push=0      44 f0 02 00 00
-   395  get_loc0                 loc=0               pop=0 push=1      c7
-   396  get_field                783                 pop=1 push=1      42 0f 03 00 00
-   401  shl                                          pop=2 push=1      a2
-   402  put_field                753                 pop=2 push=0      44 f1 02 00 00
-   407  get_loc0                 loc=0               pop=0 push=1      c7
-   408  get_loc0                 loc=0               pop=0 push=1      c7
-   409  get_field                756                 pop=1 push=1      42 f4 02 00 00
-   414  put_field                755                 pop=2 push=0      44 f3 02 00 00
-   419  get_loc0                 loc=0               pop=0 push=1      c7
-   420  get_field2               331                 pop=1 push=2      43 4b 01 00 00
-   425  call_method              0                   pop=2 push=1      24 00 00
-   428  drop                                         pop=1 push=0      0e
-   429  return_undef                                 pop=0 push=0      29
-   430  get_loc0                 loc=0               pop=0 push=1      c7
-   431  push_minus1              1                   pop=0 push=1      b6
-   432  put_field                756                 pop=2 push=0      44 f4 02 00 00
-   437  return_undef                                 pop=0 push=0      29
-   438  get_loc0                 loc=0               pop=0 push=1      c7
-   439  get_field                752                 pop=1 push=1      42 f0 02 00 00
-   444  push_i8                  15                  pop=0 push=1      bf 0f
-   446  lt                                           pop=2 push=1      a5
-   447  if_false8                50                  pop=1 push=0      ec 32
-   449  get_loc0                 loc=0               pop=0 push=1      c7
-   450  get_loc0                 loc=0               pop=0 push=1      c7
-   451  get_field2               752                 pop=1 push=2      43 f0 02 00 00
-   456  inc                                          pop=1 push=1      91
-   457  insert2                                      pop=2 push=3      15
-   458  put_field                752                 pop=2 push=0      44 f0 02 00 00
-   463  get_loc0                 loc=0               pop=0 push=1      c7
-   464  get_field                783                 pop=1 push=1      42 0f 03 00 00
-   469  shl                                          pop=2 push=1      a2
-   470  put_field                753                 pop=2 push=0      44 f1 02 00 00
-   475  get_loc0                 loc=0               pop=0 push=1      c7
-   476  get_loc0                 loc=0               pop=0 push=1      c7
-   477  get_field                756                 pop=1 push=1      42 f4 02 00 00
-   482  put_field                755                 pop=2 push=0      44 f3 02 00 00
-   487  get_loc0                 loc=0               pop=0 push=1      c7
-   488  get_field2               331                 pop=1 push=2      43 4b 01 00 00
-   493  call_method              0                   pop=2 push=1      24 00 00
-   496  drop                                         pop=1 push=0      0e
-   497  return_undef                                 pop=0 push=0      29
-   498  get_loc0                 loc=0               pop=0 push=1      c7
-   499  push_minus1              1                   pop=0 push=1      b6
-   500  put_field                756                 pop=2 push=0      44 f4 02 00 00
-   505  return_undef                                 pop=0 push=0      29
+   134  get_loc0                 loc=0               pop=0 push=1      c7
+   135  get_field                725                 pop=1 push=1      42 d5 02 00 00
+   140  put_field                724                 pop=2 push=0      44 d4 02 00 00
+   145  get_loc0                 loc=0               pop=0 push=1      c7
+   146  get_field2               313                 pop=1 push=2      43 39 01 00 00
+   151  call_method              0                   pop=2 push=1      24 00 00
+   154  drop                                         pop=1 push=0      0e
+   155  goto8                    8                   pop=0 push=0      ee 08
+   157  get_loc0                 loc=0               pop=0 push=1      c7
+   158  push_minus1              1                   pop=0 push=1      b6
+   159  put_field                725                 pop=2 push=0      44 d5 02 00 00
+   164  get_loc0                 loc=0               pop=0 push=1      c7
+   165  get_field                741                 pop=1 push=1      42 e5 02 00 00
+   170  push_minus1              1                   pop=0 push=1      b6
+   171  gt                                           pop=2 push=1      a7
+   172  if_false                 153                 pop=1 push=0      6c 99 00 00 00
+   177  get_loc0                 loc=0               pop=0 push=1      c7
+   178  get_field                740                 pop=1 push=1      42 e4 02 00 00
+   183  push_0                   0                   pop=0 push=1      b7
+   184  gt                                           pop=2 push=1      a7
+   185  if_false8                18                  pop=1 push=0      ec 12
+   187  get_loc0                 loc=0               pop=0 push=1      c7
+   188  get_field2               740                 pop=1 push=2      43 e4 02 00 00
+   193  dec                                          pop=1 push=1      90
+   194  insert2                                      pop=2 push=3      15
+   195  put_field                740                 pop=2 push=0      44 e4 02 00 00
+   200  drop                                         pop=1 push=0      0e
+   201  goto16                   124                 pop=0 push=0      ef 7c 00
+   204  get_loc0                 loc=0               pop=0 push=1      c7
+   205  get_field                739                 pop=1 push=1      42 e3 02 00 00
+   210  lnot                                         pop=1 push=1      98
+   211  if_false8                58                  pop=1 push=0      ec 3a
+   213  get_loc0                 loc=0               pop=0 push=1      c7
+   214  get_field                738                 pop=1 push=1      42 e2 02 00 00
+   219  push_0                   0                   pop=0 push=1      b7
+   220  gt                                           pop=2 push=1      a7
+   221  if_false8                39                  pop=1 push=0      ec 27
+   223  get_loc0                 loc=0               pop=0 push=1      c7
+   224  get_field2               738                 pop=1 push=2      43 e2 02 00 00
+   229  dec                                          pop=1 push=1      90
+   230  insert2                                      pop=2 push=3      15
+   231  put_field                738                 pop=2 push=0      44 e2 02 00 00
+   236  drop                                         pop=1 push=0      0e
+   237  get_loc0                 loc=0               pop=0 push=1      c7
+   238  get_loc0                 loc=0               pop=0 push=1      c7
+   239  get_field                741                 pop=1 push=1      42 e5 02 00 00
+   244  put_field                740                 pop=2 push=0      44 e4 02 00 00
+   249  get_loc0                 loc=0               pop=0 push=1      c7
+   250  get_field2               318                 pop=1 push=2      43 3e 01 00 00
+   255  call_method              0                   pop=2 push=1      24 00 00
+   258  drop                                         pop=1 push=0      0e
+   259  goto8                    66                  pop=0 push=0      ee 42
+   261  get_loc0                 loc=0               pop=0 push=1      c7
+   262  push_minus1              1                   pop=0 push=1      b6
+   263  put_field                741                 pop=2 push=0      44 e5 02 00 00
+   268  goto8                    57                  pop=0 push=0      ee 39
+   270  get_loc0                 loc=0               pop=0 push=1      c7
+   271  get_field                738                 pop=1 push=1      42 e2 02 00 00
+   276  push_i8                  15                  pop=0 push=1      bf 0f
+   278  lt                                           pop=2 push=1      a5
+   279  if_false8                39                  pop=1 push=0      ec 27
+   281  get_loc0                 loc=0               pop=0 push=1      c7
+   282  get_field2               738                 pop=1 push=2      43 e2 02 00 00
+   287  inc                                          pop=1 push=1      91
+   288  insert2                                      pop=2 push=3      15
+   289  put_field                738                 pop=2 push=0      44 e2 02 00 00
+   294  drop                                         pop=1 push=0      0e
+   295  get_loc0                 loc=0               pop=0 push=1      c7
+   296  get_loc0                 loc=0               pop=0 push=1      c7
+   297  get_field                741                 pop=1 push=1      42 e5 02 00 00
+   302  put_field                740                 pop=2 push=0      44 e4 02 00 00
+   307  get_loc0                 loc=0               pop=0 push=1      c7
+   308  get_field2               318                 pop=1 push=2      43 3e 01 00 00
+   313  call_method              0                   pop=2 push=1      24 00 00
+   316  drop                                         pop=1 push=0      0e
+   317  goto8                    8                   pop=0 push=0      ee 08
+   319  get_loc0                 loc=0               pop=0 push=1      c7
+   320  push_minus1              1                   pop=0 push=1      b6
+   321  put_field                741                 pop=2 push=0      44 e5 02 00 00
+   326  get_loc0                 loc=0               pop=0 push=1      c7
+   327  get_field                756                 pop=1 push=1      42 f4 02 00 00
+   332  push_minus1              1                   pop=0 push=1      b6
+   333  gt                                           pop=2 push=1      a7
+   334  if_false                 172                 pop=1 push=0      6c ac 00 00 00
+   339  get_loc0                 loc=0               pop=0 push=1      c7
+   340  get_field                755                 pop=1 push=1      42 f3 02 00 00
+   345  push_0                   0                   pop=0 push=1      b7
+   346  gt                                           pop=2 push=1      a7
+   347  if_false8                16                  pop=1 push=0      ec 10
+   349  get_loc0                 loc=0               pop=0 push=1      c7
+   350  get_field2               755                 pop=1 push=2      43 f3 02 00 00
+   355  dec                                          pop=1 push=1      90
+   356  insert2                                      pop=2 push=3      15
+   357  put_field                755                 pop=2 push=0      44 f3 02 00 00
+   362  drop                                         pop=1 push=0      0e
+   363  return_undef                                 pop=0 push=0      29
+   364  get_loc0                 loc=0               pop=0 push=1      c7
+   365  get_field                754                 pop=1 push=1      42 f2 02 00 00
+   370  lnot                                         pop=1 push=1      98
+   371  if_false8                68                  pop=1 push=0      ec 44
+   373  get_loc0                 loc=0               pop=0 push=1      c7
+   374  get_field                752                 pop=1 push=1      42 f0 02 00 00
+   379  push_0                   0                   pop=0 push=1      b7
+   380  gt                                           pop=2 push=1      a7
+   381  if_false8                50                  pop=1 push=0      ec 32
+   383  get_loc0                 loc=0               pop=0 push=1      c7
+   384  get_loc0                 loc=0               pop=0 push=1      c7
+   385  get_field2               752                 pop=1 push=2      43 f0 02 00 00
+   390  dec                                          pop=1 push=1      90
+   391  insert2                                      pop=2 push=3      15
+   392  put_field                752                 pop=2 push=0      44 f0 02 00 00
+   397  get_loc0                 loc=0               pop=0 push=1      c7
+   398  get_field                783                 pop=1 push=1      42 0f 03 00 00
+   403  shl                                          pop=2 push=1      a2
+   404  put_field                753                 pop=2 push=0      44 f1 02 00 00
+   409  get_loc0                 loc=0               pop=0 push=1      c7
+   410  get_loc0                 loc=0               pop=0 push=1      c7
+   411  get_field                756                 pop=1 push=1      42 f4 02 00 00
+   416  put_field                755                 pop=2 push=0      44 f3 02 00 00
+   421  get_loc0                 loc=0               pop=0 push=1      c7
+   422  get_field2               331                 pop=1 push=2      43 4b 01 00 00
+   427  call_method              0                   pop=2 push=1      24 00 00
+   430  drop                                         pop=1 push=0      0e
+   431  return_undef                                 pop=0 push=0      29
+   432  get_loc0                 loc=0               pop=0 push=1      c7
+   433  push_minus1              1                   pop=0 push=1      b6
+   434  put_field                756                 pop=2 push=0      44 f4 02 00 00
+   439  return_undef                                 pop=0 push=0      29
+   440  get_loc0                 loc=0               pop=0 push=1      c7
+   441  get_field                752                 pop=1 push=1      42 f0 02 00 00
+   446  push_i8                  15                  pop=0 push=1      bf 0f
+   448  lt                                           pop=2 push=1      a5
+   449  if_false8                50                  pop=1 push=0      ec 32
+   451  get_loc0                 loc=0               pop=0 push=1      c7
+   452  get_loc0                 loc=0               pop=0 push=1      c7
+   453  get_field2               752                 pop=1 push=2      43 f0 02 00 00
+   458  inc                                          pop=1 push=1      91
+   459  insert2                                      pop=2 push=3      15
+   460  put_field                752                 pop=2 push=0      44 f0 02 00 00
+   465  get_loc0                 loc=0               pop=0 push=1      c7
+   466  get_field                783                 pop=1 push=1      42 0f 03 00 00
+   471  shl                                          pop=2 push=1      a2
+   472  put_field                753                 pop=2 push=0      44 f1 02 00 00
+   477  get_loc0                 loc=0               pop=0 push=1      c7
+   478  get_loc0                 loc=0               pop=0 push=1      c7
+   479  get_field                756                 pop=1 push=1      42 f4 02 00 00
+   484  put_field                755                 pop=2 push=0      44 f3 02 00 00
+   489  get_loc0                 loc=0               pop=0 push=1      c7
+   490  get_field2               331                 pop=1 push=2      43 4b 01 00 00
+   495  call_method              0                   pop=2 push=1      24 00 00
+   498  drop                                         pop=1 push=0      0e
+   499  return_undef                                 pop=0 push=0      29
+   500  get_loc0                 loc=0               pop=0 push=1      c7
+   501  push_minus1              1                   pop=0 push=1      b6
+   502  put_field                756                 pop=2 push=0      44 f4 02 00 00
+   507  return_undef                                 pop=0 push=0      29
 
 === Inner Function #554 ===
 bytecodeLen=237 stackSize=3 varCount=1 argCount=0
@@ -35286,7 +35286,7 @@ bytecodeLen=17 stackSize=5 varCount=1 argCount=2
     16  return_undef                                 pop=0 push=0      29
 
 === Inner Function #662 ===
-bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
+bytecodeLen=1047 stackSize=3 varCount=2 argCount=0
      0  push_this                                    pop=0 push=1      08
      1  put_loc1                 loc=1               pop=1 push=0      cc
      2  push_0                   0                   pop=0 push=1      b7
@@ -35294,7 +35294,7 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
      4  get_loc0                 loc=0               pop=0 push=1      c7
      5  push_i32                 65535               pop=0 push=1      01 ff ff 00 00
     10  lte                                          pop=2 push=1      a6
-    11  if_false                 1024                pop=1 push=0      6c 00 04 00 00
+    11  if_false                 1025                pop=1 push=0      6c 01 04 00 00
     16  get_loc0                 loc=0               pop=0 push=1      c7
     17  push_i32                 32768               pop=0 push=1      01 00 80 00 00
     22  lt                                           pop=2 push=1      a5
@@ -35312,7 +35312,7 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
     50  get_loc1                 loc=1               pop=0 push=1      c8
     51  get_field                418                 pop=1 push=1      42 a2 01 00 00
     56  put_array_el                                 pop=3 push=0      4b
-    57  goto16                   973                 pop=0 push=0      ef cd 03
+    57  goto16                   974                 pop=0 push=0      ef ce 03
     60  get_loc0                 loc=0               pop=0 push=1      c7
     61  push_i16                 16384               pop=0 push=1      c0 00 40
     64  lt                                           pop=2 push=1      a5
@@ -35323,7 +35323,7 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
     74  get_loc1                 loc=1               pop=0 push=1      c8
     75  get_field                419                 pop=1 push=1      42 a3 01 00 00
     80  put_array_el                                 pop=3 push=0      4b
-    81  goto16                   949                 pop=0 push=0      ef b5 03
+    81  goto16                   950                 pop=0 push=0      ef b6 03
     84  get_loc0                 loc=0               pop=0 push=1      c7
     85  push_i16                 24576               pop=0 push=1      c0 00 60
     88  lt                                           pop=2 push=1      a5
@@ -35334,14 +35334,14 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
     98  get_loc1                 loc=1               pop=0 push=1      c8
     99  get_field                420                 pop=1 push=1      42 a4 01 00 00
    104  put_array_el                                 pop=3 push=0      4b
-   105  goto16                   925                 pop=0 push=0      ef 9d 03
+   105  goto16                   926                 pop=0 push=0      ef 9e 03
    108  get_loc1                 loc=1               pop=0 push=1      c8
    109  get_field                514                 pop=1 push=1      42 02 02 00 00
    114  get_loc0                 loc=0               pop=0 push=1      c7
    115  get_loc1                 loc=1               pop=0 push=1      c8
    116  get_field                421                 pop=1 push=1      42 a5 01 00 00
    121  put_array_el                                 pop=3 push=0      4b
-   122  goto16                   908                 pop=0 push=0      ef 8c 03
+   122  goto16                   909                 pop=0 push=0      ef 8d 03
    125  get_loc1                 loc=1               pop=0 push=1      c8
    126  get_field                629                 pop=1 push=1      42 75 02 00 00
    131  if_false8                73                  pop=1 push=0      ec 49
@@ -35355,7 +35355,7 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    147  get_loc1                 loc=1               pop=0 push=1      c8
    148  get_field                418                 pop=1 push=1      42 a2 01 00 00
    153  put_array_el                                 pop=3 push=0      4b
-   154  goto16                   876                 pop=0 push=0      ef 6c 03
+   154  goto16                   877                 pop=0 push=0      ef 6d 03
    157  get_loc0                 loc=0               pop=0 push=1      c7
    158  push_i16                 8448                pop=0 push=1      c0 00 21
    161  gte                                          pop=2 push=1      a8
@@ -35370,14 +35370,14 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    178  get_loc1                 loc=1               pop=0 push=1      c8
    179  get_field                422                 pop=1 push=1      42 a6 01 00 00
    184  put_array_el                                 pop=3 push=0      4b
-   185  goto16                   845                 pop=0 push=0      ef 4d 03
+   185  goto16                   846                 pop=0 push=0      ef 4e 03
    188  get_loc1                 loc=1               pop=0 push=1      c8
    189  get_field                514                 pop=1 push=1      42 02 02 00 00
    194  get_loc0                 loc=0               pop=0 push=1      c7
    195  get_loc1                 loc=1               pop=0 push=1      c8
    196  get_field                431                 pop=1 push=1      42 af 01 00 00
    201  put_array_el                                 pop=3 push=0      4b
-   202  goto16                   828                 pop=0 push=0      ef 3c 03
+   202  goto16                   829                 pop=0 push=0      ef 3d 03
    205  get_loc1                 loc=1               pop=0 push=1      c8
    206  get_field                630                 pop=1 push=1      42 76 02 00 00
    211  if_false8                90                  pop=1 push=0      ec 5a
@@ -35391,7 +35391,7 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    227  get_loc1                 loc=1               pop=0 push=1      c8
    228  get_field                418                 pop=1 push=1      42 a2 01 00 00
    233  put_array_el                                 pop=3 push=0      4b
-   234  goto16                   796                 pop=0 push=0      ef 1c 03
+   234  goto16                   797                 pop=0 push=0      ef 1d 03
    237  get_loc0                 loc=0               pop=0 push=1      c7
    238  push_i16                 16384               pop=0 push=1      c0 00 40
    241  lt                                           pop=2 push=1      a5
@@ -35402,7 +35402,7 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    251  get_loc1                 loc=1               pop=0 push=1      c8
    252  get_field                423                 pop=1 push=1      42 a7 01 00 00
    257  put_array_el                                 pop=3 push=0      4b
-   258  goto16                   772                 pop=0 push=0      ef 04 03
+   258  goto16                   773                 pop=0 push=0      ef 05 03
    261  get_loc0                 loc=0               pop=0 push=1      c7
    262  push_i16                 24576               pop=0 push=1      c0 00 60
    265  lt                                           pop=2 push=1      a5
@@ -35413,14 +35413,14 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    275  get_loc1                 loc=1               pop=0 push=1      c8
    276  get_field                424                 pop=1 push=1      42 a8 01 00 00
    281  put_array_el                                 pop=3 push=0      4b
-   282  goto16                   748                 pop=0 push=0      ef ec 02
+   282  goto16                   749                 pop=0 push=0      ef ed 02
    285  get_loc1                 loc=1               pop=0 push=1      c8
    286  get_field                514                 pop=1 push=1      42 02 02 00 00
    291  get_loc0                 loc=0               pop=0 push=1      c7
    292  get_loc1                 loc=1               pop=0 push=1      c8
    293  get_field                425                 pop=1 push=1      42 a9 01 00 00
    298  put_array_el                                 pop=3 push=0      4b
-   299  goto16                   731                 pop=0 push=0      ef db 02
+   299  goto16                   732                 pop=0 push=0      ef dc 02
    302  get_loc1                 loc=1               pop=0 push=1      c8
    303  get_field                631                 pop=1 push=1      42 77 02 00 00
    308  dup                                          pop=1 push=2      11
@@ -35444,7 +35444,7 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    347  get_loc1                 loc=1               pop=0 push=1      c8
    348  get_field                418                 pop=1 push=1      42 a2 01 00 00
    353  put_array_el                                 pop=3 push=0      4b
-   354  goto16                   676                 pop=0 push=0      ef a4 02
+   354  goto16                   677                 pop=0 push=0      ef a5 02
    357  get_loc0                 loc=0               pop=0 push=1      c7
    358  push_i16                 12288               pop=0 push=1      c0 00 30
    361  lt                                           pop=2 push=1      a5
@@ -35455,7 +35455,7 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    371  get_loc1                 loc=1               pop=0 push=1      c8
    372  get_field                426                 pop=1 push=1      42 aa 01 00 00
    377  put_array_el                                 pop=3 push=0      4b
-   378  goto16                   652                 pop=0 push=0      ef 8c 02
+   378  goto16                   653                 pop=0 push=0      ef 8d 02
    381  get_loc0                 loc=0               pop=0 push=1      c7
    382  push_i16                 16384               pop=0 push=1      c0 00 40
    385  lt                                           pop=2 push=1      a5
@@ -35466,7 +35466,7 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    395  get_loc1                 loc=1               pop=0 push=1      c8
    396  get_field                427                 pop=1 push=1      42 ab 01 00 00
    401  put_array_el                                 pop=3 push=0      4b
-   402  goto16                   628                 pop=0 push=0      ef 74 02
+   402  goto16                   629                 pop=0 push=0      ef 75 02
    405  get_loc0                 loc=0               pop=0 push=1      c7
    406  push_i16                 24576               pop=0 push=1      c0 00 60
    409  lt                                           pop=2 push=1      a5
@@ -35483,14 +35483,14 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    435  get_loc1                 loc=1               pop=0 push=1      c8
    436  get_field                428                 pop=1 push=1      42 ac 01 00 00
    441  put_array_el                                 pop=3 push=0      4b
-   442  goto16                   588                 pop=0 push=0      ef 4c 02
+   442  goto16                   589                 pop=0 push=0      ef 4d 02
    445  get_loc1                 loc=1               pop=0 push=1      c8
    446  get_field                514                 pop=1 push=1      42 02 02 00 00
    451  get_loc0                 loc=0               pop=0 push=1      c7
    452  get_loc1                 loc=1               pop=0 push=1      c8
    453  get_field                431                 pop=1 push=1      42 af 01 00 00
    458  put_array_el                                 pop=3 push=0      4b
-   459  goto16                   571                 pop=0 push=0      ef 3b 02
+   459  goto16                   572                 pop=0 push=0      ef 3c 02
    462  get_loc1                 loc=1               pop=0 push=1      c8
    463  get_field                638                 pop=1 push=1      42 7e 02 00 00
    468  if_false8                90                  pop=1 push=0      ec 5a
@@ -35504,7 +35504,7 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    484  get_loc1                 loc=1               pop=0 push=1      c8
    485  get_field                418                 pop=1 push=1      42 a2 01 00 00
    490  put_array_el                                 pop=3 push=0      4b
-   491  goto16                   539                 pop=0 push=0      ef 1b 02
+   491  goto16                   540                 pop=0 push=0      ef 1c 02
    494  get_loc0                 loc=0               pop=0 push=1      c7
    495  push_i16                 16384               pop=0 push=1      c0 00 40
    498  lt                                           pop=2 push=1      a5
@@ -35515,7 +35515,7 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    508  get_loc1                 loc=1               pop=0 push=1      c8
    509  get_field                423                 pop=1 push=1      42 a7 01 00 00
    514  put_array_el                                 pop=3 push=0      4b
-   515  goto16                   515                 pop=0 push=0      ef 03 02
+   515  goto16                   516                 pop=0 push=0      ef 04 02
    518  get_loc0                 loc=0               pop=0 push=1      c7
    519  push_i16                 24576               pop=0 push=1      c0 00 60
    522  lt                                           pop=2 push=1      a5
@@ -35526,21 +35526,21 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    532  get_loc1                 loc=1               pop=0 push=1      c8
    533  get_field                430                 pop=1 push=1      42 ae 01 00 00
    538  put_array_el                                 pop=3 push=0      4b
-   539  goto16                   491                 pop=0 push=0      ef eb 01
+   539  goto16                   492                 pop=0 push=0      ef ec 01
    542  get_loc1                 loc=1               pop=0 push=1      c8
    543  get_field                514                 pop=1 push=1      42 02 02 00 00
    548  get_loc0                 loc=0               pop=0 push=1      c7
    549  get_loc1                 loc=1               pop=0 push=1      c8
    550  get_field                431                 pop=1 push=1      42 af 01 00 00
    555  put_array_el                                 pop=3 push=0      4b
-   556  goto16                   474                 pop=0 push=0      ef da 01
+   556  goto16                   475                 pop=0 push=0      ef db 01
    559  get_loc1                 loc=1               pop=0 push=1      c8
    560  get_field                514                 pop=1 push=1      42 02 02 00 00
    565  get_loc0                 loc=0               pop=0 push=1      c7
    566  get_loc1                 loc=1               pop=0 push=1      c8
    567  get_field                431                 pop=1 push=1      42 af 01 00 00
    572  put_array_el                                 pop=3 push=0      4b
-   573  goto16                   457                 pop=0 push=0      ef c9 01
+   573  goto16                   458                 pop=0 push=0      ef ca 01
    576  get_loc0                 loc=0               pop=0 push=1      c7
    577  push_i32                 36864               pop=0 push=1      01 00 90 00 00
    582  lt                                           pop=2 push=1      a5
@@ -35557,7 +35557,7 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    608  get_loc1                 loc=1               pop=0 push=1      c8
    609  get_field                440                 pop=1 push=1      42 b8 01 00 00
    614  put_array_el                                 pop=3 push=0      4b
-   615  goto16                   415                 pop=0 push=0      ef 9f 01
+   615  goto16                   416                 pop=0 push=0      ef a0 01
    618  get_loc0                 loc=0               pop=0 push=1      c7
    619  push_i32                 38912               pop=0 push=1      01 00 98 00 00
    624  lt                                           pop=2 push=1      a5
@@ -35574,7 +35574,7 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    650  get_loc1                 loc=1               pop=0 push=1      c8
    651  get_field                441                 pop=1 push=1      42 b9 01 00 00
    656  put_array_el                                 pop=3 push=0      4b
-   657  goto16                   373                 pop=0 push=0      ef 75 01
+   657  goto16                   374                 pop=0 push=0      ef 76 01
    660  get_loc0                 loc=0               pop=0 push=1      c7
    661  push_i32                 40960               pop=0 push=1      01 00 a0 00 00
    666  lt                                           pop=2 push=1      a5
@@ -35591,7 +35591,7 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    692  get_loc1                 loc=1               pop=0 push=1      c8
    693  get_field                443                 pop=1 push=1      42 bb 01 00 00
    698  put_array_el                                 pop=3 push=0      4b
-   699  goto16                   331                 pop=0 push=0      ef 4b 01
+   699  goto16                   332                 pop=0 push=0      ef 4c 01
    702  get_loc0                 loc=0               pop=0 push=1      c7
    703  push_i32                 49152               pop=0 push=1      01 00 c0 00 00
    708  lt                                           pop=2 push=1      a5
@@ -35626,21 +35626,21 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    763  get_loc1                 loc=1               pop=0 push=1      c8
    764  get_field                434                 pop=1 push=1      42 b2 01 00 00
    769  put_array_el                                 pop=3 push=0      4b
-   770  goto16                   260                 pop=0 push=0      ef 04 01
+   770  goto16                   261                 pop=0 push=0      ef 05 01
    773  get_loc1                 loc=1               pop=0 push=1      c8
    774  get_field                514                 pop=1 push=1      42 02 02 00 00
    779  get_loc0                 loc=0               pop=0 push=1      c7
    780  get_loc1                 loc=1               pop=0 push=1      c8
    781  get_field                435                 pop=1 push=1      42 b3 01 00 00
    786  put_array_el                                 pop=3 push=0      4b
-   787  goto16                   243                 pop=0 push=0      ef f3 00
+   787  goto16                   244                 pop=0 push=0      ef f4 00
    790  get_loc1                 loc=1               pop=0 push=1      c8
    791  get_field                514                 pop=1 push=1      42 02 02 00 00
    796  get_loc0                 loc=0               pop=0 push=1      c7
    797  get_loc1                 loc=1               pop=0 push=1      c8
    798  get_field                431                 pop=1 push=1      42 af 01 00 00
    803  put_array_el                                 pop=3 push=0      4b
-   804  goto16                   226                 pop=0 push=0      ef e2 00
+   804  goto16                   227                 pop=0 push=0      ef e3 00
    807  get_loc0                 loc=0               pop=0 push=1      c7
    808  push_i32                 57344               pop=0 push=1      01 00 e0 00 00
    813  lt                                           pop=2 push=1      a5
@@ -35658,91 +35658,91 @@ bytecodeLen=1046 stackSize=3 varCount=2 argCount=0
    840  get_loc1                 loc=1               pop=0 push=1      c8
    841  get_field                436                 pop=1 push=1      42 b4 01 00 00
    846  put_array_el                                 pop=3 push=0      4b
-   847  goto16                   183                 pop=0 push=0      ef b7 00
+   847  goto16                   184                 pop=0 push=0      ef b8 00
    850  get_loc1                 loc=1               pop=0 push=1      c8
    851  get_field                514                 pop=1 push=1      42 02 02 00 00
    856  get_loc0                 loc=0               pop=0 push=1      c7
    857  get_loc1                 loc=1               pop=0 push=1      c8
    858  get_field                432                 pop=1 push=1      42 b0 01 00 00
    863  put_array_el                                 pop=3 push=0      4b
-   864  goto16                   166                 pop=0 push=0      ef a6 00
+   864  goto16                   167                 pop=0 push=0      ef a7 00
    867  get_loc0                 loc=0               pop=0 push=1      c7
    868  push_i32                 65024               pop=0 push=1      01 00 fe 00 00
    873  lt                                           pop=2 push=1      a5
-   874  if_false8                50                  pop=1 push=0      ec 32
+   874  if_false8                51                  pop=1 push=0      ec 33
    876  get_loc1                 loc=1               pop=0 push=1      c8
    877  get_field                526                 pop=1 push=1      42 0e 02 00 00
-   882  if_false8                26                  pop=1 push=0      ec 1a
+   882  if_false8                27                  pop=1 push=0      ec 1b
    884  get_loc0                 loc=0               pop=0 push=1      c7
    885  push_i32                 61440               pop=0 push=1      01 00 f0 00 00
    890  gte                                          pop=2 push=1      a8
-   891  if_false8                17                  pop=1 push=0      ec 11
+   891  if_false8                18                  pop=1 push=0      ec 12
    893  get_loc1                 loc=1               pop=0 push=1      c8
    894  get_field                514                 pop=1 push=1      42 02 02 00 00
    899  get_loc0                 loc=0               pop=0 push=1      c7
    900  get_loc1                 loc=1               pop=0 push=1      c8
    901  get_field                438                 pop=1 push=1      42 b6 01 00 00
    906  put_array_el                                 pop=3 push=0      4b
-   907  goto8                    123                 pop=0 push=0      ee 7b
-   909  get_loc1                 loc=1               pop=0 push=1      c8
-   910  get_field                514                 pop=1 push=1      42 02 02 00 00
-   915  get_loc0                 loc=0               pop=0 push=1      c7
-   916  get_loc1                 loc=1               pop=0 push=1      c8
-   917  get_field                439                 pop=1 push=1      42 b7 01 00 00
-   922  put_array_el                                 pop=3 push=0      4b
-   923  goto8                    107                 pop=0 push=0      ee 6b
-   925  get_loc0                 loc=0               pop=0 push=1      c7
-   926  push_i32                 65184               pop=0 push=1      01 a0 fe 00 00
-   931  lte                                          pop=2 push=1      a6
-   932  if_false8                17                  pop=1 push=0      ec 11
-   934  get_loc1                 loc=1               pop=0 push=1      c8
-   935  get_field                514                 pop=1 push=1      42 02 02 00 00
-   940  get_loc0                 loc=0               pop=0 push=1      c7
-   941  get_loc1                 loc=1               pop=0 push=1      c8
-   942  get_field                437                 pop=1 push=1      42 b5 01 00 00
-   947  put_array_el                                 pop=3 push=0      4b
-   948  goto8                    82                  pop=0 push=0      ee 52
-   950  get_loc0                 loc=0               pop=0 push=1      c7
-   951  push_i32                 65280               pop=0 push=1      01 00 ff 00 00
-   956  lt                                           pop=2 push=1      a5
-   957  if_false8                41                  pop=1 push=0      ec 29
-   959  get_loc1                 loc=1               pop=0 push=1      c8
-   960  get_field                526                 pop=1 push=1      42 0e 02 00 00
-   965  if_false8                17                  pop=1 push=0      ec 11
-   967  get_loc1                 loc=1               pop=0 push=1      c8
-   968  get_field                514                 pop=1 push=1      42 02 02 00 00
-   973  get_loc0                 loc=0               pop=0 push=1      c7
-   974  get_loc1                 loc=1               pop=0 push=1      c8
-   975  get_field                432                 pop=1 push=1      42 b0 01 00 00
-   980  put_array_el                                 pop=3 push=0      4b
-   981  goto8                    49                  pop=0 push=0      ee 31
-   983  get_loc1                 loc=1               pop=0 push=1      c8
-   984  get_field                514                 pop=1 push=1      42 02 02 00 00
-   989  get_loc0                 loc=0               pop=0 push=1      c7
-   990  get_loc1                 loc=1               pop=0 push=1      c8
-   991  get_field                431                 pop=1 push=1      42 af 01 00 00
-   996  put_array_el                                 pop=3 push=0      4b
-   997  goto8                    33                  pop=0 push=0      ee 21
-   999  get_loc1                 loc=1               pop=0 push=1      c8
-  1000  get_field                514                 pop=1 push=1      42 02 02 00 00
-  1005  get_loc0                 loc=0               pop=0 push=1      c7
-  1006  get_loc1                 loc=1               pop=0 push=1      c8
-  1007  get_field                432                 pop=1 push=1      42 b0 01 00 00
-  1012  put_array_el                                 pop=3 push=0      4b
-  1013  get_loc1                 loc=1               pop=0 push=1      c8
-  1014  get_field                516                 pop=1 push=1      42 04 02 00 00
-  1019  get_loc0                 loc=0               pop=0 push=1      c7
-  1020  push_i16                 255                 pop=0 push=1      c0 ff 00
-  1023  and                                          pop=2 push=1      af
-  1024  get_loc1                 loc=1               pop=0 push=1      c8
-  1025  get_field                433                 pop=1 push=1      42 b1 01 00 00
-  1030  put_array_el                                 pop=3 push=0      4b
-  1031  inc_loc                  0                   pop=0 push=0      95 00
-  1033  goto16                   64506               pop=0 push=0      ef fa fb
-  1036  get_loc1                 loc=1               pop=0 push=1      c8
-  1037  get_field2               446                 pop=1 push=2      43 be 01 00 00
-  1042  call_method              0                   pop=2 push=1      24 00 00
-  1045  return_undef                                 pop=0 push=0      29
+   907  goto16                   124                 pop=0 push=0      ef 7c 00
+   910  get_loc1                 loc=1               pop=0 push=1      c8
+   911  get_field                514                 pop=1 push=1      42 02 02 00 00
+   916  get_loc0                 loc=0               pop=0 push=1      c7
+   917  get_loc1                 loc=1               pop=0 push=1      c8
+   918  get_field                439                 pop=1 push=1      42 b7 01 00 00
+   923  put_array_el                                 pop=3 push=0      4b
+   924  goto8                    107                 pop=0 push=0      ee 6b
+   926  get_loc0                 loc=0               pop=0 push=1      c7
+   927  push_i32                 65184               pop=0 push=1      01 a0 fe 00 00
+   932  lte                                          pop=2 push=1      a6
+   933  if_false8                17                  pop=1 push=0      ec 11
+   935  get_loc1                 loc=1               pop=0 push=1      c8
+   936  get_field                514                 pop=1 push=1      42 02 02 00 00
+   941  get_loc0                 loc=0               pop=0 push=1      c7
+   942  get_loc1                 loc=1               pop=0 push=1      c8
+   943  get_field                437                 pop=1 push=1      42 b5 01 00 00
+   948  put_array_el                                 pop=3 push=0      4b
+   949  goto8                    82                  pop=0 push=0      ee 52
+   951  get_loc0                 loc=0               pop=0 push=1      c7
+   952  push_i32                 65280               pop=0 push=1      01 00 ff 00 00
+   957  lt                                           pop=2 push=1      a5
+   958  if_false8                41                  pop=1 push=0      ec 29
+   960  get_loc1                 loc=1               pop=0 push=1      c8
+   961  get_field                526                 pop=1 push=1      42 0e 02 00 00
+   966  if_false8                17                  pop=1 push=0      ec 11
+   968  get_loc1                 loc=1               pop=0 push=1      c8
+   969  get_field                514                 pop=1 push=1      42 02 02 00 00
+   974  get_loc0                 loc=0               pop=0 push=1      c7
+   975  get_loc1                 loc=1               pop=0 push=1      c8
+   976  get_field                432                 pop=1 push=1      42 b0 01 00 00
+   981  put_array_el                                 pop=3 push=0      4b
+   982  goto8                    49                  pop=0 push=0      ee 31
+   984  get_loc1                 loc=1               pop=0 push=1      c8
+   985  get_field                514                 pop=1 push=1      42 02 02 00 00
+   990  get_loc0                 loc=0               pop=0 push=1      c7
+   991  get_loc1                 loc=1               pop=0 push=1      c8
+   992  get_field                431                 pop=1 push=1      42 af 01 00 00
+   997  put_array_el                                 pop=3 push=0      4b
+   998  goto8                    33                  pop=0 push=0      ee 21
+  1000  get_loc1                 loc=1               pop=0 push=1      c8
+  1001  get_field                514                 pop=1 push=1      42 02 02 00 00
+  1006  get_loc0                 loc=0               pop=0 push=1      c7
+  1007  get_loc1                 loc=1               pop=0 push=1      c8
+  1008  get_field                432                 pop=1 push=1      42 b0 01 00 00
+  1013  put_array_el                                 pop=3 push=0      4b
+  1014  get_loc1                 loc=1               pop=0 push=1      c8
+  1015  get_field                516                 pop=1 push=1      42 04 02 00 00
+  1020  get_loc0                 loc=0               pop=0 push=1      c7
+  1021  push_i16                 255                 pop=0 push=1      c0 ff 00
+  1024  and                                          pop=2 push=1      af
+  1025  get_loc1                 loc=1               pop=0 push=1      c8
+  1026  get_field                433                 pop=1 push=1      42 b1 01 00 00
+  1031  put_array_el                                 pop=3 push=0      4b
+  1032  inc_loc                  0                   pop=0 push=0      95 00
+  1034  goto16                   64505               pop=0 push=0      ef f9 fb
+  1037  get_loc1                 loc=1               pop=0 push=1      c8
+  1038  get_field2               446                 pop=1 push=2      43 be 01 00 00
+  1043  call_method              0                   pop=2 push=1      24 00 00
+  1046  return_undef                                 pop=0 push=0      29
 
 === Inner Function #663 ===
 bytecodeLen=14 stackSize=3 varCount=0 argCount=3
@@ -36058,7 +36058,7 @@ bytecodeLen=33 stackSize=3 varCount=0 argCount=3
     32  return_undef                                 pop=0 push=0      29
 
 === Inner Function #680 ===
-bytecodeLen=315 stackSize=5 varCount=0 argCount=3
+bytecodeLen=316 stackSize=5 varCount=0 argCount=3
      0  get_arg0                 arg=0               pop=0 push=1      d3
      1  get_field                523                 pop=1 push=1      42 0b 02 00 00
      6  dup                                          pop=1 push=2      11
@@ -36067,7 +36067,7 @@ bytecodeLen=315 stackSize=5 varCount=0 argCount=3
     10  get_var_ref0             var_ref=0           pop=0 push=1      df
     11  push_i8                  10                  pop=0 push=1      bf 0a
     13  get_array_el                                 pop=2 push=1      48
-    14  if_false                 299                 pop=1 push=0      6c 2b 01 00 00
+    14  if_false                 300                 pop=1 push=0      6c 2c 01 00 00
     19  get_arg0                 arg=0               pop=0 push=1      d3
     20  get_field                524                 pop=1 push=1      42 0c 02 00 00
     25  dup                                          pop=1 push=2      11
@@ -36096,7 +36096,7 @@ bytecodeLen=315 stackSize=5 varCount=0 argCount=3
     62  add                                          pop=2 push=1      9f
     63  get_arg2                 arg=2               pop=0 push=1      d5
     64  put_array_el                                 pop=3 push=0      4b
-    65  goto16                   247                 pop=0 push=0      ef f7 00
+    65  goto16                   248                 pop=0 push=0      ef f8 00
     68  dup                                          pop=1 push=2      11
     69  push_i8                  8                   pop=0 push=1      bf 08
     71  strict_eq                                    pop=2 push=1      ad
@@ -36108,7 +36108,7 @@ bytecodeLen=315 stackSize=5 varCount=0 argCount=3
     80  get_arg0                 arg=0               pop=0 push=1      d3
     81  get_arg2                 arg=2               pop=0 push=1      d5
     82  put_field                554                 pop=2 push=0      44 2a 02 00 00
-    87  goto16                   225                 pop=0 push=0      ef e1 00
+    87  goto16                   226                 pop=0 push=0      ef e2 00
     90  get_var_ref1             var_ref=1           pop=0 push=1      e0
     91  push_atom_value          961                 pop=0 push=1      04 c1 03 00 00
     96  get_arg0                 arg=0               pop=0 push=1      d3
@@ -36121,7 +36121,7 @@ bytecodeLen=315 stackSize=5 varCount=0 argCount=3
    111  push_1                   1                   pop=0 push=1      b8
    112  call2                    npop=2              pop=1 push=1      f2
    113  drop                                         pop=1 push=0      0e
-   114  goto16                   198                 pop=0 push=0      ef c6 00
+   114  goto16                   199                 pop=0 push=0      ef c7 00
    117  dup                                          pop=1 push=2      11
    118  push_i8                  9                   pop=0 push=1      bf 09
    120  strict_eq                                    pop=2 push=1      ad
@@ -36133,7 +36133,7 @@ bytecodeLen=315 stackSize=5 varCount=0 argCount=3
    129  get_arg0                 arg=0               pop=0 push=1      d3
    130  get_arg2                 arg=2               pop=0 push=1      d5
    131  put_field                555                 pop=2 push=0      44 2b 02 00 00
-   136  goto16                   176                 pop=0 push=0      ef b0 00
+   136  goto16                   177                 pop=0 push=0      ef b1 00
    139  get_var_ref1             var_ref=1           pop=0 push=1      e0
    140  push_atom_value          961                 pop=0 push=1      04 c1 03 00 00
    145  get_arg0                 arg=0               pop=0 push=1      d3
@@ -36146,86 +36146,86 @@ bytecodeLen=315 stackSize=5 varCount=0 argCount=3
    160  push_1                   1                   pop=0 push=1      b8
    161  call2                    npop=2              pop=1 push=1      f2
    162  drop                                         pop=1 push=0      0e
-   163  goto16                   149                 pop=0 push=0      ef 95 00
+   163  goto16                   150                 pop=0 push=0      ef 96 00
    166  dup                                          pop=1 push=2      11
    167  push_i8                  10                  pop=0 push=1      bf 0a
    169  strict_eq                                    pop=2 push=1      ad
-   170  if_false8                42                  pop=1 push=0      ec 2a
+   170  if_false8                43                  pop=1 push=0      ec 2b
    172  get_arg2                 arg=2               pop=0 push=1      d5
    173  push_i8                  24                  pop=0 push=1      bf 18
    175  lt                                           pop=2 push=1      a5
-   176  if_false8                10                  pop=1 push=0      ec 0a
+   176  if_false8                11                  pop=1 push=0      ec 0b
    178  get_arg0                 arg=0               pop=0 push=1      d3
    179  get_arg2                 arg=2               pop=0 push=1      d5
    180  put_field                556                 pop=2 push=0      44 2c 02 00 00
-   185  goto8                    127                 pop=0 push=0      ee 7f
-   187  get_var_ref1             var_ref=1           pop=0 push=1      e0
-   188  push_atom_value          961                 pop=0 push=1      04 c1 03 00 00
-   193  get_arg0                 arg=0               pop=0 push=1      d3
-   194  get_field                524                 pop=1 push=1      42 0c 02 00 00
-   199  add                                          pop=2 push=1      9f
-   200  push_atom_value          962                 pop=0 push=1      04 c2 03 00 00
-   205  add                                          pop=2 push=1      9f
-   206  get_arg2                 arg=2               pop=0 push=1      d5
-   207  add                                          pop=2 push=1      9f
-   208  push_1                   1                   pop=0 push=1      b8
-   209  call2                    npop=2              pop=1 push=1      f2
-   210  drop                                         pop=1 push=0      0e
-   211  goto8                    101                 pop=0 push=0      ee 65
-   213  dup                                          pop=1 push=2      11
-   214  push_i8                  11                  pop=0 push=1      bf 0b
-   216  strict_eq                                    pop=2 push=1      ad
-   217  if_false8                25                  pop=1 push=0      ec 19
-   219  get_arg0                 arg=0               pop=0 push=1      d3
-   220  get_arg2                 arg=2               pop=0 push=1      d5
-   221  push_i16                 255                 pop=0 push=1      c0 ff 00
-   224  and                                          pop=2 push=1      af
-   225  get_arg0                 arg=0               pop=0 push=1      d3
-   226  get_field                557                 pop=1 push=1      42 2d 02 00 00
-   231  push_i16                 256                 pop=0 push=1      c0 00 01
-   234  and                                          pop=2 push=1      af
-   235  or                                           pop=2 push=1      b1
-   236  put_field                557                 pop=2 push=0      44 2d 02 00 00
-   241  goto8                    71                  pop=0 push=0      ee 47
-   243  dup                                          pop=1 push=2      11
-   244  push_i8                  12                  pop=0 push=1      bf 0c
-   246  strict_eq                                    pop=2 push=1      ad
-   247  if_false8                49                  pop=1 push=0      ec 31
-   249  get_arg0                 arg=0               pop=0 push=1      d3
-   250  get_arg2                 arg=2               pop=0 push=1      d5
-   251  push_i8                  127                 pop=0 push=1      bf 7f
-   253  gt                                           pop=2 push=1      a7
-   254  put_field                558                 pop=2 push=0      44 2e 02 00 00
-   259  get_arg0                 arg=0               pop=0 push=1      d3
-   260  get_arg2                 arg=2               pop=0 push=1      d5
-   261  push_i8                  64                  pop=0 push=1      bf 40
-   263  and                                          pop=2 push=1      af
-   264  push_i8                  64                  pop=0 push=1      bf 40
-   266  eq                                           pop=2 push=1      ab
-   267  put_field                963                 pop=2 push=0      44 c3 03 00 00
-   272  get_arg0                 arg=0               pop=0 push=1      d3
-   273  get_arg2                 arg=2               pop=0 push=1      d5
-   274  push_1                   1                   pop=0 push=1      b8
-   275  and                                          pop=2 push=1      af
-   276  push_i8                  8                   pop=0 push=1      bf 08
-   278  shl                                          pop=2 push=1      a2
-   279  get_arg0                 arg=0               pop=0 push=1      d3
-   280  get_field                557                 pop=1 push=1      42 2d 02 00 00
-   285  push_i16                 255                 pop=0 push=1      c0 ff 00
-   288  and                                          pop=2 push=1      af
-   289  or                                           pop=2 push=1      b1
-   290  put_field                557                 pop=2 push=0      44 2d 02 00 00
-   295  goto8                    17                  pop=0 push=0      ee 11
-   297  get_var_ref1             var_ref=1           pop=0 push=1      e0
-   298  push_atom_value          964                 pop=0 push=1      04 c4 03 00 00
-   303  get_arg0                 arg=0               pop=0 push=1      d3
-   304  get_field                524                 pop=1 push=1      42 0c 02 00 00
-   309  add                                          pop=2 push=1      9f
-   310  push_0                   0                   pop=0 push=1      b7
-   311  call2                    npop=2              pop=1 push=1      f2
-   312  drop                                         pop=1 push=0      0e
+   185  goto16                   128                 pop=0 push=0      ef 80 00
+   188  get_var_ref1             var_ref=1           pop=0 push=1      e0
+   189  push_atom_value          961                 pop=0 push=1      04 c1 03 00 00
+   194  get_arg0                 arg=0               pop=0 push=1      d3
+   195  get_field                524                 pop=1 push=1      42 0c 02 00 00
+   200  add                                          pop=2 push=1      9f
+   201  push_atom_value          962                 pop=0 push=1      04 c2 03 00 00
+   206  add                                          pop=2 push=1      9f
+   207  get_arg2                 arg=2               pop=0 push=1      d5
+   208  add                                          pop=2 push=1      9f
+   209  push_1                   1                   pop=0 push=1      b8
+   210  call2                    npop=2              pop=1 push=1      f2
+   211  drop                                         pop=1 push=0      0e
+   212  goto8                    101                 pop=0 push=0      ee 65
+   214  dup                                          pop=1 push=2      11
+   215  push_i8                  11                  pop=0 push=1      bf 0b
+   217  strict_eq                                    pop=2 push=1      ad
+   218  if_false8                25                  pop=1 push=0      ec 19
+   220  get_arg0                 arg=0               pop=0 push=1      d3
+   221  get_arg2                 arg=2               pop=0 push=1      d5
+   222  push_i16                 255                 pop=0 push=1      c0 ff 00
+   225  and                                          pop=2 push=1      af
+   226  get_arg0                 arg=0               pop=0 push=1      d3
+   227  get_field                557                 pop=1 push=1      42 2d 02 00 00
+   232  push_i16                 256                 pop=0 push=1      c0 00 01
+   235  and                                          pop=2 push=1      af
+   236  or                                           pop=2 push=1      b1
+   237  put_field                557                 pop=2 push=0      44 2d 02 00 00
+   242  goto8                    71                  pop=0 push=0      ee 47
+   244  dup                                          pop=1 push=2      11
+   245  push_i8                  12                  pop=0 push=1      bf 0c
+   247  strict_eq                                    pop=2 push=1      ad
+   248  if_false8                49                  pop=1 push=0      ec 31
+   250  get_arg0                 arg=0               pop=0 push=1      d3
+   251  get_arg2                 arg=2               pop=0 push=1      d5
+   252  push_i8                  127                 pop=0 push=1      bf 7f
+   254  gt                                           pop=2 push=1      a7
+   255  put_field                558                 pop=2 push=0      44 2e 02 00 00
+   260  get_arg0                 arg=0               pop=0 push=1      d3
+   261  get_arg2                 arg=2               pop=0 push=1      d5
+   262  push_i8                  64                  pop=0 push=1      bf 40
+   264  and                                          pop=2 push=1      af
+   265  push_i8                  64                  pop=0 push=1      bf 40
+   267  eq                                           pop=2 push=1      ab
+   268  put_field                963                 pop=2 push=0      44 c3 03 00 00
+   273  get_arg0                 arg=0               pop=0 push=1      d3
+   274  get_arg2                 arg=2               pop=0 push=1      d5
+   275  push_1                   1                   pop=0 push=1      b8
+   276  and                                          pop=2 push=1      af
+   277  push_i8                  8                   pop=0 push=1      bf 08
+   279  shl                                          pop=2 push=1      a2
+   280  get_arg0                 arg=0               pop=0 push=1      d3
+   281  get_field                557                 pop=1 push=1      42 2d 02 00 00
+   286  push_i16                 255                 pop=0 push=1      c0 ff 00
+   289  and                                          pop=2 push=1      af
+   290  or                                           pop=2 push=1      b1
+   291  put_field                557                 pop=2 push=0      44 2d 02 00 00
+   296  goto8                    17                  pop=0 push=0      ee 11
+   298  get_var_ref1             var_ref=1           pop=0 push=1      e0
+   299  push_atom_value          964                 pop=0 push=1      04 c4 03 00 00
+   304  get_arg0                 arg=0               pop=0 push=1      d3
+   305  get_field                524                 pop=1 push=1      42 0c 02 00 00
+   310  add                                          pop=2 push=1      9f
+   311  push_0                   0                   pop=0 push=1      b7
+   312  call2                    npop=2              pop=1 push=1      f2
    313  drop                                         pop=1 push=0      0e
-   314  return_undef                                 pop=0 push=0      29
+   314  drop                                         pop=1 push=0      0e
+   315  return_undef                                 pop=0 push=0      29
 
 === Inner Function #681 ===
 bytecodeLen=17 stackSize=3 varCount=0 argCount=3
@@ -39493,21 +39493,21 @@ bytecodeLen=119 stackSize=6 varCount=2 argCount=2
    118  throw                                        pop=1 push=0      30
 
 === Inner Function #710 ===
-bytecodeLen=301 stackSize=6 varCount=1 argCount=1
+bytecodeLen=304 stackSize=6 varCount=1 argCount=1
      0  get_var_ref0             var_ref=0           pop=0 push=1      df
      1  get_arg0                 arg=0               pop=0 push=1      d3
      2  call1                    npop=1              pop=1 push=1      f1
      3  set_arg0                 arg=0               pop=1 push=1      db
-     4  if_false                 286                 pop=1 push=0      6c 1e 01 00 00
+     4  if_false                 289                 pop=1 push=0      6c 21 01 00 00
      9  get_arg0                 arg=0               pop=0 push=1      d3
     10  get_field                1041                pop=1 push=1      42 11 04 00 00
-    15  if_false                 275                 pop=1 push=0      6c 13 01 00 00
+    15  if_false                 278                 pop=1 push=0      6c 16 01 00 00
     20  get_arg0                 arg=0               pop=0 push=1      d3
     21  get_field                1041                pop=1 push=1      42 11 04 00 00
     26  get_length                                   pop=1 push=1      eb
     27  push_0                   0                   pop=0 push=1      b7
     28  gt                                           pop=2 push=1      a7
-    29  if_false                 251                 pop=1 push=0      6c fb 00 00 00
+    29  if_false                 254                 pop=1 push=0      6c fe 00 00 00
     34  push_0                   0                   pop=0 push=1      b7
     35  put_loc0                 loc=0               pop=1 push=0      cb
     36  get_loc0                 loc=0               pop=0 push=1      c7
@@ -39515,7 +39515,7 @@ bytecodeLen=301 stackSize=6 varCount=1 argCount=1
     38  get_field                1041                pop=1 push=1      42 11 04 00 00
     43  get_length                                   pop=1 push=1      eb
     44  lt                                           pop=2 push=1      a5
-    45  if_false                 254                 pop=1 push=0      6c fe 00 00 00
+    45  if_false                 257                 pop=1 push=0      6c 01 01 00 00
     50  get_var_ref1             var_ref=1           pop=0 push=1      e0
     51  push_atom_value          1042                pop=0 push=1      04 12 04 00 00
     56  get_arg0                 arg=0               pop=0 push=1      d3
@@ -39534,95 +39534,95 @@ bytecodeLen=301 stackSize=6 varCount=1 argCount=1
     85  get_loc0                 loc=0               pop=0 push=1      c7
     86  get_array_el                                 pop=2 push=1      48
     87  get_field                1045                pop=1 push=1      42 15 04 00 00
-    92  if_false8                127                 pop=1 push=0      ec 7f
-    94  get_arg0                 arg=0               pop=0 push=1      d3
-    95  get_field                1041                pop=1 push=1      42 11 04 00 00
-   100  get_loc0                 loc=0               pop=0 push=1      c7
-   101  get_array_el                                 pop=2 push=1      48
-   102  get_field                1043                pop=1 push=1      42 13 04 00 00
-   107  get_field2               1046                pop=1 push=2      43 16 04 00 00
-   112  push_0                   0                   pop=0 push=1      b7
-   113  push_5                   5                   pop=0 push=1      bc
-   114  call_method              2                   pop=2 push=1      24 02 00
-   117  push_atom_value          1017                pop=0 push=1      04 f9 03 00 00
-   122  eq                                           pop=2 push=1      ab
-   123  if_false8                48                  pop=1 push=0      ec 30
-   125  get_var                  1011                pop=0 push=1      39 f3 03 00 00
-   130  push_atom_value          1047                pop=0 push=1      04 17 04 00 00
-   135  get_arg0                 arg=0               pop=0 push=1      d3
-   136  get_field                1041                pop=1 push=1      42 11 04 00 00
-   141  get_loc0                 loc=0               pop=0 push=1      c7
-   142  get_array_el                                 pop=2 push=1      48
-   143  get_field                1043                pop=1 push=1      42 13 04 00 00
-   148  add                                          pop=2 push=1      9f
-   149  get_var                  1048                pop=0 push=1      39 18 04 00 00
-   154  get_arg0                 arg=0               pop=0 push=1      d3
-   155  get_field                1041                pop=1 push=1      42 11 04 00 00
-   160  get_loc0                 loc=0               pop=0 push=1      c7
-   161  get_array_el                                 pop=2 push=1      48
-   162  get_field                1045                pop=1 push=1      42 15 04 00 00
-   167  call1                    npop=1              pop=1 push=1      f1
-   168  call2                    npop=2              pop=1 push=1      f2
-   169  drop                                         pop=1 push=0      0e
-   170  goto8                    104                 pop=0 push=0      ee 68
-   172  get_var                  1011                pop=0 push=1      39 f3 03 00 00
-   177  get_arg0                 arg=0               pop=0 push=1      d3
-   178  get_field                1041                pop=1 push=1      42 11 04 00 00
-   183  get_loc0                 loc=0               pop=0 push=1      c7
-   184  get_array_el                                 pop=2 push=1      48
-   185  get_field                1043                pop=1 push=1      42 13 04 00 00
-   190  get_var                  166                 pop=0 push=1      39 a6 00 00 00
-   195  get_field2               1049                pop=1 push=2      43 19 04 00 00
-   200  get_arg0                 arg=0               pop=0 push=1      d3
-   201  get_field                1041                pop=1 push=1      42 11 04 00 00
-   206  get_loc0                 loc=0               pop=0 push=1      c7
-   207  get_array_el                                 pop=2 push=1      48
-   208  get_field                1045                pop=1 push=1      42 15 04 00 00
-   213  call_method              1                   pop=2 push=1      24 01 00
-   216  call2                    npop=2              pop=1 push=1      f2
-   217  drop                                         pop=1 push=0      0e
-   218  goto8                    56                  pop=0 push=0      ee 38
-   220  get_arg0                 arg=0               pop=0 push=1      d3
-   221  get_field                1041                pop=1 push=1      42 11 04 00 00
-   226  get_loc0                 loc=0               pop=0 push=1      c7
-   227  get_array_el                                 pop=2 push=1      48
-   228  get_field                1043                pop=1 push=1      42 13 04 00 00
-   233  if_false8                32                  pop=1 push=0      ec 20
-   235  get_var_ref1             var_ref=1           pop=0 push=1      e0
-   236  push_atom_value          1050                pop=0 push=1      04 1a 04 00 00
-   241  get_arg0                 arg=0               pop=0 push=1      d3
-   242  get_field                1041                pop=1 push=1      42 11 04 00 00
-   247  get_loc0                 loc=0               pop=0 push=1      c7
-   248  get_array_el                                 pop=2 push=1      48
-   249  get_field                1043                pop=1 push=1      42 13 04 00 00
-   254  add                                          pop=2 push=1      9f
-   255  push_atom_value          1051                pop=0 push=1      04 1b 04 00 00
-   260  add                                          pop=2 push=1      9f
-   261  push_2                   2                   pop=0 push=1      b9
-   262  call2                    npop=2              pop=1 push=1      f2
-   263  drop                                         pop=1 push=0      0e
-   264  goto8                    10                  pop=0 push=0      ee 0a
-   266  get_var_ref1             var_ref=1           pop=0 push=1      e0
-   267  push_atom_value          1052                pop=0 push=1      04 1c 04 00 00
-   272  push_2                   2                   pop=0 push=1      b9
-   273  call2                    npop=2              pop=1 push=1      f2
-   274  drop                                         pop=1 push=0      0e
-   275  get_loc0                 loc=0               pop=0 push=1      c7
-   276  inc                                          pop=1 push=1      91
-   277  put_loc0                 loc=0               pop=1 push=0      cb
-   278  goto16                   65293               pop=0 push=0      ef 0d ff
-   281  get_var_ref1             var_ref=1           pop=0 push=1      e0
-   282  push_atom_value          1053                pop=0 push=1      04 1d 04 00 00
-   287  push_2                   2                   pop=0 push=1      b9
-   288  call2                    npop=2              pop=1 push=1      f2
-   289  drop                                         pop=1 push=0      0e
-   290  return_undef                                 pop=0 push=0      29
-   291  get_var_ref1             var_ref=1           pop=0 push=1      e0
-   292  push_atom_value          1053                pop=0 push=1      04 1d 04 00 00
-   297  push_2                   2                   pop=0 push=1      b9
-   298  call2                    npop=2              pop=1 push=1      f2
-   299  drop                                         pop=1 push=0      0e
-   300  return_undef                                 pop=0 push=0      29
+    92  if_false                 130                 pop=1 push=0      6c 82 00 00 00
+    97  get_arg0                 arg=0               pop=0 push=1      d3
+    98  get_field                1041                pop=1 push=1      42 11 04 00 00
+   103  get_loc0                 loc=0               pop=0 push=1      c7
+   104  get_array_el                                 pop=2 push=1      48
+   105  get_field                1043                pop=1 push=1      42 13 04 00 00
+   110  get_field2               1046                pop=1 push=2      43 16 04 00 00
+   115  push_0                   0                   pop=0 push=1      b7
+   116  push_5                   5                   pop=0 push=1      bc
+   117  call_method              2                   pop=2 push=1      24 02 00
+   120  push_atom_value          1017                pop=0 push=1      04 f9 03 00 00
+   125  eq                                           pop=2 push=1      ab
+   126  if_false8                48                  pop=1 push=0      ec 30
+   128  get_var                  1011                pop=0 push=1      39 f3 03 00 00
+   133  push_atom_value          1047                pop=0 push=1      04 17 04 00 00
+   138  get_arg0                 arg=0               pop=0 push=1      d3
+   139  get_field                1041                pop=1 push=1      42 11 04 00 00
+   144  get_loc0                 loc=0               pop=0 push=1      c7
+   145  get_array_el                                 pop=2 push=1      48
+   146  get_field                1043                pop=1 push=1      42 13 04 00 00
+   151  add                                          pop=2 push=1      9f
+   152  get_var                  1048                pop=0 push=1      39 18 04 00 00
+   157  get_arg0                 arg=0               pop=0 push=1      d3
+   158  get_field                1041                pop=1 push=1      42 11 04 00 00
+   163  get_loc0                 loc=0               pop=0 push=1      c7
+   164  get_array_el                                 pop=2 push=1      48
+   165  get_field                1045                pop=1 push=1      42 15 04 00 00
+   170  call1                    npop=1              pop=1 push=1      f1
+   171  call2                    npop=2              pop=1 push=1      f2
+   172  drop                                         pop=1 push=0      0e
+   173  goto8                    104                 pop=0 push=0      ee 68
+   175  get_var                  1011                pop=0 push=1      39 f3 03 00 00
+   180  get_arg0                 arg=0               pop=0 push=1      d3
+   181  get_field                1041                pop=1 push=1      42 11 04 00 00
+   186  get_loc0                 loc=0               pop=0 push=1      c7
+   187  get_array_el                                 pop=2 push=1      48
+   188  get_field                1043                pop=1 push=1      42 13 04 00 00
+   193  get_var                  166                 pop=0 push=1      39 a6 00 00 00
+   198  get_field2               1049                pop=1 push=2      43 19 04 00 00
+   203  get_arg0                 arg=0               pop=0 push=1      d3
+   204  get_field                1041                pop=1 push=1      42 11 04 00 00
+   209  get_loc0                 loc=0               pop=0 push=1      c7
+   210  get_array_el                                 pop=2 push=1      48
+   211  get_field                1045                pop=1 push=1      42 15 04 00 00
+   216  call_method              1                   pop=2 push=1      24 01 00
+   219  call2                    npop=2              pop=1 push=1      f2
+   220  drop                                         pop=1 push=0      0e
+   221  goto8                    56                  pop=0 push=0      ee 38
+   223  get_arg0                 arg=0               pop=0 push=1      d3
+   224  get_field                1041                pop=1 push=1      42 11 04 00 00
+   229  get_loc0                 loc=0               pop=0 push=1      c7
+   230  get_array_el                                 pop=2 push=1      48
+   231  get_field                1043                pop=1 push=1      42 13 04 00 00
+   236  if_false8                32                  pop=1 push=0      ec 20
+   238  get_var_ref1             var_ref=1           pop=0 push=1      e0
+   239  push_atom_value          1050                pop=0 push=1      04 1a 04 00 00
+   244  get_arg0                 arg=0               pop=0 push=1      d3
+   245  get_field                1041                pop=1 push=1      42 11 04 00 00
+   250  get_loc0                 loc=0               pop=0 push=1      c7
+   251  get_array_el                                 pop=2 push=1      48
+   252  get_field                1043                pop=1 push=1      42 13 04 00 00
+   257  add                                          pop=2 push=1      9f
+   258  push_atom_value          1051                pop=0 push=1      04 1b 04 00 00
+   263  add                                          pop=2 push=1      9f
+   264  push_2                   2                   pop=0 push=1      b9
+   265  call2                    npop=2              pop=1 push=1      f2
+   266  drop                                         pop=1 push=0      0e
+   267  goto8                    10                  pop=0 push=0      ee 0a
+   269  get_var_ref1             var_ref=1           pop=0 push=1      e0
+   270  push_atom_value          1052                pop=0 push=1      04 1c 04 00 00
+   275  push_2                   2                   pop=0 push=1      b9
+   276  call2                    npop=2              pop=1 push=1      f2
+   277  drop                                         pop=1 push=0      0e
+   278  get_loc0                 loc=0               pop=0 push=1      c7
+   279  inc                                          pop=1 push=1      91
+   280  put_loc0                 loc=0               pop=1 push=0      cb
+   281  goto16                   65290               pop=0 push=0      ef 0a ff
+   284  get_var_ref1             var_ref=1           pop=0 push=1      e0
+   285  push_atom_value          1053                pop=0 push=1      04 1d 04 00 00
+   290  push_2                   2                   pop=0 push=1      b9
+   291  call2                    npop=2              pop=1 push=1      f2
+   292  drop                                         pop=1 push=0      0e
+   293  return_undef                                 pop=0 push=0      29
+   294  get_var_ref1             var_ref=1           pop=0 push=1      e0
+   295  push_atom_value          1053                pop=0 push=1      04 1d 04 00 00
+   300  push_2                   2                   pop=0 push=1      b9
+   301  call2                    npop=2              pop=1 push=1      f2
+   302  drop                                         pop=1 push=0      0e
+   303  return_undef                                 pop=0 push=0      29
 
 === Inner Function #711 ===
 bytecodeLen=82 stackSize=4 varCount=3 argCount=2
@@ -40130,61 +40130,61 @@ bytecodeLen=66 stackSize=4 varCount=2 argCount=1
     65  return_undef                                 pop=0 push=0      29
 
 === Inner Function #719 ===
-bytecodeLen=129 stackSize=5 varCount=1 argCount=1
+bytecodeLen=132 stackSize=5 varCount=1 argCount=1
      0  get_var_ref0             var_ref=0           pop=0 push=1      df
      1  call0                    npop=0              pop=1 push=1      f0
-     2  if_false8                125                 pop=1 push=0      ec 7d
-     4  get_var_ref1             var_ref=1           pop=0 push=1      e0
-     5  call0                    npop=0              pop=1 push=1      f0
-     6  if_false8                121                 pop=1 push=0      ec 79
-     8  get_arg0                 arg=0               pop=0 push=1      d3
-     9  get_field                1075                pop=1 push=1      42 33 04 00 00
-    14  dup                                          pop=1 push=2      11
-    15  if_true8                 8                   pop=1 push=0      ed 08
-    17  drop                                         pop=1 push=0      0e
-    18  get_arg0                 arg=0               pop=0 push=1      d3
-    19  get_field                1076                pop=1 push=1      42 34 04 00 00
-    24  if_false8                55                  pop=1 push=0      ec 37
-    26  get_var_ref2             var_ref=2           pop=0 push=1      e1
-    27  get_field2               294                 pop=1 push=2      43 26 01 00 00
-    32  get_arg0                 arg=0               pop=0 push=1      d3
-    33  get_field                1075                pop=1 push=1      42 33 04 00 00
-    38  get_var                  165                 pop=0 push=1      39 a5 00 00 00
-    43  get_field                1077                pop=1 push=1      42 35 04 00 00
-    48  mul                                          pop=2 push=1      9c
-    49  push_i16                 180                 pop=0 push=1      c0 b4 00
-    52  div                                          pop=2 push=1      9d
-    53  get_arg0                 arg=0               pop=0 push=1      d3
-    54  get_field                1076                pop=1 push=1      42 34 04 00 00
-    59  get_var                  165                 pop=0 push=1      39 a5 00 00 00
-    64  get_field                1077                pop=1 push=1      42 35 04 00 00
-    69  mul                                          pop=2 push=1      9c
-    70  push_i16                 180                 pop=0 push=1      c0 b4 00
-    73  div                                          pop=2 push=1      9d
-    74  call_method              2                   pop=2 push=1      24 02 00
-    77  drop                                         pop=1 push=0      0e
-    78  goto8                    23                  pop=0 push=0      ee 17
-    80  get_var_ref2             var_ref=2           pop=0 push=1      e1
-    81  get_field2               294                 pop=1 push=2      43 26 01 00 00
-    86  get_arg0                 arg=0               pop=0 push=1      d3
-    87  get_field                472                 pop=1 push=1      42 d8 01 00 00
-    92  get_arg0                 arg=0               pop=0 push=1      d3
-    93  get_field                473                 pop=1 push=1      42 d9 01 00 00
-    98  call_method              2                   pop=2 push=1      24 02 00
-   101  drop                                         pop=1 push=0      0e
-   102  catch                    16                  pop=0 push=1      6f 10 00 00 00
-   107  get_arg0                 arg=0               pop=0 push=1      d3
-   108  get_field2               1074                pop=1 push=2      43 32 04 00 00
-   113  call_method              0                   pop=2 push=1      24 00 00
-   116  drop                                         pop=1 push=0      0e
-   117  drop                                         pop=1 push=0      0e
-   118  return_undef                                 pop=0 push=0      29
-   119  put_loc0                 loc=0               pop=1 push=0      cb
-   120  catch                    6                   pop=0 push=1      6f 06 00 00 00
-   125  drop                                         pop=1 push=0      0e
-   126  return_undef                                 pop=0 push=0      29
-   127  throw                                        pop=1 push=0      30
-   128  return_undef                                 pop=0 push=0      29
+     2  if_false                 128                 pop=1 push=0      6c 80 00 00 00
+     7  get_var_ref1             var_ref=1           pop=0 push=1      e0
+     8  call0                    npop=0              pop=1 push=1      f0
+     9  if_false8                121                 pop=1 push=0      ec 79
+    11  get_arg0                 arg=0               pop=0 push=1      d3
+    12  get_field                1075                pop=1 push=1      42 33 04 00 00
+    17  dup                                          pop=1 push=2      11
+    18  if_true8                 8                   pop=1 push=0      ed 08
+    20  drop                                         pop=1 push=0      0e
+    21  get_arg0                 arg=0               pop=0 push=1      d3
+    22  get_field                1076                pop=1 push=1      42 34 04 00 00
+    27  if_false8                55                  pop=1 push=0      ec 37
+    29  get_var_ref2             var_ref=2           pop=0 push=1      e1
+    30  get_field2               294                 pop=1 push=2      43 26 01 00 00
+    35  get_arg0                 arg=0               pop=0 push=1      d3
+    36  get_field                1075                pop=1 push=1      42 33 04 00 00
+    41  get_var                  165                 pop=0 push=1      39 a5 00 00 00
+    46  get_field                1077                pop=1 push=1      42 35 04 00 00
+    51  mul                                          pop=2 push=1      9c
+    52  push_i16                 180                 pop=0 push=1      c0 b4 00
+    55  div                                          pop=2 push=1      9d
+    56  get_arg0                 arg=0               pop=0 push=1      d3
+    57  get_field                1076                pop=1 push=1      42 34 04 00 00
+    62  get_var                  165                 pop=0 push=1      39 a5 00 00 00
+    67  get_field                1077                pop=1 push=1      42 35 04 00 00
+    72  mul                                          pop=2 push=1      9c
+    73  push_i16                 180                 pop=0 push=1      c0 b4 00
+    76  div                                          pop=2 push=1      9d
+    77  call_method              2                   pop=2 push=1      24 02 00
+    80  drop                                         pop=1 push=0      0e
+    81  goto8                    23                  pop=0 push=0      ee 17
+    83  get_var_ref2             var_ref=2           pop=0 push=1      e1
+    84  get_field2               294                 pop=1 push=2      43 26 01 00 00
+    89  get_arg0                 arg=0               pop=0 push=1      d3
+    90  get_field                472                 pop=1 push=1      42 d8 01 00 00
+    95  get_arg0                 arg=0               pop=0 push=1      d3
+    96  get_field                473                 pop=1 push=1      42 d9 01 00 00
+   101  call_method              2                   pop=2 push=1      24 02 00
+   104  drop                                         pop=1 push=0      0e
+   105  catch                    16                  pop=0 push=1      6f 10 00 00 00
+   110  get_arg0                 arg=0               pop=0 push=1      d3
+   111  get_field2               1074                pop=1 push=2      43 32 04 00 00
+   116  call_method              0                   pop=2 push=1      24 00 00
+   119  drop                                         pop=1 push=0      0e
+   120  drop                                         pop=1 push=0      0e
+   121  return_undef                                 pop=0 push=0      29
+   122  put_loc0                 loc=0               pop=1 push=0      cb
+   123  catch                    6                   pop=0 push=1      6f 06 00 00 00
+   128  drop                                         pop=1 push=0      0e
+   129  return_undef                                 pop=0 push=0      29
+   130  throw                                        pop=1 push=0      30
+   131  return_undef                                 pop=0 push=0      29
 
 === Inner Function #720 ===
 bytecodeLen=49 stackSize=2 varCount=0 argCount=0

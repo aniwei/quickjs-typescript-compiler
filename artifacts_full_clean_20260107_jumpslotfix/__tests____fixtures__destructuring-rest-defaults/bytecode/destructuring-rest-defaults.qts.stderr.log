@@ -1,0 +1,4 @@
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=260 pos_next=263 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=337 pos_next=340 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x

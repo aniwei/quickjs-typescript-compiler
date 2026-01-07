@@ -6,16 +6,16 @@
     "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__test_line_column_num/cli/test_line_column_num.ts.disasm",
     "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__test_line_column_num/cli/test_line_column_num.pc2line.bin",
     "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__test_line_column_num/cli/test_line_column_num.pc2line.txt",
-    "bytecodeSize": 4503,
+    "bytecodeSize": 4502,
     "pc2lineLength": 58,
     "stackMax": 0
   },
   "bytecode": {
-    "identical": false,
-    "tsSize": 4438,
+    "identical": true,
+    "tsSize": 4437,
     "wasmSize": 4437,
-    "sizeDiff": 1,
-    "sizeDiffPercent": 0.0225377507324769
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
   },
   "trace": {
     "differenceCount": 0,

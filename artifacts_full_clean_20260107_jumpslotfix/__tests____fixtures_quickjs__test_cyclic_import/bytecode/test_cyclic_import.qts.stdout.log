@@ -1,0 +1,33 @@
+__tests__/fixtures_quickjs/test_cyclic_import.js:11:8: function: g
+  mode: strict
+  args: x
+  stack_size: 2
+  opcodes:
+        get_arg0 0: x
+        push_1 1
+        add
+        return
+
+__tests__/fixtures_quickjs/test_cyclic_import.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: assert parent:loc0 const
+    1: f parent:loc1 const
+    2: g local:loc0 var
+  stack_size: 3
+  opcodes:
+        push_this
+        if_false8 7
+        fclosure8 0: [bytecode g]
+        put_var_ref2 2: g
+        return_undef
+    7:  get_var_ref_check 0: assert
+        get_var_ref_check 1: f
+        push_1 1
+        call1 1
+        push_4 4
+        call2 2
+        drop
+        undefined
+        return_async
+

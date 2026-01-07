@@ -1,0 +1,310 @@
+__tests__/fixtures/inc-1.js:1:1: function: assert
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_var Object
+        get_field2 is
+        get_arg0 0: actual
+        get_arg1 1: expected
+        call_method 2
+        if_false8 29
+        return_undef
+   29:  get_arg0 0: actual
+        is_null
+        if_true8 79
+        get_arg1 1: expected
+        is_null
+        if_true8 79
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 79
+        return_undef
+   79:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 129
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 130
+  129:  push_empty_string
+  130:  add
+        call1 1
+        throw
+
+__tests__/fixtures/inc-1.js:14:1: function: test_inc_dec
+  locals:
+    0: var a
+    1: var r
+  stack_size: 4
+  opcodes:
+        push_1 1
+        set_loc0 0: a
+        post_inc
+        put_loc0 0: a
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_1 1
+        strict_eq
+        dup
+        if_false8 20
+        drop
+        get_loc0 0: a
+        push_2 2
+        strict_eq
+   20:  push_true
+        push_atom_value "++"
+        call3 3
+        drop
+        push_1 1
+        set_loc0 0: a
+        inc
+        set_loc0 0: a
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_2 2
+        strict_eq
+        dup
+        if_false8 48
+        drop
+        get_loc0 0: a
+        push_2 2
+        strict_eq
+   48:  push_true
+        push_atom_value "++"
+        call3 3
+        drop
+        push_1 1
+        set_loc0 0: a
+        post_dec
+        put_loc0 0: a
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_1 1
+        strict_eq
+        dup
+        if_false8 76
+        drop
+        get_loc0 0: a
+        push_0 0
+        strict_eq
+   76:  push_true
+        push_atom_value "--"
+        call3 3
+        drop
+        push_1 1
+        set_loc0 0: a
+        dec
+        set_loc0 0: a
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_0 0
+        strict_eq
+        dup
+        if_false8 104
+        drop
+        get_loc0 0: a
+        push_0 0
+        strict_eq
+  104:  push_true
+        push_atom_value "--"
+        call3 3
+        drop
+        object
+        push_true
+        define_field x
+        set_loc0 0: a
+        get_field2 x
+        inc
+        put_field x
+        get_var assert
+        get_loc0 0: a
+        get_field x
+        push_2 2
+        push_atom_value "++"
+        call3 3
+        drop
+        object
+        push_true
+        define_field x
+        set_loc0 0: a
+        get_field2 x
+        dec
+        put_field x
+        get_var assert
+        get_loc0 0: a
+        get_field x
+        push_0 0
+        push_atom_value "--"
+        call3 3
+        drop
+        push_true
+        array_from 1
+        set_loc0 0: a
+        push_0 0
+        get_array_el3
+        inc
+        put_array_el
+        get_var assert
+        get_loc0 0: a
+        push_0 0
+        get_array_el
+        push_2 2
+        push_atom_value "++"
+        call3 3
+        drop
+        object
+        push_true
+        define_field x
+        set_loc0 0: a
+        get_field2 x
+        post_inc
+        perm3
+        put_field x
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_1 1
+        strict_eq
+        dup
+        if_false8 254
+        drop
+        get_loc0 0: a
+        get_field x
+        push_2 2
+        strict_eq
+  254:  push_true
+        push_atom_value "++"
+        call3 3
+        drop
+        object
+        push_true
+        define_field x
+        set_loc0 0: a
+        get_field2 x
+        post_dec
+        perm3
+        put_field x
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_1 1
+        strict_eq
+        dup
+        if_false8 303
+        drop
+        get_loc0 0: a
+        get_field x
+        push_0 0
+        strict_eq
+  303:  push_true
+        push_atom_value "--"
+        call3 3
+        drop
+        push_true
+        array_from 1
+        set_loc0 0: a
+        push_0 0
+        get_array_el3
+        post_inc
+        perm4
+        put_array_el
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_1 1
+        strict_eq
+        dup
+        if_false8 339
+        drop
+        get_loc0 0: a
+        push_0 0
+        get_array_el
+        push_2 2
+        strict_eq
+  339:  push_true
+        push_atom_value "++"
+        call3 3
+        drop
+        push_true
+        array_from 1
+        set_loc0 0: a
+        push_0 0
+        get_array_el3
+        post_dec
+        perm4
+        put_array_el
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_1 1
+        strict_eq
+        dup
+        if_false8 375
+        drop
+        get_loc0 0: a
+        push_0 0
+        get_array_el
+        push_0 0
+        strict_eq
+  375:  push_true
+        push_atom_value "--"
+        call3 3
+        return_undef
+
+__tests__/fixtures/inc-1.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var assert,64
+        check_define_var test_inc_dec,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode test_inc_dec]
+        define_func test_inc_dec,0
+        get_loc0 0: "<ret>"
+        return
+

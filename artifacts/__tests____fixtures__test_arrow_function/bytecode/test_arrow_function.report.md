@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_arrow_function.ts
-**生成时间**: 2026-01-07T15:26:57.514Z
+**生成时间**: 2026-01-07T17:33:03.378Z
 
 ## 大小对比
 

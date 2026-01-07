@@ -1,0 +1,106 @@
+__tests__/fixtures/quickjs-tests/test_worker_module.js:3:1: function: handle_msg
+  mode: strict
+  args: e
+  locals:
+    0: var ev
+  closure vars:
+    0: parent parent:loc1 var
+  stack_size: 5
+  opcodes:
+        get_arg0 0: e
+        get_field data
+        set_loc0 0: ev
+        get_field type
+        dup
+        push_atom_value abort
+        strict_eq
+        if_false8 50
+        get_var_ref0 0: parent
+        get_field2 postMessage
+        object
+        push_atom_value done
+        define_field type
+        call_method 1
+        drop
+        get_var_ref0 0: parent
+        null
+        put_field onmessage
+        return_undef
+   50:  dup
+        push_atom_value sab
+        strict_eq
+        if_false8 101
+        get_loc0 0: ev
+        get_field buf
+        push_2 2
+        push_i8 10
+        put_array_el
+        get_var_ref0 0: parent
+        get_field2 postMessage
+        object
+        push_atom_value sab_done
+        define_field type
+        get_loc0 0: ev
+        get_field buf
+        define_field buf
+        call_method 1
+        drop
+  101:  return_undef
+
+__tests__/fixtures/quickjs-tests/test_worker_module.js:18:1: function: worker_main
+  mode: strict
+  locals:
+    0: var i
+  closure vars:
+    0: parent parent:loc1 var
+    1: handle_msg parent:loc2 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: parent
+        get_var_ref1 1: handle_msg
+        put_field onmessage
+        push_0 0
+        put_loc0 0: i
+    9:  get_loc0 0: i
+        push_i8 10
+        lt
+        if_false8 46
+        get_var_ref0 0: parent
+        get_field2 postMessage
+        object
+        push_atom_value num
+        define_field type
+        get_loc0 0: i
+        define_field num
+        call_method 1
+        drop
+        inc_loc 0: i
+        goto8 9
+   46:  return_undef
+
+__tests__/fixtures/quickjs-tests/test_worker_module.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: os local:loc0 const
+    1: parent local:loc0 var
+    2: handle_msg local:loc1 var
+    3: worker_main local:loc2 var
+  stack_size: 1
+  opcodes:
+        push_this
+        if_false8 10
+        fclosure8 0: [bytecode handle_msg]
+        put_var_ref2 2: handle_msg
+        fclosure8 1: [bytecode worker_main]
+        put_var_ref3 3: worker_main
+        return_undef
+   10:  get_var_ref_check 0: os
+        get_field Worker
+        get_field parent
+        put_var_ref1 1: parent
+        get_var_ref3 3: worker_main
+        call0 0
+        drop
+        undefined
+        return_async
+

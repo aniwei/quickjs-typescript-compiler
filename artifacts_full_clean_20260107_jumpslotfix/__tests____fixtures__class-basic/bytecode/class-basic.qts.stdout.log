@@ -1,0 +1,50 @@
+__tests__/fixtures/class-basic.js:2:5: function: <null>
+  mode: strict
+  args: x y
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  drop
+        get_loc0 0: this
+        get_arg0 0: x
+        put_field x
+        get_loc0 0: this
+        get_arg1 1: y
+        put_field y
+        return_undef
+
+__tests__/fixtures/class-basic.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const Point [level:2 next:-1]
+    2: const <class_fields_init> [level:3 next:1]
+  stack_size: 3
+  opcodes:
+        check_define_var Point,128
+        define_var Point,130
+        set_loc_uninitialized 1: Point
+        undefined
+        set_loc_uninitialized 2: "<class_fields_init>"
+        push_const8 0: [bytecode <null>]
+        define_class Point,0
+        undefined
+        put_loc2 2: "<class_fields_init>"
+        drop
+        set_loc1 1: Point
+        close_loc 2: "<class_fields_init>"
+        put_var_init Point
+        get_loc0 0: "<ret>"
+        return
+

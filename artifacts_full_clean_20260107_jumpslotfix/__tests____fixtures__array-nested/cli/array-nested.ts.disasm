@@ -1,0 +1,36 @@
+Module bytecode version: 5
+Atom count: 5
+
+=== Outer Function ===
+bytecodeLen=87 stackSize=4 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 80
+     6  define_var               228                 pop=0 push=0      3f e4 00 00 00 80
+    12  push_1                   1                   pop=0 push=1      b8
+    13  push_2                   2                   pop=0 push=1      b9
+    14  array_from               2                   pop=0 push=1      26 02 00
+    17  push_3                   3                   pop=0 push=1      ba
+    18  push_4                   4                   pop=0 push=1      bb
+    19  array_from               2                   pop=0 push=1      26 02 00
+    22  object                                       pop=0 push=1      0b
+    23  push_5                   5                   pop=0 push=1      bc
+    24  define_field             229                 pop=2 push=1      4e e5 00 00 00
+    29  array_from               3                   pop=0 push=1      26 03 00
+    32  put_var_init             228                 pop=1 push=0      3b e4 00 00 00
+    37  get_var                  230                 pop=0 push=1      39 e6 00 00 00
+    42  get_field2               231                 pop=1 push=2      43 e7 00 00 00
+    47  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    52  push_0                   0                   pop=0 push=1      b7
+    53  get_array_el                                 pop=2 push=1      48
+    54  push_1                   1                   pop=0 push=1      b8
+    55  get_array_el                                 pop=2 push=1      48
+    56  call_method              1                   pop=2 push=1      24 01 00
+    59  put_loc0                 loc=0               pop=1 push=0      cb
+    60  get_var                  230                 pop=0 push=1      39 e6 00 00 00
+    65  get_field2               231                 pop=1 push=2      43 e7 00 00 00
+    70  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    75  push_2                   2                   pop=0 push=1      b9
+    76  get_array_el                                 pop=2 push=1      48
+    77  get_field                229                 pop=1 push=1      42 e5 00 00 00
+    82  call_method              1                   pop=2 push=1      24 01 00
+    85  set_loc0                 loc=0               pop=1 push=1      cf
+    86  return                                       pop=1 push=0      28

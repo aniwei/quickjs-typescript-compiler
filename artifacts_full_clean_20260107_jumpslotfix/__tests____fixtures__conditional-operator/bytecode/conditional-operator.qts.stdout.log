@@ -1,0 +1,18 @@
+__tests__/fixtures/conditional-operator.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        get_var console
+        get_field2 log
+        get_var Date
+        get_field2 now
+        call_method 0
+        if_false8 28
+        push_1 1
+        goto8 29
+   28:  push_2 2
+   29:  call_method 1
+        set_loc0 0: "<ret>"
+        return
+

@@ -205,13 +205,28 @@ async function main() {
     return path.resolve('artifacts')
   })()
 
+  const onlyPrefix = (() => {
+    const idx = args.indexOf('--only-prefix')
+    if (idx >= 0 && args[idx + 1]) return String(args[idx + 1])
+    return null
+  })()
+
   const outPath = (() => {
     const idx = args.indexOf('--out')
     if (idx >= 0 && args[idx + 1]) return path.resolve(args[idx + 1])
     return path.join(artifactsDir, 'mismatch_families.json')
   })()
 
-  const summaryFiles = await collectFilesRecursive(artifactsDir, '.guardrail.summary.json')
+  let summaryFiles = await collectFilesRecursive(artifactsDir, '.guardrail.summary.json')
+  if (onlyPrefix) {
+    summaryFiles = summaryFiles.filter((f) => {
+      const rel = path.relative(artifactsDir, f)
+      // Normalize path separators so prefix matching is stable across platforms.
+      const relNorm = rel.split(path.sep).join('/')
+      const prefixNorm = onlyPrefix.split(path.sep).join('/')
+      return relNorm.startsWith(prefixNorm)
+    })
+  }
   if (!summaryFiles.length) {
     console.error(`No guardrail summaries found under: ${artifactsDir}`)
     process.exit(2)
