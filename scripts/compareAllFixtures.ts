@@ -66,6 +66,20 @@ interface FixtureResult {
 async function main() {
   const options = parseArgs(process.argv.slice(2))
 
+  // For full-suite comparisons, we prefer producing artifacts over failing fast.
+  // RegExp literal compilation uses QuickJS WASM; if that compilation fails/hangs for a particular literal,
+  // allow a best-effort fallback so we can still classify mismatches across all fixtures.
+  if (process.env.QTS_REGEXP_LITERAL_FALLBACK == null) {
+    process.env.QTS_REGEXP_LITERAL_FALLBACK = '1'
+  }
+  if (process.env.QTS_REGEXP_LITERAL_TIMEOUT_MS == null) {
+    // Avoid pathological hangs; adjust as needed when investigating regex-specific issues.
+    process.env.QTS_REGEXP_LITERAL_TIMEOUT_MS = '20000'
+  }
+  if (process.env.QTS_COMPARE_PRINT_TRANSPILED == null) {
+    process.env.QTS_COMPARE_PRINT_TRANSPILED = '0'
+  }
+
   if (options.qtsTrace) {
     process.env.QTS_TRACE_ENABLED = '1'
     process.env.QTS_TRACE_LEVEL = String(options.qtsTraceLevel)
@@ -96,7 +110,18 @@ async function main() {
     console.log(`\n=== ${relativeName} ===`)
 
     const baseName = path.basename(fixturePath, path.extname(fixturePath))
-    const fixtureArtifactsDir = path.join(options.artifactsDir, baseName)
+    // Collision-safe artifacts directory name.
+    // We intentionally include the relative path so files like:
+    // - __tests__/fixtures_quickjs/repl.ts
+    // - __tests__/fixtures/quickjs-tests/repl.ts
+    // don't overwrite each other's artifacts.
+    const artifactKey = relativeName
+      .replace(/\\/g, '/')
+      .replace(/\.ts$/i, '')
+      .replace(/\//g, '__')
+      .replace(/[^a-zA-Z0-9_.-]+/g, '_')
+
+    const fixtureArtifactsDir = path.join(options.artifactsDir, artifactKey)
 
     const comparatorOptions: ComparisonOptions = {
       inputTs: fixturePath,

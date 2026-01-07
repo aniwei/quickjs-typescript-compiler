@@ -13,14 +13,14 @@
   "bytecode": {
     "identical": false,
     "tsSize": 16102,
-    "wasmSize": 5,
-    "sizeDiff": 16097,
-    "sizeDiffPercent": 321940
+    "wasmSize": 16154,
+    "sizeDiff": -52,
+    "sizeDiffPercent": -0.3219016961743221
   },
   "trace": {
-    "differenceCount": 11864,
-    "tsEventCount": 11105,
-    "wasmEventCount": 11944,
-    "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/raytrace/trace/trace.summary.json"
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
   }
 }

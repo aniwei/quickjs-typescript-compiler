@@ -1,0 +1,949 @@
+__tests__/fixtures_quickjs/octane/splay.js:44:1: function: GeneratePayloadTree
+  mode: strict
+  args: depth tag
+  closure vars:
+    0: GeneratePayloadTree parent:loc9 var
+  stack_size: 11
+  opcodes:
+        get_arg0 0: depth
+        push_0 0
+        eq
+        if_false8 45
+        object
+        push_0 0
+        push_1 1
+        push_2 2
+        push_3 3
+        push_4 4
+        push_5 5
+        push_6 6
+        push_7 7
+        push_i8 8
+        push_i8 9
+        array_from 10
+        define_field array
+        push_atom_value "String for key "
+        get_arg1 1: tag
+        add
+        push_atom_value " in leaf node"
+        add
+        define_field string
+        return
+   45:  object
+        get_var_ref0 0: GeneratePayloadTree
+        get_arg0 0: depth
+        push_1 1
+        sub
+        get_arg1 1: tag
+        call2 2
+        define_field left
+        get_var_ref0 0: GeneratePayloadTree
+        get_arg0 0: depth
+        push_1 1
+        sub
+        get_arg1 1: tag
+        call2 2
+        define_field right
+        return
+
+__tests__/fixtures_quickjs/octane/splay.js:58:1: function: GenerateKey
+  mode: strict
+  stack_size: 2
+  opcodes:
+        get_var Math
+        get_field2 random
+        tail_call_method 0
+
+__tests__/fixtures_quickjs/octane/splay.js:65:1: function: SplayRMS
+  mode: strict
+  closure vars:
+    0: splaySumOfSquaredPauses parent:loc12 var
+    1: splaySamples parent:loc11 var
+  stack_size: 6
+  opcodes:
+        get_var Math
+        get_field2 round
+        get_var Math
+        get_field2 sqrt
+        get_var_ref0 0: splaySumOfSquaredPauses
+        get_var_ref1 1: splaySamples
+        div
+        call_method 1
+        push_i16 10000
+        mul
+        tail_call_method 1
+
+__tests__/fixtures_quickjs/octane/splay.js:68:1: function: SplayUpdateStats
+  mode: strict
+  args: time
+  locals:
+    0: var pause
+  closure vars:
+    0: splaySampleTimeStart parent:loc8 var
+    1: splaySamples parent:loc11 var
+    2: splaySumOfSquaredPauses parent:loc12 var
+  stack_size: 3
+  opcodes:
+        get_arg0 0: time
+        get_var_ref0 0: splaySampleTimeStart
+        sub
+        put_loc0 0: pause
+        get_arg0 0: time
+        put_var_ref0 0: splaySampleTimeStart
+        get_var_ref1 1: splaySamples
+        inc
+        put_var_ref1 1: splaySamples
+        get_var_ref2 2: splaySumOfSquaredPauses
+        get_loc0 0: pause
+        get_loc0 0: pause
+        mul
+        add
+        put_var_ref2 2: splaySumOfSquaredPauses
+        return_undef
+
+__tests__/fixtures_quickjs/octane/splay.js:74:1: function: InsertNewNode
+  mode: strict
+  locals:
+    0: var key
+    1: var payload
+  closure vars:
+    0: GenerateKey parent:loc10 var
+    1: splayTree parent:loc7 var
+    2: GeneratePayloadTree parent:loc9 var
+    3: kSplayTreePayloadDepth parent:loc6 var
+  stack_size: 4
+  opcodes:
+    0:  get_var_ref0 0: GenerateKey
+        call0 0
+        put_loc0 0: key
+        get_var_ref1 1: splayTree
+        get_field2 find
+        get_loc0 0: key
+        call_method 1
+        null
+        neq
+        if_true8 0
+        get_var_ref2 2: GeneratePayloadTree
+        get_var_ref3 3: kSplayTreePayloadDepth
+        get_var String
+        get_loc0 0: key
+        call1 1
+        call2 2
+        put_loc1 1: payload
+        get_var_ref1 1: splayTree
+        get_field2 insert
+        get_loc0 0: key
+        get_loc1 1: payload
+        call_method 2
+        drop
+        get_loc0 0: key
+        return
+
+__tests__/fixtures_quickjs/octane/splay.js:84:1: function: SplaySetup
+  mode: strict
+  locals:
+    0: var i
+  closure vars:
+    0: performance parent:loc2 const
+    1: splayTree parent:loc7 var
+    2: SplayTree parent:loc19 var
+    3: splaySampleTimeStart parent:loc8 var
+    4: kSplayTreeSize parent:loc4 var
+    5: InsertNewNode parent:loc15 var
+    6: SplayUpdateStats parent:loc14 var
+  stack_size: 3
+  opcodes:
+        get_var_ref_check 0: performance
+        get_field now
+        lnot
+        if_false8 17
+        push_atom_value PerformanceNowUnsupported
+        throw
+   17:  get_var_ref2 2: SplayTree
+        dup
+        call_constructor 0
+        put_var_ref1 1: splayTree
+        get_var_ref_check 0: performance
+        get_field2 now
+        call_method 0
+        put_var_ref3 3: splaySampleTimeStart
+        push_0 0
+        put_loc0 0: i
+   37:  get_loc0 0: i
+        get_var_ref 4: kSplayTreeSize
+        lt
+        if_false8 80
+        get_var_ref 5: InsertNewNode
+        call0 0
+        drop
+        get_loc0 0: i
+        push_1 1
+        add
+        push_i8 20
+        mod
+        push_i8 19
+        eq
+        if_false8 76
+        get_var_ref 6: SplayUpdateStats
+        get_var_ref_check 0: performance
+        get_field2 now
+        call_method 0
+        call1 1
+        drop
+   76:  inc_loc 0: i
+        goto8 37
+   80:  return_undef
+
+__tests__/fixtures_quickjs/octane/splay.js:99:1: function: SplayTearDown
+  mode: strict
+  locals:
+    0: var keys
+    1: var length
+    2: var i
+  closure vars:
+    0: splayTree parent:loc7 var
+    1: splaySamples parent:loc11 var
+    2: splaySumOfSquaredPauses parent:loc12 var
+    3: kSplayTreeSize parent:loc4 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: splayTree
+        get_field2 exportKeys
+        call_method 0
+        put_loc0 0: keys
+        null
+        put_var_ref0 0: splayTree
+        push_0 0
+        put_var_ref1 1: splaySamples
+        push_0 0
+        put_var_ref2 2: splaySumOfSquaredPauses
+        get_loc0 0: keys
+        get_length
+        set_loc1 1: length
+        get_var_ref3 3: kSplayTreeSize
+        neq
+        if_false8 38
+        get_var Error
+        dup
+        push_atom_value "Splay tree has wrong size"
+        call_constructor 1
+        throw
+   38:  push_0 0
+        put_loc2 2: i
+   40:  get_loc2 2: i
+        get_loc1 1: length
+        push_1 1
+        sub
+        lt
+        if_false8 77
+        get_loc0 0: keys
+        get_loc2 2: i
+        get_array_el
+        get_loc0 0: keys
+        get_loc2 2: i
+        push_1 1
+        add
+        get_array_el
+        gte
+        if_false8 73
+        get_var Error
+        dup
+        push_atom_value "Splay tree not sorted"
+        call_constructor 1
+        throw
+   73:  inc_loc 2: i
+        goto8 40
+   77:  return_undef
+
+__tests__/fixtures_quickjs/octane/splay.js:119:1: function: SplayRun
+  mode: strict
+  locals:
+    0: var i
+    1: var key
+    2: var greatest
+  closure vars:
+    0: kSplayTreeModifications parent:loc5 var
+    1: InsertNewNode parent:loc15 var
+    2: splayTree parent:loc7 var
+    3: SplayUpdateStats parent:loc14 var
+    4: performance parent:loc2 const
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        get_var_ref0 0: kSplayTreeModifications
+        lt
+        if_false8 58
+        get_var_ref1 1: InsertNewNode
+        call0 0
+        put_loc1 1: key
+        get_var_ref2 2: splayTree
+        get_field2 findGreatestLessThan
+        get_loc1 1: key
+        call_method 1
+        set_loc2 2: greatest
+        null
+        eq
+        if_false8 38
+        get_var_ref2 2: splayTree
+        get_field2 remove
+        get_loc1 1: key
+        call_method 1
+        drop
+        goto8 54
+   38:  get_var_ref2 2: splayTree
+        get_field2 remove
+        get_loc2 2: greatest
+        get_field key
+        call_method 1
+        drop
+   54:  inc_loc 0: i
+        goto8 2
+   58:  get_var_ref3 3: SplayUpdateStats
+        get_var_ref_check 4: performance
+        get_field2 now
+        call_method 0
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/splay.js:139:1: function: SplayTree
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/splay.js:152:31: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 1
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field root_
+        lnot
+        return
+
+__tests__/fixtures_quickjs/octane/splay.js:163:30: function: <null>
+  mode: strict
+  args: key value
+  locals:
+    0: var node
+    1: var this
+  closure vars:
+    0: SplayTree parent:loc19 var
+  stack_size: 5
+  opcodes:
+        push_this
+        put_loc1 1: this
+        get_loc1 1: this
+        get_field2 isEmpty
+        call_method 0
+        if_false8 32
+        get_loc1 1: this
+        get_var_ref0 0: SplayTree
+        get_field Node
+        dup
+        get_arg0 0: key
+        get_arg1 1: value
+        call_constructor 2
+        put_field root_
+        return_undef
+   32:  get_loc1 1: this
+        get_field2 splay_
+        get_arg0 0: key
+        call_method 1
+        drop
+        get_loc1 1: this
+        get_field root_
+        get_field key
+        get_arg0 0: key
+        eq
+        if_false8 59
+        return_undef
+   59:  get_var_ref0 0: SplayTree
+        get_field Node
+        dup
+        get_arg0 0: key
+        get_arg1 1: value
+        call_constructor 2
+        put_loc0 0: node
+        get_arg0 0: key
+        get_loc1 1: this
+        get_field root_
+        get_field key
+        gt
+        if_false8 130
+        get_loc0 0: node
+        get_loc1 1: this
+        get_field root_
+        put_field left
+        get_loc0 0: node
+        get_loc1 1: this
+        get_field root_
+        get_field right
+        put_field right
+        get_loc1 1: this
+        get_field root_
+        null
+        put_field right
+        goto8 171
+  130:  get_loc0 0: node
+        get_loc1 1: this
+        get_field root_
+        put_field right
+        get_loc0 0: node
+        get_loc1 1: this
+        get_field root_
+        get_field left
+        put_field left
+        get_loc1 1: this
+        get_field root_
+        null
+        put_field left
+  171:  get_loc1 1: this
+        get_loc0 0: node
+        put_field root_
+        return_undef
+
+__tests__/fixtures_quickjs/octane/splay.js:195:30: function: <null>
+  mode: strict
+  args: key
+  locals:
+    0: var removed
+    1: var right
+    2: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc2 2: this
+        get_loc2 2: this
+        get_field2 isEmpty
+        call_method 0
+        if_false8 27
+        get_var Error
+        push_atom_value "Key not found: "
+        get_arg0 0: key
+        add
+        call1 1
+        throw
+   27:  get_loc2 2: this
+        get_field2 splay_
+        get_arg0 0: key
+        call_method 1
+        drop
+        get_loc2 2: this
+        get_field root_
+        get_field key
+        get_arg0 0: key
+        neq
+        if_false8 67
+        get_var Error
+        push_atom_value "Key not found: "
+        get_arg0 0: key
+        add
+        call1 1
+        throw
+   67:  get_loc2 2: this
+        get_field root_
+        put_loc0 0: removed
+        get_loc2 2: this
+        get_field root_
+        get_field left
+        lnot
+        if_false8 107
+        get_loc2 2: this
+        get_loc2 2: this
+        get_field root_
+        get_field right
+        put_field root_
+        goto8 159
+  107:  get_loc2 2: this
+        get_field root_
+        get_field right
+        put_loc1 1: right
+        get_loc2 2: this
+        get_loc2 2: this
+        get_field root_
+        get_field left
+        put_field root_
+        get_loc2 2: this
+        get_field2 splay_
+        get_arg0 0: key
+        call_method 1
+        drop
+        get_loc2 2: this
+        get_field root_
+        get_loc1 1: right
+        put_field right
+  159:  get_loc0 0: removed
+        return
+
+__tests__/fixtures_quickjs/octane/splay.js:225:28: function: <null>
+  mode: strict
+  args: key
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 isEmpty
+        call_method 0
+        if_false8 15
+        null
+        return
+   15:  get_loc0 0: this
+        get_field2 splay_
+        get_arg0 0: key
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_field root_
+        get_field key
+        get_arg0 0: key
+        eq
+        if_false8 48
+        get_loc0 0: this
+        get_field root_
+        return
+   48:  null
+        return
+
+__tests__/fixtures_quickjs/octane/splay.js:235:31: function: <null>
+  mode: strict
+  args: opt_startNode
+  locals:
+    0: var current
+    1: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc1 1: this
+        get_loc1 1: this
+        get_field2 isEmpty
+        call_method 0
+        if_false8 15
+        null
+        return
+   15:  get_arg0 0: opt_startNode
+        dup
+        if_true8 26
+        drop
+        get_loc1 1: this
+        get_field root_
+   26:  put_loc0 0: current
+   27:  get_loc0 0: current
+        get_field right
+        if_false8 44
+        get_loc0 0: current
+        get_field right
+        put_loc0 0: current
+        goto8 27
+   44:  get_loc0 0: current
+        return
+
+__tests__/fixtures_quickjs/octane/splay.js:249:44: function: <null>
+  mode: strict
+  args: key
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 isEmpty
+        call_method 0
+        if_false8 15
+        null
+        return
+   15:  get_loc0 0: this
+        get_field2 splay_
+        get_arg0 0: key
+        call_method 1
+        drop
+        get_loc0 0: this
+        get_field root_
+        get_field key
+        get_arg0 0: key
+        lt
+        if_false8 48
+        get_loc0 0: this
+        get_field root_
+        return
+   48:  get_loc0 0: this
+        get_field root_
+        get_field left
+        if_false8 81
+        get_loc0 0: this
+        get_field2 findMax
+        get_loc0 0: this
+        get_field root_
+        get_field left
+        tail_call_method 1
+   81:  null
+        return
+
+__tests__/fixtures_quickjs/octane/splay.js:274:30: function: <null>
+  mode: strict
+  args: node
+  closure vars:
+    0: result local:loc0 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: result
+        get_field2 push
+        get_arg0 0: node
+        get_field key
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/splay.js:271:34: function: <null>
+  mode: strict
+  locals:
+    0: var result
+    1: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc1 1: this
+        array_from 0
+        put_loc0 0: result
+        get_loc1 1: this
+        get_field2 isEmpty
+        call_method 0
+        lnot
+        if_false8 35
+        get_loc1 1: this
+        get_field root_
+        get_field2 traverse_
+        fclosure8 0: [bytecode <null>]
+        call_method 1
+        drop
+   35:  get_loc0 0: result
+        return
+
+__tests__/fixtures_quickjs/octane/splay.js:288:30: function: <null>
+  mode: strict
+  args: key
+  locals:
+    0: var dummy
+    1: var left
+    2: var right
+    3: var current
+    4: var tmp
+    5: var this
+  closure vars:
+    0: SplayTree parent:loc19 var
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc8 5: this
+        get_loc8 5: this
+        get_field2 isEmpty
+        call_method 0
+        if_false8 16
+        return_undef
+   16:  get_var_ref0 0: SplayTree
+        get_field Node
+        dup
+        null
+        null
+        call_constructor 2
+        set_loc2 2: right
+        set_loc1 1: left
+        put_loc0 0: dummy
+        get_loc8 5: this
+        get_field root_
+        put_loc3 3: current
+   39:  get_arg0 0: key
+        get_loc3 3: current
+        get_field key
+        lt
+        if_false8 134
+        get_loc3 3: current
+        get_field left
+        lnot
+        if_true 227
+        get_arg0 0: key
+        get_loc3 3: current
+        get_field left
+        get_field key
+        lt
+        if_false8 116
+        get_loc3 3: current
+        get_field left
+        put_loc8 4: tmp
+        get_loc3 3: current
+        get_loc8 4: tmp
+        get_field right
+        put_field left
+        get_loc8 4: tmp
+        get_loc3 3: current
+        put_field right
+        get_loc8 4: tmp
+        set_loc3 3: current
+        get_field left
+        lnot
+        if_true8 227
+  116:  get_loc2 2: right
+        get_loc3 3: current
+        put_field left
+        get_loc3 3: current
+        put_loc2 2: right
+        get_loc3 3: current
+        get_field left
+        put_loc3 3: current
+        goto8 39
+  134:  get_arg0 0: key
+        get_loc3 3: current
+        get_field key
+        gt
+        if_false8 227
+        get_loc3 3: current
+        get_field right
+        lnot
+        if_true8 227
+        get_arg0 0: key
+        get_loc3 3: current
+        get_field right
+        get_field key
+        gt
+        if_false8 208
+        get_loc3 3: current
+        get_field right
+        put_loc8 4: tmp
+        get_loc3 3: current
+        get_loc8 4: tmp
+        get_field left
+        put_field right
+        get_loc8 4: tmp
+        get_loc3 3: current
+        put_field left
+        get_loc8 4: tmp
+        set_loc3 3: current
+        get_field right
+        lnot
+        if_true8 227
+  208:  get_loc1 1: left
+        get_loc3 3: current
+        put_field right
+        get_loc3 3: current
+        put_loc1 1: left
+        get_loc3 3: current
+        get_field right
+        put_loc3 3: current
+        goto16 39
+  227:  get_loc1 1: left
+        get_loc3 3: current
+        get_field left
+        put_field right
+        get_loc2 2: right
+        get_loc3 3: current
+        get_field right
+        put_field left
+        get_loc3 3: current
+        get_loc0 0: dummy
+        get_field right
+        put_field left
+        get_loc3 3: current
+        get_loc0 0: dummy
+        get_field left
+        put_field right
+        get_loc8 5: this
+        get_loc3 3: current
+        put_field root_
+        return_undef
+
+__tests__/fixtures_quickjs/octane/splay.js:356:18: function: <null>
+  mode: strict
+  args: key value
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: key
+        put_field key
+        get_loc0 0: this
+        get_arg1 1: value
+        put_field value
+        return_undef
+
+__tests__/fixtures_quickjs/octane/splay.js:375:38: function: <null>
+  mode: strict
+  args: f
+  locals:
+    0: var current
+    1: var left
+    2: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc2 2: this
+        get_loc2 2: this
+        put_loc0 0: current
+    4:  get_loc0 0: current
+        if_false8 40
+        get_loc0 0: current
+        get_field left
+        set_loc1 1: left
+        if_false8 27
+        get_loc1 1: left
+        get_field2 traverse_
+        get_arg0 0: f
+        call_method 1
+        drop
+   27:  get_arg0 0: f
+        get_loc0 0: current
+        call1 1
+        drop
+        get_loc0 0: current
+        get_field right
+        put_loc0 0: current
+        goto8 4
+   40:  return_undef
+
+__tests__/fixtures_quickjs/octane/splay.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: Benchmark parent:loc0 const
+    1: BenchmarkSuite parent:loc1 const
+    2: performance parent:loc2 const
+    3: Splay local:loc0 var
+    4: kSplayTreeSize local:loc1 var
+    5: kSplayTreeModifications local:loc2 var
+    6: kSplayTreePayloadDepth local:loc3 var
+    7: splayTree local:loc4 var
+    8: splaySampleTimeStart local:loc5 var
+    9: GeneratePayloadTree local:loc6 var
+   10: GenerateKey local:loc7 var
+   11: splaySamples local:loc8 var
+   12: splaySumOfSquaredPauses local:loc9 var
+   13: SplayRMS local:loc10 var
+   14: SplayUpdateStats local:loc11 var
+   15: InsertNewNode local:loc12 var
+   16: SplaySetup local:loc13 var
+   17: SplayTearDown local:loc14 var
+   18: SplayRun local:loc15 var
+   19: SplayTree local:loc16 var
+  stack_size: 14
+  opcodes:
+        push_this
+        if_false8 49
+        fclosure8 0: [bytecode GeneratePayloadTree]
+        put_var_ref 9: GeneratePayloadTree
+        fclosure8 1: [bytecode GenerateKey]
+        put_var_ref 10: GenerateKey
+        fclosure8 2: [bytecode SplayRMS]
+        put_var_ref 13: SplayRMS
+        fclosure8 3: [bytecode SplayUpdateStats]
+        put_var_ref 14: SplayUpdateStats
+        fclosure8 4: [bytecode InsertNewNode]
+        put_var_ref 15: InsertNewNode
+        fclosure8 5: [bytecode SplaySetup]
+        put_var_ref 16: SplaySetup
+        fclosure8 6: [bytecode SplayTearDown]
+        put_var_ref 17: SplayTearDown
+        fclosure8 7: [bytecode SplayRun]
+        put_var_ref 18: SplayRun
+        fclosure8 8: [bytecode SplayTree]
+        put_var_ref 19: SplayTree
+        return_undef
+   49:  get_var_ref_check 1: BenchmarkSuite
+        dup
+        push_atom_value Splay
+        push_i32 81491
+        push_i32 2739514
+        array_from 2
+        get_var_ref_check 0: Benchmark
+        dup
+        push_atom_value Splay
+        push_true
+        push_false
+        push_i16 1400
+        get_var_ref 18: SplayRun
+        get_var_ref 16: SplaySetup
+        get_var_ref 17: SplayTearDown
+        get_var_ref 13: SplayRMS
+        call_constructor 8
+        array_from 1
+        call_constructor 3
+        put_var_ref3 3: Splay
+        push_i16 8000
+        put_var_ref 4: kSplayTreeSize
+        push_i8 80
+        put_var_ref 5: kSplayTreeModifications
+        push_5 5
+        put_var_ref 6: kSplayTreePayloadDepth
+        null
+        put_var_ref 7: splayTree
+        push_0 0
+        put_var_ref 8: splaySampleTimeStart
+        push_0 0
+        put_var_ref 11: splaySamples
+        push_0 0
+        put_var_ref 12: splaySumOfSquaredPauses
+        get_var_ref 19: SplayTree
+        get_field prototype
+        null
+        put_field root_
+        get_var_ref 19: SplayTree
+        get_field prototype
+        fclosure8 9: [bytecode <null>]
+        put_field isEmpty
+        get_var_ref 19: SplayTree
+        get_field prototype
+        fclosure8 10: [bytecode <null>]
+        put_field insert
+        get_var_ref 19: SplayTree
+        get_field prototype
+        fclosure8 11: [bytecode <null>]
+        put_field remove
+        get_var_ref 19: SplayTree
+        get_field prototype
+        fclosure8 12: [bytecode <null>]
+        put_field find
+        get_var_ref 19: SplayTree
+        get_field prototype
+        fclosure8 13: [bytecode <null>]
+        put_field findMax
+        get_var_ref 19: SplayTree
+        get_field prototype
+        fclosure8 14: [bytecode <null>]
+        put_field findGreatestLessThan
+        get_var_ref 19: SplayTree
+        get_field prototype
+        fclosure8 15: [bytecode <null>]
+        put_field exportKeys
+        get_var_ref 19: SplayTree
+        get_field prototype
+        fclosure8 16: [bytecode <null>]
+        put_field splay_
+        get_var_ref 19: SplayTree
+        fclosure8 17: [bytecode <null>]
+        put_field Node
+        get_var_ref 19: SplayTree
+        get_field Node
+        get_field prototype
+        null
+        put_field left
+        get_var_ref 19: SplayTree
+        get_field Node
+        get_field prototype
+        null
+        put_field right
+        get_var_ref 19: SplayTree
+        get_field Node
+        get_field prototype
+        fclosure8 18: [bytecode <null>]
+        put_field traverse_
+        undefined
+        return_async
+

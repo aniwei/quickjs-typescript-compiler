@@ -1,0 +1,722 @@
+__tests__/fixtures/quickjs-tests/repl.js:107:5: function: termInit
+  mode: strict
+  locals:
+    0: var tab
+  closure vars:
+    0: term_fd local:loc36 var
+    1: std parent:loc0 const
+    2: term_width local:loc38 var
+    3: os parent:loc1 const
+    4: sigint_handler local:loc41 var
+    5: term_read_buf local:loc37 var
+    6: term_read_handler local:loc42 var
+  stack_size: 4
+  opcodes:
+        get_var_ref_check 1: std
+        get_field in
+        get_field2 fileno
+        call_method 0
+        put_var_ref0 0: term_fd
+        push_i8 80
+        put_var_ref2 2: term_width
+        get_var_ref_check 3: os
+        get_field2 isatty
+        get_var_ref0 0: term_fd
+        call_method 1
+        if_false8 86
+        get_var_ref_check 3: os
+        get_field ttyGetWinSize
+        if_false8 63
+        get_var_ref_check 3: os
+        get_field2 ttyGetWinSize
+        get_var_ref0 0: term_fd
+        call_method 1
+        set_loc0 0: tab
+        if_false8 63
+        get_loc0 0: tab
+        push_0 0
+        get_array_el
+        put_var_ref2 2: term_width
+   63:  get_var_ref_check 3: os
+        get_field ttySetRaw
+        if_false8 86
+        get_var_ref_check 3: os
+        get_field2 ttySetRaw
+        get_var_ref0 0: term_fd
+        call_method 1
+        drop
+   86:  get_var_ref_check 3: os
+        get_field2 signal
+        get_var_ref_check 3: os
+        get_field SIGINT
+        get_var_ref 4: sigint_handler
+        call_method 2
+        drop
+        get_var Uint8Array
+        dup
+        push_i8 64
+        call_constructor 1
+        put_var_ref 5: term_read_buf
+        get_var_ref_check 3: os
+        get_field2 setReadHandler
+        get_var_ref0 0: term_fd
+        get_var_ref 6: term_read_handler
+        call_method 2
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:129:5: function: sigint_handler
+  mode: strict
+  closure vars:
+    0: handle_byte local:loc43 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: handle_byte
+        push_3 3
+        call1 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:133:5: function: term_read_handler
+  mode: strict
+  locals:
+    0: var l
+    1: var i
+  closure vars:
+    0: os parent:loc1 const
+    1: term_fd local:loc36 var
+    2: term_read_buf local:loc37 var
+    3: handle_byte local:loc43 var
+  stack_size: 6
+  opcodes:
+        get_var_ref_check 0: os
+        get_field2 read
+        get_var_ref1 1: term_fd
+        get_var_ref2 2: term_read_buf
+        get_field buffer
+        push_0 0
+        get_var_ref2 2: term_read_buf
+        get_length
+        call_method 4
+        put_loc0 0: l
+        push_0 0
+        put_loc1 1: i
+   24:  get_loc1 1: i
+        get_loc0 0: l
+        lt
+        if_false8 39
+        get_var_ref3 3: handle_byte
+        get_var_ref2 2: term_read_buf
+        get_loc1 1: i
+        get_array_el
+        call1 1
+        drop
+        inc_loc 1: i
+        goto8 24
+   39:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:139:5: function: handle_byte
+  mode: strict
+  args: c
+  closure vars:
+    0: utf8 local:loc19 var
+    1: utf8_state local:loc34 var
+    2: utf8_val local:loc35 var
+  stack_size: 4
+  opcodes:
+        get_var_ref0 0: utf8
+        lnot
+        if_false8 13
+        get_var handle_char
+        get_arg0 0: c
+        call1 1
+        drop
+        return_undef
+   13:  get_var_ref1 1: utf8_state
+        push_0 0
+        strict_neq
+        if_false8 57
+        get_arg0 0: c
+        push_i16 128
+        gte
+        if_false8 57
+        get_arg0 0: c
+        push_i16 192
+        lt
+        if_false8 57
+        get_var_ref2 2: utf8_val
+        push_6 6
+        shl
+        get_arg0 0: c
+        push_i8 63
+        and
+        or
+        put_var_ref2 2: utf8_val
+        get_var_ref1 1: utf8_state
+        dec
+        set_var_ref1 1: utf8_state
+        push_0 0
+        strict_eq
+        if_false8 106
+        get_var handle_char
+        get_var_ref2 2: utf8_val
+        call1 1
+        drop
+        return_undef
+   57:  get_arg0 0: c
+        push_i16 192
+        gte
+        if_false8 96
+        get_arg0 0: c
+        push_i16 248
+        lt
+        if_false8 96
+        push_1 1
+        get_arg0 0: c
+        push_i16 224
+        gte
+        add
+        get_arg0 0: c
+        push_i16 240
+        gte
+        add
+        put_var_ref1 1: utf8_state
+        get_arg0 0: c
+        push_1 1
+        push_6 6
+        get_var_ref1 1: utf8_state
+        sub
+        shl
+        push_1 1
+        sub
+        and
+        put_var_ref2 2: utf8_val
+        return_undef
+   96:  push_0 0
+        put_var_ref1 1: utf8_state
+        get_var handle_char
+        get_arg0 0: c
+        call1 1
+        drop
+  106:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:159:5: function: is_alpha
+  mode: strict
+  args: c
+  stack_size: 2
+  opcodes:
+        get_arg0 0: c
+        typeof
+        push_atom_value string
+        strict_eq
+        dup
+        if_false8 52
+        drop
+        get_arg0 0: c
+        push_atom_value A
+        gte
+        dup
+        if_false8 30
+        drop
+        get_arg0 0: c
+        push_atom_value Z
+        lte
+   30:  dup
+        if_true8 52
+        drop
+        get_arg0 0: c
+        push_atom_value a
+        gte
+        dup
+        if_false8 52
+        drop
+        get_arg0 0: c
+        push_atom_value z
+        lte
+   52:  return
+
+__tests__/fixtures/quickjs-tests/repl.js:163:5: function: is_digit
+  mode: strict
+  args: c
+  stack_size: 2
+  opcodes:
+        get_arg0 0: c
+        typeof
+        push_atom_value string
+        strict_eq
+        dup
+        if_false8 24
+        drop
+        get_arg0 0: c
+        push_const8 0: "0"
+        gte
+        dup
+        if_false8 24
+        drop
+        get_arg0 0: c
+        push_const8 1: "9"
+        lte
+   24:  return
+
+__tests__/fixtures/quickjs-tests/repl.js:166:5: function: is_word
+  mode: strict
+  args: c
+  closure vars:
+    0: is_alpha local:loc44 var
+    1: is_digit local:loc45 var
+  stack_size: 2
+  opcodes:
+        get_arg0 0: c
+        typeof
+        push_atom_value string
+        strict_eq
+        dup
+        if_false8 44
+        drop
+        get_var_ref0 0: is_alpha
+        get_arg0 0: c
+        call1 1
+        dup
+        if_true8 44
+        drop
+        get_var_ref1 1: is_digit
+        get_arg0 0: c
+        call1 1
+        dup
+        if_true8 44
+        drop
+        get_arg0 0: c
+        push_atom_value _
+        eq
+        dup
+        if_true8 44
+        drop
+        get_arg0 0: c
+        push_atom_value $
+        eq
+   44:  return
+
+__tests__/fixtures/quickjs-tests/repl.js:170:5: function: ucs_length
+  mode: strict
+  args: str
+  locals:
+    0: var len
+    1: var c
+    2: var i
+    3: var str_len
+  stack_size: 3
+  opcodes:
+        get_arg0 0: str
+        get_length
+        put_loc3 3: str_len
+        push_0 0
+        put_loc0 0: len
+        push_0 0
+        put_loc2 2: i
+    7:  get_loc2 2: i
+        get_loc3 3: str_len
+        lt
+        if_false8 48
+        get_arg0 0: str
+        get_field2 charCodeAt
+        get_loc2 2: i
+        call_method 1
+        set_loc1 1: c
+        push_i32 56320
+        lt
+        dup
+        if_true8 40
+        drop
+        get_loc1 1: c
+        push_i32 57344
+        gte
+   40:  if_false8 44
+        inc_loc 0: len
+   44:  inc_loc 2: i
+        goto8 7
+   48:  get_loc0 0: len
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:184:5: function: is_trailing_surrogate
+  mode: strict
+  args: c
+  locals:
+    0: var d
+  stack_size: 3
+  opcodes:
+        get_arg0 0: c
+        typeof
+        push_atom_value string
+        strict_neq
+        if_false8 12
+        push_false
+        return
+   12:  get_arg0 0: c
+        get_field2 codePointAt
+        push_0 0
+        call_method 1
+        set_loc0 0: d
+        push_i32 56320
+        gte
+        dup
+        if_false8 40
+        drop
+        get_loc0 0: d
+        push_i32 57344
+        lt
+   40:  return
+
+__tests__/fixtures/quickjs-tests/repl.js:191:5: function: is_balanced
+  mode: strict
+  args: a b
+  stack_size: 3
+  opcodes:
+        get_arg0 0: a
+        get_arg1 1: b
+        add
+        dup
+        push_atom_value "()"
+        strict_eq
+        if_true8 30
+        dup
+        push_atom_value "[]"
+        strict_eq
+        if_true8 30
+        dup
+        push_atom_value "{}"
+        strict_eq
+        if_false8 32
+   30:  push_true
+        return
+   32:  drop
+        push_false
+        return
+
+__tests__/fixtures/quickjs-tests/repl.js:200:5: function: print_color_text
+  mode: strict
+  args: str start style_names
+  locals:
+    0: var i
+    1: var j
+    2: var style
+  closure vars:
+    0: std parent:loc0 const
+    1: colors local:loc7 var
+    2: styles local:loc8 var
+  stack_size: 6
+  opcodes:
+        get_arg1 1: start
+        put_loc1 1: j
+    2:  get_loc1 1: j
+        get_arg0 0: str
+        get_length
+        lt
+        if_false8 98
+        get_arg2 2: style_names
+        get_loc1 1: j
+        set_loc0 0: i
+        get_array_el
+        put_loc2 2: style
+   13:  get_loc1 1: j
+        inc
+        set_loc1 1: j
+        get_arg0 0: str
+        get_length
+        lt
+        if_false8 28
+        get_arg2 2: style_names
+        get_loc1 1: j
+        get_array_el
+        get_loc2 2: style
+        eq
+        if_true8 13
+   28:  get_var_ref_check 0: std
+        get_field2 puts
+        get_var_ref1 1: colors
+        get_var_ref2 2: styles
+        get_loc2 2: style
+        get_array_el
+        dup
+        if_true8 49
+        drop
+        push_atom_value default
+   49:  get_array_el
+        call_method 1
+        drop
+        get_var_ref_check 0: std
+        get_field2 puts
+        get_arg0 0: str
+        get_field2 substring
+        get_loc0 0: i
+        get_loc1 1: j
+        call_method 2
+        call_method 1
+        drop
+        get_var_ref_check 0: std
+        get_field2 puts
+        get_var_ref1 1: colors
+        push_atom_value none
+        get_array_el
+        call_method 1
+        drop
+        goto8 2
+   98:  return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:211:5: function: print_csi
+  mode: strict
+  args: n code
+  closure vars:
+    0: std parent:loc0 const
+  stack_size: 5
+  opcodes:
+        get_var_ref_check 0: std
+        get_field2 puts
+        push_atom_value "\u001b["
+        get_arg0 0: n
+        push_1 1
+        neq
+        if_false8 21
+        get_arg0 0: n
+        goto8 22
+   21:  push_empty_string
+   22:  add
+        get_arg1 1: code
+        add
+        call_method 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:30:2: function: <null>
+  mode: strict
+  args: g
+  locals:
+    0: var Object
+    1: var String
+    2: var Array
+    3: var Date
+    4: var Math
+    5: var isFinite
+    6: var parseFloat
+    7: var colors
+    8: var styles
+    9: var history
+   10: var clip_board
+   11: var prec
+   12: var expBits
+   13: var log2_10
+   14: var pstate
+   15: var prompt
+   16: var plen
+   17: var ps1
+   18: var ps2
+   19: var utf8
+   20: var show_time
+   21: var show_colors
+   22: var eval_start_time
+   23: var eval_time
+   24: var mexpr
+   25: var level
+   26: var cmd
+   27: var cursor_pos
+   28: var last_cmd
+   29: var last_cursor_pos
+   30: var history_index
+   31: var this_fun
+   32: var last_fun
+   33: var quote_flag
+   34: var utf8_state
+   35: var utf8_val
+   36: var term_fd
+   37: var term_read_buf
+   38: var term_width
+   39: var term_cursor_x
+   40: var termInit
+   41: var sigint_handler
+   42: var term_read_handler
+   43: var handle_byte
+   44: var is_alpha
+   45: var is_digit
+   46: var is_word
+   47: var ucs_length
+   48: var is_trailing_surrogate
+   49: var is_balanced
+   50: var print_color_text
+   51: var print_csi
+  closure vars:
+    0: std parent:loc0 const
+    1: os parent:loc1 const
+  stack_size: 2
+  opcodes:
+        fclosure8 0: [bytecode termInit]
+        put_loc8 40: termInit
+        fclosure8 1: [bytecode sigint_handler]
+        put_loc8 41: sigint_handler
+        fclosure8 2: [bytecode term_read_handler]
+        put_loc8 42: term_read_handler
+        fclosure8 3: [bytecode handle_byte]
+        put_loc8 43: handle_byte
+        fclosure8 4: [bytecode is_alpha]
+        put_loc8 44: is_alpha
+        fclosure8 5: [bytecode is_digit]
+        put_loc8 45: is_digit
+        fclosure8 6: [bytecode is_word]
+        put_loc8 46: is_word
+        fclosure8 7: [bytecode ucs_length]
+        put_loc8 47: ucs_length
+        fclosure8 8: [bytecode is_trailing_surrogate]
+        put_loc8 48: is_trailing_surrogate
+        fclosure8 9: [bytecode is_balanced]
+        put_loc8 49: is_balanced
+        fclosure8 10: [bytecode print_color_text]
+        put_loc8 50: print_color_text
+        fclosure8 11: [bytecode print_csi]
+        put_loc8 51: print_csi
+        get_arg0 0: g
+        get_var_ref_check 1: os
+        put_field os
+        get_arg0 0: g
+        get_var_ref_check 0: std
+        put_field std
+        get_arg0 0: g
+        get_field Object
+        put_loc0 0: Object
+        get_arg0 0: g
+        get_field String
+        put_loc1 1: String
+        get_arg0 0: g
+        get_field Array
+        put_loc2 2: Array
+        get_arg0 0: g
+        get_field Date
+        put_loc3 3: Date
+        get_arg0 0: g
+        get_field Math
+        put_loc8 4: Math
+        get_arg0 0: g
+        get_field isFinite
+        put_loc8 5: isFinite
+        get_arg0 0: g
+        get_field parseFloat
+        put_loc8 6: parseFloat
+        object
+        push_atom_value "\u001b[0m"
+        define_field none
+        push_atom_value "\u001b[30m"
+        define_field black
+        push_atom_value "\u001b[31m"
+        define_field red
+        push_atom_value "\u001b[32m"
+        define_field green
+        push_atom_value "\u001b[33m"
+        define_field yellow
+        push_atom_value "\u001b[34m"
+        define_field blue
+        push_atom_value "\u001b[35m"
+        define_field magenta
+        push_atom_value "\u001b[36m"
+        define_field cyan
+        push_atom_value "\u001b[37m"
+        define_field white
+        push_atom_value "\u001b[30;1m"
+        define_field gray
+        push_atom_value "\u001b[30;1m"
+        define_field grey
+        push_atom_value "\u001b[31;1m"
+        define_field bright_red
+        push_atom_value "\u001b[32;1m"
+        define_field bright_green
+        push_atom_value "\u001b[33;1m"
+        define_field bright_yellow
+        push_atom_value "\u001b[34;1m"
+        define_field bright_blue
+        push_atom_value "\u001b[35;1m"
+        define_field bright_magenta
+        push_atom_value "\u001b[36;1m"
+        define_field bright_cyan
+        push_atom_value "\u001b[37;1m"
+        define_field bright_white
+        put_loc8 7: colors
+        object
+        push_atom_value bright_green
+        define_field default
+        push_atom_value white
+        define_field comment
+        push_atom_value bright_cyan
+        define_field string
+        push_atom_value cyan
+        define_field regex
+        push_atom_value green
+        define_field number
+        push_atom_value bright_white
+        define_field keyword
+        push_atom_value bright_yellow
+        define_field function
+        push_atom_value bright_magenta
+        define_field type
+        push_atom_value bright_green
+        define_field identifier
+        push_atom_value red
+        define_field error
+        push_atom_value bright_white
+        define_field result
+        push_atom_value bright_red
+        define_field error_msg
+        put_loc8 8: styles
+        array_from 0
+        put_loc8 9: history
+        push_empty_string
+        put_loc8 10: clip_board
+        push_empty_string
+        put_loc8 14: pstate
+        push_empty_string
+        put_loc8 15: prompt
+        push_0 0
+        put_loc8 16: plen
+        push_atom_value "qjs > "
+        put_loc8 17: ps1
+        push_atom_value "  ... "
+        put_loc8 18: ps2
+        push_true
+        put_loc8 19: utf8
+        push_false
+        put_loc8 20: show_time
+        push_true
+        put_loc8 21: show_colors
+        push_0 0
+        put_loc8 23: eval_time
+        push_empty_string
+        put_loc8 24: mexpr
+        push_0 0
+        put_loc8 25: level
+        push_empty_string
+        put_loc8 26: cmd
+        push_0 0
+        put_loc8 27: cursor_pos
+        push_empty_string
+        put_loc8 28: last_cmd
+        push_0 0
+        put_loc8 29: last_cursor_pos
+        push_false
+        put_loc8 33: quote_flag
+        push_0 0
+        put_loc8 34: utf8_state
+        push_0 0
+        put_loc8 35: utf8_val
+        push_0 0
+        put_loc8 39: term_cursor_x
+        return_undef
+
+__tests__/fixtures/quickjs-tests/repl.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: std local:loc0 const
+    1: os local:loc1 const
+  stack_size: 2
+  opcodes:
+        push_this
+        if_false8 4
+        return_undef
+    4:  fclosure8 0: [bytecode <null>]
+        get_var globalThis
+        call1 1
+        drop
+        undefined
+        return_async
+

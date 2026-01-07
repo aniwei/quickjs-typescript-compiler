@@ -1,0 +1,31 @@
+__tests__/fixtures/array-spread.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var a,128
+        check_define_var b,128
+        define_var a,128
+        define_var b,128
+        push_1 1
+        push_2 2
+        array_from 2
+        put_var_init a
+        array_from 0
+        push_0 0
+        get_var a
+        append
+        push_3 3
+        define_array_el
+        inc
+        drop
+        put_var_init b
+        get_var console
+        get_field2 log
+        get_var b
+        push_2 2
+        get_array_el
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

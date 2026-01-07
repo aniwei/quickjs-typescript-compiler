@@ -1,0 +1,153 @@
+__tests__/fixtures/test_regexp_skip.js:1:1: function: assert
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_var Object
+        get_field2 is
+        get_arg0 0: actual
+        get_arg1 1: expected
+        call_method 2
+        if_false8 29
+        return_undef
+   29:  get_arg0 0: actual
+        is_null
+        if_true8 79
+        get_arg1 1: expected
+        is_null
+        if_true8 79
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 79
+        return_undef
+   79:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 129
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 130
+  129:  push_empty_string
+  130:  add
+        call1 1
+        throw
+
+__tests__/fixtures/test_regexp_skip.js:14:1: function: test_regexp_skip
+  locals:
+    0: var a
+    1: var b
+  stack_size: 8
+  opcodes:
+        goto8 39
+    2:  dup
+        for_of_start
+        make_loc_ref a,0
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref b,1
+        for_of_next 2
+        drop
+        dup
+        is_undefined
+        if_false8 35
+        drop
+        push_const8 0: "abc\\("
+        push_const8 1: "\u0000\u0000\u0001\u0000\u001c\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0001a\u0000\u0001b\u0000\u0001c\u0000\u0001(\u0000\u0010\u0000\u000e"
+        regexp
+   35:  put_ref_value
+        iterator_close
+        goto8 45
+   39:  push_1 1
+        array_from 1
+        goto8 2
+   45:  drop
+        get_var assert
+        get_loc0 0: a
+        push_1 1
+        strict_eq
+        call1 1
+        drop
+        goto8 95
+   58:  dup
+        for_of_start
+        make_loc_ref a,0
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref b,1
+        for_of_next 2
+        drop
+        dup
+        is_undefined
+        if_false8 91
+        drop
+        push_const8 2: "abc\\("
+        push_const8 3: "\u0000\u0000\u0001\u0000\u001c\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0001a\u0000\u0001b\u0000\u0001c\u0000\u0001(\u0000\u0010\u0000\u000e"
+        regexp
+   91:  put_ref_value
+        iterator_close
+        goto8 101
+   95:  push_2 2
+        array_from 1
+        goto8 58
+  101:  drop
+        get_var assert
+        get_loc0 0: a
+        push_2 2
+        strict_eq
+        call1 1
+        return_undef
+
+__tests__/fixtures/test_regexp_skip.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var assert,64
+        check_define_var test_regexp_skip,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode test_regexp_skip]
+        define_func test_regexp_skip,0
+        get_loc0 0: "<ret>"
+        return
+

@@ -1,0 +1,139 @@
+__tests__/fixtures/test_try_catch7.js:4:1: function: assert
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_arg0 0: actual
+        get_arg1 1: expected
+        strict_eq
+        if_false8 17
+        return_undef
+   17:  get_arg0 0: actual
+        is_null
+        if_true8 67
+        get_arg1 1: expected
+        is_null
+        if_true8 67
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 67
+        return_undef
+   67:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 117
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 118
+  117:  push_empty_string
+  118:  add
+        call1 1
+        throw
+
+__tests__/fixtures/test_try_catch7.js:23:1: function: test_try_catch7
+  locals:
+    0: var s
+    1: catch e [level:5 next:-1]
+  stack_size: 4
+  opcodes:
+        push_empty_string
+        put_loc0 0: s
+        catch 39
+        catch 25
+        push_atom_value t
+        add_loc 0: s
+        push_atom_value a
+        throw
+   25:  gosub 31
+        throw
+   31:  push_atom_value f
+        add_loc 0: s
+        ret
+   39:  put_loc1 1: e
+        catch 58
+        get_loc1 1: e
+        add_loc 0: s
+        drop
+        undefined
+        gosub 64
+        drop
+        goto8 72
+   58:  gosub 64
+        throw
+   64:  push_atom_value g
+        add_loc 0: s
+        ret
+   72:  get_var assert
+        get_loc0 0: s
+        push_atom_value tfag
+        push_atom_value catch
+        call3 3
+        return_undef
+
+__tests__/fixtures/test_try_catch7.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: catch e [level:3 next:-1]
+  stack_size: 3
+  opcodes:
+        check_define_var assert,64
+        check_define_var test_try_catch7,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode test_try_catch7]
+        define_func test_try_catch7,0
+        undefined
+        put_loc0 0: "<ret>"
+        catch 50
+        get_var __loadScript
+        push_atom_value "test_assert.js"
+        call1 1
+        put_loc0 0: "<ret>"
+        drop
+        goto8 60
+   50:  put_loc1 1: e
+        catch 59
+        drop
+        goto8 60
+   59:  throw
+   60:  get_loc0 0: "<ret>"
+        return
+

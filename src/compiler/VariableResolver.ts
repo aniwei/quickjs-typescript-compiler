@@ -603,8 +603,11 @@ export class VariableResolver {
                   bcOut.putU16(scopeIdx)
                 } else {
                   // 其他词法变量: 标记为未初始化
-                  bcOut.putU8(Opcode.OP_set_loc_uninitialized)
-                  bcOut.putU16(scopeIdx)
+                  // 注意: catch 绑定变量始终会被 OP_catch 初始化，无需 set_loc_uninitialized
+                  if (vd.varKind !== JSVarKindEnum.JS_VAR_CATCH) {
+                    bcOut.putU8(Opcode.OP_set_loc_uninitialized)
+                    bcOut.putU16(scopeIdx)
+                  }
                 }
               }
               scopeIdx = vd.scopeNext

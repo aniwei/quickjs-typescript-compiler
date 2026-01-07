@@ -1,0 +1,126 @@
+__tests__/fixtures/test_labels2.js:1:1: function: assert
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_var Object
+        get_field2 is
+        get_arg0 0: actual
+        get_arg1 1: expected
+        call_method 2
+        if_false8 29
+        return_undef
+   29:  get_arg0 0: actual
+        is_null
+        if_true8 79
+        get_arg1 1: expected
+        is_null
+        if_true8 79
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 79
+        return_undef
+   79:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 129
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 130
+  129:  push_empty_string
+  130:  add
+        call1 1
+        throw
+
+__tests__/fixtures/test_labels2.js:14:1: function: test_labels2
+  locals:
+    0: var i
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        push_3 3
+        lt
+        if_false8 16
+        get_loc0 0: i
+        push_0 0
+        gt
+        if_true8 16
+        inc_loc 0: i
+        goto8 2
+   16:  get_var assert
+        get_loc0 0: i
+        push_1 1
+        call2 2
+        drop
+        push_0 0
+        put_loc0 0: i
+   27:  get_loc0 0: i
+        push_3 3
+        lt
+        if_false8 41
+        get_loc0 0: i
+        push_0 0
+        gt
+        if_true8 41
+        inc_loc 0: i
+        goto8 27
+   41:  get_var assert
+        get_loc0 0: i
+        push_1 1
+        call2 2
+        return_undef
+
+__tests__/fixtures/test_labels2.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var assert,64
+        check_define_var test_labels2,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode test_labels2]
+        define_func test_labels2,0
+        get_loc0 0: "<ret>"
+        return
+

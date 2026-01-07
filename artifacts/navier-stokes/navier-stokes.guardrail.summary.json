@@ -13,14 +13,14 @@
   "bytecode": {
     "identical": false,
     "tsSize": 7900,
-    "wasmSize": 5,
-    "sizeDiff": 7895,
-    "sizeDiffPercent": 157900
+    "wasmSize": 7884,
+    "sizeDiff": 16,
+    "sizeDiffPercent": 0.20294266869609334
   },
   "trace": {
-    "differenceCount": 7888,
-    "tsEventCount": 7352,
-    "wasmEventCount": 7961,
-    "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/navier-stokes/trace/trace.summary.json"
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
   }
 }

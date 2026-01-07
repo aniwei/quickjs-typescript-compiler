@@ -1,0 +1,150 @@
+__tests__/fixtures/complex-mixed-operators.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: let k [level:2 next:-1]
+    2: catch e [level:8 next:1]
+    3: var <ret>
+  stack_size: 9
+  opcodes:
+        check_define_var out,128
+        define_var out,130
+        push_0 0
+        put_var_init out
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 1: k
+        push_0 0
+        push_1 1
+        push_2 2
+        push_3 3
+        array_from 4
+        for_of_start
+        goto16 254
+   34:  put_loc1 1: k
+        undefined
+        put_loc0 0: "<ret>"
+        catch 190
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 1: k
+        dup
+        push_0 0
+        strict_eq
+        if_false8 68
+        get_var out
+        push_1 1
+        add
+        dup
+        put_var out
+        put_loc0 0: "<ret>"
+        goto8 141
+   68:  dup
+        push_1 1
+        strict_eq
+        if_false8 94
+        make_var_ref out
+        get_ref_value
+        dup
+        if_true8 89
+        drop
+        push_i8 10
+        insert3
+        put_ref_value
+        goto8 91
+   89:  nip
+        nip
+   91:  put_loc0 0: "<ret>"
+        goto8 141
+   94:  dup
+        push_2 2
+        strict_eq
+        if_false8 121
+        make_var_ref out
+        get_ref_value
+        dup
+        is_undefined_or_null
+        if_false8 116
+        drop
+        push_i8 20
+        insert3
+        put_ref_value
+        goto8 118
+  116:  nip
+        nip
+  118:  put_loc0 0: "<ret>"
+        goto8 141
+  121:  get_var out
+        drop
+        get_var out
+        push_3 3
+        add
+        dup
+        put_var out
+        put_loc0 0: "<ret>"
+  141:  drop
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 1: k
+        push_2 2
+        strict_eq
+        if_false8 161
+        drop
+        undefined
+        gosub 232
+        drop
+        goto8 254
+  161:  undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 1: k
+        push_3 3
+        strict_eq
+        if_false8 180
+        drop
+        undefined
+        gosub 232
+        drop
+        goto8 262
+  180:  drop
+        undefined
+        gosub 232
+        drop
+        goto8 254
+  190:  put_loc2 2: e
+        catch 226
+        get_var console
+        get_field2 log
+        push_atom_value catch
+        get_loc2 2: e
+        call_method 2
+        put_loc0 0: "<ret>"
+        drop
+        undefined
+        gosub 232
+        drop
+        goto8 254
+  226:  gosub 232
+        throw
+  232:  get_loc0 0: "<ret>"
+        put_loc3 3: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        get_var out
+        push_i8 100
+        add
+        dup
+        put_var out
+        put_loc0 0: "<ret>"
+        get_loc3 3: "<ret>"
+        put_loc0 0: "<ret>"
+        ret
+  254:  for_of_next 0
+        if_false 34
+        drop
+  262:  iterator_close
+        get_var console
+        get_field2 log
+        get_var out
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

@@ -1,0 +1,12 @@
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=1 pos_next=4 next_op=111 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=42 pos_next=45 next_op=14 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=77 pos_next=80 next_op=6 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=81 pos_next=84 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=117 pos_next=120 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=123 pos_next=126 next_op=113 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x

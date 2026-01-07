@@ -1,0 +1,36 @@
+__tests__/fixtures/try-finally-basic.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: var <ret>
+  stack_size: 5
+  opcodes:
+        undefined
+        put_loc0 0: "<ret>"
+        catch 32
+        get_var console
+        get_field2 log
+        push_1 1
+        call_method 1
+        put_loc0 0: "<ret>"
+        drop
+        undefined
+        gosub 38
+        drop
+        goto8 60
+   32:  gosub 38
+        throw
+   38:  get_loc0 0: "<ret>"
+        put_loc1 1: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_2 2
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_loc1 1: "<ret>"
+        put_loc0 0: "<ret>"
+        ret
+   60:  get_loc0 0: "<ret>"
+        return
+

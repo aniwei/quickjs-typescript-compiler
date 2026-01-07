@@ -343,26 +343,29 @@ class BytecodeComparator {
         throw new Error('Empty transpile output')
       }
 
-      console.log('--- Transpiled Code ---')
-      // Some fixtures (e.g. Octane bundles) are extremely large. Dumping the full
-      // transpiled output can overwhelm stdout and may trigger V8 "Invalid string length".
-      // Keep behavior deterministic while still returning the full transpiled output.
-      const MAX_PRINT_CHARS = 200_000
-      if (transpiled.outputText.length <= MAX_PRINT_CHARS) {
-        console.log(transpiled.outputText)
-      } else {
-        const head = transpiled.outputText.slice(0, 5_000)
-        const tail = transpiled.outputText.slice(-5_000)
-        console.log(
-          `[transpiled output omitted: ${transpiled.outputText.length} chars]` +
-            `
+      const printTranspiled = process.env.QTS_COMPARE_PRINT_TRANSPILED !== '0'
+      if (printTranspiled) {
+        console.log('--- Transpiled Code ---')
+        // Some fixtures (e.g. Octane bundles) are extremely large. Dumping the full
+        // transpiled output can overwhelm stdout and may trigger V8 "Invalid string length".
+        // Keep behavior deterministic while still returning the full transpiled output.
+        const MAX_PRINT_CHARS = 200_000
+        if (transpiled.outputText.length <= MAX_PRINT_CHARS) {
+          console.log(transpiled.outputText)
+        } else {
+          const head = transpiled.outputText.slice(0, 5_000)
+          const tail = transpiled.outputText.slice(-5_000)
+          console.log(
+            `[transpiled output omitted: ${transpiled.outputText.length} chars]` +
+              `
 --- head(5000) ---
 ${head}
 --- tail(5000) ---
 ${tail}`,
-        )
+          )
+        }
+        console.log('-----------------------')
       }
-      console.log('-----------------------')
 
       return transpiled.outputText
     } catch (error) {
@@ -374,10 +377,15 @@ ${tail}`,
 
   private basicStripTypeScript(tsCode: string): string {
     return tsCode
+      // Remove ambient declarations entirely (QuickJS parser doesn't accept them).
+      // These appear in generated fixtures (e.g. `declare function __loadScript(path: string): void;`).
+      .replace(/^\s*declare\b[^;]*;\s*$/gm, '')
       // 移除冒号后的基础类型标注（例如：const x: number = ...）
       .replace(/:\s*[^=;,){}]+(?=[=;,){}])/g, '')
       // 移除函数返回类型标注（块或箭头之前）
       .replace(/([)\]])\s*:\s*[^=;{=>]+(?=\s*(\{|=>))/g, '$1')
+      // 移除“函数签名式”的返回类型（例如：function f(): void;），避免残留 `): void;`
+      .replace(/\)\s*:\s*[^;]+(?=;)/g, ')')
       // 在简单场景中移除泛型参数（例如：Array<number>）
       .replace(/<\s*[^>]+\s*>/g, '')
       // 移除 interface/type 声明（非常朴素的实现）

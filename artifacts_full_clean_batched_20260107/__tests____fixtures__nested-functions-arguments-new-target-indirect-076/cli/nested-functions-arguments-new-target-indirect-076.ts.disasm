@@ -1,0 +1,24 @@
+Module bytecode version: 5
+Atom count: 5
+
+=== Outer Function ===
+bytecodeLen=35 stackSize=3 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 40
+     6  fclosure8                0                   pop=0 push=1      c2 00
+     8  define_func              228                 pop=1 push=0      41 e4 00 00 00 00
+    14  get_var                  229                 pop=0 push=1      39 e5 00 00 00
+    19  get_field2               230                 pop=1 push=2      43 e6 00 00 00
+    24  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    29  call0                    npop=0              pop=1 push=1      f0
+    30  call_method              1                   pop=2 push=1      24 01 00
+    33  set_loc0                 loc=0               pop=1 push=1      cf
+    34  return                                       pop=1 push=0      28
+
+=== Inner Function #0 ===
+bytecodeLen=9 stackSize=4 varCount=1 argCount=0
+     0  fclosure8                0                   pop=0 push=1      c2 00
+     2  set_loc0                 loc=0               pop=1 push=1      cf
+     3  push_1                   1                   pop=0 push=1      b8
+     4  push_2                   2                   pop=0 push=1      b9
+     5  push_3                   3                   pop=0 push=1      ba
+     6  tail_call                3                   pop=1 push=0      23 03 00

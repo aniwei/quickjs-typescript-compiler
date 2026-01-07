@@ -1,0 +1,72 @@
+{
+  "logPath": "/tmp/compare_fixtures_full.log",
+  "artifactsDir": "artifacts",
+  "analyses": [
+    {
+      "fixturePath": "__tests__/fixtures_quickjs/microbench.ts",
+      "artifactKey": "__tests____fixtures_quickjs__microbench",
+      "baseName": "microbench",
+      "deltaText": "Δ+2 bytes (+0.01%), trace OK",
+      "tsQbcPath": "artifacts/__tests____fixtures_quickjs__microbench/bytecode/microbench.ts.qbc",
+      "wasmQbcPath": "artifacts/__tests____fixtures_quickjs__microbench/bytecode/microbench.wasm.qbc",
+      "kinds": [
+        "cpool"
+      ],
+      "details": {
+        "qbcSize": {
+          "ts": 22483,
+          "wasm": 22481
+        },
+        "qbcFirstDiff": {
+          "index": 17789,
+          "ts": {
+            "bytes": "4b 95 01 ee f0 29 b2 05 33 82 07 04 03 1c 0c 04 17 08 07 08 07 03 12 1b 07 08 07 0a 07 08 07 01"
+          },
+          "wasm": {
+            "bytes": "4b 95 01 ee f0 29 b2 05 31 82 07 04 03 1c 0c 04 17 08 07 08 07 03 12 1b 07 08 07 0a 07 08 07 01"
+          }
+        },
+        "root": {
+          "atoms": {
+            "ts": 251,
+            "wasm": 251
+          },
+          "bytecodeLen": {
+            "ts": 1734,
+            "wasm": 1734
+          },
+          "cpoolCount": {
+            "ts": 78,
+            "wasm": 78
+          },
+          "hasDebug": {
+            "ts": true,
+            "wasm": true
+          },
+          "pc2lineLen": {
+            "ts": 90,
+            "wasm": 90
+          },
+          "sourceLen": {
+            "ts": 0,
+            "wasm": 0
+          }
+        },
+        "firstDiff": {
+          "path": "root.func.cpool[64].cpool[3].debug.pc2line",
+          "a": {
+            "len": 51,
+            "firstDiff": 27,
+            "bytes": "07 08 07 01 0b 14 18 19 07 07 07 12 07 08 07 03 12 1f 07 08 07 0a 07 08 07 08 07 03 07 05 0b 14"
+          },
+          "b": {
+            "len": 49,
+            "firstDiff": 27,
+            "bytes": "07 08 07 01 0b 14 18 19 0c 0a 07 08 07 03 12 1f 07 08 07 0a 07 08 07 08 07 03 07 05 0b 14"
+          },
+          "note": "Uint8Array differs"
+        }
+      }
+    }
+  ]
+}

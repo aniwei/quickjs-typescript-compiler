@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/raytrace.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__octane__raytrace",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__octane__raytrace/cli/raytrace.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__octane__raytrace/cli/raytrace.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__octane__raytrace/cli/raytrace.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__octane__raytrace/cli/raytrace.pc2line.txt",
+    "bytecodeSize": 16244,
+    "pc2lineLength": 592,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": false,
+    "tsSize": 16102,
+    "wasmSize": 16154,
+    "sizeDiff": -52,
+    "sizeDiffPercent": -0.3219016961743221
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}

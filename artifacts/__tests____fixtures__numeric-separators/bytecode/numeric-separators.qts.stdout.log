@@ -1,0 +1,45 @@
+__tests__/fixtures/numeric-separators.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 6
+  opcodes:
+        check_define_var decimal,128
+        check_define_var binary,128
+        check_define_var hex,128
+        check_define_var octal,128
+        check_define_var big,128
+        check_define_var bigHex,128
+        define_var decimal,128
+        define_var binary,128
+        define_var hex,128
+        define_var octal,128
+        define_var big,128
+        define_var bigHex,128
+        push_i32 1000000
+        put_var_init decimal
+        push_i16 170
+        put_var_init binary
+        push_i32 65535
+        put_var_init hex
+        push_i16 511
+        put_var_init octal
+        push_bigint_i32 123456789
+        put_var_init big
+        push_bigint_i32 511
+        put_var_init bigHex
+        get_var console
+        get_field2 log
+        get_var decimal
+        get_var binary
+        get_var hex
+        get_var octal
+        call_method 4
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var big
+        get_var bigHex
+        call_method 2
+        set_loc0 0: "<ret>"
+        return
+

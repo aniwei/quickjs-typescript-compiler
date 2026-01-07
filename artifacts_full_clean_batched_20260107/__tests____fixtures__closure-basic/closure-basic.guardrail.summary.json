@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/closure-basic.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_batched_20260107/__tests____fixtures__closure-basic",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_batched_20260107/__tests____fixtures__closure-basic/cli/closure-basic.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_batched_20260107/__tests____fixtures__closure-basic/cli/closure-basic.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_batched_20260107/__tests____fixtures__closure-basic/cli/closure-basic.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_batched_20260107/__tests____fixtures__closure-basic/cli/closure-basic.pc2line.txt",
+    "bytecodeSize": 248,
+    "pc2lineLength": 8,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": true,
+    "tsSize": 186,
+    "wasmSize": 186,
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}

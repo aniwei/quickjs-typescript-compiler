@@ -1,0 +1,13 @@
+Module bytecode version: 5
+Atom count: 3
+
+=== Outer Function ===
+bytecodeLen=30 stackSize=2 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 00
+     6  define_var               228                 pop=0 push=0      3f e4 00 00 00 00
+    12  get_var                  60                  pop=0 push=1      39 3c 00 00 00
+    17  push_atom_value          229                 pop=0 push=1      04 e5 00 00 00
+    22  call1                    npop=1              pop=1 push=1      f1
+    23  put_var                  228                 pop=1 push=0      3a e4 00 00 00
+    28  get_loc0                 loc=0               pop=0 push=1      c7
+    29  return                                       pop=1 push=0      28

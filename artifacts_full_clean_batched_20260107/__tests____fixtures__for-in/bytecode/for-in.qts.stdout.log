@@ -1,0 +1,49 @@
+__tests__/fixtures/for-in.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const k [level:2 next:-1]
+  stack_size: 4
+  opcodes:
+        check_define_var obj,128
+        check_define_var sum,128
+        define_var obj,128
+        define_var sum,130
+        object
+        push_1 1
+        define_field a
+        push_2 2
+        define_field b
+        push_3 3
+        define_field c
+        put_var_init obj
+        push_0 0
+        put_var_init sum
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 1: k
+        get_var obj
+        for_in_start
+        goto8 103
+   67:  put_loc1 1: k
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 1: k
+        push_atom_value b
+        strict_eq
+        if_true8 103
+        get_var sum
+        get_var obj
+        get_loc_check 1: k
+        get_array_el
+        add
+        dup
+        put_var sum
+        put_loc0 0: "<ret>"
+  103:  for_in_next
+        if_false8 67
+        drop
+        drop
+        get_var sum
+        set_loc0 0: "<ret>"
+        return
+

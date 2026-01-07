@@ -96,6 +96,13 @@ export class Compiler {
 
     const scriptPath = resolvePath(process.cwd(), 'scripts', 'compileRegexpLiteral.ts')
 
+    const timeoutMs = (() => {
+      const raw = process.env.QTS_REGEXP_LITERAL_TIMEOUT_MS
+      if (!raw) return 0
+      const n = Number(raw)
+      return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0
+    })()
+
     const r = spawnSync(
       'pnpm',
       ['-s', 'exec', 'tsx', scriptPath],
@@ -103,6 +110,8 @@ export class Compiler {
         input: JSON.stringify({ literalText }),
         encoding: 'utf8',
         maxBuffer: 10 * 1024 * 1024,
+        timeout: timeoutMs || undefined,
+        killSignal: 'SIGKILL',
       }
     )
 
@@ -111,9 +120,29 @@ export class Compiler {
       const signal = (r as any).signal
       const errObj = (r as any).error
       const errInfo = errObj ? ` error=${String(errObj?.message || errObj)}` : ''
-      throw new Error(
-        `Failed to compile regexp literal via QuickJS WASM (status=${r.status}, signal=${signal ?? 'null'})${errInfo}: ${stderr || '<no stderr>'}`
-      )
+
+      const allowFallback = process.env.QTS_REGEXP_LITERAL_FALLBACK === '1'
+      if (!allowFallback) {
+        throw new Error(
+          `Failed to compile regexp literal via QuickJS WASM (status=${r.status}, signal=${signal ?? 'null'})${errInfo}: ${stderr || '<no stderr>'}`
+        )
+      }
+
+      const fallback = this.tryFallbackRegexpLiteral(literalText)
+      if (!fallback) {
+        throw new Error(
+          `Failed to compile regexp literal via QuickJS WASM (status=${r.status}, signal=${signal ?? 'null'})${errInfo}, and fallback failed: ${stderr || '<no stderr>'}`
+        )
+      }
+
+      if (process.env.QTS_REGEXP_LITERAL_FALLBACK_LOG === '1') {
+        const msg = `RegExp literal fallback: status=${r.status}, signal=${signal ?? 'null'}${errInfo}: ${stderr || '<no stderr>'}`
+        // Avoid polluting stdout in scripts that expect JSON.
+        console.error(msg)
+      }
+
+      this.regexpLiteralCache.set(literalText, fallback)
+      return fallback
     }
 
     const stdout = String(r.stdout ?? '').trim()
@@ -127,6 +156,18 @@ export class Compiler {
 
     this.regexpLiteralCache.set(literalText, result)
     return result
+  }
+
+  private tryFallbackRegexpLiteral(literalText: string): CompiledRegexpLiteral | null {
+    try {
+      // QuickJS parser.c: parse_regexp emits push_const(body) + push_const(compile_regexp(body, flags)) + OP_regexp.
+      // If WASM compilation fails, we can at least keep the same *body* to avoid crashing the whole compilation.
+      const re = Function(`"use strict"; return (${literalText});`)() as unknown
+      if (!(re instanceof RegExp)) return null
+      return { pattern: re.source, bytecode: new Uint8Array(0) }
+    } catch {
+      return null
+    }
   }
 
   ensureInitializedBuiltinAtoms() {

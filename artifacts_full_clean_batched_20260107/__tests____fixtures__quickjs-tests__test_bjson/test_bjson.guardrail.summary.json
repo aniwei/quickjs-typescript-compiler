@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_bjson.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_batched_20260107/__tests____fixtures__quickjs-tests__test_bjson",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_batched_20260107/__tests____fixtures__quickjs-tests__test_bjson/cli/test_bjson.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_batched_20260107/__tests____fixtures__quickjs-tests__test_bjson/cli/test_bjson.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_batched_20260107/__tests____fixtures__quickjs-tests__test_bjson/cli/test_bjson.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_batched_20260107/__tests____fixtures__quickjs-tests__test_bjson/cli/test_bjson.pc2line.txt",
+    "bytecodeSize": 3072,
+    "pc2lineLength": 9,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": false,
+    "tsSize": 3005,
+    "wasmSize": 3006,
+    "sizeDiff": -1,
+    "sizeDiffPercent": -0.0332667997338656
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}

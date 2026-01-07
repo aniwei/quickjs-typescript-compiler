@@ -1,0 +1,185 @@
+__tests__/fixtures/class-inheritance.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 2
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        goto8 7
+    7:  get_loc0 0: this
+        undefined
+        define_field name
+        return_undef
+
+__tests__/fixtures/class-inheritance.js:3:5: function: <null>
+  mode: strict
+  args: name
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  drop
+        get_loc0 0: this
+        get_arg0 0: name
+        put_field name
+        return_undef
+
+__tests__/fixtures/class-inheritance.js:6:5: function: <null>
+  mode: strict
+  stack_size: 3
+  opcodes:
+        get_var console
+        get_field2 log
+        push_atom_value "Animal speaks"
+        call_method 1
+        return_undef
+
+__tests__/fixtures/class-inheritance.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 2
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        goto8 7
+    7:  get_loc0 0: this
+        undefined
+        define_field breed
+        return_undef
+
+__tests__/fixtures/class-inheritance.js:12:5: function: <null>
+  mode: strict
+  args: name breed
+  locals:
+    0: var this.active_func
+    1: var new.target
+    2: let this
+  closure vars:
+    0: <class_fields_init> local:loc4 const
+  stack_size: 3
+  opcodes:
+        special_object 2
+        put_loc0 0: "this.active_func"
+        special_object 3
+        put_loc1 1: "new.target"
+        set_loc_uninitialized 2: this
+        check_ctor
+        get_loc0 0: "this.active_func"
+        get_super
+        get_loc1 1: "new.target"
+        get_arg0 0: name
+        call_constructor 1
+        dup
+        put_loc_check_init 2: this
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 34
+        get_loc_check 2: this
+        swap
+        call_method 0
+   34:  drop
+        drop
+        get_loc_check 2: this
+        get_arg1 1: breed
+        put_field breed
+        get_loc_checkthis 2: this
+        return
+
+__tests__/fixtures/class-inheritance.js:16:5: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 3
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc1 1: "<home_object>"
+        get_super
+        push_atom_value speak
+        get_array_el
+        call_method 0
+        drop
+        get_var console
+        get_field2 log
+        push_atom_value "Dog barks"
+        call_method 1
+        return_undef
+
+__tests__/fixtures/class-inheritance.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const Animal [level:2 next:-1]
+    2: const <class_fields_init> [level:3 next:1]
+    3: const Dog [level:4 next:-1]
+    4: const <class_fields_init> [level:5 next:3]
+  stack_size: 4
+  opcodes:
+        check_define_var Animal,128
+        check_define_var Dog,128
+        check_define_var d,128
+        define_var Animal,130
+        define_var Dog,130
+        define_var d,128
+        set_loc_uninitialized 1: Animal
+        undefined
+        set_loc_uninitialized 2: "<class_fields_init>"
+        push_const8 0: [bytecode <null>]
+        define_class Animal,0
+        fclosure8 1: [bytecode <null>]
+        define_method speak,0
+        fclosure8 2: [bytecode <null>]
+        set_home_object
+        put_loc2 2: "<class_fields_init>"
+        drop
+        set_loc1 1: Animal
+        close_loc 2: "<class_fields_init>"
+        put_var_init Animal
+        set_loc_uninitialized 3: Dog
+        get_var Animal
+        set_loc_uninitialized 4: "<class_fields_init>"
+        push_const8 3: [bytecode <null>]
+        define_class Dog,1
+        fclosure8 4: [bytecode <null>]
+        define_method speak,0
+        fclosure8 5: [bytecode <null>]
+        set_home_object
+        put_loc8 4: "<class_fields_init>"
+        drop
+        set_loc3 3: Dog
+        close_loc 4: "<class_fields_init>"
+        put_var_init Dog
+        get_var Dog
+        dup
+        push_atom_value Rex
+        push_atom_value "German Shepherd"
+        call_constructor 2
+        put_var_init d
+        get_var d
+        get_field2 speak
+        call_method 0
+        set_loc0 0: "<ret>"
+        return
+

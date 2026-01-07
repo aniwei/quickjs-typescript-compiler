@@ -1,0 +1,32 @@
+__tests__/fixtures/template-literals.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 8
+  opcodes:
+        check_define_var name,128
+        check_define_var x,128
+        define_var name,128
+        define_var x,128
+        push_atom_value QuickJS
+        put_var_init name
+        push_3 3
+        put_var_init x
+        get_var console
+        get_field2 log
+        push_atom_value "hello "
+        get_field2 concat
+        get_var name
+        push_atom_value " "
+        push_1 1
+        get_var x
+        add
+        call_method 3
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_atom_value "line1\nline2"
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

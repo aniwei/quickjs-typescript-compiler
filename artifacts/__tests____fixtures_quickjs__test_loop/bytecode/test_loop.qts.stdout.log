@@ -1,0 +1,1242 @@
+__tests__/fixtures_quickjs/test_loop.js:1:1: function: assert
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_arg0 0: actual
+        get_arg1 1: expected
+        strict_eq
+        if_false8 17
+        return_undef
+   17:  get_arg0 0: actual
+        is_null
+        if_true8 67
+        get_arg1 1: expected
+        is_null
+        if_true8 67
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 67
+        return_undef
+   67:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 117
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 118
+  117:  push_empty_string
+  118:  add
+        call1 1
+        throw
+
+__tests__/fixtures_quickjs/test_loop.js:20:1: function: test_while
+  locals:
+    0: var i
+    1: var c
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+        push_0 0
+        put_loc1 1: c
+    4:  get_loc0 0: i
+        push_3 3
+        lt
+        if_false8 15
+        inc_loc 1: c
+        inc_loc 0: i
+        goto8 4
+   15:  get_var assert
+        get_loc1 1: c
+        push_3 3
+        strict_eq
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:30:1: function: test_while_break
+  locals:
+    0: var i
+    1: var c
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+        push_0 0
+        put_loc1 1: c
+    4:  get_loc0 0: i
+        push_3 3
+        lt
+        if_false8 20
+        inc_loc 1: c
+        get_loc0 0: i
+        push_1 1
+        eq
+        if_true8 20
+        inc_loc 0: i
+        goto8 4
+   20:  get_var assert
+        get_loc1 1: c
+        push_2 2
+        strict_eq
+        dup
+        if_false8 35
+        drop
+        get_loc0 0: i
+        push_1 1
+        strict_eq
+   35:  call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:42:1: function: test_do_while
+  locals:
+    0: var i
+    1: var c
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+        push_0 0
+        put_loc1 1: c
+    4:  inc_loc 1: c
+        inc_loc 0: i
+        get_loc0 0: i
+        push_3 3
+        lt
+        if_true8 4
+        get_var assert
+        get_loc1 1: c
+        push_3 3
+        strict_eq
+        dup
+        if_false8 28
+        drop
+        get_loc0 0: i
+        push_3 3
+        strict_eq
+   28:  call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:52:1: function: test_for
+  locals:
+    0: var i
+    1: var c
+    2: var j
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc1 1: c
+        push_0 0
+        put_loc0 0: i
+    4:  get_loc0 0: i
+        push_3 3
+        lt
+        if_false8 15
+        inc_loc 1: c
+        inc_loc 0: i
+        goto8 4
+   15:  get_var assert
+        get_loc1 1: c
+        push_3 3
+        strict_eq
+        dup
+        if_false8 30
+        drop
+        get_loc0 0: i
+        push_3 3
+        strict_eq
+   30:  call1 1
+        drop
+        push_0 0
+        put_loc1 1: c
+        push_0 0
+        put_loc2 2: j
+   36:  get_loc2 2: j
+        push_3 3
+        lt
+        if_false8 47
+        inc_loc 1: c
+        inc_loc 2: j
+        goto8 36
+   47:  get_var assert
+        get_loc1 1: c
+        push_3 3
+        strict_eq
+        dup
+        if_false8 62
+        drop
+        get_loc2 2: j
+        push_3 3
+        strict_eq
+   62:  call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:65:1: function: test_for_in
+  locals:
+    0: var i
+    1: var tab
+    2: var a
+    3: var b
+    4: var j
+    5: var k
+  stack_size: 6
+  opcodes:
+        array_from 0
+        put_loc1 1: tab
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field y
+        for_in_start
+        goto8 32
+   20:  put_loc0 0: i
+        get_loc1 1: tab
+        get_field2 push
+        get_loc0 0: i
+        call_method 1
+        drop
+   32:  for_in_next
+        if_false8 20
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "x,y"
+        push_atom_value for_in
+        call3 3
+        drop
+        object
+        push_2 2
+        define_field x
+        push_2 2
+        define_field y
+        push_3 3
+        define_field 1
+        put_loc2 2: a
+        object
+        push_3 3
+        define_field 4
+        put_loc3 3: b
+        get_var Object
+        get_field2 setPrototypeOf
+        get_loc2 2: a
+        get_loc3 3: b
+        call_method 2
+        drop
+        array_from 0
+        put_loc1 1: tab
+        get_loc2 2: a
+        for_in_start
+        goto8 127
+  115:  put_loc0 0: i
+        get_loc1 1: tab
+        get_field2 push
+        get_loc0 0: i
+        call_method 1
+        drop
+  127:  for_in_next
+        if_false8 115
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "1,x,y,4"
+        push_atom_value for_in
+        call3 3
+        drop
+        object
+        push_2 2
+        define_field y
+        push_3 3
+        define_field 1
+        put_loc2 2: a
+        get_var Object
+        get_field2 defineProperty
+        get_loc2 2: a
+        push_atom_value x
+        object
+        push_1 1
+        define_field value
+        call_method 3
+        drop
+        object
+        push_3 3
+        define_field x
+        put_loc3 3: b
+        get_var Object
+        get_field2 setPrototypeOf
+        get_loc2 2: a
+        get_loc3 3: b
+        call_method 2
+        drop
+        array_from 0
+        put_loc1 1: tab
+        get_loc2 2: a
+        for_in_start
+        goto8 243
+  231:  put_loc0 0: i
+        get_loc1 1: tab
+        get_field2 push
+        get_loc0 0: i
+        call_method 1
+        drop
+  243:  for_in_next
+        if_false8 231
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "1,y"
+        push_atom_value for_in
+        call3 3
+        drop
+        array_from 0
+        put_loc2 2: a
+        push_0 0
+        put_loc0 0: i
+  280:  get_loc0 0: i
+        push_i8 10
+        lt
+        if_false8 301
+        get_loc2 2: a
+        get_field2 push
+        get_loc0 0: i
+        call_method 1
+        drop
+        inc_loc 0: i
+        goto8 280
+  301:  array_from 0
+        put_loc1 1: tab
+        get_loc2 2: a
+        for_in_start
+        goto8 321
+  309:  put_loc0 0: i
+        get_loc1 1: tab
+        get_field2 push
+        get_loc0 0: i
+        call_method 1
+        drop
+  321:  for_in_next
+        if_false8 309
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "0,1,2,3,4,5,6,7,8,9"
+        push_atom_value for_in
+        call3 3
+        drop
+        object
+        push_0 0
+        define_field x
+        put_loc2 2: a
+        array_from 0
+        put_loc1 1: tab
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field y
+        for_in_start
+        goto8 403
+  380:  get_loc2 2: a
+        swap
+        put_field x
+        get_loc1 1: tab
+        get_field2 push
+        get_loc2 2: a
+        get_field x
+        call_method 1
+        drop
+  403:  for_in_next
+        if_false8 380
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "x,y"
+        push_atom_value for_in
+        call3 3
+        drop
+        push_0 0
+        array_from 1
+        put_loc2 2: a
+        array_from 0
+        put_loc1 1: tab
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field y
+        for_in_start
+        goto8 476
+  459:  get_loc2 2: a
+        push_0 0
+        rot3l
+        put_array_el
+        get_loc1 1: tab
+        get_field2 push
+        get_loc2 2: a
+        push_0 0
+        get_array_el
+        call_method 1
+        drop
+  476:  for_in_next
+        if_false8 459
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "x,y"
+        push_atom_value for_in
+        call3 3
+        drop
+        array_from 0
+        put_loc1 1: tab
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field y
+        for_in_start
+        goto8 541
+  527:  put_loc8 4: j
+        get_loc1 1: tab
+        get_field2 push
+        get_loc8 4: j
+        call_method 1
+        drop
+  541:  for_in_next
+        if_false8 527
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "x,y"
+        push_atom_value for_in
+        call3 3
+        drop
+        array_from 0
+        put_loc1 1: tab
+        push_2 2
+        put_loc8 5: k
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field y
+        for_in_start
+        goto8 609
+  595:  put_loc8 5: k
+        get_loc1 1: tab
+        get_field2 push
+        get_loc8 5: k
+        call_method 1
+        drop
+  609:  for_in_next
+        if_false8 595
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "x,y"
+        push_atom_value for_in
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:128:1: function: test_for_in2
+  locals:
+    0: var i
+    1: var tab
+  stack_size: 4
+  opcodes:
+        array_from 0
+        put_loc1 1: tab
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field y
+        push_3 3
+        define_field z
+        for_in_start
+        goto8 47
+   26:  put_loc0 0: i
+        get_loc0 0: i
+        push_atom_value y
+        strict_eq
+        if_true8 47
+        get_loc1 1: tab
+        get_field2 push
+        get_loc0 0: i
+        call_method 1
+        drop
+   47:  for_in_next
+        if_false8 26
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "x,z"
+        eq
+        call1 1
+        drop
+        array_from 0
+        put_loc1 1: tab
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field y
+        push_3 3
+        define_field z
+        for_in_start
+        goto8 121
+  100:  put_loc0 0: i
+        get_loc0 0: i
+        push_atom_value z
+        strict_eq
+        if_true8 125
+        get_loc1 1: tab
+        get_field2 push
+        get_loc0 0: i
+        call_method 1
+        drop
+  121:  for_in_next
+        if_false8 100
+        drop
+  125:  drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "x,y"
+        eq
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:149:18: function: <null>
+  stack_size: 3
+  opcodes:
+        push_atom_value a
+        push_atom_value b
+        push_atom_value c
+        array_from 3
+        return
+
+__tests__/fixtures_quickjs/test_loop.js:152:35: function: <null>
+  args: target key
+  locals:
+    0: var this
+  closure vars:
+    0: removed_key local:loc0 let
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_var_ref_check 0: removed_key
+        push_empty_string
+        neq
+        if_false8 22
+        get_arg1 1: key
+        get_var_ref_check 0: removed_key
+        eq
+        if_false8 22
+        get_var undefined
+        return
+   22:  object
+        push_true
+        define_field enumerable
+        push_true
+        define_field configurable
+        get_loc0 0: this
+        get_arg1 1: key
+        get_array_el
+        define_field value
+        return
+
+__tests__/fixtures_quickjs/test_loop.js:145:1: function: test_for_in_proxy
+  locals:
+    0: let removed_key [level:1 next:-1]
+    1: let target [level:1 next:0]
+    2: let proxy [level:1 next:1]
+    3: let str [level:1 next:2]
+    4: let o [level:2 next:3]
+  stack_size: 5
+  opcodes:
+        set_loc_uninitialized 3: str
+        set_loc_uninitialized 2: proxy
+        set_loc_uninitialized 1: target
+        set_loc_uninitialized 0: removed_key
+        push_empty_string
+        put_loc0 0: removed_key
+        object
+        put_loc1 1: target
+        get_var Proxy
+        dup
+        get_loc_check 1: target
+        object
+        fclosure8 0: [bytecode <null>]
+        set_name ownKeys
+        define_field ownKeys
+        fclosure8 1: [bytecode <null>]
+        set_name getOwnPropertyDescriptor
+        define_field getOwnPropertyDescriptor
+        call_constructor 2
+        put_loc2 2: proxy
+        push_empty_string
+        put_loc3 3: str
+        set_loc_uninitialized 4: o
+        get_loc_check 2: proxy
+        for_in_start
+        goto8 106
+   65:  put_loc8 4: o
+        get_loc_check 3: str
+        push_atom_value " "
+        get_loc_check 4: o
+        add
+        add
+        dup
+        put_loc_check 3: str
+        drop
+        get_loc_check 4: o
+        push_atom_value a
+        eq
+        if_false8 106
+        push_atom_value b
+        dup
+        put_loc_check 0: removed_key
+        drop
+  106:  for_in_next
+        if_false8 65
+        drop
+        drop
+        get_var assert
+        get_loc_check 3: str
+        push_atom_value " a c"
+        eq
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:167:1: function: test_for_break
+  locals:
+    0: var i
+    1: var c
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc1 1: c
+        push_0 0
+        put_loc0 0: i
+    4:  get_loc0 0: i
+        push_3 3
+        lt
+        if_false8 22
+        inc_loc 1: c
+        get_loc0 0: i
+        push_0 0
+        eq
+        if_true8 18
+        goto8 22
+   18:  inc_loc 0: i
+        goto8 4
+   22:  get_var assert
+        get_loc1 1: c
+        push_2 2
+        strict_eq
+        dup
+        if_false8 37
+        drop
+        get_loc0 0: i
+        push_1 1
+        strict_eq
+   37:  call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:180:1: function: test_switch1
+  locals:
+    0: var i
+    1: var a
+    2: var s
+  stack_size: 3
+  opcodes:
+        push_empty_string
+        put_loc2 2: s
+        push_0 0
+        put_loc0 0: i
+    4:  get_loc0 0: i
+        push_3 3
+        lt
+        if_false8 56
+        push_atom_value "?"
+        put_loc1 1: a
+        get_loc0 0: i
+        dup
+        push_0 0
+        strict_eq
+        if_false8 29
+        push_atom_value a
+        put_loc1 1: a
+        goto8 48
+   29:  dup
+        push_1 1
+        strict_eq
+        if_false8 42
+        push_atom_value b
+        put_loc1 1: a
+        goto8 48
+   42:  push_atom_value c
+        put_loc1 1: a
+   48:  drop
+        get_loc1 1: a
+        add_loc 2: s
+        inc_loc 0: i
+        goto8 4
+   56:  get_var assert
+        get_loc2 2: s
+        push_atom_value abc
+        strict_eq
+        dup
+        if_false8 75
+        drop
+        get_loc0 0: i
+        push_3 3
+        strict_eq
+   75:  call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:200:1: function: test_switch2
+  locals:
+    0: var i
+    1: var a
+    2: var s
+  stack_size: 3
+  opcodes:
+        push_empty_string
+        put_loc2 2: s
+        push_0 0
+        put_loc0 0: i
+    4:  get_loc0 0: i
+        push_4 4
+        lt
+        if_false8 62
+        push_atom_value "?"
+        put_loc1 1: a
+        get_loc0 0: i
+        dup
+        push_0 0
+        strict_eq
+        if_false8 29
+        push_atom_value a
+        put_loc1 1: a
+        goto8 54
+   29:  dup
+        push_1 1
+        strict_eq
+        if_false8 42
+        push_atom_value b
+        put_loc1 1: a
+        goto8 54
+   42:  dup
+        push_2 2
+        strict_eq
+        if_false8 50
+        drop
+        goto8 58
+   50:  push_empty_string
+        get_loc0 0: i
+        add
+        put_loc1 1: a
+   54:  drop
+        get_loc1 1: a
+        add_loc 2: s
+   58:  inc_loc 0: i
+        goto8 4
+   62:  get_var assert
+        get_loc2 2: s
+        push_atom_value ab3
+        strict_eq
+        dup
+        if_false8 81
+        drop
+        get_loc0 0: i
+        push_4 4
+        strict_eq
+   81:  call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:222:1: function: test_try_catch1
+  locals:
+    0: catch e [level:3 next:-1]
+  stack_size: 5
+  opcodes:
+        catch 11
+        push_atom_value hello
+        throw
+   11:  put_loc0 0: e
+        catch 38
+        get_var assert
+        get_loc0 0: e
+        push_atom_value hello
+        push_atom_value catch
+        call3 3
+        drop
+        undefined
+        nip_catch
+        return
+   38:  throw
+
+__tests__/fixtures_quickjs/test_loop.js:232:1: function: test_try_catch2
+  locals:
+    0: var a
+    1: catch e [level:3 next:-1]
+  stack_size: 4
+  opcodes:
+        catch 10
+        push_1 1
+        put_loc0 0: a
+        drop
+        goto8 22
+   10:  put_loc1 1: e
+        catch 21
+        push_2 2
+        put_loc0 0: a
+        drop
+        goto8 22
+   21:  throw
+   22:  get_var assert
+        get_loc0 0: a
+        push_1 1
+        push_atom_value catch
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:242:1: function: test_try_catch3
+  locals:
+    0: var s
+    1: catch e [level:3 next:-1]
+  stack_size: 4
+  opcodes:
+        push_empty_string
+        put_loc0 0: s
+        catch 24
+        push_atom_value t
+        add_loc 0: s
+        drop
+        undefined
+        gosub 53
+        drop
+        goto8 61
+   24:  put_loc1 1: e
+        catch 47
+        push_atom_value c
+        add_loc 0: s
+        drop
+        undefined
+        gosub 53
+        drop
+        goto8 61
+   47:  gosub 53
+        throw
+   53:  push_atom_value f
+        add_loc 0: s
+        ret
+   61:  get_var assert
+        get_loc0 0: s
+        push_atom_value tf
+        push_atom_value catch
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:256:1: function: test_try_catch4
+  locals:
+    0: var s
+    1: catch e [level:3 next:-1]
+  stack_size: 4
+  opcodes:
+        push_empty_string
+        put_loc0 0: s
+        catch 20
+        push_atom_value t
+        add_loc 0: s
+        push_atom_value c
+        throw
+   20:  put_loc1 1: e
+        catch 39
+        get_loc1 1: e
+        add_loc 0: s
+        drop
+        undefined
+        gosub 45
+        drop
+        goto8 53
+   39:  gosub 45
+        throw
+   45:  push_atom_value f
+        add_loc 0: s
+        ret
+   53:  get_var assert
+        get_loc0 0: s
+        push_atom_value tcf
+        push_atom_value catch
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:271:1: function: test_try_catch5
+  locals:
+    0: var s
+  stack_size: 4
+  opcodes:
+        push_empty_string
+        put_loc0 0: s
+        catch 24
+        push_atom_value t
+        add_loc 0: s
+        drop
+        undefined
+        gosub 30
+        drop
+        goto8 38
+   24:  gosub 30
+        throw
+   30:  push_atom_value f
+        add_loc 0: s
+        ret
+   38:  get_var assert
+        get_loc0 0: s
+        push_atom_value tf
+        push_atom_value catch
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:287:5: function: f
+  closure vars:
+    0: s local:loc1 var
+  stack_size: 4
+  opcodes:
+        catch 21
+        get_var_ref0 0: s
+        push_atom_value t
+        add
+        put_var_ref0 0: s
+        push_1 1
+        nip_catch
+        gosub 27
+        return
+   21:  gosub 27
+        throw
+   27:  get_var_ref0 0: s
+        push_atom_value f
+        add
+        put_var_ref0 0: s
+        ret
+
+__tests__/fixtures_quickjs/test_loop.js:286:1: function: test_try_catch6
+  locals:
+    0: var f
+    1: var s
+  stack_size: 4
+  opcodes:
+        fclosure8 0: [bytecode f]
+        put_loc0 0: f
+        push_empty_string
+        put_loc1 1: s
+        get_var assert
+        get_loc0 0: f
+        call0 0
+        push_1 1
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc1 1: s
+        push_atom_value tf
+        push_atom_value catch6
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:300:1: function: test_try_catch7
+  locals:
+    0: var s
+    1: catch e [level:5 next:-1]
+  stack_size: 4
+  opcodes:
+        push_empty_string
+        put_loc0 0: s
+        catch 39
+        catch 25
+        push_atom_value t
+        add_loc 0: s
+        push_atom_value a
+        throw
+   25:  gosub 31
+        throw
+   31:  push_atom_value f
+        add_loc 0: s
+        ret
+   39:  put_loc1 1: e
+        catch 58
+        get_loc1 1: e
+        add_loc 0: s
+        drop
+        undefined
+        gosub 64
+        drop
+        goto8 72
+   58:  gosub 64
+        throw
+   64:  push_atom_value g
+        add_loc 0: s
+        ret
+   72:  get_var assert
+        get_loc0 0: s
+        push_atom_value tfag
+        push_atom_value catch
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:320:1: function: test_try_catch8
+  locals:
+    0: var i
+    1: var s
+    2: catch e [level:5 next:-1]
+  stack_size: 4
+  opcodes:
+        push_empty_string
+        put_loc1 1: s
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field y
+        for_in_start
+        goto8 66
+   18:  put_loc0 0: i
+        catch 33
+        get_loc0 0: i
+        add_loc 1: s
+        push_atom_value a
+        throw
+   33:  put_loc2 2: e
+        catch 52
+        get_loc2 2: e
+        add_loc 1: s
+        drop
+        undefined
+        gosub 58
+        drop
+        goto8 66
+   52:  gosub 58
+        throw
+   58:  push_atom_value f
+        add_loc 1: s
+        ret
+   66:  for_in_next
+        if_false8 18
+        drop
+        drop
+        get_var assert
+        get_loc1 1: s
+        push_atom_value xafyaf
+        strict_eq
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_loop.js:337:1: function: test_cyclic_labels
+  stack_size: 0
+  opcodes:
+    0:  goto8 0
+
+__tests__/fixtures_quickjs/test_loop.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: catch e [level:3 next:-1]
+  stack_size: 3
+  opcodes:
+        check_define_var assert,64
+        check_define_var test_while,64
+        check_define_var test_while_break,64
+        check_define_var test_do_while,64
+        check_define_var test_for,64
+        check_define_var test_for_in,64
+        check_define_var test_for_in2,64
+        check_define_var test_for_in_proxy,64
+        check_define_var test_for_break,64
+        check_define_var test_switch1,64
+        check_define_var test_switch2,64
+        check_define_var test_try_catch1,64
+        check_define_var test_try_catch2,64
+        check_define_var test_try_catch3,64
+        check_define_var test_try_catch4,64
+        check_define_var test_try_catch5,64
+        check_define_var test_try_catch6,64
+        check_define_var test_try_catch7,64
+        check_define_var test_try_catch8,64
+        check_define_var test_cyclic_labels,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode test_while]
+        define_func test_while,0
+        fclosure8 2: [bytecode test_while_break]
+        define_func test_while_break,0
+        fclosure8 3: [bytecode test_do_while]
+        define_func test_do_while,0
+        fclosure8 4: [bytecode test_for]
+        define_func test_for,0
+        fclosure8 5: [bytecode test_for_in]
+        define_func test_for_in,0
+        fclosure8 6: [bytecode test_for_in2]
+        define_func test_for_in2,0
+        fclosure8 7: [bytecode test_for_in_proxy]
+        define_func test_for_in_proxy,0
+        fclosure8 8: [bytecode test_for_break]
+        define_func test_for_break,0
+        fclosure8 9: [bytecode test_switch1]
+        define_func test_switch1,0
+        fclosure8 10: [bytecode test_switch2]
+        define_func test_switch2,0
+        fclosure8 11: [bytecode test_try_catch1]
+        define_func test_try_catch1,0
+        fclosure8 12: [bytecode test_try_catch2]
+        define_func test_try_catch2,0
+        fclosure8 13: [bytecode test_try_catch3]
+        define_func test_try_catch3,0
+        fclosure8 14: [bytecode test_try_catch4]
+        define_func test_try_catch4,0
+        fclosure8 15: [bytecode test_try_catch5]
+        define_func test_try_catch5,0
+        fclosure8 16: [bytecode test_try_catch6]
+        define_func test_try_catch6,0
+        fclosure8 17: [bytecode test_try_catch7]
+        define_func test_try_catch7,0
+        fclosure8 18: [bytecode test_try_catch8]
+        define_func test_try_catch8,0
+        fclosure8 19: [bytecode test_cyclic_labels]
+        define_func test_cyclic_labels,0
+        undefined
+        put_loc0 0: "<ret>"
+        catch 302
+        get_var __loadScript
+        push_atom_value "test_assert.js"
+        call1 1
+        put_loc0 0: "<ret>"
+        drop
+        goto8 312
+  302:  put_loc1 1: e
+        catch 311
+        drop
+        goto8 312
+  311:  throw
+  312:  get_var test_while
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_while_break
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_do_while
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_for
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_for_break
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_switch1
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_switch2
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_for_in
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_for_in2
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_for_in_proxy
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_try_catch1
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_try_catch2
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_try_catch3
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_try_catch4
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_try_catch5
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_try_catch6
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_try_catch7
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_try_catch8
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

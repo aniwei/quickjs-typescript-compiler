@@ -1,0 +1,89 @@
+Module bytecode version: 5
+Atom count: 5
+
+=== Outer Function ===
+bytecodeLen=36 stackSize=1 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 40
+     6  check_define_var         229                 pop=0 push=0      40 e5 00 00 00 40
+    12  fclosure8                0                   pop=0 push=1      c2 00
+    14  define_func              228                 pop=1 push=0      41 e4 00 00 00 00
+    20  fclosure8                1                   pop=0 push=1      c2 01
+    22  define_func              229                 pop=1 push=0      41 e5 00 00 00 00
+    28  get_var                  229                 pop=0 push=1      39 e5 00 00 00
+    33  call0                    npop=0              pop=1 push=1      f0
+    34  set_loc0                 loc=0               pop=1 push=1      cf
+    35  return                                       pop=1 push=0      28
+
+=== Inner Function #0 ===
+bytecodeLen=22 stackSize=2 varCount=0 argCount=0
+     0  initial_yield                                pop=0 push=0      89
+     1  push_1                   1                   pop=0 push=1      b8
+     2  await                                        pop=1 push=1      8d
+     3  yield                                        pop=1 push=2      8a
+     4  if_false8                4                   pop=1 push=0      ec 04
+     6  await                                        pop=1 push=1      8d
+     7  await                                        pop=1 push=1      8d
+     8  return_async                                 pop=1 push=0      2f
+     9  drop                                         pop=1 push=0      0e
+    10  push_2                   2                   pop=0 push=1      b9
+    11  await                                        pop=1 push=1      8d
+    12  yield                                        pop=1 push=2      8a
+    13  if_false8                4                   pop=1 push=0      ec 04
+    15  await                                        pop=1 push=1      8d
+    16  await                                        pop=1 push=1      8d
+    17  return_async                                 pop=1 push=0      2f
+    18  drop                                         pop=1 push=0      0e
+    19  undefined                                    pop=0 push=1      06
+    20  await                                        pop=1 push=1      8d
+    21  return_async                                 pop=1 push=0      2f
+
+=== Inner Function #1 ===
+bytecodeLen=92 stackSize=6 varCount=2 argCount=0
+     0  set_loc_uninitialized    0                   pop=0 push=0      63 00 00
+     3  push_0                   0                   pop=0 push=1      b7
+     4  put_loc0                 loc=0               pop=1 push=0      cb
+     5  catch                    64                  pop=0 push=1      6f 40 00 00 00
+    10  set_loc_uninitialized    1                   pop=0 push=0      63 01 00
+    13  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    18  call0                    npop=0              pop=1 push=1      f0
+    19  for_await_of_start                           pop=1 push=3      80
+    20  goto8                    32                  pop=0 push=0      ee 20
+    22  put_loc1                 loc=1               pop=1 push=0      cc
+    23  get_loc_check            0                   pop=0 push=1      64 00 00
+    26  get_loc_check            1                   pop=0 push=1      64 01 00
+    29  add                                          pop=2 push=1      9f
+    30  dup                                          pop=1 push=2      11
+    31  put_loc_check            0                   pop=1 push=0      65 00 00
+    34  drop                                         pop=1 push=0      0e
+    35  get_loc_check            1                   pop=0 push=1      64 01 00
+    38  push_1                   1                   pop=0 push=1      b8
+    39  strict_eq                                    pop=2 push=1      ad
+    40  if_true8                 12                  pop=1 push=0      ed 0c
+    42  get_loc_check            0                   pop=0 push=1      64 00 00
+    45  push_i8                  10                  pop=0 push=1      bf 0a
+    47  add                                          pop=2 push=1      9f
+    48  dup                                          pop=1 push=2      11
+    49  put_loc_check            0                   pop=1 push=0      65 00 00
+    52  drop                                         pop=1 push=0      0e
+    53  for_await_of_next                            pop=3 push=4      83
+    54  await                                        pop=1 push=1      8d
+    55  iterator_get_value_done                      pop=2 push=3      85
+    56  if_false8                221                 pop=1 push=0      ec dd
+    58  drop                                         pop=1 push=0      0e
+    59  iterator_close                               pop=3 push=0      86
+    60  drop                                         pop=1 push=0      0e
+    61  undefined                                    pop=0 push=1      06
+    62  gosub                    13                  pop=0 push=0      70 0d 00 00 00
+    67  drop                                         pop=1 push=0      0e
+    68  goto8                    19                  pop=0 push=0      ee 13
+    70  gosub                    5                   pop=0 push=0      70 05 00 00 00
+    75  throw                                        pop=1 push=0      30
+    76  get_loc_check            0                   pop=0 push=1      64 00 00
+    79  push_i8                  100                 pop=0 push=1      bf 64
+    81  add                                          pop=2 push=1      9f
+    82  dup                                          pop=1 push=2      11
+    83  put_loc_check            0                   pop=1 push=0      65 00 00
+    86  drop                                         pop=1 push=0      0e
+    87  ret                                          pop=1 push=0      71
+    88  get_loc_check            0                   pop=0 push=1      64 00 00
+    91  return_async                                 pop=1 push=0      2f

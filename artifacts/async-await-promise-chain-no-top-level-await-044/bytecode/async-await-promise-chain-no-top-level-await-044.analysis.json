@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-03T15:14:56.086Z",
+  "timestamp": "2026-01-06T16:09:46.661Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/async-await-promise-chain-no-top-level-await-044.ts",
   "compilation": {
     "typescript": {

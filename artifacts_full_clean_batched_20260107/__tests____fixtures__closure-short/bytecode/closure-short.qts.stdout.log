@@ -1,0 +1,65 @@
+__tests__/fixtures/closure-short.js:7:5: function: inner
+  closure vars:
+    0: v0 local:loc0 var
+    1: v1 local:loc1 var
+    2: v2 local:loc2 var
+    3: v3 local:loc3 var
+    4: v4 local:loc4 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: v0
+        inc
+        put_var_ref0 0: v0
+        get_var_ref1 1: v1
+        inc
+        put_var_ref1 1: v1
+        get_var_ref2 2: v2
+        inc
+        put_var_ref2 2: v2
+        get_var_ref3 3: v3
+        inc
+        put_var_ref3 3: v3
+        get_var_ref 4: v4
+        inc
+        put_var_ref 4: v4
+        return_undef
+
+__tests__/fixtures/closure-short.js:1:1: function: short
+  locals:
+    0: var v0
+    1: var v1
+    2: var v2
+    3: var v3
+    4: var v4
+    5: var inner
+  stack_size: 1
+  opcodes:
+        fclosure8 0: [bytecode inner]
+        put_loc8 5: inner
+        push_0 0
+        put_loc0 0: v0
+        push_1 1
+        put_loc1 1: v1
+        push_2 2
+        put_loc2 2: v2
+        push_3 3
+        put_loc3 3: v3
+        push_4 4
+        put_loc8 4: v4
+        get_loc8 5: inner
+        call0 0
+        return_undef
+
+__tests__/fixtures/closure-short.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var short,64
+        fclosure8 0: [bytecode short]
+        define_func short,0
+        get_var short
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

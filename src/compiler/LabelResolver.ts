@@ -274,6 +274,13 @@ export class LabelResolver {
             const vd = fd.vars[scopeIdx]
             if (vd.scopeLevel === scope) {
               if (scopeIdx !== fd.argumentsArgIdx) {
+                // catch 绑定变量（JS_VAR_CATCH）在进入 catch scope 时会被 catch 机制立即赋值，
+                // QuickJS 最终输出的 bytecode 不会额外插入 OP_set_loc_uninitialized。
+                // 若这里插入，会导致后续 label 地址与 pc2line 全部偏移（典型：try/catch family）。
+                if (vd.varKind === JSVarKindEnum.JS_VAR_CATCH) {
+                  scopeIdx = vd.scopeNext
+                  continue
+                }
                 if (vd.varKind === JSVarKindEnum.JS_VAR_FUNCTION_DECL ||
                     vd.varKind === JSVarKindEnum.JS_VAR_NEW_FUNCTION_DECL) {
                   // 初始化词法变量 (函数声明)

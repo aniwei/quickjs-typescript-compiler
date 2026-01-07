@@ -1,0 +1,389 @@
+__tests__/fixtures/test_for_in.js:4:1: function: assert
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_arg0 0: actual
+        get_arg1 1: expected
+        strict_eq
+        if_false8 17
+        return_undef
+   17:  get_arg0 0: actual
+        is_null
+        if_true8 67
+        get_arg1 1: expected
+        is_null
+        if_true8 67
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 67
+        return_undef
+   67:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 117
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 118
+  117:  push_empty_string
+  118:  add
+        call1 1
+        throw
+
+__tests__/fixtures/test_for_in.js:22:1: function: test_for_in
+  locals:
+    0: var i
+    1: var tab
+    2: var a
+    3: var b
+    4: var j
+    5: var k
+  stack_size: 6
+  opcodes:
+        array_from 0
+        put_loc1 1: tab
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field y
+        for_in_start
+        goto8 32
+   20:  put_loc0 0: i
+        get_loc1 1: tab
+        get_field2 push
+        get_loc0 0: i
+        call_method 1
+        drop
+   32:  for_in_next
+        if_false8 20
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "x,y"
+        push_atom_value for_in
+        call3 3
+        drop
+        object
+        push_2 2
+        define_field x
+        push_2 2
+        define_field y
+        push_3 3
+        define_field 1
+        put_loc2 2: a
+        object
+        push_3 3
+        define_field 4
+        put_loc3 3: b
+        get_var Object
+        get_field2 setPrototypeOf
+        get_loc2 2: a
+        get_loc3 3: b
+        call_method 2
+        drop
+        array_from 0
+        put_loc1 1: tab
+        get_loc2 2: a
+        for_in_start
+        goto8 127
+  115:  put_loc0 0: i
+        get_loc1 1: tab
+        get_field2 push
+        get_loc0 0: i
+        call_method 1
+        drop
+  127:  for_in_next
+        if_false8 115
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "1,x,y,4"
+        push_atom_value for_in
+        call3 3
+        drop
+        object
+        push_2 2
+        define_field y
+        push_3 3
+        define_field 1
+        put_loc2 2: a
+        get_var Object
+        get_field2 defineProperty
+        get_loc2 2: a
+        push_atom_value x
+        object
+        push_1 1
+        define_field value
+        call_method 3
+        drop
+        object
+        push_3 3
+        define_field x
+        put_loc3 3: b
+        get_var Object
+        get_field2 setPrototypeOf
+        get_loc2 2: a
+        get_loc3 3: b
+        call_method 2
+        drop
+        array_from 0
+        put_loc1 1: tab
+        get_loc2 2: a
+        for_in_start
+        goto8 243
+  231:  put_loc0 0: i
+        get_loc1 1: tab
+        get_field2 push
+        get_loc0 0: i
+        call_method 1
+        drop
+  243:  for_in_next
+        if_false8 231
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "1,y"
+        push_atom_value for_in
+        call3 3
+        drop
+        array_from 0
+        put_loc2 2: a
+        push_0 0
+        put_loc0 0: i
+  280:  get_loc0 0: i
+        push_i8 10
+        lt
+        if_false8 301
+        get_loc2 2: a
+        get_field2 push
+        get_loc0 0: i
+        call_method 1
+        drop
+        inc_loc 0: i
+        goto8 280
+  301:  array_from 0
+        put_loc1 1: tab
+        get_loc2 2: a
+        for_in_start
+        goto8 321
+  309:  put_loc0 0: i
+        get_loc1 1: tab
+        get_field2 push
+        get_loc0 0: i
+        call_method 1
+        drop
+  321:  for_in_next
+        if_false8 309
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "0,1,2,3,4,5,6,7,8,9"
+        push_atom_value for_in
+        call3 3
+        drop
+        object
+        push_0 0
+        define_field x
+        put_loc2 2: a
+        array_from 0
+        put_loc1 1: tab
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field y
+        for_in_start
+        goto8 403
+  380:  get_loc2 2: a
+        swap
+        put_field x
+        get_loc1 1: tab
+        get_field2 push
+        get_loc2 2: a
+        get_field x
+        call_method 1
+        drop
+  403:  for_in_next
+        if_false8 380
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "x,y"
+        push_atom_value for_in
+        call3 3
+        drop
+        push_0 0
+        array_from 1
+        put_loc2 2: a
+        array_from 0
+        put_loc1 1: tab
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field y
+        for_in_start
+        goto8 476
+  459:  get_loc2 2: a
+        push_0 0
+        rot3l
+        put_array_el
+        get_loc1 1: tab
+        get_field2 push
+        get_loc2 2: a
+        push_0 0
+        get_array_el
+        call_method 1
+        drop
+  476:  for_in_next
+        if_false8 459
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "x,y"
+        push_atom_value for_in
+        call3 3
+        drop
+        array_from 0
+        put_loc1 1: tab
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field y
+        for_in_start
+        goto8 541
+  527:  put_loc8 4: j
+        get_loc1 1: tab
+        get_field2 push
+        get_loc8 4: j
+        call_method 1
+        drop
+  541:  for_in_next
+        if_false8 527
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "x,y"
+        push_atom_value for_in
+        call3 3
+        drop
+        array_from 0
+        put_loc1 1: tab
+        push_2 2
+        put_loc8 5: k
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field y
+        for_in_start
+        goto8 609
+  595:  put_loc8 5: k
+        get_loc1 1: tab
+        get_field2 push
+        get_loc8 5: k
+        call_method 1
+        drop
+  609:  for_in_next
+        if_false8 595
+        drop
+        drop
+        get_var assert
+        get_loc1 1: tab
+        get_field2 toString
+        call_method 0
+        push_atom_value "x,y"
+        push_atom_value for_in
+        call3 3
+        return_undef
+
+__tests__/fixtures/test_for_in.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: catch e [level:3 next:-1]
+  stack_size: 3
+  opcodes:
+        check_define_var assert,64
+        check_define_var test_for_in,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode test_for_in]
+        define_func test_for_in,0
+        undefined
+        put_loc0 0: "<ret>"
+        catch 50
+        get_var __loadScript
+        push_atom_value "test_assert.js"
+        call1 1
+        put_loc0 0: "<ret>"
+        drop
+        goto8 60
+   50:  put_loc1 1: e
+        catch 59
+        drop
+        goto8 60
+   59:  throw
+   60:  get_loc0 0: "<ret>"
+        return
+

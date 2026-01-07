@@ -1,17 +1,17 @@
 {
-  "timestamp": "2025-12-31T18:06:12.467Z",
+  "timestamp": "2026-01-06T16:05:39.639Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/mandreel.ts",
-  "note": "analysis omitted: bytecode too large (3513117 bytes)",
+  "note": "analysis omitted: bytecode too large (3513152 bytes)",
   "compilation": {
     "typescript": {
-      "size": 3513117
+      "size": 3513152
     },
     "wasm": {
-      "size": 5
+      "size": 3512848
     }
   },
   "sizeDifference": {
-    "absolute": 3513112,
-    "percentage": "70262240.00"
+    "absolute": 304,
+    "percentage": "0.01"
   }
 }

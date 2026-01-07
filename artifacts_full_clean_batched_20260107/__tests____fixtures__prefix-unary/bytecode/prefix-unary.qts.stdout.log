@@ -1,0 +1,32 @@
+__tests__/fixtures/prefix-unary.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var a,128
+        define_var a,130
+        push_1 1
+        put_var_init a
+        get_var console
+        get_field2 log
+        get_var a
+        inc
+        dup
+        put_var a
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var a
+        dec
+        dup
+        put_var a
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var a
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

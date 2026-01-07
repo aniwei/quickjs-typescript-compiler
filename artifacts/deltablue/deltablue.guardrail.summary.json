@@ -13,14 +13,14 @@
   "bytecode": {
     "identical": false,
     "tsSize": 11711,
-    "wasmSize": 5,
-    "sizeDiff": 11706,
-    "sizeDiffPercent": 234119.99999999997
+    "wasmSize": 11707,
+    "sizeDiff": 4,
+    "sizeDiffPercent": 0.034167592038951054
   },
   "trace": {
-    "differenceCount": 8700,
-    "tsEventCount": 8130,
-    "wasmEventCount": 8768,
-    "summaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/deltablue/trace/trace.summary.json"
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
   }
 }

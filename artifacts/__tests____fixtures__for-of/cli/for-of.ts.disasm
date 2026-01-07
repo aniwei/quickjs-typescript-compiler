@@ -1,0 +1,30 @@
+Module bytecode version: 5
+Atom count: 5
+
+=== Outer Function ===
+bytecodeLen=62 stackSize=6 varCount=2 argCount=0
+     0  check_define_var         229                 pop=0 push=0      40 e5 00 00 00 80
+     6  define_var               229                 pop=0 push=0      3f e5 00 00 00 80
+    12  push_1                   1                   pop=0 push=1      b8
+    13  push_2                   2                   pop=0 push=1      b9
+    14  push_3                   3                   pop=0 push=1      ba
+    15  array_from               3                   pop=0 push=1      26 03 00
+    18  put_var_init             229                 pop=1 push=0      3b e5 00 00 00
+    23  undefined                                    pop=0 push=1      06
+    24  put_loc0                 loc=0               pop=1 push=0      cb
+    25  set_loc_uninitialized    1                   pop=0 push=0      63 01 00
+    28  get_var                  229                 pop=0 push=1      39 e5 00 00 00
+    33  for_of_start                                 pop=1 push=3      7f
+    34  goto8                    19                  pop=0 push=0      ee 13
+    36  put_loc1                 loc=1               pop=1 push=0      cc
+    37  get_var                  230                 pop=0 push=1      39 e6 00 00 00
+    42  get_field2               231                 pop=1 push=2      43 e7 00 00 00
+    47  get_loc_check            1                   pop=0 push=1      64 01 00
+    50  call_method              1                   pop=2 push=1      24 01 00
+    53  put_loc0                 loc=0               pop=1 push=0      cb
+    54  for_of_next              0                   pop=3 push=5      82 00
+    56  if_false8                235                 pop=1 push=0      ec eb
+    58  drop                                         pop=1 push=0      0e
+    59  iterator_close                               pop=3 push=0      86
+    60  get_loc0                 loc=0               pop=0 push=1      c7
+    61  return                                       pop=1 push=0      28

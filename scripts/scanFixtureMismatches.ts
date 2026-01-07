@@ -245,45 +245,35 @@ function fixtureFromQbcFilename(filename: string): { fixture: string; kind: 'ts'
   return null
 }
 
+async function pathExists(p: string): Promise<boolean> {
+  try {
+    await fs.stat(p)
+    return true
+  } catch {
+    return false
+  }
+}
+
 async function findPairs(artifactsDir: string, options: { rootOnly: boolean }): Promise<Pair[]> {
   const allFiles = options.rootOnly ? await listFilesOneLevel(artifactsDir) : await walk(artifactsDir)
-  const tsByFixture = new Map<string, string[]>()
-  const wasmByFixture = new Map<string, string[]>()
 
-  for (const p of allFiles) {
-    const base = path.basename(p)
-    const parsed = fixtureFromQbcFilename(base)
-    if (!parsed) continue
-
-    const target = parsed.kind === 'ts' ? tsByFixture : wasmByFixture
-    const arr = target.get(parsed.fixture) ?? []
-    arr.push(p)
-    target.set(parsed.fixture, arr)
-  }
-
-  const rankPath = (p: string): [number, number, string] => {
-    const normalized = p.split(path.sep).join('/')
-    // Prefer guardrail outputs under */bytecode/ (they reflect latest compareAllFixtures runs),
-    // then fall back to other locations.
-    const rank = normalized.includes('/bytecode/') ? 0 : 1
-    return [rank, normalized.length, normalized]
-  }
-
-  const pickBest = (paths: string[]): string => {
-    return [...paths].sort((a, b) => {
-      const ra = rankPath(a)
-      const rb = rankPath(b)
-      if (ra[0] !== rb[0]) return ra[0] - rb[0]
-      if (ra[1] !== rb[1]) return ra[1] - rb[1]
-      return ra[2].localeCompare(rb[2])
-    })[0]
-  }
+  // Pair TS/WASM by sibling filenames, not by basename only.
+  // This avoids collisions when multiple fixtures share the same filename
+  // (e.g. __tests__/fixtures_quickjs/repl.ts and __tests__/fixtures/quickjs-tests/repl.ts).
+  const tsFiles = allFiles.filter((p) => p.endsWith('.ts.qbc'))
 
   const pairs: Pair[] = []
-  for (const [fixture, tsPaths] of tsByFixture) {
-    const wasmPaths = wasmByFixture.get(fixture)
-    if (!wasmPaths) continue
-    pairs.push({ fixture, tsPath: pickBest(tsPaths), wasmPath: pickBest(wasmPaths) })
+  for (const tsPath of tsFiles) {
+    const basePath = tsPath.slice(0, -'.ts.qbc'.length)
+    const wasmPath = `${basePath}.wasm.qbc`
+    if (!(await pathExists(wasmPath))) continue
+
+    const fixture = path
+      .relative(artifactsDir, basePath)
+      .split(path.sep)
+      .join('/')
+
+    pairs.push({ fixture, tsPath, wasmPath })
   }
 
   pairs.sort((a, b) => a.fixture.localeCompare(b.fixture))

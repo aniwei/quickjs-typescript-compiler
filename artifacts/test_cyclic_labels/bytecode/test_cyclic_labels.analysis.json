@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-03T15:15:48.397Z",
+  "timestamp": "2026-01-06T16:10:40.456Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_cyclic_labels.ts",
   "compilation": {
     "typescript": {

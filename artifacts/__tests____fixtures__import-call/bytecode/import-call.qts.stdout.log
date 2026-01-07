@@ -1,0 +1,42 @@
+__tests__/fixtures/import-call.js:2:1: function: main
+  locals:
+    0: const m1 [level:1 next:-1]
+    1: const m2 [level:1 next:0]
+  stack_size: 4
+  opcodes:
+        set_loc_uninitialized 1: m2
+        set_loc_uninitialized 0: m1
+        push_atom_value "./dep1.js"
+        undefined
+        import
+        await
+        put_loc0 0: m1
+        push_atom_value "./dep2.js"
+        object
+        object
+        push_atom_value json
+        define_field type
+        define_field assert
+        import
+        await
+        put_loc1 1: m2
+        get_loc_check 0: m1
+        get_loc_check 1: m2
+        array_from 2
+        return_async
+
+__tests__/fixtures/import-call.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var main,64
+        fclosure8 0: [bytecode main]
+        define_func main,0
+        get_var main
+        call0 0
+        drop
+        undefined
+        set_loc0 0: "<ret>"
+        return
+

@@ -1,0 +1,169 @@
+__tests__/fixtures/class-static-private-accessors.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: #x local:loc2 const
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_var_ref_check 0: "#x"
+        push_1 1
+        define_private_field
+        return_undef
+
+__tests__/fixtures/class-static-private-accessors.js:4:12: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: #x local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_var_ref0 0: "#x"
+        get_private_field
+        return
+
+__tests__/fixtures/class-static-private-accessors.js:7:12: function: <null>
+  mode: strict
+  args: v
+  locals:
+    0: var this
+  closure vars:
+    0: #x local:loc2 const
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: v
+        insert2
+        get_var_ref0 0: "#x"
+        put_private_field
+        return_undef
+
+__tests__/fixtures/class-static-private-accessors.js:10:12: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: #value local:loc3 const
+    1: #value<set> local:loc4 const
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc0 0: this
+        get_var_ref0 0: "#value"
+        check_brand
+        call_method 0
+        push_1 1
+        add
+        insert2
+        get_var_ref1 1: "#value<set>"
+        swap
+        rot3r
+        check_brand
+        rot3l
+        call_method 1
+        drop
+        drop
+        get_loc0 0: this
+        get_var_ref0 0: "#value"
+        check_brand
+        tail_call_method 0
+
+__tests__/fixtures/class-static-private-accessors.js:14:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc5 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  return_undef
+
+__tests__/fixtures/class-static-private-accessors.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: const Counter [level:2 next:-1]
+    2: const #x [level:3 next:1]
+    3: const #value [level:3 next:2]
+    4: const #value<set> [level:3 next:3]
+    5: const <class_fields_init> [level:3 next:4]
+  stack_size: 4
+  opcodes:
+        check_define_var Counter,128
+        define_var Counter,130
+        set_loc_uninitialized 1: Counter
+        undefined
+        set_loc_uninitialized 5: "<class_fields_init>"
+        set_loc_uninitialized 4: "#value<set>"
+        set_loc_uninitialized 3: "#value"
+        set_loc_uninitialized 2: "#x"
+        push_const8 3: [bytecode <null>]
+        define_class Counter,0
+        swap
+        private_symbol "#x"
+        put_loc2 2: "#x"
+        swap
+        swap
+        fclosure8 0: [bytecode <null>]
+        set_home_object
+        put_loc3 3: "#value"
+        swap
+        swap
+        fclosure8 1: [bytecode <null>]
+        set_home_object
+        put_loc8 4: "#value<set>"
+        swap
+        swap
+        fclosure8 2: [bytecode <null>]
+        define_method bump,0
+        swap
+        undefined
+        put_loc8 5: "<class_fields_init>"
+        drop
+        dup
+        dup
+        add_brand
+        set_loc1 1: Counter
+        dup
+        fclosure8 4: [bytecode <null>]
+        set_home_object
+        call_method 0
+        drop
+        close_loc 5: "<class_fields_init>"
+        close_loc 2: "#x"
+        put_var_init Counter
+        get_var console
+        get_field2 log
+        get_var Counter
+        get_field2 bump
+        call_method 0
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var Counter
+        get_field2 bump
+        call_method 0
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

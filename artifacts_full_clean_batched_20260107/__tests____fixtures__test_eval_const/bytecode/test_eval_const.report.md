@@ -1,0 +1,715 @@
+# 字节码分析报告
+
+**输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_eval_const.ts
+**生成时间**: 2026-01-07T03:19:54.464Z
+
+## 大小对比
+
+- TypeScript编译器: 1016 字节
+- WASM编译器: 1016 字节
+- 差异: 0 字节 (0.00%)
+
+## 结构分析
+
+### TypeScript编译器输出
+```json
+{
+  "source": "TypeScript",
+  "bcVersion": "0x5",
+  "userAtomCount": 33,
+  "atoms": [
+    {
+      "index": 0,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "e",
+      "offset": 2
+    },
+    {
+      "index": 1,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "assert",
+      "offset": 4
+    },
+    {
+      "index": 2,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "log_str",
+      "offset": 11
+    },
+    {
+      "index": 3,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "log",
+      "offset": 19
+    },
+    {
+      "index": 4,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "f",
+      "offset": 23
+    },
+    {
+      "index": 5,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "g1",
+      "offset": 25
+    },
+    {
+      "index": 6,
+      "rawLength": 24,
+      "actualLength": 12,
+      "isWideChar": 0,
+      "string": "__loadScript",
+      "offset": 28
+    },
+    {
+      "index": 7,
+      "rawLength": 28,
+      "actualLength": 14,
+      "isWideChar": 0,
+      "string": "test_assert.js",
+      "offset": 41
+    },
+    {
+      "index": 8,
+      "rawLength": 76,
+      "actualLength": 38,
+      "isWideChar": 0,
+      "string": "a=1,b=2,c=3,d=4,x=10,b=2,c=3,d=5,x=10,",
+      "offset": 56
+    },
+    {
+      "index": 9,
+      "rawLength": 16,
+      "actualLength": 8,
+      "isWideChar": 0,
+      "string": "closure1",
+      "offset": 95
+    },
+    {
+      "index": 10,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_eval_const",
+      "offset": 104
+    },
+    {
+      "index": 11,
+      "rawLength": 74,
+      "actualLength": 37,
+      "isWideChar": 0,
+      "string": "__tests__/fixtures/test_eval_const.js",
+      "offset": 120
+    },
+    {
+      "index": 12,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "actual",
+      "offset": 158
+    },
+    {
+      "index": 13,
+      "rawLength": 16,
+      "actualLength": 8,
+      "isWideChar": 0,
+      "string": "expected",
+      "offset": 165
+    },
+    {
+      "index": 14,
+      "rawLength": 46,
+      "actualLength": 23,
+      "isWideChar": 0,
+      "string": "assertion failed: got |",
+      "offset": 174
+    },
+    {
+      "index": 15,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "|",
+      "offset": 198
+    },
+    {
+      "index": 16,
+      "rawLength": 24,
+      "actualLength": 12,
+      "isWideChar": 0,
+      "string": ", expected |",
+      "offset": 200
+    },
+    {
+      "index": 17,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": " (",
+      "offset": 213
+    },
+    {
+      "index": 18,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": ")",
+      "offset": 216
+    },
+    {
+      "index": 19,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "str",
+      "offset": 218
+    },
+    {
+      "index": 20,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": ",",
+      "offset": 222
+    },
+    {
+      "index": 21,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "a",
+      "offset": 224
+    },
+    {
+      "index": 22,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "b",
+      "offset": 226
+    },
+    {
+      "index": 23,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "c",
+      "offset": 228
+    },
+    {
+      "index": 24,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "x",
+      "offset": 230
+    },
+    {
+      "index": 25,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "g",
+      "offset": 232
+    },
+    {
+      "index": 26,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "a=",
+      "offset": 234
+    },
+    {
+      "index": 27,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "d",
+      "offset": 237
+    },
+    {
+      "index": 28,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "h",
+      "offset": 239
+    },
+    {
+      "index": 29,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "b=",
+      "offset": 241
+    },
+    {
+      "index": 30,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "c=",
+      "offset": 244
+    },
+    {
+      "index": 31,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "d=",
+      "offset": 247
+    },
+    {
+      "index": 32,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "x=",
+      "offset": 250
+    }
+  ],
+  "functionHeader": {
+    "offset": 253,
+    "tag": "0xc",
+    "remaining": 763
+  }
+}
+```
+
+### WASM编译器输出
+```json
+{
+  "source": "WASM",
+  "bcVersion": "0x5",
+  "userAtomCount": 33,
+  "atoms": [
+    {
+      "index": 0,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "e",
+      "offset": 2
+    },
+    {
+      "index": 1,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "assert",
+      "offset": 4
+    },
+    {
+      "index": 2,
+      "rawLength": 14,
+      "actualLength": 7,
+      "isWideChar": 0,
+      "string": "log_str",
+      "offset": 11
+    },
+    {
+      "index": 3,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "log",
+      "offset": 19
+    },
+    {
+      "index": 4,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "f",
+      "offset": 23
+    },
+    {
+      "index": 5,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "g1",
+      "offset": 25
+    },
+    {
+      "index": 6,
+      "rawLength": 24,
+      "actualLength": 12,
+      "isWideChar": 0,
+      "string": "__loadScript",
+      "offset": 28
+    },
+    {
+      "index": 7,
+      "rawLength": 28,
+      "actualLength": 14,
+      "isWideChar": 0,
+      "string": "test_assert.js",
+      "offset": 41
+    },
+    {
+      "index": 8,
+      "rawLength": 76,
+      "actualLength": 38,
+      "isWideChar": 0,
+      "string": "a=1,b=2,c=3,d=4,x=10,b=2,c=3,d=5,x=10,",
+      "offset": 56
+    },
+    {
+      "index": 9,
+      "rawLength": 16,
+      "actualLength": 8,
+      "isWideChar": 0,
+      "string": "closure1",
+      "offset": 95
+    },
+    {
+      "index": 10,
+      "rawLength": 30,
+      "actualLength": 15,
+      "isWideChar": 0,
+      "string": "test_eval_const",
+      "offset": 104
+    },
+    {
+      "index": 11,
+      "rawLength": 74,
+      "actualLength": 37,
+      "isWideChar": 0,
+      "string": "__tests__/fixtures/test_eval_const.js",
+      "offset": 120
+    },
+    {
+      "index": 12,
+      "rawLength": 12,
+      "actualLength": 6,
+      "isWideChar": 0,
+      "string": "actual",
+      "offset": 158
+    },
+    {
+      "index": 13,
+      "rawLength": 16,
+      "actualLength": 8,
+      "isWideChar": 0,
+      "string": "expected",
+      "offset": 165
+    },
+    {
+      "index": 14,
+      "rawLength": 46,
+      "actualLength": 23,
+      "isWideChar": 0,
+      "string": "assertion failed: got |",
+      "offset": 174
+    },
+    {
+      "index": 15,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "|",
+      "offset": 198
+    },
+    {
+      "index": 16,
+      "rawLength": 24,
+      "actualLength": 12,
+      "isWideChar": 0,
+      "string": ", expected |",
+      "offset": 200
+    },
+    {
+      "index": 17,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": " (",
+      "offset": 213
+    },
+    {
+      "index": 18,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": ")",
+      "offset": 216
+    },
+    {
+      "index": 19,
+      "rawLength": 6,
+      "actualLength": 3,
+      "isWideChar": 0,
+      "string": "str",
+      "offset": 218
+    },
+    {
+      "index": 20,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": ",",
+      "offset": 222
+    },
+    {
+      "index": 21,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "a",
+      "offset": 224
+    },
+    {
+      "index": 22,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "b",
+      "offset": 226
+    },
+    {
+      "index": 23,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "c",
+      "offset": 228
+    },
+    {
+      "index": 24,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "x",
+      "offset": 230
+    },
+    {
+      "index": 25,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "g",
+      "offset": 232
+    },
+    {
+      "index": 26,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "a=",
+      "offset": 234
+    },
+    {
+      "index": 27,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "d",
+      "offset": 237
+    },
+    {
+      "index": 28,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "h",
+      "offset": 239
+    },
+    {
+      "index": 29,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "b=",
+      "offset": 241
+    },
+    {
+      "index": 30,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "c=",
+      "offset": 244
+    },
+    {
+      "index": 31,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "d=",
+      "offset": 247
+    },
+    {
+      "index": 32,
+      "rawLength": 4,
+      "actualLength": 2,
+      "isWideChar": 0,
+      "string": "x=",
+      "offset": 250
+    }
+  ],
+  "functionHeader": {
+    "offset": 253,
+    "tag": "0xc",
+    "remaining": 763
+  }
+}
+```
+
+## 字节级差异
+
+共发现 0 个字节差异:
+
+
+## 十六进制转储对比
+
+### TypeScript
+```
+00000000: 05 21 02 65 0c 61 73 73 65 72 74 0e 6c 6f 67 5f |.!.e.assert.log_|
+00000010: 73 74 72 06 6c 6f 67 02 66 04 67 31 18 5f 5f 6c |str.log.f.g1.__l|
+00000020: 6f 61 64 53 63 72 69 70 74 1c 74 65 73 74 5f 61 |oadScript.test_a|
+00000030: 73 73 65 72 74 2e 6a 73 4c 61 3d 31 2c 62 3d 32 |ssert.jsLa=1,b=2|
+00000040: 2c 63 3d 33 2c 64 3d 34 2c 78 3d 31 30 2c 62 3d |,c=3,d=4,x=10,b=|
+00000050: 32 2c 63 3d 33 2c 64 3d 35 2c 78 3d 31 30 2c 10 |2,c=3,d=5,x=10,.|
+00000060: 63 6c 6f 73 75 72 65 31 1e 74 65 73 74 5f 65 76 |closure1.test_ev|
+00000070: 61 6c 5f 63 6f 6e 73 74 4a 5f 5f 74 65 73 74 73 |al_constJ__tests|
+00000080: 5f 5f 2f 66 69 78 74 75 72 65 73 2f 74 65 73 74 |__/fixtures/test|
+00000090: 5f 65 76 61 6c 5f 63 6f 6e 73 74 2e 6a 73 0c 61 |_eval_const.js.a|
+000000a0: 63 74 75 61 6c 10 65 78 70 65 63 74 65 64 2e 61 |ctual.expected.a|
+000000b0: 73 73 65 72 74 69 6f 6e 20 66 61 69 6c 65 64 3a |ssertion failed:|
+000000c0: 20 67 6f 74 20 7c 02 7c 18 2c 20 65 78 70 65 63 | got |.|., expec|
+000000d0: 74 65 64 20 7c 04 20 28 02 29 06 73 74 72 02 2c |ted |. (.).str.,|
+000000e0: 02 61 02 62 02 63 02 78 02 67 04 61 3d 02 64 02 |.a.b.c.x.g.a=.d.|
+000000f0: 68 04 62 3d 04 63 3d 04 64 3d 04 78 3d 0c 00 06 |h.b=.c=.d=.x=...|
+00000100: 00 a4 01 00 02 00 04 00 03 9c 01 02 a6 01 00 00 |................|
+00000110: 00 c8 03 03 00 03 40 e5 00 00 00 40 40 e6 00 00 |......@....@@...|
+00000120: 00 00 40 e7 00 00 00 40 40 e8 00 00 00 40 40 e9 |..@....@@....@@.|
+00000130: 00 00 00 00 c2 00 41 e5 00 00 00 00 3f e6 00 00 |......A.....?...|
+00000140: 00 00 c2 01 41 e7 00 00 00 00 c2 02 41 e8 00 00 |....A.......A...|
+00000150: 00 00 3f e9 00 00 00 00 06 cb 6f 13 00 00 00 39 |..?.......o....9|
+00000160: ea 00 00 00 04 eb 00 00 00 f1 cb 0e ee 0b cc 6f |...............o|
+00000170: 07 00 00 00 0e ee 02 30 c3 3a e6 00 00 00 39 e8 |.......0.:....9.|
+00000180: 00 00 00 b8 b9 ba f3 3a e9 00 00 00 39 e9 00 00 |.......:....9...|
+00000190: 00 bc f1 cb 39 e5 00 00 00 39 e6 00 00 00 04 ec |....9....9......|
+000001a0: 00 00 00 04 ed 00 00 00 f3 cb 39 ee 00 00 00 f0 |..........9.....|
+000001b0: cf 28 de 03 1c 00 00 00 49 24 08 34 18 00 15 2e |.(......I$.4....|
+000001c0: 0d 2a 02 21 13 20 04 0d 03 1b 0e 4d 01 0d 0b 1b |.*.!. .....M....|
+000001d0: 1e 00 0c 43 06 00 ca 03 03 01 03 04 00 00 79 04 |...C..........y.|
+000001e0: e0 03 00 01 00 e2 03 00 01 00 68 00 01 00 9e 01 |..........h.....|
+000001f0: 00 01 00 0c 01 cb c7 eb b8 ab ec 03 0a d8 d3 d4 |................|
+00000200: ad ec 02 29 d3 f5 ed 2f d4 f5 ed 2b d3 99 04 4b |...).../...+...K|
+00000210: 00 00 00 ab ec 21 d4 99 04 4b 00 00 00 ab ec 17 |.....!...K......|
+00000220: d3 43 39 00 00 00 24 00 00 d4 43 39 00 00 00 24 |.C9...$...C9...$|
+00000230: 00 00 ad ec 02 29 39 9f 00 00 00 04 f2 00 00 00 |.....)9.........|
+00000240: d3 9f 04 f3 00 00 00 9f 04 f4 00 00 00 9f d4 9f |................|
+00000250: 04 f3 00 00 00 9f d5 ec 10 04 f5 00 00 00 d5 9f |................|
+00000260: 04 f6 00 00 00 9f ee 02 c3 9f f1 30 de 03 50 03 |...........0..P.|
+00000270: 00 12 10 07 12 0c 10 12 21 0d 00 07 16 07 07 12 |........!.......|
+00000280: 0d 08 00 07 0e 11 18 07 12 12 23 07 0e 2f 2c 07 |..........#../,.|
+00000290: 12 30 59 07 0c 1b 12 11 0e 07 10 1b 12 11 29 12 |.0Y...........).|
+000002a0: 29 08 04 34 44 07 03 20 12 20 0c 08 3f 07 03 20 |)..4D.. . ..?.. |
+000002b0: 16 08 31 2a 22 07 03 20 14 15 0c 06 31 07 15 00 |..1*".. ....1...|
+000002c0: 0c 43 06 00 ce 03 01 00 01 03 00 00 14 01 ee 03 |.C..............|
+000002d0: 00 01 00 39 e6 00 00 00 d3 04 f8 00 00 00 9f 9f |...9............|
+000002e0: 11 3a e6 00 00 00 29 de 03 0a 17 00 03 08 1b 16 |.:....).........|
+000002f0: 20 08 07 0d 00 0c 43 06 00 d0 03 03 02 03 03 00 | .....C.........|
+00000300: 01 1a 05 f2 03 00 01 00 f4 03 00 01 40 f6 03 00 |............@...|
+00000310: 01 40 f8 03 00 00 40 fa 03 00 01 00 c2 00 cc bf |.@....@.........|
+00000320: 0a cb 39 e7 00 00 00 04 fe 00 00 00 d3 9f f1 0e |..9.............|
+00000330: c8 bb f1 0e c8 28 de 03 14 1a 00 22 08 34 16 07 |.....(.....".4..|
+00000340: 03 07 0b 00 02 14 05 0c 02 0d 0c 07 0d 00 0c 43 |...............C|
+00000350: 06 00 fa 03 01 01 01 03 03 01 22 02 fe 03 00 01 |..........".....|
+00000360: 40 80 04 00 00 00 f8 03 00 01 f4 03 01 03 f6 03 |@...............|
+00000370: 02 03 c2 00 cb 39 e7 00 00 00 04 01 01 00 00 e0 |.....9..........|
+00000380: 9f f1 0e 39 e7 00 00 00 04 02 01 00 00 e1 9f f1 |...9............|
+00000390: 0e c7 f0 29 de 03 18 1d 04 00 03 0a 08 34 16 07 |...).........4..|
+000003a0: 03 07 0b 0d 05 34 16 07 03 07 0b 0d 05 07 02 00 |.....4..........|
+000003b0: 0c 43 06 00 80 04 00 00 00 03 02 00 1c 00 fe 03 |.C..............|
+000003c0: 00 03 f8 03 00 00 39 e7 00 00 00 04 03 01 00 00 |......9.........|
+000003d0: df 9f f1 0e 39 e7 00 00 00 04 04 01 00 00 e0 9f |....9...........|
+000003e0: f1 29 de 03 12 1e 08 03 08 34 16 07 03 07 0b 0d |.).......4......|
+000003f0: 05 34 16 07 03 07 0b 00                         |.4......|
+```
+
+### WASM
+```
+00000000: 05 21 02 65 0c 61 73 73 65 72 74 0e 6c 6f 67 5f |.!.e.assert.log_|
+00000010: 73 74 72 06 6c 6f 67 02 66 04 67 31 18 5f 5f 6c |str.log.f.g1.__l|
+00000020: 6f 61 64 53 63 72 69 70 74 1c 74 65 73 74 5f 61 |oadScript.test_a|
+00000030: 73 73 65 72 74 2e 6a 73 4c 61 3d 31 2c 62 3d 32 |ssert.jsLa=1,b=2|
+00000040: 2c 63 3d 33 2c 64 3d 34 2c 78 3d 31 30 2c 62 3d |,c=3,d=4,x=10,b=|
+00000050: 32 2c 63 3d 33 2c 64 3d 35 2c 78 3d 31 30 2c 10 |2,c=3,d=5,x=10,.|
+00000060: 63 6c 6f 73 75 72 65 31 1e 74 65 73 74 5f 65 76 |closure1.test_ev|
+00000070: 61 6c 5f 63 6f 6e 73 74 4a 5f 5f 74 65 73 74 73 |al_constJ__tests|
+00000080: 5f 5f 2f 66 69 78 74 75 72 65 73 2f 74 65 73 74 |__/fixtures/test|
+00000090: 5f 65 76 61 6c 5f 63 6f 6e 73 74 2e 6a 73 0c 61 |_eval_const.js.a|
+000000a0: 63 74 75 61 6c 10 65 78 70 65 63 74 65 64 2e 61 |ctual.expected.a|
+000000b0: 73 73 65 72 74 69 6f 6e 20 66 61 69 6c 65 64 3a |ssertion failed:|
+000000c0: 20 67 6f 74 20 7c 02 7c 18 2c 20 65 78 70 65 63 | got |.|., expec|
+000000d0: 74 65 64 20 7c 04 20 28 02 29 06 73 74 72 02 2c |ted |. (.).str.,|
+000000e0: 02 61 02 62 02 63 02 78 02 67 04 61 3d 02 64 02 |.a.b.c.x.g.a=.d.|
+000000f0: 68 04 62 3d 04 63 3d 04 64 3d 04 78 3d 0c 00 06 |h.b=.c=.d=.x=...|
+00000100: 00 a4 01 00 02 00 04 00 03 9c 01 02 a6 01 00 00 |................|
+00000110: 00 c8 03 03 00 03 40 e5 00 00 00 40 40 e6 00 00 |......@....@@...|
+00000120: 00 00 40 e7 00 00 00 40 40 e8 00 00 00 40 40 e9 |..@....@@....@@.|
+00000130: 00 00 00 00 c2 00 41 e5 00 00 00 00 3f e6 00 00 |......A.....?...|
+00000140: 00 00 c2 01 41 e7 00 00 00 00 c2 02 41 e8 00 00 |....A.......A...|
+00000150: 00 00 3f e9 00 00 00 00 06 cb 6f 13 00 00 00 39 |..?.......o....9|
+00000160: ea 00 00 00 04 eb 00 00 00 f1 cb 0e ee 0b cc 6f |...............o|
+00000170: 07 00 00 00 0e ee 02 30 c3 3a e6 00 00 00 39 e8 |.......0.:....9.|
+00000180: 00 00 00 b8 b9 ba f3 3a e9 00 00 00 39 e9 00 00 |.......:....9...|
+00000190: 00 bc f1 cb 39 e5 00 00 00 39 e6 00 00 00 04 ec |....9....9......|
+000001a0: 00 00 00 04 ed 00 00 00 f3 cb 39 ee 00 00 00 f0 |..........9.....|
+000001b0: cf 28 de 03 1c 00 00 00 49 24 08 34 18 00 15 2e |.(......I$.4....|
+000001c0: 0d 2a 02 21 13 20 04 0d 03 1b 0e 4d 01 0d 0b 1b |.*.!. .....M....|
+000001d0: 1e 00 0c 43 06 00 ca 03 03 01 03 04 00 00 79 04 |...C..........y.|
+000001e0: e0 03 00 01 00 e2 03 00 01 00 68 00 01 00 9e 01 |..........h.....|
+000001f0: 00 01 00 0c 01 cb c7 eb b8 ab ec 03 0a d8 d3 d4 |................|
+00000200: ad ec 02 29 d3 f5 ed 2f d4 f5 ed 2b d3 99 04 4b |...).../...+...K|
+00000210: 00 00 00 ab ec 21 d4 99 04 4b 00 00 00 ab ec 17 |.....!...K......|
+00000220: d3 43 39 00 00 00 24 00 00 d4 43 39 00 00 00 24 |.C9...$...C9...$|
+00000230: 00 00 ad ec 02 29 39 9f 00 00 00 04 f2 00 00 00 |.....)9.........|
+00000240: d3 9f 04 f3 00 00 00 9f 04 f4 00 00 00 9f d4 9f |................|
+00000250: 04 f3 00 00 00 9f d5 ec 10 04 f5 00 00 00 d5 9f |................|
+00000260: 04 f6 00 00 00 9f ee 02 c3 9f f1 30 de 03 50 03 |...........0..P.|
+00000270: 00 12 10 07 12 0c 10 12 21 0d 00 07 16 07 07 12 |........!.......|
+00000280: 0d 08 00 07 0e 11 18 07 12 12 23 07 0e 2f 2c 07 |..........#../,.|
+00000290: 12 30 59 07 0c 1b 12 11 0e 07 10 1b 12 11 29 12 |.0Y...........).|
+000002a0: 29 08 04 34 44 07 03 20 12 20 0c 08 3f 07 03 20 |)..4D.. . ..?.. |
+000002b0: 16 08 31 2a 22 07 03 20 14 15 0c 06 31 07 15 00 |..1*".. ....1...|
+000002c0: 0c 43 06 00 ce 03 01 00 01 03 00 00 14 01 ee 03 |.C..............|
+000002d0: 00 01 00 39 e6 00 00 00 d3 04 f8 00 00 00 9f 9f |...9............|
+000002e0: 11 3a e6 00 00 00 29 de 03 0a 17 00 03 08 1b 16 |.:....).........|
+000002f0: 20 08 07 0d 00 0c 43 06 00 d0 03 03 02 03 03 00 | .....C.........|
+00000300: 01 1a 05 f2 03 00 01 00 f4 03 00 01 40 f6 03 00 |............@...|
+00000310: 01 40 f8 03 00 00 40 fa 03 00 01 00 c2 00 cc bf |.@....@.........|
+00000320: 0a cb 39 e7 00 00 00 04 fe 00 00 00 d3 9f f1 0e |..9.............|
+00000330: c8 bb f1 0e c8 28 de 03 14 1a 00 22 08 34 16 07 |.....(.....".4..|
+00000340: 03 07 0b 00 02 14 05 0c 02 0d 0c 07 0d 00 0c 43 |...............C|
+00000350: 06 00 fa 03 01 01 01 03 03 01 22 02 fe 03 00 01 |..........".....|
+00000360: 40 80 04 00 00 00 f8 03 00 01 f4 03 01 03 f6 03 |@...............|
+00000370: 02 03 c2 00 cb 39 e7 00 00 00 04 01 01 00 00 e0 |.....9..........|
+00000380: 9f f1 0e 39 e7 00 00 00 04 02 01 00 00 e1 9f f1 |...9............|
+00000390: 0e c7 f0 29 de 03 18 1d 04 00 03 0a 08 34 16 07 |...).........4..|
+000003a0: 03 07 0b 0d 05 34 16 07 03 07 0b 0d 05 07 02 00 |.....4..........|
+000003b0: 0c 43 06 00 80 04 00 00 00 03 02 00 1c 00 fe 03 |.C..............|
+000003c0: 00 03 f8 03 00 00 39 e7 00 00 00 04 03 01 00 00 |......9.........|
+000003d0: df 9f f1 0e 39 e7 00 00 00 04 04 01 00 00 e0 9f |....9...........|
+000003e0: f1 29 de 03 12 1e 08 03 08 34 16 07 03 07 0b 0d |.).......4......|
+000003f0: 05 34 16 07 03 07 0b 00                         |.4......|
+```

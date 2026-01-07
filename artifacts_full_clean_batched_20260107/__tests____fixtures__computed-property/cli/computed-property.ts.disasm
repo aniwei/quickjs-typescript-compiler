@@ -1,0 +1,26 @@
+Module bytecode version: 5
+Atom count: 6
+
+=== Outer Function ===
+bytecodeLen=75 stackSize=4 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 80
+     6  check_define_var         229                 pop=0 push=0      40 e5 00 00 00 80
+    12  define_var               228                 pop=0 push=0      3f e4 00 00 00 80
+    18  define_var               229                 pop=0 push=0      3f e5 00 00 00 80
+    24  push_atom_value          230                 pop=0 push=1      04 e6 00 00 00
+    29  put_var_init             228                 pop=1 push=0      3b e4 00 00 00
+    34  object                                       pop=0 push=1      0b
+    35  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    40  to_propkey                                   pop=1 push=1      74
+    41  push_1                   1                   pop=0 push=1      b8
+    42  define_array_el                              pop=3 push=2      53
+    43  drop                                         pop=1 push=0      0e
+    44  put_var_init             229                 pop=1 push=0      3b e5 00 00 00
+    49  get_var                  231                 pop=0 push=1      39 e7 00 00 00
+    54  get_field2               232                 pop=1 push=2      43 e8 00 00 00
+    59  get_var                  229                 pop=0 push=1      39 e5 00 00 00
+    64  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    69  get_array_el                                 pop=2 push=1      48
+    70  call_method              1                   pop=2 push=1      24 01 00
+    73  set_loc0                 loc=0               pop=1 push=1      cf
+    74  return                                       pop=1 push=0      28

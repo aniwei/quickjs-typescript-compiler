@@ -1,0 +1,4 @@
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=1 pos=11 pos_next=14 next_op=41 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=0 pos=30 pos_next=33 next_op=6 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x

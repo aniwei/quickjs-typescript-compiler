@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-01-06T19:05:52.300Z",
+  "inputFile": "__tests__/fixtures_quickjs/octane/bundle.ts",
+  "note": "analysis omitted: bytecode too large (6661700 bytes)",
+  "compilation": {
+    "typescript": {
+      "size": 6661700
+    },
+    "wasm": {
+      "size": 6661650
+    }
+  },
+  "sizeDifference": {
+    "absolute": 50,
+    "percentage": "0.00"
+  }
+}

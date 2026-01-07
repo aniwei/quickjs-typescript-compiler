@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/pdfjs.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__octane__pdfjs",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__octane__pdfjs/cli/pdfjs.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__octane__pdfjs/cli/pdfjs.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__octane__pdfjs/cli/pdfjs.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts/__tests____fixtures_quickjs__octane__pdfjs/cli/pdfjs.pc2line.txt",
+    "bytecodeSize": 1198937,
+    "pc2lineLength": 182,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": false,
+    "tsSize": 1198543,
+    "wasmSize": 1196666,
+    "sizeDiff": 1877,
+    "sizeDiffPercent": 0.15685245507100562
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}
