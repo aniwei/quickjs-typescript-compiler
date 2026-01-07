@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/postfix-prefix-033.ts
-**生成时间**: 2026-01-07T07:07:36.305Z
+**生成时间**: 2026-01-07T15:26:01.886Z
 
 ## 大小对比
 

@@ -1,0 +1,31 @@
+Module bytecode version: 5
+Atom count: 8
+
+=== Outer Function ===
+bytecodeLen=104 stackSize=8 varCount=1 argCount=0
+     0  check_define_var         56                  pop=0 push=0      40 38 00 00 00 80
+     6  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 80
+    12  define_var               56                  pop=0 push=0      3f 38 00 00 00 80
+    18  define_var               228                 pop=0 push=0      3f e4 00 00 00 80
+    24  push_atom_value          229                 pop=0 push=1      04 e5 00 00 00
+    29  put_var_init             56                  pop=1 push=0      3b 38 00 00 00
+    34  push_3                   3                   pop=0 push=1      ba
+    35  put_var_init             228                 pop=1 push=0      3b e4 00 00 00
+    40  get_var                  230                 pop=0 push=1      39 e6 00 00 00
+    45  get_field2               231                 pop=1 push=2      43 e7 00 00 00
+    50  push_atom_value          232                 pop=0 push=1      04 e8 00 00 00
+    55  get_field2               94                  pop=1 push=2      43 5e 00 00 00
+    60  get_var                  56                  pop=0 push=1      39 38 00 00 00
+    65  push_atom_value          233                 pop=0 push=1      04 e9 00 00 00
+    70  push_1                   1                   pop=0 push=1      b8
+    71  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    76  add                                          pop=2 push=1      9f
+    77  call_method              3                   pop=2 push=1      24 03 00
+    80  call_method              1                   pop=2 push=1      24 01 00
+    83  put_loc0                 loc=0               pop=1 push=0      cb
+    84  get_var                  230                 pop=0 push=1      39 e6 00 00 00
+    89  get_field2               231                 pop=1 push=2      43 e7 00 00 00
+    94  push_atom_value          234                 pop=0 push=1      04 ea 00 00 00
+    99  call_method              1                   pop=2 push=1      24 01 00
+   102  set_loc0                 loc=0               pop=1 push=1      cf
+   103  return                                       pop=1 push=0      28

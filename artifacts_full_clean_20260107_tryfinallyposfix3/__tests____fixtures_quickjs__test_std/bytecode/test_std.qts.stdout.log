@@ -1,0 +1,1592 @@
+__tests__/fixtures_quickjs/test_std.js:4:1: function: assert
+  mode: strict
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 0
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_var Object
+        get_field2 is
+        get_arg0 0: actual
+        get_arg1 1: expected
+        call_method 2
+        if_false8 29
+        return_undef
+   29:  get_arg0 0: actual
+        is_null
+        if_true8 79
+        get_arg1 1: expected
+        is_null
+        if_true8 79
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 79
+        return_undef
+   79:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 129
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 130
+  129:  push_empty_string
+  130:  add
+        call1 1
+        throw
+
+__tests__/fixtures_quickjs/test_std.js:23:1: function: test_printf
+  mode: strict
+  closure vars:
+    0: assert parent:loc2 var
+    1: std parent:loc0 const
+  stack_size: 7
+  opcodes:
+        get_var_ref0 0: assert
+        get_var_ref_check 1: std
+        get_field2 sprintf
+        push_atom_value "a=%d s=%s"
+        push_i8 123
+        push_atom_value abc
+        call_method 3
+        push_atom_value "a=123 s=abc"
+        call2 2
+        drop
+        get_var_ref0 0: assert
+        get_var_ref_check 1: std
+        get_field2 sprintf
+        push_atom_value "%010d"
+        push_i8 123
+        call_method 2
+        push_atom_value "0000000123"
+        call2 2
+        drop
+        get_var_ref0 0: assert
+        get_var_ref_check 1: std
+        get_field2 sprintf
+        push_atom_value "%x"
+        push_i8 -2
+        call_method 2
+        push_atom_value fffffffe
+        call2 2
+        drop
+        get_var_ref0 0: assert
+        get_var_ref_check 1: std
+        get_field2 sprintf
+        push_atom_value "%lx"
+        push_i8 -2
+        call_method 2
+        push_atom_value fffffffffffffffe
+        call2 2
+        drop
+        get_var_ref0 0: assert
+        get_var_ref_check 1: std
+        get_field2 sprintf
+        push_atom_value "%10.1f"
+        push_const8 0: 2.1
+        call_method 2
+        push_atom_value "       2.1"
+        call2 2
+        drop
+        get_var_ref0 0: assert
+        get_var_ref_check 1: std
+        get_field2 sprintf
+        push_atom_value "%*.*f"
+        push_i8 10
+        push_2 2
+        push_const8 1: 2.13
+        neg
+        call_method 4
+        push_atom_value "     -2.13"
+        call2 2
+        drop
+        get_var_ref0 0: assert
+        get_var_ref_check 1: std
+        get_field2 sprintf
+        push_atom_value "%#lx"
+        push_const8 2: 9223372036854775807n
+        call_method 2
+        push_atom_value "0x7fffffffffffffff"
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_std.js:32:1: function: test_file1
+  mode: strict
+  locals:
+    0: var f
+    1: var len
+    2: var str
+    3: var size
+    4: var buf
+    5: var ret
+    6: var i
+    7: var str1
+  closure vars:
+    0: std parent:loc0 const
+    1: assert parent:loc2 var
+  stack_size: 5
+  opcodes:
+        get_var_ref_check 0: std
+        get_field2 tmpfile
+        call_method 0
+        put_loc0 0: f
+        push_atom_value "hello world\n"
+        put_loc2 2: str
+        get_loc0 0: f
+        get_field2 puts
+        get_loc2 2: str
+        call_method 1
+        drop
+        get_loc0 0: f
+        get_field2 seek
+        push_0 0
+        get_var_ref_check 0: std
+        get_field SEEK_SET
+        call_method 2
+        drop
+        get_loc0 0: f
+        get_field2 readAsString
+        call_method 0
+        put_loc8 7: str1
+        get_var_ref1 1: assert
+        get_loc8 7: str1
+        get_loc2 2: str
+        strict_eq
+        call1 1
+        drop
+        get_loc0 0: f
+        get_field2 seek
+        push_0 0
+        get_var_ref_check 0: std
+        get_field SEEK_END
+        call_method 2
+        drop
+        get_loc0 0: f
+        get_field2 tell
+        call_method 0
+        put_loc3 3: size
+        get_var_ref1 1: assert
+        get_loc3 3: size
+        get_loc2 2: str
+        get_length
+        strict_eq
+        call1 1
+        drop
+        get_loc0 0: f
+        get_field2 seek
+        push_0 0
+        get_var_ref_check 0: std
+        get_field SEEK_SET
+        call_method 2
+        drop
+        get_var Uint8Array
+        dup
+        get_loc3 3: size
+        call_constructor 1
+        put_loc8 4: buf
+        get_loc0 0: f
+        get_field2 read
+        get_loc8 4: buf
+        get_field buffer
+        push_0 0
+        get_loc3 3: size
+        call_method 3
+        put_loc8 5: ret
+        get_var_ref1 1: assert
+        get_loc8 5: ret
+        get_loc3 3: size
+        strict_eq
+        call1 1
+        drop
+        push_0 0
+        put_loc8 6: i
+  163:  get_loc8 6: i
+        get_loc3 3: size
+        lt
+        if_false8 193
+        get_var_ref1 1: assert
+        get_loc8 4: buf
+        get_loc8 6: i
+        get_array_el
+        get_loc2 2: str
+        get_field2 charCodeAt
+        get_loc8 6: i
+        call_method 1
+        strict_eq
+        call1 1
+        drop
+        inc_loc 6: i
+        goto8 163
+  193:  get_loc0 0: f
+        get_field2 close
+        call_method 0
+        return_undef
+
+__tests__/fixtures_quickjs/test_std.js:51:1: function: test_file2
+  mode: strict
+  locals:
+    0: var f
+    1: var str
+    2: var i
+    3: var size
+  closure vars:
+    0: std parent:loc0 const
+    1: assert parent:loc2 var
+  stack_size: 5
+  opcodes:
+        get_var_ref_check 0: std
+        get_field2 tmpfile
+        call_method 0
+        put_loc0 0: f
+        push_atom_value "hello world\n"
+        set_loc1 1: str
+        get_length
+        put_loc3 3: size
+        push_0 0
+        put_loc2 2: i
+   22:  get_loc2 2: i
+        get_loc3 3: size
+        lt
+        if_false8 51
+        get_loc0 0: f
+        get_field2 putByte
+        get_loc1 1: str
+        get_field2 charCodeAt
+        get_loc2 2: i
+        call_method 1
+        call_method 1
+        drop
+        inc_loc 2: i
+        goto8 22
+   51:  get_loc0 0: f
+        get_field2 seek
+        push_0 0
+        get_var_ref_check 0: std
+        get_field SEEK_SET
+        call_method 2
+        drop
+        push_0 0
+        put_loc2 2: i
+   72:  get_loc2 2: i
+        get_loc3 3: size
+        lt
+        if_false8 104
+        get_var_ref1 1: assert
+        get_loc1 1: str
+        get_field2 charCodeAt
+        get_loc2 2: i
+        call_method 1
+        get_loc0 0: f
+        get_field2 getByte
+        call_method 0
+        strict_eq
+        call1 1
+        drop
+        inc_loc 2: i
+        goto8 72
+  104:  get_var_ref1 1: assert
+        get_loc0 0: f
+        get_field2 getByte
+        call_method 0
+        push_minus1 -1
+        strict_eq
+        call1 1
+        drop
+        get_loc0 0: f
+        get_field2 close
+        call_method 0
+        return_undef
+
+__tests__/fixtures_quickjs/test_std.js:65:1: function: test_getline
+  mode: strict
+  locals:
+    0: var f
+    1: var line
+    2: var line_count
+    3: var lines
+    4: var i
+  closure vars:
+    0: std parent:loc0 const
+    1: assert parent:loc2 var
+  stack_size: 4
+  opcodes:
+        push_atom_value "hello world"
+        push_atom_value "line 1"
+        push_atom_value "line 2"
+        array_from 3
+        put_loc3 3: lines
+        get_var_ref_check 0: std
+        get_field2 tmpfile
+        call_method 0
+        put_loc0 0: f
+        push_0 0
+        put_loc8 4: i
+   34:  get_loc8 4: i
+        get_loc3 3: lines
+        get_length
+        lt
+        if_false8 64
+        get_loc0 0: f
+        get_field2 puts
+        get_loc3 3: lines
+        get_loc8 4: i
+        get_array_el
+        push_atom_value "\n"
+        call_method 2
+        drop
+        inc_loc 4: i
+        goto8 34
+   64:  get_loc0 0: f
+        get_field2 seek
+        push_0 0
+        get_var_ref_check 0: std
+        get_field SEEK_SET
+        call_method 2
+        drop
+        get_var_ref1 1: assert
+        get_loc0 0: f
+        get_field2 eof
+        call_method 0
+        lnot
+        call1 1
+        drop
+        push_0 0
+        put_loc2 2: line_count
+   98:  get_loc0 0: f
+        get_field2 getline
+        call_method 0
+        set_loc1 1: line
+        is_null
+        if_true8 123
+        get_var_ref1 1: assert
+        get_loc1 1: line
+        get_loc3 3: lines
+        get_loc2 2: line_count
+        get_array_el
+        eq
+        call1 1
+        drop
+        inc_loc 2: line_count
+        goto8 98
+  123:  get_var_ref1 1: assert
+        get_loc0 0: f
+        get_field2 eof
+        call_method 0
+        call1 1
+        drop
+        get_var_ref1 1: assert
+        get_loc2 2: line_count
+        get_loc3 3: lines
+        get_length
+        strict_eq
+        call1 1
+        drop
+        get_loc0 0: f
+        get_field2 close
+        call_method 0
+        return_undef
+
+__tests__/fixtures_quickjs/test_std.js:86:1: function: test_popen
+  mode: strict
+  locals:
+    0: var str
+    1: var f
+    2: var fname
+    3: var content
+  closure vars:
+    0: std parent:loc0 const
+    1: assert parent:loc2 var
+    2: os parent:loc1 const
+  stack_size: 4
+  opcodes:
+        push_atom_value "tmp_file.txt"
+        put_loc2 2: fname
+        push_atom_value "hello world"
+        put_loc3 3: content
+        get_var_ref_check 0: std
+        get_field2 open
+        get_loc2 2: fname
+        push_atom_value w
+        call_method 2
+        set_loc1 1: f
+        get_field2 puts
+        get_loc3 3: content
+        call_method 1
+        drop
+        get_loc1 1: f
+        get_field2 close
+        call_method 0
+        drop
+        get_var_ref1 1: assert
+        get_var_ref_check 0: std
+        get_field2 loadFile
+        get_loc2 2: fname
+        call_method 1
+        get_loc3 3: content
+        call2 2
+        drop
+        get_var_ref_check 0: std
+        get_field2 popen
+        push_atom_value "cat "
+        get_loc2 2: fname
+        add
+        push_atom_value r
+        call_method 2
+        set_loc1 1: f
+        get_field2 readAsString
+        call_method 0
+        put_loc0 0: str
+        get_loc1 1: f
+        get_field2 close
+        call_method 0
+        drop
+        get_var_ref1 1: assert
+        get_loc0 0: str
+        get_loc3 3: content
+        call2 2
+        drop
+        get_var_ref_check 2: os
+        get_field2 remove
+        get_loc2 2: fname
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_std.js:101:1: function: test_ext_json
+  mode: strict
+  locals:
+    0: var expected
+    1: var input
+    2: var obj
+  closure vars:
+    0: std parent:loc0 const
+    1: assert parent:loc2 var
+  stack_size: 4
+  opcodes:
+        push_atom_value "{\"x\":false,\"y\":true,\"z2\":null,\"a\":[1,8,160],\"b\":\"abc\\u000bd\",\"s\":\"str\"}"
+        put_loc0 0: expected
+        push_atom_value "{ \"x\":false, /*comments are allowed */\n               \"y\":true,  // also a comment\n               z2:null, // unquoted property names\n               \"a\":[+1,0o10,0xa0,], // plus prefix, octal, hexadecimal\n               \"b\": \"abc\\vd\", // multi-line strings, '\u000b' escape\n               \"s\":'str',} // trailing comma in objects and arrays, single quoted string\n            "
+        put_loc1 1: input
+        get_var_ref_check 0: std
+        get_field2 parseExtJSON
+        get_loc1 1: input
+        call_method 1
+        put_loc2 2: obj
+        get_var_ref1 1: assert
+        get_var JSON
+        get_field2 stringify
+        get_loc2 2: obj
+        call_method 1
+        get_loc0 0: expected
+        call2 2
+        drop
+        get_var_ref_check 0: std
+        get_field2 parseExtJSON
+        push_atom_value "[Infinity, +Infinity, -Infinity, NaN, +NaN, -NaN, .1, -.2]"
+        call_method 1
+        put_loc2 2: obj
+        get_var_ref1 1: assert
+        get_loc2 2: obj
+        push_0 0
+        get_array_el
+        get_var Infinity
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc2 2: obj
+        push_1 1
+        get_array_el
+        get_var Infinity
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc2 2: obj
+        push_2 2
+        get_array_el
+        get_var Infinity
+        neg
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc2 2: obj
+        push_3 3
+        get_array_el
+        get_var NaN
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc2 2: obj
+        push_4 4
+        get_array_el
+        get_var NaN
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc2 2: obj
+        push_5 5
+        get_array_el
+        get_var NaN
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc2 2: obj
+        push_6 6
+        get_array_el
+        push_const8 0: 0.1
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc2 2: obj
+        push_7 7
+        get_array_el
+        push_const8 1: 0.2
+        neg
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_std.js:124:1: function: test_os
+  mode: strict
+  locals:
+    0: var fd
+    1: var fpath
+    2: var fname
+    3: var fdir
+    4: var buf
+    5: var buf2
+    6: var i
+    7: var files
+    8: var err
+    9: var fdate
+   10: var st
+   11: var link_path
+   12: const stdinIsTTY [level:1 next:-1]
+  closure vars:
+    0: os parent:loc1 const
+    1: assert parent:loc2 var
+    2: std parent:loc0 const
+  stack_size: 8
+  opcodes:
+        set_loc_uninitialized 12: stdinIsTTY
+        get_var_ref_check 0: os
+        get_field2 exec
+        push_atom_value "/bin/sh"
+        push_atom_value "-c"
+        push_atom_value "test -t 0"
+        array_from 3
+        object
+        push_false
+        define_field usePath
+        call_method 2
+        lnot
+        put_loc8 12: stdinIsTTY
+        get_var_ref1 1: assert
+        get_var_ref_check 0: os
+        get_field2 isatty
+        push_0 0
+        call_method 1
+        get_loc_check 12: stdinIsTTY
+        push_atom_value "isatty(STDIN)"
+        call3 3
+        drop
+        push_atom_value test_tmp_dir
+        put_loc3 3: fdir
+        push_atom_value "tmp_file.txt"
+        put_loc2 2: fname
+        get_loc3 3: fdir
+        push_atom_value "/"
+        add
+        get_loc2 2: fname
+        add
+        put_loc1 1: fpath
+        get_loc3 3: fdir
+        push_atom_value "/test_link"
+        add
+        put_loc8 11: link_path
+        get_var_ref_check 0: os
+        get_field2 remove
+        get_loc8 11: link_path
+        call_method 1
+        drop
+        get_var_ref_check 0: os
+        get_field2 remove
+        get_loc1 1: fpath
+        call_method 1
+        drop
+        get_var_ref_check 0: os
+        get_field2 remove
+        get_loc3 3: fdir
+        call_method 1
+        drop
+        get_var_ref_check 0: os
+        get_field2 mkdir
+        get_loc3 3: fdir
+        push_i16 493
+        call_method 2
+        put_loc8 8: err
+        get_var_ref1 1: assert
+        get_loc8 8: err
+        push_0 0
+        strict_eq
+        call1 1
+        drop
+        get_var_ref_check 0: os
+        get_field2 open
+        get_loc1 1: fpath
+        get_var_ref_check 0: os
+        get_field O_RDWR
+        get_var_ref_check 0: os
+        get_field O_CREAT
+        or
+        get_var_ref_check 0: os
+        get_field O_TRUNC
+        or
+        call_method 2
+        put_loc0 0: fd
+        get_var_ref1 1: assert
+        get_loc0 0: fd
+        push_0 0
+        gte
+        call1 1
+        drop
+        get_var Uint8Array
+        dup
+        push_i8 10
+        call_constructor 1
+        put_loc8 4: buf
+        push_0 0
+        put_loc8 6: i
+  221:  get_loc8 6: i
+        get_loc8 4: buf
+        get_length
+        lt
+        if_false8 240
+        get_loc8 4: buf
+        get_loc8 6: i
+        get_loc8 6: i
+        put_array_el
+        inc_loc 6: i
+        goto8 221
+  240:  get_var_ref1 1: assert
+        get_var_ref_check 0: os
+        get_field2 write
+        get_loc0 0: fd
+        get_loc8 4: buf
+        get_field buffer
+        push_0 0
+        get_loc8 4: buf
+        get_length
+        call_method 4
+        get_loc8 4: buf
+        get_length
+        strict_eq
+        call1 1
+        drop
+        get_var_ref1 1: assert
+        get_var_ref_check 0: os
+        get_field2 seek
+        get_loc0 0: fd
+        push_0 0
+        get_var_ref_check 2: std
+        get_field SEEK_SET
+        call_method 3
+        push_0 0
+        strict_eq
+        call1 1
+        drop
+        get_var Uint8Array
+        dup
+        get_loc8 4: buf
+        get_length
+        call_constructor 1
+        put_loc8 5: buf2
+        get_var_ref1 1: assert
+        get_var_ref_check 0: os
+        get_field2 read
+        get_loc0 0: fd
+        get_loc8 5: buf2
+        get_field buffer
+        push_0 0
+        get_loc8 5: buf2
+        get_length
+        call_method 4
+        get_loc8 5: buf2
+        get_length
+        strict_eq
+        call1 1
+        drop
+        push_0 0
+        put_loc8 6: i
+  343:  get_loc8 6: i
+        get_loc8 4: buf
+        get_length
+        lt
+        if_false8 369
+        get_var_ref1 1: assert
+        get_loc8 4: buf
+        get_loc8 6: i
+        get_array_el
+        get_loc8 5: buf2
+        get_loc8 6: i
+        get_array_el
+        eq
+        call1 1
+        drop
+        inc_loc 6: i
+        goto8 343
+  369:  get_var_undef BigInt
+        typeof_is_undefined
+        if_true8 452
+        get_var_ref1 1: assert
+        get_var_ref_check 0: os
+        get_field2 seek
+        get_loc0 0: fd
+        get_var BigInt
+        push_6 6
+        call1 1
+        get_var_ref_check 2: std
+        get_field SEEK_SET
+        call_method 3
+        get_var BigInt
+        push_6 6
+        call1 1
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_var_ref_check 0: os
+        get_field2 read
+        get_loc0 0: fd
+        get_loc8 5: buf2
+        get_field buffer
+        push_0 0
+        push_1 1
+        call_method 4
+        push_1 1
+        strict_eq
+        call1 1
+        drop
+        get_var_ref1 1: assert
+        get_loc8 4: buf
+        push_6 6
+        get_array_el
+        get_loc8 5: buf2
+        push_0 0
+        get_array_el
+        eq
+        call1 1
+        drop
+  452:  get_var_ref1 1: assert
+        get_var_ref_check 0: os
+        get_field2 close
+        get_loc0 0: fd
+        call_method 1
+        push_0 0
+        strict_eq
+        call1 1
+        drop
+        goto8 498
+  471:  dup
+        for_of_start
+        make_loc_ref files,7
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref err,8
+        for_of_next 2
+        drop
+        put_ref_value
+        iterator_close
+        goto8 512
+  498:  get_var_ref_check 0: os
+        get_field2 readdir
+        get_loc3 3: fdir
+        call_method 1
+        goto8 471
+  512:  drop
+        get_var_ref1 1: assert
+        get_loc8 8: err
+        push_0 0
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc8 7: files
+        get_field2 indexOf
+        get_loc2 2: fname
+        call_method 1
+        push_0 0
+        gte
+        call1 1
+        drop
+        push_i16 10000
+        put_loc8 9: fdate
+        get_var_ref_check 0: os
+        get_field2 utimes
+        get_loc1 1: fpath
+        get_loc8 9: fdate
+        get_loc8 9: fdate
+        call_method 3
+        put_loc8 8: err
+        get_var_ref1 1: assert
+        get_loc8 8: err
+        push_0 0
+        call2 2
+        drop
+        goto8 593
+  566:  dup
+        for_of_start
+        make_loc_ref st,10
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref err,8
+        for_of_next 2
+        drop
+        put_ref_value
+        iterator_close
+        goto8 607
+  593:  get_var_ref_check 0: os
+        get_field2 stat
+        get_loc1 1: fpath
+        call_method 1
+        goto8 566
+  607:  drop
+        get_var_ref1 1: assert
+        get_loc8 8: err
+        push_0 0
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc8 10: st
+        get_field mode
+        get_var_ref_check 0: os
+        get_field S_IFMT
+        and
+        get_var_ref_check 0: os
+        get_field S_IFREG
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc8 10: st
+        get_field mtime
+        get_loc8 9: fdate
+        call2 2
+        drop
+        get_var_ref_check 0: os
+        get_field2 symlink
+        get_loc2 2: fname
+        get_loc8 11: link_path
+        call_method 2
+        put_loc8 8: err
+        get_var_ref1 1: assert
+        get_loc8 8: err
+        push_0 0
+        strict_eq
+        call1 1
+        drop
+        goto8 705
+  678:  dup
+        for_of_start
+        make_loc_ref st,10
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref err,8
+        for_of_next 2
+        drop
+        put_ref_value
+        iterator_close
+        goto8 720
+  705:  get_var_ref_check 0: os
+        get_field2 lstat
+        get_loc8 11: link_path
+        call_method 1
+        goto8 678
+  720:  drop
+        get_var_ref1 1: assert
+        get_loc8 8: err
+        push_0 0
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc8 10: st
+        get_field mode
+        get_var_ref_check 0: os
+        get_field S_IFMT
+        and
+        get_var_ref_check 0: os
+        get_field S_IFLNK
+        call2 2
+        drop
+        goto8 783
+  756:  dup
+        for_of_start
+        make_loc_ref buf,4
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref err,8
+        for_of_next 2
+        drop
+        put_ref_value
+        iterator_close
+        goto8 798
+  783:  get_var_ref_check 0: os
+        get_field2 readlink
+        get_loc8 11: link_path
+        call_method 1
+        goto8 756
+  798:  drop
+        get_var_ref1 1: assert
+        get_loc8 8: err
+        push_0 0
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc8 4: buf
+        get_loc2 2: fname
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_var_ref_check 0: os
+        get_field2 remove
+        get_loc8 11: link_path
+        call_method 1
+        push_0 0
+        strict_eq
+        call1 1
+        drop
+        goto8 858
+  831:  dup
+        for_of_start
+        make_loc_ref buf,4
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref err,8
+        for_of_next 2
+        drop
+        put_ref_value
+        iterator_close
+        goto8 871
+  858:  get_var_ref_check 0: os
+        get_field2 getcwd
+        call_method 0
+        goto8 831
+  871:  drop
+        get_var_ref1 1: assert
+        get_loc8 8: err
+        push_0 0
+        call2 2
+        drop
+        goto8 907
+  880:  dup
+        for_of_start
+        make_loc_ref buf2,5
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref err,8
+        for_of_next 2
+        drop
+        put_ref_value
+        iterator_close
+        goto8 925
+  907:  get_var_ref_check 0: os
+        get_field2 realpath
+        push_atom_value "."
+        call_method 1
+        goto8 880
+  925:  drop
+        get_var_ref1 1: assert
+        get_loc8 8: err
+        push_0 0
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc8 4: buf
+        get_loc8 5: buf2
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_var_ref_check 0: os
+        get_field2 remove
+        get_loc1 1: fpath
+        call_method 1
+        push_0 0
+        strict_eq
+        call1 1
+        drop
+        get_var_ref_check 0: os
+        get_field2 open
+        get_loc1 1: fpath
+        get_var_ref_check 0: os
+        get_field O_RDONLY
+        call_method 2
+        put_loc0 0: fd
+        get_var_ref1 1: assert
+        get_loc0 0: fd
+        push_0 0
+        lt
+        call1 1
+        drop
+        get_var_ref1 1: assert
+        get_var_ref_check 0: os
+        get_field2 remove
+        get_loc3 3: fdir
+        call_method 1
+        push_0 0
+        strict_eq
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_std.js:183:1: function: test_os_exec
+  mode: strict
+  locals:
+    0: var ret
+    1: var fds
+    2: var pid
+    3: var f
+    4: var status
+  closure vars:
+    0: os parent:loc1 const
+    1: assert parent:loc2 var
+    2: std parent:loc0 const
+  stack_size: 8
+  opcodes:
+        get_var_ref_check 0: os
+        get_field2 exec
+        push_atom_value true
+        array_from 1
+        call_method 1
+        put_loc0 0: ret
+        get_var_ref1 1: assert
+        get_loc0 0: ret
+        push_0 0
+        call2 2
+        drop
+        get_var_ref_check 0: os
+        get_field2 exec
+        push_atom_value "/bin/sh"
+        push_atom_value "-c"
+        push_atom_value "exit 1"
+        array_from 3
+        object
+        push_false
+        define_field usePath
+        call_method 2
+        put_loc0 0: ret
+        get_var_ref1 1: assert
+        get_loc0 0: ret
+        push_1 1
+        call2 2
+        drop
+        get_var_ref_check 0: os
+        get_field2 pipe
+        call_method 0
+        put_loc1 1: fds
+        get_var_ref_check 0: os
+        get_field2 exec
+        push_atom_value sh
+        push_atom_value "-c"
+        push_atom_value "echo $FOO"
+        array_from 3
+        object
+        get_loc1 1: fds
+        push_1 1
+        get_array_el
+        define_field stdout
+        push_false
+        define_field block
+        object
+        push_atom_value hello
+        define_field FOO
+        define_field env
+        call_method 2
+        put_loc2 2: pid
+        get_var_ref1 1: assert
+        get_loc2 2: pid
+        push_0 0
+        gte
+        call1 1
+        drop
+        get_var_ref_check 0: os
+        get_field2 close
+        get_loc1 1: fds
+        push_1 1
+        get_array_el
+        call_method 1
+        drop
+        get_var_ref_check 2: std
+        get_field2 fdopen
+        get_loc1 1: fds
+        push_0 0
+        get_array_el
+        push_atom_value r
+        call_method 2
+        put_loc3 3: f
+        get_var_ref1 1: assert
+        get_loc3 3: f
+        get_field2 getline
+        call_method 0
+        push_atom_value hello
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc3 3: f
+        get_field2 getline
+        call_method 0
+        null
+        call2 2
+        drop
+        get_loc3 3: f
+        get_field2 close
+        call_method 0
+        drop
+        goto8 250
+  223:  dup
+        for_of_start
+        make_loc_ref ret,0
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref status,4
+        for_of_next 2
+        drop
+        put_ref_value
+        iterator_close
+        goto8 265
+  250:  get_var_ref_check 0: os
+        get_field2 waitpid
+        get_loc2 2: pid
+        push_0 0
+        call_method 2
+        goto8 223
+  265:  drop
+        get_var_ref1 1: assert
+        get_loc0 0: ret
+        get_loc2 2: pid
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc8 4: status
+        push_i8 127
+        and
+        push_0 0
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc8 4: status
+        push_i8 8
+        sar
+        push_0 0
+        call2 2
+        drop
+        get_var_ref_check 0: os
+        get_field2 exec
+        push_atom_value cat
+        array_from 1
+        object
+        push_false
+        define_field block
+        call_method 2
+        put_loc2 2: pid
+        get_var_ref1 1: assert
+        get_loc2 2: pid
+        push_0 0
+        gte
+        call1 1
+        drop
+        get_var_ref_check 0: os
+        get_field2 kill
+        get_loc2 2: pid
+        get_var_ref_check 0: os
+        get_field SIGTERM
+        call_method 2
+        drop
+        goto8 372
+  345:  dup
+        for_of_start
+        make_loc_ref ret,0
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref status,4
+        for_of_next 2
+        drop
+        put_ref_value
+        iterator_close
+        goto8 387
+  372:  get_var_ref_check 0: os
+        get_field2 waitpid
+        get_loc2 2: pid
+        push_0 0
+        call_method 2
+        goto8 345
+  387:  drop
+        get_var_ref1 1: assert
+        get_loc0 0: ret
+        get_loc2 2: pid
+        call2 2
+        drop
+        get_var_ref1 1: assert
+        get_loc8 4: status
+        push_0 0
+        strict_neq
+        push_true
+        push_atom_value "expect nonzero exit code (got "
+        get_field2 concat
+        get_loc8 4: status
+        push_atom_value ")"
+        call_method 2
+        call3 3
+        drop
+        get_var_ref1 1: assert
+        get_loc8 4: status
+        push_i8 127
+        and
+        get_var_ref_check 0: os
+        get_field SIGTERM
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_std.js:218:31: function: <null>
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/test_std.js:213:1: function: test_timer
+  mode: strict
+  locals:
+    0: var th
+    1: var i
+  closure vars:
+    0: os parent:loc1 const
+  stack_size: 6
+  opcodes:
+        array_from 0
+        put_loc0 0: th
+        push_0 0
+        put_loc1 1: i
+    6:  get_loc1 1: i
+        push_3 3
+        lt
+        if_false8 34
+        get_loc0 0: th
+        get_loc1 1: i
+        get_var_ref_check 0: os
+        get_field2 setTimeout
+        fclosure8 0: [bytecode <null>]
+        push_i16 1000
+        call_method 2
+        put_array_el
+        inc_loc 1: i
+        goto8 6
+   34:  push_0 0
+        put_loc1 1: i
+   36:  get_loc1 1: i
+        push_3 3
+        lt
+        if_false8 60
+        get_var_ref_check 0: os
+        get_field2 clearTimeout
+        get_loc0 0: th
+        get_loc1 1: i
+        get_array_el
+        call_method 1
+        drop
+        inc_loc 1: i
+        goto8 36
+   60:  return_undef
+
+__tests__/fixtures_quickjs/test_std.js:227:20: function: <null>
+  mode: strict
+  closure vars:
+    0: obj local:loc0 let
+    1: std parent:loc0 const
+  stack_size: 2
+  opcodes:
+        get_var_ref_check 0: obj
+        drop
+        get_var_ref_check 1: std
+        get_field2 gc
+        call_method 0
+        return_undef
+
+__tests__/fixtures_quickjs/test_std.js:232:31: function: <null>
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/test_std.js:225:6: function: run
+  mode: strict
+  locals:
+    0: let obj [level:1 next:-1]
+    1: let done [level:1 next:0]
+    2: const p [level:1 next:1]
+  closure vars:
+    0: std parent:loc0 const
+  stack_size: 3
+  opcodes:
+        set_loc_uninitialized 2: p
+        set_loc_uninitialized 1: done
+        set_loc_uninitialized 0: obj
+        object
+        put_loc0 0: obj
+        fclosure8 0: [bytecode <null>]
+        set_name done
+        put_loc1 1: done
+        get_var Promise
+        get_field2 resolve
+        call_method 0
+        get_field2 then
+        get_loc_check 1: done
+        call_method 1
+        drop
+        get_var Promise
+        dup
+        fclosure8 1: [bytecode <null>]
+        call_constructor 1
+        put_loc2 2: p
+        get_loc_check 2: p
+        await
+        drop
+        undefined
+        return_async
+
+__tests__/fixtures_quickjs/test_std.js:224:1: function: test_async_gc
+  mode: strict
+  closure vars:
+    0: std parent:loc0 const
+  stack_size: 1
+  opcodes:
+        fclosure8 0: [bytecode run]
+        call0 0
+        return_undef
+
+__tests__/fixtures_quickjs/test_std.js:245:14: function: <null>
+  mode: strict
+  closure vars:
+    0: counter local:loc0 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: counter
+        post_inc
+        put_var_ref0 0: counter
+        return
+
+__tests__/fixtures_quickjs/test_std.js:246:14: function: <null>
+  mode: strict
+  closure vars:
+    0: counter local:loc0 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: counter
+        post_inc
+        put_var_ref0 0: counter
+        return
+
+__tests__/fixtures_quickjs/test_std.js:247:13: function: <null>
+  mode: strict
+  closure vars:
+    0: counter local:loc0 var
+  stack_size: 2
+  opcodes:
+        get_var_ref0 0: counter
+        post_inc
+        put_var_ref0 0: counter
+        return
+
+__tests__/fixtures_quickjs/test_std.js:248:19: function: <null>
+  mode: strict
+  closure vars:
+    0: assert parent:loc0 var
+    1: counter local:loc0 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: assert
+        get_var_ref1 1: counter
+        push_3 3
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_std.js:239:1: function: test_async_promise_rejection
+  mode: strict
+  locals:
+    0: var counter
+    1: var p1
+    2: var p2
+    3: var p3
+  closure vars:
+    0: assert parent:loc2 var
+    1: os parent:loc1 const
+  stack_size: 4
+  opcodes:
+        push_0 0
+        put_loc0 0: counter
+        get_var Promise
+        get_field2 reject
+        call_method 0
+        put_loc1 1: p1
+        get_var Promise
+        get_field2 reject
+        call_method 0
+        put_loc2 2: p2
+        get_var Promise
+        get_field2 resolve
+        call_method 0
+        put_loc3 3: p3
+        get_loc1 1: p1
+        get_field2 catch
+        fclosure8 0: [bytecode <null>]
+        call_method 1
+        drop
+        get_loc2 2: p2
+        get_field2 catch
+        fclosure8 1: [bytecode <null>]
+        call_method 1
+        drop
+        get_loc3 3: p3
+        get_field2 then
+        fclosure8 2: [bytecode <null>]
+        call_method 1
+        drop
+        get_var_ref_check 1: os
+        get_field2 setTimeout
+        fclosure8 3: [bytecode <null>]
+        push_i8 10
+        call_method 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_std.js:1:1: function: <eval>
+  mode: strict
+  locals:
+    0: catch e [level:3 next:-1]
+  closure vars:
+    0: std local:loc0 const
+    1: os local:loc1 const
+    2: assert local:loc0 var
+    3: test_printf local:loc1 var
+    4: test_file1 local:loc2 var
+    5: test_file2 local:loc3 var
+    6: test_getline local:loc4 var
+    7: test_popen local:loc5 var
+    8: test_ext_json local:loc6 var
+    9: test_os local:loc7 var
+   10: test_os_exec local:loc8 var
+   11: test_timer local:loc9 var
+   12: test_async_gc local:loc10 var
+   13: test_async_promise_rejection local:loc11 var
+  stack_size: 4
+  opcodes:
+        push_this
+        if_false8 60
+        fclosure8 0: [bytecode assert]
+        put_var_ref2 2: assert
+        fclosure8 1: [bytecode test_printf]
+        put_var_ref3 3: test_printf
+        fclosure8 2: [bytecode test_file1]
+        put_var_ref 4: test_file1
+        fclosure8 3: [bytecode test_file2]
+        put_var_ref 5: test_file2
+        fclosure8 4: [bytecode test_getline]
+        put_var_ref 6: test_getline
+        fclosure8 5: [bytecode test_popen]
+        put_var_ref 7: test_popen
+        fclosure8 6: [bytecode test_ext_json]
+        put_var_ref 8: test_ext_json
+        fclosure8 7: [bytecode test_os]
+        put_var_ref 9: test_os
+        fclosure8 8: [bytecode test_os_exec]
+        put_var_ref 10: test_os_exec
+        fclosure8 9: [bytecode test_timer]
+        put_var_ref 11: test_timer
+        fclosure8 10: [bytecode test_async_gc]
+        put_var_ref 12: test_async_gc
+        fclosure8 11: [bytecode test_async_promise_rejection]
+        put_var_ref 13: test_async_promise_rejection
+        return_undef
+   60:  catch 85
+        get_var_ref_check 0: std
+        get_field2 loadScript
+        push_atom_value "test_assert.js"
+        call_method 1
+        drop
+        drop
+        goto8 95
+   85:  put_loc0 0: e
+        catch 94
+        drop
+        goto8 95
+   94:  throw
+   95:  get_var_ref3 3: test_printf
+        call0 0
+        drop
+        get_var_ref 4: test_file1
+        call0 0
+        drop
+        get_var_ref 5: test_file2
+        call0 0
+        drop
+        get_var_ref 6: test_getline
+        call0 0
+        drop
+        get_var_ref 7: test_popen
+        call0 0
+        drop
+        get_var_ref 9: test_os
+        call0 0
+        drop
+        get_var_ref 10: test_os_exec
+        call0 0
+        drop
+        get_var_ref 11: test_timer
+        call0 0
+        drop
+        get_var_ref 8: test_ext_json
+        call0 0
+        drop
+        get_var_ref 12: test_async_gc
+        call0 0
+        drop
+        get_var_ref 13: test_async_promise_rejection
+        call0 0
+        drop
+        undefined
+        return_async
+

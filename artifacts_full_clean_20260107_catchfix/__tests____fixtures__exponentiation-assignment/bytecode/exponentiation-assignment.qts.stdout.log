@@ -1,0 +1,22 @@
+__tests__/fixtures/exponentiation-assignment.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var x,128
+        define_var x,130
+        push_2 2
+        put_var_init x
+        get_var x
+        push_3 3
+        pow
+        dup
+        put_var x
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var x
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-01-07T15:05:13.203Z",
+  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/mandreel.ts",
+  "note": "analysis omitted: bytecode too large (3513152 bytes)",
+  "compilation": {
+    "typescript": {
+      "size": 3513152
+    },
+    "wasm": {
+      "size": 3512848
+    }
+  },
+  "sizeDifference": {
+    "absolute": 304,
+    "percentage": "0.01"
+  }
+}

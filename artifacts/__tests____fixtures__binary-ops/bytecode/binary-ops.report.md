@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/binary-ops.ts
-**生成时间**: 2026-01-07T07:07:35.508Z
+**生成时间**: 2026-01-07T15:26:01.161Z
 
 ## 大小对比
 

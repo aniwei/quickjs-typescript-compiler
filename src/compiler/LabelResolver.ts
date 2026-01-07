@@ -137,6 +137,16 @@ export class LabelResolver {
     return OPCODE_BY_CODE[op]
   }
 
+  private allocJumpSlot(fd: FunctionDef): JumpSlot {
+    if (!fd.jumpSlots) {
+      fd.jumpSlots = []
+    }
+    if (fd.jumpCount >= fd.jumpSlots.length) {
+      fd.jumpSlots.push(new JumpSlot())
+    }
+    return fd.jumpSlots[fd.jumpCount]
+  }
+
   // ============================================================================
   // 主入口方法 - 对应 parser.c:resolve_labels
   // 
@@ -2160,14 +2170,12 @@ export class LabelResolver {
             }
             
             // 记录跳转槽 - 短跳转使用 1 字节偏移
-            if (fd.jumpCount < fd.jumpSlots.length) {
-              const jp = fd.jumpSlots[fd.jumpCount]
-              jp.op = shortOp
-              jp.size = 1
-              jp.pos = bcOut.size + 1  // 偏移位置
-              jp.label = label
-              fd.jumpCount++
-            }
+            const jp = this.allocJumpSlot(fd)
+            jp.op = shortOp
+            jp.size = 1
+            jp.pos = bcOut.size + 1  // 偏移位置
+            jp.label = label
+            fd.jumpCount++
             
             bcOut.putU8(shortOp)
             bcOut.putU8(0)
@@ -2176,14 +2184,12 @@ export class LabelResolver {
           }
           if (diff >= -32768 && diff <= 32767 && op === Opcode.OP_goto) {
             // 记录跳转槽 - 中等跳转使用 2 字节偏移
-            if (fd.jumpCount < fd.jumpSlots.length) {
-              const jp = fd.jumpSlots[fd.jumpCount]
-              jp.op = Opcode.OP_goto16
-              jp.size = 2
-              jp.pos = bcOut.size + 1
-              jp.label = label
-              fd.jumpCount++
-            }
+            const jp = this.allocJumpSlot(fd)
+            jp.op = Opcode.OP_goto16
+            jp.size = 2
+            jp.pos = bcOut.size + 1
+            jp.label = label
+            fd.jumpCount++
             
             bcOut.putU8(Opcode.OP_goto16)
             bcOut.putU16(0)
@@ -2203,14 +2209,12 @@ export class LabelResolver {
           // 因为后续的 optimizeShortJumps 可能会收缩中间的代码，导致 diff 发生变化
           // 对应 QuickJS 源码 parser.c:11363:
           // "we must record the jump because the offset may change if we optimize other jumps"
-          if (fd.jumpCount < fd.jumpSlots.length) {
-            const jp = fd.jumpSlots[fd.jumpCount]
-            jp.op = shortOp
-            jp.size = 1
-            jp.pos = bcOut.size + 1
-            jp.label = label
-            fd.jumpCount++
-          }
+          const jp = this.allocJumpSlot(fd)
+          jp.op = shortOp
+          jp.size = 1
+          jp.pos = bcOut.size + 1
+          jp.label = label
+          fd.jumpCount++
 
           bcOut.putU8(shortOp)
           bcOut.putU8(diff & 0xff)
@@ -2224,14 +2228,12 @@ export class LabelResolver {
           //   jp->op = OP_goto16;
           //   ...
           // }
-          if (fd.jumpCount < fd.jumpSlots.length) {
-            const jp = fd.jumpSlots[fd.jumpCount]
-            jp.op = Opcode.OP_goto16
-            jp.size = 2
-            jp.pos = bcOut.size + 1
-            jp.label = label
-            fd.jumpCount++
-          }
+          const jp = this.allocJumpSlot(fd)
+          jp.op = Opcode.OP_goto16
+          jp.size = 2
+          jp.pos = bcOut.size + 1
+          jp.label = label
+          fd.jumpCount++
 
           bcOut.putU8(Opcode.OP_goto16)
           // QuickJS: resolve_labels 中 diff 经过 (int16_t) 校验后写入 OP_goto16
@@ -2245,17 +2247,15 @@ export class LabelResolver {
       if (process.env.DEBUG_JUMP) {
         console.log(`[emitJump] Before recording: jumpCount=${fd.jumpCount}, jumpSlots.length=${fd.jumpSlots?.length ?? 'null'}`)
       }
-      if (fd.jumpCount < fd.jumpSlots.length) {
-        const jp = fd.jumpSlots[fd.jumpCount]
-        jp.op = op
-        jp.size = 4
-        jp.pos = bcOut.size + 1
-        jp.label = label
-        fd.jumpCount++
-        
-        if (process.env.DEBUG_JUMP) {
-          console.log(`[emitJump] Recorded LONG jump: op=0x${op.toString(16)}, size=4, pos=${jp.pos}, label=${label}`)
-        }
+      const jp = this.allocJumpSlot(fd)
+      jp.op = op
+      jp.size = 4
+      jp.pos = bcOut.size + 1
+      jp.label = label
+      fd.jumpCount++
+      
+      if (process.env.DEBUG_JUMP) {
+        console.log(`[emitJump] Recorded LONG jump: op=0x${op.toString(16)}, size=4, pos=${jp.pos}, label=${label}`)
       }
     }
     

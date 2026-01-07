@@ -626,7 +626,7 @@ bytecodeLen=115 stackSize=5 varCount=5 argCount=0
    114  throw                                        pop=1 push=0      30
 
 === Inner Function #12 ===
-bytecodeLen=448 stackSize=5 varCount=8 argCount=0
+bytecodeLen=447 stackSize=5 varCount=8 argCount=0
      0  special_object           3                   pop=0 push=1      0c 03
      2  put_loc8                 6                   pop=1 push=0      c5 06
      4  push_this                                    pop=0 push=1      08
@@ -699,7 +699,7 @@ bytecodeLen=448 stackSize=5 varCount=8 argCount=0
    228  drop                                         pop=1 push=0      0e
    229  goto8                    2                   pop=0 push=0      ee 02
    231  throw                                        pop=1 push=0      30
-   232  catch                    36                  pop=0 push=1      6f 24 00 00 00
+   232  catch                    35                  pop=0 push=1      6f 23 00 00 00
    237  get_loc8                 4                   pop=0 push=1      c4 04
    239  with_get_var             atom=60 label8=10   pop=1 push=0      75 3c 00 00 00 0a 00 00 00 00
    249  get_var                  60                  pop=0 push=1      39 3c 00 00 00
@@ -707,62 +707,62 @@ bytecodeLen=448 stackSize=5 varCount=8 argCount=0
    259  eval                     npop=1              pop=1 push=1      32 01 00 01 00
    264  drop                                         pop=1 push=0      0e
    265  drop                                         pop=1 push=0      0e
-   266  goto16                   74                  pop=0 push=0      ef 4a 00
-   269  put_loc2                 loc=2               pop=1 push=0      cd
-   270  catch                    69                  pop=0 push=1      6f 45 00 00 00
-   275  get_loc8                 4                   pop=0 push=1      c4 04
-   277  with_get_var             atom=228 label8=10  pop=1 push=0      75 e4 00 00 00 0a 00 00 00 00
-   287  get_var                  228                 pop=0 push=1      39 e4 00 00 00
-   292  get_loc2                 loc=2               pop=0 push=1      c9
-   293  get_field                50                  pop=1 push=1      42 32 00 00 00
-   298  push_4                   4                   pop=0 push=1      bb
-   299  push_atom_value          240                 pop=0 push=1      04 f0 00 00 00
-   304  call3                    npop=3              pop=1 push=1      f3
-   305  drop                                         pop=1 push=0      0e
-   306  get_loc8                 4                   pop=0 push=1      c4 04
-   308  with_get_var             atom=228 label8=10  pop=1 push=0      75 e4 00 00 00 0a 00 00 00 00
-   318  get_var                  228                 pop=0 push=1      39 e4 00 00 00
-   323  get_loc2                 loc=2               pop=0 push=1      c9
-   324  get_field                51                  pop=1 push=1      42 33 00 00 00
-   329  push_3                   3                   pop=0 push=1      ba
-   330  push_atom_value          240                 pop=0 push=1      04 f0 00 00 00
-   335  call3                    npop=3              pop=1 push=1      f3
+   266  goto8                    73                  pop=0 push=0      ee 49
+   268  put_loc2                 loc=2               pop=1 push=0      cd
+   269  catch                    69                  pop=0 push=1      6f 45 00 00 00
+   274  get_loc8                 4                   pop=0 push=1      c4 04
+   276  with_get_var             atom=228 label8=10  pop=1 push=0      75 e4 00 00 00 0a 00 00 00 00
+   286  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+   291  get_loc2                 loc=2               pop=0 push=1      c9
+   292  get_field                50                  pop=1 push=1      42 32 00 00 00
+   297  push_4                   4                   pop=0 push=1      bb
+   298  push_atom_value          240                 pop=0 push=1      04 f0 00 00 00
+   303  call3                    npop=3              pop=1 push=1      f3
+   304  drop                                         pop=1 push=0      0e
+   305  get_loc8                 4                   pop=0 push=1      c4 04
+   307  with_get_var             atom=228 label8=10  pop=1 push=0      75 e4 00 00 00 0a 00 00 00 00
+   317  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+   322  get_loc2                 loc=2               pop=0 push=1      c9
+   323  get_field                51                  pop=1 push=1      42 33 00 00 00
+   328  push_3                   3                   pop=0 push=1      ba
+   329  push_atom_value          240                 pop=0 push=1      04 f0 00 00 00
+   334  call3                    npop=3              pop=1 push=1      f3
+   335  drop                                         pop=1 push=0      0e
    336  drop                                         pop=1 push=0      0e
-   337  drop                                         pop=1 push=0      0e
-   338  goto8                    2                   pop=0 push=0      ee 02
-   340  throw                                        pop=1 push=0      30
-   341  catch                    34                  pop=0 push=1      6f 22 00 00 00
-   346  get_loc8                 4                   pop=0 push=1      c4 04
-   348  with_get_var             atom=60 label8=10   pop=1 push=0      75 3c 00 00 00 0a 00 00 00 00
-   358  get_var                  60                  pop=0 push=1      39 3c 00 00 00
-   363  push_atom_value          265                 pop=0 push=1      04 09 01 00 00
-   368  eval                     npop=1              pop=1 push=1      32 01 00 01 00
+   337  goto8                    2                   pop=0 push=0      ee 02
+   339  throw                                        pop=1 push=0      30
+   340  catch                    34                  pop=0 push=1      6f 22 00 00 00
+   345  get_loc8                 4                   pop=0 push=1      c4 04
+   347  with_get_var             atom=60 label8=10   pop=1 push=0      75 3c 00 00 00 0a 00 00 00 00
+   357  get_var                  60                  pop=0 push=1      39 3c 00 00 00
+   362  push_atom_value          265                 pop=0 push=1      04 09 01 00 00
+   367  eval                     npop=1              pop=1 push=1      32 01 00 01 00
+   372  drop                                         pop=1 push=0      0e
    373  drop                                         pop=1 push=0      0e
-   374  drop                                         pop=1 push=0      0e
-   375  return_undef                                 pop=0 push=0      29
-   376  put_loc3                 loc=3               pop=1 push=0      ce
-   377  catch                    69                  pop=0 push=1      6f 45 00 00 00
-   382  get_loc8                 4                   pop=0 push=1      c4 04
-   384  with_get_var             atom=228 label8=10  pop=1 push=0      75 e4 00 00 00 0a 00 00 00 00
-   394  get_var                  228                 pop=0 push=1      39 e4 00 00 00
-   399  get_loc3                 loc=3               pop=0 push=1      ca
-   400  get_field                50                  pop=1 push=1      42 32 00 00 00
-   405  push_4                   4                   pop=0 push=1      bb
-   406  push_atom_value          240                 pop=0 push=1      04 f0 00 00 00
-   411  call3                    npop=3              pop=1 push=1      f3
-   412  drop                                         pop=1 push=0      0e
-   413  get_loc8                 4                   pop=0 push=1      c4 04
-   415  with_get_var             atom=228 label8=10  pop=1 push=0      75 e4 00 00 00 0a 00 00 00 00
-   425  get_var                  228                 pop=0 push=1      39 e4 00 00 00
-   430  get_loc3                 loc=3               pop=0 push=1      ca
-   431  get_field                51                  pop=1 push=1      42 33 00 00 00
-   436  push_i8                  9                   pop=0 push=1      bf 09
-   438  push_atom_value          240                 pop=0 push=1      04 f0 00 00 00
-   443  call3                    npop=3              pop=1 push=1      f3
+   374  return_undef                                 pop=0 push=0      29
+   375  put_loc3                 loc=3               pop=1 push=0      ce
+   376  catch                    69                  pop=0 push=1      6f 45 00 00 00
+   381  get_loc8                 4                   pop=0 push=1      c4 04
+   383  with_get_var             atom=228 label8=10  pop=1 push=0      75 e4 00 00 00 0a 00 00 00 00
+   393  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+   398  get_loc3                 loc=3               pop=0 push=1      ca
+   399  get_field                50                  pop=1 push=1      42 32 00 00 00
+   404  push_4                   4                   pop=0 push=1      bb
+   405  push_atom_value          240                 pop=0 push=1      04 f0 00 00 00
+   410  call3                    npop=3              pop=1 push=1      f3
+   411  drop                                         pop=1 push=0      0e
+   412  get_loc8                 4                   pop=0 push=1      c4 04
+   414  with_get_var             atom=228 label8=10  pop=1 push=0      75 e4 00 00 00 0a 00 00 00 00
+   424  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+   429  get_loc3                 loc=3               pop=0 push=1      ca
+   430  get_field                51                  pop=1 push=1      42 33 00 00 00
+   435  push_i8                  9                   pop=0 push=1      bf 09
+   437  push_atom_value          240                 pop=0 push=1      04 f0 00 00 00
+   442  call3                    npop=3              pop=1 push=1      f3
+   443  drop                                         pop=1 push=0      0e
    444  drop                                         pop=1 push=0      0e
-   445  drop                                         pop=1 push=0      0e
-   446  return_undef                                 pop=0 push=0      29
-   447  throw                                        pop=1 push=0      30
+   445  return_undef                                 pop=0 push=0      29
+   446  throw                                        pop=1 push=0      30
 
 === Inner Function #13 ===
 bytecodeLen=116 stackSize=5 varCount=5 argCount=0

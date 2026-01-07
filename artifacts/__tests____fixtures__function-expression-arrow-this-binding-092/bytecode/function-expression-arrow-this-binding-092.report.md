@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/function-expression-arrow-this-binding-092.ts
-**生成时间**: 2026-01-07T07:07:36.024Z
+**生成时间**: 2026-01-07T15:26:01.619Z
 
 ## 大小对比
 

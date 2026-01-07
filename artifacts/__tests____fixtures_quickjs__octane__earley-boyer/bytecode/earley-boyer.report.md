@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/earley-boyer.ts
-**生成时间**: 2026-01-06T16:58:38.111Z
+**生成时间**: 2026-01-07T14:06:41.200Z
 
 ## 大小对比
 

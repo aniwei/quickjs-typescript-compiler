@@ -1,0 +1,191 @@
+__tests__/fixtures_quickjs/assert.js:1:8: function: assert
+  mode: strict
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 0
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        strict_eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_arg0 0: actual
+        typeof
+        get_arg1 1: expected
+        typeof
+        strict_eq
+        if_false8 91
+        get_var Object
+        get_field2 is
+        get_arg0 0: actual
+        get_arg1 1: expected
+        call_method 2
+        if_false8 36
+        return_undef
+   36:  get_arg0 0: actual
+        typeof
+        push_atom_value object
+        strict_eq
+        if_false8 91
+        get_arg0 0: actual
+        is_null
+        if_true8 91
+        get_arg1 1: expected
+        is_null
+        if_true8 91
+        get_arg0 0: actual
+        get_field constructor
+        get_arg1 1: expected
+        get_field constructor
+        strict_eq
+        if_false8 91
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 91
+        return_undef
+   91:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 141
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 142
+  141:  push_empty_string
+  142:  add
+        call1 1
+        throw
+
+__tests__/fixtures_quickjs/assert.js:18:8: function: assertThrows
+  mode: strict
+  args: err func
+  locals:
+    0: var ex
+    1: catch e [level:3 next:-1]
+  closure vars:
+    0: assert parent:loc0 var
+  stack_size: 4
+  opcodes:
+        push_false
+        put_loc0 0: ex
+        catch 13
+        get_arg1 1: func
+        call0 0
+        drop
+        drop
+        goto8 31
+   13:  put_loc1 1: e
+        catch 30
+        push_true
+        put_loc0 0: ex
+        get_var_ref0 0: assert
+        get_loc1 1: e
+        get_arg0 0: err
+        instanceof
+        call1 1
+        drop
+        drop
+        goto8 31
+   30:  throw
+   31:  get_var_ref0 0: assert
+        get_loc0 0: ex
+        push_true
+        push_atom_value "exception expected"
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/assert.js:34:15: function: <null>
+  mode: strict
+  args: value idx
+  closure vars:
+    0: assert parent:loc0 var
+    1: b local:arg1 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: assert
+        get_var_ref1 1: b
+        get_arg1 1: idx
+        get_array_el
+        get_arg0 0: value
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/assert.js:30:8: function: assertArrayEquals
+  mode: strict
+  args: a b
+  closure vars:
+    0: assert parent:loc0 var
+  stack_size: 3
+  opcodes:
+        get_var Array
+        get_field2 isArray
+        get_arg0 0: a
+        call_method 1
+        lnot
+        dup
+        if_true8 34
+        drop
+        get_var Array
+        get_field2 isArray
+        get_arg1 1: b
+        call_method 1
+        lnot
+   34:  if_false8 41
+        get_var_ref0 0: assert
+        push_false
+        tail_call 1
+   41:  get_var_ref0 0: assert
+        get_arg0 0: a
+        get_length
+        get_arg1 1: b
+        get_length
+        call2 2
+        drop
+        get_arg0 0: a
+        get_field2 forEach
+        fclosure8 0: [bytecode <null>]
+        call_method 1
+        return_undef
+
+__tests__/fixtures_quickjs/assert.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: assert local:loc0 var
+    1: assertThrows local:loc1 var
+    2: assertArrayEquals local:loc2 var
+  stack_size: 1
+  opcodes:
+        push_this
+        if_false8 13
+        fclosure8 0: [bytecode assert]
+        put_var_ref0 0: assert
+        fclosure8 1: [bytecode assertThrows]
+        put_var_ref1 1: assertThrows
+        fclosure8 2: [bytecode assertArrayEquals]
+        put_var_ref2 2: assertArrayEquals
+        return_undef
+   13:  undefined
+        return_async
+

@@ -1,0 +1,52 @@
+Module bytecode version: 5
+Atom count: 13
+
+=== Outer Function ===
+bytecodeLen=16 stackSize=1 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 40
+     6  fclosure8                0                   pop=0 push=1      c2 00
+     8  define_func              228                 pop=1 push=0      41 e4 00 00 00 00
+    14  get_loc0                 loc=0               pop=0 push=1      c7
+    15  return                                       pop=1 push=0      28
+
+=== Inner Function #0 ===
+bytecodeLen=114 stackSize=5 varCount=1 argCount=1
+     0  get_arg0                 arg=0               pop=0 push=1      d3
+     1  get_field                232                 pop=1 push=1      42 e8 00 00 00
+     6  set_loc0                 loc=0               pop=1 push=1      cf
+     7  get_field                233                 pop=1 push=1      42 e9 00 00 00
+    12  dup                                          pop=1 push=2      11
+    13  push_atom_value          234                 pop=0 push=1      04 ea 00 00 00
+    18  strict_eq                                    pop=2 push=1      ad
+    19  if_false8                38                  pop=1 push=0      ec 26
+    21  get_var                  235                 pop=0 push=1      39 eb 00 00 00
+    26  get_field2               236                 pop=1 push=2      43 ec 00 00 00
+    31  object                                       pop=0 push=1      0b
+    32  push_atom_value          107                 pop=0 push=1      04 6b 00 00 00
+    37  define_field             233                 pop=2 push=1      4e e9 00 00 00
+    42  call_method              1                   pop=2 push=1      24 01 00
+    45  drop                                         pop=1 push=0      0e
+    46  get_var                  235                 pop=0 push=1      39 eb 00 00 00
+    51  null                                         pop=0 push=1      07
+    52  put_field                237                 pop=2 push=0      44 ed 00 00 00
+    57  return_undef                                 pop=0 push=0      29
+    58  dup                                          pop=1 push=2      11
+    59  push_atom_value          238                 pop=0 push=1      04 ee 00 00 00
+    64  strict_eq                                    pop=2 push=1      ad
+    65  if_false8                47                  pop=1 push=0      ec 2f
+    67  get_loc0                 loc=0               pop=0 push=1      c7
+    68  get_field                239                 pop=1 push=1      42 ef 00 00 00
+    73  push_2                   2                   pop=0 push=1      b9
+    74  push_i8                  10                  pop=0 push=1      bf 0a
+    76  put_array_el                                 pop=3 push=0      4b
+    77  get_var                  235                 pop=0 push=1      39 eb 00 00 00
+    82  get_field2               236                 pop=1 push=2      43 ec 00 00 00
+    87  object                                       pop=0 push=1      0b
+    88  push_atom_value          240                 pop=0 push=1      04 f0 00 00 00
+    93  define_field             233                 pop=2 push=1      4e e9 00 00 00
+    98  get_loc0                 loc=0               pop=0 push=1      c7
+    99  get_field                239                 pop=1 push=1      42 ef 00 00 00
+   104  define_field             239                 pop=2 push=1      4e ef 00 00 00
+   109  call_method              1                   pop=2 push=1      24 01 00
+   112  drop                                         pop=1 push=0      0e
+   113  return_undef                                 pop=0 push=0      29

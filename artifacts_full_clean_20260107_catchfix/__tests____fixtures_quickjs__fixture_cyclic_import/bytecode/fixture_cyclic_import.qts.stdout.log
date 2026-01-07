@@ -1,0 +1,30 @@
+__tests__/fixtures_quickjs/fixture_cyclic_import.js:2:8: function: f
+  mode: strict
+  args: x
+  closure vars:
+    0: a parent:loc0 const
+  stack_size: 4
+  opcodes:
+        push_2 2
+        get_var_ref_check 0: a
+        get_field2 g
+        get_arg0 0: x
+        call_method 1
+        mul
+        return
+
+__tests__/fixtures_quickjs/fixture_cyclic_import.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: a local:loc0 const
+    1: f local:loc0 var
+  stack_size: 1
+  opcodes:
+        push_this
+        if_false8 7
+        fclosure8 0: [bytecode f]
+        put_var_ref1 1: f
+        return_undef
+    7:  undefined
+        return_async
+

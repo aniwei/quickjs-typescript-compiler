@@ -1,0 +1,210 @@
+__tests__/fixtures/test_eval_const.js:4:1: function: assert
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_arg0 0: actual
+        get_arg1 1: expected
+        strict_eq
+        if_false8 17
+        return_undef
+   17:  get_arg0 0: actual
+        is_null
+        if_true8 67
+        get_arg1 1: expected
+        is_null
+        if_true8 67
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 67
+        return_undef
+   67:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 117
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 118
+  117:  push_empty_string
+  118:  add
+        call1 1
+        throw
+
+__tests__/fixtures/test_eval_const.js:24:1: function: log
+  args: str
+  stack_size: 3
+  opcodes:
+        get_var log_str
+        get_arg0 0: str
+        push_atom_value ","
+        add
+        add
+        dup
+        put_var log_str
+        return_undef
+
+__tests__/fixtures/test_eval_const.js:31:9: function: h
+  closure vars:
+    0: d local:arg0 var
+    1: x parent:loc0 var
+  stack_size: 3
+  opcodes:
+        get_var log
+        push_atom_value "d="
+        get_var_ref0 0: d
+        add
+        call1 1
+        drop
+        get_var log
+        push_atom_value "x="
+        get_var_ref1 1: x
+        add
+        call1 1
+        return_undef
+
+__tests__/fixtures/test_eval_const.js:30:5: function: g
+  args: d
+  locals:
+    0: var h
+  closure vars:
+    0: x local:loc0 var
+    1: b local:arg1 var
+    2: c local:arg2 var
+  stack_size: 3
+  opcodes:
+        fclosure8 0: [bytecode h]
+        put_loc0 0: h
+        get_var log
+        push_atom_value "b="
+        get_var_ref1 1: b
+        add
+        call1 1
+        drop
+        get_var log
+        push_atom_value "c="
+        get_var_ref2 2: c
+        add
+        call1 1
+        drop
+        get_loc0 0: h
+        call0 0
+        return_undef
+
+__tests__/fixtures/test_eval_const.js:27:1: function: f
+  args: a b c
+  locals:
+    0: var x
+    1: var g
+  stack_size: 3
+  opcodes:
+        fclosure8 0: [bytecode g]
+        put_loc1 1: g
+        push_i8 10
+        put_loc0 0: x
+        get_var log
+        push_atom_value "a="
+        get_arg0 0: a
+        add
+        call1 1
+        drop
+        get_loc1 1: g
+        push_4 4
+        call1 1
+        drop
+        get_loc1 1: g
+        return
+
+__tests__/fixtures/test_eval_const.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: catch e [level:3 next:-1]
+  stack_size: 4
+  opcodes:
+        check_define_var assert,64
+        check_define_var log_str,0
+        check_define_var log,64
+        check_define_var f,64
+        check_define_var g1,0
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        define_var log_str,0
+        fclosure8 1: [bytecode log]
+        define_func log,0
+        fclosure8 2: [bytecode f]
+        define_func f,0
+        define_var g1,0
+        undefined
+        put_loc0 0: "<ret>"
+        catch 88
+        get_var __loadScript
+        push_atom_value "test_assert.js"
+        call1 1
+        put_loc0 0: "<ret>"
+        drop
+        goto8 98
+   88:  put_loc1 1: e
+        catch 97
+        drop
+        goto8 98
+   97:  throw
+   98:  push_empty_string
+        put_var log_str
+        get_var f
+        push_1 1
+        push_2 2
+        push_3 3
+        call3 3
+        put_var g1
+        get_var g1
+        push_5 5
+        call1 1
+        put_loc0 0: "<ret>"
+        get_var assert
+        get_var log_str
+        push_atom_value "a=1,b=2,c=3,d=4,x=10,b=2,c=3,d=5,x=10,"
+        push_atom_value closure1
+        call3 3
+        put_loc0 0: "<ret>"
+        get_var test_eval_const
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

@@ -1,0 +1,204 @@
+__tests__/fixtures_quickjs/test_worker.js:2:1: function: assert
+  mode: strict
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 0
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_arg0 0: actual
+        get_arg1 1: expected
+        strict_eq
+        if_false8 17
+        return_undef
+   17:  get_arg0 0: actual
+        is_null
+        if_true8 67
+        get_arg1 1: expected
+        is_null
+        if_true8 67
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 67
+        return_undef
+   67:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 117
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 118
+  117:  push_empty_string
+  118:  add
+        call1 1
+        throw
+
+__tests__/fixtures_quickjs/test_worker.js:20:24: function: <null>
+  mode: strict
+  args: e
+  locals:
+    0: var ev
+    1: let sab [level:4 next:-1]
+    2: let buf [level:4 next:1]
+    3: let buf [level:5 next:-1]
+  closure vars:
+    0: assert parent:loc0 var
+    1: counter local:loc0 var
+    2: worker parent:loc1 var
+  stack_size: 5
+  opcodes:
+        get_arg0 0: e
+        get_field data
+        set_loc0 0: ev
+        get_field type
+        dup
+        push_atom_value num
+        strict_eq
+        if_false8 103
+        get_var_ref0 0: assert
+        get_loc0 0: ev
+        get_field num
+        get_var_ref1 1: counter
+        call2 2
+        drop
+        get_var_ref1 1: counter
+        inc
+        set_var_ref1 1: counter
+        push_i8 10
+        eq
+        if_false 170
+        set_loc_uninitialized 2: buf
+        set_loc_uninitialized 1: sab
+        get_var SharedArrayBuffer
+        dup
+        push_i8 10
+        call_constructor 1
+        put_loc1 1: sab
+        get_var Uint8Array
+        dup
+        get_loc_check 1: sab
+        call_constructor 1
+        put_loc2 2: buf
+        get_var_ref2 2: worker
+        get_field2 postMessage
+        object
+        push_atom_value sab
+        define_field type
+        get_loc_check 2: buf
+        define_field buf
+        call_method 1
+        drop
+        return_undef
+  103:  dup
+        push_atom_value sab_done
+        strict_eq
+        if_false8 154
+        set_loc_uninitialized 3: buf
+        get_loc0 0: ev
+        get_field buf
+        put_loc3 3: buf
+        get_var_ref0 0: assert
+        get_loc_check 3: buf
+        push_2 2
+        get_array_el
+        push_i8 10
+        call2 2
+        drop
+        get_var_ref2 2: worker
+        get_field2 postMessage
+        object
+        push_atom_value abort
+        define_field type
+        call_method 1
+        drop
+        return_undef
+  154:  dup
+        push_atom_value done
+        strict_eq
+        if_false8 170
+        get_var_ref2 2: worker
+        null
+        put_field onmessage
+  170:  return_undef
+
+__tests__/fixtures_quickjs/test_worker.js:16:1: function: test_worker
+  mode: strict
+  locals:
+    0: var counter
+  closure vars:
+    0: assert parent:loc1 var
+    1: worker parent:loc2 var
+    2: os parent:loc0 const
+  stack_size: 3
+  opcodes:
+        get_var_ref_check 2: os
+        get_field Worker
+        dup
+        push_atom_value "./test_worker_module.js"
+        call_constructor 1
+        put_var_ref1 1: worker
+        push_0 0
+        put_loc0 0: counter
+        get_var_ref1 1: worker
+        fclosure8 0: [bytecode <null>]
+        put_field onmessage
+        return_undef
+
+__tests__/fixtures_quickjs/test_worker.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: os local:loc0 const
+    1: assert local:loc0 var
+    2: worker local:loc1 var
+    3: test_worker local:loc2 var
+  stack_size: 1
+  opcodes:
+        push_this
+        if_false8 10
+        fclosure8 0: [bytecode assert]
+        put_var_ref1 1: assert
+        fclosure8 1: [bytecode test_worker]
+        put_var_ref3 3: test_worker
+        return_undef
+   10:  get_var_ref3 3: test_worker
+        call0 0
+        drop
+        undefined
+        return_async
+

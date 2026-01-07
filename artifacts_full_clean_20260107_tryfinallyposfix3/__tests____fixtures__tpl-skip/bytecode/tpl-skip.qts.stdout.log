@@ -1,0 +1,129 @@
+__tests__/fixtures/tpl-skip.js:1:1: function: assert
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_var Object
+        get_field2 is
+        get_arg0 0: actual
+        get_arg1 1: expected
+        call_method 2
+        if_false8 29
+        return_undef
+   29:  get_arg0 0: actual
+        is_null
+        if_true8 79
+        get_arg1 1: expected
+        is_null
+        if_true8 79
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 79
+        return_undef
+   79:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 129
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 130
+  129:  push_empty_string
+  130:  add
+        call1 1
+        throw
+
+__tests__/fixtures/tpl-skip.js:14:1: function: test_template_skip
+  locals:
+    0: var a
+    1: var b
+  stack_size: 9
+  opcodes:
+        push_atom_value Bar
+        put_loc0 0: a
+        undefined
+        dup
+        is_undefined
+        if_true8 65
+   11:  to_object
+        dup
+        make_loc_ref b,1
+        rot3l
+        get_field b
+        dup
+        is_undefined
+        if_false8 61
+        drop
+        push_empty_string
+        get_field2 concat
+        get_loc0 0: a
+        push_atom_value a
+        get_field2 concat
+        get_loc0 0: a
+        call_method 1
+        add
+        push_atom_value baz
+        call_method 2
+   61:  put_ref_value
+        drop
+        goto8 69
+   65:  drop
+        object
+        goto8 11
+   69:  get_var assert
+        get_loc1 1: b
+        push_atom_value BaraBarbaz
+        call2 2
+        return_undef
+
+__tests__/fixtures/tpl-skip.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var assert,64
+        check_define_var test_template_skip,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode test_template_skip]
+        define_func test_template_skip,0
+        get_loc0 0: "<ret>"
+        return
+

@@ -697,6 +697,34 @@
 			"command": "grep -n '^Totals:' /tmp/compare_fixtures_full.log | tail -n 5 || true; grep -n '^Summary:' /tmp/compare_fixtures_full.log | tail -n 3 || true; grep -n '^EXIT:' /tmp/compare_fixtures_full.log | tail -n 3 || true",
 			"isBackground": false,
 			"group": "build"
+		},
+		{
+			"label": "debug: decode test_try_catch5 ops (short7)",
+			"type": "shell",
+			"command": "cd /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler && pnpm -s exec tsx -e \"import fs from 'node:fs'; import { parseBytecodeModule } from './src/bytecodeReader'; const opList=JSON.parse(fs.readFileSync('opcodes.json','utf8')); const opMap=new Map(opList.map((o)=>[o.code,o])); const decode=(bytes)=>{ const out=[]; for(let pc=0; pc<bytes.length;){ const code=bytes[pc]; const info=opMap.get(code); const size=(info&&info.size)||1; const slice=Array.from(bytes.slice(pc,pc+size)).map(b=>b.toString(16).padStart(2,'0')).join(' '); out.push({pc,name:(info&&info.name)||('op_'+code),bytes:slice}); pc+=size; } return out; }; const find=(mod)=>{ const cp=mod.func.cpool||[]; const f=cp.find((e)=>e&&typeof e==='object'&&e.tag===12&&e.funcName==='test_try_catch5'); if(!f) throw new Error('no test_try_catch5'); return f; }; const ts=parseBytecodeModule(fs.readFileSync('artifacts_test_loop_short7/test_loop.ts.qbc')); const wasm=parseBytecodeModule(fs.readFileSync('artifacts_test_loop_short7/test_loop.wasm.qbc')); const a=find(ts); const b=find(wasm); console.log('meta', JSON.stringify({ts:{bytecodeLen:a.bytecodeLen}, wasm:{bytecodeLen:b.bytecodeLen}})); console.log('TS', decode(a.bytecode)); console.log('WASM', decode(b.bytecode));\"",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "debug: decode test_try_catch5 ops (short7)",
+			"type": "shell",
+			"command": "cd /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler && pnpm -s exec tsx -e \"import fs from 'node:fs'; import { parseBytecodeModule } from './src/bytecodeReader'; const opList=JSON.parse(fs.readFileSync('opcodes.json','utf8')); const opMap=new Map(opList.map((o)=>[o.code,o])); const decode=(bytes)=>{ const out=[]; for(let pc=0; pc<bytes.length;){ const code=bytes[pc]; const info=opMap.get(code); const size=(info&&info.size)||1; const slice=Array.from(bytes.slice(pc,pc+size)).map(b=>b.toString(16).padStart(2,'0')).join(' '); out.push({pc,name:(info&&info.name)||('op_'+code),bytes:slice}); pc+=size; } return out; }; const find=(mod)=>{ const cp=mod.func.cpool||[]; const f=cp.find((e)=>e&&typeof e==='object'&&e.tag===12&&e.funcName==='test_try_catch5'); if(!f) throw new Error('no test_try_catch5'); return f; }; const ts=parseBytecodeModule(fs.readFileSync('artifacts_test_loop_short7/test_loop.ts.qbc')); const wasm=parseBytecodeModule(fs.readFileSync('artifacts_test_loop_short7/test_loop.wasm.qbc')); const a=find(ts); const b=find(wasm); console.log('meta', JSON.stringify({ts:{bytecodeLen:a.bytecodeLen}, wasm:{bytecodeLen:b.bytecodeLen}})); console.log('TS', decode(a.bytecode)); console.log('WASM', decode(b.bytecode));\"",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "debug: deepDiff test_loop short7",
+			"type": "shell",
+			"command": "cd /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler && pnpm -s exec tsx scripts/debug/deepDiffQbc.ts artifacts_test_loop_short7/test_loop.ts.qbc artifacts_test_loop_short7/test_loop.wasm.qbc | head -n 80",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "debug: decode pc2line test_try_catch5 (short7)",
+			"type": "shell",
+			"command": "cd /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler && pnpm -s exec tsx -e \"import fs from 'node:fs'; import { parseBytecodeModule } from './src/bytecodeReader'; import { PC2Line } from './src/env';\nfunction decode(buffer: Uint8Array){ let offset=0; const readULEB=()=>{ let r=0,s=0; for(;;){ const b=buffer[offset++]; r|=(b&0x7f)<<s; if(!(b&0x80)) break; s+=7; } return r>>>0; }; const readSLEB=()=>{ const u=readULEB(); return ((u>>>1) ^ -(u&1))|0; }; let pc=0; let line=readULEB(); let col=readULEB(); const out:any[]=[{pc,line,col,dp:0,dl:0,dc:0,kind:'init'}]; while(offset<buffer.length){ const op=buffer[offset++]; let dp,dl; if(op===0){ dp=readULEB(); dl=readSLEB(); } else { const enc=op-PC2Line.PC2LINE_OP_FIRST; dp=Math.floor(enc/PC2Line.PC2LINE_RANGE); dl=(enc%PC2Line.PC2LINE_RANGE)+PC2Line.PC2LINE_BASE; } const dc=readSLEB(); pc+=dp; line+=dl; col+=dc; out.push({pc,line,col,dp,dl,dc,op}); } return out; }\nfunction find(mod:any){ const cp=mod.func.cpool||[]; const f=cp.find((e:any)=>e&&typeof e==='object'&&e.tag===12&&e.funcName==='test_try_catch5'); if(!f) throw new Error('no test_try_catch5'); return f; }\nconst ts=parseBytecodeModule(fs.readFileSync('artifacts_test_loop_short7/test_loop.ts.qbc')); const wasm=parseBytecodeModule(fs.readFileSync('artifacts_test_loop_short7/test_loop.wasm.qbc'));\nconst a=find(ts); const b=find(wasm);\nconst pa=a.debug.pc2line as Uint8Array; const pb=b.debug.pc2line as Uint8Array;\nconst hex=(u:Uint8Array)=>Array.from(u).map(x=>x.toString(16).padStart(2,'0')).join(' ');\nconsole.log('TS pc2line len', pa.length, hex(pa));\nconsole.log('WASM pc2line len', pb.length, hex(pb));\nconsole.log('\\nTS decoded', decode(pa));\nconsole.log('\\nWASM decoded', decode(pb));\n\"",
+			"isBackground": false,
+			"group": "build"
 		}
 	]
 }

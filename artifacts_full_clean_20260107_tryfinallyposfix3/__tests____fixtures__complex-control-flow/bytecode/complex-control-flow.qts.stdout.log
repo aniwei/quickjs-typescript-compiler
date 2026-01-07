@@ -1,0 +1,150 @@
+__tests__/fixtures/complex-control-flow.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: let i [level:2 next:-1]
+    2: let j [level:3 next:1]
+    3: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var acc,128
+        define_var acc,130
+        push_0 0
+        put_var_init acc
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 1: i
+        push_0 0
+        put_loc1 1: i
+   25:  get_loc_check 1: i
+        push_3 3
+        lt
+        if_false 275
+        set_loc_uninitialized 2: j
+        push_0 0
+        put_loc2 2: j
+        undefined
+        put_loc0 0: "<ret>"
+   42:  get_loc_check 2: j
+        push_3 3
+        lt
+        if_false 264
+        undefined
+        put_loc0 0: "<ret>"
+        catch 225
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 1: i
+        push_2 2
+        shl
+        get_loc_check 2: j
+        or
+        dup
+        push_0 0
+        strict_eq
+        if_false8 91
+        get_var acc
+        push_1 1
+        add
+        dup
+        put_var acc
+        put_loc0 0: "<ret>"
+        goto8 144
+   91:  dup
+        push_5 5
+        strict_eq
+        if_false8 130
+        get_var acc
+        push_i8 10
+        add
+        dup
+        put_var acc
+        put_loc0 0: "<ret>"
+        get_loc_check 2: j
+        post_inc
+        put_loc_check 2: j
+        put_loc0 0: "<ret>"
+        drop
+        drop
+        undefined
+        gosub 231
+        drop
+        goto8 42
+  130:  get_var acc
+        push_2 2
+        add
+        dup
+        put_var acc
+        put_loc0 0: "<ret>"
+  144:  drop
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 1: i
+        push_2 2
+        strict_eq
+        if_false8 173
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 2: j
+        push_1 1
+        strict_eq
+        if_false8 173
+        drop
+        undefined
+        gosub 231
+        drop
+        goto8 275
+  173:  undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 2: j
+        push_2 2
+        strict_eq
+        if_false8 201
+        get_loc_check 2: j
+        post_inc
+        put_loc_check 2: j
+        put_loc0 0: "<ret>"
+        drop
+        undefined
+        gosub 231
+        drop
+        goto16 42
+  201:  get_var acc
+        push_3 3
+        add
+        dup
+        put_var acc
+        put_loc0 0: "<ret>"
+        drop
+        undefined
+        gosub 231
+        drop
+        goto8 253
+  225:  gosub 231
+        throw
+  231:  get_loc0 0: "<ret>"
+        put_loc3 3: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        get_var acc
+        push_i8 100
+        add
+        dup
+        put_var acc
+        put_loc0 0: "<ret>"
+        get_loc3 3: "<ret>"
+        put_loc0 0: "<ret>"
+        ret
+  253:  get_loc_check 2: j
+        post_inc
+        put_loc_check 2: j
+        put_loc0 0: "<ret>"
+        goto16 42
+  264:  get_loc_check 1: i
+        post_inc
+        put_loc_check 1: i
+        drop
+        goto16 25
+  275:  get_var acc
+        set_loc0 0: "<ret>"
+        return
+

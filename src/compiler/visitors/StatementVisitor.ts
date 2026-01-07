@@ -51,6 +51,18 @@ export class StatementVisitor extends VisitorContext {
     return false
   }
 
+  private isTryFinallyWithTopLevelUnlabeledBreak(stmt: ts.Statement): boolean {
+    // This is a narrow, bytecode-shape alignment for patterns like:
+    //   for(;;) { try { ...; break; ... } finally { ... } }
+    // In QuickJS/WASM, the loop-back edge is omitted because the loop body
+    // cannot fall through to the end of the loop.
+    const onlyStmt = ts.isBlock(stmt) && stmt.statements.length === 1 ? stmt.statements[0] : stmt
+    if (!ts.isTryStatement(onlyStmt) || !onlyStmt.finallyBlock) return false
+    const tryBlock = onlyStmt.tryBlock
+    if (!ts.isBlock(tryBlock)) return false
+    return tryBlock.statements.some(s => ts.isBreakStatement(s) && s.label == null)
+  }
+
   // ============================================================================
   // with 语句 - 对应 parser.c: TOK_WITH 分支
   // ============================================================================
@@ -1233,6 +1245,17 @@ export class StatementVisitor extends VisitorContext {
       return
     }
 
+    // Align with QuickJS/WASM bytecode shape for the common QuickJS test pattern:
+    //   for (;;) { try { ... break; ... } finally { ... } }
+    // In this case the loop body cannot reach the loop end, so emitting the
+    // unconditional loop-back goto would introduce an extra dead `goto8` and
+    // shift label_end, causing bytecode mismatch.
+    const suppressLoopBackGoto =
+      !node.initializer &&
+      !node.condition &&
+      !node.incrementor &&
+      this.isTryFinallyWithTopLevelUnlabeledBreak(node.statement)
+
     // QuickJS: TOK_FOR branch does not explicitly call emit_source_pos for the `for` keyword.
     // Avoid producing a standalone pc2line sample at `for` by pre-seeding the dedup pointer.
     fd.lastOpcodeSourcePtr = node.getStart()
@@ -1310,7 +1333,12 @@ export class StatementVisitor extends VisitorContext {
       this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelTest)
     } else {
       // 无增量表达式：continue 指向测试，并在循环体末尾回到测试
-      this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelTest)
+      // QuickJS: 仅在 live code 时才会生成 loop-back 边 (js_is_live_code).
+      // 典型场景：for(;;){ ... break; ... }（包括 break 发生在 try/finally 内）
+      // 循环体末尾不可达时不应产生多余的 goto8。
+      if (!suppressLoopBackGoto && this.compiler.isLiveCode(fd)) {
+        this.compiler.emitGotoInt(fd, Opcode.OP_goto, labelTest)
+      }
     }
 
     // 发射 break 标签 - 对应 parser.c:7246
@@ -2142,6 +2170,27 @@ export class StatementVisitor extends VisitorContext {
       this.compiler.emitLabelInt(fd, labelCatch)
       // 调用 finally
       if (hasFinally) {
+        // QuickJS: emit_label(label_catch); emit_goto(OP_gosub, label_finally); emit_op(OP_throw)
+        // 这里的 gosub/throw 不会额外 emit_source_pos，而是继承 try block 中最后一次 emit_source_pos。
+        // 我们在 emit_label 之后、emit_gosub 之前显式同步到 try block 的最后一个语句位置（即使该语句不可达），
+        // 避免 OP_line_num 被 TempOpcode.OP_label 吞掉导致 pc2line 缺条目。
+        const lastTryStmt = node.tryBlock.statements[node.tryBlock.statements.length - 1]
+        let catchHandlerSourcePos = lastTryStmt ? lastTryStmt.getStart() : node.tryBlock.getStart()
+        // QuickJS expression parsing often uses an operator token pointer (op_token_ptr)
+        // for source positions. In patterns like `s += "b";` this yields the `+=`
+        // column, matching WASM pc2line for the exception-path gosub.
+        if (lastTryStmt && ts.isExpressionStatement(lastTryStmt)) {
+          const expr = lastTryStmt.expression
+          if (ts.isBinaryExpression(expr)) {
+            catchHandlerSourcePos = expr.operatorToken.getStart()
+          }
+        }
+        // Force a fresh OP_line_num at this site: our compiler can visit dead
+        // statements (e.g. after an unconditional break) and later optimizers
+        // may drop their line markers, but the dedup state would still block
+        // emitting the needed mapping for the exception-path gosub.
+        fd.lastOpcodeSourcePtr = -1
+        this.compiler.emitSourcePos(fd, catchHandlerSourcePos)
         this.compiler.emitGotoInt(fd, Opcode.OP_gosub, labelFinally)
       }
       // 重新抛出

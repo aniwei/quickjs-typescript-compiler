@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-07T07:07:35.686Z",
+  "timestamp": "2026-01-07T15:26:01.334Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/closure-recursion-default-params-100.ts",
   "compilation": {
     "typescript": {

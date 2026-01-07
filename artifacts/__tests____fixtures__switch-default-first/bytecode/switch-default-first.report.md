@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/switch-default-first.ts
-**生成时间**: 2026-01-07T07:08:29.583Z
+**生成时间**: 2026-01-07T15:26:57.397Z
 
 ## 大小对比
 

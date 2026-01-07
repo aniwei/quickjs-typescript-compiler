@@ -1,0 +1,68 @@
+__tests__/fixtures/labeled-statements.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: let i [level:2 next:-1]
+    2: let j [level:4 next:1]
+  stack_size: 4
+  opcodes:
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 1: i
+        push_0 0
+        put_loc1 1: i
+    7:  get_loc_check 1: i
+        push_3 3
+        lt
+        if_false8 104
+        undefined
+        put_loc0 0: "<ret>"
+        set_loc_uninitialized 2: j
+        push_0 0
+        put_loc2 2: j
+   21:  get_loc_check 2: j
+        push_3 3
+        lt
+        if_false8 94
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 1: i
+        push_1 1
+        strict_eq
+        if_false8 46
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 2: j
+        push_1 1
+        strict_eq
+        if_true8 94
+   46:  undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 1: i
+        push_2 2
+        strict_eq
+        if_false8 64
+        undefined
+        put_loc0 0: "<ret>"
+        get_loc_check 2: j
+        push_2 2
+        strict_eq
+        if_true8 94
+   64:  get_var console
+        get_field2 log
+        get_loc_check 1: i
+        get_loc_check 2: j
+        call_method 2
+        put_loc0 0: "<ret>"
+        get_loc_check 2: j
+        post_inc
+        put_loc_check 2: j
+        drop
+        goto8 21
+   94:  get_loc_check 1: i
+        post_inc
+        put_loc_check 1: i
+        drop
+        goto8 7
+  104:  get_loc0 0: "<ret>"
+        return
+

@@ -1,0 +1,612 @@
+__tests__/fixtures/inc-3.js:1:1: function: assert
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_var Object
+        get_field2 is
+        get_arg0 0: actual
+        get_arg1 1: expected
+        call_method 2
+        if_false8 29
+        return_undef
+   29:  get_arg0 0: actual
+        is_null
+        if_true8 79
+        get_arg1 1: expected
+        is_null
+        if_true8 79
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 79
+        return_undef
+   79:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 129
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 130
+  129:  push_empty_string
+  130:  add
+        call1 1
+        throw
+
+__tests__/fixtures/inc-3.js:17:9: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  drop
+        get_loc0 0: this
+        push_i8 10
+        put_field x
+        return_undef
+
+__tests__/fixtures/inc-3.js:20:9: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_1 1
+        return
+
+__tests__/fixtures/inc-3.js:23:16: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_minus1 -1
+        return
+
+__tests__/fixtures/inc-3.js:26:9: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_i8 12
+        return
+
+__tests__/fixtures/inc-3.js:32:9: function: <null>
+  mode: strict
+  locals:
+    0: var this.active_func
+    1: var new.target
+    2: let this
+  closure vars:
+    0: <class_fields_init> local:loc5 const
+  stack_size: 3
+  opcodes:
+        special_object 2
+        put_loc0 0: "this.active_func"
+        special_object 3
+        put_loc1 1: "new.target"
+        set_loc_uninitialized 2: this
+        check_ctor
+        get_loc0 0: "this.active_func"
+        get_super
+        get_loc1 1: "new.target"
+        call_constructor 0
+        dup
+        put_loc_check_init 2: this
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 33
+        get_loc_check 2: this
+        swap
+        call_method 0
+   33:  drop
+        drop
+        get_loc_check 2: this
+        push_i8 20
+        put_field z
+        get_loc_checkthis 2: this
+        return
+
+__tests__/fixtures/inc-3.js:36:9: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_2 2
+        return
+
+__tests__/fixtures/inc-3.js:39:16: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_i8 -2
+        return
+
+__tests__/fixtures/inc-3.js:42:9: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 3
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc1 1: "<home_object>"
+        get_super
+        push_atom_value f
+        get_array_el
+        tail_call_method 0
+
+__tests__/fixtures/inc-3.js:45:16: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 3
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc1 1: "<home_object>"
+        get_super
+        push_atom_value F
+        get_array_el
+        tail_call_method 0
+
+__tests__/fixtures/inc-3.js:65:16: function: <null>
+  mode: strict
+  closure vars:
+    0: E local:loc8 const
+  stack_size: 1
+  opcodes:
+        get_var_ref_check 0: E
+        return
+
+__tests__/fixtures/inc-3.js:66:5: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc9 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  return_undef
+
+__tests__/fixtures/inc-3.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: S local:loc10 const
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        push_i8 42
+        define_field x
+        get_loc0 0: this
+        get_var_ref_check 0: S
+        get_field x
+        define_field y
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field x
+        define_field z
+        return_undef
+
+__tests__/fixtures/inc-3.js:72:5: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc11 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  return_undef
+
+__tests__/fixtures/inc-3.js:77:15: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_const8 0: "123"
+        return
+
+__tests__/fixtures/inc-3.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 2
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        goto8 7
+    7:  get_loc0 0: this
+        fclosure8 0: [bytecode <null>]
+        set_name get
+        define_field get
+        return_undef
+
+__tests__/fixtures/inc-3.js:78:9: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_i8 42
+        return
+
+__tests__/fixtures/inc-3.js:79:5: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc14 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  return_undef
+
+__tests__/fixtures/inc-3.js:14:1: function: test_class
+  locals:
+    0: var o
+    1: const C [level:2 next:15]
+    2: const <class_fields_init> [level:3 next:1]
+    3: let C [level:1 next:-1]
+    4: const D [level:4 next:15]
+    5: const <class_fields_init> [level:5 next:4]
+    6: let D [level:1 next:3]
+    7: var E1
+    8: const E [level:6 next:15]
+    9: const <class_fields_init> [level:7 next:8]
+   10: const S [level:8 next:15]
+   11: const <class_fields_init> [level:9 next:10]
+   12: let S [level:1 next:6]
+   13: const P [level:10 next:15]
+   14: const <class_fields_init> [level:11 next:13]
+   15: let P [level:1 next:12]
+  stack_size: 5
+  opcodes:
+        set_loc_uninitialized 15: P
+        set_loc_uninitialized 12: S
+        set_loc_uninitialized 6: D
+        set_loc_uninitialized 3: C
+        set_loc_uninitialized 1: C
+        undefined
+        set_loc_uninitialized 2: "<class_fields_init>"
+        push_const8 0: [bytecode <null>]
+        define_class C,0
+        fclosure8 1: [bytecode <null>]
+        define_method f,0
+        swap
+        fclosure8 2: [bytecode <null>]
+        define_method F,0
+        swap
+        fclosure8 3: [bytecode <null>]
+        define_method y,1
+        undefined
+        put_loc2 2: "<class_fields_init>"
+        drop
+        set_loc1 1: C
+        close_loc 2: "<class_fields_init>"
+        put_loc3 3: C
+        set_loc_uninitialized 4: D
+        get_loc_check 3: C
+        set_loc_uninitialized 5: "<class_fields_init>"
+        push_const8 4: [bytecode <null>]
+        define_class D,1
+        fclosure8 5: [bytecode <null>]
+        define_method g,0
+        swap
+        fclosure8 6: [bytecode <null>]
+        define_method G,0
+        swap
+        fclosure8 7: [bytecode <null>]
+        define_method h,0
+        swap
+        fclosure8 8: [bytecode <null>]
+        define_method H,0
+        swap
+        undefined
+        put_loc8 5: "<class_fields_init>"
+        drop
+        set_loc8 4: D
+        close_loc 5: "<class_fields_init>"
+        put_loc8 6: D
+        get_var assert
+        get_loc_check 3: C
+        get_field2 F
+        call_method 0
+        push_minus1 -1
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_var Object
+        get_field2 getOwnPropertyDescriptor
+        get_loc_check 3: C
+        get_field prototype
+        push_atom_value y
+        call_method 2
+        get_field get
+        get_field name
+        push_atom_value "get y"
+        strict_eq
+        call1 1
+        drop
+        get_loc_check 3: C
+        dup
+        call_constructor 0
+        put_loc0 0: o
+        get_var assert
+        get_loc0 0: o
+        get_field2 f
+        call_method 0
+        push_1 1
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: o
+        get_field x
+        push_i8 10
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc_check 6: D
+        get_field2 F
+        call_method 0
+        push_minus1 -1
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc_check 6: D
+        get_field2 G
+        call_method 0
+        push_i8 -2
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc_check 6: D
+        get_field2 H
+        call_method 0
+        push_minus1 -1
+        strict_eq
+        call1 1
+        drop
+        get_loc_check 6: D
+        dup
+        call_constructor 0
+        put_loc0 0: o
+        get_var assert
+        get_loc0 0: o
+        get_field2 f
+        call_method 0
+        push_1 1
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: o
+        get_field2 g
+        call_method 0
+        push_2 2
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: o
+        get_field x
+        push_i8 10
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: o
+        get_field z
+        push_i8 20
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: o
+        get_field2 h
+        call_method 0
+        push_1 1
+        strict_eq
+        call1 1
+        drop
+        set_loc_uninitialized 8: E
+        undefined
+        set_loc_uninitialized 9: "<class_fields_init>"
+        push_const8 10: [bytecode <null>]
+        define_class E,0
+        swap
+        fclosure8 9: [bytecode <null>]
+        define_method F,0
+        swap
+        undefined
+        put_loc8 9: "<class_fields_init>"
+        drop
+        set_loc8 8: E
+        close_loc 9: "<class_fields_init>"
+        close_loc 8: E
+        put_loc8 7: E1
+        get_var assert
+        get_loc8 7: E1
+        get_loc8 7: E1
+        get_field2 F
+        call_method 0
+        strict_eq
+        call1 1
+        drop
+        set_loc_uninitialized 10: S
+        undefined
+        set_loc_uninitialized 11: "<class_fields_init>"
+        push_const8 11: [bytecode <null>]
+        define_class S,0
+        swap
+        swap
+        swap
+        swap
+        swap
+        swap
+        undefined
+        put_loc8 11: "<class_fields_init>"
+        drop
+        set_loc8 10: S
+        dup
+        fclosure8 12: [bytecode <null>]
+        set_home_object
+        call_method 0
+        drop
+        close_loc 11: "<class_fields_init>"
+        close_loc 10: S
+        put_loc8 12: S
+        get_var assert
+        get_loc_check 12: S
+        get_field x
+        push_i8 42
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc_check 12: S
+        get_field y
+        push_i8 42
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc_check 12: S
+        get_field z
+        push_i8 42
+        strict_eq
+        call1 1
+        drop
+        set_loc_uninitialized 13: P
+        undefined
+        set_loc_uninitialized 14: "<class_fields_init>"
+        push_const8 14: [bytecode <null>]
+        define_class P,0
+        fclosure8 13: [bytecode <null>]
+        define_method static,0
+        fclosure8 15: [bytecode <null>]
+        set_home_object
+        put_loc8 14: "<class_fields_init>"
+        drop
+        set_loc8 13: P
+        close_loc 14: "<class_fields_init>"
+        put_loc8 15: P
+        get_var assert
+        get_loc_check 15: P
+        dup
+        call_constructor 0
+        get_field2 get
+        call_method 0
+        push_const8 16: "123"
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc_check 15: P
+        dup
+        call_constructor 0
+        get_field2 static
+        call_method 0
+        push_i8 42
+        strict_eq
+        call1 1
+        return_undef
+
+__tests__/fixtures/inc-3.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var assert,64
+        check_define_var test_class,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode test_class]
+        define_func test_class,0
+        get_loc0 0: "<ret>"
+        return
+

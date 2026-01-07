@@ -1,0 +1,87 @@
+Module bytecode version: 5
+Atom count: 4
+
+=== Outer Function ===
+bytecodeLen=207 stackSize=3 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 80
+     6  define_var               228                 pop=0 push=0      3f e4 00 00 00 82
+    12  push_5                   5                   pop=0 push=1      bc
+    13  put_var_init             228                 pop=1 push=0      3b e4 00 00 00
+    18  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    23  push_1                   1                   pop=0 push=1      b8
+    24  add                                          pop=2 push=1      9f
+    25  dup                                          pop=1 push=2      11
+    26  put_var                  228                 pop=1 push=0      3a e4 00 00 00
+    31  put_loc0                 loc=0               pop=1 push=0      cb
+    32  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    37  push_2                   2                   pop=0 push=1      b9
+    38  sub                                          pop=2 push=1      a0
+    39  dup                                          pop=1 push=2      11
+    40  put_var                  228                 pop=1 push=0      3a e4 00 00 00
+    45  put_loc0                 loc=0               pop=1 push=0      cb
+    46  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    51  push_3                   3                   pop=0 push=1      ba
+    52  mul                                          pop=2 push=1      9c
+    53  dup                                          pop=1 push=2      11
+    54  put_var                  228                 pop=1 push=0      3a e4 00 00 00
+    59  put_loc0                 loc=0               pop=1 push=0      cb
+    60  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    65  push_2                   2                   pop=0 push=1      b9
+    66  div                                          pop=2 push=1      9d
+    67  dup                                          pop=1 push=2      11
+    68  put_var                  228                 pop=1 push=0      3a e4 00 00 00
+    73  put_loc0                 loc=0               pop=1 push=0      cb
+    74  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    79  push_4                   4                   pop=0 push=1      bb
+    80  mod                                          pop=2 push=1      9e
+    81  dup                                          pop=1 push=2      11
+    82  put_var                  228                 pop=1 push=0      3a e4 00 00 00
+    87  put_loc0                 loc=0               pop=1 push=0      cb
+    88  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    93  push_2                   2                   pop=0 push=1      b9
+    94  pow                                          pop=2 push=1      a1
+    95  dup                                          pop=1 push=2      11
+    96  put_var                  228                 pop=1 push=0      3a e4 00 00 00
+   101  put_loc0                 loc=0               pop=1 push=0      cb
+   102  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+   107  push_1                   1                   pop=0 push=1      b8
+   108  shl                                          pop=2 push=1      a2
+   109  dup                                          pop=1 push=2      11
+   110  put_var                  228                 pop=1 push=0      3a e4 00 00 00
+   115  put_loc0                 loc=0               pop=1 push=0      cb
+   116  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+   121  push_1                   1                   pop=0 push=1      b8
+   122  sar                                          pop=2 push=1      a3
+   123  dup                                          pop=1 push=2      11
+   124  put_var                  228                 pop=1 push=0      3a e4 00 00 00
+   129  put_loc0                 loc=0               pop=1 push=0      cb
+   130  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+   135  push_1                   1                   pop=0 push=1      b8
+   136  shr                                          pop=2 push=1      a4
+   137  dup                                          pop=1 push=2      11
+   138  put_var                  228                 pop=1 push=0      3a e4 00 00 00
+   143  put_loc0                 loc=0               pop=1 push=0      cb
+   144  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+   149  push_7                   7                   pop=0 push=1      be
+   150  and                                          pop=2 push=1      af
+   151  dup                                          pop=1 push=2      11
+   152  put_var                  228                 pop=1 push=0      3a e4 00 00 00
+   157  put_loc0                 loc=0               pop=1 push=0      cb
+   158  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+   163  push_i8                  8                   pop=0 push=1      bf 08
+   165  or                                           pop=2 push=1      b1
+   166  dup                                          pop=1 push=2      11
+   167  put_var                  228                 pop=1 push=0      3a e4 00 00 00
+   172  put_loc0                 loc=0               pop=1 push=0      cb
+   173  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+   178  push_3                   3                   pop=0 push=1      ba
+   179  xor                                          pop=2 push=1      b0
+   180  dup                                          pop=1 push=2      11
+   181  put_var                  228                 pop=1 push=0      3a e4 00 00 00
+   186  put_loc0                 loc=0               pop=1 push=0      cb
+   187  get_var                  229                 pop=0 push=1      39 e5 00 00 00
+   192  get_field2               230                 pop=1 push=2      43 e6 00 00 00
+   197  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+   202  call_method              1                   pop=2 push=1      24 01 00
+   205  set_loc0                 loc=0               pop=1 push=1      cf
+   206  return                                       pop=1 push=0      28

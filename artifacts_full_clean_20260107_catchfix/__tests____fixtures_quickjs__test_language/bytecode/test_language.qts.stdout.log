@@ -1,0 +1,3748 @@
+__tests__/fixtures_quickjs/test_language.js:1:1: function: assert
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_var Object
+        get_field2 is
+        get_arg0 0: actual
+        get_arg1 1: expected
+        call_method 2
+        if_false8 29
+        return_undef
+   29:  get_arg0 0: actual
+        is_null
+        if_true8 79
+        get_arg1 1: expected
+        is_null
+        if_true8 79
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 79
+        return_undef
+   79:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 129
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 130
+  129:  push_empty_string
+  130:  add
+        call1 1
+        throw
+
+__tests__/fixtures_quickjs/test_language.js:14:1: function: assert_throws
+  args: expected_error func
+  locals:
+    0: var err
+    1: catch e [level:3 next:-1]
+  stack_size: 3
+  opcodes:
+        push_false
+        put_loc0 0: err
+        catch 13
+        get_arg1 1: func
+        call0 0
+        drop
+        drop
+        goto8 43
+   13:  put_loc1 1: e
+        catch 42
+        push_true
+        put_loc0 0: err
+        get_loc1 1: e
+        get_arg0 0: expected_error
+        instanceof
+        lnot
+        if_false8 39
+        get_var Error
+        push_atom_value "unexpected exception type"
+        call1 1
+        throw
+   39:  drop
+        goto8 43
+   42:  throw
+   43:  get_loc0 0: err
+        lnot
+        if_false8 59
+        get_var Error
+        push_atom_value "expected exception"
+        call1 1
+        throw
+   59:  return_undef
+
+__tests__/fixtures_quickjs/test_language.js:35:1: function: test_op1
+  locals:
+    0: var r
+    1: var a
+  stack_size: 4
+  opcodes:
+        push_1 1
+        push_2 2
+        add
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_3 3
+        push_atom_value "1 + 2 === 3"
+        call3 3
+        drop
+        push_1 1
+        push_2 2
+        sub
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_minus1 -1
+        push_atom_value "1 - 2 === -1"
+        call3 3
+        drop
+        push_minus1 -1
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_minus1 -1
+        push_atom_value "-1 === -1"
+        call3 3
+        drop
+        push_2 2
+        plus
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_2 2
+        push_atom_value "+2 === 2"
+        call3 3
+        drop
+        push_2 2
+        push_3 3
+        mul
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_6 6
+        push_atom_value "2 * 3 === 6"
+        call3 3
+        drop
+        push_4 4
+        push_2 2
+        div
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_2 2
+        push_atom_value "4 / 2 === 2"
+        call3 3
+        drop
+        push_4 4
+        push_3 3
+        mod
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_1 1
+        push_atom_value "4 % 3 === 3"
+        call3 3
+        drop
+        push_4 4
+        push_2 2
+        shl
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_i8 16
+        push_atom_value "4 << 2 === 16"
+        call3 3
+        drop
+        push_1 1
+        push_0 0
+        shl
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_1 1
+        push_atom_value "1 << 0 === 1"
+        call3 3
+        drop
+        push_1 1
+        push_i8 31
+        shl
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_const8 0: 2147483648
+        neg
+        push_atom_value "1 << 31 === -2147483648"
+        call3 3
+        drop
+        push_1 1
+        push_i8 32
+        shl
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_1 1
+        push_atom_value "1 << 32 === 1"
+        call3 3
+        drop
+        push_1 1
+        push_i8 31
+        shl
+        push_0 0
+        lt
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_true
+        push_atom_value "(1 << 31) < 0 === true"
+        call3 3
+        drop
+        push_i8 -4
+        push_1 1
+        sar
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_i8 -2
+        push_atom_value "-4 >> 1 === -2"
+        call3 3
+        drop
+        push_i8 -4
+        push_1 1
+        shr
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_i32 2147483646
+        push_atom_value "-4 >>> 1 === 0x7ffffffe"
+        call3 3
+        drop
+        push_1 1
+        push_1 1
+        and
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_1 1
+        push_atom_value "1 & 1 === 1"
+        call3 3
+        drop
+        push_0 0
+        push_1 1
+        or
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_1 1
+        push_atom_value "0 | 1 === 1"
+        call3 3
+        drop
+        push_1 1
+        push_1 1
+        xor
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_0 0
+        push_atom_value "1 ^ 1 === 0"
+        call3 3
+        drop
+        push_1 1
+        not
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_i8 -2
+        push_atom_value "~1 === -2"
+        call3 3
+        drop
+        push_1 1
+        lnot
+        put_loc0 0: r
+        get_var assert
+        get_loc0 0: r
+        push_false
+        push_atom_value "!1 === false"
+        call3 3
+        drop
+        get_var assert
+        push_1 1
+        push_2 2
+        lt
+        push_true
+        push_atom_value "(1 < 2) === true"
+        call3 3
+        drop
+        get_var assert
+        push_2 2
+        push_1 1
+        gt
+        push_true
+        push_atom_value "(2 > 1) === true"
+        call3 3
+        drop
+        get_var assert
+        push_atom_value b
+        push_atom_value a
+        gt
+        push_true
+        push_atom_value "('b' > 'a') === true"
+        call3 3
+        drop
+        get_var assert
+        push_2 2
+        push_i8 8
+        pow
+        push_i16 256
+        push_atom_value "2 ** 8 === 256"
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:80:1: function: test_cvt
+  stack_size: 4
+  opcodes:
+        get_var assert
+        get_var NaN
+        push_0 0
+        or
+        push_0 0
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_var Infinity
+        push_0 0
+        or
+        push_0 0
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_var Infinity
+        neg
+        push_0 0
+        or
+        push_0 0
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        push_const8 0: "12345"
+        push_0 0
+        or
+        push_i16 12345
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        push_atom_value "0x12345"
+        push_0 0
+        or
+        push_i32 74565
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        push_const8 1: 4294967296
+        push_3 3
+        mul
+        push_4 4
+        sub
+        push_0 0
+        or
+        push_i8 -4
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        push_const8 2: "12345"
+        push_0 0
+        shr
+        push_i16 12345
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        push_atom_value "0x12345"
+        push_0 0
+        shr
+        push_i32 74565
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_var NaN
+        push_0 0
+        shr
+        push_0 0
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_var Infinity
+        push_0 0
+        shr
+        push_0 0
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_var Infinity
+        neg
+        push_0 0
+        shr
+        push_0 0
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        push_const8 3: 4294967296
+        push_3 3
+        mul
+        push_4 4
+        sub
+        push_0 0
+        shr
+        push_const8 4: 4294967296
+        push_4 4
+        sub
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        push_const8 5: 19686109595169230000
+        get_field2 toString
+        call_method 0
+        push_atom_value "19686109595169230000"
+        strict_eq
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:95:1: function: test_eq
+  stack_size: 5
+  opcodes:
+        get_var assert
+        null
+        get_var undefined
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_var undefined
+        null
+        eq
+        call1 1
+        drop
+        get_var assert
+        push_true
+        push_1 1
+        eq
+        call1 1
+        drop
+        get_var assert
+        push_0 0
+        push_false
+        eq
+        call1 1
+        drop
+        get_var assert
+        push_empty_string
+        push_0 0
+        eq
+        call1 1
+        drop
+        get_var assert
+        push_const8 0: "123"
+        push_i8 123
+        eq
+        call1 1
+        drop
+        get_var assert
+        push_const8 1: "122"
+        push_i8 123
+        neq
+        call1 1
+        drop
+        get_var assert
+        get_var Number
+        dup
+        push_1 1
+        call_constructor 1
+        push_1 1
+        eq
+        call1 1
+        drop
+        get_var assert
+        push_2 2
+        get_var Number
+        dup
+        push_2 2
+        call_constructor 1
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_var String
+        dup
+        push_atom_value abc
+        call_constructor 1
+        push_atom_value abc
+        eq
+        call1 1
+        drop
+        get_var assert
+        object
+        push_atom_value abc
+        neq
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:108:1: function: test_inc_dec
+  locals:
+    0: var a
+    1: var r
+  stack_size: 4
+  opcodes:
+        push_1 1
+        set_loc0 0: a
+        post_inc
+        put_loc0 0: a
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_1 1
+        strict_eq
+        dup
+        if_false8 20
+        drop
+        get_loc0 0: a
+        push_2 2
+        strict_eq
+   20:  push_true
+        push_atom_value "++"
+        call3 3
+        drop
+        push_1 1
+        set_loc0 0: a
+        inc
+        set_loc0 0: a
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_2 2
+        strict_eq
+        dup
+        if_false8 48
+        drop
+        get_loc0 0: a
+        push_2 2
+        strict_eq
+   48:  push_true
+        push_atom_value "++"
+        call3 3
+        drop
+        push_1 1
+        set_loc0 0: a
+        post_dec
+        put_loc0 0: a
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_1 1
+        strict_eq
+        dup
+        if_false8 76
+        drop
+        get_loc0 0: a
+        push_0 0
+        strict_eq
+   76:  push_true
+        push_atom_value "--"
+        call3 3
+        drop
+        push_1 1
+        set_loc0 0: a
+        dec
+        set_loc0 0: a
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_0 0
+        strict_eq
+        dup
+        if_false8 104
+        drop
+        get_loc0 0: a
+        push_0 0
+        strict_eq
+  104:  push_true
+        push_atom_value "--"
+        call3 3
+        drop
+        object
+        push_true
+        define_field x
+        set_loc0 0: a
+        get_field2 x
+        inc
+        put_field x
+        get_var assert
+        get_loc0 0: a
+        get_field x
+        push_2 2
+        push_atom_value "++"
+        call3 3
+        drop
+        object
+        push_true
+        define_field x
+        set_loc0 0: a
+        get_field2 x
+        dec
+        put_field x
+        get_var assert
+        get_loc0 0: a
+        get_field x
+        push_0 0
+        push_atom_value "--"
+        call3 3
+        drop
+        push_true
+        array_from 1
+        set_loc0 0: a
+        push_0 0
+        get_array_el3
+        inc
+        put_array_el
+        get_var assert
+        get_loc0 0: a
+        push_0 0
+        get_array_el
+        push_2 2
+        push_atom_value "++"
+        call3 3
+        drop
+        object
+        push_true
+        define_field x
+        set_loc0 0: a
+        get_field2 x
+        post_inc
+        perm3
+        put_field x
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_1 1
+        strict_eq
+        dup
+        if_false8 254
+        drop
+        get_loc0 0: a
+        get_field x
+        push_2 2
+        strict_eq
+  254:  push_true
+        push_atom_value "++"
+        call3 3
+        drop
+        object
+        push_true
+        define_field x
+        set_loc0 0: a
+        get_field2 x
+        post_dec
+        perm3
+        put_field x
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_1 1
+        strict_eq
+        dup
+        if_false8 303
+        drop
+        get_loc0 0: a
+        get_field x
+        push_0 0
+        strict_eq
+  303:  push_true
+        push_atom_value "--"
+        call3 3
+        drop
+        push_true
+        array_from 1
+        set_loc0 0: a
+        push_0 0
+        get_array_el3
+        post_inc
+        perm4
+        put_array_el
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_1 1
+        strict_eq
+        dup
+        if_false8 339
+        drop
+        get_loc0 0: a
+        push_0 0
+        get_array_el
+        push_2 2
+        strict_eq
+  339:  push_true
+        push_atom_value "++"
+        call3 3
+        drop
+        push_true
+        array_from 1
+        set_loc0 0: a
+        push_0 0
+        get_array_el3
+        post_dec
+        perm4
+        put_array_el
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_1 1
+        strict_eq
+        dup
+        if_false8 375
+        drop
+        get_loc0 0: a
+        push_0 0
+        get_array_el
+        push_0 0
+        strict_eq
+  375:  push_true
+        push_atom_value "--"
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:144:1: function: F
+  args: x
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: x
+        put_field x
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:147:1: function: test_op2
+  locals:
+    0: var a
+    1: var b
+  stack_size: 4
+  opcodes:
+        get_var Object
+        dup
+        call_constructor 0
+        set_loc0 0: a
+        push_1 1
+        put_field x
+        get_var assert
+        get_loc0 0: a
+        get_field x
+        push_1 1
+        push_atom_value new
+        call3 3
+        drop
+        get_var F
+        dup
+        push_2 2
+        call_constructor 1
+        put_loc1 1: b
+        get_var assert
+        get_loc1 1: b
+        get_field x
+        push_2 2
+        push_atom_value new
+        call3 3
+        drop
+        object
+        push_2 2
+        define_field x
+        put_loc0 0: a
+        get_var assert
+        push_atom_value x
+        get_loc0 0: a
+        in
+        push_true
+        push_atom_value in
+        call3 3
+        drop
+        get_var assert
+        push_atom_value y
+        get_loc0 0: a
+        in
+        push_false
+        push_atom_value in
+        call3 3
+        drop
+        object
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_var Object
+        instanceof
+        push_true
+        push_atom_value instanceof
+        call3 3
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_var String
+        instanceof
+        push_false
+        push_atom_value instanceof
+        call3 3
+        drop
+        get_var assert
+        push_1 1
+        typeof
+        push_atom_value number
+        push_atom_value typeof
+        call3 3
+        drop
+        get_var assert
+        get_var_undef Object
+        typeof
+        push_atom_value function
+        push_atom_value typeof
+        call3 3
+        drop
+        get_var assert
+        null
+        typeof
+        push_atom_value object
+        push_atom_value typeof
+        call3 3
+        drop
+        get_var assert
+        get_var_undef unknown_var
+        typeof
+        push_atom_value undefined
+        push_atom_value typeof
+        call3 3
+        drop
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field if
+        push_3 3
+        define_field async
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_field if
+        push_2 2
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field async
+        push_3 3
+        strict_eq
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:185:15: function: <null>
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 3
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc1 1: "<home_object>"
+        get_super
+        push_atom_value a
+        throw_error <null>,3
+
+__tests__/fixtures_quickjs/test_language.js:168:1: function: test_delete
+  locals:
+    0: var a
+    1: var err
+    2: catch e [level:3 next:-1]
+    3: catch e [level:7 next:-1]
+  stack_size: 4
+  opcodes:
+        object
+        push_1 1
+        define_field x
+        push_1 1
+        define_field y
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_atom_value x
+        delete
+        push_true
+        push_atom_value delete
+        call3 3
+        drop
+        get_var assert
+        push_atom_value x
+        get_loc0 0: a
+        in
+        push_false
+        push_atom_value delete
+        call3 3
+        drop
+        get_var assert
+        push_atom_value abc
+        push_i8 100
+        delete
+        push_true
+        call2 2
+        drop
+        push_false
+        put_loc1 1: err
+        catch 88
+        null
+        push_atom_value a
+        delete
+        drop
+        drop
+        goto8 106
+   88:  put_loc2 2: e
+        catch 105
+        get_loc2 2: e
+        get_var TypeError
+        instanceof
+        put_loc1 1: err
+        drop
+        goto8 106
+  105:  throw
+  106:  get_var assert
+        get_loc1 1: err
+        push_true
+        push_atom_value delete
+        call3 3
+        drop
+        push_false
+        put_loc1 1: err
+        catch 149
+        object
+        fclosure8 0: [bytecode <null>]
+        define_method f,4
+        set_loc0 0: a
+        get_field2 f
+        call_method 0
+        drop
+        drop
+        goto8 167
+  149:  put_loc3 3: e
+        catch 166
+        get_loc3 3: e
+        get_var ReferenceError
+        instanceof
+        put_loc1 1: err
+        drop
+        goto8 167
+  166:  throw
+  167:  get_var assert
+        get_loc1 1: err
+        push_true
+        push_atom_value delete
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:194:13: function: f
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:196:13: function: g
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:193:1: function: test_prototype
+  locals:
+    0: var f
+    1: var g
+  stack_size: 6
+  opcodes:
+        fclosure8 0: [bytecode f]
+        put_loc0 0: f
+        get_var assert
+        get_loc0 0: f
+        get_field prototype
+        get_field constructor
+        get_loc0 0: f
+        push_atom_value prototype
+        call3 3
+        drop
+        fclosure8 1: [bytecode g]
+        put_loc1 1: g
+        get_var Object
+        get_field2 defineProperty
+        get_loc1 1: g
+        push_atom_value prototype
+        object
+        push_false
+        define_field writable
+        call_method 3
+        drop
+        get_var assert
+        get_loc1 1: g
+        get_field prototype
+        get_field constructor
+        get_loc1 1: g
+        push_atom_value prototype
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:202:5: function: f2
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_var assert
+        get_loc0 0: arguments
+        get_length
+        push_2 2
+        push_atom_value arguments
+        call3 3
+        drop
+        get_var assert
+        get_loc0 0: arguments
+        push_0 0
+        get_array_el
+        push_1 1
+        push_atom_value arguments
+        call3 3
+        drop
+        get_var assert
+        get_loc0 0: arguments
+        push_1 1
+        get_array_el
+        push_3 3
+        push_atom_value arguments
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:201:1: function: test_arguments
+  locals:
+    0: var f2
+  stack_size: 3
+  opcodes:
+        fclosure8 0: [bytecode f2]
+        set_loc0 0: f2
+        push_1 1
+        push_3 3
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:212:9: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc2 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  drop
+        get_loc0 0: this
+        push_i8 10
+        put_field x
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:215:9: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_1 1
+        return
+
+__tests__/fixtures_quickjs/test_language.js:218:16: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_minus1 -1
+        return
+
+__tests__/fixtures_quickjs/test_language.js:221:9: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_i8 12
+        return
+
+__tests__/fixtures_quickjs/test_language.js:227:9: function: <null>
+  mode: strict
+  locals:
+    0: var this.active_func
+    1: var new.target
+    2: let this
+  closure vars:
+    0: <class_fields_init> local:loc5 const
+  stack_size: 3
+  opcodes:
+        special_object 2
+        put_loc0 0: "this.active_func"
+        special_object 3
+        put_loc1 1: "new.target"
+        set_loc_uninitialized 2: this
+        check_ctor
+        get_loc0 0: "this.active_func"
+        get_super
+        get_loc1 1: "new.target"
+        call_constructor 0
+        dup
+        put_loc_check_init 2: this
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 33
+        get_loc_check 2: this
+        swap
+        call_method 0
+   33:  drop
+        drop
+        get_loc_check 2: this
+        push_i8 20
+        put_field z
+        get_loc_checkthis 2: this
+        return
+
+__tests__/fixtures_quickjs/test_language.js:231:9: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_2 2
+        return
+
+__tests__/fixtures_quickjs/test_language.js:234:16: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_i8 -2
+        return
+
+__tests__/fixtures_quickjs/test_language.js:237:9: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 3
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc1 1: "<home_object>"
+        get_super
+        push_atom_value f
+        get_array_el
+        tail_call_method 0
+
+__tests__/fixtures_quickjs/test_language.js:240:16: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 3
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc1 1: "<home_object>"
+        get_super
+        push_atom_value F
+        get_array_el
+        tail_call_method 0
+
+__tests__/fixtures_quickjs/test_language.js:260:16: function: <null>
+  mode: strict
+  closure vars:
+    0: E local:loc8 const
+  stack_size: 1
+  opcodes:
+        get_var_ref_check 0: E
+        return
+
+__tests__/fixtures_quickjs/test_language.js:261:5: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc9 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  return_undef
+
+__tests__/fixtures_quickjs/test_language.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: S local:loc10 const
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        push_i8 42
+        define_field x
+        get_loc0 0: this
+        get_var_ref_check 0: S
+        get_field x
+        define_field y
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field x
+        define_field z
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:267:5: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc11 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  return_undef
+
+__tests__/fixtures_quickjs/test_language.js:272:15: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_const8 0: "123"
+        return
+
+__tests__/fixtures_quickjs/test_language.js:1:1: function: <null>
+  mode: strict
+  locals:
+    0: var this
+    1: var <home_object>
+  stack_size: 2
+  opcodes:
+        special_object 4
+        put_loc1 1: "<home_object>"
+        push_this
+        put_loc0 0: this
+        goto8 7
+    7:  get_loc0 0: this
+        fclosure8 0: [bytecode <null>]
+        set_name get
+        define_field get
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:273:9: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_i8 42
+        return
+
+__tests__/fixtures_quickjs/test_language.js:274:5: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc14 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  return_undef
+
+__tests__/fixtures_quickjs/test_language.js:209:1: function: test_class
+  locals:
+    0: var o
+    1: const C [level:2 next:15]
+    2: const <class_fields_init> [level:3 next:1]
+    3: let C [level:1 next:-1]
+    4: const D [level:4 next:15]
+    5: const <class_fields_init> [level:5 next:4]
+    6: let D [level:1 next:3]
+    7: var E1
+    8: const E [level:6 next:15]
+    9: const <class_fields_init> [level:7 next:8]
+   10: const S [level:8 next:15]
+   11: const <class_fields_init> [level:9 next:10]
+   12: let S [level:1 next:6]
+   13: const P [level:10 next:15]
+   14: const <class_fields_init> [level:11 next:13]
+   15: let P [level:1 next:12]
+  stack_size: 5
+  opcodes:
+        set_loc_uninitialized 15: P
+        set_loc_uninitialized 12: S
+        set_loc_uninitialized 6: D
+        set_loc_uninitialized 3: C
+        set_loc_uninitialized 1: C
+        undefined
+        set_loc_uninitialized 2: "<class_fields_init>"
+        push_const8 0: [bytecode <null>]
+        define_class C,0
+        fclosure8 1: [bytecode <null>]
+        define_method f,0
+        swap
+        fclosure8 2: [bytecode <null>]
+        define_method F,0
+        swap
+        fclosure8 3: [bytecode <null>]
+        define_method y,1
+        undefined
+        put_loc2 2: "<class_fields_init>"
+        drop
+        set_loc1 1: C
+        close_loc 2: "<class_fields_init>"
+        put_loc3 3: C
+        set_loc_uninitialized 4: D
+        get_loc_check 3: C
+        set_loc_uninitialized 5: "<class_fields_init>"
+        push_const8 4: [bytecode <null>]
+        define_class D,1
+        fclosure8 5: [bytecode <null>]
+        define_method g,0
+        swap
+        fclosure8 6: [bytecode <null>]
+        define_method G,0
+        swap
+        fclosure8 7: [bytecode <null>]
+        define_method h,0
+        swap
+        fclosure8 8: [bytecode <null>]
+        define_method H,0
+        swap
+        undefined
+        put_loc8 5: "<class_fields_init>"
+        drop
+        set_loc8 4: D
+        close_loc 5: "<class_fields_init>"
+        put_loc8 6: D
+        get_var assert
+        get_loc_check 3: C
+        get_field2 F
+        call_method 0
+        push_minus1 -1
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_var Object
+        get_field2 getOwnPropertyDescriptor
+        get_loc_check 3: C
+        get_field prototype
+        push_atom_value y
+        call_method 2
+        get_field get
+        get_field name
+        push_atom_value "get y"
+        strict_eq
+        call1 1
+        drop
+        get_loc_check 3: C
+        dup
+        call_constructor 0
+        put_loc0 0: o
+        get_var assert
+        get_loc0 0: o
+        get_field2 f
+        call_method 0
+        push_1 1
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: o
+        get_field x
+        push_i8 10
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc_check 6: D
+        get_field2 F
+        call_method 0
+        push_minus1 -1
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc_check 6: D
+        get_field2 G
+        call_method 0
+        push_i8 -2
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc_check 6: D
+        get_field2 H
+        call_method 0
+        push_minus1 -1
+        strict_eq
+        call1 1
+        drop
+        get_loc_check 6: D
+        dup
+        call_constructor 0
+        put_loc0 0: o
+        get_var assert
+        get_loc0 0: o
+        get_field2 f
+        call_method 0
+        push_1 1
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: o
+        get_field2 g
+        call_method 0
+        push_2 2
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: o
+        get_field x
+        push_i8 10
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: o
+        get_field z
+        push_i8 20
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: o
+        get_field2 h
+        call_method 0
+        push_1 1
+        strict_eq
+        call1 1
+        drop
+        set_loc_uninitialized 8: E
+        undefined
+        set_loc_uninitialized 9: "<class_fields_init>"
+        push_const8 10: [bytecode <null>]
+        define_class E,0
+        swap
+        fclosure8 9: [bytecode <null>]
+        define_method F,0
+        swap
+        undefined
+        put_loc8 9: "<class_fields_init>"
+        drop
+        set_loc8 8: E
+        close_loc 9: "<class_fields_init>"
+        close_loc 8: E
+        put_loc8 7: E1
+        get_var assert
+        get_loc8 7: E1
+        get_loc8 7: E1
+        get_field2 F
+        call_method 0
+        strict_eq
+        call1 1
+        drop
+        set_loc_uninitialized 10: S
+        undefined
+        set_loc_uninitialized 11: "<class_fields_init>"
+        push_const8 11: [bytecode <null>]
+        define_class S,0
+        swap
+        swap
+        swap
+        swap
+        swap
+        swap
+        undefined
+        put_loc8 11: "<class_fields_init>"
+        drop
+        set_loc8 10: S
+        dup
+        fclosure8 12: [bytecode <null>]
+        set_home_object
+        call_method 0
+        drop
+        close_loc 11: "<class_fields_init>"
+        close_loc 10: S
+        put_loc8 12: S
+        get_var assert
+        get_loc_check 12: S
+        get_field x
+        push_i8 42
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc_check 12: S
+        get_field y
+        push_i8 42
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc_check 12: S
+        get_field z
+        push_i8 42
+        strict_eq
+        call1 1
+        drop
+        set_loc_uninitialized 13: P
+        undefined
+        set_loc_uninitialized 14: "<class_fields_init>"
+        push_const8 14: [bytecode <null>]
+        define_class P,0
+        fclosure8 13: [bytecode <null>]
+        define_method static,0
+        fclosure8 15: [bytecode <null>]
+        set_home_object
+        put_loc8 14: "<class_fields_init>"
+        drop
+        set_loc8 13: P
+        close_loc 14: "<class_fields_init>"
+        put_loc8 15: P
+        get_var assert
+        get_loc_check 15: P
+        dup
+        call_constructor 0
+        get_field2 get
+        call_method 0
+        push_const8 16: "123"
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc_check 15: P
+        dup
+        call_constructor 0
+        get_field2 static
+        call_method 0
+        push_i8 42
+        strict_eq
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:279:1: function: test_template
+  locals:
+    0: var a
+    1: var b
+  stack_size: 5
+  opcodes:
+        push_i8 123
+        put_loc1 1: b
+        push_atom_value abc
+        get_field2 concat
+        get_loc1 1: b
+        push_atom_value d
+        call_method 2
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_atom_value abc123d
+        call2 2
+        drop
+        get_var String
+        get_field2 raw
+        push_const8 0: [ 0: "abc", 1: "d" ]
+        get_loc1 1: b
+        call_method 2
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_atom_value abc123d
+        call2 2
+        drop
+        push_atom_value aaa
+        put_loc0 0: a
+        push_atom_value bbb
+        put_loc1 1: b
+        get_var assert
+        push_atom_value aaa
+        get_field2 concat
+        get_loc0 0: a
+        drop
+        get_loc1 1: b
+        push_atom_value ccc
+        call_method 2
+        push_atom_value aaabbbccc
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:290:1: function: test_template_skip
+  locals:
+    0: var a
+    1: var b
+  stack_size: 9
+  opcodes:
+        push_atom_value Bar
+        put_loc0 0: a
+        undefined
+        dup
+        is_undefined
+        if_true8 65
+   11:  to_object
+        dup
+        make_loc_ref b,1
+        rot3l
+        get_field b
+        dup
+        is_undefined
+        if_false8 61
+        drop
+        push_empty_string
+        get_field2 concat
+        get_loc0 0: a
+        push_atom_value a
+        get_field2 concat
+        get_loc0 0: a
+        call_method 1
+        add
+        push_atom_value baz
+        call_method 2
+   61:  put_ref_value
+        drop
+        goto8 69
+   65:  drop
+        object
+        goto8 11
+   69:  get_var assert
+        get_loc1 1: b
+        push_atom_value BaraBarbaz
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:298:37: function: <null>
+  locals:
+    0: var this
+  stack_size: 1
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field get
+        return
+
+__tests__/fixtures_quickjs/test_language.js:295:1: function: test_object_literal
+  locals:
+    0: var x
+    1: var get
+    2: var set
+  stack_size: 4
+  opcodes:
+        push_0 0
+        put_loc0 0: x
+        push_1 1
+        put_loc1 1: get
+        push_2 2
+        put_loc2 2: set
+        push_3 3
+        dup
+        put_var async
+        drop
+        object
+        push_2 2
+        define_field get
+        push_3 3
+        define_field set
+        push_4 4
+        define_field async
+        fclosure8 0: [bytecode <null>]
+        define_method a,5
+        dup
+        put_var a
+        drop
+        get_var assert
+        get_var JSON
+        get_field2 stringify
+        get_var a
+        call_method 1
+        push_atom_value "{\"get\":2,\"set\":3,\"async\":4,\"a\":2}"
+        call2 2
+        drop
+        get_var assert
+        get_var a
+        get_field a
+        push_2 2
+        strict_eq
+        call1 1
+        drop
+        object
+        get_loc0 0: x
+        define_field x
+        get_loc1 1: get
+        define_field get
+        get_loc2 2: set
+        define_field set
+        get_var async
+        define_field async
+        dup
+        put_var a
+        drop
+        get_var assert
+        get_var JSON
+        get_field2 stringify
+        get_var a
+        call_method 1
+        push_atom_value "{\"x\":0,\"get\":1,\"set\":2,\"async\":3}"
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:304:1: function: test_regexp_skip
+  locals:
+    0: var a
+    1: var b
+  stack_size: 8
+  opcodes:
+        goto8 39
+    2:  dup
+        for_of_start
+        make_loc_ref a,0
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref b,1
+        for_of_next 2
+        drop
+        dup
+        is_undefined
+        if_false8 35
+        drop
+        push_const8 0: "abc\\("
+        push_const8 1: "\u0000\u0000\u0001\u0000\u001c\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0001a\u0000\u0001b\u0000\u0001c\u0000\u0001(\u0000\u0010\u0000\u000e"
+        regexp
+   35:  put_ref_value
+        iterator_close
+        goto8 45
+   39:  push_1 1
+        array_from 1
+        goto8 2
+   45:  drop
+        get_var assert
+        get_loc0 0: a
+        push_1 1
+        strict_eq
+        call1 1
+        drop
+        goto8 95
+   58:  dup
+        for_of_start
+        make_loc_ref a,0
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref b,1
+        for_of_next 2
+        drop
+        dup
+        is_undefined
+        if_false8 91
+        drop
+        push_const8 2: "abc\\("
+        push_const8 3: "\u0000\u0000\u0001\u0000\u001c\u0000\u0000\u0000\u000c\u0006\u0000\u0000\u0000\u0006\u000b\u00f5\u00ff\u00ff\u00ff\u000f\u0000\u0001a\u0000\u0001b\u0000\u0001c\u0000\u0001(\u0000\u0010\u0000\u000e"
+        regexp
+   91:  put_ref_value
+        iterator_close
+        goto8 101
+   95:  push_2 2
+        array_from 1
+        goto8 58
+  101:  drop
+        get_var assert
+        get_loc0 0: a
+        push_2 2
+        strict_eq
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:311:1: function: test_labels
+  locals:
+    0: var <with> [level:6 next:-1]
+  stack_size: 1
+  opcodes:
+        goto8 2
+    2:  object
+        set_loc_uninitialized 0: "<with>"
+        to_object
+        put_loc0 0: "<with>"
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:336:1: function: test_labels2
+  locals:
+    0: var i
+  stack_size: 3
+  opcodes:
+        push_0 0
+        put_loc0 0: i
+    2:  get_loc0 0: i
+        push_3 3
+        lt
+        if_false8 16
+        get_loc0 0: i
+        push_0 0
+        gt
+        if_true8 16
+        inc_loc 0: i
+        goto8 2
+   16:  get_var assert
+        get_loc0 0: i
+        push_1 1
+        call2 2
+        drop
+        push_0 0
+        put_loc0 0: i
+   27:  get_loc0 0: i
+        push_3 3
+        lt
+        if_false8 41
+        get_loc0 0: i
+        push_0 0
+        gt
+        if_true8 41
+        inc_loc 0: i
+        goto8 27
+   41:  get_var assert
+        get_loc0 0: i
+        push_1 1
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:357:5: function: *g
+  stack_size: 1
+  opcodes:
+        initial_yield
+        push_0 0
+        return_async
+
+__tests__/fixtures_quickjs/test_language.js:356:1: function: test_destructuring
+  locals:
+    0: var g
+    1: var x
+  stack_size: 7
+  opcodes:
+        fclosure8 0: [bytecode g]
+        put_loc0 0: g
+        undefined
+        dup
+        is_undefined
+        if_true8 23
+    8:  for_of_start
+        make_loc_ref x,1
+        for_of_next 2
+        drop
+        put_ref_value
+        iterator_close
+        goto8 28
+   23:  drop
+        get_loc0 0: g
+        call0 0
+        goto8 8
+   28:  get_var assert
+        get_loc1 1: x
+        undefined
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:362:1: function: test_spread
+  locals:
+    0: var x
+  stack_size: 5
+  opcodes:
+        push_1 1
+        push_2 2
+        array_from 2
+        push_2 2
+        push_3 3
+        push_4 4
+        array_from 2
+        append
+        drop
+        put_loc0 0: x
+        get_var assert
+        get_loc0 0: x
+        get_field2 toString
+        call_method 0
+        push_atom_value "1,2,3,4"
+        call2 2
+        drop
+        array_from 0
+        push_0 0
+        array_from 0
+        dup
+        push_1 1
+        put_field length
+        append
+        drop
+        put_loc0 0: x
+        get_var assert
+        get_var Object
+        get_field2 getOwnPropertyNames
+        get_loc0 0: x
+        call_method 1
+        get_field2 toString
+        call_method 0
+        push_atom_value "0,length"
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:370:13: function: <null>
+  args: a b c
+  locals:
+    0: let a [level:1 next:-2]
+    1: let b [level:1 next:0]
+    2: let c [level:1 next:1]
+  stack_size: 2
+  opcodes:
+        set_loc_uninitialized 2: c
+        set_loc_uninitialized 1: b
+        set_loc_uninitialized 0: a
+        get_arg0 0: a
+        put_loc0 0: a
+        get_arg1 1: b
+        dup
+        is_undefined
+        if_false8 19
+        drop
+        push_1 1
+        set_arg1 1: b
+   19:  put_loc1 1: b
+        get_arg2 2: c
+        put_loc2 2: c
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:371:13: function: <null>
+  args: <null>
+  locals:
+    0: var a
+    1: var b
+  stack_size: 7
+  opcodes:
+        get_arg0 0: <null>
+        for_of_start
+        make_loc_ref a,0
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref b,1
+        for_of_next 2
+        drop
+        put_ref_value
+        iterator_close
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:372:13: function: <null>
+  args: <null>
+  locals:
+    0: var a
+    1: var b
+  stack_size: 4
+  opcodes:
+        get_arg0 0: <null>
+        to_object
+        dup
+        make_loc_ref a,0
+        rot3l
+        get_field a
+        put_ref_value
+        dup
+        make_loc_ref b,1
+        rot3l
+        get_field b
+        put_ref_value
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:373:13: function: <null>
+  args: c <null> d
+  locals:
+    0: let c [level:1 next:-2]
+    1: let a [level:1 next:0]
+    2: let b [level:1 next:1]
+    3: let d [level:1 next:2]
+    4: var b
+    5: var a
+  stack_size: 5
+  opcodes:
+        set_loc_uninitialized 3: d
+        set_loc_uninitialized 2: b
+        set_loc_uninitialized 1: a
+        set_loc_uninitialized 0: c
+        get_arg0 0: c
+        put_loc0 0: c
+        get_arg1 1: <null>
+        dup
+        is_undefined
+        if_true8 31
+   19:  for_of_start
+        for_of_next 0
+        drop
+        put_loc1 1: a
+        for_of_next 0
+        drop
+        put_loc2 2: b
+        iterator_close
+        goto8 35
+   31:  drop
+        push_1 1
+        goto8 19
+   35:  get_arg2 2: d
+        put_loc3 3: d
+        get_loc_check 2: b
+        put_loc8 4: b
+        get_loc_check 1: a
+        put_loc8 5: a
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:369:1: function: test_function_length
+  stack_size: 3
+  opcodes:
+        get_var assert
+        fclosure8 0: [bytecode <null>]
+        get_length
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        fclosure8 1: [bytecode <null>]
+        get_length
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        fclosure8 2: [bytecode <null>]
+        get_length
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        fclosure8 3: [bytecode <null>]
+        get_length
+        push_1 1
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:381:13: function: <null>
+  mode: strict
+  args: a
+  locals:
+    0: let a [level:1 next:-2]
+    1: var this
+    2: var new.target
+    3: var arguments
+  closure vars:
+    0: f parent:loc0 var
+    1: c parent:loc1 var
+  stack_size: 2
+  opcodes:
+        special_object 3
+        put_loc2 2: "new.target"
+        push_this
+        put_loc1 1: this
+        special_object 0
+        put_loc3 3: arguments
+        set_loc_uninitialized 0: a
+        get_arg0 0: a
+        dup
+        is_undefined
+        if_false8 33
+        drop
+        get_var eval
+        push_atom_value "var arguments"
+        eval 1,2
+        set_arg0 0: a
+   33:  put_loc0 0: a
+        close_loc 0: a
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:378:6: function: <null>
+  mode: strict
+  closure vars:
+    0: f local:loc0 var
+    1: c local:loc1 var
+  stack_size: 3
+  opcodes:
+        fclosure8 0: [bytecode <null>]
+        set_name f
+        put_var_ref0 0: f
+        get_var assert_throws
+        get_var SyntaxError
+        get_var_ref0 0: f
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:384:9: function: <null>
+  args: a b
+  locals:
+    0: let a [level:1 next:-2]
+    1: let b [level:1 next:0]
+    2: var <var>
+    3: var <arg_var>
+    4: var this
+    5: var new.target
+    6: var arguments
+    7: let arguments [level:1 next:1]
+  closure vars:
+    0: f local:loc0 var
+    1: c local:loc1 var
+  stack_size: 2
+  opcodes:
+        special_object 3
+        put_loc8 5: "new.target"
+        push_this
+        put_loc8 4: this
+        special_object 0
+        set_loc8 7: arguments
+        put_loc8 6: arguments
+        special_object 5
+        put_loc2 2: "<var>"
+        special_object 5
+        put_loc3 3: "<arg_var>"
+        set_loc_uninitialized 1: b
+        set_loc_uninitialized 0: a
+        get_arg0 0: a
+        dup
+        is_undefined
+        if_false8 55
+        drop
+        get_loc3 3: "<arg_var>"
+        with_get_var eval,47,0
+        get_var eval
+   47:  push_const8 0: "1"
+        eval 1,9
+        set_arg0 0: a
+   55:  put_loc0 0: a
+        get_arg1 1: b
+        dup
+        is_undefined
+        if_false8 68
+        drop
+        get_loc_check 7: arguments
+        push_0 0
+        get_array_el
+        set_arg1 1: b
+   68:  put_loc1 1: b
+        close_loc 7: arguments
+        close_loc 1: b
+        close_loc 0: a
+        get_arg1 1: b
+        return
+
+__tests__/fixtures_quickjs/test_language.js:386:9: function: <null>
+  args: a b
+  locals:
+    0: let a [level:1 next:-2]
+    1: let b [level:1 next:0]
+    2: var arguments
+  stack_size: 2
+  opcodes:
+        special_object 0
+        put_loc2 2: arguments
+        set_loc_uninitialized 1: b
+        set_loc_uninitialized 0: a
+        get_arg0 0: a
+        put_loc0 0: a
+        get_arg1 1: b
+        dup
+        is_undefined
+        if_false8 21
+        drop
+        get_loc2 2: arguments
+        push_0 0
+        get_array_el
+        set_arg1 1: b
+   21:  put_loc1 1: b
+        get_arg1 1: b
+        return
+
+__tests__/fixtures_quickjs/test_language.js:388:26: function: <null>
+  closure vars:
+    0: arguments local:loc2 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: arguments
+        return
+
+__tests__/fixtures_quickjs/test_language.js:388:9: function: <null>
+  args: a b
+  locals:
+    0: let a [level:1 next:-2]
+    1: let b [level:1 next:0]
+    2: var arguments
+  stack_size: 2
+  opcodes:
+        special_object 0
+        put_loc2 2: arguments
+        set_loc_uninitialized 1: b
+        set_loc_uninitialized 0: a
+        get_arg0 0: a
+        put_loc0 0: a
+        get_arg1 1: b
+        dup
+        is_undefined
+        if_false8 25
+        drop
+        fclosure8 0: [bytecode <null>]
+        set_name b
+        set_arg1 1: b
+   25:  put_loc1 1: b
+        get_arg1 1: b
+        return
+
+__tests__/fixtures_quickjs/test_language.js:390:38: function: <null>
+  closure vars:
+    0: arguments local:loc7 let
+  stack_size: 1
+  opcodes:
+        get_var_ref_check 0: arguments
+        return
+
+__tests__/fixtures_quickjs/test_language.js:390:9: function: <null>
+  args: a b
+  locals:
+    0: let a [level:1 next:-2]
+    1: let b [level:1 next:0]
+    2: var <var>
+    3: var <arg_var>
+    4: var this
+    5: var new.target
+    6: var arguments
+    7: let arguments [level:1 next:1]
+  closure vars:
+    0: f local:loc0 var
+    1: c local:loc1 var
+  stack_size: 2
+  opcodes:
+        special_object 3
+        put_loc8 5: "new.target"
+        push_this
+        put_loc8 4: this
+        special_object 0
+        set_loc8 7: arguments
+        put_loc8 6: arguments
+        special_object 5
+        put_loc2 2: "<var>"
+        special_object 5
+        put_loc3 3: "<arg_var>"
+        set_loc_uninitialized 1: b
+        set_loc_uninitialized 0: a
+        get_arg0 0: a
+        dup
+        is_undefined
+        if_false8 55
+        drop
+        get_loc3 3: "<arg_var>"
+        with_get_var eval,47,0
+        get_var eval
+   47:  push_const8 0: "1"
+        eval 1,9
+        set_arg0 0: a
+   55:  put_loc0 0: a
+        get_arg1 1: b
+        dup
+        is_undefined
+        if_false8 70
+        drop
+        fclosure8 1: [bytecode <null>]
+        set_name b
+        set_arg1 1: b
+   70:  put_loc1 1: b
+        close_loc 7: arguments
+        close_loc 1: b
+        close_loc 0: a
+        get_arg1 1: b
+        return
+
+__tests__/fixtures_quickjs/test_language.js:394:13: function: <null>
+  mode: strict
+  args: a
+  locals:
+    0: let a [level:1 next:-2]
+    1: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc1 1: this
+        set_loc_uninitialized 0: a
+        get_arg0 0: a
+        dup
+        is_undefined
+        if_false8 13
+        drop
+        get_loc1 1: this
+        set_arg0 0: a
+   13:  put_loc0 0: a
+        get_arg0 0: a
+        return
+
+__tests__/fixtures_quickjs/test_language.js:396:13: function: f
+  mode: strict
+  args: a
+  locals:
+    0: let a [level:1 next:-2]
+    1: const f
+  stack_size: 2
+  opcodes:
+        special_object 2
+        put_loc1 1: f
+        set_loc_uninitialized 0: a
+        get_arg0 0: a
+        dup
+        is_undefined
+        if_false8 14
+        drop
+        get_loc1 1: f
+        set_arg0 0: a
+   14:  put_loc0 0: a
+        get_arg0 0: a
+        return
+
+__tests__/fixtures_quickjs/test_language.js:398:13: function: f
+  mode: strict
+  args: a
+  locals:
+    0: let a [level:1 next:-2]
+    1: var this
+    2: var new.target
+    3: var arguments
+    4: const f
+  closure vars:
+    0: f parent:loc0 var
+    1: c parent:loc1 var
+  stack_size: 2
+  opcodes:
+        special_object 3
+        put_loc2 2: "new.target"
+        push_this
+        put_loc1 1: this
+        special_object 0
+        put_loc3 3: arguments
+        special_object 2
+        put_loc8 4: f
+        set_loc_uninitialized 0: a
+        get_arg0 0: a
+        dup
+        is_undefined
+        if_false8 37
+        drop
+        get_var eval
+        push_atom_value f
+        eval 1,2
+        set_arg0 0: a
+   37:  put_loc0 0: a
+        close_loc 0: a
+        get_arg0 0: a
+        return
+
+__tests__/fixtures_quickjs/test_language.js:392:6: function: <null>
+  mode: strict
+  closure vars:
+    0: f local:loc0 var
+    1: c local:loc1 var
+  stack_size: 4
+  opcodes:
+        fclosure8 0: [bytecode <null>]
+        set_name f
+        put_var_ref0 0: f
+        get_var assert
+        get_var_ref0 0: f
+        get_field2 call
+        push_i8 123
+        call_method 1
+        push_i8 123
+        call2 2
+        drop
+        fclosure8 1: [bytecode f]
+        put_var_ref0 0: f
+        get_var assert
+        get_var_ref0 0: f
+        call0 0
+        get_var_ref0 0: f
+        call2 2
+        drop
+        fclosure8 2: [bytecode f]
+        put_var_ref0 0: f
+        get_var assert
+        get_var_ref0 0: f
+        call0 0
+        get_var_ref0 0: f
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:401:41: function: <null>
+  closure vars:
+    0: <arg_var> local:loc4 var
+    1: c parent:loc1 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: "<arg_var>"
+        with_get_var c,12,0
+        get_var_ref1 1: c
+   12:  return
+
+__tests__/fixtures_quickjs/test_language.js:401:9: function: <null>
+  args: a probe
+  locals:
+    0: let a [level:1 next:-2]
+    1: let probe [level:1 next:0]
+    2: var c
+    3: var <var>
+    4: var <arg_var>
+  closure vars:
+    0: f local:loc0 var
+    1: c local:loc1 var
+    2: this local:loc2 var
+    3: new.target local:loc3 var
+    4: arguments local:loc4 var
+  stack_size: 3
+  opcodes:
+        special_object 5
+        put_loc3 3: "<var>"
+        special_object 5
+        put_loc8 4: "<arg_var>"
+        set_loc_uninitialized 1: probe
+        set_loc_uninitialized 0: a
+        get_arg0 0: a
+        dup
+        is_undefined
+        if_false8 47
+        drop
+        get_loc8 4: "<arg_var>"
+        with_get_var eval,36,0
+        get_var eval
+   36:  push_atom_value "var c = 1"
+        eval 1,3
+        set_arg0 0: a
+   47:  put_loc0 0: a
+        get_arg1 1: probe
+        dup
+        is_undefined
+        if_false8 62
+        drop
+        fclosure8 0: [bytecode <null>]
+        set_name probe
+        set_arg1 1: probe
+   62:  put_loc1 1: probe
+        close_loc 1: probe
+        close_loc 0: a
+        push_2 2
+        put_loc2 2: c
+        get_loc3 3: "<var>"
+        with_get_var assert,99,0
+        get_loc8 4: "<arg_var>"
+        with_get_var assert,99,0
+        get_var assert
+   99:  get_loc2 2: c
+        push_2 2
+        call2 2
+        drop
+        get_loc3 3: "<var>"
+        with_get_var assert,131,0
+        get_loc8 4: "<arg_var>"
+        with_get_var assert,131,0
+        get_var assert
+  131:  get_arg1 1: probe
+        call0 0
+        push_1 1
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:407:49: function: <null>
+  closure vars:
+    0: <arg_var> local:loc4 var
+    1: arguments parent:loc4 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: "<arg_var>"
+        with_get_var arguments,12,0
+        get_var_ref1 1: arguments
+   12:  return
+
+__tests__/fixtures_quickjs/test_language.js:407:9: function: <null>
+  args: a probe
+  locals:
+    0: let a [level:1 next:-2]
+    1: let probe [level:1 next:0]
+    2: var arguments
+    3: var <var>
+    4: var <arg_var>
+  closure vars:
+    0: f local:loc0 var
+    1: c local:loc1 var
+    2: this local:loc2 var
+    3: new.target local:loc3 var
+    4: arguments local:loc4 var
+  stack_size: 3
+  opcodes:
+        special_object 5
+        put_loc3 3: "<var>"
+        special_object 5
+        put_loc8 4: "<arg_var>"
+        set_loc_uninitialized 1: probe
+        set_loc_uninitialized 0: a
+        get_arg0 0: a
+        dup
+        is_undefined
+        if_false8 47
+        drop
+        get_loc8 4: "<arg_var>"
+        with_get_var eval,36,0
+        get_var eval
+   36:  push_atom_value "var arguments = 1"
+        eval 1,3
+        set_arg0 0: a
+   47:  put_loc0 0: a
+        get_arg1 1: probe
+        dup
+        is_undefined
+        if_false8 62
+        drop
+        fclosure8 0: [bytecode <null>]
+        set_name probe
+        set_arg1 1: probe
+   62:  put_loc1 1: probe
+        close_loc 1: probe
+        close_loc 0: a
+        push_2 2
+        put_loc2 2: arguments
+        get_loc3 3: "<var>"
+        with_get_var assert,99,0
+        get_loc8 4: "<arg_var>"
+        with_get_var assert,99,0
+        get_var assert
+   99:  get_loc2 2: arguments
+        push_2 2
+        call2 2
+        drop
+        get_loc3 3: "<var>"
+        with_get_var assert,131,0
+        get_loc8 4: "<arg_var>"
+        with_get_var assert,131,0
+        get_var assert
+  131:  get_arg1 1: probe
+        call0 0
+        push_1 1
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:413:58: function: <null>
+  closure vars:
+    0: <arg_var> local:loc4 var
+    1: c parent:loc1 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: "<arg_var>"
+        with_get_var c,12,0
+        get_var_ref1 1: c
+   12:  return
+
+__tests__/fixtures_quickjs/test_language.js:413:9: function: f
+  args: a b probe
+  locals:
+    0: let a [level:1 next:-2]
+    1: let b [level:1 next:0]
+    2: let probe [level:1 next:1]
+    3: var <var>
+    4: var <arg_var>
+    5: var this
+    6: var new.target
+    7: var arguments
+    8: let arguments [level:1 next:2]
+    9: var f
+  closure vars:
+    0: f local:loc0 var
+    1: c local:loc1 var
+    2: this local:loc2 var
+    3: new.target local:loc3 var
+    4: arguments local:loc4 var
+  stack_size: 3
+  opcodes:
+        special_object 3
+        put_loc8 6: "new.target"
+        push_this
+        put_loc8 5: this
+        special_object 0
+        set_loc8 8: arguments
+        put_loc8 7: arguments
+        special_object 2
+        put_loc8 9: f
+        special_object 5
+        put_loc3 3: "<var>"
+        special_object 5
+        put_loc8 4: "<arg_var>"
+        set_loc_uninitialized 2: probe
+        set_loc_uninitialized 1: b
+        set_loc_uninitialized 0: a
+        get_arg0 0: a
+        dup
+        is_undefined
+        if_false8 67
+        drop
+        get_loc8 4: "<arg_var>"
+        with_get_var eval,56,0
+        get_var eval
+   56:  push_atom_value "var c = 1"
+        eval 1,10
+        set_arg0 0: a
+   67:  put_loc0 0: a
+        get_arg1 1: b
+        dup
+        is_undefined
+        if_false8 88
+        drop
+        get_loc8 4: "<arg_var>"
+        with_get_var c,87,0
+        get_var_ref1 1: c
+   87:  set_arg1 1: b
+   88:  put_loc1 1: b
+        get_arg2 2: probe
+        dup
+        is_undefined
+        if_false8 103
+        drop
+        fclosure8 0: [bytecode <null>]
+        set_name probe
+        set_arg2 2: probe
+  103:  put_loc2 2: probe
+        close_loc 8: arguments
+        close_loc 2: probe
+        close_loc 1: b
+        close_loc 0: a
+        get_loc3 3: "<var>"
+        with_get_var assert,144,0
+        get_loc8 4: "<arg_var>"
+        with_get_var assert,144,0
+        get_var assert
+  144:  get_arg1 1: b
+        push_1 1
+        call2 2
+        drop
+        get_loc3 3: "<var>"
+        with_get_var assert,176,0
+        get_loc8 4: "<arg_var>"
+        with_get_var assert,176,0
+        get_var assert
+  176:  get_loc3 3: "<var>"
+        with_get_var c,200,0
+        get_loc8 4: "<arg_var>"
+        with_get_var c,200,0
+        get_var_ref1 1: c
+  200:  push_1 1
+        call2 2
+        drop
+        get_loc3 3: "<var>"
+        with_get_var assert,231,0
+        get_loc8 4: "<arg_var>"
+        with_get_var assert,231,0
+        get_var assert
+  231:  get_arg2 2: probe
+        call0 0
+        push_1 1
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:420:38: function: <null>
+  closure vars:
+    0: <arg_var> local:loc4 var
+    1: c parent:loc1 var
+  stack_size: 1
+  opcodes:
+        get_var_ref0 0: "<arg_var>"
+        with_get_var c,12,0
+        get_var_ref1 1: c
+   12:  return
+
+__tests__/fixtures_quickjs/test_language.js:420:9: function: f
+  args: a b probe
+  locals:
+    0: let a [level:1 next:-2]
+    1: let b [level:1 next:0]
+    2: let probe [level:1 next:1]
+    3: var <var>
+    4: var <arg_var>
+    5: var this
+    6: var new.target
+    7: var arguments
+    8: let arguments [level:1 next:2]
+    9: var f
+  closure vars:
+    0: f local:loc0 var
+    1: c local:loc1 var
+    2: this local:loc2 var
+    3: new.target local:loc3 var
+    4: arguments local:loc4 var
+  stack_size: 3
+  opcodes:
+        special_object 3
+        put_loc8 6: "new.target"
+        push_this
+        put_loc8 5: this
+        special_object 0
+        set_loc8 8: arguments
+        put_loc8 7: arguments
+        special_object 2
+        put_loc8 9: f
+        special_object 5
+        put_loc3 3: "<var>"
+        special_object 5
+        put_loc8 4: "<arg_var>"
+        set_loc_uninitialized 2: probe
+        set_loc_uninitialized 1: b
+        set_loc_uninitialized 0: a
+        get_arg0 0: a
+        put_loc0 0: a
+        get_arg1 1: b
+        dup
+        is_undefined
+        if_false8 55
+        drop
+        get_loc8 4: "<arg_var>"
+        with_get_var c,54,0
+        get_var_ref1 1: c
+   54:  set_arg1 1: b
+   55:  put_loc1 1: b
+        get_arg2 2: probe
+        dup
+        is_undefined
+        if_false8 70
+        drop
+        fclosure8 0: [bytecode <null>]
+        set_name probe
+        set_arg2 2: probe
+   70:  put_loc2 2: probe
+        get_loc3 3: "<var>"
+        with_get_var eval,99,0
+        get_loc8 4: "<arg_var>"
+        with_get_var eval,99,0
+        get_var eval
+   99:  push_atom_value "var c = 1"
+        eval 1,1
+        drop
+        get_loc3 3: "<var>"
+        with_get_var assert,138,0
+        get_loc8 4: "<arg_var>"
+        with_get_var assert,138,0
+        get_var assert
+  138:  get_loc3 3: "<var>"
+        with_get_var c,162,0
+        get_loc8 4: "<arg_var>"
+        with_get_var c,162,0
+        get_var_ref1 1: c
+  162:  push_1 1
+        call2 2
+        drop
+        get_loc3 3: "<var>"
+        with_get_var assert,193,0
+        get_loc8 4: "<arg_var>"
+        with_get_var assert,193,0
+        get_var assert
+  193:  get_arg1 1: b
+        push_atom_value global
+        call2 2
+        drop
+        get_loc3 3: "<var>"
+        with_get_var assert,229,0
+        get_loc8 4: "<arg_var>"
+        with_get_var assert,229,0
+        get_var assert
+  229:  get_arg2 2: probe
+        call0 0
+        push_atom_value global
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:428:51: function: <null>
+  args: d
+  locals:
+    0: let d [level:1 next:-2]
+    1: var <var>
+    2: var <arg_var>
+  closure vars:
+    0: arguments local:loc7 let
+    1: probe local:loc1 let
+    2: a local:loc0 let
+    3: <arg_var> local:loc3 var
+    4: this local:loc4 var
+    5: new.target local:loc5 var
+    6: f local:loc8 var
+    7: f parent:loc0 var
+    8: c parent:loc1 var
+    9: this parent:loc2 var
+   10: new.target parent:loc3 var
+   11: arguments parent:loc4 var
+  stack_size: 2
+  opcodes:
+        special_object 5
+        put_loc1 1: "<var>"
+        special_object 5
+        put_loc2 2: "<arg_var>"
+        set_loc_uninitialized 0: d
+        get_arg0 0: d
+        dup
+        is_undefined
+        if_false8 53
+        drop
+        get_loc2 2: "<arg_var>"
+        with_get_var eval,42,0
+        get_var_ref3 3: "<arg_var>"
+        with_get_var eval,42,0
+        get_var eval
+   42:  push_atom_value c
+        eval 1,2
+        set_arg0 0: d
+   53:  put_loc0 0: d
+        close_loc 0: d
+        get_arg0 0: d
+        return
+
+__tests__/fixtures_quickjs/test_language.js:428:9: function: f
+  args: a probe
+  locals:
+    0: let a [level:1 next:-2]
+    1: let probe [level:1 next:0]
+    2: var <var>
+    3: var <arg_var>
+    4: var this
+    5: var new.target
+    6: var arguments
+    7: let arguments [level:1 next:1]
+    8: var f
+  closure vars:
+    0: f local:loc0 var
+    1: c local:loc1 var
+    2: this local:loc2 var
+    3: new.target local:loc3 var
+    4: arguments local:loc4 var
+  stack_size: 3
+  opcodes:
+        special_object 3
+        put_loc8 5: "new.target"
+        push_this
+        put_loc8 4: this
+        special_object 0
+        set_loc8 7: arguments
+        put_loc8 6: arguments
+        special_object 2
+        put_loc8 8: f
+        special_object 5
+        put_loc2 2: "<var>"
+        special_object 5
+        put_loc3 3: "<arg_var>"
+        set_loc_uninitialized 1: probe
+        set_loc_uninitialized 0: a
+        get_arg0 0: a
+        dup
+        is_undefined
+        if_false8 62
+        drop
+        get_loc3 3: "<arg_var>"
+        with_get_var eval,51,0
+        get_var eval
+   51:  push_atom_value "var c = 1"
+        eval 1,9
+        set_arg0 0: a
+   62:  put_loc0 0: a
+        get_arg1 1: probe
+        dup
+        is_undefined
+        if_false8 77
+        drop
+        fclosure8 0: [bytecode <null>]
+        set_name probe
+        set_arg1 1: probe
+   77:  put_loc1 1: probe
+        close_loc 7: arguments
+        close_loc 1: probe
+        close_loc 0: a
+        get_loc2 2: "<var>"
+        with_get_var assert,114,0
+        get_loc3 3: "<arg_var>"
+        with_get_var assert,114,0
+        get_var assert
+  114:  get_arg1 1: probe
+        call0 0
+        push_1 1
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:375:1: function: test_argument_scope
+  locals:
+    0: var f
+    1: var c
+    2: var this
+    3: var new.target
+    4: var arguments
+  stack_size: 3
+  opcodes:
+        special_object 3
+        put_loc3 3: "new.target"
+        push_this
+        put_loc2 2: this
+        special_object 1
+        put_loc8 4: arguments
+        push_atom_value global
+        put_loc1 1: c
+        fclosure8 0: [bytecode <null>]
+        call0 0
+        drop
+        fclosure8 1: [bytecode <null>]
+        set_name f
+        put_loc0 0: f
+        get_var assert
+        get_loc0 0: f
+        push_i8 12
+        call1 1
+        push_i8 12
+        call2 2
+        drop
+        fclosure8 2: [bytecode <null>]
+        set_name f
+        put_loc0 0: f
+        get_var assert
+        get_loc0 0: f
+        push_i8 12
+        call1 1
+        push_i8 12
+        call2 2
+        drop
+        fclosure8 3: [bytecode <null>]
+        set_name f
+        put_loc0 0: f
+        get_var assert
+        get_loc0 0: f
+        push_i8 12
+        call1 1
+        call0 0
+        push_0 0
+        get_array_el
+        push_i8 12
+        call2 2
+        drop
+        fclosure8 4: [bytecode <null>]
+        set_name f
+        put_loc0 0: f
+        get_var assert
+        get_loc0 0: f
+        push_i8 12
+        call1 1
+        call0 0
+        push_0 0
+        get_array_el
+        push_i8 12
+        call2 2
+        drop
+        fclosure8 5: [bytecode <null>]
+        call0 0
+        drop
+        fclosure8 6: [bytecode <null>]
+        set_name f
+        set_loc0 0: f
+        call0 0
+        drop
+        fclosure8 7: [bytecode <null>]
+        set_name f
+        set_loc0 0: f
+        call0 0
+        drop
+        fclosure8 8: [bytecode f]
+        set_loc0 0: f
+        call0 0
+        drop
+        get_var assert
+        get_loc1 1: c
+        push_atom_value global
+        call2 2
+        drop
+        fclosure8 9: [bytecode f]
+        set_loc0 0: f
+        call0 0
+        drop
+        get_var assert
+        get_loc1 1: c
+        push_atom_value global
+        call2 2
+        drop
+        fclosure8 10: [bytecode f]
+        set_loc0 0: f
+        call0 0
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:437:9: function: myfunc
+  locals:
+    0: var myfunc
+  stack_size: 3
+  opcodes:
+        special_object 2
+        put_loc0 0: myfunc
+        object
+        get_loc0 0: myfunc
+        define_field myfunc
+        push_atom_value myfunc
+        push_1 1
+        put_ref_value
+        get_loc0 0: myfunc
+        return
+
+__tests__/fixtures_quickjs/test_language.js:444:10: function: <null>
+  closure vars:
+    0: myfunc local:loc0 var
+  stack_size: 3
+  opcodes:
+        object
+        get_var_ref0 0: myfunc
+        define_field myfunc
+        push_atom_value myfunc
+        push_1 1
+        put_ref_value
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:442:9: function: myfunc
+  locals:
+    0: var myfunc
+  stack_size: 3
+  opcodes:
+        special_object 2
+        put_loc0 0: myfunc
+        object
+        get_loc0 0: myfunc
+        define_field myfunc
+        push_atom_value myfunc
+        push_1 1
+        put_ref_value
+        fclosure8 0: [bytecode <null>]
+        call0 0
+        drop
+        get_loc0 0: myfunc
+        return
+
+__tests__/fixtures_quickjs/test_language.js:450:9: function: myfunc
+  locals:
+    0: var <var>
+    1: var this
+    2: var new.target
+    3: var arguments
+    4: var myfunc
+  closure vars:
+    0: f local:loc0 var
+  stack_size: 2
+  opcodes:
+        special_object 3
+        put_loc2 2: "new.target"
+        push_this
+        put_loc1 1: this
+        special_object 1
+        put_loc3 3: arguments
+        special_object 2
+        put_loc8 4: myfunc
+        special_object 5
+        put_loc0 0: "<var>"
+        get_loc0 0: "<var>"
+        with_get_var eval,31,0
+        get_var eval
+   31:  push_atom_value "myfunc = 1"
+        eval 1,1
+        drop
+        get_loc8 4: myfunc
+        return
+
+__tests__/fixtures_quickjs/test_language.js:457:9: function: myfunc
+  mode: strict
+  locals:
+    0: const myfunc
+  stack_size: 1
+  opcodes:
+        special_object 2
+        put_loc0 0: myfunc
+        throw_error myfunc,0
+
+__tests__/fixtures_quickjs/test_language.js:464:10: function: <null>
+  mode: strict
+  closure vars:
+    0: myfunc local:loc0 const
+  stack_size: 0
+  opcodes:
+        throw_error myfunc,0
+
+__tests__/fixtures_quickjs/test_language.js:462:9: function: myfunc
+  mode: strict
+  locals:
+    0: const myfunc
+  stack_size: 1
+  opcodes:
+        special_object 2
+        put_loc0 0: myfunc
+        fclosure8 0: [bytecode <null>]
+        call0 0
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:469:9: function: myfunc
+  mode: strict
+  locals:
+    0: var this
+    1: var new.target
+    2: var arguments
+    3: const myfunc
+  closure vars:
+    0: f local:loc0 var
+  stack_size: 2
+  opcodes:
+        special_object 3
+        put_loc1 1: "new.target"
+        push_this
+        put_loc0 0: this
+        special_object 0
+        put_loc2 2: arguments
+        special_object 2
+        put_loc3 3: myfunc
+        get_var eval
+        push_atom_value "myfunc = 1"
+        eval 1,1
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:433:1: function: test_function_expr_name
+  locals:
+    0: var f
+  stack_size: 3
+  opcodes:
+        fclosure8 0: [bytecode myfunc]
+        put_loc0 0: f
+        get_var assert
+        get_loc0 0: f
+        call0 0
+        get_loc0 0: f
+        call2 2
+        drop
+        fclosure8 1: [bytecode myfunc]
+        put_loc0 0: f
+        get_var assert
+        get_loc0 0: f
+        call0 0
+        get_loc0 0: f
+        call2 2
+        drop
+        fclosure8 2: [bytecode myfunc]
+        put_loc0 0: f
+        get_var assert
+        get_loc0 0: f
+        call0 0
+        get_loc0 0: f
+        call2 2
+        drop
+        fclosure8 3: [bytecode myfunc]
+        put_loc0 0: f
+        get_var assert_throws
+        get_var TypeError
+        get_loc0 0: f
+        call2 2
+        drop
+        fclosure8 4: [bytecode myfunc]
+        put_loc0 0: f
+        get_var assert_throws
+        get_var TypeError
+        get_loc0 0: f
+        call2 2
+        drop
+        fclosure8 5: [bytecode myfunc]
+        put_loc0 0: f
+        get_var assert_throws
+        get_var TypeError
+        get_loc0 0: f
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:479:9: function: func
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:482:17: function: <null>
+  args: x
+  stack_size: 2
+  opcodes:
+        get_arg0 0: x
+        push_1 1
+        add
+        return
+
+__tests__/fixtures_quickjs/test_language.js:478:5: function: *f
+  locals:
+    0: var func
+    1: var h
+  stack_size: 2
+  opcodes:
+        initial_yield
+        fclosure8 0: [bytecode func]
+        put_loc0 0: func
+        push_1 1
+        yield
+        if_false8 9
+        return_async
+    9:  drop
+        fclosure8 1: [bytecode <null>]
+        set_name h
+        put_loc1 1: h
+        push_2 2
+        yield
+        if_false8 23
+        return_async
+   23:  drop
+        undefined
+        return_async
+
+__tests__/fixtures_quickjs/test_language.js:486:9: function: func
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:489:17: function: <null>
+  args: x
+  stack_size: 2
+  opcodes:
+        get_arg0 0: x
+        push_1 1
+        add
+        return
+
+__tests__/fixtures_quickjs/test_language.js:485:5: function: g
+  locals:
+    0: var func
+    1: var h
+  stack_size: 1
+  opcodes:
+        fclosure8 0: [bytecode func]
+        put_loc0 0: func
+        push_1 1
+        await
+        drop
+        fclosure8 1: [bytecode <null>]
+        set_name h
+        put_loc1 1: h
+        push_2 2
+        await
+        drop
+        undefined
+        return_async
+
+__tests__/fixtures_quickjs/test_language.js:475:1: function: test_parse_semicolon
+  locals:
+    0: var f
+    1: var g
+  stack_size: 1
+  opcodes:
+        fclosure8 0: [bytecode f]
+        put_loc0 0: f
+        fclosure8 1: [bytecode g]
+        put_loc1 1: g
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:493:1: function: test_parse_arrow_function
+  locals:
+    0: var <var>
+    1: var this
+    2: var new.target
+    3: var arguments
+  stack_size: 3
+  opcodes:
+        special_object 3
+        put_loc2 2: "new.target"
+        push_this
+        put_loc1 1: this
+        special_object 1
+        put_loc3 3: arguments
+        special_object 5
+        put_loc0 0: "<var>"
+        get_loc0 0: "<var>"
+        with_get_var assert,27,0
+        get_var assert
+   27:  get_loc0 0: "<var>"
+        with_get_var eval,43,0
+        get_var eval
+   43:  push_atom_value "() => {}\n() => {}"
+        eval 1,1
+        typeof
+        push_atom_value function
+        call2 2
+        drop
+        get_loc0 0: "<var>"
+        with_get_var assert,77,0
+        get_var assert
+   77:  get_loc0 0: "<var>"
+        with_get_var eval,93,0
+        get_var eval
+   93:  push_atom_value "() => {}\n+1"
+        eval 1,1
+        push_1 1
+        call2 2
+        drop
+        get_loc0 0: "<var>"
+        with_get_var assert,122,0
+        get_var assert
+  122:  get_loc0 0: "<var>"
+        with_get_var eval,138,0
+        get_var eval
+  138:  push_atom_value "x => {}\n() => {}"
+        eval 1,1
+        typeof
+        push_atom_value function
+        call2 2
+        drop
+        get_loc0 0: "<var>"
+        with_get_var assert,172,0
+        get_var assert
+  172:  get_loc0 0: "<var>"
+        with_get_var eval,188,0
+        get_var eval
+  188:  push_atom_value "async () => {}\n() => {}"
+        eval 1,1
+        typeof
+        push_atom_value function
+        call2 2
+        drop
+        get_loc0 0: "<var>"
+        with_get_var assert,222,0
+        get_var assert
+  222:  get_loc0 0: "<var>"
+        with_get_var eval,238,0
+        get_var eval
+  238:  push_atom_value "async x => {}\n() => {}"
+        eval 1,1
+        typeof
+        push_atom_value function
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:513:9: function: <null>
+  locals:
+    0: var this
+  stack_size: 1
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field _b
+        return
+
+__tests__/fixtures_quickjs/test_language.js:501:1: function: test_optional_chaining
+  locals:
+    0: var a
+    1: var z
+  stack_size: 4
+  opcodes:
+        null
+        put_loc1 1: z
+        object
+        object
+        push_2 2
+        define_field c
+        define_field b
+        put_loc0 0: a
+        get_var assert
+        get_loc1 1: z
+        dup
+        is_undefined_or_null
+        if_false8 30
+        drop
+        undefined
+        goto8 43
+   30:  get_field b
+        push_atom_value c
+        delete
+        goto8 45
+   43:  drop
+        push_true
+   45:  push_true
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        dup
+        is_undefined_or_null
+        if_false8 62
+        drop
+        undefined
+        goto8 75
+   62:  get_field b
+        push_atom_value c
+        delete
+        goto8 77
+   75:  drop
+        push_true
+   77:  push_true
+        call2 2
+        drop
+        get_var assert
+        get_var JSON
+        get_field2 stringify
+        get_loc0 0: a
+        call_method 1
+        push_atom_value "{\"b\":{}}"
+        push_atom_value "optional chaining delete"
+        call3 3
+        drop
+        object
+        object
+        push_2 2
+        define_field c
+        define_field b
+        put_loc0 0: a
+        get_var assert
+        get_loc1 1: z
+        dup
+        is_undefined_or_null
+        if_false8 139
+        drop
+        undefined
+        goto8 152
+  139:  get_field b
+        push_atom_value c
+        delete
+        goto8 154
+  152:  drop
+        push_true
+  154:  push_true
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        dup
+        is_undefined_or_null
+        if_false8 171
+        drop
+        undefined
+        goto8 184
+  171:  get_field b
+        push_atom_value c
+        delete
+        goto8 186
+  184:  drop
+        push_true
+  186:  push_true
+        call2 2
+        drop
+        get_var assert
+        get_var JSON
+        get_field2 stringify
+        get_loc0 0: a
+        call_method 1
+        push_atom_value "{\"b\":{}}"
+        call2 2
+        drop
+        object
+        fclosure8 0: [bytecode <null>]
+        define_method b,4
+        object
+        push_i8 42
+        define_field c
+        define_field _b
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        dup
+        is_undefined_or_null
+        if_false8 252
+        drop
+        undefined
+        goto8 259
+  252:  get_field2 b
+        goto8 260
+  259:  undefined
+  260:  call_method 0
+        get_field c
+        push_i8 42
+        call2 2
+        drop
+        get_var assert
+        get_loc0 0: a
+        dup
+        is_undefined_or_null
+        if_false8 286
+        drop
+        undefined
+        goto8 294
+  286:  push_atom_value b
+        get_array_el2
+        goto8 295
+  294:  undefined
+  295:  call_method 0
+        get_field c
+        push_i8 42
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:519:1: function: test_unicode_ident
+  locals:
+    0: var Ãµ
+  stack_size: 3
+  opcodes:
+        push_3 3
+        put_loc0 0: "\u00c3\u00b5"
+        get_var assert
+        get_var_undef "\u00f5"
+        typeof
+        push_atom_value undefined
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_language.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+    1: catch e [level:3 next:-1]
+  stack_size: 3
+  opcodes:
+        check_define_var assert,64
+        check_define_var assert_throws,64
+        check_define_var test_op1,64
+        check_define_var test_cvt,64
+        check_define_var test_eq,64
+        check_define_var test_inc_dec,64
+        check_define_var F,64
+        check_define_var test_op2,64
+        check_define_var test_delete,64
+        check_define_var test_prototype,64
+        check_define_var test_arguments,64
+        check_define_var test_class,64
+        check_define_var test_template,64
+        check_define_var test_template_skip,64
+        check_define_var test_object_literal,64
+        check_define_var test_regexp_skip,64
+        check_define_var test_labels,64
+        check_define_var test_labels2,64
+        check_define_var test_destructuring,64
+        check_define_var test_spread,64
+        check_define_var test_function_length,64
+        check_define_var test_argument_scope,64
+        check_define_var test_function_expr_name,64
+        check_define_var test_parse_semicolon,64
+        check_define_var test_parse_arrow_function,64
+        check_define_var test_optional_chaining,64
+        check_define_var test_unicode_ident,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode assert_throws]
+        define_func assert_throws,0
+        fclosure8 2: [bytecode test_op1]
+        define_func test_op1,0
+        fclosure8 3: [bytecode test_cvt]
+        define_func test_cvt,0
+        fclosure8 4: [bytecode test_eq]
+        define_func test_eq,0
+        fclosure8 5: [bytecode test_inc_dec]
+        define_func test_inc_dec,0
+        fclosure8 6: [bytecode F]
+        define_func F,0
+        fclosure8 7: [bytecode test_op2]
+        define_func test_op2,0
+        fclosure8 8: [bytecode test_delete]
+        define_func test_delete,0
+        fclosure8 9: [bytecode test_prototype]
+        define_func test_prototype,0
+        fclosure8 10: [bytecode test_arguments]
+        define_func test_arguments,0
+        fclosure8 11: [bytecode test_class]
+        define_func test_class,0
+        fclosure8 12: [bytecode test_template]
+        define_func test_template,0
+        fclosure8 13: [bytecode test_template_skip]
+        define_func test_template_skip,0
+        fclosure8 14: [bytecode test_object_literal]
+        define_func test_object_literal,0
+        fclosure8 15: [bytecode test_regexp_skip]
+        define_func test_regexp_skip,0
+        fclosure8 16: [bytecode test_labels]
+        define_func test_labels,0
+        fclosure8 17: [bytecode test_labels2]
+        define_func test_labels2,0
+        fclosure8 18: [bytecode test_destructuring]
+        define_func test_destructuring,0
+        fclosure8 19: [bytecode test_spread]
+        define_func test_spread,0
+        fclosure8 20: [bytecode test_function_length]
+        define_func test_function_length,0
+        fclosure8 21: [bytecode test_argument_scope]
+        define_func test_argument_scope,0
+        fclosure8 22: [bytecode test_function_expr_name]
+        define_func test_function_expr_name,0
+        fclosure8 23: [bytecode test_parse_semicolon]
+        define_func test_parse_semicolon,0
+        fclosure8 24: [bytecode test_parse_arrow_function]
+        define_func test_parse_arrow_function,0
+        fclosure8 25: [bytecode test_optional_chaining]
+        define_func test_optional_chaining,0
+        fclosure8 26: [bytecode test_unicode_ident]
+        define_func test_unicode_ident,0
+        undefined
+        put_loc0 0: "<ret>"
+        catch 400
+        get_var __loadScript
+        push_atom_value "test_assert.js"
+        call1 1
+        put_loc0 0: "<ret>"
+        drop
+        goto8 410
+  400:  put_loc1 1: e
+        catch 409
+        drop
+        goto8 410
+  409:  throw
+  410:  get_var test_op1
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_cvt
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_eq
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_inc_dec
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_op2
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_delete
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_prototype
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_arguments
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_class
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_template
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_template_skip
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_object_literal
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_regexp_skip
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_labels
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_labels2
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_destructuring
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_spread
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_function_length
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_argument_scope
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_function_expr_name
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_parse_semicolon
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_optional_chaining
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_parse_arrow_function
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_unicode_ident
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

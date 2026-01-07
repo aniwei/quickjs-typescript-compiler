@@ -626,11 +626,6 @@ export class Compiler {
   emitSourcePos(fd: FunctionDef, sourcePos: number): void {
     if (fd.suppressSourcePos) return
 
-    // Align with QuickJS call-sites that guard emit_source_pos() with js_is_live_code().
-    // This avoids emitting OP_line_num markers in dead code, which would otherwise
-    // perturb pc2line after skip_dead_code() in resolve_labels.
-    if (!this.isLiveCode(fd)) return
-
     // Defensive: some synthetic/implicit TS nodes can yield negative positions.
     // QuickJS never emits an OP_line_num for an invalid source pointer.
     if (sourcePos < 0) return

@@ -1,0 +1,1447 @@
+__tests__/fixtures_quickjs/octane/richards.js:42:1: function: runRichards
+  mode: strict
+  locals:
+    0: var scheduler
+    1: var queue
+    2: var msg
+  closure vars:
+    0: Scheduler parent:loc7 var
+    1: ID_IDLE parent:loc8 var
+    2: COUNT parent:loc4 var
+    3: Packet parent:loc29 var
+    4: ID_WORKER parent:loc9 var
+    5: KIND_WORK parent:loc16 var
+    6: ID_DEVICE_A parent:loc12 var
+    7: KIND_DEVICE parent:loc15 var
+    8: ID_HANDLER_A parent:loc10 var
+    9: ID_DEVICE_B parent:loc13 var
+   10: ID_HANDLER_B parent:loc11 var
+   11: EXPECTED_QUEUE_COUNT parent:loc5 var
+   12: EXPECTED_HOLD_COUNT parent:loc6 var
+  stack_size: 6
+  opcodes:
+        get_var_ref0 0: Scheduler
+        dup
+        call_constructor 0
+        set_loc0 0: scheduler
+        get_field2 addIdleTask
+        get_var_ref1 1: ID_IDLE
+        push_0 0
+        null
+        get_var_ref2 2: COUNT
+        call_method 4
+        drop
+        get_var_ref3 3: Packet
+        dup
+        null
+        get_var_ref 4: ID_WORKER
+        get_var_ref 5: KIND_WORK
+        call_constructor 3
+        put_loc1 1: queue
+        get_var_ref3 3: Packet
+        dup
+        get_loc1 1: queue
+        get_var_ref 4: ID_WORKER
+        get_var_ref 5: KIND_WORK
+        call_constructor 3
+        put_loc1 1: queue
+        get_loc0 0: scheduler
+        get_field2 addWorkerTask
+        get_var_ref 4: ID_WORKER
+        push_i16 1000
+        get_loc1 1: queue
+        call_method 3
+        drop
+        get_var_ref3 3: Packet
+        dup
+        null
+        get_var_ref 6: ID_DEVICE_A
+        get_var_ref 7: KIND_DEVICE
+        call_constructor 3
+        put_loc1 1: queue
+        get_var_ref3 3: Packet
+        dup
+        get_loc1 1: queue
+        get_var_ref 6: ID_DEVICE_A
+        get_var_ref 7: KIND_DEVICE
+        call_constructor 3
+        put_loc1 1: queue
+        get_var_ref3 3: Packet
+        dup
+        get_loc1 1: queue
+        get_var_ref 6: ID_DEVICE_A
+        get_var_ref 7: KIND_DEVICE
+        call_constructor 3
+        put_loc1 1: queue
+        get_loc0 0: scheduler
+        get_field2 addHandlerTask
+        get_var_ref 8: ID_HANDLER_A
+        push_i16 2000
+        get_loc1 1: queue
+        call_method 3
+        drop
+        get_var_ref3 3: Packet
+        dup
+        null
+        get_var_ref 9: ID_DEVICE_B
+        get_var_ref 7: KIND_DEVICE
+        call_constructor 3
+        put_loc1 1: queue
+        get_var_ref3 3: Packet
+        dup
+        get_loc1 1: queue
+        get_var_ref 9: ID_DEVICE_B
+        get_var_ref 7: KIND_DEVICE
+        call_constructor 3
+        put_loc1 1: queue
+        get_var_ref3 3: Packet
+        dup
+        get_loc1 1: queue
+        get_var_ref 9: ID_DEVICE_B
+        get_var_ref 7: KIND_DEVICE
+        call_constructor 3
+        put_loc1 1: queue
+        get_loc0 0: scheduler
+        get_field2 addHandlerTask
+        get_var_ref 10: ID_HANDLER_B
+        push_i16 3000
+        get_loc1 1: queue
+        call_method 3
+        drop
+        get_loc0 0: scheduler
+        get_field2 addDeviceTask
+        get_var_ref 6: ID_DEVICE_A
+        push_i16 4000
+        null
+        call_method 3
+        drop
+        get_loc0 0: scheduler
+        get_field2 addDeviceTask
+        get_var_ref 9: ID_DEVICE_B
+        push_i16 5000
+        null
+        call_method 3
+        drop
+        get_loc0 0: scheduler
+        get_field2 schedule
+        call_method 0
+        drop
+        get_loc0 0: scheduler
+        get_field queueCount
+        get_var_ref 11: EXPECTED_QUEUE_COUNT
+        neq
+        dup
+        if_true8 242
+        drop
+        get_loc0 0: scheduler
+        get_field holdCount
+        get_var_ref 12: EXPECTED_HOLD_COUNT
+        neq
+  242:  if_false8 287
+        push_atom_value "Error during execution: queueCount = "
+        get_loc0 0: scheduler
+        get_field queueCount
+        add
+        push_atom_value ", holdCount = "
+        add
+        get_loc0 0: scheduler
+        get_field holdCount
+        add
+        push_atom_value "."
+        add
+        put_loc2 2: msg
+        get_var Error
+        dup
+        get_loc2 2: msg
+        call_constructor 1
+        throw
+  287:  return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:82:1: function: Scheduler
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: NUMBER_OF_IDS parent:loc14 var
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        push_0 0
+        put_field queueCount
+        get_loc0 0: this
+        push_0 0
+        put_field holdCount
+        get_loc0 0: this
+        get_var Array
+        dup
+        get_var_ref0 0: NUMBER_OF_IDS
+        call_constructor 1
+        put_field blocks
+        get_loc0 0: this
+        null
+        put_field list
+        get_loc0 0: this
+        null
+        put_field currentTcb
+        get_loc0 0: this
+        null
+        put_field currentId
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:106:35: function: <null>
+  mode: strict
+  args: id priority queue count
+  locals:
+    0: var this
+  closure vars:
+    0: IdleTask parent:loc24 var
+  stack_size: 10
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 addRunningTask
+        get_arg0 0: id
+        get_arg1 1: priority
+        get_arg2 2: queue
+        get_var_ref0 0: IdleTask
+        dup
+        get_loc0 0: this
+        push_1 1
+        get_arg3 3: count
+        call_constructor 3
+        call_method 4
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:115:37: function: <null>
+  mode: strict
+  args: id priority queue
+  locals:
+    0: var this
+  closure vars:
+    0: WorkerTask parent:loc26 var
+    1: ID_HANDLER_A parent:loc10 var
+  stack_size: 10
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 addTask
+        get_arg0 0: id
+        get_arg1 1: priority
+        get_arg2 2: queue
+        get_var_ref0 0: WorkerTask
+        dup
+        get_loc0 0: this
+        get_var_ref1 1: ID_HANDLER_A
+        push_0 0
+        call_constructor 3
+        call_method 4
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:124:38: function: <null>
+  mode: strict
+  args: id priority queue
+  locals:
+    0: var this
+  closure vars:
+    0: HandlerTask parent:loc27 var
+  stack_size: 8
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 addTask
+        get_arg0 0: id
+        get_arg1 1: priority
+        get_arg2 2: queue
+        get_var_ref0 0: HandlerTask
+        dup
+        get_loc0 0: this
+        call_constructor 1
+        call_method 4
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:133:37: function: <null>
+  mode: strict
+  args: id priority queue
+  locals:
+    0: var this
+  closure vars:
+    0: DeviceTask parent:loc25 var
+  stack_size: 8
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 addTask
+        get_arg0 0: id
+        get_arg1 1: priority
+        get_arg2 2: queue
+        get_var_ref0 0: DeviceTask
+        dup
+        get_loc0 0: this
+        call_constructor 1
+        call_method 4
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:143:38: function: <null>
+  mode: strict
+  args: id priority queue task
+  locals:
+    0: var this
+  stack_size: 6
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 addTask
+        get_arg0 0: id
+        get_arg1 1: priority
+        get_arg2 2: queue
+        get_arg3 3: task
+        call_method 4
+        drop
+        get_loc0 0: this
+        get_field currentTcb
+        get_field2 setRunning
+        call_method 0
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:154:31: function: <null>
+  mode: strict
+  args: id priority queue task
+  locals:
+    0: var this
+  closure vars:
+    0: TaskControlBlock parent:loc17 var
+  stack_size: 8
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_var_ref0 0: TaskControlBlock
+        dup
+        get_loc0 0: this
+        get_field list
+        get_arg0 0: id
+        get_arg1 1: priority
+        get_arg2 2: queue
+        get_arg3 3: task
+        call_constructor 5
+        put_field currentTcb
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field currentTcb
+        put_field list
+        get_loc0 0: this
+        get_field blocks
+        get_arg0 0: id
+        get_loc0 0: this
+        get_field currentTcb
+        put_array_el
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:162:32: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field list
+        put_field currentTcb
+   14:  get_loc0 0: this
+        get_field currentTcb
+        null
+        neq
+        if_false8 98
+        get_loc0 0: this
+        get_field currentTcb
+        get_field2 isHeldOrSuspended
+        call_method 0
+        if_false8 59
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field currentTcb
+        get_field link
+        put_field currentTcb
+        goto8 14
+   59:  get_loc0 0: this
+        get_loc0 0: this
+        get_field currentTcb
+        get_field id
+        put_field currentId
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field currentTcb
+        get_field2 run
+        call_method 0
+        put_field currentTcb
+        goto8 14
+   98:  return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:178:31: function: <null>
+  mode: strict
+  args: id
+  locals:
+    0: var tcb
+    1: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc1 1: this
+        get_loc1 1: this
+        get_field blocks
+        get_arg0 0: id
+        get_array_el
+        set_loc0 0: tcb
+        null
+        eq
+        if_false8 17
+        get_loc0 0: tcb
+        return
+   17:  get_loc0 0: tcb
+        get_field2 markAsNotHeld
+        call_method 0
+        drop
+        get_loc0 0: tcb
+        get_field priority
+        get_loc1 1: this
+        get_field currentTcb
+        get_field priority
+        gt
+        if_false8 49
+        get_loc0 0: tcb
+        return
+   49:  get_loc1 1: this
+        get_field currentTcb
+        return
+
+__tests__/fixtures_quickjs/octane/richards.js:195:35: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 holdCount
+        inc
+        put_field holdCount
+        get_loc0 0: this
+        get_field currentTcb
+        get_field2 markAsHeld
+        call_method 0
+        drop
+        get_loc0 0: this
+        get_field currentTcb
+        get_field link
+        return
+
+__tests__/fixtures_quickjs/octane/richards.js:204:38: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field currentTcb
+        get_field2 markAsSuspended
+        call_method 0
+        drop
+        get_loc0 0: this
+        get_field currentTcb
+        return
+
+__tests__/fixtures_quickjs/octane/richards.js:214:29: function: <null>
+  mode: strict
+  args: packet
+  locals:
+    0: var t
+    1: var this
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc1 1: this
+        get_loc1 1: this
+        get_field blocks
+        get_arg0 0: packet
+        get_field id
+        get_array_el
+        set_loc0 0: t
+        null
+        eq
+        if_false8 22
+        get_loc0 0: t
+        return
+   22:  get_loc1 1: this
+        get_field2 queueCount
+        inc
+        put_field queueCount
+        get_arg0 0: packet
+        null
+        put_field link
+        get_arg0 0: packet
+        get_loc1 1: this
+        get_field currentId
+        put_field id
+        get_loc0 0: t
+        get_field2 checkPriorityAdd
+        get_loc1 1: this
+        get_field currentTcb
+        get_arg0 0: packet
+        tail_call_method 2
+
+__tests__/fixtures_quickjs/octane/richards.js:233:1: function: TaskControlBlock
+  mode: strict
+  args: link id priority queue task
+  locals:
+    0: var this
+  closure vars:
+    0: STATE_SUSPENDED parent:loc20 var
+    1: STATE_SUSPENDED_RUNNABLE parent:loc22 var
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: link
+        put_field link
+        get_loc0 0: this
+        get_arg1 1: id
+        put_field id
+        get_loc0 0: this
+        get_arg2 2: priority
+        put_field priority
+        get_loc0 0: this
+        get_arg3 3: queue
+        put_field queue
+        get_loc0 0: this
+        get_arg 4: task
+        put_field task
+        get_arg3 3: queue
+        null
+        eq
+        if_false8 52
+        get_loc0 0: this
+        get_var_ref0 0: STATE_SUSPENDED
+        put_field state
+        return_undef
+   52:  get_loc0 0: this
+        get_var_ref1 1: STATE_SUSPENDED_RUNNABLE
+        put_field state
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:265:41: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: STATE_RUNNING parent:loc18 var
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_var_ref0 0: STATE_RUNNING
+        put_field state
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:268:44: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: STATE_NOT_HELD parent:loc23 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field state
+        get_var_ref0 0: STATE_NOT_HELD
+        and
+        put_field state
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:271:41: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: STATE_HELD parent:loc21 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field state
+        get_var_ref0 0: STATE_HELD
+        or
+        put_field state
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:274:48: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: STATE_HELD parent:loc21 var
+    1: STATE_SUSPENDED parent:loc20 var
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field state
+        get_var_ref0 0: STATE_HELD
+        and
+        push_0 0
+        neq
+        dup
+        if_true8 24
+        drop
+        get_loc0 0: this
+        get_field state
+        get_var_ref1 1: STATE_SUSPENDED
+        eq
+   24:  return
+
+__tests__/fixtures_quickjs/octane/richards.js:277:46: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: STATE_SUSPENDED parent:loc20 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field state
+        get_var_ref0 0: STATE_SUSPENDED
+        or
+        put_field state
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:280:45: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  closure vars:
+    0: STATE_RUNNABLE parent:loc19 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field state
+        get_var_ref0 0: STATE_RUNNABLE
+        or
+        put_field state
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:286:34: function: <null>
+  mode: strict
+  locals:
+    0: var packet
+    1: var this
+  closure vars:
+    0: STATE_SUSPENDED_RUNNABLE parent:loc22 var
+    1: STATE_RUNNING parent:loc18 var
+    2: STATE_RUNNABLE parent:loc19 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc1 1: this
+        get_loc1 1: this
+        get_field state
+        get_var_ref0 0: STATE_SUSPENDED_RUNNABLE
+        eq
+        if_false8 59
+        get_loc1 1: this
+        get_field queue
+        put_loc0 0: packet
+        get_loc1 1: this
+        get_loc0 0: packet
+        get_field link
+        put_field queue
+        get_loc1 1: this
+        get_field queue
+        null
+        eq
+        if_false8 50
+        get_loc1 1: this
+        get_var_ref1 1: STATE_RUNNING
+        put_field state
+        goto8 61
+   50:  get_loc1 1: this
+        get_var_ref2 2: STATE_RUNNABLE
+        put_field state
+        goto8 61
+   59:  null
+        put_loc0 0: packet
+   61:  get_loc1 1: this
+        get_field task
+        get_field2 run
+        get_loc0 0: packet
+        tail_call_method 1
+
+__tests__/fixtures_quickjs/octane/richards.js:308:47: function: <null>
+  mode: strict
+  args: task packet
+  locals:
+    0: var this
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field queue
+        null
+        eq
+        if_false8 46
+        get_loc0 0: this
+        get_arg1 1: packet
+        put_field queue
+        get_loc0 0: this
+        get_field2 markAsRunnable
+        call_method 0
+        drop
+        get_loc0 0: this
+        get_field priority
+        get_arg0 0: task
+        get_field priority
+        gt
+        if_false8 67
+        get_loc0 0: this
+        return
+   46:  get_loc0 0: this
+        get_arg1 1: packet
+        get_field2 addTo
+        get_loc0 0: this
+        get_field queue
+        call_method 1
+        put_field queue
+   67:  get_arg0 0: task
+        return
+
+__tests__/fixtures_quickjs/octane/richards.js:320:39: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        push_atom_value "tcb { "
+        get_loc0 0: this
+        get_field task
+        add
+        push_atom_value "@"
+        add
+        get_loc0 0: this
+        get_field state
+        add
+        push_atom_value " }"
+        add
+        return
+
+__tests__/fixtures_quickjs/octane/richards.js:331:1: function: IdleTask
+  mode: strict
+  args: scheduler v1 count
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: scheduler
+        put_field scheduler
+        get_loc0 0: this
+        get_arg1 1: v1
+        put_field v1
+        get_loc0 0: this
+        get_arg2 2: count
+        put_field count
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:336:26: function: <null>
+  mode: strict
+  args: packet
+  locals:
+    0: var this
+  closure vars:
+    0: ID_DEVICE_A parent:loc12 var
+    1: ID_DEVICE_B parent:loc13 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_field2 count
+        dec
+        put_field count
+        get_loc0 0: this
+        get_field count
+        push_0 0
+        eq
+        if_false8 38
+        get_loc0 0: this
+        get_field scheduler
+        get_field2 holdCurrent
+        tail_call_method 0
+   38:  get_loc0 0: this
+        get_field v1
+        push_1 1
+        and
+        push_0 0
+        eq
+        if_false8 79
+        get_loc0 0: this
+        get_loc0 0: this
+        get_field v1
+        push_1 1
+        sar
+        put_field v1
+        get_loc0 0: this
+        get_field scheduler
+        get_field2 release
+        get_var_ref0 0: ID_DEVICE_A
+        tail_call_method 1
+   79:  get_loc0 0: this
+        get_loc0 0: this
+        get_field v1
+        push_1 1
+        sar
+        push_i32 53256
+        xor
+        put_field v1
+        get_loc0 0: this
+        get_field scheduler
+        get_field2 release
+        get_var_ref1 1: ID_DEVICE_B
+        tail_call_method 1
+
+__tests__/fixtures_quickjs/octane/richards.js:349:31: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_atom_value IdleTask
+        return
+
+__tests__/fixtures_quickjs/octane/richards.js:358:1: function: DeviceTask
+  mode: strict
+  args: scheduler
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: scheduler
+        put_field scheduler
+        get_loc0 0: this
+        null
+        put_field v1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:362:28: function: <null>
+  mode: strict
+  args: packet
+  locals:
+    0: var v
+    1: var this
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc1 1: this
+        get_arg0 0: packet
+        null
+        eq
+        if_false8 60
+        get_loc1 1: this
+        get_field v1
+        null
+        eq
+        if_false8 31
+        get_loc1 1: this
+        get_field scheduler
+        get_field2 suspendCurrent
+        tail_call_method 0
+   31:  get_loc1 1: this
+        get_field v1
+        put_loc0 0: v
+        get_loc1 1: this
+        null
+        put_field v1
+        get_loc1 1: this
+        get_field scheduler
+        get_field2 queue
+        get_loc0 0: v
+        tail_call_method 1
+   60:  get_loc1 1: this
+        get_arg0 0: packet
+        put_field v1
+        get_loc1 1: this
+        get_field scheduler
+        get_field2 holdCurrent
+        tail_call_method 0
+
+__tests__/fixtures_quickjs/octane/richards.js:375:33: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_atom_value DeviceTask
+        return
+
+__tests__/fixtures_quickjs/octane/richards.js:385:1: function: WorkerTask
+  mode: strict
+  args: scheduler v1 v2
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: scheduler
+        put_field scheduler
+        get_loc0 0: this
+        get_arg1 1: v1
+        put_field v1
+        get_loc0 0: this
+        get_arg2 2: v2
+        put_field v2
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:390:28: function: <null>
+  mode: strict
+  args: packet
+  locals:
+    0: var i
+    1: var this
+  closure vars:
+    0: ID_HANDLER_A parent:loc10 var
+    1: ID_HANDLER_B parent:loc11 var
+    2: DATA_SIZE parent:loc28 var
+  stack_size: 3
+  opcodes:
+        push_this
+        put_loc1 1: this
+        get_arg0 0: packet
+        null
+        eq
+        if_false8 21
+        get_loc1 1: this
+        get_field scheduler
+        get_field2 suspendCurrent
+        tail_call_method 0
+   21:  get_loc1 1: this
+        get_field v1
+        get_var_ref0 0: ID_HANDLER_A
+        eq
+        if_false8 40
+        get_loc1 1: this
+        get_var_ref1 1: ID_HANDLER_B
+        put_field v1
+        goto8 47
+   40:  get_loc1 1: this
+        get_var_ref0 0: ID_HANDLER_A
+        put_field v1
+   47:  get_arg0 0: packet
+        get_loc1 1: this
+        get_field v1
+        put_field id
+        get_arg0 0: packet
+        push_0 0
+        put_field a1
+        push_0 0
+        put_loc0 0: i
+   68:  get_loc0 0: i
+        get_var_ref2 2: DATA_SIZE
+        lt
+        if_false8 121
+        get_loc1 1: this
+        get_field2 v2
+        inc
+        put_field v2
+        get_loc1 1: this
+        get_field v2
+        push_i8 26
+        gt
+        if_false8 103
+        get_loc1 1: this
+        push_1 1
+        put_field v2
+  103:  get_arg0 0: packet
+        get_field a2
+        get_loc0 0: i
+        get_loc1 1: this
+        get_field v2
+        put_array_el
+        inc_loc 0: i
+        goto8 68
+  121:  get_loc1 1: this
+        get_field scheduler
+        get_field2 queue
+        get_arg0 0: packet
+        tail_call_method 1
+
+__tests__/fixtures_quickjs/octane/richards.js:412:33: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_atom_value WorkerTask
+        return
+
+__tests__/fixtures_quickjs/octane/richards.js:420:1: function: HandlerTask
+  mode: strict
+  args: scheduler
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: scheduler
+        put_field scheduler
+        get_loc0 0: this
+        null
+        put_field v1
+        get_loc0 0: this
+        null
+        put_field v2
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:425:29: function: <null>
+  mode: strict
+  args: packet
+  locals:
+    0: var count
+    1: var v
+    2: var this
+  closure vars:
+    0: KIND_WORK parent:loc16 var
+    1: DATA_SIZE parent:loc28 var
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc2 2: this
+        get_arg0 0: packet
+        null
+        neq
+        if_false8 61
+        get_arg0 0: packet
+        get_field kind
+        get_var_ref0 0: KIND_WORK
+        eq
+        if_false8 40
+        get_loc2 2: this
+        get_arg0 0: packet
+        get_field2 addTo
+        get_loc2 2: this
+        get_field v1
+        call_method 1
+        put_field v1
+        goto8 61
+   40:  get_loc2 2: this
+        get_arg0 0: packet
+        get_field2 addTo
+        get_loc2 2: this
+        get_field v2
+        call_method 1
+        put_field v2
+   61:  get_loc2 2: this
+        get_field v1
+        null
+        neq
+        if_false 211
+        get_loc2 2: this
+        get_field v1
+        get_field a1
+        set_loc0 0: count
+        get_var_ref1 1: DATA_SIZE
+        lt
+        if_false8 172
+        get_loc2 2: this
+        get_field v2
+        null
+        neq
+        if_false8 211
+        get_loc2 2: this
+        get_field v2
+        put_loc1 1: v
+        get_loc2 2: this
+        get_loc2 2: this
+        get_field v2
+        get_field link
+        put_field v2
+        get_loc1 1: v
+        get_loc2 2: this
+        get_field v1
+        get_field a2
+        get_loc0 0: count
+        get_array_el
+        put_field a1
+        get_loc2 2: this
+        get_field v1
+        get_loc0 0: count
+        push_1 1
+        add
+        put_field a1
+        get_loc2 2: this
+        get_field scheduler
+        get_field2 queue
+        get_loc1 1: v
+        tail_call_method 1
+  172:  get_loc2 2: this
+        get_field v1
+        put_loc1 1: v
+        get_loc2 2: this
+        get_loc2 2: this
+        get_field v1
+        get_field link
+        put_field v1
+        get_loc2 2: this
+        get_field scheduler
+        get_field2 queue
+        get_loc1 1: v
+        tail_call_method 1
+  211:  get_loc2 2: this
+        get_field scheduler
+        get_field2 suspendCurrent
+        tail_call_method 0
+
+__tests__/fixtures_quickjs/octane/richards.js:454:34: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_atom_value HandlerTask
+        return
+
+__tests__/fixtures_quickjs/octane/richards.js:473:1: function: Packet
+  mode: strict
+  args: link id kind
+  locals:
+    0: var this
+  closure vars:
+    0: DATA_SIZE parent:loc28 var
+  stack_size: 4
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: link
+        put_field link
+        get_loc0 0: this
+        get_arg1 1: id
+        put_field id
+        get_loc0 0: this
+        get_arg2 2: kind
+        put_field kind
+        get_loc0 0: this
+        push_0 0
+        put_field a1
+        get_loc0 0: this
+        get_var Array
+        dup
+        get_var_ref0 0: DATA_SIZE
+        call_constructor 1
+        put_field a2
+        return_undef
+
+__tests__/fixtures_quickjs/octane/richards.js:484:26: function: <null>
+  mode: strict
+  args: queue
+  locals:
+    0: var peek
+    1: var next
+    2: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc2 2: this
+        get_loc2 2: this
+        null
+        put_field link
+        get_arg0 0: queue
+        null
+        eq
+        if_false8 16
+        get_loc2 2: this
+        return
+   16:  get_arg0 0: queue
+        put_loc1 1: next
+   18:  get_loc1 1: next
+        get_field link
+        set_loc0 0: peek
+        null
+        neq
+        if_false8 33
+        get_loc0 0: peek
+        put_loc1 1: next
+        goto8 18
+   33:  get_loc1 1: next
+        get_loc2 2: this
+        put_field link
+        get_arg0 0: queue
+        return
+
+__tests__/fixtures_quickjs/octane/richards.js:494:29: function: <null>
+  mode: strict
+  stack_size: 1
+  opcodes:
+        push_atom_value Packet
+        return
+
+__tests__/fixtures_quickjs/octane/richards.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: Benchmark parent:loc0 const
+    1: BenchmarkSuite parent:loc1 const
+    2: Richards local:loc0 var
+    3: runRichards local:loc1 var
+    4: COUNT local:loc2 var
+    5: EXPECTED_QUEUE_COUNT local:loc3 var
+    6: EXPECTED_HOLD_COUNT local:loc4 var
+    7: Scheduler local:loc5 var
+    8: ID_IDLE local:loc6 var
+    9: ID_WORKER local:loc7 var
+   10: ID_HANDLER_A local:loc8 var
+   11: ID_HANDLER_B local:loc9 var
+   12: ID_DEVICE_A local:loc10 var
+   13: ID_DEVICE_B local:loc11 var
+   14: NUMBER_OF_IDS local:loc12 var
+   15: KIND_DEVICE local:loc13 var
+   16: KIND_WORK local:loc14 var
+   17: TaskControlBlock local:loc15 var
+   18: STATE_RUNNING local:loc16 var
+   19: STATE_RUNNABLE local:loc17 var
+   20: STATE_SUSPENDED local:loc18 var
+   21: STATE_HELD local:loc19 var
+   22: STATE_SUSPENDED_RUNNABLE local:loc20 var
+   23: STATE_NOT_HELD local:loc21 var
+   24: IdleTask local:loc22 var
+   25: DeviceTask local:loc23 var
+   26: WorkerTask local:loc24 var
+   27: HandlerTask local:loc25 var
+   28: DATA_SIZE local:loc26 var
+   29: Packet local:loc27 var
+  stack_size: 11
+  opcodes:
+        push_this
+        if_false8 42
+        fclosure8 0: [bytecode runRichards]
+        put_var_ref3 3: runRichards
+        fclosure8 1: [bytecode Scheduler]
+        put_var_ref 7: Scheduler
+        fclosure8 13: [bytecode TaskControlBlock]
+        put_var_ref 17: TaskControlBlock
+        fclosure8 23: [bytecode IdleTask]
+        put_var_ref 24: IdleTask
+        fclosure8 26: [bytecode DeviceTask]
+        put_var_ref 25: DeviceTask
+        fclosure8 29: [bytecode WorkerTask]
+        put_var_ref 26: WorkerTask
+        fclosure8 32: [bytecode HandlerTask]
+        put_var_ref 27: HandlerTask
+        fclosure8 35: [bytecode Packet]
+        put_var_ref 29: Packet
+        return_undef
+   42:  get_var_ref_check 1: BenchmarkSuite
+        dup
+        push_atom_value Richards
+        push_i32 35302
+        array_from 1
+        get_var_ref_check 0: Benchmark
+        dup
+        push_atom_value Richards
+        push_true
+        push_false
+        push_i16 8200
+        get_var_ref3 3: runRichards
+        call_constructor 5
+        array_from 1
+        call_constructor 3
+        put_var_ref2 2: Richards
+        push_i16 1000
+        put_var_ref 4: COUNT
+        push_i16 2322
+        put_var_ref 5: EXPECTED_QUEUE_COUNT
+        push_i16 928
+        put_var_ref 6: EXPECTED_HOLD_COUNT
+        push_0 0
+        put_var_ref 8: ID_IDLE
+        push_1 1
+        put_var_ref 9: ID_WORKER
+        push_2 2
+        put_var_ref 10: ID_HANDLER_A
+        push_3 3
+        put_var_ref 11: ID_HANDLER_B
+        push_4 4
+        put_var_ref 12: ID_DEVICE_A
+        push_5 5
+        put_var_ref 13: ID_DEVICE_B
+        push_6 6
+        put_var_ref 14: NUMBER_OF_IDS
+        push_0 0
+        put_var_ref 15: KIND_DEVICE
+        push_1 1
+        put_var_ref 16: KIND_WORK
+        get_var_ref 7: Scheduler
+        get_field prototype
+        fclosure8 2: [bytecode <null>]
+        put_field addIdleTask
+        get_var_ref 7: Scheduler
+        get_field prototype
+        fclosure8 3: [bytecode <null>]
+        put_field addWorkerTask
+        get_var_ref 7: Scheduler
+        get_field prototype
+        fclosure8 4: [bytecode <null>]
+        put_field addHandlerTask
+        get_var_ref 7: Scheduler
+        get_field prototype
+        fclosure8 5: [bytecode <null>]
+        put_field addDeviceTask
+        get_var_ref 7: Scheduler
+        get_field prototype
+        fclosure8 6: [bytecode <null>]
+        put_field addRunningTask
+        get_var_ref 7: Scheduler
+        get_field prototype
+        fclosure8 7: [bytecode <null>]
+        put_field addTask
+        get_var_ref 7: Scheduler
+        get_field prototype
+        fclosure8 8: [bytecode <null>]
+        put_field schedule
+        get_var_ref 7: Scheduler
+        get_field prototype
+        fclosure8 9: [bytecode <null>]
+        put_field release
+        get_var_ref 7: Scheduler
+        get_field prototype
+        fclosure8 10: [bytecode <null>]
+        put_field holdCurrent
+        get_var_ref 7: Scheduler
+        get_field prototype
+        fclosure8 11: [bytecode <null>]
+        put_field suspendCurrent
+        get_var_ref 7: Scheduler
+        get_field prototype
+        fclosure8 12: [bytecode <null>]
+        put_field queue
+        push_0 0
+        put_var_ref 18: STATE_RUNNING
+        push_1 1
+        put_var_ref 19: STATE_RUNNABLE
+        push_2 2
+        put_var_ref 20: STATE_SUSPENDED
+        push_4 4
+        put_var_ref 21: STATE_HELD
+        get_var_ref 20: STATE_SUSPENDED
+        get_var_ref 19: STATE_RUNNABLE
+        or
+        put_var_ref 22: STATE_SUSPENDED_RUNNABLE
+        get_var_ref 21: STATE_HELD
+        not
+        put_var_ref 23: STATE_NOT_HELD
+        get_var_ref 17: TaskControlBlock
+        get_field prototype
+        fclosure8 14: [bytecode <null>]
+        put_field setRunning
+        get_var_ref 17: TaskControlBlock
+        get_field prototype
+        fclosure8 15: [bytecode <null>]
+        put_field markAsNotHeld
+        get_var_ref 17: TaskControlBlock
+        get_field prototype
+        fclosure8 16: [bytecode <null>]
+        put_field markAsHeld
+        get_var_ref 17: TaskControlBlock
+        get_field prototype
+        fclosure8 17: [bytecode <null>]
+        put_field isHeldOrSuspended
+        get_var_ref 17: TaskControlBlock
+        get_field prototype
+        fclosure8 18: [bytecode <null>]
+        put_field markAsSuspended
+        get_var_ref 17: TaskControlBlock
+        get_field prototype
+        fclosure8 19: [bytecode <null>]
+        put_field markAsRunnable
+        get_var_ref 17: TaskControlBlock
+        get_field prototype
+        fclosure8 20: [bytecode <null>]
+        put_field run
+        get_var_ref 17: TaskControlBlock
+        get_field prototype
+        fclosure8 21: [bytecode <null>]
+        put_field checkPriorityAdd
+        get_var_ref 17: TaskControlBlock
+        get_field prototype
+        fclosure8 22: [bytecode <null>]
+        put_field toString
+        get_var_ref 24: IdleTask
+        get_field prototype
+        fclosure8 24: [bytecode <null>]
+        put_field run
+        get_var_ref 24: IdleTask
+        get_field prototype
+        fclosure8 25: [bytecode <null>]
+        put_field toString
+        get_var_ref 25: DeviceTask
+        get_field prototype
+        fclosure8 27: [bytecode <null>]
+        put_field run
+        get_var_ref 25: DeviceTask
+        get_field prototype
+        fclosure8 28: [bytecode <null>]
+        put_field toString
+        get_var_ref 26: WorkerTask
+        get_field prototype
+        fclosure8 30: [bytecode <null>]
+        put_field run
+        get_var_ref 26: WorkerTask
+        get_field prototype
+        fclosure8 31: [bytecode <null>]
+        put_field toString
+        get_var_ref 27: HandlerTask
+        get_field prototype
+        fclosure8 33: [bytecode <null>]
+        put_field run
+        get_var_ref 27: HandlerTask
+        get_field prototype
+        fclosure8 34: [bytecode <null>]
+        put_field toString
+        push_4 4
+        put_var_ref 28: DATA_SIZE
+        get_var_ref 29: Packet
+        get_field prototype
+        fclosure8 36: [bytecode <null>]
+        put_field addTo
+        get_var_ref 29: Packet
+        get_field prototype
+        fclosure8 37: [bytecode <null>]
+        put_field toString
+        undefined
+        return_async
+

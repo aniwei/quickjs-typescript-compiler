@@ -1,0 +1,88 @@
+__tests__/fixtures/compound-assignment.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var n,128
+        define_var n,130
+        push_5 5
+        put_var_init n
+        get_var n
+        push_1 1
+        add
+        dup
+        put_var n
+        put_loc0 0: "<ret>"
+        get_var n
+        push_2 2
+        sub
+        dup
+        put_var n
+        put_loc0 0: "<ret>"
+        get_var n
+        push_3 3
+        mul
+        dup
+        put_var n
+        put_loc0 0: "<ret>"
+        get_var n
+        push_2 2
+        div
+        dup
+        put_var n
+        put_loc0 0: "<ret>"
+        get_var n
+        push_4 4
+        mod
+        dup
+        put_var n
+        put_loc0 0: "<ret>"
+        get_var n
+        push_2 2
+        pow
+        dup
+        put_var n
+        put_loc0 0: "<ret>"
+        get_var n
+        push_1 1
+        shl
+        dup
+        put_var n
+        put_loc0 0: "<ret>"
+        get_var n
+        push_1 1
+        sar
+        dup
+        put_var n
+        put_loc0 0: "<ret>"
+        get_var n
+        push_1 1
+        shr
+        dup
+        put_var n
+        put_loc0 0: "<ret>"
+        get_var n
+        push_7 7
+        and
+        dup
+        put_var n
+        put_loc0 0: "<ret>"
+        get_var n
+        push_i8 8
+        or
+        dup
+        put_var n
+        put_loc0 0: "<ret>"
+        get_var n
+        push_3 3
+        xor
+        dup
+        put_var n
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var n
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

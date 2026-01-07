@@ -1,0 +1,45 @@
+Module bytecode version: 5
+Atom count: 13
+
+=== Outer Function ===
+bytecodeLen=22 stackSize=1 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 40
+     6  fclosure8                0                   pop=0 push=1      c2 00
+     8  define_func              228                 pop=1 push=0      41 e4 00 00 00 00
+    14  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    19  call0                    npop=0              pop=1 push=1      f0
+    20  set_loc0                 loc=0               pop=1 push=1      cf
+    21  return                                       pop=1 push=0      28
+
+=== Inner Function #0 ===
+bytecodeLen=54 stackSize=1 varCount=11 argCount=0
+     0  fclosure8                0                   pop=0 push=1      c2 00
+     2  put_loc8                 10                  pop=1 push=0      c5 0a
+     4  set_loc_uninitialized    4                   pop=0 push=0      63 04 00
+     7  set_loc_uninitialized    3                   pop=0 push=0      63 03 00
+    10  set_loc_uninitialized    2                   pop=0 push=0      63 02 00
+    13  set_loc_uninitialized    1                   pop=0 push=0      63 01 00
+    16  set_loc_uninitialized    0                   pop=0 push=0      63 00 00
+    19  push_0                   0                   pop=0 push=1      b7
+    20  put_loc0                 loc=0               pop=1 push=0      cb
+    21  push_1                   1                   pop=0 push=1      b8
+    22  put_loc1                 loc=1               pop=1 push=0      cc
+    23  push_2                   2                   pop=0 push=1      b9
+    24  put_loc2                 loc=2               pop=1 push=0      cd
+    25  push_3                   3                   pop=0 push=1      ba
+    26  put_loc3                 loc=3               pop=1 push=0      ce
+    27  push_4                   4                   pop=0 push=1      bb
+    28  put_loc8                 4                   pop=1 push=0      c5 04
+    30  push_i8                  10                  pop=0 push=1      bf 0a
+    32  put_loc8                 5                   pop=1 push=0      c5 05
+    34  push_i8                  11                  pop=0 push=1      bf 0b
+    36  put_loc8                 6                   pop=1 push=0      c5 06
+    38  push_i8                  12                  pop=0 push=1      bf 0c
+    40  put_loc8                 7                   pop=1 push=0      c5 07
+    42  push_i8                  13                  pop=0 push=1      bf 0d
+    44  put_loc8                 8                   pop=1 push=0      c5 08
+    46  push_i8                  14                  pop=0 push=1      bf 0e
+    48  put_loc8                 9                   pop=1 push=0      c5 09
+    50  get_loc8                 10                  pop=0 push=1      c4 0a
+    52  call0                    npop=0              pop=1 push=1      f0
+    53  return_undef                                 pop=0 push=0      29

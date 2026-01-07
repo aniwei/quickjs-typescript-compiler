@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-07T07:07:36.279Z",
+  "timestamp": "2026-01-07T15:26:01.862Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/optional-chaining-nullish-coalescing-array-object-nested-059.ts",
   "compilation": {
     "typescript": {

@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/import-call.ts
-**生成时间**: 2026-01-07T07:07:36.067Z
+**生成时间**: 2026-01-07T15:26:01.661Z
 
 ## 大小对比
 

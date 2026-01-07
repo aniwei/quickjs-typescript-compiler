@@ -1,0 +1,61 @@
+__tests__/fixtures/new-target.js:1:1: function: Plain
+  locals:
+    0: var new.target
+  stack_size: 1
+  opcodes:
+        special_object 3
+        put_loc0 0: "new.target"
+        get_loc0 0: "new.target"
+        return
+
+__tests__/fixtures/new-target.js:4:1: function: Ctor
+  locals:
+    0: var new.target
+  stack_size: 2
+  opcodes:
+        special_object 3
+        put_loc0 0: "new.target"
+        get_loc0 0: "new.target"
+        get_var Ctor
+        strict_eq
+        return
+
+__tests__/fixtures/new-target.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var Plain,64
+        check_define_var Ctor,64
+        fclosure8 0: [bytecode Plain]
+        define_func Plain,0
+        fclosure8 1: [bytecode Ctor]
+        define_func Ctor,0
+        get_var console
+        get_field2 log
+        get_var Plain
+        call0 0
+        get_var undefined
+        strict_eq
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var Plain
+        dup
+        call_constructor 0
+        get_var Plain
+        strict_eq
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var Ctor
+        dup
+        call_constructor 0
+        push_true
+        strict_eq
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

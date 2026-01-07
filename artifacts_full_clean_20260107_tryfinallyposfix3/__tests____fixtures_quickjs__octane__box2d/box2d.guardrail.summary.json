@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/box2d.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_tryfinallyposfix3/__tests____fixtures_quickjs__octane__box2d",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_tryfinallyposfix3/__tests____fixtures_quickjs__octane__box2d/cli/box2d.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_tryfinallyposfix3/__tests____fixtures_quickjs__octane__box2d/cli/box2d.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_tryfinallyposfix3/__tests____fixtures_quickjs__octane__box2d/cli/box2d.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260107_tryfinallyposfix3/__tests____fixtures_quickjs__octane__box2d/cli/box2d.pc2line.txt",
+    "bytecodeSize": 268307,
+    "pc2lineLength": 261,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": false,
+    "tsSize": 267461,
+    "wasmSize": 267139,
+    "sizeDiff": 322,
+    "sizeDiffPercent": 0.12053649972486233
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}

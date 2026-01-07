@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-06T16:58:59.595Z",
+  "timestamp": "2026-01-07T14:07:01.962Z",
   "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/mandreel.ts",
   "note": "analysis omitted: bytecode too large (3513152 bytes)",
   "compilation": {
