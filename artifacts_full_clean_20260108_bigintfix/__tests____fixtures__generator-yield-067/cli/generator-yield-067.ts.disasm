@@ -1,0 +1,93 @@
+Module bytecode version: 5
+Atom count: 6
+
+=== Outer Function ===
+bytecodeLen=89 stackSize=5 varCount=2 argCount=0
+     0  check_define_var         229                 pop=0 push=0      40 e5 00 00 00 40
+     6  check_define_var         230                 pop=0 push=0      40 e6 00 00 00 80
+    12  fclosure8                0                   pop=0 push=1      c2 00
+    14  define_func              229                 pop=1 push=0      41 e5 00 00 00 00
+    20  define_var               230                 pop=0 push=0      3f e6 00 00 00 82
+    26  push_0                   0                   pop=0 push=1      b7
+    27  put_var_init             230                 pop=1 push=0      3b e6 00 00 00
+    32  undefined                                    pop=0 push=1      06
+    33  put_loc0                 loc=0               pop=1 push=0      cb
+    34  set_loc_uninitialized    1                   pop=0 push=0      63 01 00
+    37  get_var                  229                 pop=0 push=1      39 e5 00 00 00
+    42  call0                    npop=0              pop=1 push=1      f0
+    43  for_of_start                                 pop=1 push=3      7f
+    44  goto8                    18                  pop=0 push=0      ee 12
+    46  put_loc1                 loc=1               pop=1 push=0      cc
+    47  get_var                  230                 pop=0 push=1      39 e6 00 00 00
+    52  get_loc_check            1                   pop=0 push=1      64 01 00
+    55  add                                          pop=2 push=1      9f
+    56  dup                                          pop=1 push=2      11
+    57  put_var                  230                 pop=1 push=0      3a e6 00 00 00
+    62  put_loc0                 loc=0               pop=1 push=0      cb
+    63  for_of_next              0                   pop=3 push=5      82 00
+    65  if_false8                236                 pop=1 push=0      ec ec
+    67  drop                                         pop=1 push=0      0e
+    68  iterator_close                               pop=3 push=0      86
+    69  get_var                  231                 pop=0 push=1      39 e7 00 00 00
+    74  get_field2               232                 pop=1 push=2      43 e8 00 00 00
+    79  get_var                  230                 pop=0 push=1      39 e6 00 00 00
+    84  call_method              1                   pop=2 push=1      24 01 00
+    87  set_loc0                 loc=0               pop=1 push=1      cf
+    88  return                                       pop=1 push=0      28
+
+=== Inner Function #0 ===
+bytecodeLen=96 stackSize=6 varCount=0 argCount=0
+     0  initial_yield                                pop=0 push=0      89
+     1  push_i8                  67                  pop=0 push=1      bf 43
+     3  yield                                        pop=1 push=2      8a
+     4  if_false8                2                   pop=1 push=0      ec 02
+     6  return_async                                 pop=1 push=0      2f
+     7  drop                                         pop=1 push=0      0e
+     8  push_1                   1                   pop=0 push=1      b8
+     9  push_2                   2                   pop=0 push=1      b9
+    10  push_3                   3                   pop=0 push=1      ba
+    11  array_from               3                   pop=0 push=1      26 03 00
+    14  for_of_start                                 pop=1 push=3      7f
+    15  drop                                         pop=1 push=0      0e
+    16  undefined                                    pop=0 push=1      06
+    17  undefined                                    pop=0 push=1      06
+    18  iterator_next                                pop=4 push=4      87
+    19  iterator_check_object                        pop=1 push=1      84
+    20  get_field2               107                 pop=1 push=2      43 6b 00 00 00
+    25  if_true8                 56                  pop=1 push=0      ed 38
+    27  yield_star                                   pop=1 push=2      8b
+    28  dup                                          pop=1 push=2      11
+    29  if_true8                 4                   pop=1 push=0      ed 04
+    31  drop                                         pop=1 push=0      0e
+    32  goto8                    241                 pop=0 push=0      ee f1
+    34  push_2                   2                   pop=0 push=1      b9
+    35  strict_eq                                    pop=2 push=1      ad
+    36  if_true8                 22                  pop=1 push=0      ed 16
+    38  iterator_call            0                   pop=4 push=5      88 00
+    40  if_true8                 14                  pop=1 push=0      ed 0e
+    42  iterator_check_object                        pop=1 push=1      84
+    43  get_field2               107                 pop=1 push=2      43 6b 00 00 00
+    48  if_false8                234                 pop=1 push=0      ec ea
+    50  get_field                66                  pop=1 push=1      42 42 00 00 00
+    55  nip                                          pop=2 push=1      0f
+    56  nip                                          pop=2 push=1      0f
+    57  nip                                          pop=2 push=1      0f
+    58  return_async                                 pop=1 push=0      2f
+    59  iterator_call            1                   pop=4 push=5      88 01
+    61  if_true8                 11                  pop=1 push=0      ed 0b
+    63  iterator_check_object                        pop=1 push=1      84
+    64  get_field2               107                 pop=1 push=2      43 6b 00 00 00
+    69  if_false8                213                 pop=1 push=0      ec d5
+    71  goto8                    10                  pop=0 push=0      ee 0a
+    73  iterator_call            2                   pop=4 push=5      88 02
+    75  drop                                         pop=1 push=0      0e
+    76  throw_error              0                   pop=0 push=0      31 00 00 00 00 04
+    82  get_field                66                  pop=1 push=1      42 42 00 00 00
+    87  nip                                          pop=2 push=1      0f
+    88  nip                                          pop=2 push=1      0f
+    89  nip                                          pop=2 push=1      0f
+    90  drop                                         pop=1 push=0      0e
+    91  push_i8                  67                  pop=0 push=1      bf 43
+    93  push_1                   1                   pop=0 push=1      b8
+    94  add                                          pop=2 push=1      9f
+    95  return_async                                 pop=1 push=0      2f

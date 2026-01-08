@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/primitives.ts
-**生成时间**: 2026-01-08T02:27:31.398Z
+**生成时间**: 2026-01-08T03:25:32.196Z
 
 ## 大小对比
 

@@ -1,0 +1,21 @@
+Module bytecode version: 5
+Atom count: 3
+
+=== Outer Function ===
+bytecodeLen=46 stackSize=3 varCount=1 argCount=0
+     0  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+     5  get_field2               229                 pop=1 push=2      43 e5 00 00 00
+    10  push_1                   1                   pop=0 push=1      b8
+    11  call_method              1                   pop=2 push=1      24 01 00
+    14  put_loc0                 loc=0               pop=1 push=0      cb
+    15  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    20  get_field2               229                 pop=1 push=2      43 e5 00 00 00
+    25  push_2                   2                   pop=0 push=1      b9
+    26  call_method              1                   pop=2 push=1      24 01 00
+    29  put_loc0                 loc=0               pop=1 push=0      cb
+    30  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    35  get_field2               229                 pop=1 push=2      43 e5 00 00 00
+    40  push_3                   3                   pop=0 push=1      ba
+    41  call_method              1                   pop=2 push=1      24 01 00
+    44  set_loc0                 loc=0               pop=1 push=1      cf
+    45  return                                       pop=1 push=0      28

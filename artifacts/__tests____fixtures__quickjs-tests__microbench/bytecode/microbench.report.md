@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/microbench.ts
-**生成时间**: 2026-01-08T02:27:31.492Z
+**生成时间**: 2026-01-08T03:25:32.295Z
 
 ## 大小对比
 

@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/test_argument_scope.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260108_bigintfix/__tests____fixtures__test_argument_scope",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260108_bigintfix/__tests____fixtures__test_argument_scope/cli/test_argument_scope.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260108_bigintfix/__tests____fixtures__test_argument_scope/cli/test_argument_scope.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260108_bigintfix/__tests____fixtures__test_argument_scope/cli/test_argument_scope.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260108_bigintfix/__tests____fixtures__test_argument_scope/cli/test_argument_scope.pc2line.txt",
+    "bytecodeSize": 3725,
+    "pc2lineLength": 2,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": false,
+    "tsSize": 3661,
+    "wasmSize": 3663,
+    "sizeDiff": -2,
+    "sizeDiffPercent": -0.054600054600054605
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}

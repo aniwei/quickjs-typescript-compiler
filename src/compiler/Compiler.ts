@@ -18,6 +18,13 @@ import {
 import { Opcode, TempOpcode, env, JSAtom, JSMode, JS_EVAL_TYPE_GLOBAL, JS_EVAL_TYPE_MODULE } from '../env'
 import { BytecodeBuilder } from './BytecodeBuilder'
 import { DebugInfoBuilder } from './DebugInfoBuilder'
+import {
+  qtsTraceEmitAtom,
+  qtsTraceEmitOp,
+  qtsTraceEmitU16,
+  qtsTraceEmitU32,
+  qtsTraceEmitU8,
+} from '../qtsTrace'
 
 type CompiledRegexpLiteral = {
   pattern: string
@@ -595,6 +602,7 @@ export class Compiler {
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1765-1767
    */
   emitU8(fd: FunctionDef, val: number): void {
+    qtsTraceEmitU8(val, fd.byteCode.size)
     fd.byteCode.putByte(val)
   }
 
@@ -604,6 +612,7 @@ export class Compiler {
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1769-1771
    */
   emitU16(fd: FunctionDef, val: number): void {
+    qtsTraceEmitU16(val, fd.byteCode.size)
     fd.byteCode.putU16(val)
   }
 
@@ -613,6 +622,7 @@ export class Compiler {
    * QuickJS 源码位置: third_party/QuickJS/src/core/parser.c:1773-1775
    */
   emitU32(fd: FunctionDef, val: number): void {
+    qtsTraceEmitU32(val, fd.byteCode.size)
     fd.byteCode.putU32(val)
   }
 
@@ -633,8 +643,14 @@ export class Compiler {
     // Match QuickJS emit_source_pos(): dedup by exact source position.
     // QuickJS compares the source_ptr pointer; our equivalent is `sourcePos`.
     if (fd.lastOpcodeSourcePtr !== sourcePos) {
+      // QuickJS parser.c:emit_source_pos
+      // - traces OP_line_num as an opcode
+      // - writes the opcode byte directly (not via emit_u8)
+      // - then emits the u32 source position.
+      const pos = fd.byteCode.size
+      qtsTraceEmitOp(TempOpcode.OP_line_num, pos)
       fd.byteCode.putByte(TempOpcode.OP_line_num)
-      fd.byteCode.putU32(sourcePos)
+      this.emitU32(fd, sourcePos)
       fd.lastOpcodeSourcePtr = sourcePos
     }
   }
@@ -652,6 +668,9 @@ export class Compiler {
     }
     
     fd.lastOpcodePos = fd.byteCode.size
+    qtsTraceEmitOp(val, fd.lastOpcodePos)
+    // QuickJS parser.c:emit_op writes the opcode byte directly (not via emit_u8),
+    // so it should not produce an EMIT u8=... trace line.
     fd.byteCode.putByte(val)
   }
 
@@ -663,7 +682,9 @@ export class Compiler {
    * 注意: QuickJS 中会复制 atom，但在 TypeScript 中我们直接使用 atom 值
    */
   emitAtom(fd: FunctionDef, atom: number): void {
-    fd.byteCode.putU32(atom)
+    qtsTraceEmitAtom(atom, fd.byteCode.size)
+    // Match QuickJS: emit_atom() logs atom and then writes u32.
+    this.emitU32(fd, atom)
   }
 
   /**

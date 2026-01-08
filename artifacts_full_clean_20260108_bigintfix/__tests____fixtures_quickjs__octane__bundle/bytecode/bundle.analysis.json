@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-01-08T02:44:38.577Z",
+  "inputFile": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/bundle.ts",
+  "note": "analysis omitted: bytecode too large (6661862 bytes)",
+  "compilation": {
+    "typescript": {
+      "size": 6661862
+    },
+    "wasm": {
+      "size": 6661650
+    }
+  },
+  "sizeDifference": {
+    "absolute": 212,
+    "percentage": "0.00"
+  }
+}

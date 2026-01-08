@@ -1,0 +1,222 @@
+__tests__/fixtures/inc-2.js:1:1: function: assert
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_var Object
+        get_field2 is
+        get_arg0 0: actual
+        get_arg1 1: expected
+        call_method 2
+        if_false8 29
+        return_undef
+   29:  get_arg0 0: actual
+        is_null
+        if_true8 79
+        get_arg1 1: expected
+        is_null
+        if_true8 79
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 79
+        return_undef
+   79:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 129
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 130
+  129:  push_empty_string
+  130:  add
+        call1 1
+        throw
+
+__tests__/fixtures/inc-2.js:14:1: function: F
+  args: x
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        get_loc0 0: this
+        get_arg0 0: x
+        put_field x
+        return_undef
+
+__tests__/fixtures/inc-2.js:17:1: function: test_op2
+  locals:
+    0: var a
+    1: var b
+  stack_size: 4
+  opcodes:
+        get_var Object
+        dup
+        call_constructor 0
+        set_loc0 0: a
+        push_1 1
+        put_field x
+        get_var assert
+        get_loc0 0: a
+        get_field x
+        push_1 1
+        push_atom_value new
+        call3 3
+        drop
+        get_var F
+        dup
+        push_2 2
+        call_constructor 1
+        put_loc1 1: b
+        get_var assert
+        get_loc1 1: b
+        get_field x
+        push_2 2
+        push_atom_value new
+        call3 3
+        drop
+        object
+        push_2 2
+        define_field x
+        put_loc0 0: a
+        get_var assert
+        push_atom_value x
+        get_loc0 0: a
+        in
+        push_true
+        push_atom_value in
+        call3 3
+        drop
+        get_var assert
+        push_atom_value y
+        get_loc0 0: a
+        in
+        push_false
+        push_atom_value in
+        call3 3
+        drop
+        object
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_var Object
+        instanceof
+        push_true
+        push_atom_value instanceof
+        call3 3
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_var String
+        instanceof
+        push_false
+        push_atom_value instanceof
+        call3 3
+        drop
+        get_var assert
+        push_1 1
+        typeof
+        push_atom_value number
+        push_atom_value typeof
+        call3 3
+        drop
+        get_var assert
+        get_var_undef Object
+        typeof
+        push_atom_value function
+        push_atom_value typeof
+        call3 3
+        drop
+        get_var assert
+        null
+        typeof
+        push_atom_value object
+        push_atom_value typeof
+        call3 3
+        drop
+        get_var assert
+        get_var_undef unknown_var
+        typeof
+        push_atom_value undefined
+        push_atom_value typeof
+        call3 3
+        drop
+        object
+        push_1 1
+        define_field x
+        push_2 2
+        define_field if
+        push_3 3
+        define_field async
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        get_field if
+        push_2 2
+        strict_eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: a
+        get_field async
+        push_3 3
+        strict_eq
+        call1 1
+        return_undef
+
+__tests__/fixtures/inc-2.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var assert,64
+        check_define_var F,64
+        check_define_var test_op2,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode F]
+        define_func F,0
+        fclosure8 2: [bytecode test_op2]
+        define_func test_op2,0
+        get_loc0 0: "<ret>"
+        return
+

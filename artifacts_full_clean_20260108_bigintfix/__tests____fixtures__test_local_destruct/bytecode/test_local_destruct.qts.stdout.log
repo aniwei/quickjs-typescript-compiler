@@ -1,0 +1,147 @@
+__tests__/fixtures/test_local_destruct.js:1:1: function: local_destruct
+  args: n
+  locals:
+    0: var j
+    1: var v1
+    2: var v2
+    3: var v3
+    4: var v4
+    5: var array
+    6: var o
+    7: var a
+    8: var b
+    9: var c
+   10: var d
+  stack_size: 10
+  opcodes:
+        push_1 1
+        push_2 2
+        push_3 3
+        push_4 4
+        push_5 5
+        array_from 5
+        put_loc8 5: array
+        object
+        push_1 1
+        define_field a
+        push_2 2
+        define_field b
+        push_3 3
+        define_field c
+        push_4 4
+        define_field d
+        put_loc8 6: o
+        push_0 0
+        put_loc0 0: j
+   39:  get_loc0 0: j
+        get_arg0 0: n
+        lt
+        if_false 267
+        goto8 113
+   49:  dup
+        for_of_start
+        make_loc_ref v1,1
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref v2,2
+        for_of_next 2
+        drop
+        put_ref_value
+        for_of_next 0
+        drop
+        drop
+        make_loc_ref v3,3
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref v4,4
+        array_from 0
+        push_0 0
+   99:  for_of_next 4
+        if_true8 107
+        define_array_el
+        inc
+        goto8 99
+  107:  drop
+        drop
+        put_ref_value
+        iterator_close
+        goto8 117
+  113:  get_loc8 5: array
+        goto8 49
+  117:  drop
+        goto8 185
+  120:  dup
+        to_object
+        dup
+        make_loc_ref a,7
+        rot3l
+        get_field a
+        put_ref_value
+        dup
+        make_loc_ref b,8
+        rot3l
+        get_field b
+        put_ref_value
+        dup
+        make_loc_ref c,9
+        rot3l
+        get_field c
+        put_ref_value
+        dup
+        make_loc_ref d,10
+        rot3l
+        get_field d
+        put_ref_value
+        drop
+        goto8 189
+  185:  get_loc8 6: o
+        goto8 120
+  189:  drop
+        goto8 257
+  192:  dup
+        to_object
+        dup
+        make_loc_ref a,7
+        rot3l
+        get_field a
+        put_ref_value
+        dup
+        make_loc_ref b,8
+        rot3l
+        get_field b
+        put_ref_value
+        dup
+        make_loc_ref c,9
+        rot3l
+        get_field c
+        put_ref_value
+        dup
+        make_loc_ref d,10
+        rot3l
+        get_field d
+        put_ref_value
+        drop
+        goto8 261
+  257:  get_loc8 6: o
+        goto8 192
+  261:  drop
+        inc_loc 0: j
+        goto16 39
+  267:  get_arg0 0: n
+        push_i8 12
+        mul
+        return
+
+__tests__/fixtures/test_local_destruct.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var local_destruct,64
+        fclosure8 0: [bytecode local_destruct]
+        define_func local_destruct,0
+        get_loc0 0: "<ret>"
+        return
+

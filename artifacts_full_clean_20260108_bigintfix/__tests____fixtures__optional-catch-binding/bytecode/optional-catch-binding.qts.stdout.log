@@ -1,0 +1,26 @@
+__tests__/fixtures/optional-catch-binding.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        undefined
+        put_loc0 0: "<ret>"
+        catch 22
+        get_var Error
+        dup
+        push_atom_value boom
+        call_constructor 1
+        throw
+   22:  drop
+        catch 50
+        get_var console
+        get_field2 log
+        push_atom_value "caught without binding"
+        call_method 1
+        put_loc0 0: "<ret>"
+        drop
+        goto8 51
+   50:  throw
+   51:  get_loc0 0: "<ret>"
+        return
+

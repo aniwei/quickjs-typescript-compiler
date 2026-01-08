@@ -1,0 +1,95 @@
+__tests__/fixtures/quickjs-tests/test_promise_gc_crash.js:5:35: function: <null>
+  stack_size: 3
+  opcodes:
+        get_var Uint8Array
+        dup
+        push_i32 1000000
+        call_constructor 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_promise_gc_crash.js:4:1: function: createTask
+  stack_size: 3
+  opcodes:
+        get_var Promise
+        get_field2 resolve
+        call_method 0
+        get_field2 then
+        fclosure8 0: [bytecode <null>]
+        call_method 1
+        return_async
+
+__tests__/fixtures/quickjs-tests/test_promise_gc_crash.js:11:14: function: <null>
+  args: v
+  stack_size: 3
+  opcodes:
+        get_var console
+        get_field2 log
+        get_arg0 0: v
+        get_length
+        call_method 1
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_promise_gc_crash.js:12:16: function: <null>
+  args: v
+  closure vars:
+    0: fn local:loc0 let
+  stack_size: 2
+  opcodes:
+        get_var_ref_check 0: fn
+        get_arg0 0: v
+        tail_call 1
+
+__tests__/fixtures/quickjs-tests/test_promise_gc_crash.js:14:27: function: <null>
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures/quickjs-tests/test_promise_gc_crash.js:10:1: function: run
+  locals:
+    0: let fn [level:1 next:-1]
+    1: let done [level:1 next:0]
+    2: const p [level:1 next:1]
+  stack_size: 3
+  opcodes:
+        set_loc_uninitialized 2: p
+        set_loc_uninitialized 1: done
+        set_loc_uninitialized 0: fn
+        fclosure8 0: [bytecode <null>]
+        set_name fn
+        put_loc0 0: fn
+        fclosure8 1: [bytecode <null>]
+        set_name done
+        put_loc1 1: done
+        get_var createTask
+        call0 0
+        get_field2 then
+        get_loc_check 1: done
+        call_method 1
+        drop
+        get_var Promise
+        dup
+        fclosure8 2: [bytecode <null>]
+        call_constructor 1
+        put_loc2 2: p
+        get_loc_check 2: p
+        await
+        drop
+        undefined
+        return_async
+
+__tests__/fixtures/quickjs-tests/test_promise_gc_crash.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var createTask,64
+        check_define_var run,64
+        fclosure8 0: [bytecode createTask]
+        define_func createTask,0
+        fclosure8 1: [bytecode run]
+        define_func run,0
+        get_var run
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

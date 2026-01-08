@@ -3,6 +3,11 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { parseBytecodeModule } from '../../src/bytecodeReader'
+type OpcodeInfo = {
+  code: number
+  name: string
+  size: number
+}
 
 type GuardrailSummary = {
   fixturePath: string
@@ -24,6 +29,13 @@ type Diff = {
   a: unknown
   b: unknown
   note?: string
+}
+type ByteDiffMeta = {
+  kind: 'bytecode'
+  normalizedPath: string
+  signature: string
+  aOp?: { pc: number; code: number; name: string; size: number }
+  bOp?: { pc: number; code: number; name: string; size: number }
 }
 
 function isUint8Array(v: any): v is Uint8Array {
@@ -153,13 +165,104 @@ function normalizeDiffPath(p: string): string {
   return p.replace(/\[(\d+)\]/g, '[*]')
 }
 
-function quickjsAnchorForFamily(normPath: string): { title: string; anchors: { file: string; hint: string }[] } {
+function parsePathSegments(p: string): Array<string | number> {
+  const cleaned = p.startsWith('root.') ? p.slice('root.'.length) : p
+  const out: Array<string | number> = []
+  const re = /([^.\[]+)|(\[(\d+)\])/g
+  for (const m of cleaned.matchAll(re)) {
+    if (m[1]) out.push(m[1])
+    else if (m[3]) out.push(Number(m[3]))
+  }
+  return out
+}
+function getByPath(root: any, p: string): any {
+  const segs = parsePathSegments(p)
+  let cur: any = root
+  for (const seg of segs) {
+    if (cur == null) return undefined
+    if (typeof seg === 'number') {
+      if (!Array.isArray(cur)) return undefined
+      cur = cur[seg]
+    } else {
+      cur = cur[seg]
+    }
+  }
+  return cur
+}
+function decodeOpcodeStream(bytecode: Uint8Array, opByCode: Map<number, OpcodeInfo>): Array<{ pc: number; code: number; name: string; size: number }> {
+  const out: Array<{ pc: number; code: number; name: string; size: number }> = []
+  for (let pc = 0; pc < bytecode.length; ) {
+    const code = bytecode[pc]
+    const info = opByCode.get(code)
+    const size = info?.size ?? 1
+    const name = info?.name ?? `unknown_${code}`
+    out.push({ pc, code, name, size })
+    pc += size
+  }
+  return out
+}
+function findOpAtOffset(bytecode: Uint8Array, offset: number, opByCode: Map<number, OpcodeInfo>) {
+  const ops = decodeOpcodeStream(bytecode, opByCode)
+  let last = ops[0]
+  for (const op of ops) {
+    if (op.pc > offset) break
+    last = op
+  }
+  return last
+}
+function signatureForBytecodeDiff(normPath: string, aBytecode: Uint8Array, bBytecode: Uint8Array, firstDiff: number, opByCode: Map<number, OpcodeInfo>): ByteDiffMeta {
+  const aOp = findOpAtOffset(aBytecode, firstDiff, opByCode)
+  const bOp = findOpAtOffset(bBytecode, firstDiff, opByCode)
+  const signature = `${normPath}::${aOp.name}->${bOp.name}`
+  return { kind: 'bytecode', normalizedPath: normPath, signature, aOp, bOp }
+}
+function quickjsAnchorForFamily(
+  normPath: string,
+  signature?: string,
+): { title: string; anchors: { file: string; hint: string }[] } {
   // Anchors are coarse-grained; we refine per-family when debugging a representative.
   if (normPath.includes('.debug.pc2line')) {
     return {
       title: 'pc2line/debug 映射差异',
       anchors: [
-        { file: 'third_party/QuickJS/src/core/parser.c', hint: 'emit_source_pos() 写入 OP_line_num；以及 pc2line 生成/编码逻辑（debug info 相关段落）' },
+        {
+          file: 'third_party/QuickJS/src/core/parser.c',
+          hint: 'emit_source_pos() 写入 OP_line_num；以及 pc2line 生成/编码逻辑（可配合 QTS_TRACE_PC2LINE_*）',
+        },
+      ],
+    }
+  }
+
+  if (
+    signature?.includes('OP_push_bigint_i32') ||
+    signature?.includes('push_bigint_i32') ||
+    signature?.includes('OP_bigint') ||
+    signature?.includes('bigint') ||
+    signature?.includes('BigInt')
+  ) {
+    return {
+      title: 'BigInt 常量/一元运算 lowering 差异',
+      anchors: [
+        {
+          file: 'third_party/QuickJS/src/core/parser.c',
+          hint: 'BigInt 字面量与一元运算：js_parse_primary / js_parse_unary（涉及 OP_push_bigint_i32、OP_neg 等）',
+        },
+        {
+          file: 'third_party/QuickJS/src/core/bytecode.c',
+          hint: 'BigInt 常量序列化：JS_WriteBigInt / 常量池写出（如涉及常量池差异）',
+        },
+      ],
+    }
+  }
+
+  if (signature?.includes('goto') || signature?.includes('label')) {
+    return {
+      title: 'label/goto/控制流布局差异',
+      anchors: [
+        {
+          file: 'third_party/QuickJS/src/core/parser.c',
+          hint: 'emit_label()/emit_goto() + resolve_labels()/optimize_short_jumps（可配合 QTS_TRACE_LABEL_*）',
+        },
       ],
     }
   }
@@ -216,6 +319,20 @@ async function main() {
     if (idx >= 0 && args[idx + 1]) return path.resolve(args[idx + 1])
     return path.join(artifactsDir, 'mismatch_families.json')
   })()
+
+  const opcodeListPath = path.resolve('opcodes.json')
+  const opByCode = new Map<number, OpcodeInfo>()
+  try {
+    const raw = await fs.readFile(opcodeListPath, 'utf8')
+    const list = JSON.parse(raw) as OpcodeInfo[]
+    for (const op of list) {
+      if (typeof op?.code === 'number' && typeof op?.name === 'string') {
+        opByCode.set(op.code, { code: op.code, name: op.name, size: Number((op as any).size ?? 1) || 1 })
+      }
+    }
+  } catch {
+    // ok
+  }
 
   let summaryFiles = await collectFilesRecursive(artifactsDir, '.guardrail.summary.json')
   if (onlyPrefix) {
@@ -278,6 +395,19 @@ async function main() {
         })
       } else {
         const norm = normalizeDiffPath(d.path)
+        const meta =
+          d.note === 'Uint8Array differs' && d.path.endsWith('.bytecode') && opByCode.size > 0
+            ? (() => {
+                const aBytecode = getByPath(aMod as any, d.path)
+                const bBytecode = getByPath(bMod as any, d.path)
+                const firstDiff = (d.a as any)?.firstDiff
+                if (isUint8Array(aBytecode) && isUint8Array(bBytecode) && typeof firstDiff === 'number' && firstDiff >= 0) {
+                  return signatureForBytecodeDiff(norm, aBytecode, bBytecode, firstDiff, opByCode)
+                }
+                return null
+              })()
+            : null
+        const signature = meta?.signature
         mismatches.push({
           fixturePath: summary.fixturePath,
           artifactsDir: summary.artifactsDir,
@@ -285,7 +415,9 @@ async function main() {
           trace: summary.trace,
           diff: d,
           normalizedPath: norm,
-          family: quickjsAnchorForFamily(norm),
+          signature,
+          byteDiffMeta: meta,
+          family: quickjsAnchorForFamily(norm, signature),
         })
       }
     } catch (e) {
@@ -299,12 +431,13 @@ async function main() {
     }
   }
 
-  const familyMap = new Map<string, { count: number; title: string; anchors: any[]; examples: string[] }>()
+  const familyMap = new Map<string, { normalizedPath: string; count: number; title: string; anchors: any[]; examples: string[] }>()
   for (const m of mismatches) {
-    const key = m.normalizedPath ?? 'unknown'
+    const key = (m.signature as string | undefined) ?? (m.normalizedPath as string | undefined) ?? 'unknown'
     const info = familyMap.get(key)
     if (!info) {
       familyMap.set(key, {
+        normalizedPath: m.normalizedPath ?? 'unknown',
         count: 1,
         title: m.family?.title ?? 'unknown',
         anchors: m.family?.anchors ?? [],
@@ -317,7 +450,7 @@ async function main() {
   }
 
   const families = Array.from(familyMap.entries())
-    .map(([normalizedPath, info]) => ({ normalizedPath, ...info }))
+    .map(([familyKey, info]) => ({ familyKey, ...info }))
     .sort((a, b) => b.count - a.count)
 
   const report = {
@@ -337,7 +470,7 @@ async function main() {
   console.log(`Report: ${outPath}`)
   console.log('\nTop families:')
   for (const f of families.slice(0, 12)) {
-    console.log(`- ${f.count}× ${f.normalizedPath}  (${f.title})`)
+    console.log(`- ${f.count}× ${f.familyKey}  (${f.title})`)
     for (const a of f.anchors) {
       console.log(`    - QuickJS: ${a.file} — ${a.hint}`)
     }

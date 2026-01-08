@@ -21,6 +21,12 @@ import {
   GetLineColCache,
 } from './FunctionDef'
 import { PC2Line } from '../env'
+import {
+  qtsTracePc2lineBegin,
+  qtsTracePc2lineEnd,
+  qtsTracePc2lineInit,
+  qtsTracePc2lineSlot,
+} from '../qtsTrace'
 
 // ============================================================================
 // 常量定义 - 从 env.ts 的 PC2Line 枚举导入
@@ -212,6 +218,9 @@ export class DebugInfoBuilder {
     
     // 初始化 pc2line 缓冲区 - parser.c:10868
     fd.pc2line = new BytecodeBuilder()
+
+    // Trace mirrors QuickJS pc2line tracing.
+    qtsTracePc2lineBegin(fd.lineNumberCount ?? 0, fd.sourcePos >>> 0)
     
     // 获取初始行列号 - parser.c:10870-10871
     const [initLineNum, initColNum] = this.getLineColCached(
@@ -226,8 +235,11 @@ export class DebugInfoBuilder {
     // 写入初始行列号 (line_num - 1, col_num - 1) - parser.c:10872-10873
     fd.pc2line.putULEB128(lastLineNum)
     fd.pc2line.putULEB128(lastColNum)
+
+    qtsTracePc2lineInit(lastLineNum | 0, lastColNum | 0)
     
     // 遍历行号槽 - parser.c:10875-10911
+    let outIndex = 0
     for (let i = 0; i < fd.lineNumberCount; i++) {
       const slot = fd.lineNumberSlots[i]
       const pc = slot.pc
@@ -254,15 +266,19 @@ export class DebugInfoBuilder {
       }
       
       // 编码 pc2line 条目 - parser.c:10893-10907
+      let isShort = false
+      let opByte = 0
       if (diffLine >= PC2LINE_BASE &&
           diffLine < PC2LINE_BASE + PC2LINE_RANGE &&
           diffPc <= PC2LINE_DIFF_PC_MAX) {
         // 短编码 - parser.c:10896-10899
-        fd.pc2line.putByte(
-          (diffLine - PC2LINE_BASE) + diffPc * PC2LINE_RANGE + PC2LINE_OP_FIRST
-        )
+        isShort = true
+        opByte = (diffLine - PC2LINE_BASE) + diffPc * PC2LINE_RANGE + PC2LINE_OP_FIRST
+        fd.pc2line.putByte(opByte)
       } else {
         // 长编码 - parser.c:10901-10904
+        isShort = false
+        opByte = 0
         fd.pc2line.putByte(0)
         fd.pc2line.putULEB128(diffPc)
         fd.pc2line.putSLEB128(diffLine)
@@ -270,12 +286,28 @@ export class DebugInfoBuilder {
       
       // 写入列号差值 - parser.c:10905
       fd.pc2line.putSLEB128(diffCol)
+
+      qtsTracePc2lineSlot(
+        outIndex,
+        pc >>> 0,
+        sourcePos >>> 0,
+        lineNum | 0,
+        colNum | 0,
+        diffPc | 0,
+        diffLine | 0,
+        diffCol | 0,
+        isShort,
+        opByte & 0xff,
+      )
+      outIndex++
       
       // 更新上一个值 - parser.c:10907-10909
       lastPc = pc
       lastLineNum = lineNum
       lastColNum = colNum
     }
+
+    qtsTracePc2lineEnd(fd.pc2line.size | 0)
   }
   
   /**

@@ -1,0 +1,998 @@
+__tests__/fixtures_quickjs/test_op_overloading.js:2:1: function: assert
+  mode: strict
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 0
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_arg0 0: actual
+        get_arg1 1: expected
+        strict_eq
+        if_false8 17
+        return_undef
+   17:  get_arg0 0: actual
+        is_null
+        if_true8 67
+        get_arg1 1: expected
+        is_null
+        if_true8 67
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 67
+        return_undef
+   67:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 117
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 118
+  117:  push_empty_string
+  118:  add
+        call1 1
+        throw
+
+__tests__/fixtures_quickjs/test_op_overloading.js:18:9: function: <null>
+  mode: strict
+  args: x y
+  locals:
+    0: var this
+  closure vars:
+    0: <class_fields_init> local:loc1 const
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        check_ctor
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 14
+        get_loc0 0: this
+        swap
+        call_method 0
+   14:  drop
+        get_loc0 0: this
+        get_arg0 0: x
+        put_field x
+        get_loc0 0: this
+        get_arg1 1: y
+        put_field y
+        return_undef
+
+__tests__/fixtures_quickjs/test_op_overloading.js:22:16: function: <null>
+  mode: strict
+  args: p1 a
+  locals:
+    0: var r
+  closure vars:
+    0: Vec2 local:loc0 const
+  stack_size: 3
+  opcodes:
+        get_var_ref_check 0: Vec2
+        dup
+        call_constructor 0
+        set_loc0 0: r
+        get_arg0 0: p1
+        get_field x
+        get_arg1 1: a
+        mul
+        put_field x
+        get_loc0 0: r
+        get_arg0 0: p1
+        get_field y
+        get_arg1 1: a
+        mul
+        put_field y
+        get_loc0 0: r
+        return
+
+__tests__/fixtures_quickjs/test_op_overloading.js:28:9: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        push_atom_value "Vec2("
+        get_loc0 0: this
+        get_field x
+        add
+        push_atom_value ","
+        add
+        get_loc0 0: this
+        get_field y
+        add
+        push_atom_value ")"
+        add
+        return
+
+__tests__/fixtures_quickjs/test_op_overloading.js:33:9: function: <null>
+  mode: strict
+  args: p1 p2
+  locals:
+    0: var r
+  closure vars:
+    0: Vec2 local:loc2 let
+  stack_size: 3
+  opcodes:
+        get_var_ref_check 0: Vec2
+        dup
+        call_constructor 0
+        set_loc0 0: r
+        get_arg0 0: p1
+        get_field x
+        get_arg1 1: p2
+        get_field x
+        add
+        put_field x
+        get_loc0 0: r
+        get_arg0 0: p1
+        get_field y
+        get_arg1 1: p2
+        get_field y
+        add
+        put_field y
+        get_loc0 0: r
+        return
+
+__tests__/fixtures_quickjs/test_op_overloading.js:39:9: function: <null>
+  mode: strict
+  args: p1 p2
+  locals:
+    0: var r
+  closure vars:
+    0: Vec2 local:loc2 let
+  stack_size: 3
+  opcodes:
+        get_var_ref_check 0: Vec2
+        dup
+        call_constructor 0
+        set_loc0 0: r
+        get_arg0 0: p1
+        get_field x
+        get_arg1 1: p2
+        get_field x
+        sub
+        put_field x
+        get_loc0 0: r
+        get_arg0 0: p1
+        get_field y
+        get_arg1 1: p2
+        get_field y
+        sub
+        put_field y
+        get_loc0 0: r
+        return
+
+__tests__/fixtures_quickjs/test_op_overloading.js:45:9: function: <null>
+  mode: strict
+  args: a b
+  stack_size: 2
+  opcodes:
+        get_arg0 0: a
+        get_field x
+        get_arg1 1: b
+        get_field x
+        eq
+        dup
+        if_false8 30
+        drop
+        get_arg0 0: a
+        get_field y
+        get_arg1 1: b
+        get_field y
+        eq
+   30:  return
+
+__tests__/fixtures_quickjs/test_op_overloading.js:48:9: function: <null>
+  mode: strict
+  args: a b
+  locals:
+    0: var r
+  stack_size: 2
+  opcodes:
+        get_arg0 0: a
+        get_field x
+        get_arg1 1: b
+        get_field x
+        eq
+        if_false8 31
+        get_arg0 0: a
+        get_field y
+        get_arg1 1: b
+        get_field y
+        lt
+        put_loc0 0: r
+        goto8 45
+   31:  get_arg0 0: a
+        get_field x
+        get_arg1 1: b
+        get_field x
+        lt
+        put_loc0 0: r
+   45:  get_loc0 0: r
+        return
+
+__tests__/fixtures_quickjs/test_op_overloading.js:57:9: function: <null>
+  mode: strict
+  args: a
+  locals:
+    0: var r
+  closure vars:
+    0: Vec2 local:loc2 let
+  stack_size: 3
+  opcodes:
+        get_var_ref_check 0: Vec2
+        dup
+        call_constructor 0
+        set_loc0 0: r
+        get_arg0 0: a
+        get_field x
+        push_1 1
+        add
+        put_field x
+        get_loc0 0: r
+        get_arg0 0: a
+        get_field y
+        push_1 1
+        add
+        put_field y
+        get_loc0 0: r
+        return
+
+__tests__/fixtures_quickjs/test_op_overloading.js:65:9: function: <null>
+  mode: strict
+  args: a b
+  closure vars:
+    0: Vec2 local:loc2 let
+  stack_size: 4
+  opcodes:
+        get_var_ref_check 0: Vec2
+        get_field2 mul_scalar
+        get_arg1 1: b
+        get_arg0 0: a
+        tail_call_method 2
+
+__tests__/fixtures_quickjs/test_op_overloading.js:70:9: function: <null>
+  mode: strict
+  args: a b
+  closure vars:
+    0: Vec2 local:loc2 let
+  stack_size: 4
+  opcodes:
+        get_var_ref_check 0: Vec2
+        get_field2 mul_scalar
+        get_arg0 0: a
+        get_arg1 1: b
+        tail_call_method 2
+
+__tests__/fixtures_quickjs/test_op_overloading.js:16:1: function: test_operators_create
+  mode: strict
+  locals:
+    0: const Vec2 [level:2 next:2]
+    1: const <class_fields_init> [level:3 next:0]
+    2: let Vec2 [level:1 next:-1]
+    3: var a
+    4: var b
+    5: var r
+  stack_size: 8
+  opcodes:
+        set_loc_uninitialized 2: Vec2
+        set_loc_uninitialized 0: Vec2
+        undefined
+        set_loc_uninitialized 1: "<class_fields_init>"
+        push_const8 0: [bytecode <null>]
+        define_class Vec2,0
+        swap
+        fclosure8 1: [bytecode <null>]
+        define_method mul_scalar,0
+        swap
+        fclosure8 2: [bytecode <null>]
+        define_method toString,0
+        undefined
+        put_loc1 1: "<class_fields_init>"
+        drop
+        set_loc0 0: Vec2
+        close_loc 1: "<class_fields_init>"
+        close_loc 0: Vec2
+        put_loc2 2: Vec2
+        get_loc_check 2: Vec2
+        get_field prototype
+        get_var Symbol
+        get_field operatorSet
+        get_var Operators
+        get_field2 create
+        object
+        fclosure8 3: [bytecode <null>]
+        define_method "+",4
+        fclosure8 4: [bytecode <null>]
+        define_method "-",4
+        fclosure8 5: [bytecode <null>]
+        define_method "==",4
+        fclosure8 6: [bytecode <null>]
+        define_method "<",4
+        fclosure8 7: [bytecode <null>]
+        define_method "++",4
+        object
+        get_var Number
+        define_field left
+        fclosure8 8: [bytecode <null>]
+        define_method "*",4
+        object
+        get_var Number
+        define_field right
+        fclosure8 9: [bytecode <null>]
+        define_method "*",4
+        call_method 3
+        put_array_el
+        get_loc_check 2: Vec2
+        dup
+        push_1 1
+        push_2 2
+        call_constructor 2
+        put_loc3 3: a
+        get_loc_check 2: Vec2
+        dup
+        push_3 3
+        push_4 4
+        call_constructor 2
+        put_loc8 4: b
+        get_loc3 3: a
+        push_2 2
+        mul
+        push_3 3
+        get_loc8 4: b
+        mul
+        add
+        put_loc8 5: r
+        get_var assert
+        get_loc8 5: r
+        get_field x
+        push_i8 11
+        strict_eq
+        dup
+        if_false8 218
+        drop
+        get_loc8 5: r
+        get_field y
+        push_i8 16
+        strict_eq
+  218:  call1 1
+        drop
+        get_var assert
+        get_loc3 3: a
+        get_loc3 3: a
+        eq
+        push_true
+        call2 2
+        drop
+        get_var assert
+        get_loc3 3: a
+        get_loc8 4: b
+        eq
+        push_false
+        call2 2
+        drop
+        get_var assert
+        get_loc3 3: a
+        get_loc3 3: a
+        neq
+        push_false
+        call2 2
+        drop
+        get_var assert
+        get_loc3 3: a
+        get_loc8 4: b
+        lt
+        push_true
+        call2 2
+        drop
+        get_var assert
+        get_loc3 3: a
+        get_loc8 4: b
+        lte
+        push_true
+        call2 2
+        drop
+        get_var assert
+        get_loc8 4: b
+        get_loc3 3: a
+        lt
+        push_false
+        call2 2
+        drop
+        get_var assert
+        get_loc8 4: b
+        get_loc3 3: a
+        lte
+        push_false
+        call2 2
+        drop
+        get_var assert
+        get_loc3 3: a
+        get_loc3 3: a
+        lte
+        push_true
+        call2 2
+        drop
+        get_var assert
+        get_loc3 3: a
+        get_loc3 3: a
+        gte
+        push_true
+        call2 2
+        drop
+        inc_loc 3: a
+        get_var assert
+        get_loc3 3: a
+        get_field x
+        push_2 2
+        strict_eq
+        dup
+        if_false8 351
+        drop
+        get_loc3 3: a
+        get_field y
+        push_3 3
+        strict_eq
+  351:  call1 1
+        drop
+        get_loc3 3: a
+        inc
+        set_loc3 3: a
+        put_loc8 5: r
+        get_var assert
+        get_loc3 3: a
+        get_field x
+        push_3 3
+        strict_eq
+        dup
+        if_false8 383
+        drop
+        get_loc3 3: a
+        get_field y
+        push_4 4
+        strict_eq
+  383:  call1 1
+        drop
+        get_var assert
+        get_loc8 5: r
+        get_loc3 3: a
+        strict_eq
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_op_overloading.js:97:5: function: mul_scalar
+  mode: strict
+  args: p1 a
+  locals:
+    0: var r
+  closure vars:
+    0: Vec2 local:loc0 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: Vec2
+        dup
+        call_constructor 0
+        set_loc0 0: r
+        get_arg0 0: p1
+        get_field x
+        get_arg1 1: a
+        mul
+        put_field x
+        get_loc0 0: r
+        get_arg0 0: p1
+        get_field y
+        get_arg1 1: a
+        mul
+        put_field y
+        get_loc0 0: r
+        return
+
+__tests__/fixtures_quickjs/test_op_overloading.js:104:9: function: <null>
+  mode: strict
+  args: p1 p2
+  locals:
+    0: var r
+  closure vars:
+    0: Vec2 local:loc0 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: Vec2
+        dup
+        call_constructor 0
+        set_loc0 0: r
+        get_arg0 0: p1
+        get_field x
+        get_arg1 1: p2
+        get_field x
+        add
+        put_field x
+        get_loc0 0: r
+        get_arg0 0: p1
+        get_field y
+        get_arg1 1: p2
+        get_field y
+        add
+        put_field y
+        get_loc0 0: r
+        return
+
+__tests__/fixtures_quickjs/test_op_overloading.js:110:9: function: <null>
+  mode: strict
+  args: p1 p2
+  locals:
+    0: var r
+  closure vars:
+    0: Vec2 local:loc0 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: Vec2
+        dup
+        call_constructor 0
+        set_loc0 0: r
+        get_arg0 0: p1
+        get_field x
+        get_arg1 1: p2
+        get_field x
+        sub
+        put_field x
+        get_loc0 0: r
+        get_arg0 0: p1
+        get_field y
+        get_arg1 1: p2
+        get_field y
+        sub
+        put_field y
+        get_loc0 0: r
+        return
+
+__tests__/fixtures_quickjs/test_op_overloading.js:116:9: function: <null>
+  mode: strict
+  args: a b
+  stack_size: 2
+  opcodes:
+        get_arg0 0: a
+        get_field x
+        get_arg1 1: b
+        get_field x
+        eq
+        dup
+        if_false8 30
+        drop
+        get_arg0 0: a
+        get_field y
+        get_arg1 1: b
+        get_field y
+        eq
+   30:  return
+
+__tests__/fixtures_quickjs/test_op_overloading.js:119:9: function: <null>
+  mode: strict
+  args: a b
+  locals:
+    0: var r
+  stack_size: 2
+  opcodes:
+        get_arg0 0: a
+        get_field x
+        get_arg1 1: b
+        get_field x
+        eq
+        if_false8 31
+        get_arg0 0: a
+        get_field y
+        get_arg1 1: b
+        get_field y
+        lt
+        put_loc0 0: r
+        goto8 45
+   31:  get_arg0 0: a
+        get_field x
+        get_arg1 1: b
+        get_field x
+        lt
+        put_loc0 0: r
+   45:  get_loc0 0: r
+        return
+
+__tests__/fixtures_quickjs/test_op_overloading.js:128:9: function: <null>
+  mode: strict
+  args: a
+  locals:
+    0: var r
+  closure vars:
+    0: Vec2 local:loc0 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: Vec2
+        dup
+        call_constructor 0
+        set_loc0 0: r
+        get_arg0 0: a
+        get_field x
+        push_1 1
+        add
+        put_field x
+        get_loc0 0: r
+        get_arg0 0: a
+        get_field y
+        push_1 1
+        add
+        put_field y
+        get_loc0 0: r
+        return
+
+__tests__/fixtures_quickjs/test_op_overloading.js:136:9: function: <null>
+  mode: strict
+  args: a b
+  closure vars:
+    0: mul_scalar local:loc1 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: mul_scalar
+        get_arg1 1: b
+        get_arg0 0: a
+        tail_call 2
+
+__tests__/fixtures_quickjs/test_op_overloading.js:141:9: function: <null>
+  mode: strict
+  args: a b
+  closure vars:
+    0: mul_scalar local:loc1 var
+  stack_size: 3
+  opcodes:
+        get_var_ref0 0: mul_scalar
+        get_arg0 0: a
+        get_arg1 1: b
+        tail_call 2
+
+__tests__/fixtures_quickjs/test_op_overloading.js:146:9: function: <null>
+  mode: strict
+  args: x y
+  locals:
+    0: var this.active_func
+    1: var new.target
+    2: let this
+  closure vars:
+    0: <class_fields_init> local:loc4 const
+  stack_size: 3
+  opcodes:
+        special_object 2
+        put_loc0 0: "this.active_func"
+        special_object 3
+        put_loc1 1: "new.target"
+        set_loc_uninitialized 2: this
+        check_ctor
+        get_loc0 0: "this.active_func"
+        get_super
+        get_loc1 1: "new.target"
+        call_constructor 0
+        dup
+        put_loc_check_init 2: this
+        get_var_ref_check 0: "<class_fields_init>"
+        dup
+        if_false8 33
+        get_loc_check 2: this
+        swap
+        call_method 0
+   33:  drop
+        drop
+        get_loc_check 2: this
+        get_arg0 0: x
+        put_field x
+        get_loc_check 2: this
+        get_arg1 1: y
+        put_field y
+        get_loc_checkthis 2: this
+        return
+
+__tests__/fixtures_quickjs/test_op_overloading.js:151:9: function: <null>
+  mode: strict
+  locals:
+    0: var this
+  stack_size: 2
+  opcodes:
+        push_this
+        put_loc0 0: this
+        push_atom_value "Vec2("
+        get_loc0 0: this
+        get_field x
+        add
+        push_atom_value ","
+        add
+        get_loc0 0: this
+        get_field y
+        add
+        push_atom_value ")"
+        add
+        return
+
+__tests__/fixtures_quickjs/test_op_overloading.js:95:1: function: test_operators
+  mode: strict
+  locals:
+    0: var Vec2
+    1: var mul_scalar
+    2: var vec2_ops
+    3: const Vec2 [level:2 next:-1]
+    4: const <class_fields_init> [level:3 next:3]
+    5: var a
+    6: var b
+    7: var r
+  stack_size: 5
+  opcodes:
+        fclosure8 0: [bytecode mul_scalar]
+        put_loc1 1: mul_scalar
+        get_var Operators
+        object
+        fclosure8 1: [bytecode <null>]
+        define_method "+",4
+        fclosure8 2: [bytecode <null>]
+        define_method "-",4
+        fclosure8 3: [bytecode <null>]
+        define_method "==",4
+        fclosure8 4: [bytecode <null>]
+        define_method "<",4
+        fclosure8 5: [bytecode <null>]
+        define_method "++",4
+        object
+        get_var Number
+        define_field left
+        fclosure8 6: [bytecode <null>]
+        define_method "*",4
+        object
+        get_var Number
+        define_field right
+        fclosure8 7: [bytecode <null>]
+        define_method "*",4
+        call3 3
+        put_loc2 2: vec2_ops
+        set_loc_uninitialized 3: Vec2
+        get_loc2 2: vec2_ops
+        set_loc_uninitialized 4: "<class_fields_init>"
+        push_const8 8: [bytecode <null>]
+        define_class Vec2,1
+        fclosure8 9: [bytecode <null>]
+        define_method toString,0
+        undefined
+        put_loc8 4: "<class_fields_init>"
+        drop
+        set_loc3 3: Vec2
+        close_loc 4: "<class_fields_init>"
+        set_loc0 0: Vec2
+        dup
+        push_1 1
+        push_2 2
+        call_constructor 2
+        put_loc8 5: a
+        get_loc0 0: Vec2
+        dup
+        push_3 3
+        push_4 4
+        call_constructor 2
+        put_loc8 6: b
+        get_loc8 5: a
+        push_2 2
+        mul
+        push_3 3
+        get_loc8 6: b
+        mul
+        add
+        put_loc8 7: r
+        get_var assert
+        get_loc8 7: r
+        get_field x
+        push_i8 11
+        strict_eq
+        dup
+        if_false8 178
+        drop
+        get_loc8 7: r
+        get_field y
+        push_i8 16
+        strict_eq
+  178:  call1 1
+        drop
+        get_var assert
+        get_loc8 5: a
+        get_loc8 5: a
+        eq
+        push_true
+        call2 2
+        drop
+        get_var assert
+        get_loc8 5: a
+        get_loc8 6: b
+        eq
+        push_false
+        call2 2
+        drop
+        get_var assert
+        get_loc8 5: a
+        get_loc8 5: a
+        neq
+        push_false
+        call2 2
+        drop
+        get_var assert
+        get_loc8 5: a
+        get_loc8 6: b
+        lt
+        push_true
+        call2 2
+        drop
+        get_var assert
+        get_loc8 5: a
+        get_loc8 6: b
+        lte
+        push_true
+        call2 2
+        drop
+        get_var assert
+        get_loc8 6: b
+        get_loc8 5: a
+        lt
+        push_false
+        call2 2
+        drop
+        get_var assert
+        get_loc8 6: b
+        get_loc8 5: a
+        lte
+        push_false
+        call2 2
+        drop
+        get_var assert
+        get_loc8 5: a
+        get_loc8 5: a
+        lte
+        push_true
+        call2 2
+        drop
+        get_var assert
+        get_loc8 5: a
+        get_loc8 5: a
+        gte
+        push_true
+        call2 2
+        drop
+        inc_loc 5: a
+        get_var assert
+        get_loc8 5: a
+        get_field x
+        push_2 2
+        strict_eq
+        dup
+        if_false8 326
+        drop
+        get_loc8 5: a
+        get_field y
+        push_3 3
+        strict_eq
+  326:  call1 1
+        drop
+        get_loc8 5: a
+        inc
+        set_loc8 5: a
+        put_loc8 7: r
+        get_var assert
+        get_loc8 5: a
+        get_field x
+        push_3 3
+        strict_eq
+        dup
+        if_false8 362
+        drop
+        get_loc8 5: a
+        get_field y
+        push_4 4
+        strict_eq
+  362:  call1 1
+        drop
+        get_var assert
+        get_loc8 7: r
+        get_loc8 5: a
+        strict_eq
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_op_overloading.js:175:1: function: test_default_op
+  mode: strict
+  stack_size: 3
+  opcodes:
+        get_var assert
+        get_var Object
+        push_1 1
+        call1 1
+        push_2 2
+        add
+        push_3 3
+        call2 2
+        drop
+        get_var assert
+        get_var Object
+        push_1 1
+        call1 1
+        push_true
+        add
+        push_2 2
+        call2 2
+        drop
+        get_var assert
+        get_var Object
+        push_1 1
+        call1 1
+        neg
+        push_minus1 -1
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_op_overloading.js:1:1: function: <eval>
+  mode: strict
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var assert,64
+        check_define_var test_operators_create,64
+        check_define_var test_operators,64
+        check_define_var test_default_op,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode test_operators_create]
+        define_func test_operators_create,0
+        fclosure8 2: [bytecode test_operators]
+        define_func test_operators,0
+        fclosure8 3: [bytecode test_default_op]
+        define_func test_default_op,0
+        push_atom_value "use strict"
+        put_loc0 0: "<ret>"
+        get_var test_operators_create
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_operators
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_default_op
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

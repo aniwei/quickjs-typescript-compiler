@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/closure-recursion-default-params-024.ts
-**生成时间**: 2026-01-08T02:27:30.808Z
+**生成时间**: 2026-01-08T03:25:31.557Z
 
 ## 大小对比
 

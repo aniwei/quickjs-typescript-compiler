@@ -1,0 +1,32 @@
+__tests__/fixtures/exponentiation-ops.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 5
+  opcodes:
+        get_var console
+        get_field2 log
+        push_2 2
+        push_3 3
+        pow
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_2 2
+        push_3 3
+        push_2 2
+        pow
+        pow
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        push_2 2
+        push_3 3
+        pow
+        push_2 2
+        pow
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

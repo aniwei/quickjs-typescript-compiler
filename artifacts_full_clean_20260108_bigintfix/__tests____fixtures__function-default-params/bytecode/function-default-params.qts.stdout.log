@@ -1,0 +1,39 @@
+__tests__/fixtures/function-default-params.js:1:1: function: greet
+  args: name
+  locals:
+    0: let name [level:1 next:-2]
+  stack_size: 4
+  opcodes:
+        set_loc_uninitialized 0: name
+        get_arg0 0: name
+        dup
+        is_undefined
+        if_false8 15
+        drop
+        push_atom_value world
+        set_arg0 0: name
+   15:  put_loc0 0: name
+        get_var console
+        get_field2 log
+        push_atom_value Hello
+        get_arg0 0: name
+        call_method 2
+        return_undef
+
+__tests__/fixtures/function-default-params.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 2
+  opcodes:
+        check_define_var greet,64
+        fclosure8 0: [bytecode greet]
+        define_func greet,0
+        get_var greet
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var greet
+        push_atom_value QuickJS
+        call1 1
+        set_loc0 0: "<ret>"
+        return
+

@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures_quickjs/octane/gbemu-part2.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260108_bigintfix/__tests____fixtures_quickjs__octane__gbemu-part2",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260108_bigintfix/__tests____fixtures_quickjs__octane__gbemu-part2/cli/gbemu-part2.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260108_bigintfix/__tests____fixtures_quickjs__octane__gbemu-part2/cli/gbemu-part2.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260108_bigintfix/__tests____fixtures_quickjs__octane__gbemu-part2/cli/gbemu-part2.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260108_bigintfix/__tests____fixtures_quickjs__octane__gbemu-part2/cli/gbemu-part2.pc2line.txt",
+    "bytecodeSize": 271275,
+    "pc2lineLength": 1506,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": false,
+    "tsSize": 271152,
+    "wasmSize": 270799,
+    "sizeDiff": 353,
+    "sizeDiffPercent": 0.13035498653983213
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}

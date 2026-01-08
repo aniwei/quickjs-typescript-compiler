@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/try-finally-basic.ts
-**生成时间**: 2026-01-08T02:28:27.715Z
+**生成时间**: 2026-01-08T03:26:27.901Z
 
 ## 大小对比
 

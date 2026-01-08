@@ -1,0 +1,9 @@
+{
+  "inputTs": "__tests__/fixtures/test_repl1.ts",
+  "referenceJsPath": "__tests__/fixtures/test_repl1.js",
+  "isModule": true,
+  "tsEventCount": 413,
+  "wasmEventCount": 413,
+  "differenceCount": 397,
+  "firstDifferenceIndex": 9
+}
