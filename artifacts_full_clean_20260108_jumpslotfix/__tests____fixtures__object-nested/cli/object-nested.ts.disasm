@@ -1,0 +1,44 @@
+Module bytecode version: 5
+Atom count: 10
+
+=== Outer Function ===
+bytecodeLen=140 stackSize=4 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 80
+     6  define_var               228                 pop=0 push=0      3f e4 00 00 00 80
+    12  object                                       pop=0 push=1      0b
+    13  object                                       pop=0 push=1      0b
+    14  push_1                   1                   pop=0 push=1      b8
+    15  define_field             229                 pop=2 push=1      4e e5 00 00 00
+    20  push_atom_value          230                 pop=0 push=1      04 e6 00 00 00
+    25  define_field             56                  pop=2 push=1      4e 38 00 00 00
+    30  object                                       pop=0 push=1      0b
+    31  push_2                   2                   pop=0 push=1      b9
+    32  define_field             229                 pop=2 push=1      4e e5 00 00 00
+    37  push_atom_value          231                 pop=0 push=1      04 e7 00 00 00
+    42  define_field             56                  pop=2 push=1      4e 38 00 00 00
+    47  array_from               2                   pop=0 push=1      26 02 00
+    50  define_field             232                 pop=2 push=1      4e e8 00 00 00
+    55  object                                       pop=0 push=1      0b
+    56  push_1                   1                   pop=0 push=1      b8
+    57  define_field             233                 pop=2 push=1      4e e9 00 00 00
+    62  push_i8                  100                 pop=0 push=1      bf 64
+    64  define_field             234                 pop=2 push=1      4e ea 00 00 00
+    69  define_field             125                 pop=2 push=1      4e 7d 00 00 00
+    74  put_var_init             228                 pop=1 push=0      3b e4 00 00 00
+    79  get_var                  235                 pop=0 push=1      39 eb 00 00 00
+    84  get_field2               236                 pop=1 push=2      43 ec 00 00 00
+    89  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    94  get_field                232                 pop=1 push=1      42 e8 00 00 00
+    99  push_0                   0                   pop=0 push=1      b7
+   100  get_array_el                                 pop=2 push=1      48
+   101  get_field                56                  pop=1 push=1      42 38 00 00 00
+   106  call_method              1                   pop=2 push=1      24 01 00
+   109  put_loc0                 loc=0               pop=1 push=0      cb
+   110  get_var                  235                 pop=0 push=1      39 eb 00 00 00
+   115  get_field2               236                 pop=1 push=2      43 ec 00 00 00
+   120  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+   125  get_field                125                 pop=1 push=1      42 7d 00 00 00
+   130  get_field                234                 pop=1 push=1      42 ea 00 00 00
+   135  call_method              1                   pop=2 push=1      24 01 00
+   138  set_loc0                 loc=0               pop=1 push=1      cf
+   139  return                                       pop=1 push=0      28

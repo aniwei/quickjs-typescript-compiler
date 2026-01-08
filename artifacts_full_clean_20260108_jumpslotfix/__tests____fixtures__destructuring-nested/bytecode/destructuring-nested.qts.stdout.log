@@ -1,0 +1,54 @@
+__tests__/fixtures/destructuring-nested.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 5
+  opcodes:
+        check_define_var obj,128
+        check_define_var x,128
+        check_define_var y,128
+        check_define_var z,128
+        define_var obj,128
+        define_var x,128
+        define_var y,128
+        define_var z,128
+        object
+        push_1 1
+        define_field a
+        push_2 2
+        define_field b
+        get_var undefined
+        define_field c
+        put_var_init obj
+        undefined
+        dup
+        is_undefined
+        if_true8 124
+   81:  to_object
+        dup
+        get_field a
+        put_var_init x
+        dup
+        get_field b
+        put_var_init y
+        dup
+        get_field c
+        dup
+        is_undefined
+        if_false8 116
+        drop
+        push_3 3
+  116:  put_var_init z
+        drop
+        goto8 132
+  124:  drop
+        get_var obj
+        goto8 81
+  132:  get_var console
+        get_field2 log
+        get_var x
+        get_var y
+        get_var z
+        call_method 3
+        set_loc0 0: "<ret>"
+        return
+

@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/quickjs-tests/test_ic_atom_free.ts
-**生成时间**: 2026-01-07T17:33:02.049Z
+**生成时间**: 2026-01-08T02:28:25.522Z
 
 ## 大小对比
 

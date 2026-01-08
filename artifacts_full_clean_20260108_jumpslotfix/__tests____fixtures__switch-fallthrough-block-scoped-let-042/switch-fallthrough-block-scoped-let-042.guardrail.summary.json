@@ -1,0 +1,26 @@
+{
+  "fixturePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/switch-fallthrough-block-scoped-let-042.ts",
+  "artifactsDir": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260108_jumpslotfix/__tests____fixtures__switch-fallthrough-block-scoped-let-042",
+  "cli": {
+    "bytecodePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260108_jumpslotfix/__tests____fixtures__switch-fallthrough-block-scoped-let-042/cli/switch-fallthrough-block-scoped-let-042.ts.qbc",
+    "disassemblyPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260108_jumpslotfix/__tests____fixtures__switch-fallthrough-block-scoped-let-042/cli/switch-fallthrough-block-scoped-let-042.ts.disasm",
+    "pc2lineBinaryPath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260108_jumpslotfix/__tests____fixtures__switch-fallthrough-block-scoped-let-042/cli/switch-fallthrough-block-scoped-let-042.pc2line.bin",
+    "pc2lineTablePath": "/Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/artifacts_full_clean_20260108_jumpslotfix/__tests____fixtures__switch-fallthrough-block-scoped-let-042/cli/switch-fallthrough-block-scoped-let-042.pc2line.txt",
+    "bytecodeSize": 338,
+    "pc2lineLength": 30,
+    "stackMax": 0
+  },
+  "bytecode": {
+    "identical": true,
+    "tsSize": 278,
+    "wasmSize": 278,
+    "sizeDiff": 0,
+    "sizeDiffPercent": 0
+  },
+  "trace": {
+    "differenceCount": 0,
+    "tsEventCount": 0,
+    "wasmEventCount": 0,
+    "summaryPath": ""
+  }
+}

@@ -1,0 +1,48 @@
+__tests__/fixtures/do-while-break-continue-091.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 3
+  opcodes:
+        check_define_var i,128
+        check_define_var s,128
+        define_var i,130
+        define_var s,130
+        push_0 0
+        put_var_init i
+        push_0 0
+        put_var_init s
+   36:  undefined
+        put_loc0 0: "<ret>"
+        get_var i
+        post_inc
+        put_var i
+        put_loc0 0: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        get_var i
+        push_2 2
+        strict_eq
+        if_true8 90
+        get_var s
+        get_var i
+        add
+        dup
+        put_var s
+        put_loc0 0: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        get_var i
+        push_3 3
+        gt
+        if_true8 100
+   90:  get_var i
+        push_i8 10
+        lt
+        if_true8 36
+  100:  get_var console
+        get_field2 log
+        get_var s
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+

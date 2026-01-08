@@ -1,0 +1,18 @@
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=5 pos_next=8 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=5 pos_next=8 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=76 pos_next=79 next_op=111 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=107 pos_next=110 next_op=14 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=123 pos_next=126 next_op=111 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=221 pos_next=224 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=262 pos_next=265 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=283 pos_next=286 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x

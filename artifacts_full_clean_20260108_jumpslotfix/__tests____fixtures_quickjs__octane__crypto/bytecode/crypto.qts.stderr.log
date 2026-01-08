@@ -1,0 +1,880 @@
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=34 pos_next=37 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=94 idx=0 pos=106 pos_next=109 next_op=72 expected_get=93
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=163 pos_next=166 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=94 idx=3 pos=245 pos_next=248 next_op=90 expected_get=93
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=34 pos_next=37 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=56 pos_next=59 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=78 pos_next=81 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=153 pos_next=156 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=94 idx=0 pos=178 pos_next=181 next_op=72 expected_get=93
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=198 pos_next=201 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=6 pos=251 pos_next=254 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=94 idx=3 pos=504 pos_next=507 next_op=90 expected_get=93
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=34 pos_next=37 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=56 pos_next=59 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=78 pos_next=81 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=153 pos_next=156 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=94 idx=0 pos=178 pos_next=181 next_op=72 expected_get=93
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=198 pos_next=201 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=6 pos=251 pos_next=254 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=94 idx=3 pos=468 pos_next=471 next_op=90 expected_get=93
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=34 pos_next=37 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=56 pos_next=59 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=78 pos_next=81 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=153 pos_next=156 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=94 idx=0 pos=178 pos_next=181 next_op=72 expected_get=93
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=198 pos_next=201 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=6 pos=251 pos_next=254 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=94 idx=3 pos=468 pos_next=471 next_op=90 expected_get=93
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=48 pos_next=51 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=34 pos_next=37 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=61 pos_next=64 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=457 pos_next=460 next_op=9 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=461 pos_next=464 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=469 pos_next=472 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=615 pos_next=618 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=43 pos_next=46 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=449 pos_next=452 next_op=9 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=453 pos_next=456 next_op=4 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=461 pos_next=464 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=6 pos=477 pos_next=480 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=7 pos=530 pos_next=533 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=6 pos=547 pos_next=550 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=34 pos_next=37 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=74 pos_next=77 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=133 pos_next=136 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=5 pos_next=8 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=34 pos_next=37 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=34 pos_next=37 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=45 pos_next=48 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=34 pos_next=37 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=59 pos_next=62 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=84 pos_next=87 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=117 pos_next=120 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=170 pos_next=173 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=6 pos=214 pos_next=217 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=34 pos_next=37 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=120 pos_next=123 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=213 pos_next=216 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=238 pos_next=241 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=271 pos_next=274 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=6 pos=348 pos_next=351 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=34 pos_next=37 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=55 pos_next=58 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=63 pos_next=66 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=71 pos_next=74 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=133 pos_next=136 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=259 pos_next=262 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=506 pos_next=509 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=753 pos_next=756 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=990 pos_next=993 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=1077 pos_next=1080 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=34 pos_next=37 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=58 pos_next=61 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=87 pos_next=90 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=108 pos_next=111 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=129 pos_next=132 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=21 pos_next=24 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=42 pos_next=45 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=63 pos_next=66 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=114 pos_next=117 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=364 pos_next=367 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=26 pos_next=29 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=95 pos_next=98 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=340 pos_next=343 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=356 pos_next=359 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=377 pos_next=380 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=398 pos_next=401 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=6 pos=474 pos_next=477 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=7 pos=690 pos_next=693 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=8 pos=711 pos_next=714 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=9 pos=747 pos_next=750 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=10 pos=915 pos_next=918 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=11 pos=940 pos_next=943 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=12 pos=976 pos_next=979 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=13 pos=998 pos_next=1001 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=14 pos=1019 pos_next=1022 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=15 pos=1044 pos_next=1047 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=16 pos=1106 pos_next=1109 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=17 pos=1170 pos_next=1173 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=18 pos=1761 pos_next=1764 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=80 pos_next=83 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=153 pos_next=156 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=18 pos_next=21 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=132 pos_next=135 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=225 pos_next=228 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=390 pos_next=393 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=100 pos_next=103 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=119 pos_next=122 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=151 pos_next=154 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=189 pos_next=192 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=427 pos_next=430 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=179 pos_next=182 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=226 pos_next=229 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=253 pos_next=256 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=272 pos_next=275 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=291 pos_next=294 next_op=4 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=299 pos_next=302 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=101 pos_next=104 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=148 pos_next=151 next_op=9 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=152 pos_next=155 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=160 pos_next=163 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=168 pos_next=171 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=176 pos_next=179 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=6 pos=263 pos_next=266 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=597 pos_next=600 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=619 pos_next=622 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=29 pos_next=32 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=51 pos_next=54 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=133 pos_next=136 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=141 pos_next=144 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=158 pos_next=161 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=328 pos_next=331 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=1071 pos_next=1074 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=34 pos_next=37 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=55 pos_next=58 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=117 pos_next=120 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=32 pos_next=35 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=53 pos_next=56 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=61 pos_next=64 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=51 pos_next=54 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=21 pos_next=24 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=5 pos_next=8 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=5 pos_next=8 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=35 pos_next=38 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=43 pos_next=46 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=66 pos_next=69 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=44 pos_next=47 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=34 pos_next=37 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=55 pos_next=58 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=63 pos_next=66 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=71 pos_next=74 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=133 pos_next=136 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=259 pos_next=262 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=506 pos_next=509 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=753 pos_next=756 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=984 pos_next=987 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=1063 pos_next=1066 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=16 pos_next=19 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=35 pos_next=38 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=18 pos_next=21 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=39 pos_next=42 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=115 pos_next=118 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=18 pos_next=21 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=39 pos_next=42 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=136 pos_next=139 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=244 pos_next=247 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=18 pos_next=21 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=47 pos_next=50 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=71 pos_next=74 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=557 pos_next=560 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=6 pos=565 pos_next=568 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=7 pos=587 pos_next=590 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=8 pos=620 pos_next=623 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=9 pos=711 pos_next=714 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=10 pos=996 pos_next=999 next_op=10 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=12 pos=1000 pos_next=1003 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=13 pos=1019 pos_next=1022 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=86 pos_next=89 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=190 pos_next=193 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=251 pos_next=254 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=321 pos_next=324 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=350 pos_next=353 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=13 pos_next=16 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=78 pos_next=81 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=149 pos_next=152 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=282 pos_next=285 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=26 pos_next=29 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=179 pos_next=182 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=203 pos_next=206 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=227 pos_next=230 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=251 pos_next=254 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=275 pos_next=278 next_op=96 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=6 pos=299 pos_next=302 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=21 pos_next=24 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=42 pos_next=45 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=456 pos_next=459 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=478 pos_next=481 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=585 pos_next=588 next_op=72 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=721 pos_next=724 next_op=72 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=39 pos_next=42 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=68 pos_next=71 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=141 pos_next=144 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=270 pos_next=273 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=278 pos_next=281 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=409 pos_next=412 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=6 pos=532 pos_next=535 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=6 pos=554 pos_next=557 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=1 pos=22 pos_next=25 next_op=74 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=1 pos=79 pos_next=82 next_op=74 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=1 pos=147 pos_next=150 next_op=74 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=1 pos=215 pos_next=218 next_op=74 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=5 pos_next=8 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=13 pos_next=16 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=103 pos_next=106 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=135 pos_next=138 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=259 pos_next=262 next_op=36 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=335 pos_next=338 next_op=57 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=357 pos_next=360 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=77 pos_next=80 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=141 pos_next=144 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=207 pos_next=210 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=26 pos_next=29 next_op=1 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=34 pos_next=37 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=416 pos_next=419 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=17 pos_next=20 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=39 pos_next=42 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=2 pos=123 pos_next=126 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=3 pos=730 pos_next=733 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=4 pos=848 pos_next=851 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=5 pos=900 pos_next=903 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=6 pos=937 pos_next=940 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=203 pos_next=206 next_op=93 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=289 pos_next=292 next_op=184 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=29 pos_next=32 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=61 pos_next=64 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=17 pos_next=20 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=0 pos=17 pos_next=20 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=91 idx=1 pos=188 pos_next=191 next_op=90 expected_get=90
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=13 pos=11 pos_next=14 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=14 pos=19 pos_next=22 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=15 pos=27 pos_next=30 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=16 pos=35 pos_next=38 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=17 pos=43 pos_next=46 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=18 pos=51 pos_next=54 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=24 pos=59 pos_next=62 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=25 pos=67 pos_next=70 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=26 pos=75 pos_next=78 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=27 pos=83 pos_next=86 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=28 pos=91 pos_next=94 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=29 pos=99 pos_next=102 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=30 pos=107 pos_next=110 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=31 pos=115 pos_next=118 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=32 pos=123 pos_next=126 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=33 pos=131 pos_next=134 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=34 pos=139 pos_next=142 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=35 pos=147 pos_next=150 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=36 pos=155 pos_next=158 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=37 pos=163 pos_next=166 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=38 pos=171 pos_next=174 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=39 pos=179 pos_next=182 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=40 pos=187 pos_next=190 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=41 pos=195 pos_next=198 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=42 pos=203 pos_next=206 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=43 pos=211 pos_next=214 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=44 pos=219 pos_next=222 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=45 pos=227 pos_next=230 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=46 pos=235 pos_next=238 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=47 pos=243 pos_next=246 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=48 pos=251 pos_next=254 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=49 pos=259 pos_next=262 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=50 pos=267 pos_next=270 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=51 pos=275 pos_next=278 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=52 pos=283 pos_next=286 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=53 pos=291 pos_next=294 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=54 pos=299 pos_next=302 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=55 pos=307 pos_next=310 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=56 pos=315 pos_next=318 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=57 pos=323 pos_next=326 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=58 pos=331 pos_next=334 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=59 pos=339 pos_next=342 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=60 pos=347 pos_next=350 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=61 pos=355 pos_next=358 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=62 pos=363 pos_next=366 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=63 pos=371 pos_next=374 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=64 pos=379 pos_next=382 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=65 pos=387 pos_next=390 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=66 pos=395 pos_next=398 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=67 pos=403 pos_next=406 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=68 pos=411 pos_next=414 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=69 pos=419 pos_next=422 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=70 pos=427 pos_next=430 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=71 pos=435 pos_next=438 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=72 pos=443 pos_next=446 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=73 pos=451 pos_next=454 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=74 pos=459 pos_next=462 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=75 pos=467 pos_next=470 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=76 pos=475 pos_next=478 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=77 pos=483 pos_next=486 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=78 pos=491 pos_next=494 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=79 pos=499 pos_next=502 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=80 pos=507 pos_next=510 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=81 pos=515 pos_next=518 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=82 pos=523 pos_next=526 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=83 pos=531 pos_next=534 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=84 pos=539 pos_next=542 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=85 pos=547 pos_next=550 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=86 pos=555 pos_next=558 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=87 pos=563 pos_next=566 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=88 pos=571 pos_next=574 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=89 pos=579 pos_next=582 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=90 pos=587 pos_next=590 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=91 pos=595 pos_next=598 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=92 pos=603 pos_next=606 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=93 pos=611 pos_next=614 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=94 pos=619 pos_next=622 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=95 pos=627 pos_next=630 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=96 pos=635 pos_next=638 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=97 pos=643 pos_next=646 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=98 pos=651 pos_next=654 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=99 pos=659 pos_next=662 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=100 pos=667 pos_next=670 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=101 pos=675 pos_next=678 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=102 pos=683 pos_next=686 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=103 pos=691 pos_next=694 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=104 pos=699 pos_next=702 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=105 pos=707 pos_next=710 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=106 pos=715 pos_next=718 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=107 pos=723 pos_next=726 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=108 pos=731 pos_next=734 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=109 pos=739 pos_next=742 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=110 pos=747 pos_next=750 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=111 pos=755 pos_next=758 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=112 pos=763 pos_next=766 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=113 pos=771 pos_next=774 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=114 pos=779 pos_next=782 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=115 pos=787 pos_next=790 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=116 pos=795 pos_next=798 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=117 pos=803 pos_next=806 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=118 pos=811 pos_next=814 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=119 pos=819 pos_next=822 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=120 pos=827 pos_next=830 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=121 pos=835 pos_next=838 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=124 pos=843 pos_next=846 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=125 pos=851 pos_next=854 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=126 pos=859 pos_next=862 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=127 pos=867 pos_next=870 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=128 pos=875 pos_next=878 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=129 pos=883 pos_next=886 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=134 pos=891 pos_next=894 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=135 pos=899 pos_next=902 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=137 pos=907 pos_next=910 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=138 pos=915 pos_next=918 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=139 pos=923 pos_next=926 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=140 pos=931 pos_next=934 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=141 pos=939 pos_next=942 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=142 pos=947 pos_next=950 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=143 pos=955 pos_next=958 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=144 pos=963 pos_next=966 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=145 pos=971 pos_next=974 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=146 pos=979 pos_next=982 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=147 pos=987 pos_next=990 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=148 pos=995 pos_next=998 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=149 pos=1003 pos_next=1006 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=150 pos=1011 pos_next=1014 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=151 pos=1019 pos_next=1022 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=152 pos=1027 pos_next=1030 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=153 pos=1035 pos_next=1038 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=164 pos=1043 pos_next=1046 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=165 pos=1051 pos_next=1054 next_op=41 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=2 pos=1167 pos_next=1170 next_op=2 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=11 pos=1175 pos_next=1178 next_op=96 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] MATCHED! folding to set_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=12 pos=1208 pos_next=1211 next_op=3 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=19 pos=1221 pos_next=1224 next_op=4 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=20 pos=1229 pos_next=1232 next_op=57 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=21 pos=1251 pos_next=1254 next_op=2 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=22 pos=1368 pos_next=1371 next_op=96 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=22 pos=1533 pos_next=1536 next_op=96 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=22 pos=1698 pos_next=1701 next_op=96 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=122 pos=4202 pos_next=4205 next_op=1 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=123 pos=4270 pos_next=4273 next_op=96 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=130 pos=6102 pos_next=6105 next_op=96 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=133 pos=6300 pos_next=6303 next_op=96 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=133 pos=6350 pos_next=6353 next_op=96 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=154 pos=6772 pos_next=6775 next_op=2 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=155 pos=6780 pos_next=6783 next_op=4 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=156 pos=6788 pos_next=6791 next_op=4 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=157 pos=6796 pos_next=6799 next_op=4 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=158 pos=6804 pos_next=6807 next_op=4 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=159 pos=6812 pos_next=6815 next_op=4 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=160 pos=6820 pos_next=6823 next_op=4 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=161 pos=6828 pos_next=6831 next_op=96 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x
+[QTS:PUT_LOC_PEEPHOLE] op=97 idx=162 pos=6877 pos_next=6880 next_op=6 expected_get=96
+[QTS:PUT_LOC_PEEPHOLE] NOT matched, emitting put_x

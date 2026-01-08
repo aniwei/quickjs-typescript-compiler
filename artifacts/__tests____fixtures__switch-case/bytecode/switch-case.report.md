@@ -1,7 +1,7 @@
 # 字节码分析报告
 
 **输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/switch-case.ts
-**生成时间**: 2026-01-07T17:33:03.236Z
+**生成时间**: 2026-01-08T02:28:26.652Z
 
 ## 大小对比
 

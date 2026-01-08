@@ -345,10 +345,17 @@ export class ExpressionVisitor extends VisitorContext {
     const fd = this.funcDef!
     const text = node.text.replace(/n$/, '') // 移除尾部的 'n'
     const value = BigInt(text)
+    this.emitBigIntConst(fd, value)
+  }
 
+  private emitBigIntConst(fd: FunctionDef, value: bigint, sourcePos?: number): void {
     // 检查是否可以使用 push_bigint_i32
     if (value >= BigInt(-2147483648) && value <= BigInt(2147483647)) {
-      this.compiler.emitOp(fd, Opcode.OP_push_bigint_i32)
+      if (sourcePos != null) {
+        this.compiler.emitOp(fd, Opcode.OP_push_bigint_i32, sourcePos)
+      } else {
+        this.compiler.emitOp(fd, Opcode.OP_push_bigint_i32)
+      }
       this.compiler.emitU32(fd, Number(value) >>> 0)
     } else {
       // 大的 BigInt 使用常量池
@@ -434,9 +441,22 @@ export class ExpressionVisitor extends VisitorContext {
         break
 
       case ts.SyntaxKind.MinusToken:
-        // - 运算符: 先计算操作数，然后发射 OP_neg
-        this.context.visit(node.operand)
-        this.compiler.emitOp(fd, Opcode.OP_neg, sourcePos)
+        // - 运算符: 对 BigInt 字面量做常量折叠（QuickJS 会直接发射负 BigInt 常量，而不是 push + OP_neg）
+        if (ts.isBigIntLiteral(node.operand)) {
+          const text = node.operand.text.replace(/n$/, '')
+          const value = -BigInt(text)
+          // 仅在 i32 范围内折叠：对齐 QuickJS 的编码选择（大 BigInt 仍保留 OP_neg 路径）
+          if (value >= BigInt(-2147483648) && value <= BigInt(2147483647)) {
+            this.emitBigIntConst(fd, value, sourcePos)
+          } else {
+            this.context.visit(node.operand)
+            this.compiler.emitOp(fd, Opcode.OP_neg, sourcePos)
+          }
+        } else {
+          // 其他情况：先计算操作数，然后发射 OP_neg
+          this.context.visit(node.operand)
+          this.compiler.emitOp(fd, Opcode.OP_neg, sourcePos)
+        }
         break
 
       case ts.SyntaxKind.ExclamationToken:

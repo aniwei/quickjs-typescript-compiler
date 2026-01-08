@@ -1,0 +1,221 @@
+__tests__/fixtures/test_function_length.js:1:1: function: assert
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 1
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_var Object
+        get_field2 is
+        get_arg0 0: actual
+        get_arg1 1: expected
+        call_method 2
+        if_false8 29
+        return_undef
+   29:  get_arg0 0: actual
+        is_null
+        if_true8 79
+        get_arg1 1: expected
+        is_null
+        if_true8 79
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 79
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 79
+        return_undef
+   79:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 129
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 130
+  129:  push_empty_string
+  130:  add
+        call1 1
+        throw
+
+__tests__/fixtures/test_function_length.js:15:13: function: <null>
+  args: a b c
+  locals:
+    0: let a [level:1 next:-2]
+    1: let b [level:1 next:0]
+    2: let c [level:1 next:1]
+  stack_size: 2
+  opcodes:
+        set_loc_uninitialized 2: c
+        set_loc_uninitialized 1: b
+        set_loc_uninitialized 0: a
+        get_arg0 0: a
+        put_loc0 0: a
+        get_arg1 1: b
+        dup
+        is_undefined
+        if_false8 19
+        drop
+        push_1 1
+        set_arg1 1: b
+   19:  put_loc1 1: b
+        get_arg2 2: c
+        put_loc2 2: c
+        return_undef
+
+__tests__/fixtures/test_function_length.js:16:13: function: <null>
+  args: <null>
+  locals:
+    0: var a
+    1: var b
+  stack_size: 7
+  opcodes:
+        get_arg0 0: <null>
+        for_of_start
+        make_loc_ref a,0
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref b,1
+        for_of_next 2
+        drop
+        put_ref_value
+        iterator_close
+        return_undef
+
+__tests__/fixtures/test_function_length.js:17:13: function: <null>
+  args: <null>
+  locals:
+    0: var a
+    1: var b
+  stack_size: 4
+  opcodes:
+        get_arg0 0: <null>
+        to_object
+        dup
+        make_loc_ref a,0
+        rot3l
+        get_field a
+        put_ref_value
+        dup
+        make_loc_ref b,1
+        rot3l
+        get_field b
+        put_ref_value
+        return_undef
+
+__tests__/fixtures/test_function_length.js:18:13: function: <null>
+  args: c <null> d
+  locals:
+    0: let c [level:1 next:-2]
+    1: let a [level:1 next:0]
+    2: let b [level:1 next:1]
+    3: let d [level:1 next:2]
+    4: var b
+    5: var a
+  stack_size: 5
+  opcodes:
+        set_loc_uninitialized 3: d
+        set_loc_uninitialized 2: b
+        set_loc_uninitialized 1: a
+        set_loc_uninitialized 0: c
+        get_arg0 0: c
+        put_loc0 0: c
+        get_arg1 1: <null>
+        dup
+        is_undefined
+        if_true8 31
+   19:  for_of_start
+        for_of_next 0
+        drop
+        put_loc1 1: a
+        for_of_next 0
+        drop
+        put_loc2 2: b
+        iterator_close
+        goto8 35
+   31:  drop
+        push_1 1
+        goto8 19
+   35:  get_arg2 2: d
+        put_loc3 3: d
+        get_loc_check 2: b
+        put_loc8 4: b
+        get_loc_check 1: a
+        put_loc8 5: a
+        return_undef
+
+__tests__/fixtures/test_function_length.js:14:1: function: test_function_length
+  stack_size: 3
+  opcodes:
+        get_var assert
+        fclosure8 0: [bytecode <null>]
+        get_length
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        fclosure8 1: [bytecode <null>]
+        get_length
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        fclosure8 2: [bytecode <null>]
+        get_length
+        push_1 1
+        call2 2
+        drop
+        get_var assert
+        fclosure8 3: [bytecode <null>]
+        get_length
+        push_1 1
+        call2 2
+        return_undef
+
+__tests__/fixtures/test_function_length.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var assert,64
+        check_define_var test_function_length,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode test_function_length]
+        define_func test_function_length,0
+        get_loc0 0: "<ret>"
+        return
+

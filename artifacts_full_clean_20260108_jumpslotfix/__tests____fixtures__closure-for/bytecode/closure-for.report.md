@@ -1,0 +1,125 @@
+# 字节码分析报告
+
+**输入文件**: /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler/__tests__/fixtures/closure-for.ts
+**生成时间**: 2026-01-07T17:56:53.689Z
+
+## 大小对比
+
+- TypeScript编译器: 140 字节
+- WASM编译器: 140 字节
+- 差异: 0 字节 (0.00%)
+
+## 结构分析
+
+### TypeScript编译器输出
+```json
+{
+  "source": "TypeScript",
+  "bcVersion": "0x5",
+  "userAtomCount": 3,
+  "atoms": [
+    {
+      "index": 0,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "main",
+      "offset": 2
+    },
+    {
+      "index": 1,
+      "rawLength": 66,
+      "actualLength": 33,
+      "isWideChar": 0,
+      "string": "__tests__/fixtures/closure-for.js",
+      "offset": 7
+    },
+    {
+      "index": 2,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "i",
+      "offset": 41
+    }
+  ],
+  "functionHeader": {
+    "offset": 43,
+    "tag": "0xc",
+    "remaining": 97
+  }
+}
+```
+
+### WASM编译器输出
+```json
+{
+  "source": "WASM",
+  "bcVersion": "0x5",
+  "userAtomCount": 3,
+  "atoms": [
+    {
+      "index": 0,
+      "rawLength": 8,
+      "actualLength": 4,
+      "isWideChar": 0,
+      "string": "main",
+      "offset": 2
+    },
+    {
+      "index": 1,
+      "rawLength": 66,
+      "actualLength": 33,
+      "isWideChar": 0,
+      "string": "__tests__/fixtures/closure-for.js",
+      "offset": 7
+    },
+    {
+      "index": 2,
+      "rawLength": 2,
+      "actualLength": 1,
+      "isWideChar": 0,
+      "string": "i",
+      "offset": 41
+    }
+  ],
+  "functionHeader": {
+    "offset": 43,
+    "tag": "0xc",
+    "remaining": 97
+  }
+}
+```
+
+## 字节级差异
+
+共发现 0 个字节差异:
+
+
+## 十六进制转储对比
+
+### TypeScript
+```
+00000000: 05 03 08 6d 61 69 6e 42 5f 5f 74 65 73 74 73 5f |...mainB__tests_|
+00000010: 5f 2f 66 69 78 74 75 72 65 73 2f 63 6c 6f 73 75 |_/fixtures/closu|
+00000020: 72 65 2d 66 6f 72 2e 6a 73 02 69 0c 00 06 00 a4 |re-for.js.i.....|
+00000030: 01 00 01 00 01 00 01 16 01 a6 01 00 00 00 40 e4 |..............@.|
+00000040: 00 00 00 40 c2 00 41 e4 00 00 00 00 39 e4 00 00 |...@..A.....9...|
+00000050: 00 f0 cf 28 ca 03 08 00 00 00 0e 0e 00 1b 08 00 |...(............|
+00000060: 0c 43 06 00 c8 03 00 01 00 02 00 00 0d 01 cc 03 |.C..............|
+00000070: 00 00 00 b7 cb c7 bf 0a a5 ec 05 95 00 ee f7 29 |...............)|
+00000080: ca 03 08 00 00 0f 28 11 04 11 0e 00             |......(.....|
+```
+
+### WASM
+```
+00000000: 05 03 08 6d 61 69 6e 42 5f 5f 74 65 73 74 73 5f |...mainB__tests_|
+00000010: 5f 2f 66 69 78 74 75 72 65 73 2f 63 6c 6f 73 75 |_/fixtures/closu|
+00000020: 72 65 2d 66 6f 72 2e 6a 73 02 69 0c 00 06 00 a4 |re-for.js.i.....|
+00000030: 01 00 01 00 01 00 01 16 01 a6 01 00 00 00 40 e4 |..............@.|
+00000040: 00 00 00 40 c2 00 41 e4 00 00 00 00 39 e4 00 00 |...@..A.....9...|
+00000050: 00 f0 cf 28 ca 03 08 00 00 00 0e 0e 00 1b 08 00 |...(............|
+00000060: 0c 43 06 00 c8 03 00 01 00 02 00 00 0d 01 cc 03 |.C..............|
+00000070: 00 00 00 b7 cb c7 bf 0a a5 ec 05 95 00 ee f7 29 |...............)|
+00000080: ca 03 08 00 00 0f 28 11 04 11 0e 00             |......(.....|
+```

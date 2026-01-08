@@ -1,0 +1,8 @@
+Module bytecode version: 5
+Atom count: 1
+
+=== Outer Function ===
+bytecodeLen=4 stackSize=1 varCount=1 argCount=0
+     0  push_i8                  123                 pop=0 push=1      bf 7b
+     2  set_loc0                 loc=0               pop=1 push=1      cf
+     3  return                                       pop=1 push=0      28

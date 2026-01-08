@@ -1,0 +1,108 @@
+Module bytecode version: 5
+Atom count: 15
+
+=== Outer Function ===
+bytecodeLen=30 stackSize=1 varCount=1 argCount=0
+     0  check_define_var         228                 pop=0 push=0      40 e4 00 00 00 40
+     6  check_define_var         229                 pop=0 push=0      40 e5 00 00 00 40
+    12  fclosure8                0                   pop=0 push=1      c2 00
+    14  define_func              228                 pop=1 push=0      41 e4 00 00 00 00
+    20  fclosure8                1                   pop=0 push=1      c2 01
+    22  define_func              229                 pop=1 push=0      41 e5 00 00 00 00
+    28  get_loc0                 loc=0               pop=0 push=1      c7
+    29  return                                       pop=1 push=0      28
+
+=== Inner Function #0 ===
+bytecodeLen=133 stackSize=4 varCount=1 argCount=3
+     0  special_object           1                   pop=0 push=1      0c 01
+     2  put_loc0                 loc=0               pop=1 push=0      cb
+     3  get_loc0                 loc=0               pop=0 push=1      c7
+     4  get_length                                   pop=1 push=1      eb
+     5  push_1                   1                   pop=0 push=1      b8
+     6  eq                                           pop=2 push=1      ab
+     7  if_false8                3                   pop=1 push=0      ec 03
+     9  push_true                                    pop=0 push=1      0a
+    10  put_arg1                 arg=1               pop=1 push=0      d8
+    11  get_var                  157                 pop=0 push=1      39 9d 00 00 00
+    16  get_field2               233                 pop=1 push=2      43 e9 00 00 00
+    21  get_arg0                 arg=0               pop=0 push=1      d3
+    22  get_arg1                 arg=1               pop=0 push=1      d4
+    23  call_method              2                   pop=2 push=1      24 02 00
+    26  if_false8                2                   pop=1 push=0      ec 02
+    28  return_undef                                 pop=0 push=0      29
+    29  get_arg0                 arg=0               pop=0 push=1      d3
+    30  is_null                                      pop=1 push=1      f5
+    31  if_true8                 47                  pop=1 push=0      ed 2f
+    33  get_arg1                 arg=1               pop=0 push=1      d4
+    34  is_null                                      pop=1 push=1      f5
+    35  if_true8                 43                  pop=1 push=0      ed 2b
+    37  get_arg0                 arg=0               pop=0 push=1      d3
+    38  typeof                                       pop=1 push=1      99
+    39  push_atom_value          75                  pop=0 push=1      04 4b 00 00 00
+    44  eq                                           pop=2 push=1      ab
+    45  if_false8                33                  pop=1 push=0      ec 21
+    47  get_arg1                 arg=1               pop=0 push=1      d4
+    48  typeof                                       pop=1 push=1      99
+    49  push_atom_value          75                  pop=0 push=1      04 4b 00 00 00
+    54  eq                                           pop=2 push=1      ab
+    55  if_false8                23                  pop=1 push=0      ec 17
+    57  get_arg0                 arg=0               pop=0 push=1      d3
+    58  get_field2               57                  pop=1 push=2      43 39 00 00 00
+    63  call_method              0                   pop=2 push=1      24 00 00
+    66  get_arg1                 arg=1               pop=0 push=1      d4
+    67  get_field2               57                  pop=1 push=2      43 39 00 00 00
+    72  call_method              0                   pop=2 push=1      24 00 00
+    75  strict_eq                                    pop=2 push=1      ad
+    76  if_false8                2                   pop=1 push=0      ec 02
+    78  return_undef                                 pop=0 push=0      29
+    79  get_var                  159                 pop=0 push=1      39 9f 00 00 00
+    84  push_atom_value          234                 pop=0 push=1      04 ea 00 00 00
+    89  get_arg0                 arg=0               pop=0 push=1      d3
+    90  add                                          pop=2 push=1      9f
+    91  push_atom_value          235                 pop=0 push=1      04 eb 00 00 00
+    96  add                                          pop=2 push=1      9f
+    97  push_atom_value          236                 pop=0 push=1      04 ec 00 00 00
+   102  add                                          pop=2 push=1      9f
+   103  get_arg1                 arg=1               pop=0 push=1      d4
+   104  add                                          pop=2 push=1      9f
+   105  push_atom_value          235                 pop=0 push=1      04 eb 00 00 00
+   110  add                                          pop=2 push=1      9f
+   111  get_arg2                 arg=2               pop=0 push=1      d5
+   112  if_false8                16                  pop=1 push=0      ec 10
+   114  push_atom_value          237                 pop=0 push=1      04 ed 00 00 00
+   119  get_arg2                 arg=2               pop=0 push=1      d5
+   120  add                                          pop=2 push=1      9f
+   121  push_atom_value          238                 pop=0 push=1      04 ee 00 00 00
+   126  add                                          pop=2 push=1      9f
+   127  goto8                    2                   pop=0 push=0      ee 02
+   129  push_empty_string                            pop=0 push=1      c3
+   130  add                                          pop=2 push=1      9f
+   131  call1                    npop=1              pop=1 push=1      f1
+   132  throw                                        pop=1 push=0      30
+
+=== Inner Function #1 ===
+bytecodeLen=44 stackSize=3 varCount=0 argCount=0
+     0  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+     5  fclosure8                0                   pop=0 push=1      c2 00
+     7  get_length                                   pop=1 push=1      eb
+     8  push_1                   1                   pop=0 push=1      b8
+     9  call2                    npop=2              pop=1 push=1      f2
+    10  drop                                         pop=1 push=0      0e
+    11  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    16  fclosure8                1                   pop=0 push=1      c2 01
+    18  get_length                                   pop=1 push=1      eb
+    19  push_1                   1                   pop=0 push=1      b8
+    20  call2                    npop=2              pop=1 push=1      f2
+    21  drop                                         pop=1 push=0      0e
+    22  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    27  fclosure8                2                   pop=0 push=1      c2 02
+    29  get_length                                   pop=1 push=1      eb
+    30  push_1                   1                   pop=0 push=1      b8
+    31  call2                    npop=2              pop=1 push=1      f2
+    32  drop                                         pop=1 push=0      0e
+    33  get_var                  228                 pop=0 push=1      39 e4 00 00 00
+    38  fclosure8                3                   pop=0 push=1      c2 03
+    40  get_length                                   pop=1 push=1      eb
+    41  push_1                   1                   pop=0 push=1      b8
+    42  call2                    npop=2              pop=1 push=1      f2
+    43  return_undef                                 pop=0 push=0      29

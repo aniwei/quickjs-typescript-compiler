@@ -1,0 +1,27 @@
+__tests__/fixtures/delete-prop.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 2
+  opcodes:
+        check_define_var obj,128
+        check_define_var arr,128
+        define_var obj,128
+        define_var arr,128
+        object
+        push_1 1
+        define_field a
+        put_var_init obj
+        get_var obj
+        push_atom_value a
+        delete
+        put_loc0 0: "<ret>"
+        push_1 1
+        push_2 2
+        array_from 2
+        put_var_init arr
+        get_var arr
+        push_0 0
+        delete
+        set_loc0 0: "<ret>"
+        return
+

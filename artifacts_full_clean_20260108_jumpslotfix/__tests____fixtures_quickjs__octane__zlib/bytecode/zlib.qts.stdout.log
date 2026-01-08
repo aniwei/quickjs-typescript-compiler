@@ -1,0 +1,64 @@
+__tests__/fixtures_quickjs/octane/zlib.js:34:1: function: runZlib
+  mode: strict
+  closure vars:
+    0: InitializeZlibBenchmark parent:loc2 const
+  stack_size: 2
+  opcodes:
+        get_var_undef Ya
+        typeof_is_function
+        if_true8 13
+        get_var_ref_check 0: InitializeZlibBenchmark
+        call0 0
+        drop
+   13:  get_var Ya
+        push_const8 0: "1"
+        array_from 1
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/octane/zlib.js:40:1: function: tearDownZlib
+  mode: strict
+  stack_size: 0
+  opcodes:
+        return_undef
+
+__tests__/fixtures_quickjs/octane/zlib.js:1:1: function: <eval>
+  mode: strict
+  closure vars:
+    0: Benchmark parent:loc0 const
+    1: BenchmarkSuite parent:loc1 const
+    2: InitializeZlibBenchmark parent:loc2 const
+    3: runZlib local:loc0 var
+    4: tearDownZlib local:loc1 var
+  stack_size: 15
+  opcodes:
+        push_this
+        if_false8 12
+        fclosure8 0: [bytecode runZlib]
+        put_var_ref3 3: runZlib
+        fclosure8 1: [bytecode tearDownZlib]
+        put_var_ref 4: tearDownZlib
+        return_undef
+   12:  get_var_ref_check 1: BenchmarkSuite
+        dup
+        push_atom_value zlib
+        push_i32 152815148
+        array_from 1
+        get_var_ref_check 0: Benchmark
+        dup
+        push_atom_value zlib
+        push_false
+        push_true
+        push_i8 10
+        get_var_ref3 3: runZlib
+        get_var undefined
+        get_var_ref 4: tearDownZlib
+        null
+        push_3 3
+        call_constructor 9
+        array_from 1
+        call_constructor 3
+        drop
+        undefined
+        return_async
+

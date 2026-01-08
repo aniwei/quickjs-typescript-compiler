@@ -725,6 +725,13 @@
 			"command": "cd /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler && pnpm -s exec tsx -e \"import fs from 'node:fs'; import { parseBytecodeModule } from './src/bytecodeReader'; import { PC2Line } from './src/env';\nfunction decode(buffer: Uint8Array){ let offset=0; const readULEB=()=>{ let r=0,s=0; for(;;){ const b=buffer[offset++]; r|=(b&0x7f)<<s; if(!(b&0x80)) break; s+=7; } return r>>>0; }; const readSLEB=()=>{ const u=readULEB(); return ((u>>>1) ^ -(u&1))|0; }; let pc=0; let line=readULEB(); let col=readULEB(); const out:any[]=[{pc,line,col,dp:0,dl:0,dc:0,kind:'init'}]; while(offset<buffer.length){ const op=buffer[offset++]; let dp,dl; if(op===0){ dp=readULEB(); dl=readSLEB(); } else { const enc=op-PC2Line.PC2LINE_OP_FIRST; dp=Math.floor(enc/PC2Line.PC2LINE_RANGE); dl=(enc%PC2Line.PC2LINE_RANGE)+PC2Line.PC2LINE_BASE; } const dc=readSLEB(); pc+=dp; line+=dl; col+=dc; out.push({pc,line,col,dp,dl,dc,op}); } return out; }\nfunction find(mod:any){ const cp=mod.func.cpool||[]; const f=cp.find((e:any)=>e&&typeof e==='object'&&e.tag===12&&e.funcName==='test_try_catch5'); if(!f) throw new Error('no test_try_catch5'); return f; }\nconst ts=parseBytecodeModule(fs.readFileSync('artifacts_test_loop_short7/test_loop.ts.qbc')); const wasm=parseBytecodeModule(fs.readFileSync('artifacts_test_loop_short7/test_loop.wasm.qbc'));\nconst a=find(ts); const b=find(wasm);\nconst pa=a.debug.pc2line as Uint8Array; const pb=b.debug.pc2line as Uint8Array;\nconst hex=(u:Uint8Array)=>Array.from(u).map(x=>x.toString(16).padStart(2,'0')).join(' ');\nconsole.log('TS pc2line len', pa.length, hex(pa));\nconsole.log('WASM pc2line len', pb.length, hex(pb));\nconsole.log('\\nTS decoded', decode(pa));\nconsole.log('\\nWASM decoded', decode(pb));\n\"",
 			"isBackground": false,
 			"group": "build"
+		},
+		{
+			"label": "compare:fixtures (jumpslotfix clean)",
+			"type": "shell",
+			"command": "cd /Users/aniwei/Desktop/workspaces/quickjs-typescript-compiler && rm -f /tmp/compare_fixtures_full_20260108_jumpslotfix.log && QTS_WASM_STACK_SIZE=8388608 QTS_WASM_INITIAL_MEMORY=268435456 pnpm -s compare:fixtures --include-quickjs-tests --no-fail --artifacts-dir artifacts_full_clean_20260108_jumpslotfix > /tmp/compare_fixtures_full_20260108_jumpslotfix.log 2>&1; echo EXIT:$? >> /tmp/compare_fixtures_full_20260108_jumpslotfix.log",
+			"isBackground": true,
+			"group": "build"
 		}
 	]
 }

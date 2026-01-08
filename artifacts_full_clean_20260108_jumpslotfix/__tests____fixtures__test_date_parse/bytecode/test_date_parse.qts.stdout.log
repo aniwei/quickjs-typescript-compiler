@@ -1,0 +1,162 @@
+__tests__/fixtures/test_date_parse.js:28:1: function: date_parse
+  args: n
+  locals:
+    0: var x0
+    1: var dx
+    2: var j
+    3: var x1
+    4: var x2
+    5: var x3
+    6: var d0
+    7: var d1
+    8: var d2
+    9: var d3
+  stack_size: 4
+  opcodes:
+        push_0 0
+        put_loc0 0: x0
+        push_0 0
+        put_loc1 1: dx
+        push_0 0
+        put_loc2 2: j
+    6:  get_loc2 2: j
+        get_arg0 0: n
+        lt
+        if_false 302
+        get_loc0 0: x0
+        get_loc0 0: x0
+        push_i16 1000
+        mod
+        sub
+        put_loc3 3: x1
+        get_loc0 0: x0
+        neg
+        put_loc8 4: x2
+        get_loc3 3: x1
+        neg
+        put_loc8 5: x3
+        get_var Date
+        dup
+        get_loc0 0: x0
+        call_constructor 1
+        put_loc8 6: d0
+        get_var Date
+        dup
+        get_loc3 3: x1
+        call_constructor 1
+        put_loc8 7: d1
+        get_var Date
+        dup
+        get_loc8 4: x2
+        call_constructor 1
+        put_loc8 8: d2
+        get_var Date
+        dup
+        get_loc8 5: x3
+        call_constructor 1
+        put_loc8 9: d3
+        get_var Date
+        get_field2 parse
+        get_loc8 6: d0
+        get_field2 toISOString
+        call_method 0
+        call_method 1
+        get_loc0 0: x0
+        neq
+        dup
+        if_true 256
+        drop
+        get_var Date
+        get_field2 parse
+        get_loc8 7: d1
+        get_field2 toGMTString
+        call_method 0
+        call_method 1
+        get_loc3 3: x1
+        neq
+        dup
+        if_true8 256
+        drop
+        get_var Date
+        get_field2 parse
+        get_loc8 7: d1
+        get_field2 toString
+        call_method 0
+        call_method 1
+        get_loc3 3: x1
+        neq
+        dup
+        if_true8 256
+        drop
+        get_var Date
+        get_field2 parse
+        get_loc8 8: d2
+        get_field2 toISOString
+        call_method 0
+        call_method 1
+        get_loc8 4: x2
+        neq
+        dup
+        if_true8 256
+        drop
+        get_var Date
+        get_field2 parse
+        get_loc8 9: d3
+        get_field2 toGMTString
+        call_method 0
+        call_method 1
+        get_loc8 5: x3
+        neq
+        dup
+        if_true8 256
+        drop
+        get_var Date
+        get_field2 parse
+        get_loc8 9: d3
+        get_field2 toString
+        call_method 0
+        call_method 1
+        get_loc8 5: x3
+        neq
+  256:  if_false8 281
+        get_var console
+        get_field2 log
+        push_atom_value "Date.parse error for "
+        get_loc0 0: x0
+        add
+        call_method 1
+        drop
+        push_minus1 -1
+        return
+  281:  get_loc1 1: dx
+        push_const8 0: 1.1
+        mul
+        push_1 1
+        add
+        push_0 0
+        sar
+        put_loc1 1: dx
+        get_loc0 0: x0
+        get_loc1 1: dx
+        add
+        push_const8 1: 8640000000000000
+        mod
+        put_loc0 0: x0
+        inc_loc 2: j
+        goto16 6
+  302:  get_arg0 0: n
+        push_6 6
+        mul
+        return
+
+__tests__/fixtures/test_date_parse.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 1
+  opcodes:
+        check_define_var date_parse,64
+        fclosure8 0: [bytecode date_parse]
+        define_func date_parse,0
+        get_loc0 0: "<ret>"
+        return
+

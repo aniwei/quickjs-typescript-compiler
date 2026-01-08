@@ -1,0 +1,1131 @@
+__tests__/fixtures_quickjs/test_bigint.js:2:1: function: assert
+  mode: strict
+  args: actual expected message
+  locals:
+    0: var arguments
+  stack_size: 4
+  opcodes:
+        special_object 0
+        put_loc0 0: arguments
+        get_loc0 0: arguments
+        get_length
+        push_1 1
+        eq
+        if_false8 11
+        push_true
+        put_arg1 1: expected
+   11:  get_arg0 0: actual
+        get_arg1 1: expected
+        strict_eq
+        if_false8 17
+        return_undef
+   17:  get_arg0 0: actual
+        is_null
+        if_true8 67
+        get_arg1 1: expected
+        is_null
+        if_true8 67
+        get_arg0 0: actual
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg1 1: expected
+        typeof
+        push_atom_value object
+        eq
+        if_false8 67
+        get_arg0 0: actual
+        get_field2 toString
+        call_method 0
+        get_arg1 1: expected
+        get_field2 toString
+        call_method 0
+        strict_eq
+        if_false8 67
+        return_undef
+   67:  get_var Error
+        push_atom_value "assertion failed: got |"
+        get_arg0 0: actual
+        add
+        push_atom_value "|"
+        add
+        push_atom_value ", expected |"
+        add
+        get_arg1 1: expected
+        add
+        push_atom_value "|"
+        add
+        get_arg2 2: message
+        if_false8 117
+        push_atom_value " ("
+        get_arg2 2: message
+        add
+        push_atom_value ")"
+        add
+        goto8 118
+  117:  push_empty_string
+  118:  add
+        call1 1
+        throw
+
+__tests__/fixtures_quickjs/test_bigint.js:15:1: function: assertThrows
+  mode: strict
+  args: err func
+  locals:
+    0: var ex
+    1: catch e [level:3 next:-1]
+  stack_size: 4
+  opcodes:
+        push_false
+        put_loc0 0: ex
+        catch 13
+        get_arg1 1: func
+        call0 0
+        drop
+        drop
+        goto8 35
+   13:  put_loc1 1: e
+        catch 34
+        push_true
+        put_loc0 0: ex
+        get_var assert
+        get_loc1 1: e
+        get_arg0 0: err
+        instanceof
+        call1 1
+        drop
+        drop
+        goto8 35
+   34:  throw
+   35:  get_var assert
+        get_loc0 0: ex
+        push_true
+        push_atom_value "exception expected"
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/test_bigint.js:33:1: function: bigint_pow
+  mode: strict
+  args: a n
+  locals:
+    0: var r
+    1: var i
+  stack_size: 2
+  opcodes:
+        push_bigint_i32 1
+        put_loc0 0: r
+        push_bigint_i32 0
+        put_loc1 1: i
+   12:  get_loc1 1: i
+        get_arg1 1: n
+        lt
+        if_false8 25
+        get_loc0 0: r
+        get_arg0 0: a
+        mul
+        put_loc0 0: r
+        inc_loc 1: i
+        goto8 12
+   25:  get_loc0 0: r
+        return
+
+__tests__/fixtures_quickjs/test_bigint.js:41:1: function: test_less
+  mode: strict
+  args: a b
+  stack_size: 3
+  opcodes:
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        lt
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        lt
+        lnot
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        lte
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        lte
+        lnot
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        gt
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        gt
+        lnot
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        gte
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        gte
+        lnot
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        neq
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        eq
+        lnot
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_bigint.js:54:1: function: test_eq
+  mode: strict
+  args: a b
+  stack_size: 3
+  opcodes:
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        neq
+        lnot
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        neq
+        lnot
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        lte
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        lte
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        lt
+        lnot
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        gte
+        call1 1
+        drop
+        get_var assert
+        get_arg1 1: b
+        get_arg0 0: a
+        gte
+        call1 1
+        drop
+        get_var assert
+        get_arg0 0: a
+        get_arg1 1: b
+        gt
+        lnot
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_bigint.js:66:1: function: test_bigint1
+  mode: strict
+  locals:
+    0: var a
+    1: var r
+  stack_size: 4
+  opcodes:
+        get_var test_less
+        push_bigint_i32 2
+        push_bigint_i32 3
+        call2 2
+        drop
+        get_var test_eq
+        push_bigint_i32 3
+        push_bigint_i32 3
+        call2 2
+        drop
+        get_var test_less
+        push_2 2
+        push_bigint_i32 3
+        call2 2
+        drop
+        get_var test_eq
+        push_3 3
+        push_bigint_i32 3
+        call2 2
+        drop
+        get_var test_less
+        push_const8 0: 2.1
+        push_bigint_i32 3
+        call2 2
+        drop
+        get_var test_eq
+        get_var Math
+        get_field2 sqrt
+        push_4 4
+        call_method 1
+        push_bigint_i32 2
+        call2 2
+        drop
+        get_var bigint_pow
+        push_bigint_i32 3
+        push_bigint_i32 100
+        call2 2
+        put_loc0 0: a
+        get_var assert
+        get_loc0 0: a
+        push_bigint_i32 1
+        sub
+        get_loc0 0: a
+        neq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: a
+        push_const8 1: 515377520732011331036461129765621272702107522001n
+        eq
+        call1 1
+        drop
+        get_var assert
+        get_loc0 0: a
+        push_const8 2: 515377520732011331036461129765621272702107522001n
+        eq
+        call1 1
+        drop
+        push_bigint_i32 1
+        push_bigint_i32 31
+        shl
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_const8 3: 2147483648n
+        push_atom_value "1 << 31n === 2147483648n"
+        call3 3
+        drop
+        push_bigint_i32 1
+        push_bigint_i32 32
+        shl
+        put_loc1 1: r
+        get_var assert
+        get_loc1 1: r
+        push_const8 4: 4294967296n
+        push_atom_value "1 << 32n === 4294967296n"
+        call3 3
+        return_undef
+
+__tests__/fixtures_quickjs/test_bigint.js:87:31: function: <null>
+  mode: strict
+  stack_size: 2
+  opcodes:
+        get_var BigInt
+        push_atom_value "+"
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_bigint.js:88:31: function: <null>
+  mode: strict
+  stack_size: 2
+  opcodes:
+        get_var BigInt
+        push_atom_value "-"
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_bigint.js:89:31: function: <null>
+  mode: strict
+  stack_size: 2
+  opcodes:
+        get_var BigInt
+        push_atom_value "\u0000a"
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_bigint.js:90:31: function: <null>
+  mode: strict
+  stack_size: 2
+  opcodes:
+        get_var BigInt
+        push_atom_value "  123  r"
+        call1 1
+        return_undef
+
+__tests__/fixtures_quickjs/test_bigint.js:83:1: function: test_bigint2
+  mode: strict
+  stack_size: 3
+  opcodes:
+        get_var assert
+        get_var BigInt
+        push_empty_string
+        call1 1
+        push_bigint_i32 0
+        call2 2
+        drop
+        get_var assert
+        get_var BigInt
+        push_atom_value "  123"
+        call1 1
+        push_bigint_i32 123
+        call2 2
+        drop
+        get_var assert
+        get_var BigInt
+        push_atom_value "  123   "
+        call1 1
+        push_bigint_i32 123
+        call2 2
+        drop
+        get_var assertThrows
+        get_var SyntaxError
+        fclosure8 0: [bytecode <null>]
+        call2 2
+        drop
+        get_var assertThrows
+        get_var SyntaxError
+        fclosure8 1: [bytecode <null>]
+        call2 2
+        drop
+        get_var assertThrows
+        get_var SyntaxError
+        fclosure8 2: [bytecode <null>]
+        call2 2
+        drop
+        get_var assertThrows
+        get_var SyntaxError
+        fclosure8 3: [bytecode <null>]
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_bigint.js:92:1: function: test_bigint3
+  mode: strict
+  stack_size: 4
+  opcodes:
+        get_var assert
+        get_var Number
+        push_const8 0: 18446744073709551615n
+        call1 1
+        push_const8 1: 18446744073709552000
+        call2 2
+        drop
+        get_var assert
+        get_var Number
+        push_const8 2: 18446744073709551615n
+        neg
+        call1 1
+        push_const8 3: 18446744073709552000
+        neg
+        call2 2
+        drop
+        get_var assert
+        push_const8 4: 100000000000000000000n
+        push_const8 5: 100000000000000000000
+        eq
+        push_true
+        call2 2
+        drop
+        get_var assert
+        push_const8 6: 100000000000000000001n
+        push_const8 7: 100000000000000000000
+        eq
+        push_false
+        call2 2
+        drop
+        get_var assert
+        push_bigint_i32 1
+        push_bigint_i32 100
+        shl
+        get_field2 toString
+        push_i8 10
+        call_method 1
+        push_atom_value "1267650600228229401496703205376"
+        call2 2
+        drop
+        get_var assert
+        push_bigint_i32 -1
+        push_bigint_i32 100
+        shl
+        get_field2 toString
+        push_i8 36
+        call_method 1
+        push_atom_value "-3ewfdnca0n6ld1ggvfgg"
+        call2 2
+        drop
+        get_var assert
+        push_bigint_i32 1
+        push_bigint_i32 100
+        shl
+        get_field2 toString
+        push_i8 8
+        call_method 1
+        push_atom_value "2000000000000000000000000000000000"
+        call2 2
+        drop
+        get_var assert
+        push_const8 8: 27938671381391989327075080053n
+        push_bigint_i32 78
+        shl
+        push_const8 9: 8443945299673273647701379149826607537748959488376832n
+        call2 2
+        drop
+        get_var assert
+        push_const8 10: 27938671381391989327075080053n
+        neg
+        push_bigint_i32 78
+        shl
+        push_const8 11: 8443945299673273647701379149826607537748959488376832n
+        neg
+        call2 2
+        drop
+        get_var assert
+        push_const8 12: 27938671381391989327075080053n
+        push_bigint_i32 78
+        sar
+        push_bigint_i32 92441
+        call2 2
+        drop
+        get_var assert
+        push_const8 13: 27938671381391989327075080053n
+        neg
+        push_bigint_i32 78
+        sar
+        push_bigint_i32 -92442
+        call2 2
+        drop
+        get_var assert
+        push_bigint_i32 1516584102
+        not
+        push_bigint_i32 -1516584103
+        call2 2
+        drop
+        get_var assert
+        push_bigint_i32 1514552486
+        push_bigint_i32 1731684438
+        or
+        push_bigint_i32 2138537206
+        call2 2
+        drop
+        get_var assert
+        push_bigint_i32 1514552486
+        push_bigint_i32 1731684438
+        and
+        push_bigint_i32 1107699718
+        call2 2
+        drop
+        get_var assert
+        push_bigint_i32 1514552486
+        push_bigint_i32 1731684438
+        xor
+        push_bigint_i32 1030837488
+        call2 2
+        drop
+        get_var assert
+        push_const8 14: 3213213213213213432453243n
+        push_const8 15: 123434343439n
+        div
+        push_const8 16: 26031760073331n
+        call2 2
+        drop
+        get_var assert
+        push_const8 17: 3213213213213213432453243n
+        neg
+        push_const8 18: 123434343439n
+        div
+        push_const8 19: 26031760073331n
+        neg
+        call2 2
+        drop
+        get_var assert
+        push_const8 20: 3213213213213213432453243n
+        neg
+        push_const8 21: 123434343439n
+        neg
+        mod
+        push_const8 22: 26953727934n
+        neg
+        call2 2
+        drop
+        get_var assert
+        push_const8 23: 3213213213213213432453243n
+        push_const8 24: 123434343439n
+        mod
+        push_const8 25: 26953727934n
+        call2 2
+        drop
+        get_var assert
+        push_bigint_i32 -2
+        push_bigint_i32 127
+        pow
+        push_const8 26: 170141183460469231731687303715884105728n
+        neg
+        call2 2
+        drop
+        get_var assert
+        push_bigint_i32 2
+        push_bigint_i32 127
+        pow
+        push_const8 27: 170141183460469231731687303715884105728n
+        call2 2
+        drop
+        get_var assert
+        push_bigint_i32 -256
+        push_bigint_i32 11
+        pow
+        push_const8 28: 309485009821345068724781056n
+        neg
+        call2 2
+        drop
+        get_var assert
+        push_bigint_i32 7
+        push_bigint_i32 20
+        pow
+        push_const8 29: 79792266297612001n
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_bigint.js:119:1: function: floor_log2
+  mode: strict
+  args: a
+  locals:
+    0: var k_max
+    1: var a1
+    2: var k
+    3: var i
+  stack_size: 3
+  opcodes:
+        push_bigint_i32 0
+        put_loc0 0: k_max
+    6:  get_arg0 0: a
+        push_bigint_i32 2
+        get_loc0 0: k_max
+        pow
+        sar
+        push_bigint_i32 0
+        neq
+        if_false8 27
+        inc_loc 0: k_max
+        goto8 6
+   27:  push_bigint_i32 0
+        put_loc2 2: k
+        get_arg0 0: a
+        put_loc1 1: a1
+        get_loc0 0: k_max
+        push_bigint_i32 1
+        sub
+        put_loc3 3: i
+   43:  get_loc3 3: i
+        push_bigint_i32 0
+        gte
+        if_false8 86
+        get_arg0 0: a
+        push_bigint_i32 2
+        get_loc3 3: i
+        pow
+        sar
+        set_loc1 1: a1
+        push_bigint_i32 0
+        neq
+        if_false8 82
+        get_loc1 1: a1
+        put_arg0 0: a
+        get_loc2 2: k
+        push_bigint_i32 1
+        get_loc3 3: i
+        shl
+        or
+        put_loc2 2: k
+   82:  dec_loc 3: i
+        goto8 43
+   86:  get_loc2 2: k
+        return
+
+__tests__/fixtures_quickjs/test_bigint.js:137:1: function: ceil_log2
+  mode: strict
+  args: a
+  stack_size: 3
+  opcodes:
+        get_var floor_log2
+        get_arg0 0: a
+        push_bigint_i32 1
+        sub
+        call1 1
+        push_bigint_i32 1
+        add
+        return
+
+__tests__/fixtures_quickjs/test_bigint.js:141:1: function: int_sqrt
+  mode: strict
+  args: a
+  locals:
+    0: var l
+    1: var u
+    2: var s
+  stack_size: 3
+  opcodes:
+        get_arg0 0: a
+        push_bigint_i32 0
+        eq
+        if_false8 11
+        get_arg0 0: a
+        return
+   11:  get_var ceil_log2
+        get_arg0 0: a
+        call1 1
+        put_loc0 0: l
+        push_bigint_i32 1
+        get_loc0 0: l
+        push_bigint_i32 1
+        add
+        push_bigint_i32 2
+        div
+        shl
+        put_loc1 1: u
+   39:  get_loc1 1: u
+        put_loc2 2: s
+        get_arg0 0: a
+        get_loc2 2: s
+        div
+        get_loc2 2: s
+        add
+        push_bigint_i32 2
+        div
+        set_loc1 1: u
+        get_loc2 2: s
+        gte
+        if_true8 59
+        goto8 39
+   59:  get_loc2 2: s
+        return
+
+__tests__/fixtures_quickjs/test_bigint.js:164:5: function: chud_bs
+  mode: strict
+  args: a b need_G
+  locals:
+    0: var c
+    1: var P
+    2: var Q
+    3: var G
+    4: var P1
+    5: var Q1
+    6: var G1
+    7: var P2
+    8: var Q2
+    9: var G2
+  closure vars:
+    0: CHUD_B local:loc1 const
+    1: CHUD_A local:loc0 const
+    2: CHUD_C3 local:loc3 const
+    3: chud_bs local:loc5 var
+  stack_size: 8
+  opcodes:
+        get_arg0 0: a
+        get_arg1 1: b
+        push_bigint_i32 1
+        sub
+        eq
+        if_false8 89
+        push_bigint_i32 2
+        get_arg1 1: b
+        mul
+        push_bigint_i32 1
+        sub
+        push_bigint_i32 6
+        get_arg1 1: b
+        mul
+        push_bigint_i32 1
+        sub
+        mul
+        push_bigint_i32 6
+        get_arg1 1: b
+        mul
+        push_bigint_i32 5
+        sub
+        mul
+        set_loc3 3: G
+        get_var_ref_check 0: CHUD_B
+        get_arg1 1: b
+        mul
+        get_var_ref_check 1: CHUD_A
+        add
+        mul
+        put_loc1 1: P
+        get_arg1 1: b
+        push_bigint_i32 1
+        and
+        if_false8 76
+        get_loc1 1: P
+        neg
+        put_loc1 1: P
+   76:  get_arg1 1: b
+        get_arg1 1: b
+        mul
+        get_arg1 1: b
+        mul
+        get_var_ref_check 2: CHUD_C3
+        mul
+        put_loc2 2: Q
+        goto16 230
+   89:  get_arg0 0: a
+        get_arg1 1: b
+        add
+        push_bigint_i32 1
+        sar
+        put_loc0 0: c
+        goto8 139
+  101:  dup
+        for_of_start
+        make_loc_ref P1,4
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref Q1,5
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref G1,6
+        for_of_next 2
+        drop
+        put_ref_value
+        iterator_close
+        goto8 146
+  139:  get_var_ref3 3: chud_bs
+        get_arg0 0: a
+        get_loc0 0: c
+        push_true
+        call3 3
+        goto8 101
+  146:  drop
+        goto8 187
+  149:  dup
+        for_of_start
+        make_loc_ref P2,7
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref Q2,8
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref G2,9
+        for_of_next 2
+        drop
+        put_ref_value
+        iterator_close
+        goto8 194
+  187:  get_var_ref3 3: chud_bs
+        get_loc0 0: c
+        get_arg1 1: b
+        get_arg2 2: need_G
+        call3 3
+        goto8 149
+  194:  drop
+        get_loc8 4: P1
+        get_loc8 8: Q2
+        mul
+        get_loc8 7: P2
+        get_loc8 6: G1
+        mul
+        add
+        put_loc1 1: P
+        get_loc8 5: Q1
+        get_loc8 8: Q2
+        mul
+        put_loc2 2: Q
+        get_arg2 2: need_G
+        if_false8 224
+        get_loc8 6: G1
+        get_loc8 9: G2
+        mul
+        put_loc3 3: G
+        goto8 230
+  224:  push_bigint_i32 0
+        put_loc3 3: G
+  230:  get_loc1 1: P
+        get_loc2 2: Q
+        get_loc3 3: G
+        array_from 3
+        return
+
+__tests__/fixtures_quickjs/test_bigint.js:157:1: function: calc_pi
+  mode: strict
+  args: prec
+  locals:
+    0: const CHUD_A [level:1 next:-1]
+    1: const CHUD_B [level:1 next:0]
+    2: const CHUD_C [level:1 next:1]
+    3: const CHUD_C3 [level:1 next:2]
+    4: const CHUD_BITS_PER_TERM [level:1 next:3]
+    5: var chud_bs
+    6: var n
+    7: var P
+    8: var Q
+    9: var G
+  stack_size: 8
+  opcodes:
+        fclosure8 2: [bytecode chud_bs]
+        put_loc8 5: chud_bs
+        set_loc_uninitialized 4: CHUD_BITS_PER_TERM
+        set_loc_uninitialized 3: CHUD_C3
+        set_loc_uninitialized 2: CHUD_C
+        set_loc_uninitialized 1: CHUD_B
+        set_loc_uninitialized 0: CHUD_A
+        push_bigint_i32 13591409
+        put_loc0 0: CHUD_A
+        push_bigint_i32 545140134
+        put_loc1 1: CHUD_B
+        push_bigint_i32 640320
+        put_loc2 2: CHUD_C
+        push_const8 0: 10939058860032000n
+        put_loc3 3: CHUD_C3
+        push_const8 1: 47.11041313821584
+        put_loc8 4: CHUD_BITS_PER_TERM
+        get_var BigInt
+        get_var Math
+        get_field2 ceil
+        get_var Number
+        get_arg0 0: prec
+        call1 1
+        get_loc_check 4: CHUD_BITS_PER_TERM
+        div
+        call_method 1
+        call1 1
+        push_bigint_i32 10
+        add
+        put_loc8 6: n
+        goto8 122
+   84:  dup
+        for_of_start
+        make_loc_ref P,7
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref Q,8
+        for_of_next 2
+        drop
+        put_ref_value
+        make_loc_ref G,9
+        for_of_next 2
+        drop
+        put_ref_value
+        iterator_close
+        goto8 135
+  122:  get_loc8 5: chud_bs
+        push_bigint_i32 0
+        get_loc8 6: n
+        push_false
+        call3 3
+        goto8 84
+  135:  drop
+        get_loc_check 2: CHUD_C
+        push_bigint_i32 12
+        div
+        get_loc8 8: Q
+        get_arg0 0: prec
+        shl
+        mul
+        get_loc8 7: P
+        get_loc8 8: Q
+        get_loc_check 0: CHUD_A
+        mul
+        add
+        div
+        put_loc8 8: Q
+        get_var int_sqrt
+        get_loc_check 2: CHUD_C
+        push_bigint_i32 2
+        get_arg0 0: prec
+        mul
+        shl
+        call1 1
+        put_loc8 9: G
+        get_loc8 8: Q
+        get_loc8 9: G
+        mul
+        get_arg0 0: prec
+        sar
+        return
+
+__tests__/fixtures_quickjs/test_bigint.js:194:1: function: compute_pi
+  mode: strict
+  args: n_digits
+  locals:
+    0: var r
+    1: var n_bits
+    2: var out
+  stack_size: 7
+  opcodes:
+        get_var BigInt
+        get_var Math
+        get_field2 ceil
+        get_arg0 0: n_digits
+        get_var Math
+        get_field2 log2
+        push_i8 10
+        call_method 1
+        mul
+        call_method 1
+        call1 1
+        push_bigint_i32 32
+        add
+        put_loc1 1: n_bits
+        get_var calc_pi
+        get_loc1 1: n_bits
+        call1 1
+        put_loc0 0: r
+        push_bigint_i32 10
+        get_var BigInt
+        get_arg0 0: n_digits
+        call1 1
+        pow
+        get_loc0 0: r
+        mul
+        get_loc1 1: n_bits
+        sar
+        set_loc0 0: r
+        get_field2 toString
+        call_method 0
+        set_loc2 2: out
+        push_0 0
+        get_array_el
+        push_atom_value "."
+        add
+        get_loc2 2: out
+        get_field2 slice
+        push_1 1
+        call_method 1
+        add
+        return
+
+__tests__/fixtures_quickjs/test_bigint.js:204:1: function: test_pi
+  mode: strict
+  stack_size: 3
+  opcodes:
+        get_var assert
+        get_var compute_pi
+        push_i16 2000
+        call1 1
+        push_atom_value "3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196442881097566593344612847564823378678316527120190914564856692346034861045432664821339360726024914127372458700660631558817488152092096282925409171536436789259036001133053054882046652138414695194151160943305727036575959195309218611738193261179310511854807446237996274956735188575272489122793818301194912983367336244065664308602139494639522473719070217986094370277053921717629317675238467481846766940513200056812714526356082778577134275778960917363717872146844090122495343014654958537105079227968925892354201995611212902196086403441815981362977477130996051870721134999999837297804995105973173281609631859502445945534690830264252230825334468503526193118817101000313783875288658753320838142061717766914730359825349042875546873115956286388235378759375195778185778053217122680661300192787661119590921642019893809525720106548586327886593615338182796823030195203530185296899577362259941389124972177528347913151557485724245415069595082953311686172785588907509838175463746493931925506040092770167113900984882401285836160356370766010471018194295559619894676783744944825537977472684710404753464620804668425906949129331367702898915210475216205696602405803815019351125338243003558764024749647326391419927260426992279678235478163600934172164121992458631503028618297455570674983850549458858692699569092721079750930295532116534498720275596023648066549911988183479775356636980742654252786255181841757467289097777279380008164706001614524919217321721477235014144197356854816136115735255213347574184946843852332390739414333454776241686251898356948556209921922218427255025425688767179049460165346680498862723279178608578438382796797668145410095388378636095068006422512520511739298489608412848862694560424196528502221066118630674427862203919494504712371378696095636437191728746776465757396241389086583264599581339047802759009"
+        call2 2
+        return_undef
+
+__tests__/fixtures_quickjs/test_bigint.js:1:1: function: <eval>
+  mode: strict
+  locals:
+    0: var <ret>
+    1: catch e [level:3 next:-1]
+  stack_size: 3
+  opcodes:
+        check_define_var assert,64
+        check_define_var assertThrows,64
+        check_define_var bigint_pow,64
+        check_define_var test_less,64
+        check_define_var test_eq,64
+        check_define_var test_bigint1,64
+        check_define_var test_bigint2,64
+        check_define_var test_bigint3,64
+        check_define_var floor_log2,64
+        check_define_var ceil_log2,64
+        check_define_var int_sqrt,64
+        check_define_var calc_pi,64
+        check_define_var compute_pi,64
+        check_define_var test_pi,64
+        fclosure8 0: [bytecode assert]
+        define_func assert,0
+        fclosure8 1: [bytecode assertThrows]
+        define_func assertThrows,0
+        fclosure8 2: [bytecode bigint_pow]
+        define_func bigint_pow,0
+        fclosure8 3: [bytecode test_less]
+        define_func test_less,0
+        fclosure8 4: [bytecode test_eq]
+        define_func test_eq,0
+        fclosure8 5: [bytecode test_bigint1]
+        define_func test_bigint1,0
+        fclosure8 6: [bytecode test_bigint2]
+        define_func test_bigint2,0
+        fclosure8 7: [bytecode test_bigint3]
+        define_func test_bigint3,0
+        fclosure8 8: [bytecode floor_log2]
+        define_func floor_log2,0
+        fclosure8 9: [bytecode ceil_log2]
+        define_func ceil_log2,0
+        fclosure8 10: [bytecode int_sqrt]
+        define_func int_sqrt,0
+        fclosure8 11: [bytecode calc_pi]
+        define_func calc_pi,0
+        fclosure8 12: [bytecode compute_pi]
+        define_func compute_pi,0
+        fclosure8 13: [bytecode test_pi]
+        define_func test_pi,0
+        push_atom_value "use strict"
+        put_loc0 0: "<ret>"
+        undefined
+        put_loc0 0: "<ret>"
+        catch 224
+        get_var __loadScript
+        push_atom_value "test_assert.js"
+        call1 1
+        put_loc0 0: "<ret>"
+        drop
+        goto8 234
+  224:  put_loc1 1: e
+        catch 233
+        drop
+        goto8 234
+  233:  throw
+  234:  get_var test_bigint1
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_bigint2
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_bigint3
+        call0 0
+        put_loc0 0: "<ret>"
+        get_var test_pi
+        call0 0
+        set_loc0 0: "<ret>"
+        return
+

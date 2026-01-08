@@ -1,0 +1,45 @@
+__tests__/fixtures/object-nested.js:1:1: function: <eval>
+  locals:
+    0: var <ret>
+  stack_size: 4
+  opcodes:
+        check_define_var data,128
+        define_var data,128
+        object
+        object
+        push_1 1
+        define_field id
+        push_atom_value Alice
+        define_field name
+        object
+        push_2 2
+        define_field id
+        push_atom_value Bob
+        define_field name
+        array_from 2
+        define_field users
+        object
+        push_1 1
+        define_field page
+        push_i8 100
+        define_field total
+        define_field meta
+        put_var_init data
+        get_var console
+        get_field2 log
+        get_var data
+        get_field users
+        push_0 0
+        get_array_el
+        get_field name
+        call_method 1
+        put_loc0 0: "<ret>"
+        get_var console
+        get_field2 log
+        get_var data
+        get_field meta
+        get_field total
+        call_method 1
+        set_loc0 0: "<ret>"
+        return
+
